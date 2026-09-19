@@ -43,3 +43,31 @@ fronteira de palavra direto na string com underscore.
 **Custo do aprendizado:** ~5 min — pego durante teste unitário manual antes
 de rodar contra o site real; o gotcha é o tipo de erro silencioso (sem
 exceção, só "nunca prioriza nada") que só aparece inspecionando o resultado.
+
+### [tags: playwright, scraping, cebraspe, href]
+**Sintoma:** `get_contest_links` retorna lista vazia contra o site real
+(0 concursos), mesmo depois de todas as correções da Etapa 2 (filtro de
+ano, `/concursos/encerrado`, priorização) já estarem certas e cobertas por
+lições anteriores. `task.md`/`CLAUDE.md` marcavam a Fase 2 como concluída
+sem que ninguém tivesse rodado o crawler ponta a ponta contra o DOM real
+depois da última alteração.
+**Causa:** Os cards da listagem usam `href` **relativo**
+(`/concursos/PF_25_ADM`), não absoluto. `element.get_attribute("href")`
+devolve o atributo cru do HTML — ele NÃO resolve contra a URL da página,
+ao contrário da propriedade `.href` do DOM (que o browser resolve
+automaticamente). O filtro `href.startswith("https://www.cebraspe.org.br/concursos/")`
+comparava um path relativo contra uma URL absoluta e nunca dava match —
+100% dos 424 cards descartados, silenciosamente, sem exceção.
+**Solução:** Resolver o href antes de comparar:
+`href = urljoin(page.url, raw_href)`. Funciona tanto para href relativo
+quanto absoluto (idempotente se já for absoluto).
+**Custo do aprendizado:** ~20 min — só apareceu numa auditoria dedicada que
+rodou `get_contest_links` de verdade contra o site (não só as funções
+puras de extração de slug/ano/órgão, que já tinham teste unitário e
+passavam). **Lição maior:** testar unitariamente `extract_year_from_slug`,
+`extract_orgao_from_slug` etc. isoladamente não garante que o crawler
+funciona ponta a ponta — o bug estava no ponto de entrada
+(`get_contest_links`), não em nenhuma das funções já testadas. Uma tarefa
+"corrigir o crawler" só deve ser marcada `[x]` depois de rodar o método
+público (`get_contest_links`/`run`) contra o site real, não só as funções
+auxiliares que ele chama.

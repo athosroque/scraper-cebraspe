@@ -58,13 +58,18 @@ extração de questões futuro (fora do escopo deste projeto).
 - [x] Fase 2 — Crawler: `spider.py` filtra ano pelo slug da URL (não pelo
       texto do link), percorre `/concursos/encerrado`, falha de um concurso
       não aborta o lote, idempotência por registro local
-      (`data/processed_concursos.json`)
+      (`data/processed_concursos.json`). Auditado ao vivo em 2026-09-19:
+      encontrado e corrigido um bug crítico de href relativo que zerava o
+      resultado do crawler em produção (ver seção 12) — 31 concursos de
+      2025 confirmados após a correção.
 - [x] Fase 3 — Download: `downloader.py` valida PDFs (magic bytes `%PDF-` +
       Content-Type) e grava em `data/<ano>/CEBRASPE/<orgao_slug>/{Editais,
       Provas,Gabaritos}/` com dedup por URL (manifesto) e por hash de
       conteúdo; `spider.py` ganhou `extract_orgao_from_slug` (o nome do
-      órgão também só existe no slug, mesma causa-raiz da Fase 2); 18 testes
-      cobrindo slugify, validação de PDF e dedup
+      órgão também só existe no slug, mesma causa-raiz da Fase 2); 21 testes
+      cobrindo slugify, validação de PDF, dedup e resolução de href.
+      Auditado ao vivo em 2026-09-19 contra PDFs reais do CEBRASPE — sem
+      falhas encontradas no downloader em si.
 - [ ] Fase 4 — Extração híbrida: seções validadas documentadas; parser +
       chunking; extração LLM com checkpoint humano aprovado em ≥1 edital
       piloto
@@ -104,9 +109,19 @@ extração de questões futuro (fora do escopo deste projeto).
   concurso, evita nova requisição de rede numa reexecução) e por hash de
   conteúdo (evita gravar o mesmo PDF duas vezes quando dois links diferentes
   apontam para o mesmo arquivo).
+- Todo `href` de `get_attribute("href")` é resolvido com
+  `urljoin(page.url, href)` antes de comparar contra a URL base — o atributo
+  cru do HTML pode vir relativo, e o `.href` (propriedade JS resolvida) não
+  é o que `get_attribute` devolve.
 
 ## 7. Anti-patterns
 
+- Nunca comparar `get_attribute("href")` direto contra uma URL absoluta
+  sem resolver primeiro (`urljoin(page.url, href)`) — os cards da listagem
+  do CEBRASPE usam href relativo (`/concursos/PF_25_ADM`), e um
+  `href.startswith("https://...")` sem resolver descarta 100% dos links
+  silenciosamente (0 resultados, sem exceção). Achado ao vivo em
+  2026-09-19, ver seção 12.
 - Nunca filtrar ano com regex no texto do link — o ano está no slug da URL
   (ex: `TJ_CE_25_NOTARIOS` → 2025), não aparece como "2025" no texto visível.
 - Nunca envolver o loop de concursos inteiro num único `try/except` (mascara
@@ -269,6 +284,32 @@ checagem de hash resolve duplicata de conteúdo sob URLs diferentes
 **Alternativas descartadas:** Dedup só por nome de arquivo — falso-positivo
 (nomes iguais, conteúdo diferente) e falso-negativo (nomes diferentes,
 mesmo conteúdo) fáceis de ocorrer em PDFs do CEBRASPE.
+
+### 2026-09-19 — Auditoria pós-Etapa 3: href relativo zerava o crawler em produção
+**Decisão:** Em `get_contest_links`, resolver todo `href` com
+`urljoin(page.url, href)` antes de compará-lo contra
+`"https://www.cebraspe.org.br/concursos/"`, em vez de comparar o atributo
+cru do HTML direto.
+**Motivo:** Auditoria ao vivo (Playwright real contra
+`/concursos/encerrado`, não mock) revelou que os 424 cards da listagem
+usam **href relativo** (`/concursos/PF_25_ADM`), não absoluto —
+`get_attribute("href")` devolve exatamente o que está no atributo HTML, sem
+resolver contra a base da página (diferente da propriedade `.href` do DOM,
+resolvida pelo browser). O filtro `href.startswith("https://www.cebraspe.org.br/concursos/")`
+— presente desde o commit inicial do projeto e mantido sem alteração pela
+Etapa 2 — descartava **100% dos cards**, silenciosamente: `get_contest_links`
+retornava lista vazia sem lançar exceção, mesmo padrão de falha do bug do
+filtro de ano já documentado, mas desta vez no ponto de entrada do crawler,
+mascarando que nenhuma das correções da Etapa 2 (filtro de ano,
+priorização, idempotência) chegava a ser exercitada em produção — apesar de
+`task.md` e este `CLAUDE.md` marcarem a Fase 2 como concluída. Confirmado
+antes/depois da correção: 0 → 31 concursos de 2025 encontrados contra o
+site real; `download_concurso_pdfs` (Etapa 3) validado ponta a ponta com
+PDFs reais de um desses concursos (`AGSUS_25_CCE`).
+**Alternativas descartadas:** Nenhuma — é uma correção direta de bug, sem
+trade-off. Reforça a lição já registrada em `LESSONS.md` de sempre validar
+o crawler contra o DOM real, nunca assumir a forma de um atributo HTML sem
+inspecionar ao vivo.
 
 ## 13. LESSONS.md (do projeto)
 

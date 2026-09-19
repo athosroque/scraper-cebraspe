@@ -72,7 +72,26 @@ enviar o bloco de uma etapa específica para o agente construir.
   o slug da URL — mesma causa-raiz do bug do filtro de ano; ver
   `CLAUDE.md` (seção 12).
 - `[x]` Manter o mapeamento de PDFs de Edital de Abertura, Provas e
-  Gabaritos por concurso (lógica já existe em `map_pdf_links`).
+  Gabaritos por concurso (lógica já existe em `map_pdf_links`). Validado ao
+  vivo contra um concurso real (`AGSUS_25_CCE`): retornou 3 editais, 10
+  provas, 1 gabarito, todos em URLs absolutas (`cdn.cebraspe.org.br`).
+- `[x]` **BUG encontrado e corrigido na auditoria de 2026-09-19:**
+  `get_contest_links` filtrava `href.startswith("https://www.cebraspe.org.br/concursos/")`,
+  mas os cards reais da listagem usam **href relativo**
+  (`/concursos/PF_25_ADM`, não absoluto) — `get_attribute("href")` devolve o
+  atributo cru do HTML, sem resolver contra a URL da página. Resultado: **0
+  concursos encontrados em produção, silenciosamente, sem exceção** — o
+  mesmo padrão de falha silenciosa já documentado para o filtro de ano, mas
+  desta vez no ponto de entrada do crawler, mascarando que todo o resto da
+  Etapa 2 (filtro de ano, priorização, idempotência) nunca chegava a rodar.
+  Confirmado ao vivo: rodar `get_contest_links` contra
+  `/concursos/encerrado` retornava 0/424 cards antes da correção. Corrigido
+  resolvendo o href com `urljoin(page.url, raw_href)` antes de comparar —
+  após a correção, 31 concursos de 2025 encontrados, priorização e
+  extração de órgão corretas para todos (`PF_25_ADM`, `TCU_25_TEFC`
+  priorizados; `AGSUS_25_CCE` → `AGSUS`, etc.). 3 testes de regressão
+  adicionados em `tests/test_spider.py`
+  (`TestGetContestLinksResolveHref`). Ver `CLAUDE.md`, seção 12.
 
 ## Etapa 3: Download e Organização Estruturada
 - `[x]` Criar `src/downloader.py` com função de download que valida
@@ -88,6 +107,13 @@ enviar o bloco de uma etapa específica para o agente construir.
   lista já filtrada/priorizada da Etapa 2 (concursos encerrados de 2025,
   ordenados por prioridade) — o corte final para 1–2 concursos do piloto
   acontece na Etapa 6, não aqui.
+- `[x]` **Auditoria 2026-09-19 — validado ao vivo, sem falhas:** rodado
+  `download_concurso_pdfs` contra PDFs reais do concurso `AGSUS_25_CCE`
+  (`cdn.cebraspe.org.br`) — edital e gabarito baixados com sucesso,
+  magic bytes `%PDF-1.5` confirmados, gravados em
+  `2025/CEBRASPE/AGSUS/{Editais,Gabaritos}/` com `.manifest.json`
+  populado corretamente. Nenhuma falha encontrada no downloader em si; o
+  bug real da fase estava upstream, no crawler (ver Etapa 2).
 
 ## Etapa 4: Análise Exploratória e Extração Híbrida
 - `[ ]` **Análise Exploratória Manual:** baixar amostras de editais brutos

@@ -3,6 +3,7 @@ import random
 import re
 import time
 from pathlib import Path
+from urllib.parse import urljoin
 
 from playwright.sync_api import Page, sync_playwright
 
@@ -117,9 +118,19 @@ class CebraspeSpider:
 
         for link in links:
             text = link.inner_text().strip().upper()
-            href = link.get_attribute("href")
+            raw_href = link.get_attribute("href")
 
-            if not href or not href.startswith("https://www.cebraspe.org.br/concursos/"):
+            if not raw_href:
+                continue
+
+            # Os cards da listagem usam href RELATIVO (ex: "/concursos/ABIN_17"),
+            # não absoluto — `get_attribute("href")` devolve o atributo cru do
+            # HTML, sem resolver contra a base da página. Comparar direto com
+            # "https://www.cebraspe.org.br/concursos/" descartava 100% dos
+            # cards silenciosamente (0 contests, sem exceção). Resolver contra
+            # a URL da página corrige tanto o caso relativo quanto o absoluto.
+            href = urljoin(page.url, raw_href)
+            if not href.startswith("https://www.cebraspe.org.br/concursos/"):
                 continue
 
             # O ano só está disponível no slug da URL — o texto do link é
