@@ -7,7 +7,7 @@ Template version: 1.2
 - **ID:** `scraper-cebraspe` (diretório físico: `scraper_cebraspe/`)
 - **Nome legível:** Scraper CEBRASPE — Coleta Estruturada de Editais, Provas e Gabaritos
 - **Guia de referência:** `task.md` (roteiro de implementação por etapas, neste diretório)
-- **Status:** in-progress:phase-3
+- **Status:** in-progress:phase-4
 - **Repositório GitHub:** homelab local / a versionar
 
 ## 2. Pré-requisitos
@@ -43,8 +43,9 @@ extração de questões futuro (fora do escopo deste projeto).
 - playwright >=1.42 (chromium)
 - pymupdf >=1.23
 - pydantic >=2.6
-- psycopg2-binary (a adicionar ao `requirements.txt`)
-- python-dotenv (a adicionar ao `requirements.txt`)
+- psycopg2-binary
+- python-dotenv
+- requests >=2.31 (download de PDFs na Etapa 3, fora do contexto Playwright)
 - pytest + ruff (CI universal do portfólio)
 - PostgreSQL 16 + pgvector — reaproveitado de `study-rag-agent`, não é
   serviço próprio deste projeto
@@ -58,8 +59,12 @@ extração de questões futuro (fora do escopo deste projeto).
       texto do link), percorre `/concursos/encerrado`, falha de um concurso
       não aborta o lote, idempotência por registro local
       (`data/processed_concursos.json`)
-- [ ] Fase 3 — Download: `downloader.py` valida PDFs (Content-Type/magic
-      bytes) e grava em hierarquia determinística e testada
+- [x] Fase 3 — Download: `downloader.py` valida PDFs (magic bytes `%PDF-` +
+      Content-Type) e grava em `data/<ano>/CEBRASPE/<orgao_slug>/{Editais,
+      Provas,Gabaritos}/` com dedup por URL (manifesto) e por hash de
+      conteúdo; `spider.py` ganhou `extract_orgao_from_slug` (o nome do
+      órgão também só existe no slug, mesma causa-raiz da Fase 2); 18 testes
+      cobrindo slugify, validação de PDF e dedup
 - [ ] Fase 4 — Extração híbrida: seções validadas documentadas; parser +
       chunking; extração LLM com checkpoint humano aprovado em ≥1 edital
       piloto
@@ -88,7 +93,17 @@ extração de questões futuro (fora do escopo deste projeto).
 - Idempotência do crawler: registro local em JSON
   (`data/processed_concursos.json`, um array de slugs) checado/atualizado a
   cada concurso processado com sucesso — não depende da estrutura de pastas
-  da Etapa 3 (ainda não implementada).
+  da Etapa 3.
+- Nome de órgão também extraído do slug (`extract_orgao_from_slug` em
+  `spider.py`: segmento antes do token de ano `_YY`) — o texto do link
+  nunca carrega o nome do órgão, mesma causa-raiz do filtro de ano.
+- Validação de PDF baixado sempre por magic bytes (`content.startswith(b"%PDF-")`)
+  no conteúdo em si, nunca só pelo header `Content-Type` — um link quebrado
+  pode responder 200 com uma página HTML de erro.
+- Dedup de download em duas camadas: por URL (manifesto `.manifest.json` por
+  concurso, evita nova requisição de rede numa reexecução) e por hash de
+  conteúdo (evita gravar o mesmo PDF duas vezes quando dois links diferentes
+  apontam para o mesmo arquivo).
 
 ## 7. Anti-patterns
 
@@ -128,7 +143,21 @@ extração de questões futuro (fora do escopo deste projeto).
    `study-rag-db` + porta `5432` se este projeto vier a rodar dentro da rede
    `homelab_default`)
 4. `python -m src.spider` — roda a Etapa 2 isolada para validação
-5. `pytest` para validar
+5. `pytest` para validar (spider + downloader)
+
+## 9.1. Uso do downloader (Etapa 3)
+
+```python
+from src.downloader import download_concurso_pdfs
+
+resultado = download_concurso_pdfs(
+    orgao="TJ_CE",       # ou contest["orgao"] retornado por get_contest_links
+    ano=2025,
+    pdf_map=pdfs,        # dict retornado por spider.map_pdf_links
+)
+# resultado = {"editais_abertura": [...], "provas": [...], "gabaritos": [...]}
+# paths dos arquivos efetivamente baixados/reaproveitados
+```
 
 ## 10. Entregáveis
 
@@ -208,6 +237,38 @@ existir.
 porque o `task.md` pede idempotência já na Etapa 2, e o crawler sozinho já
 é caro o suficiente (network + stealth wait) para justificar não reprocessar
 concursos.
+
+### 2026-09-19 — Nome de órgão também vem do slug, não do texto do link
+**Decisão:** Adicionar `extract_orgao_from_slug` em `spider.py` (segmento do
+slug antes do token de ano `_YY`, ex: `TJ_CE_25_NOTARIOS` → `TJ_CE`) e
+incluir a chave `orgao` no dict retornado por `get_contest_links`.
+**Motivo:** A Etapa 3 (downloader) precisa de um nome de órgão para montar
+`data/<ano>/CEBRASPE/<orgao_slug>/...`, mas nada no crawler produzia isso —
+`ConcursoMetadados.orgao` existe no modelo desde a Etapa 1, porém
+`get_contest_links` só devolvia `title` (sempre "MAIS INFORMAÇÕES", mesma
+causa-raiz do filtro de ano) e nunca populava esse campo. Extrair do slug é
+consistente com o padrão já usado para ano e priorização.
+**Alternativas descartadas:** Buscar o nome do órgão na página de detalhe do
+concurso (H1/breadcrumb) — mais preciso, mas exige nova navegação Playwright
+por concurso (custo de rede/tempo) e não foi validado ao vivo nesta sessão;
+fica como possível refinamento futuro se o slug abreviado (ex: `TJ_CE`) se
+mostrar insuficiente para leitura humana das pastas.
+
+### 2026-09-19 — Dedup de download em duas camadas (URL + hash de conteúdo)
+**Decisão:** `downloader.py` mantém um manifesto JSON por concurso
+(`.manifest.json` dentro da pasta do órgão) mapeando URL → {hash, path}.
+Antes de baixar, verifica se a URL já está no manifesto (pula a requisição
+de rede); depois de baixar, verifica se o hash do conteúdo já corresponde a
+um arquivo existente (evita gravar duplicata em disco quando dois links
+apontam pro mesmo PDF).
+**Motivo:** O `task.md` pede dedup "por hash de conteúdo entre execuções",
+mas só o hash não evita a requisição de rede repetida (precisa baixar antes
+de saber o hash) — o manifesto por URL resolve a reexecução idempotente, e a
+checagem de hash resolve duplicata de conteúdo sob URLs diferentes
+(retificação de edital que reaponta pro mesmo arquivo, por exemplo).
+**Alternativas descartadas:** Dedup só por nome de arquivo — falso-positivo
+(nomes iguais, conteúdo diferente) e falso-negativo (nomes diferentes,
+mesmo conteúdo) fáceis de ocorrer em PDFs do CEBRASPE.
 
 ## 13. LESSONS.md (do projeto)
 

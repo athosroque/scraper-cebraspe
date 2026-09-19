@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 
 class ConcursoMetadados(BaseModel):
@@ -7,7 +6,7 @@ class ConcursoMetadados(BaseModel):
     orgao: str
     ano: int
     link_pagina: str
-    links_editais: List[str] = []
+    links_editais: list[str] = []
 
 
 class CargoEdital(BaseModel):
@@ -17,9 +16,9 @@ class CargoEdital(BaseModel):
 
 class Topico(BaseModel):
     nome: str
-    subtopicos: List[str] = []
+    subtopicos: list[str] = []
 
 
 class TaxonomiaEdital(BaseModel):
     materia: str
-    topicos: List[Topico]
+    topicos: list[Topico]

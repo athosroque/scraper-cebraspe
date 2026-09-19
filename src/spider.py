@@ -1,12 +1,12 @@
 import json
+import random
 import re
 import time
-import random
 from pathlib import Path
-from typing import List, Dict, Optional, Set
-from playwright.sync_api import sync_playwright, Page
-from src.logger import logger
 
+from playwright.sync_api import Page, sync_playwright
+
+from src.logger import logger
 
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
@@ -51,7 +51,7 @@ def extract_slug(url: str) -> str:
     return url.rstrip("/").split("/")[-1]
 
 
-def extract_year_from_slug(url: str) -> Optional[int]:
+def extract_year_from_slug(url: str) -> int | None:
     """Extracts the 2-digit year suffix from the contest's URL slug.
 
     O texto visível de todo card de concurso na listagem é sempre
@@ -65,7 +65,24 @@ def extract_year_from_slug(url: str) -> Optional[int]:
     return 2000 + int(match.group(1))
 
 
-def load_processed_slugs() -> Set[str]:
+def extract_orgao_from_slug(url: str) -> str:
+    """Segmento de órgão do slug: tudo antes do token de ano de 2 dígitos.
+
+    Mesma razão dos outros extractors: o texto do link não carrega o nome do
+    órgão (é sempre "MAIS INFORMAÇÕES"), então a Etapa 3 (downloader, que
+    organiza PDFs por órgão) também depende do slug. Ex:
+    TJ_CE_25_NOTARIOS -> "TJ_CE". Sem match de ano no slug, usa o slug
+    inteiro como fallback (não deveria ocorrer para concursos já filtrados
+    por target_year).
+    """
+    slug = extract_slug(url)
+    match = re.search(r'_(\d{2})(_|$)', slug)
+    if not match:
+        return slug
+    return slug[:match.start()] or slug
+
+
+def load_processed_slugs() -> set[str]:
     if not PROCESSED_REGISTRY.exists():
         return set()
     try:
@@ -74,7 +91,7 @@ def load_processed_slugs() -> Set[str]:
         return set()
 
 
-def mark_processed(slug: str, processed_slugs: Set[str]):
+def mark_processed(slug: str, processed_slugs: set[str]):
     processed_slugs.add(slug)
     PROCESSED_REGISTRY.parent.mkdir(parents=True, exist_ok=True)
     PROCESSED_REGISTRY.write_text(
@@ -89,7 +106,7 @@ class CebraspeSpider:
         self.target_year = target_year
         self.base_url = "https://www.cebraspe.org.br/concursos/encerrado"
 
-    def get_contest_links(self, page: Page) -> List[Dict]:
+    def get_contest_links(self, page: Page) -> list[dict]:
         """Fetch closed contest links for target_year, prioritizing big jobs."""
         logger.info(f"Navigating to {self.base_url}")
         page.goto(self.base_url, timeout=60000)
@@ -121,6 +138,7 @@ class CebraspeSpider:
                 "title": text,
                 "url": href,
                 "slug": slug,
+                "orgao": extract_orgao_from_slug(href),
                 "ano": ano,
                 "priority": priority
             })
@@ -137,7 +155,7 @@ class CebraspeSpider:
         unique_contests.sort(key=lambda x: x["priority"], reverse=True)
         return unique_contests
 
-    def map_pdf_links(self, page: Page, contest_url: str) -> Dict[str, List[str]]:
+    def map_pdf_links(self, page: Page, contest_url: str) -> dict[str, list[str]]:
         """Maps PDF links for Edital de Abertura, Provas, and Gabaritos."""
         logger.info(f"Mapping PDFs for {contest_url}")
         page.goto(contest_url, timeout=60000)

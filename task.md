@@ -75,16 +75,16 @@ enviar o bloco de uma etapa específica para o agente construir.
   Gabaritos por concurso (lógica já existe em `map_pdf_links`).
 
 ## Etapa 3: Download e Organização Estruturada
-- `[ ]` Criar `src/downloader.py` com função de download que valida
+- `[x]` Criar `src/downloader.py` com função de download que valida
   Content-Type/magic bytes do PDF (evita salvar uma página HTML de erro como
   se fosse PDF, algo comum quando um link está quebrado).
-- `[ ]` Definir função de slugify determinística para nome de órgão
+- `[x]` Definir função de slugify determinística para nome de órgão
   (acentos/espaços → forma normalizada única) — sem isso, execuções
   diferentes podem gerar nomes de pasta distintos para o mesmo órgão.
-- `[ ]` Salvar em `data/<ano>/CEBRASPE/<orgao_slug>/{Editais,Provas,Gabaritos}/`.
-- `[ ]` Dedup por hash de conteúdo entre execuções (não rebaixar PDF já
+- `[x]` Salvar em `data/<ano>/CEBRASPE/<orgao_slug>/{Editais,Provas,Gabaritos}/`.
+- `[x]` Dedup por hash de conteúdo entre execuções (não rebaixar PDF já
   presente).
-- `[ ]` Escopo explícito: nesta fase de construção, a Etapa 3 roda sobre a
+- `[x]` Escopo explícito: nesta fase de construção, a Etapa 3 roda sobre a
   lista já filtrada/priorizada da Etapa 2 (concursos encerrados de 2025,
   ordenados por prioridade) — o corte final para 1–2 concursos do piloto
   acontece na Etapa 6, não aqui.
