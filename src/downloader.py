@@ -11,8 +11,19 @@ import requests
 from src.logger import logger
 from src.spider import USER_AGENTS, stealth_wait
 
-# Ancorado na raiz do projeto, mesmo padrão de src/logger.py.
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# Aponta para o repositório original, não para a worktree, para que VS Code veja os arquivos
+# Busca o .git da raiz do homelab e usa scraper_cebraspe/data a partir daí
+_project_root = Path(__file__).resolve()
+while _project_root != _project_root.parent:
+    if (_project_root / ".git").exists():
+        break
+    _project_root = _project_root.parent
+
+# Se estiver em worktree, volta para o repositório original
+if ".claude/worktrees" in str(_project_root):
+    _project_root = _project_root.parent.parent.parent
+
+DATA_DIR = _project_root / "scraper_cebraspe" / "data"
 
 CATEGORIA_PASTA = {
     "editais_abertura": "Editais",
