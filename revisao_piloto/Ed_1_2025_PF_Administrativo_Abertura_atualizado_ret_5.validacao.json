@@ -1,0 +1,18 @@
+{
+  "edital": "Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.pdf",
+  "total_chunks_analisados": 39,
+  "total_alertas": 0,
+  "total_informativos": 1,
+  "alertas": [
+    {
+      "chunk_index": 31,
+      "cargo": "CARGO 13: TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",
+      "materia": "TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",
+      "tipo": "topico_divergencia_leve",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": null,
+      "topico_nome_extraido": "Educação corporativa (atuação do pedagogo)"
+    }
+  ]
+}

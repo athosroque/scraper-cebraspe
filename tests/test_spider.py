@@ -74,3 +74,76 @@ class TestExtractOrgaoFromSlug:
         url = "https://www.cebraspe.org.br/concursos/INSS_25"
         assert extract_orgao_from_slug(url) == "INSS"
         assert extract_year_from_slug(url) == 2025
+
+
+class TestMapPdfLinks:
+    def _spider_with_page(self, monkeypatch, links):
+        monkeypatch.setattr("src.spider.stealth_wait", lambda: None)
+        spider = CebraspeSpider(headless=True)
+        page = MagicMock()
+        page.url = "https://www.cebraspe.org.br/concursos/TCU_25_TEFC"
+        page.locator.return_value.element_handles.return_value = links
+        return spider, page
+
+    def test_classifica_padrao_resposta_discursiva_como_gabarito_e_nao_prova(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "PADRÕES DEFINITIVOS DE RESPOSTAS – PROVAS DISCURSIVAS(P3)",
+                    "https://cdn.cebraspe.org.br/concursos/TCU_25_TEFC/arquivos/padrao.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["gabaritos"]) == 1
+        assert len(pdf_map["provas"]) == 0
+        assert "padrao.pdf" in pdf_map["gabaritos"][0]
+
+    def test_edital_resultado_de_prova_vai_para_nao_classificados_e_nao_provas(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "EDITAL Nº 3 – RESULTADO FINAL NAS PROVAS OBJETIVAS E O RESULTADO PROVISÓRIO NA PROVA DISCURSIVA",
+                    "https://cdn.cebraspe.org.br/concursos/TCU_25_TEFC/arquivos/ed3.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["provas"]) == 0
+        assert len(pdf_map["nao_classificados"]) == 1
+
+    def test_caderno_de_questoes_vai_para_provas(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "PROVA OBJETIVA – CONHECIMENTOS BÁSICOS",
+                    "https://cdn.cebraspe.org.br/concursos/TCU_25_TEFC/arquivos/prova_cb.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["provas"]) == 1
+        assert pdf_map["provas"][0]["texto"] == "PROVA OBJETIVA – CONHECIMENTOS BÁSICOS"
+
+    def test_edital_reabertura_nao_vai_para_editais_abertura(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "EDITAL Nº 8 - RETIFICAÇÃO E REABERTURA DO PERÍODO DE ACESSO",
+                    "https://cdn.cebraspe.org.br/concursos/CD_25_NS/arquivos/ed8.pdf",
+                ),
+                _make_link(
+                    "EDITAL Nº 1 – ABERTURA – ATUALIZADO CONFORME RETIFICAÇÕES",
+                    "https://cdn.cebraspe.org.br/concursos/CD_25_NS/arquivos/ed1.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["editais_abertura"]) == 1
+        assert "ed1.pdf" in pdf_map["editais_abertura"][0]
+        assert len(pdf_map["nao_classificados"]) == 1
+

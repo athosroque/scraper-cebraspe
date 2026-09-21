@@ -9,6 +9,9 @@ from playwright.sync_api import Page, sync_playwright
 
 from src.logger import logger
 
+# Import tardio (dentro de run()) para evitar import circular: downloader.py
+# importa USER_AGENTS/stealth_wait deste módulo.
+
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
@@ -166,7 +169,7 @@ class CebraspeSpider:
         unique_contests.sort(key=lambda x: x["priority"], reverse=True)
         return unique_contests
 
-    def map_pdf_links(self, page: Page, contest_url: str) -> dict[str, list[str]]:
+    def map_pdf_links(self, page: Page, contest_url: str) -> dict[str, list]:
         """Maps PDF links for Edital de Abertura, Provas, and Gabaritos."""
         logger.info(f"Mapping PDFs for {contest_url}")
         page.goto(contest_url, timeout=60000)
@@ -175,27 +178,85 @@ class CebraspeSpider:
         pdf_map = {
             "editais_abertura": [],
             "provas": [],
-            "gabaritos": []
+            "gabaritos": [],
+            "nao_classificados": []
         }
 
         links = page.locator("a").element_handles()
         for link in links:
-            href = link.get_attribute("href")
+            raw_href = link.get_attribute("href")
             text = link.inner_text().strip().upper()
 
-            if not href or not href.lower().endswith(".pdf"):
+            if not raw_href or not raw_href.lower().endswith(".pdf"):
                 continue
 
-            if re.search(r'EDITAL.*?ABERTURA', text):
-                pdf_map["editais_abertura"].append(href)
-            elif re.search(r'PROVA', text):
-                pdf_map["provas"].append(href)
-            elif re.search(r'GABARITO', text):
-                pdf_map["gabaritos"].append(href)
+            href = urljoin(page.url, raw_href)
 
+            if re.search(r'EDITAL.*?\bABERTURA\b', text):
+                pdf_map["editais_abertura"].append(href)
+                logger.info(f"[PROVA-PDF] editais_abertura <- '{text}' ({href})")
+            elif re.search(r'GABARITO|PADR[ÕOÃA]ES?.*RESPOSTA', text):
+                # "PADRÃO DE RESPOSTA (DEFINITIVO)" é o gabarito da prova
+                # discursiva — o CEBRASPE não usa a palavra "GABARITO" nesse
+                # caso. Deve ser checado antes de "PROVA" porque títulos como
+                # "PADRÕES DEFINITIVOS DE RESPOSTAS – PROVAS DISCURSIVAS"
+                # contêm a palavra "PROVAS" mas são gabaritos.
+                pdf_map["gabaritos"].append(href)
+                logger.info(f"[PROVA-PDF] gabaritos <- '{text}' ({href})")
+            elif re.search(r'PROVA', text):
+                # Editais administrativos que apenas citam prova (ex: resultados, convocações, locais)
+                # não são cadernos de questões de prova.
+                if re.search(r'EDITAL\s+N[ºO]|RESULTADO|LOCAIS\s+DE\s+APLICA', text):
+                    pdf_map["nao_classificados"].append({"url": href, "texto": text})
+                    logger.info(f"[PROVA-PDF] nao_classificados (edital administrativo citando prova) <- '{text}' ({href})")
+                else:
+                    # Guardar o texto do link é essencial: é a única fonte de
+                    # tipo (CB/CE/discursiva), nível e cargo(s) cobertos — esse
+                    # texto não existe dentro do conteúdo do PDF (ver LESSONS.md).
+                    pdf_map["provas"].append({"url": href, "texto": text})
+                    logger.info(f"[PROVA-PDF] provas <- '{text}' ({href})")
+            else:
+                # Nunca descartar em silêncio: qualquer PDF que caia aqui é
+                # um tipo de documento que a regex ainda não reconhece.
+                pdf_map["nao_classificados"].append({"url": href, "texto": text})
+                logger.warning(f"[PROVA-PDF] NÃO CLASSIFICADO: '{text}' ({href})")
+
+        logger.info(
+            f"Classificação em {contest_url}: "
+            f"{len(pdf_map['editais_abertura'])} editais, "
+            f"{len(pdf_map['provas'])} provas, "
+            f"{len(pdf_map['gabaritos'])} gabaritos, "
+            f"{len(pdf_map['nao_classificados'])} não classificados"
+        )
         return pdf_map
 
-    def run(self):
+    def process_contest(self, page: Page, contest: dict, processed_slugs: set[str]) -> dict:
+        """Mapeia, baixa PDFs de um concurso e registra no índice de processados."""
+        logger.info(f"Processing: {contest['title']} (Priority: {contest['priority']})")
+        pdfs = self.map_pdf_links(page, contest["url"])
+
+        logger.info(f"Found {len(pdfs['editais_abertura'])} Editais de Abertura")
+        logger.info(f"Found {len(pdfs['provas'])} Provas")
+        logger.info(f"Found {len(pdfs['gabaritos'])} Gabaritos")
+        if pdfs['nao_classificados']:
+            logger.warning(f"Found {len(pdfs['nao_classificados'])} PDFs NÃO classificados — ver [PROVA-PDF] acima")
+
+        # Import tardio: evita import circular (downloader importa deste módulo no nível de topo).
+        from src.downloader import download_concurso_pdfs
+
+        baixados = download_concurso_pdfs(contest["orgao"], contest["ano"], pdfs)
+        logger.info(
+            f"Baixados para {contest['slug']}: "
+            f"{len(baixados['editais_abertura'])} editais, "
+            f"{len(baixados['provas'])} provas, "
+            f"{len(baixados['gabaritos'])} gabaritos"
+        )
+
+        # Só marca como processado depois do download ter efetivamente rodado
+        mark_processed(contest["slug"], processed_slugs)
+        return baixados
+
+    def run(self, slug_filtro: str | None = None):
         logger.info("Starting Cebraspe Spider")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=self.headless)
@@ -204,31 +265,37 @@ class CebraspeSpider:
             setup_stealth(page)
 
             try:
-                contests = self.get_contest_links(page)
-                logger.info(f"Found {len(contests)} contests matching criteria for {self.target_year}.")
-
                 processed_slugs = load_processed_slugs()
 
-                for contest in contests:
-                    if contest["slug"] in processed_slugs:
-                        logger.info(f"Skipping already processed contest: {contest['slug']}")
-                        continue
+                if slug_filtro:
+                    url = slug_filtro if slug_filtro.startswith("http") else f"https://www.cebraspe.org.br/concursos/{slug_filtro}"
+                    slug = extract_slug(url)
+                    contest = {
+                        "title": slug,
+                        "url": url,
+                        "slug": slug,
+                        "orgao": extract_orgao_from_slug(url),
+                        "ano": extract_year_from_slug(url) or self.target_year,
+                        "priority": 1 if has_priority_keyword(slug) else 0,
+                    }
+                    self.process_contest(page, contest, processed_slugs)
+                else:
+                    contests = self.get_contest_links(page)
+                    logger.info(f"Found {len(contests)} contests matching criteria for {self.target_year}.")
 
-                    # Falha isolada de um concurso não pode abortar o lote inteiro.
-                    try:
-                        logger.info(f"Processing: {contest['title']} (Priority: {contest['priority']})")
-                        pdfs = self.map_pdf_links(page, contest["url"])
+                    for contest in contests:
+                        if contest["slug"] in processed_slugs:
+                            logger.info(f"Skipping already processed contest: {contest['slug']}")
+                            continue
 
-                        logger.info(f"Found {len(pdfs['editais_abertura'])} Editais de Abertura")
-                        logger.info(f"Found {len(pdfs['provas'])} Provas")
-                        logger.info(f"Found {len(pdfs['gabaritos'])} Gabaritos")
-
-                        mark_processed(contest["slug"], processed_slugs)
-                    except Exception as e:
-                        logger.error(f"Error processing contest {contest['slug']}: {e}")
-                    finally:
-                        stealth_wait()
-            except Exception as e:
+                        # Falha isolada de um concurso não pode abortar o lote inteiro.
+                        try:
+                            self.process_contest(page, contest, processed_slugs)
+                        except Exception as e:  # noqa: BLE001 — falha de 1 concurso não aborta o lote
+                            logger.error(f"Error processing contest {contest['slug']}: {e}")
+                        finally:
+                            stealth_wait()
+            except Exception as e:  # noqa: BLE001 — garante browser.close() e log final
                 logger.error(f"Error during spider run: {e}")
             finally:
                 browser.close()
@@ -236,5 +303,12 @@ class CebraspeSpider:
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Crawler de concursos do CEBRASPE")
+    parser.add_argument("--slug", type=str, default=None, help="Slug específico de concurso a processar (ex: TCU_25_TEFC)")
+    args = parser.parse_args()
+
     spider = CebraspeSpider(headless=True)
-    spider.run()
+    spider.run(slug_filtro=args.slug)
+

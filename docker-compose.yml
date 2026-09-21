@@ -1,0 +1,95 @@
+# Serviços locais do scraper_cebraspe:
+#
+# 1. scraper-cebraspe-db — PostgreSQL 16 próprio deste projeto, banco de
+#    produção da Etapa 5 (star schema de estatísticas). Independente do
+#    study-rag-db (ADR-026): credenciais em .env, porta publicada só em
+#    127.0.0.1:5435, na rede homelab_default para permitir cruzamento
+#    futuro via postgres_fdw sem abrir porta extra.
+#
+# 2. scraper-cebraspe-datasette — Datasette para o checkpoint de revisão
+#    humana da Etapa 4 (task.md). NÃO é o banco de produção. Serve o conteúdo de
+# revisao_piloto/ (auditoria de chunks + taxonomia extraída) para
+# navegação/busca tabular (Datasette) e, via --static, o relatório HTML de
+# página única gerado por scripts/gerar_relatorio_revisao.py
+# (revisao_piloto/relatorio/ -> /relatorio/*).
+#
+# Exposição e Acesso:
+# Os dados servidos possuem status_revisao_humana = PENDENTE (auditoria
+# do piloto da Etapa 4). O serviço está conectado à rede homelab_default e
+# exposto via Traefik em `datasette.projetoathos.com.br` (protegido por
+# autenticação via Cloudflare Access SSO), além de acessível localmente
+# em http://127.0.0.1:8011.
+#
+# Subir:
+#   cd /home/athos/homelab/scraper_cebraspe
+#   python -m scripts.validar_taxonomia        # gera <edital>.validacao.json
+#   python -m scripts.gerar_relatorio_revisao  # gera revisao_piloto/relatorio/*.html
+#   python -m scripts.gerar_db_datasette        # gera/atualiza revisao_piloto/revisao.db
+#   docker compose up -d
+# Acessar: http://127.0.0.1:8011 (tabelas) e http://127.0.0.1:8011/relatorio/index.html (página única)
+# Reconstruiu o banco com o container já no ar? Reinicie pra ele pegar o
+# arquivo novo (o rebuild apaga e recria o .db, a conexão antiga fica presa
+# no inode antigo até reiniciar):
+#   python -m scripts.gerar_db_datasette && docker compose restart scraper-cebraspe-datasette
+# Mudou o `command` (ex.: nova flag --static)? `restart` não pega — precisa
+# recriar o container: docker compose up -d
+# Derrubar: docker compose down
+
+services:
+  scraper-cebraspe-db:
+    image: postgres:16-alpine
+    container_name: scraper-cebraspe-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cebraspe}
+      POSTGRES_USER: ${POSTGRES_USER:-cebraspe}
+      # Sem default de propósito: senha vazia faz o container recusar subir
+      # (nunca cair num "postgres/postgres" como o study-rag-db).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - scraper_cebraspe_pgdata:/var/lib/postgresql/data
+    networks:
+      - homelab_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  scraper-cebraspe-datasette:
+    image: datasetteproject/datasette
+    container_name: scraper-cebraspe-datasette
+    restart: unless-stopped
+    command:
+      - datasette
+      - serve
+      - /data/revisao.db
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8001"
+      - --setting
+      - sql_time_limit_ms
+      - "5000"
+      - --static
+      - relatorio:/data/relatorio
+    volumes:
+      - ./revisao_piloto:/data:ro
+    ports:
+      - "127.0.0.1:8011:8001"
+    networks:
+      - homelab_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scraper-datasette.rule=Host(`datasette.projetoathos.com.br`)"
+      - "traefik.http.routers.scraper-datasette.entrypoints=web"
+      - "traefik.http.services.scraper-datasette.loadbalancer.server.port=8001"
+
+volumes:
+  scraper_cebraspe_pgdata:
+
+networks:
+  homelab_default:
+    external: true

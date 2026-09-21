@@ -9,7 +9,12 @@ from urllib.parse import urlparse
 import requests
 
 from src.logger import logger
-from src.spider import USER_AGENTS, stealth_wait
+from src.spider import (
+    USER_AGENTS,
+    extract_orgao_from_slug,
+    extract_year_from_slug,
+    stealth_wait,
+)
 
 # Aponta para o repositório original, não para a worktree, para que VS Code veja os arquivos
 # Busca o .git da raiz do homelab e usa scraper_cebraspe/data a partir daí
@@ -32,6 +37,7 @@ CATEGORIA_PASTA = {
 }
 
 MANIFEST_FILENAME = ".manifest.json"
+PROVAS_TEXTO_FILENAME = "provas_texto_link.json"
 PDF_MAGIC_BYTES = b"%PDF-"
 REQUEST_TIMEOUT = 30
 
@@ -86,6 +92,39 @@ def _filename_from_url(url: str) -> str:
     return nome
 
 
+def resolver_concurso_do_pdf(pdf_path: Path) -> dict | None:
+    """Identifica o concurso (slug, órgão, ano) de um PDF já baixado, via
+    manifesto da pasta do órgão.
+
+    O path em disco (`data/<ano>/CEBRASPE/<orgao>/Editais/x.pdf`) só carrega
+    ano e órgão — não o concurso: dois concursos do mesmo órgão no mesmo ano
+    (ex: `TJ_CE_25_NOTARIOS` e `TJ_CE_25_SERVIDOR`) caem na mesma pasta. O
+    slug só existe na URL de origem (`.../concursos/PF_25_ADM/arquivos/x.pdf`),
+    guardada como chave do manifesto. Casa pelo nome do arquivo, não pelo
+    `path` gravado no manifesto — este pode apontar pra outra cópia do repo
+    (achado: paths de worktree antiga). Retorna None se não achar ou se o
+    nome do arquivo for ambíguo entre concursos.
+    """
+    manifest = _load_manifest(pdf_path.parent.parent / MANIFEST_FILENAME)
+    slugs = set()
+    for url, entry in manifest.items():
+        if pdf_path.name not in (_filename_from_url(url), Path(entry.get("path", "")).name):
+            continue
+        match = re.search(r"/concursos/([^/]+)/", url)
+        if match:
+            slugs.add(match.group(1))
+
+    if len(slugs) != 1:
+        logger.warning(
+            f"Concurso de {pdf_path.name} não identificado pelo manifesto "
+            f"({'ambíguo: ' + ', '.join(sorted(slugs)) if slugs else 'sem entrada'})."
+        )
+        return None
+
+    slug = slugs.pop()
+    return {"slug": slug, "orgao": extract_orgao_from_slug(slug), "ano": extract_year_from_slug(slug)}
+
+
 def download_pdf(url: str, dest_dir: Path, manifest: dict[str, dict[str, str]]) -> Path | None:
     """Baixa um PDF, validando magic bytes e deduplicando por URL e por hash.
 
@@ -138,32 +177,46 @@ def download_pdf(url: str, dest_dir: Path, manifest: dict[str, dict[str, str]]) 
 
 
 def download_concurso_pdfs(
-    orgao: str, ano: int, pdf_map: dict[str, list[str]], data_dir: Path = DATA_DIR
+    orgao: str, ano: int, pdf_map: dict[str, list], data_dir: Path = DATA_DIR
 ) -> dict[str, list[str]]:
     """Baixa e organiza os PDFs mapeados de um concurso.
 
     Grava em `<data_dir>/<ano>/CEBRASPE/<orgao_slug>/{Editais,Provas,Gabaritos}/`.
     Uma falha isolada num PDF é logada e não interrompe os demais downloads
     do concurso.
+
+    `pdf_map["provas"]` pode vir como `list[str]` (URLs puras) ou
+    `list[dict]` no formato `{"url": ..., "texto": ...}` — o texto do link é
+    a única fonte de tipo/nível/cargo(s) cobertos (ver `spider.map_pdf_links`
+    e `LESSONS.md`) e é persistido em `PROVAS_TEXTO_FILENAME`, indexado pelo
+    nome do arquivo baixado, para a Etapa 4 consumir depois.
     """
     orgao_slug = slugify(orgao)
     concurso_dir = data_dir / str(ano) / "CEBRASPE" / orgao_slug
     manifest_path = concurso_dir / MANIFEST_FILENAME
+    provas_texto_path = concurso_dir / PROVAS_TEXTO_FILENAME
     concurso_dir.mkdir(parents=True, exist_ok=True)
     manifest = _load_manifest(manifest_path)
+    provas_texto = _load_manifest(provas_texto_path)
 
     resultado: dict[str, list[str]] = {categoria: [] for categoria in CATEGORIA_PASTA}
 
     for categoria, pasta in CATEGORIA_PASTA.items():
         dest_dir = concurso_dir / pasta
-        for url in pdf_map.get(categoria, []):
+        for entry in pdf_map.get(categoria, []):
+            url = entry["url"] if isinstance(entry, dict) else entry
+            texto = entry.get("texto") if isinstance(entry, dict) else None
             try:
                 path = download_pdf(url, dest_dir, manifest)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 — falha de 1 PDF não aborta o concurso
                 logger.error(f"Falha inesperada ao baixar {url} ({orgao_slug}): {e}")
                 continue
             if path:
                 resultado[categoria].append(str(path))
+                if texto is not None:
+                    provas_texto[Path(path).name] = texto
 
     _save_manifest(manifest_path, manifest)
+    if provas_texto:
+        _save_manifest(provas_texto_path, provas_texto)
     return resultado

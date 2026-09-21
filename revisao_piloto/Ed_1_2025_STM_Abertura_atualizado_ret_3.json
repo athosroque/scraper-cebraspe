@@ -1,0 +1,4484 @@
+{
+  "edital": "Ed_1_2025_STM_Abertura_atualizado_ret_3.pdf",
+  "concurso": {
+    "slug": "STM_25",
+    "orgao": "STM",
+    "ano": 2025
+  },
+  "cargos": [
+    {
+      "numero": 1,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 2,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 3,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "nivel": "superior"
+    },
+    {
+      "numero": 4,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: COMUNICAÇÃO SOCIAL",
+      "nivel": "superior"
+    },
+    {
+      "numero": 5,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "nivel": "superior"
+    },
+    {
+      "numero": 6,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 7,
+      "nome": "ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 8,
+      "nome": "TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 9,
+      "nome": "TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA – ESPECIALIDADE: AGENTE DA POLÍCIA JUDICIAL",
+      "nivel": "superior"
+    },
+    {
+      "numero": 10,
+      "nome": "TÉCNICO JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "nivel": "superior"
+    }
+  ],
+  "total_chunks": 53,
+  "extraidos_com_sucesso": 53,
+  "falhas": 0,
+  "chunks_com_falha": [],
+  "resultados": [
+    {
+      "chunk_index": 0,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos de gêneros variados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Reconhecimento de tipos e gêneros textuais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+              "Emprego de tempos e modos verbais"
+            ]
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Emprego das classes de palavras",
+              "Relações de coordenação entre orações e entre termos da oração",
+              "Relações de subordinação entre orações e entre termos da oração",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Regência verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação dos pronomes átonos"
+            ]
+          },
+          {
+            "nome": "Reescrita de frases e parágrafos do texto",
+            "subtopicos": [
+              "Significação das palavras",
+              "Substituição de palavras ou de trechos de texto",
+              "Reorganização da estrutura de orações e de períodos do texto",
+              "Reescrita de textos de diferentes gêneros e níveis de formalidade"
+            ]
+          },
+          {
+            "nome": "Redação Oficial",
+            "subtopicos": [
+              "Manual de Redação da Presidência da República"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 1,
+      "cargo": null,
+      "materia_chunk": "LEGISLAÇÃO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LEGISLAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação",
+        "topicos": [
+          {
+            "nome": "Lei nº 8.457/1992 e suas alterações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regimento Interno do STM",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 8.112/1990 (Regime Jurídico Único)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 9.784/1999 (processo administrativo)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 11.416/2006 (carreiras do Poder Judiciário)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução do CNJ nº 351/2020 (Política de Prevenção e Enfrentamento do Assédio Moral, do Assédio Sexual e da Discriminação no âmbito do Poder Judiciário)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução do CNJ nº 400/2021 (Política Nacional de Sustentabilidade no Âmbito do Poder Judiciário)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução do CNJ nº 401/2021 (diretrizes de acessibilidade e inclusão de pessoas com deficiência nos órgãos do Poder Judiciário)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia_chunk": "ÉTICA NO SERVIÇO PÚBLICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ÉTICA NO SERVIÇO PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ética",
+        "topicos": [
+          {
+            "nome": "Ética e moral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética, princípios e valores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética e democracia",
+            "subtopicos": [
+              "Exercício da cidadania"
+            ]
+          },
+          {
+            "nome": "Ética e função pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética no setor público",
+            "subtopicos": [
+              "Lei nº 8.429/1992 e suas alterações",
+              "Disposições gerais",
+              "Atos de improbidade administrativa"
+            ]
+          },
+          {
+            "nome": "Código de Ética dos Servidores da Justiça Militar da União",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA INGLESA (APENAS PARA O CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – \nESPECIALIDADE: ANÁLISE DE SISTEMAS E PARA O CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO \nESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO)",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA INGLESA (APENAS PARA O CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – \nESPECIALIDADE: ANÁLISE DE SISTEMAS E PARA O CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO \nESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO)",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Inglesa",
+        "topicos": [
+          {
+            "nome": "Compreensão de texto escrito em língua inglesa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Itens gramaticais relevantes para a compreensão de conteúdos semânticos",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia_chunk": "DIREITO CONSTITUCIONAL (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E \nPARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO CONSTITUCIONAL (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E \nPARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Constituição",
+        "topicos": [
+          {
+            "nome": "Constituição",
+            "subtopicos": [
+              "Conceito, objeto, elementos e classificações",
+              "Supremacia da Constituição",
+              "Aplicabilidade das normas constitucionais",
+              "Interpretação das normas constitucionais",
+              "Métodos, princípios e limites"
+            ]
+          },
+          {
+            "nome": "Poder constituinte",
+            "subtopicos": [
+              "Características",
+              "Poder constituinte originário",
+              "Poder constituinte derivado"
+            ]
+          },
+          {
+            "nome": "Princípios fundamentais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direitos e garantias fundamentais",
+            "subtopicos": [
+              "Direitos e deveres individuais e coletivos",
+              "Habeas corpus, mandado de segurança, mandado de injunção e habeas data",
+              "Direitos sociais",
+              "Nacionalidade",
+              "Direitos políticos",
+              "Partidos políticos"
+            ]
+          },
+          {
+            "nome": "Organização do Estado",
+            "subtopicos": [
+              "Organização político-administrativa",
+              "Estado federal brasileiro",
+              "União",
+              "Estados federados",
+              "Municípios",
+              "Distrito Federal",
+              "Territórios",
+              "Intervenção federal",
+              "Intervenção dos estados nos municípios"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Disposições gerais",
+              "Servidores públicos",
+              "Militares dos estados, do Distrito Federal e dos territórios"
+            ]
+          },
+          {
+            "nome": "Organização dos poderes no Estado",
+            "subtopicos": [
+              "Mecanismos de freios e contrapesos",
+              "Poder Legislativo",
+              "Estrutura, funcionamento e atribuições",
+              "Comissões parlamentares de inquérito",
+              "Fiscalização contábil, financeira e orçamentária",
+              "Tribunal de Contas da União (TCU)",
+              "Processo legislativo",
+              "Prerrogativas parlamentares",
+              "Poder Executivo",
+              "Presidente da República",
+              "Atribuições, prerrogativas e responsabilidades",
+              "Ministros de Estado",
+              "Conselho da República e de Defesa Nacional",
+              "Poder Judiciário",
+              "Disposições gerais",
+              "Órgãos do Poder Judiciário",
+              "Organização e competências",
+              "Conselho Nacional de Justiça (CNJ)"
+            ]
+          },
+          {
+            "nome": "Funções essenciais à justiça",
+            "subtopicos": [
+              "Ministério Público",
+              "Princípios, garantias, vedações, organização e competências",
+              "Conselho Nacional do Ministério Público",
+              "Advocacia pública",
+              "Defensoria Pública"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 5,
+      "cargo": null,
+      "materia_chunk": "DIREITO PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E \nPARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E \nPARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Penal Militar",
+        "topicos": [
+          {
+            "nome": "Aplicação da lei penal militar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crime",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes contra o serviço militar e o dever militar",
+            "subtopicos": [
+              "Insubmissão",
+              "Deserção",
+              "Abandono de posto e de outros"
+            ]
+          },
+          {
+            "nome": "Crimes contra o patrimônio",
+            "subtopicos": [
+              "Furto"
+            ]
+          },
+          {
+            "nome": "Crimes contra a incolumidade pública",
+            "subtopicos": [
+              "Tráfico, posse ou uso de entorpecente ou substância de efeito similar",
+              "Casos assimilados",
+              "Forma qualificada"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 6,
+      "cargo": null,
+      "materia_chunk": "DIREITO PROCESSUAL PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: \nADMINISTRATIVA E PARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO PROCESSUAL PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: \nADMINISTRATIVA E PARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Processual Penal Militar",
+        "topicos": [
+          {
+            "nome": "Lei processual penal militar e sua aplicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Inquérito policial militar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ação penal militar",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 7,
+      "cargo": "CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "A evolução da administração pública e a reforma do Estado",
+            "subtopicos": [
+              "Do modelo racional-legal ao paradigma pós-burocrático",
+              "Convergências e diferenças entre a gestão pública e a gestão privada",
+              "Excelência na gestão dos serviços públicos",
+              "Empreendedorismo governamental e novas lideranças no setor público"
+            ]
+          },
+          {
+            "nome": "Gestão de pessoas",
+            "subtopicos": [
+              "Conceitos e práticas relativas ao servidor público",
+              "Gestão de desempenho",
+              "Comunicação",
+              "Comportamento, clima e cultura organizacional",
+              "Gestão por competências",
+              "Gestão do conhecimento",
+              "Qualidade de vida no trabalho",
+              "Liderança, motivação e satisfação no trabalho",
+              "Recrutamento e seleção de pessoas",
+              "Análise e descrição de cargos",
+              "Educação, treinamento e desenvolvimento",
+              "Educação corporativa",
+              "Educação a distância",
+              "Planejamento, desenvolvimento e objetivos do ensino",
+              "Avaliação",
+              "Gestão de conflitos"
+            ]
+          },
+          {
+            "nome": "Gestão de processos",
+            "subtopicos": [
+              "Conceitos da abordagem por processos",
+              "Técnicas de mapeamento, análise e melhoria de processos",
+              "Construção e mensuração de indicadores de processos"
+            ]
+          },
+          {
+            "nome": "Gestão de riscos",
+            "subtopicos": [
+              "Conceitos básicos",
+              "Processo de gestão de riscos",
+              "Instâncias e responsabilidades"
+            ]
+          },
+          {
+            "nome": "Processo de mudança",
+            "subtopicos": [
+              "Mudança organizacional, forças internas e externas, papel do agente e métodos de mudança"
+            ]
+          },
+          {
+            "nome": "Características das organizações formais modernas",
+            "subtopicos": [
+              "Tipos de estrutura organizacional, natureza, finalidades e critérios de departamentalização"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 8,
+      "cargo": "CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "NOÇÕES DE ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "NOÇÕES DE ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "O papel do Estado e a atuação do governo nas finanças públicas",
+            "subtopicos": [
+              "Formas e dimensões da intervenção da administração na economia",
+              "Funções do orçamento público"
+            ]
+          },
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Técnicas orçamentárias",
+              "Princípios orçamentários",
+              "Ciclo orçamentário",
+              "Processo orçamentário"
+            ]
+          },
+          {
+            "nome": "Orçamento público no Brasil",
+            "subtopicos": [
+              "Sistema de planejamento e de orçamento federal",
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Outros planos e programas",
+              "Sistema e processo de orçamentação",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos ordinários e adicionais"
+            ]
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal",
+            "subtopicos": [
+              "Conceitos e objetivos",
+              "Planejamento",
+              "Dívida e endividamento",
+              "Transparência, controle e fiscalização"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 9,
+      "cargo": "CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Noções de organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta e indireta",
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista"
+            ]
+          },
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies",
+              "Invalidação, extinção, anulação e revogação",
+              "Prescrição"
+            ]
+          },
+          {
+            "nome": "Poderes administrativos",
+            "subtopicos": [
+              "Hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Licitações e contratos administrativos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei nº 14.133/2021",
+              "Decreto nº 11.531/2023 e Portaria Conjunta MGI/MF/CGU nº 33/2023 (convênios e instrumentos congêneres)",
+              "Decreto nº 11.462/2023",
+              "IN/MPOG nº 5/2017 e IN/SEGES/ME nº 98/2022",
+              "Disposições constitucionais aplicáveis",
+              "Disposições doutrinárias e jurisprudenciais",
+              "Elaboração e fiscalização de contratos",
+              "Cláusulas e indicadores de nível de serviço",
+              "Papel do fiscalizador do contrato",
+              "Papel do preposto da contratada",
+              "Acompanhamento da execução contratual",
+              "Registro e notificação de irregularidades",
+              "Definição e aplicação de penalidades e sanções administrativas"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Controle exercido pela administração pública",
+              "Controle judicial",
+              "Controle legislativo"
+            ]
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": [
+              "Responsabilidade civil do Estado no direito brasileiro",
+              "Responsabilidade por ato comissivo do Estado",
+              "Responsabilidade por omissão do Estado",
+              "Requisitos para a demonstração da responsabilidade do Estado",
+              "Causas excludentes e atenuantes da responsabilidade do Estado"
+            ]
+          },
+          {
+            "nome": "Acesso à informação e proteção de dados",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei nº 12.527/2011 (Lei de Acesso à Informação)",
+              "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
+      "materia_chunk": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "A evolução da administração pública e a reforma do Estado",
+            "subtopicos": [
+              "Do modelo racional-legal ao paradigma pós-burocrático",
+              "Convergências e diferenças entre a gestão pública e a gestão privada",
+              "Excelência na gestão dos serviços públicos",
+              "Empreendedorismo governamental e novas lideranças no setor público"
+            ]
+          },
+          {
+            "nome": "Gestão de pessoas",
+            "subtopicos": [
+              "Conceitos e práticas relativas ao servidor público",
+              "Gestão de desempenho",
+              "Comunicação",
+              "Comportamento, clima e cultura organizacional",
+              "Gestão por competências",
+              "Gestão do conhecimento",
+              "Qualidade de vida no trabalho",
+              "Liderança, motivação e satisfação no trabalho",
+              "Recrutamento e seleção de pessoas",
+              "Análise e descrição de cargos",
+              "Educação, treinamento e desenvolvimento",
+              "Gestão de conflitos"
+            ]
+          },
+          {
+            "nome": "Gestão estratégica",
+            "subtopicos": [
+              "Diagnóstico estratégico",
+              "Planejamento estratégico",
+              "Definições de estratégia",
+              "Condições necessárias para se desenvolver a estratégia",
+              "Questões-chave em estratégia",
+              "Metas estratégicas e resultados pretendidos",
+              "Execução da estratégia",
+              "Monitoramento da estratégia",
+              "Estratégia Nacional do Poder Judiciário"
+            ]
+          },
+          {
+            "nome": "Indicadores de desempenho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de processos",
+            "subtopicos": [
+              "Conceitos da abordagem por processos",
+              "Tipos de processos",
+              "Ciclo de vida de gerenciamento de processos",
+              "Técnicas de mapeamento, análise e melhoria de processos",
+              "Construção e mensuração de indicadores de processos",
+              "Cadeia de valor",
+              "Funções de gerenciamento de processos"
+            ]
+          },
+          {
+            "nome": "Ferramentas de análise de cenário interno e externo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Balanced scorecard",
+            "subtopicos": []
+          },
+          {
+            "nome": "OKR (objective and key results)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de projetos",
+            "subtopicos": [
+              "Elaboração, análise e avaliação de projetos",
+              "Principais características dos modelos de gestão de projetos",
+              "Projetos e suas etapas",
+              "Escritório de projetos"
+            ]
+          },
+          {
+            "nome": "Gestão de riscos",
+            "subtopicos": [
+              "Conceitos básicos",
+              "Processo de gestão de riscos",
+              "Instâncias e responsabilidades"
+            ]
+          },
+          {
+            "nome": "Processo decisório",
+            "subtopicos": [
+              "Processo racional de solução de problemas",
+              "Fatores que afetam a decisão",
+              "Tipos de decisões"
+            ]
+          },
+          {
+            "nome": "Características das organizações formais modernas",
+            "subtopicos": [
+              "Tipos de estrutura organizacional, natureza, finalidades e critérios de departamentalização"
+            ]
+          },
+          {
+            "nome": "Governança organizacional",
+            "subtopicos": [
+              "Conceito de governança pública organizacional",
+              "Sistema de governança no setor público",
+              "Princípios e diretrizes",
+              "Práticas de governança"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 11,
+      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
+      "materia_chunk": "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "O papel do Estado e a atuação do governo nas finanças públicas",
+            "subtopicos": [
+              "Formas e dimensões da intervenção da administração na economia",
+              "Funções do orçamento público"
+            ]
+          },
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Técnicas orçamentárias",
+              "Princípios orçamentários",
+              "Ciclo orçamentário",
+              "Processo orçamentário"
+            ]
+          },
+          {
+            "nome": "Orçamento público no Brasil",
+            "subtopicos": [
+              "Sistema de planejamento e de orçamento federal",
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Outros planos e programas",
+              "Sistema e processo de orçamentação",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos ordinários e adicionais"
+            ]
+          },
+          {
+            "nome": "Programação e execução orçamentária e financeira",
+            "subtopicos": [
+              "Programação financeira",
+              "Descentralização orçamentária e financeira",
+              "Acompanhamento da execução",
+              "Alterações orçamentárias",
+              "Limites e contingenciamentos"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Fontes",
+              "Dívida ativa"
+            ]
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Restos a pagar",
+              "Despesas de exercícios anteriores",
+              "Dívida flutuante e fundada",
+              "Suprimento de fundos"
+            ]
+          },
+          {
+            "nome": "Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal)",
+            "subtopicos": [
+              "Conceitos e objetivos",
+              "Planejamento",
+              "Dívida e endividamento",
+              "Transparência, controle e fiscalização",
+              "Regra de ouro",
+              "Geração da despesa e despesa obrigatória de caráter continuado"
+            ]
+          },
+          {
+            "nome": "Lei nº 4.320/1964 e suas alterações",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 12,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "ENGENHARIA DE SOFTWARE",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "ENGENHARIA DE SOFTWARE",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Processos de software, gestão de projetos e produtos de software",
+        "topicos": [
+          {
+            "nome": "Processos de software, gestão de projetos e produtos de software",
+            "subtopicos": []
+          },
+          {
+            "nome": "Metodologias ágeis para o desenvolvimento de software",
+            "subtopicos": [
+              "Scrum",
+              "Kanban",
+              "XP",
+              "Lean"
+            ]
+          },
+          {
+            "nome": "Engenharia de requisitos",
+            "subtopicos": [
+              "Produto mínimo viável (MVP)",
+              "Gestão de backlog",
+              "Técnicas de priorização e de estimativas com story points"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 13,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "DESENVOLVIMENTO DE SISTEMAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "DESENVOLVIMENTO DE SISTEMAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Tecnologia da Informação - Desenvolvimento de Software",
+        "topicos": [
+          {
+            "nome": "Linguagens de programação",
+            "subtopicos": [
+              "PHP",
+              "JavaScript",
+              "Java",
+              "Python"
+            ]
+          },
+          {
+            "nome": "Linguagens de script",
+            "subtopicos": [
+              "Ansible",
+              "Terraform",
+              "Shell Script (Bash)",
+              "Windows PowerShell",
+              "Python"
+            ]
+          },
+          {
+            "nome": "Frameworks e toolkits",
+            "subtopicos": [
+              "Laravel",
+              "Symfony",
+              "React",
+              "Angular",
+              "jQuery",
+              "Spring",
+              "Spring Boot",
+              "Hibernate e JPA",
+              "Apache CXF",
+              "Scikit-learn",
+              "TensorFlow",
+              "PyTorch",
+              "NLTK",
+              "Matplotlib",
+              "Jupyter Notebook"
+            ]
+          },
+          {
+            "nome": "Padrões XML, XSLT, UDDI, WSDL, SOAP e JSON",
+            "subtopicos": []
+          },
+          {
+            "nome": "Desenvolvimento web e mobile",
+            "subtopicos": [
+              "JavaScript, HTML5, CSS3, AJAX, WebSocket, Single Page Application (SPA)",
+              "Usabilidade e acessibilidade na Internet, padrões W3C",
+              "Noções de desenvolvimento para dispositivos móveis"
+            ]
+          },
+          {
+            "nome": "Desenvolvimento com contêineres",
+            "subtopicos": [
+              "Docker",
+              "Kubernetes"
+            ]
+          },
+          {
+            "nome": "Integração de sistemas",
+            "subtopicos": [
+              "Apache Kafka",
+              "REST",
+              "SOAP",
+              "mensageria",
+              "RabbitMQ"
+            ]
+          },
+          {
+            "nome": "Arquitetura de software",
+            "subtopicos": [
+              "Padrões de arquitetura de software: MVC, orientado a eventos, microsserviços, SOA/web services, cliente-servidor, pipes-and-filters e P2P",
+              "Controles e testes de segurança para aplicações e webservices"
+            ]
+          },
+          {
+            "nome": "Testes de software",
+            "subtopicos": [
+              "Testes de unidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD",
+              "Planejamento de testes, princípios FIRST, testabilidade"
+            ]
+          },
+          {
+            "nome": "Bancos de dados",
+            "subtopicos": [
+              "Conceitos e fundamentos",
+              "SGBD Oracle, MySQL e PostgreSQL",
+              "Noções de bancos de dados NoSQL (orientados a documento, chave-valor, grafo e colunar)",
+              "Características de bancos de dados massivos (big data)",
+              "Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays",
+              "Tipos de modelagem dimensional: Star Schema, Snowflake Schema e Fact Constellation",
+              "Metodologia CRISP-DM"
+            ]
+          },
+          {
+            "nome": "Plataforma Moodle de aprendizagem virtual",
+            "subtopicos": [
+              "Configuração e recursos"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 14,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "NOÇÕES SOBRE DEVOPS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "NOÇÕES SOBRE DEVOPS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "DevOps",
+        "topicos": [
+          {
+            "nome": "Princípios e fundamentos das práticas DevOps, técnicas e ferramentas de builds e deploys automatizados, ferramentas de deploy contínuo, modelo de versionamento, merge, branch e pipeline",
+            "subtopicos": []
+          },
+          {
+            "nome": "CI/CD (continuous integration/continuous delivery)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ambiente de clusters, Kubernetes, ferramenta de orquestração de contêineres, Rancher",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 15,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "NORMATIVOS DA PDPJ-BR",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "NORMATIVOS DA PDPJ-BR",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação CNJ (sistemas informatizados e PDPJ-Br)",
+        "topicos": [
+          {
+            "nome": "Resolução CNJ nº 522/2023",
+            "subtopicos": [
+              "Institui o modelo de requisitos para sistemas informatizados de gestão de processos e documentos do Poder Judiciário",
+              "Disciplina a obrigatoriedade da sua utilização no desenvolvimento e manutenção de sistemas informatizados para as atividades judiciárias e administrativas no âmbito do Poder Judiciário"
+            ]
+          },
+          {
+            "nome": "Resolução CNJ nº 335/2020",
+            "subtopicos": [
+              "Institui política pública para governança e gestão de processo judicial eletrônico",
+              "Integra os tribunais do país com a criação da Plataforma Digital do Poder Judiciário Brasileiro – PDPJ-Br",
+              "Mantém o sistema PJe como sistema de processo eletrônico prioritário do Conselho Nacional de Justiça"
+            ]
+          },
+          {
+            "nome": "Portaria CNJ nº 252/2020",
+            "subtopicos": [
+              "Dispõe sobre modelo de governança e gestão da Plataforma Digital do Poder Judiciário – PDPJ-Br"
+            ]
+          },
+          {
+            "nome": "Portaria CNJ nº 253/2020",
+            "subtopicos": [
+              "Institui os critérios e as diretrizes técnicas para o processo de desenvolvimento de módulos e serviços na Plataforma Digital do Poder Judiciário Brasileiro – PDPJ-Br"
+            ]
+          },
+          {
+            "nome": "Portaria CNJ nº 131/2021",
+            "subtopicos": [
+              "Institui o grupo revisor de código-fonte das soluções da Plataforma Digital do Poder Judiciário – PDPJ-Br e do Processo Judicial Eletrônico – PJe"
+            ]
+          },
+          {
+            "nome": "Resolução CNJ nº 396/2021",
+            "subtopicos": [
+              "Institui a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – ENSEC-PJ"
+            ]
+          },
+          {
+            "nome": "Portaria CNJ nº 162/2021",
+            "subtopicos": [
+              "Aprova protocolos e manuais criados pela Resolução CNJ nº 396/2021, que instituiu a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – ENSEC-PJ"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Linguagem de programação Java",
+        "topicos": [
+          {
+            "nome": "Linguagem de programação Java",
+            "subtopicos": []
+          },
+          {
+            "nome": "Arquitetura distribuída de microsserviços",
+            "subtopicos": [
+              "API RESTful",
+              "JSON",
+              "framework Spring",
+              "Spring Cloud",
+              "Spring Boot",
+              "Spring Eureka, Zuul",
+              "Map Struct",
+              "Swagger",
+              "Service Discovery",
+              "API Gateway"
+            ]
+          },
+          {
+            "nome": "Persistência",
+            "subtopicos": [
+              "JPA 2.0",
+              "Hibernate 4.3 ou superior",
+              "Hibernate Envers",
+              "biblioteca Flyway"
+            ]
+          },
+          {
+            "nome": "Banco de dados",
+            "subtopicos": [
+              "PostgreSQL",
+              "H2 Database"
+            ]
+          },
+          {
+            "nome": "Serviços de autenticação",
+            "subtopicos": [
+              "single sign-on (SSO)",
+              "keycloak",
+              "protocolo OAuth2 (RFC 6749)"
+            ]
+          },
+          {
+            "nome": "Mensageria e webhooks",
+            "subtopicos": [
+              "message broker",
+              "RabbitMQ",
+              "evento negocial",
+              "webhook",
+              "APIs reversas"
+            ]
+          },
+          {
+            "nome": "Ferramenta de versionamento Git",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ambiente de clusters e Kubernetes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ferramenta de orquestração de contêineres, Rancher",
+            "subtopicos": []
+          },
+          {
+            "nome": "Deploy de aplicações",
+            "subtopicos": [
+              "continuous delivery e continuous integration (CI/CD)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "GOVERNANÇA E GESTÃO DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "GOVERNANÇA E GESTÃO DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão de TIC",
+        "topicos": [
+          {
+            "nome": "Planejamento estratégico de TIC",
+            "subtopicos": [
+              "Fundamentos do planejamento estratégico em tecnologia da informação e comunicação",
+              "Elaboração e implementação do plano diretor de TIC (PDTIC)",
+              "Indicadores de desempenho de TIC e alinhamento com objetivos organizacionais"
+            ]
+          },
+          {
+            "nome": "Governança de TIC",
+            "subtopicos": [
+              "COBIT 2019: conceitos básicos, estrutura, objetivos e aplicação para a governança de TIC",
+              "ITIL v4: gerenciamento de serviços de TIC, com foco em processos e melhores práticas",
+              "Metodologias de indicadores OKR, PKI e BSC",
+              "Análise SWOT aplicados à TIC"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de projetos de TIC",
+            "subtopicos": [
+              "PMBOK 7ª edição: conceitos, grupos de processos e áreas de conhecimento",
+              "Escritório de projetos – PMO e gestão de portfólio de projetos"
+            ]
+          },
+          {
+            "nome": "Governança e Gestão de TIC",
+            "subtopicos": [
+              "Resolução CNJ nº 370/2021 (Estratégia Nacional de Tecnologia da Informação e Comunicação do Poder Judiciário – ENTIC-JUD)",
+              "Resolução CNJ nº 468/2022 e o Guia de Contratações de STIC do Poder Judiciário e suas alterações",
+              "Lei nº 14.133/2021",
+              "Planejamento, fiscalização e gestão de contratos de TIC"
+            ]
+          },
+          {
+            "nome": "Noções de gestão de riscos de TIC",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 18,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "CIÊNCIA DE DADOS E INTELIGÊNCIA ARTIFICIAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "CIÊNCIA DE DADOS E INTELIGÊNCIA ARTIFICIAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Inteligência Artificial e Análise de Dados",
+        "topicos": [
+          {
+            "nome": "Conceitos e tecnologias de IA, redes neurais, aprendizado de máquina, processamento de linguagem natural (PLN), deep learning, chatbots",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conceitos de big data e analytics",
+            "subtopicos": [
+              "Ferramenta Qlik Sense"
+            ]
+          },
+          {
+            "nome": "Noções de business intelligence, data warehouse, data mart, data mining, data lake, ETL e OLAP",
+            "subtopicos": []
+          },
+          {
+            "nome": "Principais técnicas de pré-processamento de dados estruturados e não estruturados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de modelos preditivos (supervisionados) e descritivos (não supervisionados)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Avaliação de modelos (sobreajuste, métricas de classificação e regressão, análise ROC)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Algoritmos para exploração de dados e machine learning",
+            "subtopicos": []
+          },
+          {
+            "nome": "Grandes modelos de linguagem (LLM), IA generativa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tecnologias emergentes e tendências",
+            "subtopicos": [
+              "Blockchain: conceitos e aplicações, sistemas de suporte à decisão analítica",
+              "Computação em nuvem (SaaS, PaaS, IaaS), migração para a nuvem, estratégias de escalabilidade"
+            ]
+          },
+          {
+            "nome": "Governança e ética na IA",
+            "subtopicos": [
+              "Transparência, responsabilidade, explicabilidade, privacidade, segurança, viés"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 19,
+      "cargo": "CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ANÁLISE DE SISTEMAS",
+      "materia_chunk": "SEGURANÇA DA INFORMAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "SEGURANÇA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Segurança da Informação",
+        "topicos": [
+          {
+            "nome": "Conceitos básicos",
+            "subtopicos": [
+              "Confidencialidade",
+              "Integridade",
+              "Disponibilidade",
+              "Autenticidade"
+            ]
+          },
+          {
+            "nome": "Gestão de segurança da informação",
+            "subtopicos": [
+              "NBR ISO/IEC Família 27001:2022 e NBR ISSO/IEC 27002:2022",
+              "NIST – Cybersecurity Framework",
+              "CIS Controls"
+            ]
+          },
+          {
+            "nome": "Segurança da informação e desenvolvimento de software seguro",
+            "subtopicos": [
+              "Privacidade e segurança por padrão e por design, criptografia, autenticação e autorização",
+              "Segurança em aplicações web e mobile, gestão de identidades e acess",
+              "Análise de vulnerabilidades em aplicações web",
+              "Metodologia Open Web Application Security Project (OWASP)",
+              "Técnicas de proteção de aplicações web, testes de invasão"
+            ]
+          },
+          {
+            "nome": "Métodos de autenticação",
+            "subtopicos": [
+              "Autenticação multifator baseada em biometria, por token e certificados",
+              "Protocolos de autenticação: OAuth 2.0, OpenID Connect, JWT (JSON Web Tokens) e SSO"
+            ]
+          },
+          {
+            "nome": "Ameaças e vulnerabilidades em aplicações",
+            "subtopicos": [
+              "Injection (SQL, LDAP), cross-site scripting (XSS)",
+              "Quebra de autenticação e gerenciamento de sessão",
+              "Referência insegura a objetos, cross-site request forgery",
+              "Armazenamento inseguro de dados criptografados"
+            ]
+          },
+          {
+            "nome": "Segurança de aplicativos web",
+            "subtopicos": []
+          },
+          {
+            "nome": "Prevenção e combate a ataques a redes de computadores",
+            "subtopicos": [
+              "DDoS, DoS, DNS spoofing",
+              "Eavesdropping, ransomware, phishing",
+              "Brute force, port scanning"
+            ]
+          },
+          {
+            "nome": "Criptografia e proteção de dados",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 4: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: COMUNICAÇÃO SOCIAL",
+      "materia_chunk": "COMUNICAÇÃO SOCIAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "COMUNICAÇÃO SOCIAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Comunicação Social",
+        "topicos": [
+          {
+            "nome": "Comunicação pública",
+            "subtopicos": [
+              "Conceito de comunicação pública",
+              "Processos de comunicação pública",
+              "Instrumentos de comunicação pública",
+              "Legislação"
+            ]
+          },
+          {
+            "nome": "Comunicação nas organizações",
+            "subtopicos": [
+              "Fundamentos e finalidades",
+              "Assessoria de comunicação",
+              "Atribuições, organização, estrutura e funcionamento",
+              "Produtos e rotinas de uma assessoria de comunicação",
+              "Papel do assessor",
+              "Sugestões de pauta, releases e artigos",
+              "Notas oficiais",
+              "Clipping",
+              "Atendimento à imprensa",
+              "Organização de entrevistas",
+              "Comunicação de crise"
+            ]
+          },
+          {
+            "nome": "Jornalismo institucional",
+            "subtopicos": [
+              "Comunicação interna e endomarketing"
+            ]
+          },
+          {
+            "nome": "Teorias do jornalismo e critérios de noticiabilidade",
+            "subtopicos": [
+              "Agenda setting, gatekeeping, newsmaking, espiral do silêncio"
+            ]
+          },
+          {
+            "nome": "Produção jornalística",
+            "subtopicos": [
+              "Princípios e orientações gerais para redigir um texto jornalístico",
+              "Edição e revisão de informação",
+              "Características, linguagens e técnicas de produção, apuração, entrevista, redação em diferentes meios",
+              "Telejornalismo e radiojornalismo",
+              "Técnicas de redação e produção",
+              "Fotojornalismo"
+            ]
+          },
+          {
+            "nome": "Novas tecnologias de comunicação",
+            "subtopicos": [
+              "Comunicação digital e mídias sociais",
+              "Jornalismo digital",
+              "Características e elementos",
+              "Ferramentas, linguagens e plataformas",
+              "Impactos da comunicação da Internet",
+              "Fake news e jornalismo",
+              "Inteligência artificial e produção de conteúdo"
+            ]
+          },
+          {
+            "nome": "Jornalismo jurídico e cobertura jornalística do Poder Judiciário",
+            "subtopicos": [
+              "Português jurídico",
+              "Normativos da comunicação social no Poder Judiciário",
+              "Instrução Normativa da Presidência do CNJ nº 96/2023 (institui a Política de Comunicação Social do Conselho Nacional de Justiça)",
+              "Portaria CNJ nº 198/2019 (constitui o Comitê de Comunicação Social do Poder Judiciário)",
+              "Resolução CNJ nº 407/2021 (institui o Plano Complementar de Comunicação Interna dos Tribunais)",
+              "Pacto Nacional do Judiciário pela Linguagem Simples",
+              "Eixos temáticos",
+              "Resolução CNJ nº 85/2009 (dispõe sobre a comunicação social no âmbito do Poder Judiciário)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 21,
+      "cargo": "CARGO 5: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "CONTABILIDADE GERAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "CONTABILIDADE GERAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Geral",
+        "topicos": [
+          {
+            "nome": "Norma Brasileira de Contabilidade (NBC TG Estrutura Conceitual)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Plano de contas e procedimentos de escrituração",
+            "subtopicos": [
+              "Conceito, classificação (patrimoniais e de resultado) e natureza das contas (devedoras e credoras)",
+              "Elementos essenciais do lançamento contábil",
+              "Formalidades essenciais da escrituração: Livros utilizados na escrituração",
+              "Formalidades essenciais da escrituração: Arts. 39 e 40 da Lei nº 8.934/1994",
+              "Formalidades essenciais da escrituração: Arts. 132, 1.065, e de 1.179 a 1.195 da Lei nº 10.406/2002 (Código Civil)",
+              "Formalidades essenciais da escrituração: Arts. 133, 289, 294 e 295 da Lei nº 6.404/1976 (sociedades por ações)",
+              "Formalidades essenciais da escrituração: Instrução Normativa DREI/SGD/ME nº 82/2021",
+              "Formalidades essenciais da escrituração: ITG2000 (R1) do CFC (escrituração contábil)",
+              "Sistema Público de Escrituração Digital (SPED): Decreto nº 6.022/2007",
+              "Sistema Público de Escrituração Digital (SPED): Instrução Normativa RFB nº 2.003/2021",
+              "Sistema Público de Escrituração Digital (SPED): CTG 2001 (R3): procedimentos técnicos e demais formalidades a serem observados na escrituração contábil em forma digital para fins de atendimento ao SPED"
+            ]
+          },
+          {
+            "nome": "Elaboração de demonstrações contábeis pela legislação societária, pelas normas brasileiras de contabilidade do Conselho Federal da Contabilidade (CFC) e pelos pronunciamentos do Comitê de Pronunciamentos Contábeis (CPC)",
+            "subtopicos": [
+              "Demonstração dos fluxos de caixa (métodos direto e indireto)",
+              "Balanço patrimonial",
+              "Demonstração do resultado do exercício",
+              "Demonstração do valor adicionado",
+              "Demonstração das mutações do patrimônio líquido",
+              "Demonstração de lucros ou prejuízos acumulados",
+              "Demonstração do resultado abrangente"
+            ]
+          },
+          {
+            "nome": "Disponibilidades: caixa e equivalentes de caixa",
+            "subtopicos": [
+              "Conteúdo, classificação e critérios de avaliação"
+            ]
+          },
+          {
+            "nome": "Contas a receber",
+            "subtopicos": [
+              "Conceito, conteúdo e critérios contábeis"
+            ]
+          },
+          {
+            "nome": "Estoques",
+            "subtopicos": [
+              "Conceito e classificação",
+              "Critérios de avaliação de estoques"
+            ]
+          },
+          {
+            "nome": "Realizável a longo prazo (não circulante)",
+            "subtopicos": [
+              "Conceito e classificação",
+              "Ajuste a valor presente: conceito e metodologia",
+              "Ajuste a valor presente: cálculo",
+              "Ajuste a valor presente: contabilização"
+            ]
+          },
+          {
+            "nome": "Passivo exigível",
+            "subtopicos": [
+              "Conceitos gerais, avaliação e conteúdo do passivo"
+            ]
+          },
+          {
+            "nome": "Fornecedores, obrigações fiscais e outras obrigações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Empréstimos e financiamentos, debêntures e outros títulos de dívida",
+            "subtopicos": []
+          },
+          {
+            "nome": "Provisões, passivos contingentes e ativos contingentes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Patrimônio líquido",
+            "subtopicos": [
+              "Reservas de capital",
+              "Ajustes de avaliação patrimonial",
+              "Reservas de lucros",
+              "Ações em tesouraria",
+              "Prejuízos acumulados",
+              "Dividendos"
+            ]
+          },
+          {
+            "nome": "Receita de vendas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tributos sobre vendas na sistemática cumulativa e não cumulativa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Custo das mercadorias e dos produtos vendidos e dos serviços prestados",
+            "subtopicos": [
+              "Custeio real ou custeio por absorção",
+              "Custeio direto (ou custeio variável)",
+              "Custo-padrão",
+              "Custeio baseado em atividades",
+              "RKW",
+              "Custos para tomada de decisões",
+              "Sistemas de custos e informações gerenciais",
+              "Estudo da relação custo versus volume versus lucro",
+              "Custos e formação de preços em contratações públicas"
+            ]
+          },
+          {
+            "nome": "Despesas de vendas, gerais e administrativas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Receitas e despesas financeiras",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tributos sobre a renda",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lucro líquido do exercício",
+            "subtopicos": []
+          },
+          {
+            "nome": "Consolidação das demonstrações contábeis e demonstrações separadas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise econômico-financeira",
+            "subtopicos": [
+              "Indicadores de liquidez",
+              "Indicadores de rentabilidade",
+              "Indicadores de lucratividade",
+              "Indicadores de endividamento",
+              "Indicadores de estrutura de capitais",
+              "Análise vertical e horizontal"
+            ]
+          },
+          {
+            "nome": "Licitações e contratos",
+            "subtopicos": [
+              "§ 1º do Art. 65 e Art. 69 da Lei nº 14.133/2021",
+              "Instrução Normativa STJ/GDG nº 30/2022"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 5: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "CONTABILIDADE PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "CONTABILIDADE PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Pública",
+        "topicos": [
+          {
+            "nome": "Princípios de contabilidade sob a perspectiva do setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de contabilidade federal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conceituação, objeto e campo de aplicação da contabilidade pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Composição do patrimônio público",
+            "subtopicos": [
+              "Patrimônio público",
+              "Ativo",
+              "Passivo",
+              "Saldo patrimonial"
+            ]
+          },
+          {
+            "nome": "Variações patrimoniais",
+            "subtopicos": [
+              "Qualitativas",
+              "Quantitativas",
+              "Receita e despesa sob o enfoque patrimonial",
+              "Realização da variação patrimonial",
+              "Resultado patrimonial"
+            ]
+          },
+          {
+            "nome": "Mensuração de ativos",
+            "subtopicos": [
+              "Ativo imobilizado",
+              "Ativo intangível",
+              "Reavaliação e redução ao valor recuperável",
+              "Depreciação, amortização e exaustão"
+            ]
+          },
+          {
+            "nome": "Mensuração de passivos",
+            "subtopicos": [
+              "Provisões",
+              "Passivos contingentes"
+            ]
+          },
+          {
+            "nome": "Tratamento contábil aplicável aos impostos e contribuições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de custos",
+            "subtopicos": [
+              "Aspectos legais do sistema de custos",
+              "Ambiente da informação de custos",
+              "Características da informação de custos",
+              "Terminologia de custos"
+            ]
+          },
+          {
+            "nome": "Plano de contas aplicado ao setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstrações contábeis aplicadas ao setor público",
+            "subtopicos": [
+              "Balanço orçamentário",
+              "Balanço financeiro",
+              "Demonstração das variações patrimoniais",
+              "Balanço patrimonial",
+              "Demonstração dos fluxos de caixa",
+              "Demonstração das mutações do patrimônio líquido",
+              "Notas explicativas às demonstrações contábeis",
+              "Consolidação das demonstrações contábeis"
+            ]
+          },
+          {
+            "nome": "Transações no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Manual de Contabilidade Aplicada ao Setor Público (MCASP) 11ª edição",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regime contábil",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema Integrado de Administração Financeira do Governo Federal (SIAFI)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de Informações Contábeis e Fiscais do Setor Público Brasileiro (SICONFI)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 23,
+      "cargo": "CARGO 5: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "LEGISLAÇÃO TRIBUTÁRIA APLICADA ÀS CONTRATAÇÕES PÚBLICAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "LEGISLAÇÃO TRIBUTÁRIA APLICADA ÀS CONTRATAÇÕES PÚBLICAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Tributos",
+        "topicos": [
+          {
+            "nome": "Tributos",
+            "subtopicos": [
+              "Impostos, taxas e contribuições"
+            ]
+          },
+          {
+            "nome": "Operações fiscais e tributárias",
+            "subtopicos": [
+              "Noções de cálculo de tributos federais, estaduais e municipais, contribuições previdenciárias, FGTS e outras operações",
+              "Noções sobre contribuições EFD, e-Social e EFD Reinf"
+            ]
+          },
+          {
+            "nome": "Retenções na fonte realizadas pela administração pública federal",
+            "subtopicos": [
+              "Imposto de renda da pessoa jurídica (IRPJ)",
+              "Contribuição social sobre o lucro líquido (CSLL)",
+              "Programa de Integração Social (PIS)",
+              "Contribuição para o financiamento da seguridade social (COFINS)",
+              "Imposto sobre serviços (ISS)",
+              "Contribuição previdenciária (INSS)"
+            ]
+          },
+          {
+            "nome": "Legislação básica e suas atualizações",
+            "subtopicos": [
+              "Instrução Normativa da Receita Federal do Brasil nº 2.110/2022",
+              "Instrução Normativa da Receita Federal do Brasil nº 1.234/2012",
+              "Lei Complementar nº 116/2003"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 24,
+      "cargo": "CARGO 5: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "AUDITORIA GOVERNAMENTAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "AUDITORIA GOVERNAMENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Auditoria Governamental",
+        "topicos": [
+          {
+            "nome": "Conceito e evolução da auditoria governamental",
+            "subtopicos": [
+              "Papéis das auditorias interna e externa",
+              "Auditoria de regularidade e auditoria operacional"
+            ]
+          },
+          {
+            "nome": "Instrumentos de fiscalização: auditoria, levantamento, monitoramento, acompanhamento e inspeção",
+            "subtopicos": []
+          },
+          {
+            "nome": "Planejamento de auditoria",
+            "subtopicos": [
+              "Plano de auditoria baseado no risco",
+              "Atividades preliminares",
+              "Determinação de escopo",
+              "Materialidade, risco e relevância",
+              "Exame e avaliação do controle interno",
+              "Risco inerente, de controle e de detecção",
+              "Risco de auditoria",
+              "Matriz de planejamento",
+              "Programa de auditoria",
+              "Papéis de trabalho",
+              "Testes de auditoria",
+              "Amostragem estatística em auditoria"
+            ]
+          },
+          {
+            "nome": "Execução da auditoria",
+            "subtopicos": [
+              "Técnicas e procedimentos: exame documental, inspeção física, conferência de cálculos, observação, entrevista, circularização, conciliações, análise de contas contábeis, revisão analítica"
+            ]
+          },
+          {
+            "nome": "Evidências",
+            "subtopicos": [
+              "Caracterização de achados de auditoria",
+              "Matriz de achados e matriz de responsabilização"
+            ]
+          },
+          {
+            "nome": "Comunicação dos resultados: relatórios de auditoria",
+            "subtopicos": []
+          },
+          {
+            "nome": "Monitoramento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Documentação da auditoria",
+            "subtopicos": []
+          },
+          {
+            "nome": "Supervisão e controle de qualidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Procedimentos em processos de prestação de contas da administração pública federal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidade fiscal (Lei Complementar nº 101/2000 e suas alterações)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 25,
+      "cargo": "CARGO 5: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Princípios orçamentários",
+              "Ciclo orçamentário"
+            ]
+          },
+          {
+            "nome": "Orçamento público no Brasil",
+            "subtopicos": [
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos adicionais"
+            ]
+          },
+          {
+            "nome": "Programação e execução orçamentária e financeira",
+            "subtopicos": [
+              "Descentralização orçamentária e financeira",
+              "Alterações orçamentárias"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Classificação das receitas públicas",
+              "Estágios da receita pública",
+              "Fontes de receitas públicas",
+              "Dívida ativa"
+            ]
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios da despesa pública",
+              "Restos a pagar",
+              "Despesas de exercícios anteriores",
+              "Dívida fundada e flutuante",
+              "Suprimento de fundos"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 26,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "INFRAESTRUTURA DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "INFRAESTRUTURA DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Redes de Computadores e Infraestrutura de TI",
+        "topicos": [
+          {
+            "nome": "ISO/IEC 20000",
+            "subtopicos": []
+          },
+          {
+            "nome": "ITIL v4",
+            "subtopicos": [
+              "Conceitos básicos, disciplinas, estrutura e objetivos"
+            ]
+          },
+          {
+            "nome": "Meios de transmissão e tipos de cabeamentos",
+            "subtopicos": [
+              "Cabeamento estruturado categorias 5, 5e, 6 e 6a, de acordo com a ABNT NBR 14565:2019",
+              "Fibras ópticas (monomodo e multimodo)"
+            ]
+          },
+          {
+            "nome": "Técnicas de circuitos, pacotes e células",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tecnologias, protocolos e elementos de redes locais e de longa distância (PAN, LAN, MAN, WAN, WPAN, WLAN, WMAN e WWAN)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Modelos de referência OSI e TCP/IP",
+            "subtopicos": [
+              "Protocolos de comunicação TCP/IP, RDMA OVER converged ethernet (RoCE), MTU, Jumbo Frames"
+            ]
+          },
+          {
+            "nome": "Elementos de interconexão de redes de computadores (gateways, hubs, repetidores, bridges, switches e roteadores)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Protocolos de rede TCP/IP",
+            "subtopicos": [
+              "Protocolos IPv4 e IPv6",
+              "Segmentação e endereçamento",
+              "CIDR",
+              "Protocolos TCP, UDP, ICMP, IPSec, ARP, SSH, SMTP, HTTP e HTTPS, SSL e TLS, FTP, NFS, SMB, LDAP, DNS, DHCP, IMAP",
+              "Conceitos de multi protocol label switching (MPLS) e SD-WAN"
+            ]
+          },
+          {
+            "nome": "Mecanismos NAT e PAT",
+            "subtopicos": []
+          },
+          {
+            "nome": "Spanning tree protocol (IEEE 802.1D)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Protocolos de roteamento",
+            "subtopicos": [
+              "OSPF, BGP, RIP, VRRP e HSRP"
+            ]
+          },
+          {
+            "nome": "Noções de VLAN (IEEE 802.1Q)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tecnologia VOIP",
+            "subtopicos": [
+              "Protocolos H.323 e SIP",
+              "Qualidade de serviço (QoS)"
+            ]
+          },
+          {
+            "nome": "Padrão IEEE 802.3",
+            "subtopicos": [
+              "Fast ethernet",
+              "Gigabit ethernet"
+            ]
+          },
+          {
+            "nome": "Redes sem fio (wireless)",
+            "subtopicos": [
+              "Padrões IEEE 802.11, 802.1x, WPA e WPA2"
+            ]
+          },
+          {
+            "nome": "Ativos e perímetros de segurança de rede e aplicação",
+            "subtopicos": [
+              "Firewall, firewall proxy, WAF, SIEM, identity access management (IAM), privileged access management (PAM), IPTables, IDS/IPS, VPN, antivírus e antispam, antiDDoS"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de redes",
+            "subtopicos": [
+              "SNMP, MIBs, NMSs e agentes"
+            ]
+          },
+          {
+            "nome": "Ferramentas de monitoramento e logging",
+            "subtopicos": [
+              "Zabbix, Grafana, Elasticsearch, Kibana, application performance monitoring (APM)"
+            ]
+          },
+          {
+            "nome": "Serviços de nuvem (IaaS, PaaS e SaaS)",
+            "subtopicos": [
+              "Modelos de nuvem (público, privado, comunitário, híbrido)",
+              "Google Workspace",
+              "Microsoft Office 365"
+            ]
+          },
+          {
+            "nome": "Armazenamento de dados em rede",
+            "subtopicos": [
+              "Network attached storage (NAS), direct attached storage (DAS), software defined storage (SDS), cloud storage, protocolo FCP, protocolos CIFS e NFS, noções de storage"
+            ]
+          },
+          {
+            "nome": "Backup",
+            "subtopicos": [
+              "Políticas",
+              "Tipos de backup",
+              "Tecnologias de backup",
+              "Veritas Netbackup, Robocopy, RSync, deduplicação"
+            ]
+          },
+          {
+            "nome": "Sistemas operacionais",
+            "subtopicos": [
+              "Ambiente Linux (Red Hat e Oracle Linux)",
+              "Instalação, configuração e administração",
+              "Utilitários e comandos-padrão",
+              "Shell Script",
+              "Microsoft Windows (Windows 11 e Windows Server 2022)",
+              "Instalação, configuração e administração",
+              "Active Directory",
+              "Powershell"
+            ]
+          },
+          {
+            "nome": "Virtualização",
+            "subtopicos": [
+              "VMWare",
+              "Fundamentos, configuração, administração e alta disponibilidade"
+            ]
+          },
+          {
+            "nome": "Virtualização de desktop",
+            "subtopicos": [
+              "Remote",
+              "Desktop services",
+              "Noções de máquinas virtuais e contêineres",
+              "Arquitetura de orquestração de contêineres",
+              "Docker, Kubernetes, Rancher, noções de ferramentas de orquestração de automação de infraestrutura (Ansible e Puppet), noções de DevOps, ambiente de clusters",
+              "Deploy de aplicações; continuous delivery e continuous integration (CI/CD)",
+              "Ferramenta de versionamento Git: configuração e utilização"
+            ]
+          },
+          {
+            "nome": "Noções de alta disponibilidade e tolerância a falhas",
+            "subtopicos": [
+              "Indicadores de disponibilidade",
+              "MTBF, MTTR e MTTF",
+              "Clusterização",
+              "Balanceamento de carga",
+              "Failover"
+            ]
+          },
+          {
+            "nome": "Servidores de aplicação (JBoss, Apache HTTP Server, IIS)",
+            "subtopicos": [
+              "Administração e configuração",
+              "Análise de desempenho da rede",
+              "Gerenciamento de usuários",
+              "Configuração, administração e logs de serviços"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 27,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "BANCO DE DADOS E CIÊNCIA DE DADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "BANCO DE DADOS E CIÊNCIA DE DADOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Banco de Dados e Ciência de Dados",
+        "topicos": [
+          {
+            "nome": "Administração de SGBD",
+            "subtopicos": [
+              "MySQL, Oracle e PostgreSQL",
+              "Características de um SGBD"
+            ]
+          },
+          {
+            "nome": "Modelagens de dados",
+            "subtopicos": [
+              "Relacional, multidimensional, noSQL",
+              "Noções de normalização de dados"
+            ]
+          },
+          {
+            "nome": "Arquitetura de inteligência de negócio",
+            "subtopicos": [
+              "Business inteligence, data warehouse, data mart, data mining, data lake, data mesh, ETL e OLAP"
+            ]
+          },
+          {
+            "nome": "Ciência de dados",
+            "subtopicos": [
+              "Aprendizado de máquina",
+              "Deep learning",
+              "Processamento de linguagem natural",
+              "Big data",
+              "Qualidade de dados",
+              "Tipos de aprendizado",
+              "Supervisionado, não supervisionado, semissupervisionado, por reforço, por transferência"
+            ]
+          },
+          {
+            "nome": "Grandes modelos de linguagem (LLM), IA generativa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes neurais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "SEGURANÇA DA INFORMAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "SEGURANÇA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Segurança da Informação",
+        "topicos": [
+          {
+            "nome": "Normas ABNT NBR ISO/IEC 27001:2013 e ABNT NBR ISO/IEC 27002:2022",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de riscos de SI",
+            "subtopicos": [
+              "ABNT NBR ISO/IEC 27005:2022"
+            ]
+          },
+          {
+            "nome": "Políticas de segurança da informação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento de incidentes de segurança da informação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de continuidade de negócio",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de segurança da informação",
+            "subtopicos": [
+              "Classificação de informações, confidencialidade, integridade, disponibilidade, não repúdio, privacidade, autenticidade, segurança física e lógica"
+            ]
+          },
+          {
+            "nome": "Criptografia",
+            "subtopicos": [
+              "Conceitos básicos e aplicações",
+              "Protocolos criptográficos",
+              "Criptografia simétrica e assimétrica",
+              "Assinatura e certificação digital",
+              "Hashes e algoritmos de hash",
+              "Esteganografia e criptoanálise"
+            ]
+          },
+          {
+            "nome": "Infraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP-Brasil",
+            "subtopicos": []
+          },
+          {
+            "nome": "Controle de acesso",
+            "subtopicos": [
+              "Autenticação, autorização e auditoria",
+              "Controle de acesso baseado em papéis",
+              "Autenticação baseada em múltiplos fatores (MFA)"
+            ]
+          },
+          {
+            "nome": "Gestão de identidades, acesso e serviços de autenticação",
+            "subtopicos": [
+              "Radius",
+              "SSO Single",
+              "Sign On",
+              "Keycloak; protocolos SAML, OAuth2 (RFC 6749)",
+              "OpenId Connect"
+            ]
+          },
+          {
+            "nome": "Monitoramento de tráfego; ferramentas e conceitos de sniffer de rede; wireshark; análise de pacotes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ameaças e ataques em aplicações web",
+            "subtopicos": [
+              "SQL injection, broken authentication, cross-site scripting (XSS), insecure deserialization, directory traversal, watering hole attack, cross-site request forgery, cookie/session poisoning, buffer overflow, CAPTCHA attacks, OWASP Top 10:2021"
+            ]
+          },
+          {
+            "nome": "Ameaças e ataques em redes de computadores e redes wireless",
+            "subtopicos": [
+              "Ataques de negação de serviço (denial of service – DoS), distributed denial of service (DDoS), permanent denial of service (PDoS), distributed reflection denial of service (DRDoS)",
+              "Ataques de reconhecimento",
+              "Ping sweeping, port scanning, social engineering, DNS footprinting",
+              "Ataques de sniffing and spoofing",
+              "Tipos de ataques em redes wireless"
+            ]
+          },
+          {
+            "nome": "Ameaças e ataques de e-mail",
+            "subtopicos": [
+              "Phishing (spear phishing, whaling, pharming, spimming), spamming, mail bombing, mail storms",
+              "Protocolos de segurança de e-mail SPF e DKIM"
+            ]
+          },
+          {
+            "nome": "Ataques de malwares",
+            "subtopicos": [
+              "Vírus, worms, trojans, ransomware, rootkits, adware, spyware, botnet, backdoor",
+              "Advanced persistent threats (APT)"
+            ]
+          },
+          {
+            "nome": "Frameworks de segurança da informação e segurança cibernética",
+            "subtopicos": [
+              "MITRE ATT&CK, CIS Controls e NIST CyberSecurity Framework (NIST CSF)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 29,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "GOVERNANÇA E GESTÃO DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "GOVERNANÇA E GESTÃO DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Planejamento e Governança de TIC",
+        "topicos": [
+          {
+            "nome": "Planejamento estratégico de TIC",
+            "subtopicos": [
+              "Fundamentos do planejamento estratégico em tecnologia da informação e comunicação",
+              "Elaboração e implementação do plano diretor de TIC (PDTIC)",
+              "Indicadores de desempenho de TIC e alinhamento com objetivos organizacionais"
+            ]
+          },
+          {
+            "nome": "Governança de TIC",
+            "subtopicos": [
+              "COBIT 2019: conceitos básicos, estrutura, objetivos e aplicação para a governança de TIC",
+              "ITIL v4: gerenciamento de serviços de TIC, com foco em processos e melhores práticas",
+              "Metodologias de indicadores OKR, PKI e BSC",
+              "Análise SWOT aplicados à TIC"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de projetos de TIC",
+            "subtopicos": [
+              "PMBOK 7ª edição: conceitos, grupos de processos e áreas de conhecimento",
+              "Escritório de projetos – PMO e gestão de portfólio de projetos"
+            ]
+          },
+          {
+            "nome": "Governança e gestão de TIC",
+            "subtopicos": [
+              "Resolução CNJ nº 370/2021 (Estratégia Nacional de Tecnologia da Informação e Comunicação do Poder Judiciário – ENTIC-JUD)",
+              "Resolução CNJ nº 468/2022 e o Guia de Contratações de STIC do Poder Judiciário e suas alterações",
+              "Lei nº 14.133/2021",
+              "Planejamento, fiscalização e gestão de contratos de TIC"
+            ]
+          },
+          {
+            "nome": "Noções de gestão de riscos de TIC",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "NORMATIVOS DA PDPJ-BR",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "NORMATIVOS DA PDPJ-BR",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação CNJ",
+        "topicos": [
+          {
+            "nome": "Resolução CNJ nº 522/2023 (institui o modelo de requisitos para sistemas informatizados de gestão de processos e documentos do Poder Judiciário e disciplina a obrigatoriedade da sua utilização no desenvolvimento e manutenção de sistemas informatizados para as atividades judiciárias e administrativas no âmbito do Poder Judiciário)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução CNJ nº 335/2020 (institui política pública para governança e gestão de processo judicial eletrônico; integra os tribunais do país com a criação da Plataforma Digital do Poder Judiciário Brasileiro – PDPJ-Br; mantém o sistema PJe como sistema de processo eletrônico prioritário do Conselho Nacional de Justiça)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Portaria CNJ nº 252/2020 (dispõe sobre modelo de governança e gestão da Plataforma Digital do Poder Judiciário – PDPJ-Br)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Portaria CNJ nº 253/2020 (institui os critérios e as diretrizes técnicas para o processo de desenvolvimento de módulos e serviços na Plataforma Digital do Poder Judiciário Brasileiro – PDPJ-Br)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Portaria CNJ nº 131/2021 (institui o grupo revisor de código-fonte das soluções da Plataforma Digital do Poder Judiciário – PDPJ-Br e do Processo Judicial Eletrônico – PJe)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução CNJ nº 396/2021 (institui a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – ENSEC-PJ)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Portaria CNJ nº 162/2021 (aprova protocolos e manuais criados pela Resolução CNJ nº 396/2021, que instituiu a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – ENSEC-PJ)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 31,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Conhecimentos Específicos - Desenvolvimento de Software",
+        "topicos": [
+          {
+            "nome": "Linguagem de programação Java",
+            "subtopicos": []
+          },
+          {
+            "nome": "Arquitetura distribuída de microsserviços; API RESTful; JSON; framework Spring; Spring Cloud; Spring Boot; Spring Eureka, Zuul; Map Struct; Swagger; Service Discovery; API Gateway",
+            "subtopicos": [
+              "Arquitetura distribuída de microsserviços",
+              "API RESTful",
+              "JSON",
+              "framework Spring",
+              "Spring Cloud",
+              "Spring Boot",
+              "Spring Eureka, Zuul",
+              "Map Struct",
+              "Swagger",
+              "Service Discovery",
+              "API Gateway"
+            ]
+          },
+          {
+            "nome": "Persistência; JPA 2.0; Hibernate 4.3 ou superior; Hibernate Envers; Biblioteca Flyway",
+            "subtopicos": [
+              "Persistência",
+              "JPA 2.0",
+              "Hibernate 4.3 ou superior",
+              "Hibernate Envers",
+              "Biblioteca Flyway"
+            ]
+          },
+          {
+            "nome": "Banco de dados; PostgreSQL; H2 Database",
+            "subtopicos": [
+              "Banco de dados",
+              "PostgreSQL",
+              "H2 Database"
+            ]
+          },
+          {
+            "nome": "Serviços de autenticação; single sign-on (SSO); keycloak; protocolo OAuth2 (RFC 6749)",
+            "subtopicos": [
+              "Serviços de autenticação",
+              "single sign-on (SSO)",
+              "keycloak",
+              "protocolo OAuth2 (RFC 6749)"
+            ]
+          },
+          {
+            "nome": "Mensageria e webhooks; message broker; RabbitMQ; evento negocial; webhook; APIs reversas",
+            "subtopicos": [
+              "Mensageria e webhooks",
+              "message broker",
+              "RabbitMQ",
+              "evento negocial",
+              "webhook",
+              "APIs reversas"
+            ]
+          },
+          {
+            "nome": "Ferramenta de versionamento Git",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ambiente de clusters e Kubernetes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ferramenta de orquestração de contêineres, Rancher",
+            "subtopicos": []
+          },
+          {
+            "nome": "Deploy de aplicações; continuous delivery e continuous integration (CI/CD)",
+            "subtopicos": [
+              "Deploy de aplicações",
+              "continuous delivery e continuous integration (CI/CD)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO PENAL MILITAR",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO PENAL MILITAR",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Penal Militar",
+        "topicos": [
+          {
+            "nome": "Aplicação da lei penal militar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crime",
+            "subtopicos": []
+          },
+          {
+            "nome": "Imputabilidade penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Concurso de agentes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Penas",
+            "subtopicos": [
+              "Penas principais",
+              "Aplicação da pena",
+              "Suspensão condicional da pena",
+              "Livramento condicional",
+              "Penas acessórias",
+              "Efeitos da condenação"
+            ]
+          },
+          {
+            "nome": "Medidas de segurança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ação penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Extinção da punibilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes militares em tempo de paz",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes militares em tempo de guerra",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes propriamente militares",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes impropriamente militares",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes militares por extensão",
+            "subtopicos": []
+          },
+          {
+            "nome": "Jurisprudência aplicada dos tribunais superiores",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 33,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO PROCESSUAL PENAL MILITAR",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO PROCESSUAL PENAL MILITAR",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Processo Penal Militar",
+        "topicos": [
+          {
+            "nome": "Lei processual penal militar e sua aplicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Polícia judiciária militar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Inquérito policial militar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ação penal militar e seu exercício",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo penal militar em geral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Juiz, auxiliares e partes do processo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Denúncia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Foro militar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Competência em geral",
+            "subtopicos": [
+              "Espécies de competência",
+              "Desaforamento",
+              "Conflitos de competência"
+            ]
+          },
+          {
+            "nome": "Questões prejudiciais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Exceções em geral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Incidente de insanidade mental do acusado e incidente de falsidade de documento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Medidas preventivas e assecuratórias",
+            "subtopicos": [
+              "Providências que recaem sobre coisas ou pessoas",
+              "Providências que recaem sobre coisas",
+              "Providências que recaem sobre pessoas"
+            ]
+          },
+          {
+            "nome": "Menagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Liberdade provisória",
+            "subtopicos": []
+          },
+          {
+            "nome": "Aplicação provisória de medidas de segurança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Citação, intimação e notificação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Atos probatórios",
+            "subtopicos": [
+              "Disposições gerais",
+              "Qualificação e interrogatório do acusado",
+              "Confissão",
+              "Perguntas ao ofendido",
+              "Perícias e exames",
+              "Testemunhas",
+              "Acareação",
+              "Reconhecimento de pessoa e de coisa",
+              "Documentos",
+              "Indícios"
+            ]
+          },
+          {
+            "nome": "Processos em espécie",
+            "subtopicos": [
+              "Processo ordinário",
+              "Processos especiais: deserção em geral, processo de deserção de oficial, processo de deserção de praça com ou sem graduação e de praça especial, processo de crime de insubmissão, habeas corpus, processo para restauração de autos, processo de competência originária do Superior Tribunal Militar, correição parcial"
+            ]
+          },
+          {
+            "nome": "Nulidades e recursos em geral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; execução das medidas de segurança; incidentes da execução",
+            "subtopicos": []
+          },
+          {
+            "nome": "Jurisprudência aplicada dos tribunais superiores",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 34,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO PENAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO PENAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Penal",
+        "topicos": [
+          {
+            "nome": "Fontes do direito penal",
+            "subtopicos": [
+              "Princípios aplicáveis ao direito penal"
+            ]
+          },
+          {
+            "nome": "Aplicação da lei penal",
+            "subtopicos": [
+              "Anterioridade da lei",
+              "Lei penal no tempo e no espaço",
+              "Tempo e lugar do crime",
+              "Lei penal excepcional, especial e temporária",
+              "Territorialidade e extraterritorialidade da lei penal",
+              "Pena cumprida no estrangeiro",
+              "Eficácia da sentença estrangeira",
+              "Contagem de prazo",
+              "Frações não computáveis da pena",
+              "Interpretação da lei penal",
+              "Analogia",
+              "Irretroatividade da lei penal",
+              "Conflito aparente de normas"
+            ]
+          },
+          {
+            "nome": "Crime",
+            "subtopicos": [
+              "Classificação dos crimes",
+              "Teorias do crime",
+              "Fato típico e seus elementos",
+              "Relação de causalidade",
+              "Superveniência de causa independente",
+              "Relevância da omissão",
+              "Crime consumado e tentado",
+              "Pena da tentativa",
+              "Desistência voluntária e arrependimento eficaz",
+              "Arrependimento posterior",
+              "Crime impossível",
+              "Crime doloso, culposo e preterdoloso",
+              "Agravação pelo resultado",
+              "Concurso de crimes",
+              "Erro sobre elementos do tipo",
+              "Descriminantes putativas",
+              "Erro determinado por terceiro",
+              "Erro sobre a pessoa",
+              "Erro sobre a ilicitude do fato (erro de proibição)",
+              "Coação irresistível e obediência hierárquica",
+              "Ilicitude e causas de exclusão",
+              "Excesso punível",
+              "Culpabilidade",
+              "Teorias, elementos e causas de exclusão"
+            ]
+          },
+          {
+            "nome": "Imputabilidade penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Concurso de pessoas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Penas",
+            "subtopicos": [
+              "Espécies de penas",
+              "Cominação das penas",
+              "Aplicação da pena",
+              "Suspensão condicional da pena",
+              "Livramento condicional",
+              "Efeitos da condenação",
+              "Reabilitação",
+              "Execução das penas em espécie e incidentes de execução"
+            ]
+          },
+          {
+            "nome": "Medidas de segurança",
+            "subtopicos": [
+              "Execução das medidas de segurança"
+            ]
+          },
+          {
+            "nome": "Ação penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Punibilidade e causas de extinção",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes em espécie do Código Penal",
+            "subtopicos": [
+              "Crimes contra o patrimônio",
+              "Crimes contra a incolumidade pública",
+              "Crimes contra a paz pública",
+              "Crimes contra a fé pública",
+              "Crimes contra a administração pública"
+            ]
+          },
+          {
+            "nome": "Crimes constantes de legislação especial",
+            "subtopicos": [
+              "Crimes hediondos (Lei nº 8.072/1990 e suas alterações)",
+              "Crimes resultantes de preconceito de raça ou de cor (Lei nº 7.716/1989 e suas alterações)",
+              "Crime de tortura (Lei nº 9.455/1997 e suas alterações)",
+              "Crimes relacionados a entorpecentes (Lei nº 11.343/2006 e alterações – Lei Antidrogas)",
+              "Crime de abuso de autoridade (Lei nº 13.869/2019)",
+              "Crimes tipificados no Estatuto do Desarmamento (Lei nº 10.826/2003 e suas alterações)",
+              "Crimes e infrações administrativas tipificados no Estatuto da Criança e do Adolescente (Lei nº 8.069/1990 e suas alterações)",
+              "Crimes tipificados no Estatuto da Pessoa Idosa (Lei nº 10.741/2003)",
+              "Crimes contra a ordem tributária e econômica (Lei nº 8.137/1990 e suas alterações)"
+            ]
+          },
+          {
+            "nome": "Convenção americana sobre direitos humanos (Pacto de São José e Decreto nº 678/1992)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Disposições constitucionais aplicáveis ao direito penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Súmulas e jurisprudência do STF e STJ",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 35,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO PROCESSUAL PENAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO PROCESSUAL PENAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Processual Penal",
+        "topicos": [
+          {
+            "nome": "Disposições preliminares do Código de Processo Penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Inquérito policial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ação penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Competência",
+            "subtopicos": []
+          },
+          {
+            "nome": "Atos processuais",
+            "subtopicos": [
+              "Conceito, classificação, forma, tempo, lugar, prazos",
+              "Preclusão",
+              "Atos das partes, do juiz, dos auxiliares da justiça e de terceiros",
+              "Atos simples, complexos e compostos",
+              "Atos de comunicação processual: espécies e formas",
+              "Revelia no processo penal",
+              "Atos de cooperação internacional",
+              "Utilização de sistema de transmissão de dados para a prática de atos processuais"
+            ]
+          },
+          {
+            "nome": "Prova",
+            "subtopicos": [
+              "Conceito, objetivo, objeto, fontes e elementos",
+              "Classificação e princípios",
+              "Meios de prova em espécie previstos no Código de Processo Penal e em leis extravagantes",
+              "Ônus da prova no processo penal",
+              "Prova emprestada",
+              "Provas admissíveis e provas proibidas",
+              "Provas direta e indireta",
+              "Sistemas de apreciação ou avaliação das provas",
+              "Princípio do livre convencimento",
+              "Iniciativa instrutória do juiz de direito"
+            ]
+          },
+          {
+            "nome": "Sujeitos e partes do processo",
+            "subtopicos": [
+              "Juiz, Ministério Público, acusado, defensor, assistentes, auxiliares da justiça e terceiros",
+              "Relação jurídica processual penal: finalidade, natureza jurídica, características, conteúdo, objeto, início, suspensão e fim",
+              "Substituição processual"
+            ]
+          },
+          {
+            "nome": "Nulidades",
+            "subtopicos": [
+              "Conceito, classificações e sistema legal",
+              "Princípios",
+              "Nulidades previstas no Código de Processo Penal",
+              "Nulidades absoluta e relativa",
+              "Anulabilidade",
+              "Irregularidades",
+              "Inexistência jurídica",
+              "Atipicidade constitucional",
+              "Arguição, saneamento e efeitos",
+              "Prazos"
+            ]
+          },
+          {
+            "nome": "Jurisdição",
+            "subtopicos": [
+              "Conceito, características, princípios, formas, objeto",
+              "Órgãos"
+            ]
+          },
+          {
+            "nome": "Competência penal",
+            "subtopicos": [
+              "Conceito",
+              "Critérios determinadores e causas modificadoras da competência de foro e do juízo",
+              "Conexão e continência",
+              "Competência funcional",
+              "Conflitos de competência e de atribuição"
+            ]
+          },
+          {
+            "nome": "Questões e processos incidentes",
+            "subtopicos": [
+              "Questões prejudiciais",
+              "Exceções",
+              "Incompatibilidade, impedimento e suspeição",
+              "Incidente de insanidade mental do acusado"
+            ]
+          },
+          {
+            "nome": "Prisão, liberdade provisória e fiança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo e julgamento dos crimes de responsabilidade dos funcionários públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Habeas corpus e seu processo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Disposições constitucionais aplicáveis ao direito processual penal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 9.296/1996 (interceptação telefônica)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de execução penal",
+            "subtopicos": [
+              "Execução das penas e das medidas de segurança",
+              "Natureza jurídica da execução penal"
+            ]
+          },
+          {
+            "nome": "Lei Anticrime (Lei nº 13.964/2019)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Súmulas e jurisprudência do STF e STJ",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 36,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO CONSTITUCIONAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO CONSTITUCIONAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Constitucional",
+        "topicos": [
+          {
+            "nome": "Constituição",
+            "subtopicos": [
+              "Conceito, objeto, elementos e classificações",
+              "Supremacia da Constituição",
+              "Aplicabilidade das normas constitucionais",
+              "Interpretação das normas constitucionais",
+              "Métodos, princípios e limites"
+            ]
+          },
+          {
+            "nome": "Poder constituinte",
+            "subtopicos": [
+              "Características",
+              "Poder constituinte originário",
+              "Poder constituinte derivado"
+            ]
+          },
+          {
+            "nome": "Princípios fundamentais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direitos e garantias fundamentais",
+            "subtopicos": [
+              "Direitos e deveres individuais e coletivos",
+              "Habeas corpus, mandado de segurança, mandado de injunção e habeas data",
+              "Direitos sociais",
+              "Nacionalidade",
+              "Direitos políticos",
+              "Partidos políticos"
+            ]
+          },
+          {
+            "nome": "Organização do Estado",
+            "subtopicos": [
+              "Organização político-administrativa",
+              "Estado federal brasileiro",
+              "União",
+              "Estados federados",
+              "Municípios",
+              "Distrito Federal",
+              "Territórios",
+              "Intervenção federal",
+              "Intervenção dos estados nos municípios"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Disposições gerais",
+              "Servidores públicos",
+              "Militares dos estados, do Distrito Federal e dos territórios"
+            ]
+          },
+          {
+            "nome": "Organização dos poderes no Estado",
+            "subtopicos": [
+              "Mecanismos de freios e contrapesos",
+              "Poder Legislativo",
+              "Estrutura, funcionamento e atribuições",
+              "Comissões parlamentares de inquérito",
+              "Fiscalização contábil, financeira e orçamentária",
+              "Tribunal de Contas da União (TCU)",
+              "Processo legislativo",
+              "Prerrogativas parlamentares",
+              "Poder Executivo",
+              "Presidente da República",
+              "Atribuições, prerrogativas e responsabilidades",
+              "Ministros de Estado",
+              "Conselho da República e de Defesa Nacional",
+              "Poder Judiciário",
+              "Disposições gerais",
+              "Órgãos do Poder Judiciário",
+              "Organização e competências",
+              "Conselho Nacional de Justiça (CNJ)"
+            ]
+          },
+          {
+            "nome": "Funções essenciais à justiça",
+            "subtopicos": [
+              "Ministério Público",
+              "Princípios, garantias, vedações, organização e competências",
+              "Conselho Nacional do Ministério Público",
+              "Advocacia pública",
+              "Defensoria Pública"
+            ]
+          },
+          {
+            "nome": "Controle de constitucionalidade",
+            "subtopicos": [
+              "Sistemas gerais e sistema brasileiro",
+              "Controle incidental ou concreto",
+              "Controle abstrato de constitucionalidade",
+              "Exame in abstractu da constitucionalidade de proposições legislativas",
+              "Ação declaratória de constitucionalidade",
+              "Ação direta de inconstitucionalidade",
+              "Arguição de descumprimento de preceito fundamental",
+              "Ação direta de inconstitucionalidade por omissão",
+              "Ação direta de inconstitucionalidade interventiva",
+              "Controle concreto e abstrato de constitucionalidade do direito municipal"
+            ]
+          },
+          {
+            "nome": "Defesa do Estado e das instituições democráticas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema Tributário Nacional",
+            "subtopicos": [
+              "Princípios gerais",
+              "Limitações do poder de tributar",
+              "Impostos da União, dos estados e dos municípios",
+              "Repartição das receitas tributárias"
+            ]
+          },
+          {
+            "nome": "Finanças públicas",
+            "subtopicos": [
+              "Normas gerais",
+              "Orçamentos"
+            ]
+          },
+          {
+            "nome": "Ordem econômica e financeira",
+            "subtopicos": [
+              "Princípios gerais da atividade econômica"
+            ]
+          },
+          {
+            "nome": "Sistema Financeiro Nacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ordem social",
+            "subtopicos": []
+          },
+          {
+            "nome": "Disciplina constitucional dos precatórios",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal (Lei Complementar nº 101/2000)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 37,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Introdução ao direito administrativo",
+            "subtopicos": [
+              "Origem, natureza jurídica e objeto do direito administrativo",
+              "Os diferentes critérios adotados para a conceituação do direito administrativo",
+              "Fontes do direito administrativo"
+            ]
+          },
+          {
+            "nome": "Regime jurídico-administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Supremacia do interesse público sobre o privado e indisponibilidade, pela administração, dos interesses púbicos",
+              "Princípios expressos e implícitos da administração pública"
+            ]
+          },
+          {
+            "nome": "Organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta: conceito",
+              "Órgão público: conceito",
+              "Teorias sobre as relações do Estado com os agentes públicos",
+              "Características e classificação",
+              "Administração indireta: conceito",
+              "Autarquias",
+              "Agências reguladoras",
+              "Agências executivas",
+              "Fundações públicas",
+              "Empresas públicas",
+              "Sociedades de economia mista",
+              "Consórcios públicos",
+              "Entidades paraestatais e terceiro setor: serviços sociais autônomos",
+              "Entidades de apoio",
+              "Organizações sociais",
+              "Organizações da sociedade civil de interesse público (OSCIP)"
+            ]
+          },
+          {
+            "nome": "Atos administrativos",
+            "subtopicos": [
+              "Conceito",
+              "Fatos da administração, atos da administração e atos administrativos",
+              "Requisitos ou elementos",
+              "Atributos",
+              "Classificação",
+              "Atos administrativos em espécie",
+              "Extinção dos atos administrativos: revogação, anulação e cassação",
+              "Convalidação",
+              "Vinculação e discricionariedade",
+              "Atos administrativos nulos, anuláveis e inexistentes",
+              "Decadência administrativa"
+            ]
+          },
+          {
+            "nome": "Poderes e deveres da administração pública",
+            "subtopicos": [
+              "Poder regulamentar",
+              "Poder hierárquico",
+              "Poder disciplinar",
+              "Poder de polícia",
+              "Dever de agir",
+              "Dever de eficiência",
+              "Dever de probidade",
+              "Dever de prestação de contas",
+              "Abuso do poder"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Conceito",
+              "Classificação das formas de controle: conforme a origem",
+              "Conforme o momento a ser exercido",
+              "Conforme a amplitude",
+              "Controle exercido pela administração pública",
+              "Controle legislativo",
+              "Controle judicial"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Licitações",
+            "subtopicos": [
+              "Legislação pertinente: Lei nº 14.133/2021 e suas alterações",
+              "Decreto nº 11.462/2023",
+              "Fundamentos constitucionais",
+              "Disposições doutrinárias: conceito",
+              "Objeto e finalidade",
+              "Destinatários",
+              "Princípios",
+              "Contratação direta: dispensa e inexigibilidade",
+              "Modalidades",
+              "Tipos",
+              "Procedimento",
+              "Anulação e revogação",
+              "Sanções administrativas"
+            ]
+          },
+          {
+            "nome": "Contratos administrativos",
+            "subtopicos": [
+              "Legislação pertinente: Lei nº 14.133/2021 e suas alterações",
+              "Lei nº 11.107/2005 e Decreto nº 6.017/2007 (consórcios públicos)",
+              "Disposições doutrinárias: conceito",
+              "Características",
+              "Vigência",
+              "Alterações contratuais",
+              "Execução, inexecução e rescisão",
+              "Convênios e instrumentos congêneres"
+            ]
+          },
+          {
+            "nome": "Desapropriação",
+            "subtopicos": [
+              "Conceito, características, fundamentos, requisitos constitucionais, objeto, beneficiários, indenização e seu pagamento, desapropriação indireta e por zona"
+            ]
+          },
+          {
+            "nome": "Jurisprudência pacificada dos tribunais superiores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 12.527/2011 (Lei de Acesso à Informação)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 38,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO CIVIL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO CIVIL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Civil",
+        "topicos": [
+          {
+            "nome": "Introdução ao direito civil",
+            "subtopicos": [
+              "Decreto-lei nº 4.657/1942 (Lei de Introdução às Normas do Direito Brasileiro): arts. 1º a 19",
+              "Vigência, aplicação, obrigatoriedade, interpretação e integração das leis",
+              "Conflito das leis no tempo",
+              "Eficácia das leis no espaço"
+            ]
+          },
+          {
+            "nome": "Pessoas naturais",
+            "subtopicos": [
+              "Conceito",
+              "Início da pessoa natural",
+              "Personalidade",
+              "Capacidade",
+              "Direitos da personalidade",
+              "Nome civil",
+              "Estado civil",
+              "Domicílio",
+              "Ausência"
+            ]
+          },
+          {
+            "nome": "Pessoas jurídicas",
+            "subtopicos": [
+              "Disposições gerais",
+              "Conceito e elementos caracterizadores",
+              "Constituição",
+              "Extinção",
+              "Capacidade e direitos da personalidade"
+            ]
+          },
+          {
+            "nome": "Fatos jurídicos",
+            "subtopicos": [
+              "Negócio jurídico",
+              "Atos jurídicos lícitos",
+              "Atos jurídicos ilícitos",
+              "Prescrição e decadência",
+              "Prova"
+            ]
+          },
+          {
+            "nome": "Direito das obrigações",
+            "subtopicos": [
+              "Modalidades",
+              "Transmissão",
+              "Adimplemento e extinção",
+              "Inadimplemento",
+              "Atos unilaterais"
+            ]
+          },
+          {
+            "nome": "Contratos",
+            "subtopicos": [
+              "Princípios",
+              "Classificações",
+              "Interpretação",
+              "Disposições gerais",
+              "Extinção",
+              "Espécies de contratos regulados no Código Civil"
+            ]
+          },
+          {
+            "nome": "Preferências e privilégios creditórios",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidade civil",
+            "subtopicos": [
+              "Obrigação de indenizar",
+              "Indenização"
+            ]
+          },
+          {
+            "nome": "Direito das sucessões",
+            "subtopicos": [
+              "Sucessão em geral",
+              "Sucessão legítima",
+              "Sucessão testamentária",
+              "Inventário e partilha"
+            ]
+          },
+          {
+            "nome": "Legislação especial",
+            "subtopicos": [
+              "Lei nº 10.741/2003 (Estatuto da Pessoa Idosa)",
+              "Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência)",
+              "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais)"
+            ]
+          },
+          {
+            "nome": "Jurisprudência pacificada dos tribunais superiores",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 39,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "DIREITO PROCESSUAL CIVIL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "DIREITO PROCESSUAL CIVIL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Processual Civil",
+        "topicos": [
+          {
+            "nome": "Lei nº 13.105/2015 e suas alterações (Código de Processo Civil)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Introdução ao direito processual civil",
+            "subtopicos": [
+              "Princípios gerais",
+              "Fontes",
+              "Lei processual civil: eficácia, aplicação e interpretação"
+            ]
+          },
+          {
+            "nome": "Jurisdição e competência",
+            "subtopicos": [
+              "Conceito, características e princípios da jurisdição",
+              "Jurisdição contenciosa e voluntária",
+              "Meios alternativos de pacificação social",
+              "Critérios de definição e de modificação de competência",
+              "Competência absoluta e relativa",
+              "Meios de declaração de incompetência",
+              "Conflitos de competência e de atribuição",
+              "Competência originária dos tribunais superiores"
+            ]
+          },
+          {
+            "nome": "Ação",
+            "subtopicos": [
+              "Conceito, natureza, elementos e características",
+              "Condições",
+              "Classificação",
+              "Conexão e continência",
+              "Concurso e cumulação"
+            ]
+          },
+          {
+            "nome": "Processo",
+            "subtopicos": [
+              "Conceitos fundamentais",
+              "Relação jurídica processual",
+              "Pressupostos processuais",
+              "Processo e procedimento",
+              "Espécies de processos e de procedimentos",
+              "Objeto do processo",
+              "Mérito",
+              "Questão principal, questões preliminares e prejudiciais"
+            ]
+          },
+          {
+            "nome": "Sujeitos do processo",
+            "subtopicos": [
+              "Partes e procuradores",
+              "Capacidade processual e postulatória",
+              "Deveres das partes e dos procuradores",
+              "Responsabilidade das partes por dano processual",
+              "Procuradores",
+              "Sucessão das partes e dos procuradores",
+              "Litisconsórcio",
+              "Intervenção de terceiros",
+              "Juiz e auxiliares da justiça",
+              "Ministério Público, advocacia pública e Defensoria Pública"
+            ]
+          },
+          {
+            "nome": "Atos processuais",
+            "subtopicos": [
+              "Forma, tempo e lugar",
+              "Prazos",
+              "Comunicação dos atos processuais",
+              "Nulidades",
+              "Distribuição e registro"
+            ]
+          },
+          {
+            "nome": "Tutela de urgência e tutela da evidência",
+            "subtopicos": [
+              "Princípios",
+              "Fungibilidade",
+              "Disposições gerais",
+              "Procedimentos"
+            ]
+          },
+          {
+            "nome": "Formação, suspensão e extinção do processo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo de conhecimento e cumprimento de sentença: procedimento comum",
+            "subtopicos": [
+              "Disposições gerais",
+              "Petição inicial",
+              "Improcedência liminar do pedido",
+              "Sentença e coisa julgada",
+              "Liquidação da sentença",
+              "Cumprimento da sentença"
+            ]
+          },
+          {
+            "nome": "Procedimentos especiais",
+            "subtopicos": [
+              "Generalidades, características, espécies"
+            ]
+          },
+          {
+            "nome": "Processos nos tribunais e meios de impugnação das decisões judiciais",
+            "subtopicos": [
+              "Ordem dos processos e processos de competência originária dos tribunais",
+              "Recursos"
+            ]
+          },
+          {
+            "nome": "Ações diversas",
+            "subtopicos": [
+              "Mandado de segurança",
+              "Ação popular",
+              "Ação civil pública",
+              "Ação de improbidade administrativa",
+              "Mandado de injunção",
+              "Habeas data",
+              "Ação declaratória de constitucionalidade",
+              "Ação direta de inconstitucionalidade",
+              "Arguição de descumprimento de preceito fundamental",
+              "Declaração incidental de inconstitucionalidade"
+            ]
+          },
+          {
+            "nome": "Jurisprudência pacificada dos tribunais superiores em matéria processual civil",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 40,
+      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+      "materia_chunk": "LEGISLAÇÃO ESPECIAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "LEGISLAÇÃO ESPECIAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "",
+        "topicos": [
+          {
+            "nome": "Lei nº 11.418/2006",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 12.016/2009",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 41,
+      "cargo": "CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "ARQUIVOLOGIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "ARQUIVOLOGIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Arquivologia",
+        "topicos": [
+          {
+            "nome": "Arquivos",
+            "subtopicos": [
+              "Histórico, função e classificação"
+            ]
+          },
+          {
+            "nome": "Noções de teoria arquivística",
+            "subtopicos": []
+          },
+          {
+            "nome": "Terminologia arquivística",
+            "subtopicos": []
+          },
+          {
+            "nome": "Documentos: gêneros, espécies, tipos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Documentos de arquivos: características e especificidades",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ciclo vital dos documentos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento da informação: objetivos e vantagens",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de documentos arquivísticos: produção, tramitação, uso e destinação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Protocolo: recebimento, registro, distribuição, tramitação e expedição de documentos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de classificação: plano de classificação e tabela de temporalidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Avaliação documental: seleção documental, eliminação e recolhimento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Armazenamento: ordenação e busca",
+            "subtopicos": []
+          },
+          {
+            "nome": "Arquivo permanente: arranjo e descrição",
+            "subtopicos": []
+          },
+          {
+            "nome": "Normalização da descrição arquivística: ISAD (G), Norma Brasileira de Descrição Arquivística (NOBRADE), ISAAR (CPF) e instrumentos de pesquisa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Políticas públicas dos arquivos permanentes: ações culturais, educativas e de preservação do patrimônio arquivístico",
+            "subtopicos": []
+          },
+          {
+            "nome": "Preservação de documentos arquivísticos analógicos: preservação, conservação preventiva e restauração",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tecnologias aplicadas aos arquivos: políticas, planejamento, técnicas, microfilmagem e digitalização",
+            "subtopicos": []
+          },
+          {
+            "nome": "Arquivos no mundo digital: documentos digitais, gestão de documentos digitais, gestão eletrônica de documentos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Modelo de requisitos para sistemas informatizados de gestão de processos e documentos do Poder Judiciário (Moreq-Jus)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Modelo de requisitos para sistemas informatizados de gestão arquivística de documentos (e-ARQ Brasil)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Certificação digital: definição, infraestrutura de chaves públicas brasileira (ICP/Brasil), assinatura digital, criptografia simétrica e assimétrica",
+            "subtopicos": []
+          },
+          {
+            "nome": "Preservação de documentos arquivísticos digitais",
+            "subtopicos": [
+              "Elaboração de políticas de preservação de documentos arquivísticos digitais",
+              "Modelo de referência OAIS (Open Archival Information System)",
+              "Repositórios arquivísticos digitais confiáveis (RDC-Arq)"
+            ]
+          },
+          {
+            "nome": "Legislação pertinente",
+            "subtopicos": [
+              "Política Nacional de Arquivos Públicos e Privados (Lei nº 8.159/1991)",
+              "Decretos nº 4.073/2002 e nº 7.845/2012",
+              "Lei nº 12.527/2011 e Decreto nº 7.724/2012",
+              "Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018)",
+              "Normas e manuais do Conselho Nacional de Justiça: Resolução nº 215/2015",
+              "Normas e manuais do Conselho Nacional de Justiça: Resolução nº 324/2020",
+              "Normas e manuais do Conselho Nacional de Justiça: Resolução nº 469/2022",
+              "Normas e manuais do Conselho Nacional de Justiça: Manual de Gestão Documental do Poder Judiciário",
+              "Normas e manuais do Conselho Nacional de Justiça: Manual de Gestão de Memória do Poder Judiciário",
+              "Normas e manuais do Conselho Nacional de Justiça: Manual de Digitalização de Documentos do Poder Judiciário"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 42,
+      "cargo": "CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "GESTÃO DE PESSOAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "GESTÃO DE PESSOAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão de Pessoas",
+        "topicos": [
+          {
+            "nome": "Modelos de gestão de pessoas",
+            "subtopicos": [
+              "Administração de pessoal",
+              "Gestão estratégica de pessoas"
+            ]
+          },
+          {
+            "nome": "Processos de gestão de pessoas",
+            "subtopicos": [
+              "Modelagem do trabalho: descrição e análise de cargos, modelos de desenho de cargos, coleta de dados sobre cargos",
+              "Treinamento e desenvolvimento"
+            ]
+          },
+          {
+            "nome": "Motivação e satisfação no trabalho",
+            "subtopicos": []
+          },
+          {
+            "nome": "O indivíduo e o contexto organizacional: variáveis individuais, grupais e organizacionais",
+            "subtopicos": [
+              "Comportamento humano no trabalho: satisfação e comprometimento",
+              "Equipes e grupos de trabalho",
+              "Competência interpessoal"
+            ]
+          },
+          {
+            "nome": "Comunicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Comportamento, clima e cultura organizacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão por competências",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão do conhecimento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Qualidade de vida no trabalho",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 43,
+      "cargo": "CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "NOÇÕES DE ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "NOÇÕES DE ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "O papel do Estado e a atuação do governo nas finanças públicas",
+            "subtopicos": [
+              "Formas e dimensões da intervenção da administração na economia",
+              "Funções do orçamento público"
+            ]
+          },
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Técnicas orçamentárias",
+              "Princípios orçamentários",
+              "Ciclo orçamentário",
+              "Processo orçamentário"
+            ]
+          },
+          {
+            "nome": "Orçamento público no Brasil",
+            "subtopicos": [
+              "Sistema de planejamento e de orçamento federal",
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Outros planos e programas",
+              "Sistema e processo de orçamentação",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos ordinários e adicionais"
+            ]
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal",
+            "subtopicos": [
+              "Conceitos e objetivos",
+              "Planejamento",
+              "Dívida e endividamento",
+              "Transparência, controle e fiscalização"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 44,
+      "cargo": "CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "NOÇÕES DE DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "NOÇÕES DE DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies",
+              "Extinção do ato administrativo",
+              "Cassação, anulação, revogação e convalidação",
+              "Decadência administrativa"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": [
+              "Conceito",
+              "Espécies",
+              "Cargo, emprego e função pública",
+              "Provimento",
+              "Vacância",
+              "Efetividade, estabilidade e vitaliciedade",
+              "Remuneração",
+              "Direitos e deveres",
+              "Responsabilidades",
+              "Processo administrativo disciplinar",
+              "Disposições constitucionais aplicáveis"
+            ]
+          },
+          {
+            "nome": "Poderes da administração pública",
+            "subtopicos": [
+              "Hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso de poder"
+            ]
+          },
+          {
+            "nome": "Regime jurídico-administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Princípios expressos e implícitos da administração pública"
+            ]
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": [
+              "Responsabilidade por ato comissivo do Estado",
+              "Responsabilidade por omissão do Estado",
+              "Reparação do dano"
+            ]
+          },
+          {
+            "nome": "Organização administrativa",
+            "subtopicos": [
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista",
+              "Entidades paraestatais e terceiro setor",
+              "Serviços sociais autônomos, entidades de apoio, organizações sociais, organizações da sociedade civil de interesse público"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Controle exercido pela administração pública",
+              "Controle judicial",
+              "Controle legislativo"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 45,
+      "cargo": "CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "GESTÃO DE CONTRATOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "GESTÃO DE CONTRATOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Licitações e contratos administrativos",
+        "topicos": [
+          {
+            "nome": "Licitações e contratos administrativos",
+            "subtopicos": [
+              "Lei nº 14.133/2021: conceitos, princípios, contratação direta, modalidades, tipos e aspectos procedimentais"
+            ]
+          },
+          {
+            "nome": "Decreto nº 11.462/2023",
+            "subtopicos": []
+          },
+          {
+            "nome": "Elaboração e fiscalização de contratos",
+            "subtopicos": [
+              "Cláusulas e indicadores de nível de serviço",
+              "Papel do fiscalizador do contrato",
+              "Papel do preposto da contratada",
+              "Acompanhamento da execução contratual",
+              "Registro e notificação de irregularidades",
+              "Definição e aplicação de penalidades e sanções administrativas"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 46,
+      "cargo": "CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA",
+      "materia_chunk": "ADMINISTRAÇÃO DE RECURSOS MATERIAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "ADMINISTRAÇÃO DE RECURSOS MATERIAIS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração de Materiais",
+        "topicos": [
+          {
+            "nome": "Classificação de materiais",
+            "subtopicos": [
+              "Atributos para classificação de materiais",
+              "Tipos de classificação",
+              "Metodologia de cálculo da curva ABC"
+            ]
+          },
+          {
+            "nome": "Recebimento e armazenagem",
+            "subtopicos": [
+              "Entrada",
+              "Conferência",
+              "Objetivos da armazenagem",
+              "Critérios e técnicas de armazenagem",
+              "Arranjo físico (leiaute)"
+            ]
+          },
+          {
+            "nome": "Gestão patrimonial",
+            "subtopicos": [
+              "Tombamento de bens",
+              "Controle de bens",
+              "Inventário",
+              "Alienação de bens",
+              "Alterações e baixa de bens"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 47,
+      "cargo": "CARGO 9: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA – ESPECIALIDADE: AGENTE DA POLÍCIA JUDICIAL",
+      "materia_chunk": "NOÇÕES DE DIREITO PENAL E DE DIREITO PROCESSUAL PENAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 9,
+      "materia_normalizada": "NOÇÕES DE DIREITO PENAL E DE DIREITO PROCESSUAL PENAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Código Penal e Código de Processo Penal",
+        "topicos": [
+          {
+            "nome": "Código Penal",
+            "subtopicos": [
+              "Parte geral: aplicação da lei penal (arts. 1 a 10)",
+              "Anterioridade da lei",
+              "Lei penal no tempo",
+              "Lei excepcional ou temporária",
+              "Tempo do crime",
+              "Territorialidade",
+              "Lugar do crime",
+              "Extraterritorialidade",
+              "Eficácia da sentença",
+              "Contagem de prazo"
+            ]
+          },
+          {
+            "nome": "Crimes contra a pessoa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes contra o patrimônio",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes contra a fé pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes contra a administração pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código de Processo Penal",
+            "subtopicos": [
+              "Prova",
+              "Exame de corpo de delito, cadeia de custódia e perícias em geral (artigos 158 a 184)",
+              "Prisão em flagrante (artigos 301 a 310)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 48,
+      "cargo": "CARGO 9: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA – ESPECIALIDADE: AGENTE DA POLÍCIA JUDICIAL",
+      "materia_chunk": "SEGURANÇA DE DIGNITÁRIOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 9,
+      "materia_normalizada": "SEGURANÇA DE DIGNITÁRIOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Segurança",
+        "topicos": [
+          {
+            "nome": "Técnicas, táticas, operacionalização, planejamento e execução",
+            "subtopicos": []
+          },
+          {
+            "nome": "Objeto e modus operandi",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise de riscos",
+            "subtopicos": [
+              "Riscos, ameaças, danos e perdas",
+              "Diagnóstico",
+              "Aplicação de métodos"
+            ]
+          },
+          {
+            "nome": "Planejamento de contingências",
+            "subtopicos": [
+              "Necessidade",
+              "Planejamento",
+              "Componentes do planejamento",
+              "Manejo de emergência",
+              "Gerenciamento de crises",
+              "Procedimentos emergenciais"
+            ]
+          },
+          {
+            "nome": "Segurança de pessoas",
+            "subtopicos": [
+              "Noções sobre condutas preventivas, condutas protetivas, identificação de ameaças e vulnerabilidades, planejamento e execução da proteção de dignitários"
+            ]
+          },
+          {
+            "nome": "Defesa pessoal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Armamento e tiro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direção defensiva",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direção ofensiva",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de primeiros socorros",
+            "subtopicos": [
+              "Conceitos e aspectos básicos, identificação dos principais acidentes",
+              "Avaliação e segurança da vítima e da cena até a chegada do socorro especializado"
+            ]
+          },
+          {
+            "nome": "Noções de gestão de conflitos",
+            "subtopicos": [
+              "Negociação, postura, critérios de ação"
+            ]
+          },
+          {
+            "nome": "Classificação dos graus de risco",
+            "subtopicos": [
+              "Tipologia dos causadores",
+              "Fases",
+              "Pré‐confronto ou preparo",
+              "Resposta imediata",
+              "Plano específico"
+            ]
+          },
+          {
+            "nome": "Perímetros táticos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Organização do posto de comando",
+            "subtopicos": []
+          },
+          {
+            "nome": "Táticas de negociação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Trabalho em equipe",
+            "subtopicos": []
+          },
+          {
+            "nome": "Uso diferenciado da força",
+            "subtopicos": [
+              "Níveis do uso da força",
+              "Princípios da necessidade e da proporcionalidade",
+              "Responsabilidade pelo uso da força",
+              "Uso de instrumentos de menor potencial ofensivo no controle da força"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 49,
+      "cargo": "CARGO 9: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA – ESPECIALIDADE: AGENTE DA POLÍCIA JUDICIAL",
+      "materia_chunk": "SEGURANÇA ORGÂNICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 9,
+      "materia_normalizada": "SEGURANÇA ORGÂNICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Segurança",
+        "topicos": [
+          {
+            "nome": "Fundamentos, princípios e definições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança corporativa estratégica",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise de riscos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Planejamento de contingências",
+            "subtopicos": [
+              "Necessidade, planejamento, componentes do planejamento, manejo de emergência, gerenciamento de crises, procedimentos emergenciais"
+            ]
+          },
+          {
+            "nome": "Segurança da gestão das áreas e instalações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Identificação de vulnerabilidades e ameaças",
+            "subtopicos": [
+              "Conceitos, modelos, equipamentos e funcionamento de barreiras físicas, sistemas de controle de acesso, sistemas de monitoramento eletrônico e CFTV (circuito fechado de televisão)"
+            ]
+          },
+          {
+            "nome": "Segurança patrimonial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Noções de integridade, confidencialidade, disponibilidade, vulnerabilidades, ameaças, identificação de códigos maliciosos e condutas preventivas"
+            ]
+          },
+          {
+            "nome": "Noções de prevenção e combate a incêndio",
+            "subtopicos": [
+              "Aspectos básicos, identificação e utilização de equipamentos de prevenção e combate a incêndio em uma edificação",
+              "Condutas preventivas",
+              "Classes de incêndio",
+              "Métodos de extinção do fogo",
+              "Tipos e aplicações de extintores de incêndio e hidrantes",
+              "NR-23 (proteção contra incêndios)"
+            ]
+          },
+          {
+            "nome": "Plano de evacuação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de serviço de inteligência",
+            "subtopicos": [
+              "Inteligência estratégica",
+              "Doutrina de inteligência",
+              "Metodologia de produção de conhecimento",
+              "Fontes de coleta"
+            ]
+          },
+          {
+            "nome": "Qualidade no atendimento ao público",
+            "subtopicos": [
+              "Comunicabilidade, apresentação, atenção, cortesia, interesse, presteza, eficiência, tolerância, discrição, conduta, objetividade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 50,
+      "cargo": "CARGO 9: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA – ESPECIALIDADE: AGENTE DA POLÍCIA JUDICIAL",
+      "materia_chunk": "LEGISLAÇÃO RELACIONADA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 9,
+      "materia_normalizada": "LEGISLAÇÃO RELACIONADA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação Especial",
+        "topicos": [
+          {
+            "nome": "Crimes de menor potencial ofensivo e juizados especiais cíveis e criminais (Lei nº 9.099/1995 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Abuso de autoridade (Lei nº 13.869/2019 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes resultantes de preconceitos de raça ou de cor (Lei nº 7.716/1989 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estatuto da Pessoa Idosa (Lei nº 10.741/2003 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Apresentação e uso de documentos de identificação pessoal (Lei nº 5.553/1968 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Normas do cerimonial público e ordem geral de precedência (Decreto nº 70.274/1972 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Registro, posse e comercialização de armas de fogo e munição, Sistema Nacional de Armas – SINARM (Lei nº 10.826/2003 e suas alterações)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução CNJ nº 344/2020 (regulamenta o exercício do poder de polícia administrativa no âmbito dos tribunais e dispõe sobre as atribuições funcionais dos agentes e inspetores da polícia judicial)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução CNJ nº 383/2021 (Sistema de Inteligência de Segurança Institucional do Poder Judiciário)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resolução CNJ nº 435/2021 (Política e Sistema Nacional de Segurança do Poder Judiciário)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resoluções CNJ nº 467/2022 e CNJ nº 566/2024 (regulamentam, no âmbito do Poder Judiciário, o disposto nos artigos 6º, inciso XI, e 7ºA da Lei nº 10.826/2003, com as alterações promovidas pela Lei nº 12.694/2012 e suas alterações)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 51,
+      "cargo": "CARGO 10: TÉCNICO JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "CONTABILIDADE GERAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 10,
+      "materia_normalizada": "CONTABILIDADE GERAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade",
+        "topicos": [
+          {
+            "nome": "Objeto e objetivos da contabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Técnicas contábeis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Campo de aplicação da contabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Patrimônio",
+            "subtopicos": [
+              "Aspectos qualitativos e quantitativos do patrimônio",
+              "Ativo, passivo e patrimônio líquido"
+            ]
+          },
+          {
+            "nome": "Disponibilidades – caixa e equivalentes de caixa",
+            "subtopicos": [
+              "conteúdo, classificação e critérios de avaliação"
+            ]
+          },
+          {
+            "nome": "Contas a receber",
+            "subtopicos": [
+              "conceito, conteúdo e critérios contábeis"
+            ]
+          },
+          {
+            "nome": "Estoques",
+            "subtopicos": [
+              "Conceito e classificação",
+              "Critérios de avaliação de estoques"
+            ]
+          },
+          {
+            "nome": "Realizável a longo prazo (não circulante)",
+            "subtopicos": [
+              "conceito e classificação"
+            ]
+          },
+          {
+            "nome": "Ajuste a valor presente",
+            "subtopicos": [
+              "cálculo e contabilização de contas ativas e passivas"
+            ]
+          },
+          {
+            "nome": "Mensuração do valor justo",
+            "subtopicos": [
+              "Definição do valor justo",
+              "Valor justo: aplicação para ativos, passivos e instrumentos patrimoniais"
+            ]
+          },
+          {
+            "nome": "Ativo imobilizado",
+            "subtopicos": [
+              "Conceituação, classificação e conteúdo das contas",
+              "Critérios de avaliação e mensuração do ativo imobilizado",
+              "Redução ao valor recuperável",
+              "Depreciação, exaustão e amortização"
+            ]
+          },
+          {
+            "nome": "Ativos intangíveis",
+            "subtopicos": [
+              "Definição, reconhecimento e mensuração",
+              "Impairment test: intangíveis com vida útil definida e indefinida"
+            ]
+          },
+          {
+            "nome": "Passivo exigível",
+            "subtopicos": [
+              "Conceitos fundamentais, avaliação e conteúdo do passivo",
+              "Fornecedores, obrigações fiscais e outras obrigações",
+              "Empréstimos, financiamentos, debêntures e outros títulos de dívida"
+            ]
+          },
+          {
+            "nome": "Provisões, passivos contingentes e ativos contingentes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Patrimônio líquido",
+            "subtopicos": [
+              "Reservas de capital",
+              "Ajustes de avaliação patrimonial",
+              "Reservas de lucros",
+              "Ações em tesouraria",
+              "Prejuízos acumulados",
+              "Dividendos"
+            ]
+          },
+          {
+            "nome": "Receitas de vendas de produtos e serviços",
+            "subtopicos": [
+              "Conceitos e mensuração da receita e momento de seu reconhecimento",
+              "Deduções das vendas"
+            ]
+          },
+          {
+            "nome": "Custos e despesas",
+            "subtopicos": [
+              "Custo das mercadorias, dos produtos vendidos e dos serviços prestados",
+              "Despesas e outros resultados operacionais"
+            ]
+          },
+          {
+            "nome": "Elaboração de demonstrações contábeis conforme a legislação societária, os princípios fundamentais da contabilidade e os pronunciamentos contábeis do Comitê de Pronunciamentos Contábeis (CPC)",
+            "subtopicos": [
+              "Balanço patrimonial",
+              "Demonstração do resultado do exercício",
+              "Demonstração de fluxos de caixa (métodos direto e indireto)",
+              "Demonstração do valor adicionado",
+              "Demonstração das mutações do patrimônio líquido",
+              "Demonstração de lucros ou prejuízos acumulados"
+            ]
+          },
+          {
+            "nome": "Accountability e competência da contabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Escrituração digital e SPED",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 52,
+      "cargo": "CARGO 10: TÉCNICO JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: CONTABILIDADE",
+      "materia_chunk": "CONTABILIDADE APLICADA AO SETOR PÚBLICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 10,
+      "materia_normalizada": "CONTABILIDADE APLICADA AO SETOR PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Pública",
+        "topicos": [
+          {
+            "nome": "Conceituação, objeto e campo de aplicação da contabilidade pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios e normas de contabilidade sob a perspectiva do setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Patrimônio público",
+            "subtopicos": [
+              "Ativo",
+              "Passivo",
+              "Saldo patrimonial"
+            ]
+          },
+          {
+            "nome": "Variações patrimoniais",
+            "subtopicos": [
+              "Variações qualitativas e quantitativas",
+              "Realização da variação patrimonial",
+              "Resultado patrimonial"
+            ]
+          },
+          {
+            "nome": "Receita e despesa sob o enfoque patrimonial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mensuração de ativos",
+            "subtopicos": [
+              "Ativo imobilizado",
+              "Ativo intangível",
+              "Reavaliação e redução ao valor recuperável"
+            ]
+          },
+          {
+            "nome": "Mensuração de passivos",
+            "subtopicos": [
+              "Provisões",
+              "Passivos contingentes"
+            ]
+          },
+          {
+            "nome": "Tratamento contábil aplicável aos impostos e contribuições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Plano de Contas Aplicado ao Setor Público (PCASP)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transações no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Receita e despesa pública",
+            "subtopicos": [
+              "Conceito, etapas, estágios e categorias econômicas"
+            ]
+          },
+          {
+            "nome": "Execução orçamentária e financeira",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstrações contábeis aplicadas ao setor público",
+            "subtopicos": [
+              "Balanço orçamentário",
+              "Balanço financeiro",
+              "Demonstração das variações patrimoniais",
+              "Balanço patrimonial",
+              "Demonstração de fluxos de caixa",
+              "Demonstração das mutações do patrimônio líquido",
+              "Notas explicativas às demonstrações contábeis"
+            ]
+          },
+          {
+            "nome": "Sistema Integrado de Administração Financeira do Governo Federal (SIAFI)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidade Fiscal (Lei Complementar nº 101/2000 e suas alterações)",
+            "subtopicos": []
+          }
+        ]
+      }
+    }
+  ],
+  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+}

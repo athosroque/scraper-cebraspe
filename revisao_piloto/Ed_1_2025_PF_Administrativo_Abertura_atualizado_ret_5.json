@@ -1,0 +1,3983 @@
+{
+  "edital": "Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.pdf",
+  "concurso": {
+    "slug": "PF_25_ADM",
+    "orgao": "PF",
+    "ano": 2025
+  },
+  "cargos": [
+    {
+      "numero": 1,
+      "nome": "ADMINISTRADOR",
+      "nivel": "superior"
+    },
+    {
+      "numero": 2,
+      "nome": "ASSISTENTE SOCIAL",
+      "nivel": "superior"
+    },
+    {
+      "numero": 3,
+      "nome": "CONTADOR",
+      "nivel": "superior"
+    },
+    {
+      "numero": 4,
+      "nome": "ENFERMEIRO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 5,
+      "nome": "ESTATÍSTICO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 6,
+      "nome": "FARMACÊUTICO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 7,
+      "nome": "MÉDICO CLÍNICO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 8,
+      "nome": "MÉDICO ORTOPEDISTA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 9,
+      "nome": "MÉDICO PSIQUIATRA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 10,
+      "nome": "NUTRICIONISTA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 11,
+      "nome": "PSICÓLOGO CLÍNICO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 12,
+      "nome": "PSICÓLOGO ORGANIZACIONAL",
+      "nivel": "superior"
+    },
+    {
+      "numero": 13,
+      "nome": "TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 14,
+      "nome": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "nivel": "superior"
+    },
+    {
+      "numero": 15,
+      "nome": "AGENTE ADMINISTRATIVO",
+      "nivel": "medio"
+    }
+  ],
+  "total_chunks": 39,
+  "extraidos_com_sucesso": 39,
+  "falhas": 0,
+  "chunks_com_falha": [],
+  "resultados": [
+    {
+      "chunk_index": 0,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tipologia textual",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": [
+              "Emprego da acentuação gráfica"
+            ]
+          },
+          {
+            "nome": "Emprego das classes de palavras",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e outros elementos de sequenciação textual",
+              "Emprego/correlação de tempos e modos verbais"
+            ]
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Relações de coordenação entre orações e entre termos da oração",
+              "Relações de subordinação entre orações e entre termos da oração",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação dos pronomes átonos"
+            ]
+          },
+          {
+            "nome": "Regência nominal e verbal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Correspondência oficial (conforme Manual de Redação da Presidência da República)",
+            "subtopicos": [
+              "Adequação da linguagem ao tipo de documento",
+              "Adequação do formato do texto ao gênero"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 1,
+      "cargo": null,
+      "materia_chunk": "RACIOCÍNIO LÓGICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "RACIOCÍNIO LÓGICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Raciocínio Lógico",
+        "topicos": [
+          {
+            "nome": "Estruturas lógicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lógica de argumentação",
+            "subtopicos": [
+              "Analogias, inferências, deduções e conclusões"
+            ]
+          },
+          {
+            "nome": "Lógica sentencial (ou proposicional)",
+            "subtopicos": [
+              "Proposições simples e compostas",
+              "Tabelas-verdade",
+              "Equivalências",
+              "Leis de De Morgan",
+              "Diagramas lógicos"
+            ]
+          },
+          {
+            "nome": "Lógica de primeira ordem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de contagem e probabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Operações com conjuntos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Raciocínio lógico envolvendo problemas aritméticos, geométricos e matriciais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia_chunk": "ÉTICA NO SERVIÇO PÚBLICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ÉTICA NO SERVIÇO PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ética no Serviço Público",
+        "topicos": [
+          {
+            "nome": "Ética e moral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética, princípios e valores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética e democracia",
+            "subtopicos": [
+              "Exercício da cidadania"
+            ]
+          },
+          {
+            "nome": "Ética e função pública",
+            "subtopicos": [
+              "Código de Ética Profissional do Serviço Público (Decreto nº 1.171/1994)"
+            ]
+          },
+          {
+            "nome": "Lei nº 8.112/1990 e alterações (Regime Jurídico dos Servidores Públicos Civis da União)",
+            "subtopicos": [
+              "Regime disciplinar (deveres e proibições, acumulação, responsabilidades, penalidades)"
+            ]
+          },
+          {
+            "nome": "Lei nº 8.429/1992 (Lei de improbidade administrativa)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei de Conflito de Interesses – LCI (Lei nº 12.813/2013)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE INFORMÁTICA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE INFORMÁTICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Noções de sistema operacional (ambiente Windows)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Edição de textos, planilhas e apresentações (ambiente Microsoft Office)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e intranet",
+              "Programas de navegação (Microsoft Edge, Mozilla Firefox, Google Chrome e similares)",
+              "Sítios de busca e pesquisa na Internet",
+              "Redes sociais",
+              "Computação na nuvem (cloud computing)"
+            ]
+          },
+          {
+            "nome": "Conceitos de organização e de gerenciamento de informações, arquivos, pastas e programas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Procedimentos de segurança",
+              "Noções de malware",
+              "Aplicativos para segurança (antivírus, firewall, anti-spyware etc.)",
+              "Procedimentos de backup",
+              "Armazenamento de dados na nuvem (cloud storage)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE DIREITO CONSTITUCIONAL",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE DIREITO CONSTITUCIONAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Constituição da República Federativa do Brasil de 1988",
+        "topicos": [
+          {
+            "nome": "1 Constituição da República Federativa do Brasil de 1988",
+            "subtopicos": [
+              "1.1 Princípios fundamentais"
+            ]
+          },
+          {
+            "nome": "2 Aplicabilidade das normas constitucionais",
+            "subtopicos": [
+              "2.1 Normas de eficácia plena, contida e limitada",
+              "2.2 Normas programáticas"
+            ]
+          },
+          {
+            "nome": "3 Direitos e garantias fundamentais",
+            "subtopicos": [
+              "3.1 Direitos e deveres individuais e coletivos, direitos sociais, direitos de nacionalidade, direitos políticos, partidos políticos"
+            ]
+          },
+          {
+            "nome": "4 Organização político-administrativa do Estado",
+            "subtopicos": [
+              "4.1 Estado federal brasileiro, União, estados, Distrito Federal, municípios e territórios"
+            ]
+          },
+          {
+            "nome": "5 Administração Pública",
+            "subtopicos": [
+              "5.1 Disposições gerais, servidores públicos"
+            ]
+          },
+          {
+            "nome": "6 Poder executivo",
+            "subtopicos": [
+              "6.1 Atribuições e responsabilidades do presidente da República"
+            ]
+          },
+          {
+            "nome": "7 Poder legislativo",
+            "subtopicos": [
+              "7.1 Estrutura",
+              "7.2 Funcionamento e atribuições"
+            ]
+          },
+          {
+            "nome": "8 Poder judiciário",
+            "subtopicos": [
+              "8.1 Disposições gerais",
+              "8.2 Órgãos do poder judiciário",
+              "8.2.1 Organização e competências; Conselho Nacional de Justiça"
+            ]
+          },
+          {
+            "nome": "9 Constituição da República Federativa do Brasil de 1988: Capítulo III Segurança Pública: artigo 144",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 5,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Noções de organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta e indireta",
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista"
+            ]
+          },
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei nº 8.112/1990 (Regime Jurídico dos Servidores Públicos Civis da União): disposições preliminares; provimento, vacância, remoção, redistribuição e substituição; direitos e vantagens; vencimento e remuneração, vantagens, férias, licenças, afastamentos, direito de petição"
+            ]
+          },
+          {
+            "nome": "Poderes administrativos",
+            "subtopicos": [
+              "Hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Controle exercido pela administração pública",
+              "Controle judicial",
+              "Controle legislativo"
+            ]
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": [
+              "Responsabilidade civil do Estado no direito brasileiro",
+              "Responsabilidade por ato comissivo do Estado",
+              "Responsabilidade por omissão do Estado",
+              "Requisitos para a demonstração da responsabilidade do Estado",
+              "Causas excludentes e atenuantes da responsabilidade do Estado"
+            ]
+          },
+          {
+            "nome": "Regime jurídico-administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Princípios expressos e implícitos da Administração Pública"
+            ]
+          },
+          {
+            "nome": "Lei nº 12.527/2011 (Lei de Acesso à Informação)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Decreto nº 9.830/2019 (regulamenta motivação de decisão)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 9.784/1999 (processo administrativo federal)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 6,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "medio",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tipologia textual",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": [
+              "Emprego da acentuação gráfica"
+            ]
+          },
+          {
+            "nome": "Emprego das classes de palavras",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e outros elementos de sequenciação textual",
+              "Emprego/correlação de tempos e modos verbais"
+            ]
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Relações de coordenação entre orações e entre termos da oração",
+              "Relações de subordinação entre orações e entre termos da oração",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação dos pronomes átonos"
+            ]
+          },
+          {
+            "nome": "Regência nominal e verbal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Correspondência oficial (conforme Manual de Redação da Presidência da República)",
+            "subtopicos": [
+              "Adequação da linguagem ao tipo de documento",
+              "Adequação do formato do texto ao gênero"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 7,
+      "cargo": null,
+      "materia_chunk": "RACIOCÍNIO LÓGICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "medio",
+      "cargo_numero": null,
+      "materia_normalizada": "RACIOCÍNIO LÓGICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Raciocínio Lógico",
+        "topicos": [
+          {
+            "nome": "Estruturas lógicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lógica de argumentação",
+            "subtopicos": [
+              "Analogias, inferências, deduções e conclusões"
+            ]
+          },
+          {
+            "nome": "Lógica sentencial (ou proposicional)",
+            "subtopicos": [
+              "Proposições simples e compostas",
+              "Tabelas-verdade",
+              "Equivalências",
+              "Leis de De Morgan",
+              "Diagramas lógicos"
+            ]
+          },
+          {
+            "nome": "Lógica de primeira ordem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de contagem e probabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Operações com conjuntos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Raciocínio lógico envolvendo problemas aritméticos, geométricos e matriciais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 8,
+      "cargo": null,
+      "materia_chunk": "ÉTICA NO SERVIÇO PÚBLICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "medio",
+      "cargo_numero": null,
+      "materia_normalizada": "ÉTICA NO SERVIÇO PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ética no Serviço Público",
+        "topicos": [
+          {
+            "nome": "Ética e moral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética, princípios e valores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética e democracia",
+            "subtopicos": [
+              "Exercício da cidadania"
+            ]
+          },
+          {
+            "nome": "Ética e função pública",
+            "subtopicos": [
+              "Código de Ética Profissional do Serviço Público (Decreto nº 1.171/1994)"
+            ]
+          },
+          {
+            "nome": "Lei nº 8.112/1990 e alterações (Regime Jurídico dos Servidores Públicos Civis da União)",
+            "subtopicos": [
+              "Regime disciplinar (deveres e proibições, acumulação, responsabilidades, penalidades)"
+            ]
+          },
+          {
+            "nome": "Lei nº 8.429/1992 (Lei de improbidade administrativa)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei de Conflito de Interesses – LCI (Lei nº 12.813/2013)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 9,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE INFORMÁTICA",
+      "tipo_conhecimento": "basico",
+      "nivel": "medio",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE INFORMÁTICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Noções de sistema operacional (ambiente Windows)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Edição de textos, planilhas e apresentações (ambiente Microsoft Office)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e intranet",
+              "Programas de navegação (Microsoft Edge, Mozilla Firefox, Google Chrome e similares)",
+              "Sítios de busca e pesquisa na Internet",
+              "Redes sociais",
+              "Computação na nuvem (cloud computing)"
+            ]
+          },
+          {
+            "nome": "Conceitos de organização e de gerenciamento de informações, arquivos, pastas e programas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Procedimentos de segurança",
+              "Noções de malware",
+              "Aplicativos para segurança (antivírus, firewall, anti-spyware etc.)",
+              "Procedimentos de backup",
+              "Armazenamento de dados na nuvem (cloud storage)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 10,
+      "cargo": null,
+      "materia_chunk": "ATUALIDADES (SOMENTE PARA A PROVA DISCURSIVA)",
+      "tipo_conhecimento": "basico",
+      "nivel": "medio",
+      "cargo_numero": null,
+      "materia_normalizada": "ATUALIDADES",
+      "apenas_discursiva": true,
+      "taxonomia_extraida": {
+        "materia": "Tópicos relevantes e atuais",
+        "topicos": [
+          {
+            "nome": "Tópicos relevantes e atuais de diversas áreas",
+            "subtopicos": [
+              "segurança",
+              "transportes",
+              "política",
+              "economia",
+              "sociedade",
+              "educação",
+              "saúde",
+              "cultura",
+              "tecnologia",
+              "energia",
+              "relações internacionais",
+              "desenvolvimento sustentável",
+              "ecologia"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 11,
+      "cargo": "CARGO 1: ADMINISTRADOR",
+      "materia_chunk": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração",
+        "topicos": [
+          {
+            "nome": "Evolução da administração",
+            "subtopicos": [
+              "Principais abordagens da administração (clássica até contingencial)",
+              "Evolução da Administração Pública no Brasil (após 1930); reformas administrativas; a nova gestão pública"
+            ]
+          },
+          {
+            "nome": "Processo administrativo",
+            "subtopicos": [
+              "Funções de administração: planejamento, organização, direção e controle",
+              "Processo de planejamento",
+              "Planejamento estratégico: visão, missão e análise SWOT",
+              "Análise competitiva e estratégias genéricas",
+              "Redes e alianças",
+              "Planejamento tático",
+              "Planejamento operacional",
+              "Administração por objetivos",
+              "Balanced scorecard",
+              "Processo decisório",
+              "Organização",
+              "Estrutura organizacional",
+              "Tipos de departamentalização: características, vantagens e desvantagens de cada tipo",
+              "Organização informal",
+              "Cultura organizacional",
+              "Direção",
+              "Motivação e liderança",
+              "Comunicação",
+              "Descentralização e delegação",
+              "Controle",
+              "Características",
+              "Tipos, vantagens e desvantagens",
+              "Sistema de medição de desempenho organizacional"
+            ]
+          },
+          {
+            "nome": "Gestão da qualidade e modelo de excelência gerencial",
+            "subtopicos": [
+              "Principais teóricos e suas contribuições para a gestão da qualidade",
+              "Ferramentas de gestão da qualidade",
+              "Modelo de Excelência da Gestão (MEG) da Fundação Nacional da Qualidade",
+              "Modelo de gespublica"
+            ]
+          },
+          {
+            "nome": "Gestão de projetos",
+            "subtopicos": [
+              "Elaboração, análise e avaliação de projetos",
+              "Principais características dos modelos de gestão de projetos",
+              "Projetos e suas etapas"
+            ]
+          },
+          {
+            "nome": "Gestão de processos",
+            "subtopicos": [
+              "Conceitos da abordagem por processos",
+              "Técnicas de mapeamento, análise e melhoria de processos",
+              "Processos e certificação ISO 9000:2015",
+              "Noções de estatística aplicada ao controle e à melhoria de processos"
+            ]
+          },
+          {
+            "nome": "Licitação pública – Lei nº 14.133/2021",
+            "subtopicos": [
+              "Das licitações",
+              "Dos contratos administrativos",
+              "Das irregularidades",
+              "Disposições Gerais"
+            ]
+          },
+          {
+            "nome": "Governança",
+            "subtopicos": [
+              "Princípios da governança",
+              "Fundamentos e governança pública"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Empreendedorismo governamental e novas lideranças no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de resultados na produção de serviços públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Convergências e diferenças entre a gestão pública e a gestão privada",
+            "subtopicos": []
+          },
+          {
+            "nome": "O paradigma do cliente na gestão pública",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 12,
+      "cargo": "CARGO 1: ADMINISTRADOR",
+      "materia_chunk": "ADMINISTRAÇÃO FINANCEIRA, ORÇAMENTÁRIA E ORÇAMENTO PÚBLICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO FINANCEIRA, ORÇAMENTÁRIA E ORÇAMENTO PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "O papel do Estado e a atuação do governo nas finanças públicas",
+            "subtopicos": [
+              "Formas e dimensões da intervenção da administração na economia",
+              "Funções do orçamento público"
+            ]
+          },
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Técnicas orçamentárias",
+              "Princípios orçamentários",
+              "Ciclo orçamentário",
+              "Processo orçamentário"
+            ]
+          },
+          {
+            "nome": "O orçamento público no Brasil",
+            "subtopicos": [
+              "Sistema de planejamento e de orçamento federal",
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Outros planos e programas",
+              "Sistema e processo de orçamentação",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos ordinários e adicionais"
+            ]
+          },
+          {
+            "nome": "Programação e execução orçamentária e financeira",
+            "subtopicos": [
+              "Descentralização orçamentária e financeira",
+              "Acompanhamento da execução",
+              "Sistemas de informações",
+              "SIOP e SIAFI",
+              "Alterações orçamentárias"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Fontes",
+              "Dívida ativa"
+            ]
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Restos a pagar",
+              "Despesas de exercícios anteriores",
+              "Dívida flutuante e fundada",
+              "Suprimento de fundos"
+            ]
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal",
+            "subtopicos": [
+              "Conceitos e objetivos",
+              "Planejamento",
+              "Receita Pública",
+              "Despesa Pública",
+              "Dívida e endividamento",
+              "Transparência, controle e fiscalização"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 13,
+      "cargo": "CARGO 1: ADMINISTRADOR",
+      "materia_chunk": "GESTÃO DE PESSOAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "GESTÃO DE PESSOAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração de Recursos Humanos",
+        "topicos": [
+          {
+            "nome": "Conceitos, importância, relação com os outros sistemas de organização",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fundamentos, teorias e escolas da administração e o seu impacto na gestão de pessoas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Funções do órgão de recursos humanos",
+            "subtopicos": [
+              "Atribuições básicas e objetivos",
+              "Políticas e sistemas de informações gerenciais"
+            ]
+          },
+          {
+            "nome": "Comportamento organizacional",
+            "subtopicos": [
+              "Relações indivíduo/organização",
+              "Liderança, motivação e desempenho",
+              "Qualidade de vida"
+            ]
+          },
+          {
+            "nome": "Competência interpessoal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento de conflitos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão da mudança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Recrutamento e seleção",
+            "subtopicos": [
+              "Tipos de recrutamento: vantagens e desvantagens",
+              "Técnicas de seleção: vantagens, desvantagens e processo decisório"
+            ]
+          },
+          {
+            "nome": "Análise e descrição de cargos: objetivos, métodos, vantagens e desvantagens",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de desempenho",
+            "subtopicos": [
+              "Objetivos",
+              "Métodos de avaliação de desempenho: características, vantagens e desvantagens"
+            ]
+          },
+          {
+            "nome": "Desenvolvimento e capacitação de pessoal",
+            "subtopicos": [
+              "Levantamento de necessidades",
+              "Programação, execução e avaliação"
+            ]
+          },
+          {
+            "nome": "Administração de cargos, carreiras e salários",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão por competências",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tendências em gestão de pessoas no setor público",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 14,
+      "cargo": "CARGO 1: ADMINISTRADOR",
+      "materia_chunk": "ADMINISTRAÇÃO DE RECURSOS MATERIAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO DE RECURSOS MATERIAIS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão de Materiais",
+        "topicos": [
+          {
+            "nome": "Classificação de materiais",
+            "subtopicos": [
+              "Atributos para classificação de materiais",
+              "Tipos de classificação",
+              "Metodologia de cálculo da curva ABC"
+            ]
+          },
+          {
+            "nome": "Gestão de estoques",
+            "subtopicos": []
+          },
+          {
+            "nome": "Recebimento e armazenagem",
+            "subtopicos": [
+              "Entrada",
+              "Conferência",
+              "Objetivos da armazenagem",
+              "Critérios e técnicas de armazenagem",
+              "Arranjo físico (leiaute)"
+            ]
+          },
+          {
+            "nome": "Distribuição de materiais",
+            "subtopicos": [
+              "Características das modalidades de transporte",
+              "Estrutura para distribuição"
+            ]
+          },
+          {
+            "nome": "Gestão patrimonial",
+            "subtopicos": [
+              "Tombamento de bens",
+              "Controle de bens",
+              "Inventário",
+              "Alienação de bens",
+              "Alterações e baixa de bens"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 15,
+      "cargo": "CARGO 2: ASSISTENTE SOCIAL",
+      "materia_chunk": "ASSISTENTE SOCIAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ASSISTENTE SOCIAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Serviço Social",
+        "topicos": [
+          {
+            "nome": "Fundamentos históricos e teórico-metodológicos do serviço social",
+            "subtopicos": [
+              "Institucionalização do serviço social ao movimento de reconceituação na América Latina, em particular no Brasil",
+              "Redimensionamento da profissão ante as transformações societárias",
+              "Condições e relações de trabalho, espaços sócio-ocupacionais, atribuições"
+            ]
+          },
+          {
+            "nome": "O projeto ético-político do serviço social",
+            "subtopicos": [
+              "Construção e desafios"
+            ]
+          },
+          {
+            "nome": "Legislação específica do Serviço Social (Lei nº 8.662/1993)",
+            "subtopicos": [
+              "Resolução do CFESS nº 273/1993 e suas alterações (Código de Ética Profissional do Assistente Social)"
+            ]
+          },
+          {
+            "nome": "A dimensão investigativa, processos de planejamento e de intervenção profissional",
+            "subtopicos": [
+              "Formulação de projeto de intervenção profissional aspectos teóricos e metodológicos",
+              "Fundamentos, instrumentos e técnicas de pesquisa social",
+              "O planejamento como processo técnico-político: concepção, operacionalização e avaliação de planos, programas e projetos"
+            ]
+          },
+          {
+            "nome": "A dimensão técnico-operativa do serviço social",
+            "subtopicos": [
+              "Concepções e debates sobre instrumentos e técnicas",
+              "Entrevista, visita domiciliar, visita institucional, reunião, mobilização social, trabalho em rede, ação socioeducativa com indivíduos, grupos e família, abordagens individual e coletiva",
+              "Estudo social, perícia social, relatório social, laudo social, parecer social",
+              "Atuação em equipe multiprofissional e interdisciplinar"
+            ]
+          },
+          {
+            "nome": "Questão social e direitos de cidadania",
+            "subtopicos": [
+              "Formas de expressão, enfrentamento e serviço social",
+              "Estado social de direito e Welfare State"
+            ]
+          },
+          {
+            "nome": "Política social",
+            "subtopicos": [
+              "Fundamentos, história e políticas",
+              "Seguridade social no Brasil: relação Estado/sociedade; contexto atual e neoliberalismo",
+              "Concepções e modalidades de família"
+            ]
+          },
+          {
+            "nome": "Políticas Sociais",
+            "subtopicos": [
+              "Seguridade e Previdência Social",
+              "Lei Orgânica da Assistência Social- LOAS (Lei nº 8.742/1993) e suas alterações",
+              "Política Nacional da Assistência Social- PNAS (2004)",
+              "Estatuto da Pessoa Idosa (Lei nº 10.741/2003)",
+              "Estatuto da Criança e do Adolescente- ECA (Lei nº 8.069/1990)",
+              "Lei da Pessoa com Deficiência (Lei nº 7.853/1989)",
+              "Decreto nº 3.298/1999 (Política Nacional para a Integração da Pessoa Portadora de Deficiência)",
+              "Lei nº 12.764/2012 (Política Nacional de Proteção dos Direitos da Pessoa com Transtorno do Espectro Autista)"
+            ]
+          },
+          {
+            "nome": "Política Nacional de Saúde Mental",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema Nacional de Políticas Públicas sobre Drogas (SISNAD)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Saúde do trabalhador e a intervenção do Serviço Social",
+            "subtopicos": []
+          },
+          {
+            "nome": "Exames de Saúde Ocupacional",
+            "subtopicos": [
+              "Sofrimento e Doenças Mentais Relacionadas ao Trabalho",
+              "Readaptação Funcional",
+              "Avaliação Biopsicossocial"
+            ]
+          },
+          {
+            "nome": "Políticas de Prevenção e Enfrentamento ao Assédio e a Discriminação",
+            "subtopicos": [
+              "Programa Federal de Enfrentamento do Assédio e da Discriminação, Decreto 12.122/2024",
+              "Convenção nº 190 da OIT sobre Violência e Assédio, 2019"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia_chunk": "CONTABILIDADE GERAL E SOCIETÁRIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "CONTABILIDADE GERAL E SOCIETÁRIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Geral e Societária",
+        "topicos": [
+          {
+            "nome": "Contabilidade Geral e Societária",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de Legislação Societária",
+            "subtopicos": [
+              "Lei nº 6.404/1976, com as alterações das Leis nº 11.638/2007 e nº 11.941/2009",
+              "Legislação complementar"
+            ]
+          },
+          {
+            "nome": "Normas Brasileiras de Contabilidade (aprovadas pelo Conselho Federal de Contabilidade – CFC)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Normas (Pronunciamentos, orientações e interpretações) emitidas pelo Comitê de Pronunciamentos Contábeis (CPC)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estrutura Conceitual",
+            "subtopicos": [
+              "Conceito e objetivos",
+              "Usuários e suas necessidades de informação",
+              "Os ramos aplicados da Contabilidade"
+            ]
+          },
+          {
+            "nome": "Patrimônio e Variações patrimoniais",
+            "subtopicos": [
+              "Conceituação de patrimônio, ativos, passivos e patrimônio líquido",
+              "Aspecto qualitativo e quantitativo",
+              "Representação gráfica",
+              "Equação básica da contabilidade",
+              "Registros de mutações patrimoniais",
+              "Apuração do resultado"
+            ]
+          },
+          {
+            "nome": "Plano de Contas e Procedimentos de Escrituração",
+            "subtopicos": [
+              "Conceito",
+              "Classificação (patrimoniais e de resultado) e natureza das contas (devedoras e credoras)",
+              "Método das partidas dobradas",
+              "Mecanismos de débito e crédito",
+              "Origens e aplicações de recursos",
+              "Elementos essenciais do lançamento contábil",
+              "Regime de competência",
+              "Balancete de verificação",
+              "Livros utilizados na escrituração"
+            ]
+          },
+          {
+            "nome": "Avaliação de Ativos e Passivos",
+            "subtopicos": [
+              "Classificação e critérios de avaliação de Disponibilidades (caixa e equivalentes de caixa)",
+              "Classificação e critérios de avaliação de estoques"
+            ]
+          },
+          {
+            "nome": "Despesas antecipadas",
+            "subtopicos": [
+              "Conceito, conteúdo, classificação e critérios de avaliação"
+            ]
+          },
+          {
+            "nome": "Conceitos gerais, avaliação, reconhecimento, mensuração e conteúdo do passivo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fornecedores, obrigações fiscais e outras obrigações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Empréstimos e financiamentos, debêntures e outros títulos de dívida; Patrimônio Líquido",
+            "subtopicos": [
+              "Empréstimos e financiamentos, debêntures e outros títulos de dívida",
+              "Capital Social",
+              "Reservas de capital",
+              "Ajustes de avaliação patrimonial",
+              "Reservas de lucros",
+              "Ações em tesouraria",
+              "Prejuízos acumulados",
+              "Dividendos e Juros sobre o Capital Próprio"
+            ]
+          },
+          {
+            "nome": "Depreciação, exaustão e amortização",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redução ao Valor Recuperável de Ativos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ativo Intangível",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transações entre partes relacionadas. Arrendamentos. Subvenção e Assistência Governamentais",
+            "subtopicos": [
+              "Transações entre partes relacionadas",
+              "Arrendamentos",
+              "Subvenção e Assistência Governamentais"
+            ]
+          },
+          {
+            "nome": "Contratos de Seguro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ajuste a Valor Presente",
+            "subtopicos": []
+          },
+          {
+            "nome": "Combinação de Negócios",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estoques",
+            "subtopicos": []
+          },
+          {
+            "nome": "Custos de Empréstimos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Políticas Contábeis, Mudança de Estimativa e Retificação de Erro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Evento Subsequente",
+            "subtopicos": []
+          },
+          {
+            "nome": "Provisões, Passivos Contingentes e Ativos Contingentes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ativo Imobilizado",
+            "subtopicos": []
+          },
+          {
+            "nome": "Propriedade para Investimento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ativo Não Circulante Mantido para Venda e Operação Descontinuada",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tributos sobre o Lucro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Benefícios a Empregados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstrações Consolidadas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mensuração do Valor Justo. Receita de Contrato com Cliente",
+            "subtopicos": [
+              "Mensuração do Valor Justo",
+              "Receita de Contrato com Cliente"
+            ]
+          },
+          {
+            "nome": "Contratos de Concessão",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise econômico-financeira",
+            "subtopicos": []
+          },
+          {
+            "nome": "Indicadores de liquidez",
+            "subtopicos": []
+          },
+          {
+            "nome": "Indicadores de rentabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Indicadores de lucratividade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Indicadores de endividamento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Indicadores de estrutura de capitais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise vertical e horizontal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Relato Integrado",
+            "subtopicos": [
+              "Conceitos e estrutura"
+            ]
+          },
+          {
+            "nome": "Elaboração de demonstrações contábeis pela legislação societária e pelas Normas Brasileiras de Contabilidade",
+            "subtopicos": [
+              "Balanço Patrimonial",
+              "Demonstração do Resultado do Exercício e Demonstração do Resultado Abrangente",
+              "Demonstração dos Lucros ou Prejuízos Acumulados",
+              "Demonstração das Mutações do Patrimônio Líquido",
+              "Demonstração dos Fluxos de Caixa",
+              "Demonstração do Valor Adicionado",
+              "Notas explicativas"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia_chunk": "CONTABILIDADE APLICADA AO SETOR PÚBLICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "CONTABILIDADE APLICADA AO SETOR PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Pública",
+        "topicos": [
+          {
+            "nome": "Conceito",
+            "subtopicos": []
+          },
+          {
+            "nome": "Campo de aplicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regime orçamentário e contábil (patrimonial)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Patrimônio Público: conceituação, composição e classificação contábil e legal",
+            "subtopicos": []
+          },
+          {
+            "nome": "NBC TSP Estrutura Conceitual - estrutura conceitual para elaboração e divulgação de informação contábil de propósito geral pelas entidades do setor público",
+            "subtopicos": [
+              "Normas Brasileiras de Contabilidade Aplicadas ao Setor Público – NBC TSP"
+            ]
+          },
+          {
+            "nome": "Manual de Contabilidade Aplicada ao Setor Público, 10ª edição (MCASP)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Definições, finalidade, componentes, estrutura e conteúdo das demonstrações",
+            "subtopicos": [
+              "de acordo com a Lei nº 4.320/1964 e suas alterações",
+              "de acordo com a NBC T SP 11",
+              "de acordo com o MCASP"
+            ]
+          },
+          {
+            "nome": "Balanço Financeiro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstração das variações patrimoniais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Balanço patrimonial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstração de fluxos de caixa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstração das Mutações do Patrimônio Líquido",
+            "subtopicos": []
+          },
+          {
+            "nome": "Notas explicativas às demonstrações contábeis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Consolidação das demonstrações contábeis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Plano de Contas Aplicado ao Setor Público (PCASP)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conceito de contas patrimoniais e de resultado",
+            "subtopicos": []
+          },
+          {
+            "nome": "Função e estrutura das contas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Escrituração: débito, crédito, saldo, sistema de partidas dobradas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tópicos selecionados da Lei Complementar nº 101/2000 e suas alterações",
+            "subtopicos": [
+              "Conceitos de dívida pública e restos a pagar, escrituração e consolidação das contas"
+            ]
+          },
+          {
+            "nome": "Procedimentos Contábeis Patrimoniais conforme Manual de Contabilidade Aplicada ao Setor Público (MCASP), 10ª edição, aprovado pela Portaria STN/MF nº 1568, de 11 de dezembro de 2023",
+            "subtopicos": []
+          },
+          {
+            "nome": "Restos a pagar, empenho, liquidação e pagamento (Lei nº 4.320/1964 e MCASP)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Apresentação de Informação Orçamentária nas Demonstrações Contábeis (NBC TSP 13)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Normas Internacionais de Contabilidade Aplicadas ao Setor Público (IPSAS)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Aspectos legais do sistema de custos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ambiente da informação de custos",
+            "subtopicos": [
+              "Características da informação de custos",
+              "Terminologia de custos",
+              "NBC TSP 34 - Custos no Setor Público",
+              "Manual de Informações de Custos do Governo Federal, aprovado pela Portaria STN nº 518/2018",
+              "Manual de Informações do Sistema de Custos do Governo Federal",
+              "Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal)"
+            ]
+          },
+          {
+            "nome": "Lei nº 4.320/1964",
+            "subtopicos": []
+          },
+          {
+            "nome": "Manual de Demonstrativos Fiscais, 14ª edição",
+            "subtopicos": [
+              "Relatório resumido da execução orçamentária: estrutura, composição",
+              "Relatório de gestão fiscal: estrutura, composição"
+            ]
+          },
+          {
+            "nome": "Decreto-Lei nº 200/1967",
+            "subtopicos": []
+          },
+          {
+            "nome": "Constituição Federal de 1988, art. 70 a 74",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 10.180/2001",
+            "subtopicos": []
+          },
+          {
+            "nome": "Decreto nº 93.872/1986",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções acerca do Sistema Integrado de Administração Financeira do Governo Federal (SIAFI)",
+            "subtopicos": [
+              "objetivo, vantagens e principais atribuições",
+              "estrutura do SIAFI",
+              "principais documentos de entrada e saída do SIAFI"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 18,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia_chunk": "CONTABILIDADE TRIBUTÁRIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "CONTABILIDADE TRIBUTÁRIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Tributos",
+        "topicos": [
+          {
+            "nome": "Noções básicas sobre tributos",
+            "subtopicos": [
+              "Impostos, taxas e contribuições"
+            ]
+          },
+          {
+            "nome": "Tratamento contábil aplicável aos impostos e contribuições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Retenções na fonte realizadas pela administração pública federal",
+            "subtopicos": [
+              "Imposto de renda pessoa jurídica (IRPJ)",
+              "Contribuição social sobre o lucro líquido (CSLL)",
+              "Imposto de renda retido na fonte (IRRF)",
+              "Imposto sobre circulação de mercadorias e serviços (ICMS)",
+              "Participações governamentais",
+              "Programas de integração social e de formação do patrimônio do servidor público (PIS/PASEP)",
+              "Contribuição para o financiamento da seguridade social (COFINS)",
+              "Contribuição de intervenção no domínio econômico (CIDE)",
+              "Imposto sobre serviços (ISS)",
+              "Contribuição Previdenciária (INSS)"
+            ]
+          },
+          {
+            "nome": "Legislação básica e suas atualizações",
+            "subtopicos": [
+              "Instrução Normativa RFB Nº 2110, de 17 de outubro de 2022",
+              "Instrução Normativa da Receita Federal do Brasil nº 1.234/2012",
+              "Lei Complementar nº 116/2003",
+              "Lei Complementar nº 123/2006"
+            ]
+          },
+          {
+            "nome": "Noções básicas sobre E-Social, EFD-REINF, DCTFWeb e DARF Numerado",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 19,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia_chunk": "NOÇÕES DE AUDITORIA GOVERNAMENTAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "NOÇÕES DE AUDITORIA GOVERNAMENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Auditoria",
+        "topicos": [
+          {
+            "nome": "Normas Brasileiras de Contabilidade Técnicas de Auditoria de Informação Contábil Histórica Aplicável ao Setor Público - NBC TASP",
+            "subtopicos": []
+          },
+          {
+            "nome": "Normas Brasileiras de Contabilidade Técnicas de Auditoria Interna - NBC TI",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conceitos de auditoria interna e externa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Relatórios de Auditoria",
+            "subtopicos": []
+          },
+          {
+            "nome": "Auditoria no setor público federal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Finalidades e objetivos da auditoria governamental. Abrangência de atuação",
+            "subtopicos": [
+              "Finalidades e objetivos da auditoria governamental",
+              "Abrangência de atuação"
+            ]
+          },
+          {
+            "nome": "Formas e tipos de Auditoria. Normas relativas à execução dos trabalhos",
+            "subtopicos": [
+              "Formas e tipos de Auditoria",
+              "Normas relativas à execução dos trabalhos"
+            ]
+          },
+          {
+            "nome": "Conceito e finalidade do controle da Administração Pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Controle interno e controle externo da Administração Pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Decisão Normativa TCU nº 198/2022",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia_chunk": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "1 Orçamento público",
+            "subtopicos": [
+              "1.1 Conceitos, diretrizes e princípios orçamentários",
+              "1.2 Métodos, técnicas e instrumentos do orçamento público"
+            ]
+          },
+          {
+            "nome": "2 Ciclo orçamentário",
+            "subtopicos": [
+              "elaboração, aprovação, execução e avaliação"
+            ]
+          },
+          {
+            "nome": "3 Processo de planejamento orçamentário",
+            "subtopicos": [
+              "Plano Plurianual",
+              "Lei de Diretrizes Orçamentárias",
+              "Lei Orçamentária Anual"
+            ]
+          },
+          {
+            "nome": "4 Receita e despesa orçamentária",
+            "subtopicos": [
+              "4.1 Conceituação, classificação e estágios da receita e despesa orçamentária"
+            ]
+          },
+          {
+            "nome": "5 Ordenador de Despesas",
+            "subtopicos": []
+          },
+          {
+            "nome": "6 Restos a pagar",
+            "subtopicos": []
+          },
+          {
+            "nome": "7 Despesa de exercícios anteriores",
+            "subtopicos": []
+          },
+          {
+            "nome": "8 Suprimento de fundos",
+            "subtopicos": [
+              "regime de adiantamento"
+            ]
+          },
+          {
+            "nome": "9 Créditos adicionais",
+            "subtopicos": [
+              "suplementares",
+              "especiais",
+              "extraordinários"
+            ]
+          },
+          {
+            "nome": "10 Dívida ativa",
+            "subtopicos": [
+              "Fonte e destinação de recursos"
+            ]
+          },
+          {
+            "nome": "11 Classificações orçamentárias",
+            "subtopicos": [
+              "11.1 Classificação da despesa pública: institucional, funcional, programática, pela natureza",
+              "11.2 Classificação da receita pública: institucional, por categorias econômicas, por fontes"
+            ]
+          },
+          {
+            "nome": "12 Programação de desembolso e mecanismos retificadores do orçamento",
+            "subtopicos": []
+          },
+          {
+            "nome": "13 Conta Única do Tesouro Nacional",
+            "subtopicos": [
+              "conceito e previsão legal"
+            ]
+          },
+          {
+            "nome": "14 Gestão organizacional das finanças públicas",
+            "subtopicos": [
+              "sistema de planejamento e orçamento e de programação financeira constantes da Lei nº 10.180/2001"
+            ]
+          },
+          {
+            "nome": "15 Noções de licitação, pregão e registro de preços",
+            "subtopicos": []
+          },
+          {
+            "nome": "16 Dos crimes contra as finanças públicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "17 Manual Técnico do Orçamento - MTO 2024",
+            "subtopicos": [
+              "17.1 Classificação da despesa pública: institucional, funcional, programática, pela natureza e classificações adicionais previstas no Manual Técnico de Orçamento (MTO)",
+              "17.2 Classificação da receita pública: institucional, por categorias econômicas, por fontes e classificações adicionais previstas no Manual Técnico de Orçamento (MTO)"
+            ]
+          },
+          {
+            "nome": "18 Manual de Contabilidade Aplicada ao Setor Público (MCASP) 10ª ed - Parte I - Procedimentos Contábeis Orçamentários, aprovada pela Portaria Conjunta STN/SOF nº 23, de 11 de dezembro de 2023",
+            "subtopicos": [
+              "18.1 Orientações aplicáveis ao processo de execução orçamentária das despesas relativas a pessoal, benefícios aos servidores, sentenças judiciais e pensões indenizatórias"
+            ]
+          },
+          {
+            "nome": "19 Dívida ativa",
+            "subtopicos": []
+          },
+          {
+            "nome": "20 Restos a pagar",
+            "subtopicos": []
+          },
+          {
+            "nome": "21 Despesas de exercícios anteriores",
+            "subtopicos": []
+          },
+          {
+            "nome": "22 Suprimento de fundos",
+            "subtopicos": []
+          },
+          {
+            "nome": "23 Regras para elaboração, execução e controle orçamentário previstas na Lei nº 4.320/1964 e suas alterações",
+            "subtopicos": []
+          },
+          {
+            "nome": "24 Lei de Responsabilidade Fiscal (Lei Complementar nº 101/2000 e suas alterações)",
+            "subtopicos": [
+              "princípios, conceitos, planejamento",
+              "renúncia de receitas",
+              "geração de despesas",
+              "transferências voluntárias",
+              "destinação de recursos para o setor privado",
+              "transparência da gestão fiscal",
+              "prestação de contas e fiscalização da gestão fiscal",
+              "Dívida pública e controle do endividamento",
+              "Limites e controle de despesa com pessoal"
+            ]
+          },
+          {
+            "nome": "25 Manual de Demonstrativos Fiscais, 14ª edição",
+            "subtopicos": []
+          },
+          {
+            "nome": "26 Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal)",
+            "subtopicos": [
+              "Lei nº 4.320/1964"
+            ]
+          },
+          {
+            "nome": "27 Constituição Federal de 1988, art. 165 a 169",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 21,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia_chunk": "MATEMÁTICA FINANCEIRA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "MATEMÁTICA FINANCEIRA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Matemática Financeira",
+        "topicos": [
+          {
+            "nome": "Regra de três simples e composta, proporcionalidades e porcentagens",
+            "subtopicos": []
+          },
+          {
+            "nome": "Juros simples e compostos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Capitalização e desconto",
+            "subtopicos": []
+          },
+          {
+            "nome": "Taxas de juros nominal, efetiva, equivalente, real e aparente",
+            "subtopicos": []
+          },
+          {
+            "nome": "Rendas uniformes e variáveis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Planos de amortização de empréstimos e financiamentos",
+            "subtopicos": [
+              "Sistema francês (tabela Price)",
+              "Sistema de amortização constante (SAC)",
+              "Sistema de amortização misto (SAM)"
+            ]
+          },
+          {
+            "nome": "Cálculo financeiro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Custo real e efetivo das operações de financiamento, empréstimo e investimento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Avaliação de alternativas de investimento em economia estável e em ambiente inflacionário",
+            "subtopicos": []
+          },
+          {
+            "nome": "Avaliação econômica de projetos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Taxas de retorno e taxas internas de retorno",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia_chunk": "ENFERMEIRO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "ENFERMEIRO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Enfermagem",
+        "topicos": [
+          {
+            "nome": "Sistema Único de Saúde (SUS)",
+            "subtopicos": [
+              "princípios, diretrizes, estrutura e organização",
+              "Políticas de saúde",
+              "Estrutura e funcionamento das instituições e suas relações com os serviços de saúde",
+              "Níveis progressivos de assistência à saúde",
+              "Políticas públicas do SUS para gestão de recursos físicos, financeiros, materiais e humanos",
+              "Sistema de planejamento do SUS",
+              "Direitos dos usuários do SUS",
+              "Participação e controle social",
+              "Ações e programas do SUS",
+              "Legislação básica do SUS"
+            ]
+          },
+          {
+            "nome": "Vigilância epidemiológica e vigilância em saúde",
+            "subtopicos": [
+              "Programas de prevenção e controle de doenças transmissíveis prevalentes no cenário epidemiológico brasileiro",
+              "Doenças e agravos não transmissíveis",
+              "Programa Nacional de Imunizações"
+            ]
+          },
+          {
+            "nome": "Modalidades assistenciais",
+            "subtopicos": [
+              "Hospital-dia, assistência domiciliar, trabalho de grupo",
+              "Prática de enfermagem na comunidade",
+              "Estratégia da saúde da família"
+            ]
+          },
+          {
+            "nome": "Teorias e processo de enfermagem",
+            "subtopicos": [
+              "Taxonomias de diagnósticos de enfermagem"
+            ]
+          },
+          {
+            "nome": "Assistência de enfermagem ao adulto portador de transtorno mental",
+            "subtopicos": [
+              "Unidades de atenção à saúde mental",
+              "Instrumentos de intervenção de enfermagem em saúde mental"
+            ]
+          },
+          {
+            "nome": "Assistência de enfermagem em gerontologia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assistência de enfermagem ao paciente oncológico nas diferentes fases da doença e tratamentos",
+            "subtopicos": [
+              "Quimioterapia, radioterapia e cirurgias"
+            ]
+          },
+          {
+            "nome": "Procedimentos técnicos em enfermagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assistência de enfermagem perioperatória",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assistência de enfermagem a pacientes com alterações da função cardiovascular e circulatória",
+            "subtopicos": [
+              "Digestiva e gastrointestinal",
+              "Metabólica e endócrina",
+              "Renal e do trato urinário",
+              "Reprodutiva",
+              "Tegumentar",
+              "Neurológica",
+              "Músculo esquelético"
+            ]
+          },
+          {
+            "nome": "Assistência de enfermagem aplicada à saúde sexual e reprodutiva da mulher com ênfase nas ações de baixa e média complexidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assistência de enfermagem à gestante, parturiente e puérpera",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assistência de enfermagem ao recém-nascido",
+            "subtopicos": [
+              "Modelos de atenção ao recém-nascido que compõem o programa de humanização no pré-natal e nascimento"
+            ]
+          },
+          {
+            "nome": "Assistência de enfermagem à mulher no climatério e menopausa e na prevenção e tratamento de ginecopatias",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assistência de enfermagem à criança sadia",
+            "subtopicos": [
+              "Crescimento, desenvolvimento, aleitamento materno, alimentação",
+              "Cuidado nas doenças prevalentes na infância (diarreicas e respiratórias)"
+            ]
+          },
+          {
+            "nome": "Atendimento a pacientes em situações de urgência e emergência",
+            "subtopicos": [
+              "Estrutura organizacional do serviço de emergência hospitalar e pré-hospitalar",
+              "Suporte básico de vida em emergências",
+              "Emergências relacionadas a doenças do aparelho respiratório, do aparelho circulatório e psiquiátricas",
+              "Atendimento inicial ao politraumatizado",
+              "Atendimento na parada cardiorrespiratória",
+              "Assistência de enfermagem ao paciente crítico com distúrbios hidroeletrolíticos, acidobásicos, insuficiência respiratória e ventilação mecânica",
+              "Doação, captação e transplante de órgãos",
+              "Enfermagem em urgências"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de enfermagem em serviços de saúde",
+            "subtopicos": [
+              "Gerenciamento de recursos humanos",
+              "Avaliação da qualidade nos processos de trabalho",
+              "Processo de trabalho de gerenciamento em enfermagem"
+            ]
+          },
+          {
+            "nome": "Atuação da enfermagem em procedimentos e métodos diagnósticos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Agravos à saúde relacionados ao trabalho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento dos resíduos de serviços de saúde",
+            "subtopicos": []
+          },
+          {
+            "nome": "Pressupostos teóricos e metodológicos da pesquisa em saúde e enfermagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Central de material e esterilização",
+            "subtopicos": [
+              "Processamento de produtos para saúde",
+              "Processos de esterilização de produtos para saúde",
+              "Controle de qualidade e validação dos processos de esterilização de produtos para saúde"
+            ]
+          },
+          {
+            "nome": "Práticas de biossegurança aplicadas ao processo de cuidar",
+            "subtopicos": [
+              "Risco biológico e medidas de precauções básicas para a segurança individual e coletiva no serviço de assistência à saúde",
+              "Precaução-padrão e precauções por forma de transmissão das doenças"
+            ]
+          },
+          {
+            "nome": "Controle de infecção hospitalar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código de ética dos profissionais de enfermagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Legislação em enfermagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Associações de classe e órgãos de fiscalização do exercício profissional",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 23,
+      "cargo": "CARGO 5: ESTATÍSTICO",
+      "materia_chunk": "ESTATÍSTICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "ESTATÍSTICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Estatística",
+        "topicos": [
+          {
+            "nome": "Estatística descritiva e análise exploratória de dados",
+            "subtopicos": [
+              "Tipos de Variáveis e Níveis de Mensuração",
+              "Gráficos, diagramas, tabelas, medidas descritivas (posição, dispersão, assimetria e curtose)"
+            ]
+          },
+          {
+            "nome": "Probabilidade",
+            "subtopicos": [
+              "Definições básicas e axiomas",
+              "Probabilidade condicional e independência",
+              "Variáveis aleatórias discretas e contínuas",
+              "Distribuição de probabilidade",
+              "Função de probabilidade",
+              "Função densidade de probabilidade",
+              "Esperança e momentos",
+              "Distribuições especiais",
+              "Distribuições condicionais e independência",
+              "Lei dos Grandes Números",
+              "Teorema Central do Limite",
+              "Amostras Aleatórias",
+              "Distribuições Amostrais"
+            ]
+          },
+          {
+            "nome": "Inferência Estatística",
+            "subtopicos": [
+              "Estimação Pontual: métodos de estimação, propriedades dos estimadores, suficiência",
+              "Estimação intervalar: intervalos de confiança, intervalos de credibilidade",
+              "Testes de hipóteses: hipóteses simples e compostas, níveis de significância e potência de um teste, teste t de Student, teste qui-quadrado"
+            ]
+          },
+          {
+            "nome": "Análise de regressão linear",
+            "subtopicos": [
+              "Critérios de mínimos quadrados e de máxima verossimilhança",
+              "Modelos de regressão linear",
+              "Inferência sobre os parâmetros do modelo",
+              "Análise de variância",
+              "Análise de resíduos"
+            ]
+          },
+          {
+            "nome": "Técnicas de amostragem",
+            "subtopicos": [
+              "Amostragem aleatória simples, estratificada, sistemática e por conglomerados",
+              "Tamanho amostral"
+            ]
+          },
+          {
+            "nome": "Análise Multivariada",
+            "subtopicos": [
+              "Distribuição Normal Multivariada",
+              "Análise de Componentes Principais",
+              "Análise Fatorial",
+              "Análise Discriminante",
+              "Análise de Agrupamento"
+            ]
+          },
+          {
+            "nome": "Métodos para sumarização e análise exploratória de dados",
+            "subtopicos": [
+              "Distribuição de frequência: absoluta, relativa, acumulada",
+              "Medidas de posição: média, moda, mediana e quartis",
+              "Medidas de dispersão: amplitude, variância, desvio-padrão, coeficiente de variação, amplitude interquartil"
+            ]
+          },
+          {
+            "nome": "Conceitos básicos de Python",
+            "subtopicos": [
+              "Listas, tuplas, dicionários, funções e estruturas de controle"
+            ]
+          },
+          {
+            "nome": "Conceitos básicos de SQL",
+            "subtopicos": [
+              "Consultas, filtragem de dados, agrupamento de dados, ordenação de dados, junção de tabelas (joins)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 24,
+      "cargo": "CARGO 6: FARMACÊUTICO",
+      "materia_chunk": "FARMACÊUTICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "FARMACÊUTICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Farmacologia",
+        "topicos": [
+          {
+            "nome": "Noções de química orgânica",
+            "subtopicos": [
+              "Compostos nitrogenados",
+              "Alcanos, alquenos, alquinos, compostos aromáticos, compostos halogenados, álcoois, fenóis, éteres, aldeídos, cetonas, ácidos carboxílicos e seus derivados e compostos nitrogenados: nomenclatura, propriedades e reações"
+            ]
+          },
+          {
+            "nome": "Farmacologia geral",
+            "subtopicos": [
+              "Subdivisão de farmacologia",
+              "Classificação das formas farmacêuticas",
+              "Classificação das drogas"
+            ]
+          },
+          {
+            "nome": "Bases fisiológicas da farmacologia",
+            "subtopicos": [
+              "Medidores químicos",
+              "Evolução do conceito de mediação química",
+              "Receptores farmacológicos",
+              "Receptores pré e pós-sinápticos",
+              "Interação droga-receptor",
+              "Mensageiro secundário"
+            ]
+          },
+          {
+            "nome": "Métodos fisiológicos aplicados à farmacologia",
+            "subtopicos": [
+              "Ensaios biológicos",
+              "Estudo in vitro e in vivo",
+              "Líquidos nutridores"
+            ]
+          },
+          {
+            "nome": "Métodos estatísticos aplicados à farmacologia",
+            "subtopicos": [
+              "Padronização biológica",
+              "Comparação entre médias",
+              "Teste t de Student",
+              "Análise de variância",
+              "Correlação linear"
+            ]
+          },
+          {
+            "nome": "Farmacocinética",
+            "subtopicos": [
+              "Vias de administração de drogas",
+              "Absorção",
+              "Biodisponibilidade",
+              "Meia-vida das drogas",
+              "Distribuição",
+              "Biotransformações",
+              "Excreção"
+            ]
+          },
+          {
+            "nome": "Farmacodinâmica",
+            "subtopicos": [
+              "Mecanismos de ação de drogas",
+              "Interação droga-receptor",
+              "Relação dose-efeito",
+              "Sinergismo",
+              "Tipos de antagonismo",
+              "Eficácia e potência de uma droga",
+              "Dose-efetiva (ED50)",
+              "Dose-letal (LD50)",
+              "Índice terapêutico"
+            ]
+          },
+          {
+            "nome": "Farmacologia dos sistemas – Drogas que atuam em nível de sinapses periféricas e junções neuromusculares",
+            "subtopicos": [
+              "Agonistas colinérgicos",
+              "Agentes anticolinestrásicos",
+              "Agentes antimuscarínicos",
+              "Aminas simpaticominéticas",
+              "Antiadrenérgicos e bloqueadores alfa e beta aldrenérgicos",
+              "Estimulantes e bloqueadores ganglionares",
+              "Bloqueadores neuromusculares (curares)",
+              "Anestésicos locais"
+            ]
+          },
+          {
+            "nome": "Drogas que atuam em nível de sistema nervoso central",
+            "subtopicos": [
+              "Hipnóticos e sedativos",
+              "Álcoois alifáticos",
+              "Anestésicos gerais",
+              "Estimulantes do sistema nervoso central",
+              "Neurolépticos",
+              "Ansiolíticos",
+              "Antidepressivos",
+              "Opiáceos",
+              "Alucinógenos",
+              "Tolerância, vício, dependência e abuso de drogas"
+            ]
+          },
+          {
+            "nome": "Autacóides",
+            "subtopicos": [
+              "Histamina e análogos",
+              "Serotonima",
+              "Prostaglandinas",
+              "Bradicina e angiotensina",
+              "Drogas relacionadas com o tema autacóides: anti-histamínicos, costicosteróides e analgésicos não esteroidais"
+            ]
+          },
+          {
+            "nome": "Drogas com ação cardiovascular",
+            "subtopicos": [
+              "Cardiotônicos",
+              "Antiarrítmicos",
+              "Antiangionosos"
+            ]
+          },
+          {
+            "nome": "Drogas que afetam a função renal",
+            "subtopicos": [
+              "Diuréticos",
+              "Hormônio antidiurético",
+              "Inibidores do transporte tubular"
+            ]
+          },
+          {
+            "nome": "Drogas que afetam a motilidade uterina",
+            "subtopicos": [
+              "Ocitócicos",
+              "Prostaglandinas",
+              "Alcalóides do esporão de centeio"
+            ]
+          },
+          {
+            "nome": "Drogas que afetam a função respiratória",
+            "subtopicos": [
+              "Broncoconstritores",
+              "Broncodilatadores",
+              "Antialérgicos",
+              "Descongestionantes nasais",
+              "Estimulantes respiratórios"
+            ]
+          },
+          {
+            "nome": "Drogas que afetam as funções neuro endócrinas",
+            "subtopicos": [
+              "Estrogênios e progestógenos",
+              "Androgênios",
+              "Indutores de ovulação",
+              "Anovulatórios"
+            ]
+          },
+          {
+            "nome": "Antibióticos e quimioterápicos",
+            "subtopicos": [
+              "Penicilinas",
+              "Cefalosporinas",
+              "Antibióticos aminoglicosídicos",
+              "Tetracidinas e cloranfenicol",
+              "Sulfas",
+              "Antineoplásticos",
+              "Anti-helmínticos",
+              "Anti-sépticos e desinfetantes"
+            ]
+          },
+          {
+            "nome": "Farmacognosia",
+            "subtopicos": [
+              "Princípios vegetais",
+              "Obtenção de princípios vegetais: tisana, infusão, decocção, maceração etc",
+              "Estabilização e leofilisação",
+              "Métodos gerais de reconhecimento e caracterização de princípios vegetais",
+              "Essências vegetais",
+              "Resinas vegetais",
+              "Óleos vegetais",
+              "Glicosídeos tiociânicos",
+              "Glicosídeos fenolgenéticos",
+              "Glicosídeos esteroídeos",
+              "Glicosídeos fravonóides",
+              "Alcalóides",
+              "Saponinas",
+              "Taninos",
+              "Propriedades farmacodinâmicas dos princípios extraídos de espécimes vegetais"
+            ]
+          },
+          {
+            "nome": "Abuso de drogas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Interações medicamentosas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Vitaminas hidrossolúveis e lipossolúveis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções básicas de toxicologia e toxicologia de medicamentos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Legislação farmacêutica",
+            "subtopicos": [
+              "Lei nº 5.991/1973",
+              "Portaria nº 344/1998 do Ministério da Saúde",
+              "Lei nº 6.437/1977"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 25,
+      "cargo": "CARGO 7: MÉDICO CLÍNICO",
+      "materia_chunk": "MÉDICO CLÍNICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 7,
+      "materia_normalizada": "MÉDICO CLÍNICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Clínica Médica",
+        "topicos": [
+          {
+            "nome": "Ética médica e bioética",
+            "subtopicos": []
+          },
+          {
+            "nome": "Doenças cardiovasculares",
+            "subtopicos": [
+              "Hipertensão arterial sistêmica",
+              "Insuficiência cardíaca",
+              "Miocardiopatias",
+              "Valvulopatias",
+              "Arritmias cardíacas",
+              "Síndromes isquêmicas coronárias",
+              "Fatores predisponentes à formação da placa aterosclerótica",
+              "Tromboembolismo venoso periférico",
+              "Aneurisma da aorta",
+              "Coração de atleta",
+              "Cardiopatias na gravidez"
+            ]
+          },
+          {
+            "nome": "Doenças pulmonares",
+            "subtopicos": [
+              "Asma brônquica",
+              "Doença pulmonar obstrutiva crônica",
+              "Embolia pulmonar",
+              "Pneumonias e abcessos pulmonares",
+              "TEP e Hipertensão pulmonar",
+              "Neoplasia pulmonar"
+            ]
+          },
+          {
+            "nome": "Doenças gastrointestinais e hepáticas",
+            "subtopicos": [
+              "Úlcera péptica",
+              "Doença do refluxo gastroesofágico",
+              "Doenças intestinais inflamatórias e parasitárias",
+              "Diarreia",
+              "Colelitíase e colecistite",
+              "Pancreatite aguda e crônica",
+              "Hepatites virais",
+              "Cirrose hepática",
+              "Síndromes disabsortivas",
+              "Abdome agudo",
+              "Neoplasia gástrica",
+              "Neoplasia hepática",
+              "Neoplasia pancreática",
+              "Neoplasia colorretal"
+            ]
+          },
+          {
+            "nome": "Acidentes produzidos por agentes físicos",
+            "subtopicos": [
+              "Acidentes provocados por animais peçonhentos",
+              "Intoxicações exógenas",
+              "Queimaduras"
+            ]
+          },
+          {
+            "nome": "Doenças renais e urológicas",
+            "subtopicos": [
+              "Insuficiência renal aguda e crônica",
+              "Litíase renal",
+              "Infecção urinária",
+              "Glomerulonefrites",
+              "Síndrome nefrótica",
+              "Câncer Renal",
+              "Câncer de próstata",
+              "Hiperplasia de próstata"
+            ]
+          },
+          {
+            "nome": "Doenças endócrinas",
+            "subtopicos": [
+              "Diabetes mellitus",
+              "Obesidade",
+              "Síndrome metabólica",
+              "Hipotireoidismo e hipertireoidismo",
+              "Tireoidite e nódulos tireoidianos",
+              "Neoplasia de tireoide"
+            ]
+          },
+          {
+            "nome": "Reumatologia",
+            "subtopicos": [
+              "Artrites agudas",
+              "Artrite reumatoide",
+              "Esclerodermia",
+              "Espondilite anquilosante",
+              "Lúpus eritematoso sistêmico",
+              "Sarcoidose",
+              "Vasculites sistêmicas",
+              "Gota",
+              "Urticária e angioedema"
+            ]
+          },
+          {
+            "nome": "Infectologia",
+            "subtopicos": [
+              "Síndrome da imunodeficiência adquirida",
+              "Endocardite infecciosa",
+              "Infecções estafilocócicas",
+              "Tuberculose",
+              "Hanseníase",
+              "Doenças sexualmente transmissíveis",
+              "Herpes simples e zoster",
+              "Dengue e febre amarela",
+              "Febre",
+              "Síndrome pós-covid"
+            ]
+          },
+          {
+            "nome": "Emergências clínicas",
+            "subtopicos": [
+              "Vias aéreas e ventilação",
+              "Ressuscitação cardiopulmonar",
+              "ACLS",
+              "Edema agudo pulmonar",
+              "Emergência hipertensiva",
+              "Hemorragia digestiva",
+              "Estados de choque",
+              "Anafilaxia",
+              "Intoxicações exógenas",
+              "Crise convulsiva",
+              "Acidente vascular encefálico",
+              "Alterações do estado de consciência",
+              "Hipoglicemia e hiperglicemia",
+              "SARA",
+              "Hipertensão intracraniana",
+              "Coagulação intravascular dissemina, coagulopatia de consumo, trombólise e uso de antiplaquetários e anticoagulantes",
+              "Trauma raquimedular",
+              "Traumatismo cranioencefálico",
+              "Crise convulsiva",
+              "Dor torácica"
+            ]
+          },
+          {
+            "nome": "Dermatologia",
+            "subtopicos": [
+              "Doenças exantemáticas",
+              "Infecções da pele e do tecido subcutâneo",
+              "Psoríase",
+              "Câncer de pele",
+              "Melanoma",
+              "Carcinoma basocelular"
+            ]
+          },
+          {
+            "nome": "Doenças inflamatórias pélvicas, neoplasias ginecológicas, câncer de mama",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema auditivo",
+            "subtopicos": [
+              "Deficiências auditivas",
+              "Zumbido: diagnósticos diferenciais",
+              "Labirintopatias periféricas e centrais",
+              "Apneia do sono",
+              "Neoplasias da laringe",
+              "Teste de audiometria: noção básica"
+            ]
+          },
+          {
+            "nome": "Doenças degenerativas e infecciosas do Sistemas Nervoso Central. Cefaleias",
+            "subtopicos": []
+          },
+          {
+            "nome": "Hematologia",
+            "subtopicos": [
+              "Anemias",
+              "Discrasias de células plasmáticas",
+              "Distúrbios de coagulação",
+              "Doenças linfoproliferativas",
+              "Leucopenia"
+            ]
+          },
+          {
+            "nome": "Toxicologia",
+            "subtopicos": [
+              "Toxicologia básica",
+              "Toxicologia e epidemiologia",
+              "Toxicocinética e toxicodinâmica dos agentes químicos",
+              "Monitoração biológica"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 26,
+      "cargo": "CARGO 8: MÉDICO ORTOPEDISTA",
+      "materia_chunk": "MÉDICO ORTOPEDISTA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 8,
+      "materia_normalizada": "MÉDICO ORTOPEDISTA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ortopedia e Traumatologia",
+        "topicos": [
+          {
+            "nome": "Sistema músculo esquelético",
+            "subtopicos": [
+              "Embriologia do sistema músculo esquelético",
+              "Estrutura do tecido ósseo",
+              "Crescimento e desenvolvimento dos ossos e articulações",
+              "Biomecânica na ortopedia",
+              "Marcha normal e patológica",
+              "Métodos diagnósticos em ortopedia",
+              "Princípios gerais do tratamento das fraturas",
+              "Cicatrização dos ossos e articulações e suas falhas",
+              "Estrutura do tecido cartilaginoso: organização, crescimento e lubrificação",
+              "Ênteses: definição e patologias",
+              "Tecido muscular: organização, fisiologia e alterações inflamatórias e infecciosas",
+              "Tecido nervoso: estrutura, organização, fisiologia, alterações degenerativas e inflamatórias",
+              "Lesões traumáticas dos nervos periféricos",
+              "Doenças neuromusculares"
+            ]
+          },
+          {
+            "nome": "Deformidades congênitas e adquiridas e patologias inflamatórias",
+            "subtopicos": [
+              "Etiologia, diagnóstico e tratamento",
+              "Pé torto congênito",
+              "Displasia do desenvolvimento do quadril",
+              "Doença de Legg-Calvé – Perthes",
+              "Epifisiólise proximal do fêmur",
+              "Coxa vara",
+              "Artrogripose",
+              "Doença de Blount",
+              "Pseudoartrose congênita tibial",
+              "Tálus vertical",
+              "Pé plano da criança",
+              "Pé plano do adulto",
+              "Pé cavo",
+              "Hálux valgo",
+              "Hálux rígido",
+              "Metatarsalgia",
+              "Fasceíte plantar",
+              "Tendinopatia do tendão de Aquiles",
+              "Tendinopatia dos tendões fibulares",
+              "Aplasia congênita/displasia dos ossos longos",
+              "Deformidades rotacionais e angulares e discrepâncias de comprimento dos ossos longos",
+              "Polidactilia e sindactilia",
+              "Paralisia cerebral",
+              "Paralisia obstétrica",
+              "Defeitos de fechamento do Tubo Neural"
+            ]
+          },
+          {
+            "nome": "Infecções e alterações inflamatórias osteoarticulares",
+            "subtopicos": [
+              "Etiologia, diagnóstico e tratamento",
+              "Artrite séptica",
+              "Osteomielite aguda e crônica",
+              "Tuberculose óssea",
+              "Infecção da coluna vertebral",
+              "Sinovites e tenossinovites dos membros superiores e inferiores: inflamatórias e infecciosas",
+              "Pé diabético e Artropatia de Charcot",
+              "Artrite Reumatóide",
+              "Escolioses",
+              "Doença de Scheuermann",
+              "Cifose",
+              "Espondilólise",
+              "Espondilolistese"
+            ]
+          },
+          {
+            "nome": "Tumores ósseos e lesões pseudotumorais",
+            "subtopicos": [
+              "Propriedades biológicas",
+              "Classificação",
+              "Diagnóstico, estadiamento e tratamento",
+              "Tumores de partes moles do sistema músculo esquelético"
+            ]
+          },
+          {
+            "nome": "Osteocondroses",
+            "subtopicos": [
+              "Etiologia, diagnóstico e tratamento",
+              "Membro superior, inferior e quadril"
+            ]
+          },
+          {
+            "nome": "Alterações degenerativas osteoarticulares",
+            "subtopicos": [
+              "Etiologia, diagnóstico e tratamento",
+              "Gonartrose",
+              "Coxartrose",
+              "Artrose do carpo e da mão",
+              "Artrose do pé e do tornozelo",
+              "Artrose dos ombros e dos cotovelos",
+              "Necroses ósseas em membros superiores e inferiores",
+              "Patologias degenerativas da coluna vertebral",
+              "Doenças ortopédicas relacionadas ao trabalho: etiologia, fisiopatologia, diagnóstico e tratamento"
+            ]
+          },
+          {
+            "nome": "Doenças osteometabólicas na prática ortopédica",
+            "subtopicos": [
+              "Etiologia, diagnóstico e tratamento",
+              "Repercussões ósteo-articulares das doenças hematológicas e endócrinas"
+            ]
+          },
+          {
+            "nome": "Princípios do tratamento do paciente politraumatizado (ATLS)",
+            "subtopicos": [
+              "Resposta endócrino metabólica ao trauma",
+              "Ferimentos por projéteis de arma de fogo"
+            ]
+          },
+          {
+            "nome": "Princípios gerais e técnicos das osteossínteses",
+            "subtopicos": [
+              "Biomecânica da consolidação das fraturas",
+              "Estabilidade",
+              "Implantes e métodos de fixação",
+              "Fraturas e luxações da articulação da coluna cervical, torácica e lombar: etiologia, diagnóstico e tratamento"
+            ]
+          },
+          {
+            "nome": "Fraturas, luxações, lesões capsulo-ligamentares e epifisárias do membro superior e inferior em adultos e crianças",
+            "subtopicos": [
+              "Etiologia, diagnóstico e métodos de tratamento",
+              "Impacto do ombro",
+              "Lesões ligamentares e instabilidades da articulação escápulo-umeral",
+              "Fraturas da articulação do quadril e anel pélvico",
+              "Impacto do quadril",
+              "Fraturas e lesões ligamentares do tornozelo e do pé",
+              "Fraturas, lesões ligamentares e instabilidades/transtornos internos dos joelhos",
+              "Fraturas e lesões ligamentares dos cotovelos",
+              "Fraturas e lesões ligamentares do punho e da mão"
+            ]
+          },
+          {
+            "nome": "Exame físico da coluna vertebral, ombro, cotovelo, punho e mão",
+            "subtopicos": [
+              "Exame físico do quadril, do joelho, do pé e do tornozelo"
+            ]
+          },
+          {
+            "nome": "Diagnóstico, classificação e tratamento",
+            "subtopicos": [
+              "Fraturas diafisárias do fêmur",
+              "Fraturas diafisárias do úmero",
+              "Fraturas do antebraço",
+              "Fraturas da tíbia: diáfise, platô tibial e tíbia distal"
+            ]
+          },
+          {
+            "nome": "Artroscopias",
+            "subtopicos": [
+              "Princípios gerais e indicações",
+              "Artroscopia do ombro",
+              "Artroscopia do joelho",
+              "Artroscopia do quadril",
+              "Artroscopia do punho",
+              "Artroscopia do tornozelo e do pé"
+            ]
+          },
+          {
+            "nome": "Artrodeses",
+            "subtopicos": [
+              "Princípios gerais, técnicas cirúrgicas e indicações",
+              "Artrodese da coluna vertebral",
+              "Artrodese do pé e tornozelo",
+              "Artrodese do carpo e da mão"
+            ]
+          },
+          {
+            "nome": "Artroplastias do ombro, joelho, quadril e tornozelo: princípios gerais, técnicas cirúrgicas, indicações e complicações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fraturas expostas",
+            "subtopicos": [
+              "Diagnóstico, tratamento e classificações",
+              "Lesões ósseas e de partes moles"
+            ]
+          },
+          {
+            "nome": "Síndrome compartimental em membros superiores e inferiores: etiologia, fisiopatologia, diagnóstico e tratamento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Imobilizações na prática ortopédica e traumatológica: princípios gerais e indicações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Curativos: princípios gerais e indicações técnicas em ortopedia e traumatologia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Garroteamento e dessangramento de membros",
+            "subtopicos": [
+              "Atendimento pré-hospitalar e com finalidade cirúrgica",
+              "Indicações, técnicas e complicações"
+            ]
+          },
+          {
+            "nome": "Amputações dos membros inferiores: princípios gerais, indicações e técnicas cirúrgicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Próteses e órteses para o aparelho locomotor: definição, tipos, indicações e aplicabilidade na traumatologia e ortopedia",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 27,
+      "cargo": "CARGO 9: MÉDICO PSIQUIATRA",
+      "materia_chunk": "MÉDICO PSIQUIATRA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 9,
+      "materia_normalizada": "MÉDICO PSIQUIATRA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Psiquiatria",
+        "topicos": [
+          {
+            "nome": "Transtornos mentais orgânicos agudos e crônicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtornos psiquiátricos associados ao uso de álcool e ao uso de múltiplas drogas e de outras substâncias psicoativas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtorno bipolar, Episódio depressivo, Transtorno do humor, Transtorno distímico",
+            "subtopicos": []
+          },
+          {
+            "nome": "Esquizofrenia, Transtornos psicóticos agudos e transitórios, Transtornos esquizotípicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtorno de ansiedade generalizada, Transtorno de pânico, Agorafobia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtorno de estresse pós-traumático, Transtorno de ajustamento, Burnout e Reação aguda ao estresse Transtorno de adaptação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtorno obsessivo-compulsivo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtornos Dissociativos com sintomas neurológicos, Transtornos factícios, Transtorno de somatização, Simulação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transtornos de personalidade e transtorno de conduta antissocial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Emergências em psiquiatria",
+            "subtopicos": []
+          },
+          {
+            "nome": "Suicídio e tentativa de suicídio",
+            "subtopicos": []
+          },
+          {
+            "nome": "Psiquiatria forense",
+            "subtopicos": [
+              "Exame pericial psiquiátrico",
+              "Alienação mental",
+              "Retardo mental"
+            ]
+          },
+          {
+            "nome": "Transtornos globais do desenvolvimento (transtorno do espectro autista)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Distúrbios psiquiátricos associados ao uso de substâncias psicoativas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Deficiência mental",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 10: NUTRICIONISTA",
+      "materia_chunk": "NUTRICIONISTA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 10,
+      "materia_normalizada": "NUTRICIONISTA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Nutrição",
+        "topicos": [
+          {
+            "nome": "Bases da nutrição humana",
+            "subtopicos": [
+              "anatomofisiologia do aparelho digestivo e glândulas anexas"
+            ]
+          },
+          {
+            "nome": "Energia e nutrientes",
+            "subtopicos": [
+              "definição, classificação, propriedades, funções, digestão, absorção, metabolismo intermediário, biodisponibilidade, requerimentos e recomendações, fontes alimentares, carências e toxicidade de macro e micronutrientes, água, eletrólitos e fibras"
+            ]
+          },
+          {
+            "nome": "Nutrição normal",
+            "subtopicos": [
+              "definição, fundamentação e característica da dieta normal e suas modificações",
+              "Necessidades e recomendações nutricionais para indivíduos: planejamento e avaliação"
+            ]
+          },
+          {
+            "nome": "Alimentação e nutrição nos diferentes grupos etários, nos estresses fisiológicos, enfermidades e para grupos nutricionalmente vulneráveis",
+            "subtopicos": [
+              "conceitos e métodos, inquéritos dietéticos, antropometria, composição corporal, avaliação laboratorial dos parâmetros nutricionais e imunológicos, semiologia nutricional, balanço nitrogenado, balanço energético",
+              "Prognóstico nutricional e avaliação nutricional subjetiva global"
+            ]
+          },
+          {
+            "nome": "Avaliação nutricional de indivíduos e de comunidades",
+            "subtopicos": [
+              "tipos, conceitos, materiais e métodos, interpretação e aplicabilidade dos resultados",
+              "Guias alimentares para a população brasileira, alimentação saudável nos ciclos da vida",
+              "Educação nutricional"
+            ]
+          },
+          {
+            "nome": "Alimentos",
+            "subtopicos": [
+              "características organolépticas, físico-químicas, nutricionais e higiênico-sanitárias"
+            ]
+          },
+          {
+            "nome": "Grupos de alimentos, critérios e aplicabilidade",
+            "subtopicos": [
+              "Planejamento e operacionalização de cardápios"
+            ]
+          },
+          {
+            "nome": "Métodos de avaliação e efeitos das diversas modalidades de armazenamento, pré-preparo, preparo e conservação da qualidade nutricional",
+            "subtopicos": [
+              "Pontos críticos de controle da qualidade higiênico-sanitária das refeições produzidas"
+            ]
+          },
+          {
+            "nome": "Aquisição, seleção, armazenamento, conservação e destino final",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fatores de conversão, correção e absorção",
+            "subtopicos": []
+          },
+          {
+            "nome": "Higiene e sanitização dos alimentos, utensílios e equipamentos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Enfermidades transmitidas por alimentos (ETA)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Nutrição aplicada",
+            "subtopicos": [
+              "patologia da nutrição e dietoterapia nas doenças nutricionais"
+            ]
+          },
+          {
+            "nome": "Noções de epidemiologia clínica e bioestatística",
+            "subtopicos": [
+              "Epidemiologia e vigilância nutricional",
+              "Fisiopatologia nutricional e dietoterapia",
+              "Desnutrição e carências nutricionais",
+              "Obesidade",
+              "Transtornos alimentares",
+              "Estresse metabólico: sepse, queimaduras, cirurgias, câncer e síndrome da imunodeficiência adquirida (SIDA)",
+              "Diabetes e outras endócrinas e metabólicas",
+              "Cardiovasculopatias e síndrome metabólica",
+              "Doenças do aparelho digestório",
+              "Nefropatias",
+              "Doenças do aparelho respiratório",
+              "Transplantes",
+              "Alergias e intolerâncias alimentares",
+              "Doenças reumáticas e neurodegenerativas",
+              "Doenças gestacionais, da infância e adolescência"
+            ]
+          },
+          {
+            "nome": "Características e efeito das diferentes modalidades terapêuticas e investigação diagnóstica sobre o estado e necessidades nutricionais",
+            "subtopicos": [
+              "procedimentos cirúrgicos, diálise, interação drogas e nutrientes, quimioterapia e radioterapia, exames bioquímicos e de imagem"
+            ]
+          },
+          {
+            "nome": "Técnica dietética aplicada à nutrição clínica",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética e legislação profissional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Programa Nacional de Atenção Básica (PNAB)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 29,
+      "cargo": "CARGO 11: PSICÓLOGO CLÍNICO",
+      "materia_chunk": "PSICÓLOGO CLÍNICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 11,
+      "materia_normalizada": "PSICÓLOGO CLÍNICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Psicologia Clínica",
+        "topicos": [
+          {
+            "nome": "Ética profissional",
+            "subtopicos": [
+              "Psicólogos clínicos e bioética na saúde"
+            ]
+          },
+          {
+            "nome": "Resoluções do Conselho Federal de Psicologia",
+            "subtopicos": [
+              "Resolução CFP 01/1999 (Estabelece normas de atuação para os psicólogos em relação à questão da Orientação Sexual)",
+              "Resolução 18/2002 (Estabelece normas de atuação para os psicólogos em relação a preconceito e discriminação racial)",
+              "Resolução CFP nº 2/2016 (Avaliação Psicológica em Concurso Público e processos seletivos de natureza pública e privada)",
+              "Resolução nº 6/2019 (Institui regras para a elaboração de documentos escritos produzidos pela(o) psicóloga(o) no exercício profissional)",
+              "Resolução nº 8/2020 (Estabelece normas de exercício profissional da psicologia em relação às violências de gênero)",
+              "Resolução nº 01/2022 (Regulamenta a Avaliação Psicológica para concessão de registro e porte de arma de fogo)",
+              "Resolução 13/2022 (Dispõe sobre diretrizes e deveres para o exercício da psicoterapia por psicóloga e por psicólogo)",
+              "Resolução nº 31/2022 (Estabelece diretrizes para a realização de Avaliação Psicológica no exercício profissional da psicóloga e do psicólogo, regulamenta o Sistema de Avaliação de Testes Psicológicos – SATEPSI)",
+              "Resolução CFP nº 14/2023 (Avaliação de riscos psicossociais relacionados ao trabalho)",
+              "Resolução CFP nº 09/2024 (Regulamenta o exercício profissional da Psicologia mediado por Tecnologias Digitais da Informação e da Comunicação (TDICs)"
+            ]
+          },
+          {
+            "nome": "Avaliação psicológica e psicodiagnóstico",
+            "subtopicos": [
+              "Fundamentos e etapas da medida psicológica",
+              "Instrumentos de avaliação: critérios de seleção, avaliação e interpretação dos resultados",
+              "Técnicas de entrevista",
+              "Laudos, pareceres, relatórios, declaração e atestados",
+              "Resoluções CFP nº 04/2019 e 06/2019 (manual de elaboração de documentos)",
+              "Entrevista motivacional"
+            ]
+          },
+          {
+            "nome": "Teorias e técnicas psicoterápicas",
+            "subtopicos": [
+              "Psicoterapia individual de adultos e grupal",
+              "Abordagens teóricas: psicanálise, comportamental, cognitiva-comportamental, cognitiva de 3ª onda, humanista existencial, psicodrama, psicoterapia breve e psicoterapia de apoio"
+            ]
+          },
+          {
+            "nome": "Psicopatologia",
+            "subtopicos": [
+              "Transtornos de humor",
+              "Transtornos de personalidade",
+              "Transtornos relacionados ao uso e abuso de substâncias psicoativas",
+              "Transtornos de ansiedade",
+              "Transtorno do estresse pós-traumático",
+              "Burnout",
+              "Transtornos depressivos",
+              "Transtornos fóbicos",
+              "Transtornos psicossomáticos",
+              "Esquizofrenia",
+              "Outros transtornos psicóticos",
+              "Estruturas clínicas (neurose, psicose e perversão)",
+              "Diagnóstico diferencial"
+            ]
+          },
+          {
+            "nome": "Psicologia da saúde",
+            "subtopicos": [
+              "Políticas de saúde do serviço público federal",
+              "Processo saúde-doença (doenças crônicas e agudas)",
+              "Processo de adoecimento",
+              "Enfrentamento da doença e adesão ao tratamento",
+              "Teorias e manejos do estresse",
+              "Estilos de enfrentamento (coping)",
+              "O impacto da doença sobre o doente e a família",
+              "Uso de técnicas de mindfulness no manejo do estresse",
+              "Técnicas de Aconselhamento Psicológico",
+              "Ações básicas de saúde: promoção, prevenção e reabilitação",
+              "Níveis de atenção à saúde",
+              "Barreiras e comportamentos de saúde",
+              "Programas em saúde mental: atuação em programas de prevenção e intervenção de saúde mental no trabalho",
+              "Orientação para Aposentadoria",
+              "Trabalho do psicólogo em equipes interdisciplinares",
+              "Interdisciplinaridade e multidisciplinaridade em saúde",
+              "Modelo biopsicossocial"
+            ]
+          },
+          {
+            "nome": "Intervenção psicológica em problemas específicos",
+            "subtopicos": [
+              "Tratamento e prevenção da dependência química: álcool, tabagismo, outras drogas e redução de danos",
+              "Intervenção em situação de crise: estresse pós-traumático, manejo do suicídio, posvenção em suicídio, acidente de trabalho e manejo do luto"
+            ]
+          },
+          {
+            "nome": "Psicologia social e aplicação no trabalho",
+            "subtopicos": [
+              "Relação entre indivíduo e sociedade",
+              "Qualidade de Vida no trabalho",
+              "Intervenções psicossociais em comunidades e organizações",
+              "Psicologia de grupo e equipes de trabalho",
+              "Fundamentos teóricos e técnicos sobre grupos, conflitos no grupo e resolução de problemas",
+              "Avaliação psicológica dos fatores psicossociais do trabalho",
+              "Avaliação psicossocial da deficiência",
+              "Orientação para Aposentadoria"
+            ]
+          },
+          {
+            "nome": "Lei nº 11.340, de 7 de agosto de 2006 (Lei Maria da Penha)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assédio moral, assédio sexual e discriminação: prevenção das violências no trabalho",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 12: PSICÓLOGO ORGANIZACIONAL",
+      "materia_chunk": "PSICÓLOGO ORGANIZACIONAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 12,
+      "materia_normalizada": "PSICÓLOGO ORGANIZACIONAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Psicologia",
+        "topicos": [
+          {
+            "nome": "Ética profissional do psicólogo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resoluções do Conselho Federal de Psicologia",
+            "subtopicos": [
+              "Resolução CFP 01/1999 (Estabelece normas de atuação para os psicólogos em relação à questão da Orientação Sexual)",
+              "Resolução 18/2002 (Estabelece normas de atuação para os psicólogos em relação a preconceito e discriminação racial)",
+              "Resolução CFP nº 2/2016 (Avaliação Psicológica em Concurso Público e processos seletivos de natureza pública e privada)",
+              "Resolução nº 6/2019 (Institui regras para a elaboração de documentos escritos produzidos pela(o) psicóloga(o) no exercício profissional)",
+              "Resolução nº 8/2020 (Estabelece normas de exercício profissional da psicologia em relação às violências de gênero)",
+              "Resolução nº 01/2022 (Regulamenta a Avaliação Psicológica para concessão de registro e porte de arma de fogo)",
+              "Resolução 13/2022 (Dispõe sobre diretrizes e deveres para o exercício da psicoterapia por psicóloga e por psicólogo)",
+              "Resolução nº 31/2022 (Estabelece diretrizes para a realização de Avaliação Psicológica no exercício profissional da psicóloga e do psicólogo, regulamenta o Sistema de Avaliação de Testes Psicológicos – SATEPSI)",
+              "Resolução CFP nº 14/2023 (Avaliação de riscos psicossociais relacionados ao trabalho)",
+              "Resolução CFP nº 09/2024 (Regulamenta o exercício profissional da Psicologia mediado por Tecnologias Digitais da Informação e da Comunicação (TDICs)"
+            ]
+          },
+          {
+            "nome": "Decreto nº 9.739, de 28 de março de 2019",
+            "subtopicos": []
+          },
+          {
+            "nome": "Avaliação psicológica e psicodiagnóstico",
+            "subtopicos": [
+              "Fundamentos e etapas da medida psicológica",
+              "Instrumentos de avaliação: critérios de seleção, avaliação e interpretação dos resultados",
+              "Testes psicológicos",
+              "Tipos de testes. Testes de habilidades; testes de personalidade; testes projetivos e expressivos; testes psicomotores",
+              "Técnicas de entrevista",
+              "Diagnóstico diferencial",
+              "Laudos, pareceres, declaração, relatório e atestados"
+            ]
+          },
+          {
+            "nome": "Entrevista motivacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Teorias e técnicas psicoterápicas",
+            "subtopicos": [
+              "Psicoterapia individual de adultos e grupal",
+              "Abordagens teóricas: psicanálise (Freud), cognitiva (Beck), comportamental (Skinner), humanista existencial (Rogers, Perls)"
+            ]
+          },
+          {
+            "nome": "Psicologia do Desenvolvimento",
+            "subtopicos": [
+              "Fases do desenvolvimento",
+              "Vida adulta",
+              "Terceira idade e saúde mental",
+              "O processo do envelhecimento e as doenças crônicas e degenerativas",
+              "Preparação para aposentadoria (PPA)"
+            ]
+          },
+          {
+            "nome": "Psicologia da saúde",
+            "subtopicos": [
+              "Políticas de saúde do serviço público federal",
+              "Processo saúde-doença (doenças crônicas e agudas)",
+              "Impacto diagnóstico",
+              "Processo de adoecimento",
+              "Enfrentamento da doença e adesão ao tratamento",
+              "Teorias e manejos da Síndrome Geral de Adaptação (Estresse)",
+              "Estilos de enfrentamento (coping)",
+              "Ações básicas de saúde: promoção, prevenção e reabilitação",
+              "Níveis de atenção à saúde",
+              "Equipes interdisciplinares: interdisciplinaridade e multidisciplinaridade em saúde",
+              "Modelo biopsicossocial"
+            ]
+          },
+          {
+            "nome": "Intervenção psicológica em problemas específicos",
+            "subtopicos": [
+              "Tratamento e prevenção da dependência química: álcool, tabagismo, outras drogas e redução de danos",
+              "Intervenção em recaída de alcoolismo e outras drogas",
+              "Intervenção em situação de crise: estresse pós-traumático; acidente de trabalho; os cinco estágios do luto (Modelo de Kübler-Ross)",
+              "Intervenção em suicídio: avaliação de risco suicida (ideação e tentativa de suicídio), posvenção do suicídio",
+              "Modelos de intervenções psicossociais em crise, emergência e catástrofe",
+              "Tratamento da dependência de internet e jogo eletrônicos",
+              "Primeiros socorros psicológicos"
+            ]
+          },
+          {
+            "nome": "Gestão de pessoas nas organizações",
+            "subtopicos": [
+              "Teoria das organizações e concepções de trabalho",
+              "Sistemas modernos de gestão de pessoas",
+              "Ferramentas de gestão e estilos de liderança",
+              "A negociação no contexto organizacional",
+              "Configuração do poder organizacional: bases do poder organizacional, liderança, estilo de funcionamento organizacional, justiça no trabalho, comportamentos éticos organizacionais",
+              "Gerenciamento de conflitos"
+            ]
+          },
+          {
+            "nome": "Planejamento estratégico da gestão de pessoas",
+            "subtopicos": [
+              "O indivíduo e o contexto organizacional: percepção, atitudes, valores e diferenças individuais",
+              "Habilidades Sociais e competência interpessoal"
+            ]
+          },
+          {
+            "nome": "Cultura organizacional: paradigmas, conceitos, elementos e dinâmica. Clima organizacional: evolução conceitual, componentes e estratégias de gestão",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento da diversidade nas organizações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Comportamento humano no trabalho: motivação e significado do trabalho, satisfação, comprometimento, envolvimento e engajamento no trabalho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise e desenvolvimento organizacional",
+            "subtopicos": [
+              "Treinamento e desenvolvimento de pessoal: levantamento de necessidades, planejamento, execução e avaliação"
+            ]
+          },
+          {
+            "nome": "Desenvolvimento de pessoas como estratégia de gestão e a interação desta atividade com as demais funções do processo de gestão de pessoas",
+            "subtopicos": [
+              "Elaboração de projetos de desenvolvimento de pessoas: fases, procedimentos, diagnóstico, planejamento, execução, acompanhamento e avaliação"
+            ]
+          },
+          {
+            "nome": "Psicodinâmica do trabalho: promoção da saúde do trabalhador nas organizações",
+            "subtopicos": [
+              "Atuação dos profissionais de gestão de pessoas junto às equipes multidisciplinares e interdisciplinares voltadas para a saúde do trabalhador dentro e fora do mundo do trabalho",
+              "Avaliação psicológica dos fatores psicossociais do trabalho"
+            ]
+          },
+          {
+            "nome": "Ergonomia da atividade e psicopatologia do trabalho",
+            "subtopicos": [
+              "Relação entre trabalho, processos de subjetivação e processos de saúde e adoecimento relacionado ao trabalho"
+            ]
+          },
+          {
+            "nome": "Psicologia de grupo e gestão equipes de trabalho: fundamentos teóricos e técnicos sobre grupos, conflitos no grupo e resolução de problemas",
+            "subtopicos": [
+              "Práticas grupais"
+            ]
+          },
+          {
+            "nome": "Qualidade de vida no trabalho",
+            "subtopicos": [
+              "Bem-estar no trabalho",
+              "Conflito trabalho-família"
+            ]
+          },
+          {
+            "nome": "Gestão por competências: objetivos estratégicos, definição de competências, avaliação de desempenho por competências, gestão do desempenho e feedback",
+            "subtopicos": []
+          },
+          {
+            "nome": "Recrutamento e seleção de pessoas",
+            "subtopicos": [
+              "Planejamento, técnicas, avaliação e controle de resultados do processo seletivo",
+              "A avaliação psicológica no concurso público: análise e descrição de cargos, profissiografia"
+            ]
+          },
+          {
+            "nome": "Rotatividade de pessoal, absenteísmo e presenteísmo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Pesquisa e intervenções nas organizações",
+            "subtopicos": [
+              "Planejamento, elaboração de instrumentos (escalas, questionários, entrevistas, grupos focais, protocolos de observação de comportamento) métodos de análise de dados"
+            ]
+          },
+          {
+            "nome": "Noções de psicometria",
+            "subtopicos": [
+              "Elaboração de itens, validade e fidedignidade"
+            ]
+          },
+          {
+            "nome": "Psicologia e desafios contemporâneos",
+            "subtopicos": [
+              "Direitos humanos",
+              "Teorias de gênero"
+            ]
+          },
+          {
+            "nome": "Lei nº 11.340, de 7 de agosto de 2006 (Lei Maria da Penha)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assédio moral nas organizações, assédio sexual e discriminação",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 31,
+      "cargo": "CARGO 13: TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",
+      "materia_chunk": "TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 13,
+      "materia_normalizada": "TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Fundamentos da Educação",
+        "topicos": [
+          {
+            "nome": "Fundamentos da educação",
+            "subtopicos": [
+              "Relação educação e sociedade",
+              "Dimensões filosófica, sociocultural e pedagógica",
+              "Bases legais da educação nacional",
+              "Constituição da República",
+              "LDB (Lei n.º 9.394/1996)",
+              "Projeto Político Institucional",
+              "Papel e Processo de planejamento",
+              "Legislação aplicada à educação a distância"
+            ]
+          },
+          {
+            "nome": "Projeto político-pedagógico no ambiente organizacional",
+            "subtopicos": [
+              "Concepção, importância, dimensões e eixos norteadores"
+            ]
+          },
+          {
+            "nome": "Planejamento de ensino em seus elementos constitutivos",
+            "subtopicos": [
+              "Etapas",
+              "Tipos de Planos",
+              "Objetivos e conteúdos de ensino"
+            ]
+          },
+          {
+            "nome": "Planejamento participativo",
+            "subtopicos": [
+              "Concepção, construção, acompanhamento e avaliação"
+            ]
+          },
+          {
+            "nome": "Comunicação e interação grupal no processo de planejamento",
+            "subtopicos": []
+          },
+          {
+            "nome": "A avaliação na perspectiva da construção do conhecimento",
+            "subtopicos": [
+              "Avaliação institucional",
+              "Tipos de avaliação",
+              "Comissão Própria de Avaliação"
+            ]
+          },
+          {
+            "nome": "Educação corporativa",
+            "subtopicos": [
+              "Escolas de governo",
+              "Atribuições das escolas de governo",
+              "Treinamento e Desenvolvimento",
+              "Trilhas de aprendizagem organizacional"
+            ]
+          },
+          {
+            "nome": "Competências",
+            "subtopicos": [
+              "Conhecimentos, habilidades, atitudes"
+            ]
+          },
+          {
+            "nome": "Currículo e construção do conhecimento",
+            "subtopicos": []
+          },
+          {
+            "nome": "A ação pedagógica e o trabalho com projetos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Educação corporativa (atuação do pedagogo)",
+            "subtopicos": [
+              "Atuação do pedagogo no âmbito corporativo"
+            ]
+          },
+          {
+            "nome": "Design thinking na educação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gamificação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mídias para educação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tecnologias mediadoras da educação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ambientes virtuais de aprendizagem",
+            "subtopicos": [
+              "Aprendizagem com tecnologias digitais",
+              "Novas tecnologias aplicadas à educação e plataformas de aprendizagem virtuais e avaliação educacional"
+            ]
+          },
+          {
+            "nome": "Processo de ensino-aprendizagem",
+            "subtopicos": [
+              "Teoria de aprendizagem",
+              "Bases psicológicas da aprendizagem",
+              "Aprendizagem de adultos (andragogia)"
+            ]
+          },
+          {
+            "nome": "Relação professor/aluno",
+            "subtopicos": [
+              "Modelagem de trilhas e curadoria de conhecimento"
+            ]
+          },
+          {
+            "nome": "Metodologia de projetos educacionais na modalidade presencial e a distância",
+            "subtopicos": []
+          },
+          {
+            "nome": "História da Educação",
+            "subtopicos": [
+              "Origem",
+              "Evolução",
+              "Tendências Pedagógicas e suas relações com as teorias da aprendizagem"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 14: TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "materia_chunk": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 14,
+      "materia_normalizada": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Comunicação Social",
+        "topicos": [
+          {
+            "nome": "Comunicação pública",
+            "subtopicos": [
+              "Conceito de comunicação pública",
+              "Processos de comunicação pública",
+              "Instrumentos de comunicação pública",
+              "Linguagem simples no setor público"
+            ]
+          },
+          {
+            "nome": "Comunicação nas organizações",
+            "subtopicos": [
+              "Fundamentos e finalidades",
+              "Assessoria de comunicação: atribuições, organização, estrutura e funcionamento",
+              "Produtos e rotinas de uma assessoria de comunicação",
+              "O papel do assessor",
+              "Sugestões de pauta, releases e artigos",
+              "Notas oficiais",
+              "Clipping",
+              "Atendimento à imprensa",
+              "Organização de entrevistas",
+              "Comunicação de crise",
+              "Mecanismos de controle da informação",
+              "Design thinking"
+            ]
+          },
+          {
+            "nome": "Jornalismo institucional",
+            "subtopicos": [
+              "Comunicação interna e endomarketing",
+              "Canais e estratégias de comunicação interna",
+              "Planejamento editorial de publicações internas, campanhas e veículos internos (intranet e outros), programas de incentivo, projetos de integração, motivação e comprometimento"
+            ]
+          },
+          {
+            "nome": "Teorias do jornalismo e critérios de noticiabilidade",
+            "subtopicos": [
+              "Agenda setting, gatekeeping, newsmaking, espiral do silêncio"
+            ]
+          },
+          {
+            "nome": "Produção jornalística",
+            "subtopicos": [
+              "Princípios e orientações gerais para redigir um texto jornalístico",
+              "Edição e revisão de informação",
+              "Características, linguagens e técnicas de produção, apuração, entrevista, redação em diferentes meios",
+              "Telejornalismo, radiojornalismo e webjornalismo: técnicas de redação e produção jornalística: lide, pirâmide invertida",
+              "Fotojornalismo"
+            ]
+          },
+          {
+            "nome": "Novas tecnologias de comunicação",
+            "subtopicos": [
+              "Comunicação digital e mídias sociais",
+              "Jornalismo digital: características e elementos",
+              "Jornalismo digital: ferramentas, linguagens e plataformas",
+              "Jornalismo digital: impactos da comunicação da internet",
+              "Fake News e jornalismo",
+              "Inteligência artificial e produção de conteúdo"
+            ]
+          },
+          {
+            "nome": "Ética e Legislação em comunicação social",
+            "subtopicos": []
+          },
+          {
+            "nome": "Elementos básicos da comunicação social",
+            "subtopicos": []
+          },
+          {
+            "nome": "Relações públicas",
+            "subtopicos": [
+              "Conceitos básicos, natureza e funções estratégicas",
+              "Principais técnicas e instrumentos utilizados em relações públicas",
+              "Organização de eventos e promoção institucional",
+              "Cerimonial e protocolo"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 33,
+      "cargo": "CARGO 15: AGENTE ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE DIREITO CONSTITUCIONAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "medio",
+      "cargo_numero": 15,
+      "materia_normalizada": "NOÇÕES DE DIREITO CONSTITUCIONAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Constituição Federal",
+        "topicos": [
+          {
+            "nome": "1 Constituição Federal",
+            "subtopicos": [
+              "1.1 Conceito, classificações, princípios fundamentais",
+              "1.2 Capítulo III Segurança Pública: artigo 144"
+            ]
+          },
+          {
+            "nome": "2 Direitos e garantias fundamentais",
+            "subtopicos": [
+              "2.1 Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos políticos, partidos políticos"
+            ]
+          },
+          {
+            "nome": "3 Organização político-administrativa",
+            "subtopicos": [
+              "3.1 União, estados, Distrito Federal, municípios e territórios"
+            ]
+          },
+          {
+            "nome": "4 Administração pública",
+            "subtopicos": [
+              "4.1 Disposições gerais, servidores públicos"
+            ]
+          },
+          {
+            "nome": "5 Poder Executivo",
+            "subtopicos": [
+              "5.1 atribuições do presidente da República e dos ministros de Estado"
+            ]
+          },
+          {
+            "nome": "6 Constituição Federal",
+            "subtopicos": []
+          },
+          {
+            "nome": "7 Finanças públicas",
+            "subtopicos": [
+              "7.1 Normas gerais",
+              "7.2 Orçamentos"
+            ]
+          },
+          {
+            "nome": "8 Ordem social",
+            "subtopicos": [
+              "8.1 Disposições Gerais",
+              "8.2 Previdência Social"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 34,
+      "cargo": "CARGO 15: AGENTE ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "medio",
+      "cargo_numero": 15,
+      "materia_normalizada": "NOÇÕES DE DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Noções de organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta e indireta",
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista"
+            ]
+          },
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei nº 8.112/1990",
+              "Disposições constitucionais aplicáveis",
+              "Disposições doutrinárias",
+              "Conceito",
+              "Espécies",
+              "Cargo, emprego e função pública"
+            ]
+          },
+          {
+            "nome": "Poderes administrativos",
+            "subtopicos": [
+              "Hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Licitação",
+            "subtopicos": [
+              "Princípios",
+              "Contratação direta: dispensa e inexigibilidade",
+              "Modalidades",
+              "Tipos",
+              "Procedimento"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Controle exercido pela administração pública",
+              "Controle judicial",
+              "Controle legislativo"
+            ]
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": [
+              "Responsabilidade civil do Estado no direito brasileiro",
+              "Responsabilidade por ato comissivo do Estado",
+              "Responsabilidade por omissão do Estado",
+              "Requisitos para a demonstração da responsabilidade do Estado",
+              "Causas excludentes e atenuantes da responsabilidade do Estado"
+            ]
+          },
+          {
+            "nome": "Regime jurídico-administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Princípios expressos e implícitos da administração pública"
+            ]
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Decreto nº 9.830/2019 (regulamenta motivação de decisão)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 9.784/1999 (processo administrativo federal)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 35,
+      "cargo": "CARGO 15: AGENTE ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE GOVERNANÇA PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "medio",
+      "cargo_numero": 15,
+      "materia_normalizada": "NOÇÕES DE GOVERNANÇA PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "Teorias da administração",
+            "subtopicos": []
+          },
+          {
+            "nome": "Características básicas das organizações formais modernas: tipos de estrutura organizacional, natureza e finalidades",
+            "subtopicos": []
+          },
+          {
+            "nome": "Cultura organizacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Governança e gestão pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Planejamento estratégico",
+            "subtopicos": [
+              "Conceitos, métodos e técnicas"
+            ]
+          },
+          {
+            "nome": "Processo organizacional: planejamento, direção, comunicação, controle e avaliação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de resultados na produção de serviços públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão por processos",
+            "subtopicos": [
+              "Ferramentas clássicas para o gerenciamento de processos"
+            ]
+          },
+          {
+            "nome": "Gestão de projetos",
+            "subtopicos": [
+              "Noções de elaboração, análise, avaliação e gerenciamento de projetos"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sustentabilidade pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Acessibilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Inovação na gestão pública",
+            "subtopicos": [
+              "Design Thinking",
+              "Inteligência Artificial"
+            ]
+          },
+          {
+            "nome": "Comunicação na gestão pública e gestão de redes organizacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transparência, integridade e ética na administração pública",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 36,
+      "cargo": "CARGO 15: AGENTE ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE GESTÃO DE PESSOAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "medio",
+      "cargo_numero": 15,
+      "materia_normalizada": "NOÇÕES DE GESTÃO DE PESSOAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão de Pessoas",
+        "topicos": [
+          {
+            "nome": "Modelos de gestão de pessoas",
+            "subtopicos": [
+              "Administração de Pessoal",
+              "Gestão estratégica de pessoas"
+            ]
+          },
+          {
+            "nome": "Os processos de gestão de pessoas",
+            "subtopicos": [
+              "Recrutamento e seleção de pessoas",
+              "Treinamento e Desenvolvimento",
+              "Gestão do desempenho"
+            ]
+          },
+          {
+            "nome": "Motivação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão por competências",
+            "subtopicos": []
+          },
+          {
+            "nome": "O indivíduo e o contexto organizacional: variáveis individuais, grupais e organizacionais",
+            "subtopicos": [
+              "Comportamento humano no trabalho: satisfação e comprometimento",
+              "Equipes e grupos de trabalho",
+              "Competência Interpessoal",
+              "Gerenciamento de conflitos"
+            ]
+          },
+          {
+            "nome": "Gestão do conhecimento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Qualidade de vida no trabalho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Dimensionamento de pessoal",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 37,
+      "cargo": "CARGO 15: AGENTE ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE GESTÃO DE CONTRATOS E RECURSOS MATERIAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "medio",
+      "cargo_numero": 15,
+      "materia_normalizada": "NOÇÕES DE GESTÃO DE CONTRATOS E RECURSOS MATERIAIS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Licitações e contratos administrativos",
+        "topicos": [
+          {
+            "nome": "1 Licitações e contratos administrativos",
+            "subtopicos": [
+              "Lei nº 14.133/2021, conceito, princípios, contratação direta, modalidades, tipos e aspectos procedimentais",
+              "1.1 Decreto nº 11.531/2023 e Portaria Conjunta MGI/MF/CGU nº 33/2023 (convênios e instrumentos congêneres)",
+              "1.2 Decreto nº 11.462/2023",
+              "1.3 IN/MPOG nº 5/2017 e IN/SEGES/ME nº 98/2022"
+            ]
+          },
+          {
+            "nome": "2 Elaboração e fiscalização de contratos",
+            "subtopicos": [
+              "2.1 Cláusulas e indicadores de nível de serviço",
+              "2.2 Papel do fiscalizador do contrato",
+              "2.3 Papel do preposto da contratada",
+              "2.4 Acompanhamento da execução contratual",
+              "2.5 Registro e notificação de irregularidades",
+              "2.6 Definição e aplicação de penalidades e sanções administrativas"
+            ]
+          },
+          {
+            "nome": "3 Classificação de materiais",
+            "subtopicos": [
+              "3.1 Tipos de classificação"
+            ]
+          },
+          {
+            "nome": "4 Gestão de estoques",
+            "subtopicos": []
+          },
+          {
+            "nome": "5 Recebimento e armazenagem",
+            "subtopicos": [
+              "5.1 Entrada",
+              "5.2 Conferência",
+              "5.3 Critérios e técnicas de armazenagem"
+            ]
+          },
+          {
+            "nome": "6 Gestão patrimonial",
+            "subtopicos": [
+              "6.1 Controle de bens",
+              "6.2 Inventário",
+              "6.3 Alterações e baixa de bens"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 38,
+      "cargo": "CARGO 15: AGENTE ADMINISTRATIVO",
+      "materia_chunk": "LEGISLAÇÃO APLICADA À POLÍCIA FEDERAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "medio",
+      "cargo_numero": 15,
+      "materia_normalizada": "LEGISLAÇÃO APLICADA À POLÍCIA FEDERAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação Especial",
+        "topicos": [
+          {
+            "nome": "Lei nº 14.967/2024",
+            "subtopicos": [
+              "Institui o estatuto da segurança privada e da segurança das instituições financeiras, e dá outras providências"
+            ]
+          },
+          {
+            "nome": "Lei nº 10.357/2001",
+            "subtopicos": [
+              "Estabelece normas de controle e fiscalização sobre produtos químicos que direta ou indiretamente possam ser destinados à elaboração ilícita de substâncias entorpecentes, psicotrópicas ou que determinem dependência física ou psíquica, e dá outras providências"
+            ]
+          },
+          {
+            "nome": "Lei nº 13.445/2017 (Lei de Migração)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 10.826/2003",
+            "subtopicos": [
+              "Estatuto do Desarmamento"
+            ]
+          },
+          {
+            "nome": "Lei nº 12.830/2013",
+            "subtopicos": [
+              "Dispõe sobre a investigação criminal conduzida pelo delegado de polícia"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+}

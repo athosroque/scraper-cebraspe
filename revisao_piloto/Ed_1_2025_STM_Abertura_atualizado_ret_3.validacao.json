@@ -1,0 +1,18 @@
+{
+  "edital": "Ed_1_2025_STM_Abertura_atualizado_ret_3.pdf",
+  "total_chunks_analisados": 53,
+  "total_alertas": 0,
+  "total_informativos": 1,
+  "alertas": [
+    {
+      "chunk_index": 31,
+      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
+      "materia": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "tipo": "topico_divergencia_leve",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": null,
+      "topico_nome_extraido": "Persistência; JPA 2.0; Hibernate 4.3 ou superior; Hibernate Envers; Biblioteca Flyway"
+    }
+  ]
+}

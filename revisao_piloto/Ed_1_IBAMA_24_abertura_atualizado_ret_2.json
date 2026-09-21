@@ -1,0 +1,2270 @@
+{
+  "edital": "Ed_1_IBAMA_24_abertura_atualizado_ret_2.pdf",
+  "concurso": {
+    "slug": "IBAMA_25",
+    "orgao": "IBAMA",
+    "ano": 2025
+  },
+  "cargos": [
+    {
+      "numero": 1,
+      "nome": "ANALISTA ADMINISTRATIVO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 2,
+      "nome": "ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "nivel": "superior"
+    },
+    {
+      "numero": 3,
+      "nome": "ANALISTA AMBIENTAL – TEMA 2: MANEJO, CONSERVAÇÃO E REABILITAÇÃO DA FAUNA SILVESTRE",
+      "nivel": "superior"
+    }
+  ],
+  "total_chunks": 33,
+  "extraidos_com_sucesso": 33,
+  "falhas": 0,
+  "chunks_com_falha": [],
+  "resultados": [
+    {
+      "chunk_index": 0,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA  PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA  PORTUGUESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos de gêneros variados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual"
+            ]
+          },
+          {
+            "nome": "Emprego de tempos e modos verbais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Emprego das classes de palavras",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Regência verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação pronominal"
+            ]
+          },
+          {
+            "nome": "Reescrita de frases e parágrafos do texto",
+            "subtopicos": [
+              "Significação das palavras",
+              "Substituição de palavras ou de trechos de texto",
+              "Reorganização da estrutura de orações e de períodos do texto",
+              "Reescrita de textos de diferentes gêneros e níveis de formalidade"
+            ]
+          },
+          {
+            "nome": "As estruturas linguísticas no processo de construção de mensagens adequadas",
+            "subtopicos": [
+              "A pragmática na linguagem: o significado contextual",
+              "Os diversos níveis de linguagem",
+              "As funções da linguagem",
+              "Intertextualidade"
+            ]
+          },
+          {
+            "nome": "Aspectos gerais da redação oficial (conforme Manual de Redação da Presidência da República)",
+            "subtopicos": [
+              "Finalidade dos expedientes oficiais",
+              "Adequação da linguagem ao tipo de documento",
+              "Adequação do formato do texto ao gênero",
+              "Pronomes de tratamento"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 1,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Noções de sistema operacional (Windows)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Aplicativos Microsoft Office 365",
+            "subtopicos": [
+              "Word, Excel, PowerPoint, Outlook, Teams, Onedrive e SharePoint"
+            ]
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Programas de navegação (Google Chrome e Edge)",
+              "Programas de correio eletrônico (Outlook Express)",
+              "Sítios de busca e pesquisa na Internet",
+              "Redes sociais"
+            ]
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Procedimentos de segurança",
+              "Noções de vírus, worms e pragas virtuais",
+              "Aplicativos para segurança (antivírus, firewall, anti-spyware etc.)"
+            ]
+          },
+          {
+            "nome": "Sistema Eletrônico de Informações (SEI) – parte operacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Acesso à informação (Lei nº 12.527/2011 e Decreto nº 7.724/2012)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Serviços públicos digitais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de Inteligência Artificial",
+            "subtopicos": [
+              "Conceitos Básicos de Inteligência Artificial",
+              "Aplicações de Inteligência Artificial",
+              "Técnicas e Algoritmos de IA",
+              "Impactos da Inteligência Artificial"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia_chunk": "LEGISLAÇÃO AMBIENTAL",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LEGISLAÇÃO AMBIENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação Ambiental",
+        "topicos": [
+          {
+            "nome": "Lei nº 7.735/1989",
+            "subtopicos": [
+              "Criação do IBAMA"
+            ]
+          },
+          {
+            "nome": "Lei nº 6.938/1981 e suas alterações",
+            "subtopicos": [
+              "Política Nacional do Meio Ambiente"
+            ]
+          },
+          {
+            "nome": "Lei nº 9.605/1998 e Decreto nº 6.514/2008",
+            "subtopicos": [
+              "Lei dos Crimes Ambientais"
+            ]
+          },
+          {
+            "nome": "Lei Complementar nº 140/2011",
+            "subtopicos": [
+              "Competências ambientais"
+            ]
+          },
+          {
+            "nome": "Lei nº 10.410/2002",
+            "subtopicos": [
+              "Criação da carreira de especialista em meio ambiente"
+            ]
+          },
+          {
+            "nome": "Lei nº 13.019/2014",
+            "subtopicos": [
+              "Regime jurídico das parcerias entre a Administração Pública"
+            ]
+          },
+          {
+            "nome": "Lei nº 12.651/2012",
+            "subtopicos": [
+              "Proteção da vegetação nativa"
+            ]
+          },
+          {
+            "nome": "Decreto nº 11.367/2023",
+            "subtopicos": [
+              "Comissão Interministerial Permanente para prevenir e controlar o desmatamento, entre outros"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE ARQUIVOLOGIA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE ARQUIVOLOGIA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão documental",
+        "topicos": [
+          {
+            "nome": "Gestão documental",
+            "subtopicos": [
+              "documento de arquivo",
+              "documento digital",
+              "processo eletrônico",
+              "processo híbrido",
+              "espécie",
+              "ciclo de vida dos documentos",
+              "teoria das três idades",
+              "transferência",
+              "descarte",
+              "recolhimento"
+            ]
+          },
+          {
+            "nome": "Políticas de acesso aos documentos de arquivo, Sistemas informatizados de gestão arquivística de documentos (documentos digitais, requisitos, metadados)",
+            "subtopicos": [
+              "Gerenciamento de documentos arquivísticos digitais (teorias, princípios e soluções tecnológicas)",
+              "Gerenciamento da memória institucional"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia_chunk": "LOGÍSTICA  E  PATRIMÔNIO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LOGÍSTICA  E  PATRIMÔNIO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração de Recursos Materiais e Patrimoniais",
+        "topicos": [
+          {
+            "nome": "Administração de Recursos Materiais e Patrimoniais",
+            "subtopicos": [
+              "Conceituação de Material e Patrimônio",
+              "O Patrimônio das empresas e órgãos públicos",
+              "O Patrimônio Imobiliário",
+              "O Patrimônio Mobiliário",
+              "Organização e Controle Logístico",
+              "Gestão de cadeia de suprimentos",
+              "Logística reversa"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 5,
+      "cargo": null,
+      "materia_chunk": "ÉTICA NO SERVIÇO PÚBLICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ÉTICA NO SERVIÇO PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ética",
+        "topicos": [
+          {
+            "nome": "Ética e moral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética, princípios e valores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética e democracia",
+            "subtopicos": [
+              "Exercício da cidadania"
+            ]
+          },
+          {
+            "nome": "Ética e função pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código de Conduta Ética dos Agentes Públicos do IBAMA (Portaria IBAMA nº 2.534/2019)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código de Ética Profissional do Servidor Público Civil do Poder Executivo Federal (Decreto nº 1.171/1994)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assédio no Serviço Público",
+            "subtopicos": [
+              "Definição e Tipos de Assédio",
+              "Impactos do Assédio no Ambiente de Trabalho",
+              "Estratégias de Prevenção e Combate"
+            ]
+          },
+          {
+            "nome": "Discriminação no Serviço Público",
+            "subtopicos": [
+              "Tipos de Discriminação",
+              "Consequências da Discriminação",
+              "Promoção de Igualdade e Diversidade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 6,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE GESTÃO PÚBLICA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE GESTÃO PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão Pública",
+        "topicos": [
+          {
+            "nome": "Processos participativos de gestão pública",
+            "subtopicos": [
+              "Conselhos de gestão",
+              "Orçamento participativo",
+              "Parceria entre governo e sociedade"
+            ]
+          },
+          {
+            "nome": "Governo eletrônico",
+            "subtopicos": [
+              "Transparência da administração pública",
+              "Controle social e cidadania",
+              "Accountability"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": [
+              "Gestão por resultados na produção de serviços públicos"
+            ]
+          },
+          {
+            "nome": "Comunicação na gestão pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ciclo orçamentário",
+            "subtopicos": [
+              "Transferências voluntárias e legislação sobre o tema"
+            ]
+          },
+          {
+            "nome": "Ciclo de planejamento governamental",
+            "subtopicos": [
+              "Plano Plurianual (PPA) 2024-2027: modelo de planejamento, mega objetivos, dimensões, programa e ação"
+            ]
+          },
+          {
+            "nome": "Lei de Diretrizes Orçamentárias (LDO)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Orçamentária Anual (LOA)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 7,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA  PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA  PORTUGUESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos de gêneros variados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual"
+            ]
+          },
+          {
+            "nome": "Emprego de tempos e modos verbais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Emprego das classes de palavras",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Regência verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação pronominal"
+            ]
+          },
+          {
+            "nome": "Reescrita de frases e parágrafos do texto",
+            "subtopicos": [
+              "Significação das palavras",
+              "Substituição de palavras ou de trechos de texto",
+              "Reorganização da estrutura de orações e de períodos do texto",
+              "Reescrita de textos de diferentes gêneros e níveis de formalidade"
+            ]
+          },
+          {
+            "nome": "As estruturas linguísticas no processo de construção de mensagens adequadas",
+            "subtopicos": [
+              "A pragmática na linguagem: o significado contextual",
+              "Os diversos níveis de linguagem",
+              "As funções da linguagem",
+              "Intertextualidade"
+            ]
+          },
+          {
+            "nome": "Aspectos gerais da redação oficial (conforme Manual de Redação da Presidência da República)",
+            "subtopicos": [
+              "Finalidade dos expedientes oficiais",
+              "Adequação da linguagem ao tipo de documento",
+              "Adequação do formato do texto ao gênero",
+              "Pronomes de tratamento"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 8,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Noções de sistema operacional (Windows)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Aplicativos Microsoft Office 365",
+            "subtopicos": [
+              "Word, Excel, PowerPoint, Outlook, Teams, Onedrive e SharePoint"
+            ]
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Programas de navegação (Google Chrome e Edge)",
+              "Programas de correio eletrônico (Outlook Express)",
+              "Sítios de busca e pesquisa na Internet",
+              "Redes sociais"
+            ]
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Procedimentos de segurança",
+              "Noções de vírus, worms e pragas virtuais",
+              "Aplicativos para segurança (antivírus, firewall, anti-spyware etc.)"
+            ]
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Acesso à informação (Lei nº 12.527/2011 e Decreto nº 7.724/2012)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Serviços públicos digitais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 9,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA INGLESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA INGLESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Inglesa",
+        "topicos": [
+          {
+            "nome": "Conhecimento e uso das formas contemporâneas da linguagem inglesa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Compreensão e interpretação de textos variados",
+            "subtopicos": [
+              "domínio do vocabulário e da estrutura da língua",
+              "ideias principais e secundárias, explícitas e implícitas",
+              "relações intratextuais e intertextuais"
+            ]
+          },
+          {
+            "nome": "Itens gramaticais relevantes para a compreensão dos conteúdos semânticos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Palavras e expressões equivalentes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Elementos de referência",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 10,
+      "cargo": null,
+      "materia_chunk": "ÉTICA NO SERVIÇO PÚBLICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ÉTICA NO SERVIÇO PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ética no Serviço Público",
+        "topicos": [
+          {
+            "nome": "Ética e moral",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética, princípios e valores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética e democracia",
+            "subtopicos": [
+              "Exercício da cidadania"
+            ]
+          },
+          {
+            "nome": "Ética e função pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ética no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código de Ética Profissional do Servidor Público Civil do Poder Executivo Federal (Decreto nº 1.171/1994)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código de Conduta Ética dos Agentes Públicos do IBAMA (Portaria IBAMA nº 2.534/2019)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Assédio no Serviço Público",
+            "subtopicos": [
+              "Definição e tipos de assédio",
+              "Impactos do assédio no ambiente de trabalho",
+              "Estratégias de prevenção e combate"
+            ]
+          },
+          {
+            "nome": "Discriminação no serviço público",
+            "subtopicos": [
+              "Tipos de discriminação",
+              "Consequências da discriminação",
+              "Promoção de igualdade e diversidade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 11,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE GESTÃO PÚBLICA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE GESTÃO PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão Pública",
+        "topicos": [
+          {
+            "nome": "Processos participativos de gestão pública",
+            "subtopicos": [
+              "Conselhos de gestão",
+              "Orçamento participativo",
+              "Parceria entre governo e sociedade"
+            ]
+          },
+          {
+            "nome": "Governo eletrônico",
+            "subtopicos": [
+              "Transparência da administração pública",
+              "Controle social e cidadania",
+              "Accountability"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": [
+              "Gestão por resultados na produção de serviços públicos"
+            ]
+          },
+          {
+            "nome": "Comunicação na gestão pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ciclo orçamentário",
+            "subtopicos": [
+              "Transferências voluntárias e legislação sobre o tema"
+            ]
+          },
+          {
+            "nome": "Ciclo de planejamento governamental",
+            "subtopicos": [
+              "Plano Plurianual (PPA) 2024-2027: modelo de planejamento, megaobjetivos, dimensões, programa e ação"
+            ]
+          },
+          {
+            "nome": "Lei de Diretrizes Orçamentárias (LDO)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Orçamentária Anual (LOA)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 12,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE DIREITO CONSTITUCIONAL",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE DIREITO CONSTITUCIONAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Constituição da República Federativa do Brasil de 1988 e emendas",
+        "topicos": [
+          {
+            "nome": "Constituição da República Federativa do Brasil de 1988 e emendas",
+            "subtopicos": [
+              "Conceito, classificações, princípios fundamentais"
+            ]
+          },
+          {
+            "nome": "Direitos e garantias fundamentais",
+            "subtopicos": [
+              "Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos políticos, partidos políticos"
+            ]
+          },
+          {
+            "nome": "Organização político-administrativa",
+            "subtopicos": [
+              "União, estados, Distrito Federal, municípios e territórios"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Disposições gerais, servidores públicos"
+            ]
+          },
+          {
+            "nome": "Organização dos poderes no Estado",
+            "subtopicos": [
+              "Poder Legislativo",
+              "Estrutura, funcionamento e atribuições",
+              "Tribunal de Contas da União (TCU)"
+            ]
+          },
+          {
+            "nome": "Funções essenciais à Justiça",
+            "subtopicos": []
+          },
+          {
+            "nome": "Artigos 23, 170, 225 e 231 da Constituição Federal de 1988",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 13,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES  DE  DIREITO  ADMINISTRATIVO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES  DE  DIREITO  ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Noções de organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta e indireta",
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista"
+            ]
+          },
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei n.º 8.112/1990",
+              "Disposições constitucionais aplicáveis",
+              "Disposições doutrinárias",
+              "Conceito",
+              "Espécies",
+              "Cargo, emprego e função pública"
+            ]
+          },
+          {
+            "nome": "Poderes administrativos",
+            "subtopicos": [
+              "Hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Licitação",
+            "subtopicos": [
+              "Princípios",
+              "Contratação direta",
+              "Dispensa e inexigibilidade",
+              "Modalidades",
+              "Tipos",
+              "Procedimento"
+            ]
+          },
+          {
+            "nome": "Contratos administrativos",
+            "subtopicos": [
+              "Conceitos e características"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regime jurídico administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Princípios expressos e implícitos da administração pública"
+            ]
+          },
+          {
+            "nome": "Processo administrativo federal (Lei n.º 9.784/1999)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Improbidade administrativa (Lei n.º 8.429/1992)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Acesso à Informação",
+            "subtopicos": [
+              "Lei n.º 12.527/2011 (Lei de Acesso à Informação)",
+              "Lei n.º 13.709/2018 (Lei Geral de Proteção de Dados)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 14,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia_chunk": "DIREITO CONSTITUCIONAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "DIREITO CONSTITUCIONAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Constituição Federal",
+        "topicos": [
+          {
+            "nome": "Constituição",
+            "subtopicos": [
+              "Conceito, objeto, elementos e classificações"
+            ]
+          },
+          {
+            "nome": "Princípios fundamentais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direitos e garantias fundamentais",
+            "subtopicos": [
+              "Direitos e deveres individuais e coletivos",
+              "Habeas corpus, mandado de segurança, mandado de injunção e habeas data",
+              "Direitos sociais",
+              "Nacionalidade",
+              "Direitos políticos",
+              "Partidos políticos"
+            ]
+          },
+          {
+            "nome": "Organização do Estado",
+            "subtopicos": [
+              "Organização político-administrativa",
+              "Estado federal brasileiro",
+              "União",
+              "Estados federados",
+              "Municípios",
+              "Distrito Federal",
+              "Territórios"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Disposições gerais",
+              "Servidores públicos"
+            ]
+          },
+          {
+            "nome": "Organização dos poderes no Estado",
+            "subtopicos": [
+              "Poder Legislativo",
+              "Estrutura, funcionamento e atribuições",
+              "Fiscalização contábil, financeira e orçamentária",
+              "Tribunal de Contas da União (TCU)"
+            ]
+          },
+          {
+            "nome": "Funções essenciais à Justiça",
+            "subtopicos": [
+              "Ministério Público",
+              "Advocacia pública"
+            ]
+          },
+          {
+            "nome": "Defesa do Estado e das instituições democráticas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema Tributário Nacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Finanças públicas",
+            "subtopicos": [
+              "Normas gerais",
+              "Orçamentos"
+            ]
+          },
+          {
+            "nome": "Ordem econômica e financeira",
+            "subtopicos": [
+              "Princípios gerais da atividade econômica",
+              "Sistema Financeiro Nacional"
+            ]
+          },
+          {
+            "nome": "Artigos 23, 170, 225 e 231 da Constituição Federal de 1988",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 15,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia_chunk": "DIREITO  ADMINISTRATIVO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "DIREITO  ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Estado, governo e administração pública",
+            "subtopicos": [
+              "Conceitos",
+              "Elementos"
+            ]
+          },
+          {
+            "nome": "Direito administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Objeto",
+              "Fontes"
+            ]
+          },
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies",
+              "Extinção do ato administrativo",
+              "Cassação, anulação, revogação e convalidação",
+              "Decadência administrativa"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei n.º 8.112/1990",
+              "Disposições constitucionais aplicáveis",
+              "Disposições doutrinárias",
+              "Conceito",
+              "Espécies",
+              "Cargo, emprego e função pública",
+              "Provimento",
+              "Vacância",
+              "Efetividade, estabilidade e vitaliciedade",
+              "Remuneração",
+              "Direitos e deveres",
+              "Responsabilidade",
+              "Processo administrativo disciplinar"
+            ]
+          },
+          {
+            "nome": "Poderes da administração pública",
+            "subtopicos": [
+              "Hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Regime jurídico-administrativo",
+            "subtopicos": [
+              "Conceito",
+              "Princípios expressos e implícitos da administração pública",
+              "Princípio da Legalidade"
+            ]
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": [
+              "Evolução histórica",
+              "Responsabilidade civil do Estado no direito brasileiro"
+            ]
+          },
+          {
+            "nome": "Serviços públicos",
+            "subtopicos": [
+              "Conceito",
+              "Elementos constitutivos",
+              "Formas de prestação e meios de execução",
+              "Delegação",
+              "Concessão, permissão e autorização",
+              "Classificação",
+              "Princípios"
+            ]
+          },
+          {
+            "nome": "Organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta e indireta",
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista",
+              "Entidades paraestatais e terceiro setor",
+              "Serviços sociais autônomos, entidades de apoio, organizações sociais, organizações da sociedade civil de interesse público"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Controle exercido pela administração pública",
+              "Controle judicial",
+              "Controle legislativo",
+              "Improbidade administrativa: Lei n.º 8.429/1992 e suas alterações"
+            ]
+          },
+          {
+            "nome": "Processo administrativo",
+            "subtopicos": [
+              "Lei n.º 9.784/1999"
+            ]
+          },
+          {
+            "nome": "Licitações e contratos administrativos",
+            "subtopicos": [
+              "Conceito, natureza jurídica, objeto e finalidade",
+              "Princípios básicos e correlatos",
+              "Modalidades",
+              "Obrigatoriedade, dispensa e inexigibilidade",
+              "Procedimento licitatório",
+              "Anulação, revogação e recursos administrativos",
+              "Sanções e procedimento sancionatório",
+              "Crimes em licitações e contratos administrativos"
+            ]
+          },
+          {
+            "nome": "Contrato administrativo para compras na administração pública",
+            "subtopicos": [
+              "Conceito, principais características e espécies",
+              "Formalização, execução e inexecução",
+              "Duração, prorrogação, renovação e extinção",
+              "Revisão e rescisão"
+            ]
+          },
+          {
+            "nome": "Acesso à Informação",
+            "subtopicos": [
+              "Lei n.º 12.527/2011 (Lei de Acesso à Informação)",
+              "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia_chunk": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "A evolução da administração pública e a reforma do Estado",
+            "subtopicos": [
+              "Do modelo racional-legal ao paradigma pós-burocrático",
+              "Convergências e diferenças entre a gestão pública e a gestão privada",
+              "Excelência na gestão dos serviços públicos",
+              "Empreendedorismo governamental e novas lideranças no setor público"
+            ]
+          },
+          {
+            "nome": "Gestão de pessoas",
+            "subtopicos": [
+              "Conceitos e práticas relativas ao servidor público",
+              "Gestão de desempenho",
+              "Comunicação",
+              "Comportamento, clima e cultura organizacional",
+              "Gestão por competências",
+              "Gestão do conhecimento",
+              "Qualidade de vida no trabalho",
+              "Liderança, motivação e satisfação no trabalho",
+              "Recrutamento e seleção de pessoas",
+              "Análise e descrição de cargos",
+              "Educação, treinamento e desenvolvimento",
+              "Gestão de conflito"
+            ]
+          },
+          {
+            "nome": "Gestão organizacional",
+            "subtopicos": [
+              "Planejamento estratégico"
+            ]
+          },
+          {
+            "nome": "Indicadores de desempenho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de processos",
+            "subtopicos": [
+              "Conceitos da abordagem por processos",
+              "Técnicas de mapeamento, análise e melhoria de processos",
+              "Construção e mensuração de indicadores de processos"
+            ]
+          },
+          {
+            "nome": "Ferramentas de análise de cenário interno e externo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Balanced scorecard",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de projetos",
+            "subtopicos": [
+              "Elaboração, análise e avaliação de projetos",
+              "Principais características dos modelos de gestão de projetos",
+              "Projetos e suas etapas",
+              "Escritório de projetos"
+            ]
+          },
+          {
+            "nome": "Gestão de risco",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo decisório",
+            "subtopicos": [
+              "O processo racional de solução de problemas",
+              "Fatores que afetam a decisão",
+              "Tipos de decisões"
+            ]
+          },
+          {
+            "nome": "Processo de mudança",
+            "subtopicos": [
+              "Mudança organizacional, forças internas e externas, o papel do agente e métodos de mudança"
+            ]
+          },
+          {
+            "nome": "Características das organizações formais modernas",
+            "subtopicos": [
+              "Tipos de estrutura organizacional, natureza, finalidades e critérios de departamentalização"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia_chunk": "ADMINISTRAÇÃO  ORÇAMENTÁRIA,  FINANCEIRA  E  ORÇAMENTO  PÚBLICO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO  ORÇAMENTÁRIA,  FINANCEIRA  E  ORÇAMENTO  PÚBLICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Técnicas orçamentárias",
+              "Princípios orçamentários",
+              "Ciclo orçamentário",
+              "Processo orçamentário"
+            ]
+          },
+          {
+            "nome": "O orçamento público no Brasil",
+            "subtopicos": [
+              "Sistema de planejamento e de orçamento federal",
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Outros planos e programas",
+              "Sistema e processo de orçamentação",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos ordinários e adicionais"
+            ]
+          },
+          {
+            "nome": "Programação e execução orçamentária e financeira",
+            "subtopicos": [
+              "Descentralização orçamentária e financeira",
+              "Acompanhamento da execução",
+              "Sistemas de informações",
+              "Alterações orçamentárias"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Fontes",
+              "Dívida ativa"
+            ]
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Restos a pagar",
+              "Despesas de exercícios anteriores",
+              "Dívida flutuante e fundada",
+              "Suprimento de fundos"
+            ]
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal",
+            "subtopicos": [
+              "Conceitos e objetivos",
+              "Transparência, controle e fiscalização"
+            ]
+          },
+          {
+            "nome": "Noções de Direito Financeiro e Tributário",
+            "subtopicos": [
+              "Lei nº 5.172/1966 (Sistema Tributário Nacional)",
+              "Lei nº 4.320/1964 (Normas Gerais de Direito Financeiro)",
+              "Decreto nº 70.235/1972 e suas alterações (Processo Administrativo Fiscal)",
+              "Instrução Normativa IBAMA nº 17/2011 (Regulamentação da TCFA – Taxa de Controle e Fiscalização Ambiental)"
+            ]
+          },
+          {
+            "nome": "Lei nº 10.522/2002 e Decreto nº 9.194/2017",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 18,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia_chunk": "CONTABILIDADE  PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "CONTABILIDADE  PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Pública",
+        "topicos": [
+          {
+            "nome": "Sistema de Contabilidade Federal",
+            "subtopicos": [
+              "Organização e competências (Lei nº 10.180/2021 e Decreto nº 6.976/2009)",
+              "Sistema Integrado de Administração Financeira do Governo Federal (SIAFI): conceito, objetivos, usuários e segurança do sistema (princípios e instrumentos)"
+            ]
+          },
+          {
+            "nome": "Conceituação, objeto e campo de aplicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Composição do Patrimônio Público",
+            "subtopicos": [
+              "Patrimônio Público",
+              "Ativo",
+              "Passivo",
+              "Saldo Patrimonial"
+            ]
+          },
+          {
+            "nome": "Variações Patrimoniais",
+            "subtopicos": [
+              "Qualitativas",
+              "Quantitativas: receita e despesa sob o enfoque patrimonial",
+              "Realização da variação patrimonial",
+              "Resultado patrimonial"
+            ]
+          },
+          {
+            "nome": "Regime Orçamentário e Regime Contábil",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mensuração de ativos",
+            "subtopicos": [
+              "Ativo Imobilizado",
+              "Ativo Intangível",
+              "Reavaliação e redução ao valor recuperável",
+              "Depreciação, amortização e exaustão"
+            ]
+          },
+          {
+            "nome": "Mensuração de passivos",
+            "subtopicos": [
+              "Provisões",
+              "Passivos Contingentes"
+            ]
+          },
+          {
+            "nome": "Tratamento contábil aplicável aos impostos e contribuições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de custos",
+            "subtopicos": [
+              "Aspectos legais do sistema de custos",
+              "Ambiente da informação de custos",
+              "Características da informação de custos",
+              "Terminologia de custos",
+              "NBC TSP 34 - Custos no Setor Público",
+              "Manual de Informações de Custos do Governo Federal, aprovado pela Portaria STN nº 518/2018"
+            ]
+          },
+          {
+            "nome": "Estrutura do Plano de contas aplicado ao setor público (PCASP)",
+            "subtopicos": [
+              "Naturezas da Informação Contábil",
+              "Código da Conta Contábil",
+              "Atributos da informação contábil",
+              "Regras de integridade do PCASP"
+            ]
+          },
+          {
+            "nome": "Demonstrações contábeis aplicadas ao setor público",
+            "subtopicos": [
+              "Balanço orçamentário",
+              "Balanço Financeiro",
+              "Demonstração das variações patrimoniais",
+              "Balanço patrimonial",
+              "Demonstração de fluxos de caixa",
+              "Demonstração das Mutações do Patrimônio Líquido",
+              "Notas explicativas às demonstrações contábeis",
+              "Consolidação das demonstrações contábeis"
+            ]
+          },
+          {
+            "nome": "Transações no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito, etapas, estágios e categorias econômicas"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Conceito, etapas, estágios e categorias econômicas"
+            ]
+          },
+          {
+            "nome": "Créditos Adicionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Execução orçamentária e financeira",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fonte ou Destinação de Recursos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Suprimento de Fundos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Restos a pagar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Despesas com Pessoal",
+            "subtopicos": [
+              "Definições e Limites",
+              "Controle da Despesa Total com Pessoal"
+            ]
+          },
+          {
+            "nome": "Despesas de Exercícios anteriores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conta única do Tesouro Nacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Norma Brasileira de Contabilidade – NBC TSP Estrutura Conceitual, de 23 de setembro de 2016",
+            "subtopicos": []
+          },
+          {
+            "nome": "MCASP 10ª edição",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal (Lei nº 101/2000)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 4.320/1964",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 19,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia_chunk": "GESTÃO DE PESSOAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "GESTÃO DE PESSOAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Gestão de Pessoas",
+        "topicos": [
+          {
+            "nome": "Gestão de pessoas",
+            "subtopicos": [
+              "Liderança, gerenciamento de conflitos, motivação, sistemas de incentivo e responsabilização, gestão do desempenho",
+              "Programa de Gestão do Desempenho, teletrabalho",
+              "Indicadores de gestão de pessoas",
+              "Trabalho em equipe"
+            ]
+          },
+          {
+            "nome": "Qualidade de vida no trabalho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Capacitação e desenvolvimento de pessoas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão por competência",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise de dados de pessoas",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "LEGISLAÇÃO  AMBIENTAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "LEGISLAÇÃO  AMBIENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação Ambiental",
+        "topicos": [
+          {
+            "nome": "Leis, decretos, resoluções e portarias",
+            "subtopicos": [
+              "Lei de Proteção à Fauna (Lei nº 5.197/1967)",
+              "Lei nº 6.938/1981 e suas alterações (Política Nacional do Meio Ambiente)",
+              "Lei nº 7.173/1983",
+              "Lei nº 7.735/1989 (criação do IBAMA)",
+              "Lei nº 9.605/1998 (Lei dos Crimes Ambientais) e Decreto nº 6.514/2008",
+              "Lei nº 9.966/2000 (Lei do Óleo)",
+              "Lei nº 10.410/2002 (Criação da carreira de especialista em meio ambiente)",
+              "Lei nº 11.284/2006 (títulos I, II e III e V)",
+              "Lei nº 11.428/2006 (Mata Atlântica)",
+              "Lei nº 12.187/2009 (Política Nacional sobre Mudança do Clima) e Decreto nº 9.578/2018",
+              "Lei nº 12.305/2010 (Política Nacional de Resíduos Sólidos) e Decreto nº 10.936/2022",
+              "Lei Complementar nº 140/2011 (Competências ambientais)",
+              "Lei nº 12.651/2012 (proteção da vegetação nativa)",
+              "Lei nº 13.123/2015 e Decreto nº 8.772/2016 (Convenção sobre Diversidade Biológica)",
+              "Lei nº 11.959/2009",
+              "Lei nº 14.785/2023 (agrotóxicos)",
+              "Lei nº 9.433/1997 (Política Nacional de Recursos Hídricos) e alterações",
+              "Lei nº 9.985/2000 (Sistema Nacional de Unidades de Conservação da Natureza) e Decreto nº 4.340/2002",
+              "Lei nº 12.334/2010 (Política Nacional de Segurança de Barragens) e alterações",
+              "Decreto nº 8.437/2015",
+              "Decreto nº 70.235/1972 (Processo Administrativo Fiscal)",
+              "Decreto nº 3.607/2000 (CITES)",
+              "Decreto nº 7.830/2012",
+              "Decreto nº 11.367/2023 (Comissão Interministerial Permanente para prevenir e controlar o desmatamento, entre outros)",
+              "Decreto nº 12.044/2024 (Sociobioeconomia)",
+              "Decreto nº 2.519/1998 (Convenção sobre Diversidade Biológica)",
+              "Decreto nº 875/1993 (Convenção de Basileia), Decreto nº 9.470/2018 (Convenção de Minamata) e Decreto nº 99.280/1990 (Protocolo de Montreal)",
+              "Decreto nº 6.640/2008 (Proteção de cavidades)",
+              "Decreto nº 10.935/2022",
+              "Resoluções do Conselho Nacional do Meio Ambiente (CONAMA): nº 1/1986, nº 5/1989, nº 237/1997, nº 350/2004, nº 357/2005, nº 302/2002, nº 303/2002, nº 369/2006, nº 371/2006, nº 393/2007, nº 394/2007, nº 396/2008, nº 457/2013, nº 487/2018, nº 489/2018, nº 496/2020 e nº 507/2024",
+              "Portaria Interministerial nº 60/2015 (disciplina a atuação dos órgãos e entidades da administração pública federal em processos de licenciamento ambiental de competência do IBAMA)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 21,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "PROTEÇÃO  DE  RECURSOS  GENÉTICOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "PROTEÇÃO  DE  RECURSOS  GENÉTICOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Proteção dos Recursos Genéticos",
+        "topicos": [
+          {
+            "nome": "Proteção dos Recursos Genéticos",
+            "subtopicos": [
+              "Ilícitos relacionados ao patrimônio genético e conhecimento tradicional associado",
+              "Protocolo de Cartagena, Decreto nº 5.705/2006",
+              "Normas de segurança e fiscalização de Organismos Geneticamente Modificados (OGM)",
+              "Lei nº 11.460/2007",
+              "Ilícitos envolvendo OGMs",
+              "Resoluções Normativas da Comissão Técnica Nacional de Biossegurança (CTNBio) nº 26/2020 e nº 37/2022",
+              "Resolução do Conselho de Gestão do Patrimônio Genético (CGEN) nº 27"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "PROTEÇÃO DA FAUNA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "PROTEÇÃO DA FAUNA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Proteção da Fauna",
+        "topicos": [
+          {
+            "nome": "Proteção da Fauna",
+            "subtopicos": [
+              "Conceitos biológicos e taxonomia de fauna",
+              "Evolução da proteção, defesa e direitos dos animais",
+              "Lei nº 5.197/1967",
+              "Ilícitos contra a fauna: tráfico, maus-tratos, caça, espécies exóticas"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 23,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "PROTEÇÃO  DE  RECURSOS  PESQUEIROS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "PROTEÇÃO  DE  RECURSOS  PESQUEIROS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Proteção de Recursos Pesqueiros",
+        "topicos": [
+          {
+            "nome": "Proteção de Recursos Pesqueiros",
+            "subtopicos": [
+              "Recursos pesqueiros e ecossistemas aquáticos relevantes",
+              "Métodos da pesca industrial",
+              "Evolução do ordenamento pesqueiro no Brasil: Sistema Informatizado do Registro Geral da Atividade Pesqueira (SisRGP) e Programa Nacional de Rastreamento de Embarcações Pesqueiras por Satélite (Preps)",
+              "Pesca ilegal e ilícitos relacionados",
+              "Danos ambientais decorrentes da atividade pesqueira"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 24,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "COMÉRCIO EXTERIOR",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "COMÉRCIO EXTERIOR",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Comércio Exterior",
+        "topicos": [
+          {
+            "nome": "Comércio Exterior",
+            "subtopicos": [
+              "Território aduaneiro e controle de operações",
+              "Convenção sobre o Comércio Internacional das Espécies da Flora e Fauna Selvagens em Perigo de Extinção (CITES)",
+              "Regime aduaneiro especial",
+              "Portaria nº 38 da Secex/MDIC, de 18 de maio de 2015, Portaria Secex nº 346, de 28 de agosto de 2024, Portaria Secex nº 19, de 2 de julho de 2019, Portaria Secex nº 249, de 4 de julho de 2023"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 25,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "INCÊNDIOS FLORESTAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "INCÊNDIOS FLORESTAIS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ecologia do Fogo",
+        "topicos": [
+          {
+            "nome": "Lei nº 14.944/2024",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ecologia do Fogo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fundamentos da Ecologia do Fogo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fisiologia Vegetal e Adaptações ao Fogo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regimes de Fogo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Impactos do Fogo nos Ecossistemas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Manejo e Prevenção de Incêndios Florestais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 26,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "EMERGÊNCIAS CLIMÁTICAS E AMBIENTAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "EMERGÊNCIAS CLIMÁTICAS E AMBIENTAIS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Mudanças Climáticas e Emergências Ambientais",
+        "topicos": [
+          {
+            "nome": "Mudanças Climáticas Globais",
+            "subtopicos": [
+              "Causas, consequências e cenários futuros",
+              "Evidências científicas do Painel Intergovernamental sobre Mudanças Climáticas (IPCC)"
+            ]
+          },
+          {
+            "nome": "Resiliência Climática e Redução de Riscos de Desastres Ambientais",
+            "subtopicos": [
+              "Conceitos de adaptação e mitigação em face de eventos climáticos extremos, como secas, inundações e tempestades"
+            ]
+          },
+          {
+            "nome": "Emergências Ambientais no Brasil",
+            "subtopicos": [
+              "Gestão e resposta a emergências ambientais"
+            ]
+          },
+          {
+            "nome": "Principais desastres ambientais recentes no país",
+            "subtopicos": [
+              "Derramamento de óleo",
+              "Rompimento de barragens",
+              "Incêndios florestais"
+            ]
+          },
+          {
+            "nome": "Responsabilidades legais e protocolos de atuação",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 27,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "PROCESSO SANCIONADOR AMBIENTAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "PROCESSO SANCIONADOR AMBIENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação Ambiental",
+        "topicos": [
+          {
+            "nome": "Lei nº 7.735/1989",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Complementar nº 140/2011",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 9.784/1999 e Lei nº 9.873/1999",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 9.605/1998",
+            "subtopicos": []
+          },
+          {
+            "nome": "Decreto nº 6.514/2008",
+            "subtopicos": []
+          },
+          {
+            "nome": "Instrução Normativa Ibama nº 19/2023",
+            "subtopicos": []
+          },
+          {
+            "nome": "Instrução Normativa Ibama nº 8/2024",
+            "subtopicos": []
+          },
+          {
+            "nome": "Portaria Ibama nº 1.369/2020",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "LICENCIAMENTO  AMBIENTAL  FEDERAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "LICENCIAMENTO  AMBIENTAL  FEDERAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Licenciamento Ambiental Federal",
+        "topicos": [
+          {
+            "nome": "Socioantropologia no Licenciamento Ambiental",
+            "subtopicos": [
+              "Conceitos fundadores: cultura, indivíduo, comunidade e sociedade",
+              "Conflito e movimentos sociais",
+              "Dinâmica e mudança social",
+              "Estrutura social e etnologia brasileira",
+              "Relação entre meio ambiente e organização social",
+              "Papel do território: planejamento ambiental e territorial, urbanismo, vocação e uso do solo",
+              "Noções de pesquisa social: teoria, método, análise de dados qualitativos e quantitativos, definição de indicadores",
+              "Estado e sociedade"
+            ]
+          },
+          {
+            "nome": "Demografia, Economia e Sociologia",
+            "subtopicos": [
+              "Direitos Humanos e Políticas Públicas: Políticas sociais, Estado de bem-estar social, desenvolvimento agrário, economia do setor público",
+              "Identidade cultural e multiculturalismo no Brasil",
+              "Equilíbrio entre equidade social e competitividade econômica"
+            ]
+          },
+          {
+            "nome": "Caracterização da Sociedade Brasileira",
+            "subtopicos": [
+              "Dinâmica populacional: transição demográfica, migrações, fecundidade, mortalidade",
+              "Organização geoeconômica no Brasil",
+              "Distribuição de renda e PIB",
+              "Desenvolvimento nacional",
+              "Questão agrária: estrutura fundiária e sociedade rural"
+            ]
+          },
+          {
+            "nome": "Impactos Sociais e Econômicos de Grandes Empreendimentos",
+            "subtopicos": [
+              "Análise social e econômica de projetos",
+              "Economia ambiental"
+            ]
+          },
+          {
+            "nome": "Licenciamento Ambiental e Avaliação de Impacto",
+            "subtopicos": [
+              "Licenciamento Ambiental Federal: Conceitos, finalidades, procedimentos, etapas e competência",
+              "Avaliação de Impactos Ambientais: Metodologias principais e aplicação",
+              "EIA/RIMA: Critérios, métodos de elaboração",
+              "Gestão e Mitigação Ambiental: Plano de gestão, análise de risco, compensação, mitigação e recuperação de áreas degradadas",
+              "Monitoramento Ambiental"
+            ]
+          },
+          {
+            "nome": "Cartografia e Sensoriamento",
+            "subtopicos": [
+              "Levantamentos, SIG, análise de paisagens",
+              "Ecossistemas e Fitogeografia: Ecossistemas brasileiros, fitossociologia, flora e fauna",
+              "Geologia e Geotecnia: Geologia ambiental, riscos geológicos, processos erosivos",
+              "Climatologia e Mudanças Climáticas: Mitigação e adaptação",
+              "Hidrologia e Hidrogeologia: Ciclo hidrológico, águas subterrâneas, poluição hídrica",
+              "Química e Poluição Ambiental: Poluição do solo, água e ar, resíduos e emissões",
+              "Energia e Infraestrutura: Matriz energética, energias renováveis, infraestrutura viária e projetos de construção civil"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 29,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "BIODIVERSIDADE E FLORESTAS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "BIODIVERSIDADE E FLORESTAS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Meio Ambiente e Recursos Florestais",
+        "topicos": [
+          {
+            "nome": "Desenvolvimento sustentável",
+            "subtopicos": []
+          },
+          {
+            "nome": "Financiamento da política ambiental",
+            "subtopicos": []
+          },
+          {
+            "nome": "Valoração da natureza e serviços ambientais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Desertificação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidade por dano ao meio ambiente",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tutela processual do meio ambiente",
+            "subtopicos": []
+          },
+          {
+            "nome": "Maus tratos e bem-estar animal de silvestres",
+            "subtopicos": []
+          },
+          {
+            "nome": "Questões ambientais globais e acordos internacionais",
+            "subtopicos": [
+              "Convenção sobre Diversidade Biológica",
+              "Convenção sobre o Comércio Internacional das Espécies Silvestres Ameaçadas de Extinção (CITES)",
+              "Convenção Internacional de Combate à Desertificação",
+              "Agenda 2030 para o Desenvolvimento Sustentável, Objetivos de Desenvolvimento Sustentável (ODS) da ONU e ODS Brasil"
+            ]
+          },
+          {
+            "nome": "Classificação e taxonomia animal e vegetal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fatores biológicos determinantes de riscos de extinção",
+            "subtopicos": []
+          },
+          {
+            "nome": "Radiação evolutiva (evolução filogenética e filogeografia)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Degradação de habitat",
+            "subtopicos": []
+          },
+          {
+            "nome": "Monitoramento ambiental: conceitos, objetivos e suas aplicações no solo, ar, água, fauna, flora e ecossistemas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fragmentação, efeito de borda e perda de biodiversidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Corredores ecológicos, dispersão de fauna e flora e trocas genéticas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conservação e manejo de populações e de metapopulações in situ e ex situ",
+            "subtopicos": []
+          },
+          {
+            "nome": "Introdução indesejada de espécies exóticas e seus impactos sobre populações e comunidades naturais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estratégias de conservação de hábitats e de espécies",
+            "subtopicos": []
+          },
+          {
+            "nome": "Biomas e fitofisionomias brasileiros: características e evolução da fauna e flora",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conceitos, práticas e técnicas de manejo florestal madeireiro e não-madeireiro",
+            "subtopicos": []
+          },
+          {
+            "nome": "Política florestal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Dendrometria e inventário florestal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sementes e viveiros florestais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ciclagem de nutrientes",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ecologia e manejo de fragmentos florestais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ecologia de paisagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Recuperação de áreas degradadas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Economia florestal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Geoprocessamento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Acesso e uso de produtos florestais e conflitos sociais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Controle e monitoramento das atividades florestais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Biodiversidade e conservação de espécies florestais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Florestas e mudanças climáticas: serviços ambientais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Aquecimento global e sequestro de carbono",
+            "subtopicos": []
+          },
+          {
+            "nome": "Descentralização da gestão florestal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Políticas públicas de controle e prevenção do desmatamento",
+            "subtopicos": []
+          },
+          {
+            "nome": "Desenvolvimento econômico e conservação da biodiversidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fiscalização e poder de polícia administrativa",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "QUALIDADE AMBIENTAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "QUALIDADE AMBIENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Qualidade Ambiental",
+        "topicos": [
+          {
+            "nome": "Qualidade Ambiental",
+            "subtopicos": [
+              "Impacto ambiental, degradação e poluição",
+              "Controle e fiscalização do uso de mercúrio",
+              "Instrução Normativa IBAMA nº 17/2011 (Taxa de Controle e Fiscalização Ambiental – TCFA)",
+              "Relatório Anual de Atividades Potencialmente Poluidoras e Utilizadoras de Recursos Ambientais (RAPP) e Cadastro Técnico Federal (CTF)",
+              "Programa de Controle de Poluição do Ar por Veículos Automotores (Proconve)"
+            ]
+          },
+          {
+            "nome": "Resolução CONAMA nº 452/2012",
+            "subtopicos": [
+              "Pneumáticos: Resolução CONAMA nº 416/2009",
+              "Resolução CONAMA nº 401/2008 (pilhas e baterias)",
+              "Óleos lubrificantes usados ou contaminados",
+              "Resoluções CONAMA nº 362/2005 e nº 450/2012",
+              "Convenção de Minamata sobre Mercúrio",
+              "Decreto nº 97.634/1989 (mercúrio metálico)"
+            ]
+          },
+          {
+            "nome": "Acordo de Paris Resoluções CONAMA nº 267/2000 e nº 340/2003",
+            "subtopicos": [
+              "Lei nº 8.723/1993 (redução de emissão de poluentes por veículos automotores)",
+              "Resolução CONAMA nº 18/1986",
+              "Resolução CONAMA nº 490/2018",
+              "Resolução CONAMA nº 492/2018",
+              "Resolução CONAMA nº 493/2019"
+            ]
+          },
+          {
+            "nome": "Programa Nacional de Educação e Controle da Poluição Sonora ‐ Silêncio",
+            "subtopicos": [
+              "Resoluções CONAMA nº 2/1990 e nº 20/1994"
+            ]
+          },
+          {
+            "nome": "Resolução CONAMA nº 1/1998 (CTF/AIDA)",
+            "subtopicos": [
+              "Instrução Normativa Ibama nº 12/2021",
+              "Lei nº 7.804/1989 (CTF/APP)",
+              "Instrução Normativa Ibama nº 13/2021",
+              "Instrução Normativa Ibama nº 06/2022",
+              "Lei nº 10.165/2001",
+              "Instrução Normativa Ibama nº 22/2021 e alterações (Relatório anual de atividades potencialmente poluidoras e utilizadoras de recursos ambientais ‐ RAPP)"
+            ]
+          },
+          {
+            "nome": "Biorremediação",
+            "subtopicos": [
+              "Resolução CONAMA nº 463/2014",
+              "Resolução CONAMA nº 472/2015",
+              "Áreas contaminadas: Resolução CONAMA nº 420/2009"
+            ]
+          },
+          {
+            "nome": "Compartimentos ambientais",
+            "subtopicos": [
+              "Ciclos biogeoquímicos",
+              "Transporte, distribuição e transformação de agentes químicos no meio ambiente",
+              "Bioacumulação e biomagnificação",
+              "Testes ecotoxicológicos"
+            ]
+          },
+          {
+            "nome": "Convenções internacionais",
+            "subtopicos": [
+              "Decreto nº 5.472/2005 (Convenção de Estocolmo)",
+              "Decreto nº 5.360/2005 (Convenção de Roterdã)"
+            ]
+          },
+          {
+            "nome": "Agrotóxicos, seus componentes e afins",
+            "subtopicos": [
+              "Lei nº 14.785/2023 (agrotóxicos)",
+              "Decreto nº 4.074/2002",
+              "Decreto nº 10.833/2021",
+              "Portaria IBAMA nº 84/1996 (potencial de periculosidade ambiental de agrotóxicos e afins)",
+              "Instrução Normativa Ibama nº 27/2018 e alterações",
+              "Instrução Normativa Ibama nº 02/2017",
+              "Manual de Avaliação de Risco Ambiental de Agrotóxicos para Abelhas",
+              "Produtos de baixa periculosidade: bioquímicos, semioquímicos, microbiológicos e agentes biológicos de controle",
+              "Avaliação de risco ecológico de agrotóxicos",
+              "Produtos preservativos de madeira",
+              "Lei nº 4.797/1965",
+              "Portaria Interministerial nº 292/1989 (Ministério da Fazenda, Ministério da Saúde e Ministério do Interior)",
+              "Fundamentos de Agroecologia"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 31,
+      "cargo": "CARGO 2: ANALISTA AMBIENTAL – TEMA 1: PROTEÇÃO, LICENCIAMENTO, MONITORAMENTO E QUALIDADE AMBIENTAL",
+      "materia_chunk": "MONITORAMENTO  AMBIENTAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "MONITORAMENTO  AMBIENTAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Monitoramento Ambiental",
+        "topicos": [
+          {
+            "nome": "Conceitos, objetivos e aplicações do monitoramento ambiental",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sensoriamento remoto",
+            "subtopicos": [
+              "Sensores ativos e passivos",
+              "Sistemas de imageamento: conceitos de pixel, resolução espacial, temporal e radiométrica",
+              "Aplicação do sensoriamento remoto no monitoramento e controle de desmatamentos, incêndios florestais e recuperação da vegetação"
+            ]
+          },
+          {
+            "nome": "Sistemas de Informação Geográfica (SIG)",
+            "subtopicos": [
+              "Sistemas de coordenadas e georreferenciamento",
+              "Projeções e transformações",
+              "Descrição e uso das funcionalidades de um SIG"
+            ]
+          },
+          {
+            "nome": "Geoprocessamento e Análise de dados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estrutura de dados espaciais",
+            "subtopicos": [
+              "Modelagem de dados em geoprocessamento",
+              "Sistema Gerenciador de Banco de Dados (SGBD)",
+              "Infraestrutura Nacional de Dados Espaciais (INDE)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 3: ANALISTA AMBIENTAL – TEMA 2: MANEJO, CONSERVAÇÃO E REABILITAÇÃO DA FAUNA SILVESTRE",
+      "materia_chunk": "MANEJO,  CONSERVAÇÃO  E  REABILITAÇÃO  DA  FAUNA  SILVESTRE",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "MANEJO,  CONSERVAÇÃO  E  REABILITAÇÃO  DA  FAUNA  SILVESTRE",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Zoologia e Manejo de Fauna",
+        "topicos": [
+          {
+            "nome": "IN Ibama 05/2021",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ecossistemas brasileiros",
+            "subtopicos": []
+          },
+          {
+            "nome": "Biologia da conservação: estratégias para conservação de espécies, habitats e paisagens",
+            "subtopicos": []
+          },
+          {
+            "nome": "Corredores ecológicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de geografia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Biologia animal e evolução",
+            "subtopicos": []
+          },
+          {
+            "nome": "Taxonomia, sistemática e classificação animal",
+            "subtopicos": [
+              "Dispersão e fluxo gênico em populações naturais",
+              "Adaptação e especiação"
+            ]
+          },
+          {
+            "nome": "Conservação da fauna silvestre",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ecologia e distribuição dos animais",
+            "subtopicos": [
+              "Estrutura de populações e metapopulações",
+              "Fragmentação de ecossistemas e efeito de borda",
+              "Proteção de áreas de reprodução e de alimentação da fauna"
+            ]
+          },
+          {
+            "nome": "Manejo de fauna",
+            "subtopicos": [
+              "Introduções, reintroduções, translocações e adensamento populacional de fauna silvestre",
+              "Manejo de fauna silvestre, suas populações e de metapopulações in situ e ex situ",
+              "Contenção química e física de animais silvestres",
+              "Nutrição de animais silvestres",
+              "Doenças nutricionais",
+              "Biossegurança aplicada ao manejo de fauna silvestre",
+              "Medidas mitigadoras para a captura incidental de aves, mamíferos e répteis marinhos em artes de pesca",
+              "Fauna Ameaçada de Extinção – Manejo de Fauna Invasora",
+              "Taxonomia e Sistemática de vertebrados",
+              "Biologia reprodutiva e cuidados parentais em animais selvagens"
+            ]
+          },
+          {
+            "nome": "Epidemiologia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Anatomia e fisiologia de animais silvestres",
+            "subtopicos": []
+          },
+          {
+            "nome": "Proteção da Fauna",
+            "subtopicos": [
+              "Conceitos biológicos e taxonomia de fauna",
+              "Evolução da proteção, defesa e direitos dos animais",
+              "Lei nº 5.197/1967",
+              "Ilícitos contra a fauna: tráfico, maus-tratos, caça, espécies exóticas"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+}

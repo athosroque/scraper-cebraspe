@@ -1,3 +1,4 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -141,3 +142,38 @@ class TestDownloadConcursoPdfs:
 
             downloader.download_concurso_pdfs("Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path)
             assert mock_get.call_count == 1
+
+
+class TestResolverConcursoDoPdf:
+    def _preparar(self, tmp_path, urls: list[str]):
+        orgao_dir = tmp_path / "2025" / "CEBRASPE" / "PF"
+        (orgao_dir / "Editais").mkdir(parents=True)
+        manifest = {url: {"hash": "x", "path": f"/outra/copia/{url.rsplit('/', 1)[-1]}"} for url in urls}
+        (orgao_dir / downloader.MANIFEST_FILENAME).write_text(json.dumps(manifest), encoding="utf-8")
+        return orgao_dir / "Editais"
+
+    def test_resolve_slug_orgao_e_ano_pela_url_do_manifesto(self, tmp_path):
+        # O path gravado no manifesto aponta pra outra cópia do repo (achado
+        # real: worktree antiga) — o casamento tem que ser pelo nome do arquivo.
+        editais = self._preparar(
+            tmp_path, ["https://cdn.cebraspe.org.br/concursos/PF_25_ADM/arquivos/Ed_1.pdf"]
+        )
+        assert downloader.resolver_concurso_do_pdf(editais / "Ed_1.pdf") == {
+            "slug": "PF_25_ADM",
+            "orgao": "PF",
+            "ano": 2025,
+        }
+
+    def test_mesmo_nome_de_arquivo_em_dois_concursos_do_orgao_e_ambiguo(self, tmp_path):
+        editais = self._preparar(
+            tmp_path,
+            [
+                "https://cdn.cebraspe.org.br/concursos/PF_25_ADM/arquivos/Ed_1.pdf",
+                "https://cdn.cebraspe.org.br/concursos/PF_25_AGENTE/arquivos/Ed_1.pdf",
+            ],
+        )
+        assert downloader.resolver_concurso_do_pdf(editais / "Ed_1.pdf") is None
+
+    def test_pdf_fora_do_manifesto_retorna_none(self, tmp_path):
+        editais = self._preparar(tmp_path, [])
+        assert downloader.resolver_concurso_do_pdf(editais / "Ed_1.pdf") is None

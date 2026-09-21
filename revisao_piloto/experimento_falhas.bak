@@ -1,0 +1,165 @@
+{
+  "auditoria_origem": "/home/athos/homelab/scraper_cebraspe/revisao_piloto/Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.auditoria.json",
+  "resultados": [
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "CONTABILIDADE GERAL E SOCIETÁRIA",
+      "configuracao": "baseline",
+      "status": "falha",
+      "topicos_extraidos": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "CONTABILIDADE GERAL E SOCIETÁRIA",
+      "configuracao": "max_tokens_e_timeout_maiores",
+      "status": "sucesso",
+      "topicos_extraidos": 40
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "CONTABILIDADE GERAL E SOCIETÁRIA",
+      "configuracao": "reasoning_desligado",
+      "status": "falha",
+      "topicos_extraidos": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "CONTABILIDADE GERAL E SOCIETÁRIA",
+      "configuracao": "reasoning_desligado_texto_limpo",
+      "status": "falha",
+      "topicos_extraidos": null
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "configuracao": "baseline",
+      "status": "falha",
+      "topicos_extraidos": null
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "configuracao": "max_tokens_e_timeout_maiores",
+      "status": "sucesso",
+      "topicos_extraidos": 27
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "configuracao": "reasoning_desligado",
+      "status": "sucesso",
+      "topicos_extraidos": 27
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "configuracao": "reasoning_desligado_texto_limpo",
+      "status": "sucesso",
+      "topicos_extraidos": 27
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 10: NUTRICIONISTA",
+      "materia": "NUTRICIONISTA",
+      "configuracao": "baseline",
+      "status": "sucesso",
+      "topicos_extraidos": 18
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 10: NUTRICIONISTA",
+      "materia": "NUTRICIONISTA",
+      "configuracao": "max_tokens_e_timeout_maiores",
+      "status": "sucesso",
+      "topicos_extraidos": 18
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 10: NUTRICIONISTA",
+      "materia": "NUTRICIONISTA",
+      "configuracao": "reasoning_desligado",
+      "status": "sucesso",
+      "topicos_extraidos": 18
+    },
+    {
+      "chunk_index": 28,
+      "cargo": "CARGO 10: NUTRICIONISTA",
+      "materia": "NUTRICIONISTA",
+      "configuracao": "reasoning_desligado_texto_limpo",
+      "status": "sucesso",
+      "topicos_extraidos": 18
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 12: PSICÓLOGO ORGANIZACIONAL",
+      "materia": "PSICÓLOGO ORGANIZACIONAL",
+      "configuracao": "baseline",
+      "status": "falha",
+      "topicos_extraidos": null
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 12: PSICÓLOGO ORGANIZACIONAL",
+      "materia": "PSICÓLOGO ORGANIZACIONAL",
+      "configuracao": "max_tokens_e_timeout_maiores",
+      "status": "sucesso",
+      "topicos_extraidos": 28
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 12: PSICÓLOGO ORGANIZACIONAL",
+      "materia": "PSICÓLOGO ORGANIZACIONAL",
+      "configuracao": "reasoning_desligado",
+      "status": "falha",
+      "topicos_extraidos": null
+    },
+    {
+      "chunk_index": 30,
+      "cargo": "CARGO 12: PSICÓLOGO ORGANIZACIONAL",
+      "materia": "PSICÓLOGO ORGANIZACIONAL",
+      "configuracao": "reasoning_desligado_texto_limpo",
+      "status": "sucesso",
+      "topicos_extraidos": 28
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 14: TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "materia": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "configuracao": "baseline",
+      "status": "sucesso",
+      "topicos_extraidos": 9
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 14: TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "materia": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "configuracao": "max_tokens_e_timeout_maiores",
+      "status": "sucesso",
+      "topicos_extraidos": 9
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 14: TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "materia": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "configuracao": "reasoning_desligado",
+      "status": "sucesso",
+      "topicos_extraidos": 9
+    },
+    {
+      "chunk_index": 32,
+      "cargo": "CARGO 14: TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "materia": "TÉCNICO EM COMUNICAÇÃO SOCIAL",
+      "configuracao": "reasoning_desligado_texto_limpo",
+      "status": "sucesso",
+      "topicos_extraidos": 9
+    }
+  ]
+}

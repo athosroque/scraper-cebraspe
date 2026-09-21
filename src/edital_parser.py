@@ -1,0 +1,515 @@
+import re
+from dataclasses import dataclass
+from pathlib import Path
+
+import pymupdf
+
+from src.logger import logger
+
+# Análise exploratória manual (2026-09-19, edital real
+# Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.pdf, PF_25_ADM):
+# a única seção com valor pra taxonomia matéria→tópico→subtópico é
+# "OBJETOS DE AVALIAÇÃO (HABILIDADES E CONHECIMENTOS)" (item 14 nesse
+# edital, mas o número do item varia por concurso — por isso o corte usa o
+# texto do marcador, não o número). Outras seções candidatas foram
+# descartadas por não servirem ao objetivo de taxonomia de estudo:
+# cronograma, critérios de desempate e requisitos/atividades por cargo são
+# dados operacionais do concurso, não conteúdo programático. Ver CLAUDE.md
+# seção 12 para o racional completo.
+MARCADOR_INICIO_SECAO = "OBJETOS DE AVALIAÇÃO"
+MARCADOR_FIM_SECAO = "ANEXO I"
+
+# Cabeçalho de cargo dentro de "CONHECIMENTOS ESPECÍFICOS PARA OS CARGOS...",
+# ex: "CARGO 7: MÉDICO CLÍNICO". Cargos de especialidade médica costumam ter
+# o conteúdo direto embaixo do próprio "CARGO N: <nome>" (sem matéria
+# nomeada à parte); cargos administrativos usam "CARGO N: <nome>" só como
+# rótulo, seguido de matérias nomeadas (ver PADRAO_MATERIA). Ambos os casos
+# são reais no PF_25_ADM — o parser trata os dois.
+PADRAO_CARGO = re.compile(r'\nCARGO\s+(\d+):\s*([^\n]+)')
+
+# Cabeçalho de matéria, ex: "LÍNGUA PORTUGUESA: 1 Compreensão ...",
+# "ADMINISTRAÇÃO FINANCEIRA, ORÇAMENTÁRIA E ORÇAMENTO PÚBLICO: ...",
+# "ATUALIDADES (SOMENTE PARA A PROVA DISCURSIVA): ...",
+# "LÍNGUA INGLESA (APENAS PARA O CARGO 3: ... E CARGO 6: ...): ...".
+# Suporta especificações entre parênteses que contêm colons sem perder a fronteira da matéria.
+PADRAO_MATERIA = re.compile(
+    r'\n(?!CARGO\s+\d)'
+    r'('
+    r'[A-ZÀ-Ú][A-ZÀ-Ú0-9 /,–\-]{2,90}'
+    r'(?:(?:,\s*|\s+(?:E|OU|DE|DA|DO|DOS|DAS))\s*\n\s*[A-ZÀ-Ú0-9 /,–\-]{2,90})?'
+    r'(?:\s*\([^)]*\))?'
+    r'):\s*'
+)
+
+# Cabeçalho de bloco que agrupa matérias por tipo de conhecimento e nível,
+# ex: "CONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR",
+# "CONHECIMENTOS ESPECÍFICOS PARA O CARGO DE NÍVEL MÉDIO",
+# "CONHECIMENTOS GERAIS",
+# "15.2.2 CONHECIMENTOS BÁSICOS PARA O CARGO DE ANALISTA ADMINISTRATIVO".
+PADRAO_BLOCO = re.compile(r'\n(?:\d+(?:\.\d+)*\s+)?CONHECIMENTOS\s+(BÁSICOS|ESPECÍFICOS|COMPLEMENTARES|GERAIS)([^\n:]*)(?=\n)')
+TIPO_CONHECIMENTO = {
+    "BÁSICOS": "basico",
+    "ESPECÍFICOS": "especifico",
+    "COMPLEMENTARES": "complementar",
+    "GERAIS": "basico",
+}
+
+# Marca de matéria cobrada só na prova discursiva, ex: "ATUALIDADES (SOMENTE
+# PARA A PROVA DISCURSIVA)" — vira flag `apenas_discursiva` e sai do nome
+# normalizado da matéria, pra "ATUALIDADES" ser comparável entre concursos.
+PADRAO_APENAS_DISCURSIVA = re.compile(r"\s*\(SOMENTE PARA (?:AS? )?PROVAS? DISCURSIVAS?\)", re.IGNORECASE)
+
+# Nota de retificação embutida no meio do texto programático (ex: "CARGO 12:
+# PSICÓLOGO ORGANIZACIONAL", achado ao vivo 2026-09-20, ver CLAUDE.md seção
+# 12): "(Retificado por meio do Edital nº 5 – PF – Administrativo, de 13 de
+# junho de 2025...)". É ruído administrativo, não conteúdo de estudo.
+PADRAO_RETIFICACAO = re.compile(r"\s*\(Retificado\s+por\s+meio\s+do\s+Edital[^)]*\)\s*", re.IGNORECASE)
+
+# Linha de cargo do signatário no bloco de assinatura do fim do edital (ver
+# `remover_assinatura_final`). Sem IGNORECASE: no corpo programático essas
+# palavras aparecem em minúscula ou no meio de frase ("7.3.1 Presidente da
+# República." — e essa linha tem ponto, o que já a exclui).
+PADRAO_CARGO_ASSINATURA = re.compile(
+    r"^\s*(?:Ministr[oa]|Presidente|Diretor[a]?|Secret[áa]ri[oa]|Delegad[oa]|Coordenador[a]?"
+    r"|Superintendente|Reitor[a]?|Procurador[a]?)\b"
+)
+
+# Item de primeiro nível numerado dentro do texto de uma matéria/cargo, ex:
+# "1 Compreensão e interpretação de textos." — usado tanto por
+# `scripts/validar_taxonomia.py` (comparação de-para) quanto pelo reparo
+# determinístico de `src/taxonomia_extractor.py` (ver ADR-021), então mora
+# aqui pra não duplicar/divergir entre os dois usos. `(?<!\d\.)` evita casar
+# o segundo número de itens pontuados ("3.1") sem bloquear um item de
+# primeiro nível colado ao ponto final do item anterior sem espaço (ex.:
+# "...lógicos.4 Lógica..." — "4" é item novo, não "X.4"). A lookahead por
+# maiúscula/parêntese evita casar números soltos em citações legais ("Lei
+# 8.112, de 11 de dezembro de 1990").
+PADRAO_ITEM_NUMERADO = re.compile(r"(?<!\d\.)\b(\d{1,3})\s+(?=[A-ZÀ-Ú(])")
+
+# Tamanho mínimo de texto para um bloco entrar na checagem de coluna — um
+# bloco curto isolado (ex: bloco de assinatura, centralizado) tem x0
+# diferente da margem do corpo do texto sem que isso indique colunas
+# paralelas de conteúdo corrido. Achado real (2026-09-19): sem esse piso, a
+# checagem dava falso positivo na página de assinatura ao fim da seção 14.
+TAMANHO_MINIMO_BLOCO_COLUNA = 150
+
+
+@dataclass
+class ChunkTaxonomia:
+    cargo: str | None  # None para CONHECIMENTOS BÁSICOS (sem cargo associado)
+    materia: str
+    texto: str  # já limpo de ruído conhecido (ver _limpar_ruido_edital) — é o que vai pro LLM
+    # offset_inicio/offset_fim apontam pro span BRUTO consumido da seção (antes da limpeza
+    # de ruído) — úteis pra auditoria rastrear de volta ao PDF, não reconstroem `texto` via
+    # slice+strip quando há ruído removido no meio.
+    offset_inicio: int = 0
+    offset_fim: int = 0
+    # Vêm do cabeçalho de bloco (PADRAO_BLOCO) em que o chunk está. None =
+    # chunk fora de bloco reconhecido, ou bloco que não declara um nível
+    # único (ex: "PARA TODOS OS CARGOS") — `validar_taxonomia` alerta.
+    tipo_conhecimento: str | None = None  # "basico" | "especifico" | "complementar"
+    nivel: str | None = None  # "medio" | "superior"
+    cargo_numero: int | None = None
+
+    @property
+    def apenas_discursiva(self) -> bool:
+        return bool(PADRAO_APENAS_DISCURSIVA.search(self.materia))
+
+    @property
+    def materia_normalizada(self) -> str:
+        return PADRAO_APENAS_DISCURSIVA.sub("", self.materia).strip()
+
+
+# Campos de classificação do chunk propagados pra `.json`/`.auditoria.json`/
+# banco de revisão — lista única pra os scripts não divergirem entre si.
+CAMPOS_CLASSIFICACAO_CHUNK = (
+    "tipo_conhecimento",
+    "nivel",
+    "cargo_numero",
+    "materia_normalizada",
+    "apenas_discursiva",
+)
+
+
+def metadados_chunk(chunk: ChunkTaxonomia) -> dict:
+    return {campo: getattr(chunk, campo) for campo in CAMPOS_CLASSIFICACAO_CHUNK}
+
+
+def _nivel_do_bloco(resto_cabecalho: str) -> str | None:
+    tem_superior = "SUPERIOR" in resto_cabecalho
+    tem_medio = "MÉDIO" in resto_cabecalho or "MEDIO" in resto_cabecalho
+    if tem_superior == tem_medio:
+        # Nenhum ou os dois níveis no mesmo bloco — não dá pra atribuir um
+        # nível único às matérias; fica None e vira alerta na validação.
+        return None
+    return "superior" if tem_superior else "medio"
+
+
+def detectar_cargo_e_nivel_edital(pdf_path: Path) -> dict[str, str | None]:
+    """Inspeciona as páginas preliminares do edital para identificar se o concurso
+    possui cargo único e/ou nível de escolaridade único (médio/superior).
+
+    Útil para editais de cargo único (ex.: TCU_25_TEFC), onde a seção de Objetos de
+    Avaliação não repete 'PARA CARGOS DE NÍVEL...' nem usa 'CARGO 1: ...', pois
+    todo o concurso é destinado a um único cargo e nível.
+    """
+    try:
+        doc = pymupdf.open(pdf_path)
+        texto = "\n".join(page.get_text().replace("\xa0", " ") for page in doc[:15])
+    except (pymupdf.FileDataError, OSError, RuntimeError) as e:
+        logger.warning(f"Não foi possível inspecionar páginas preliminares de {pdf_path.name}: {e}")
+        return {"cargo": None, "nivel": None}
+
+    # 1. Detecção de cargo único no item 1 ou 2:
+    # '2 DO CARGO DE TÉCNICO...' ou '1 DO CARGO DE ...' (singular, diferente de 'DOS CARGOS')
+    cargo_unico = None
+    m_cargo = re.search(r"\n(?:1|2)\s+DO CARGO(?:\s+DE|\s*:)?\s+([^\n]+)", texto, re.IGNORECASE)
+    if m_cargo:
+        cargo_bruto = m_cargo.group(1).strip()
+        # Remove sufixos como '- TEFC', etc.
+        cargo_limpo = re.sub(r"\s*[-–]\s*[A-Z0-9/]+\s*$", "", cargo_bruto).strip()
+        cargo_unico = cargo_limpo
+
+    # 2. Detecção de nível de escolaridade via bloco de requisitos
+    requisitos = re.findall(r"REQUISITO[S]?:\s*([^\n]+(?:\n[^\n]+){1,3})", texto, re.IGNORECASE)
+    tem_medio = any(
+        re.search(r"ensino\s+m[ée]dio|n[íi]vel\s+m[ée]dio|intermedi[áa]rio|segundo\s+grau", r, re.IGNORECASE)
+        for r in requisitos
+    )
+    tem_superior = any(
+        re.search(r"n[íi]vel\s+superior|gradua[çc][ãa]o|bacharelado|licenciatura|terceiro\s+grau", r, re.IGNORECASE)
+        for r in requisitos
+    )
+
+    nivel_detectado = None
+    if tem_medio and not tem_superior:
+        nivel_detectado = "medio"
+    elif tem_superior and not tem_medio:
+        nivel_detectado = "superior"
+
+    return {
+        "cargo": cargo_unico,
+        "nivel": nivel_detectado,
+    }
+
+
+def mapear_cargos(
+    chunks: list[ChunkTaxonomia],
+    cargo_padrao: str | None = None,
+    nivel_padrao: str | None = None,
+) -> list[dict]:
+    """Lista de cargos do edital com o nível herdado do bloco de
+    conhecimentos específicos onde o `CARGO N:` aparece (ex: PF_25_ADM:
+    cargos 1–14 superior, 15 médio). Base para ligar os blocos básicos
+    (N cargos por nível) aos cadernos CB1/CB2 na Fase 5.
+    """
+    cargos: dict[int, dict] = {}
+    for chunk in chunks:
+        if chunk.cargo_numero is None or chunk.cargo_numero in cargos:
+            continue
+        cargos[chunk.cargo_numero] = {
+            "numero": chunk.cargo_numero,
+            "nome": chunk.cargo.split(": ", 1)[-1] if chunk.cargo else None,
+            "nivel": chunk.nivel,
+        }
+    if not cargos and cargo_padrao:
+        return [
+            {
+                "numero": 1,
+                "nome": cargo_padrao.split(": ", 1)[-1] if cargo_padrao else None,
+                "nivel": nivel_padrao,
+            }
+        ]
+    return [cargos[n] for n in sorted(cargos)]
+
+
+@dataclass
+class SecaoExtraida:
+    """Seção "OBJETOS DE AVALIAÇÃO" recortada do edital, com os metadados de
+    corte (páginas/chars totais do PDF, offsets do recorte) necessários pra
+    trilha de auditoria de entrada/saída do parser — ver
+    `scripts/revisar_taxonomia_piloto.py`.
+    """
+
+    texto: str
+    paginas_pdf_total: int
+    chars_pdf_total: int
+    offset_inicio: int
+    offset_fim: int
+    marcador_fim_encontrado: bool  # False = cortou até o fim do PDF, sem achar "ANEXO I"
+    cargo_detectado: str | None = None
+    nivel_detectado: str | None = None
+
+
+def extrair_texto_paginas(pdf_path: Path) -> list[str]:
+    doc = pymupdf.open(pdf_path)
+    return [page.get_text().replace("\xa0", " ") for page in doc]
+
+
+def extrair_secao_objetos_avaliacao_detalhada(pdf_path: Path) -> SecaoExtraida | None:
+    """Versão de `extrair_secao_objetos_avaliacao` que também devolve os
+    metadados do corte (offsets, contagem de páginas/chars do PDF inteiro),
+    usados para montar a trilha de auditoria de entrada/saída do filtro.
+    Retorna None nas mesmas condições da versão simples (marcador de início
+    ausente).
+    """
+    paginas = extrair_texto_paginas(pdf_path)
+    texto_completo = "\n".join(paginas)
+
+    inicio = texto_completo.find(MARCADOR_INICIO_SECAO)
+    if inicio == -1:
+        logger.warning(f"Seção 'OBJETOS DE AVALIAÇÃO' não encontrada em {pdf_path.name}")
+        return None
+
+    fim = texto_completo.find(MARCADOR_FIM_SECAO, inicio)
+    marcador_fim_encontrado = fim != -1
+    if fim == -1:
+        fim = len(texto_completo)
+
+    info_edital = detectar_cargo_e_nivel_edital(pdf_path)
+
+    return SecaoExtraida(
+        texto=texto_completo[inicio:fim],
+        paginas_pdf_total=len(paginas),
+        chars_pdf_total=len(texto_completo),
+        offset_inicio=inicio,
+        offset_fim=fim,
+        marcador_fim_encontrado=marcador_fim_encontrado,
+        cargo_detectado=info_edital.get("cargo"),
+        nivel_detectado=info_edital.get("nivel"),
+    )
+
+
+def extrair_secao_objetos_avaliacao(pdf_path: Path) -> str | None:
+    """Recorta a seção "OBJETOS DE AVALIAÇÃO (HABILIDADES E CONHECIMENTOS)"
+    do edital, do marcador de início até o próximo "ANEXO" (ou fim do PDF
+    se não houver anexo). Retorna None se o marcador não existir — editais
+    diferentes podem numerar/nomear a seção de outro jeito, e isso deve ser
+    logado, não estourar exceção (mesmo padrão de resiliência do
+    crawler/downloader).
+    """
+    secao = extrair_secao_objetos_avaliacao_detalhada(pdf_path)
+    return secao.texto if secao else None
+
+
+def _limpar_ruido_edital(texto: str) -> str:
+    """Remove ruído administrativo conhecido (não é conteúdo de estudo) que
+    aparece embutido no meio do texto programático de um chunk — hoje só a
+    nota de retificação (`PADRAO_RETIFICACAO`). Achado ao vivo 2026-09-20:
+    esse ruído inflava o chunk sem agregar taxonomia, consumindo orçamento
+    de reasoning do LLM à toa. Ver CLAUDE.md seção 12.
+    """
+    return remover_assinatura_final(PADRAO_RETIFICACAO.sub(" ", texto).strip())
+
+
+def remover_assinatura_final(texto: str) -> str:
+    """Remove o bloco de assinatura do fim da seção de Objetos de Avaliação
+    (nome do signatário + cargo), que o recorte da seção cola na cauda do
+    último item. Todos os 5 editais de 2025 do piloto terminam assim, em
+    formatos diferentes: nome em caixa alta (`RODRIGO AGOSTINHO\\nPresidente
+    do Ibama`), nome na mesma linha depois do ponto final do último item (PF),
+    nome sem caixa alta (STM, `Ten Brig Ar ...\\nMinistro-Presidente`), cargo
+    em várias linhas (TCU, CD).
+
+    Âncora é o **cargo** do signatário (`PADRAO_CARGO_ASSINATURA`), não o
+    nome: só conta se estiver no fim do texto, se nada depois dele tiver
+    ponto final (item programático termina em ponto; linha de assinatura não)
+    e se a linha anterior tiver cara de nome (sem dígito, curta). Qualquer
+    dúvida devolve o texto intacto — perder um pedaço de conteúdo é pior que
+    deixar a assinatura.
+    """
+    linhas = texto.rstrip().split("\n")
+    idx_cargo = None
+    for i in range(len(linhas) - 1, 0, -1):
+        if "." in linhas[i]:
+            break
+        if PADRAO_CARGO_ASSINATURA.match(linhas[i]):
+            idx_cargo = i
+    if idx_cargo is None:
+        return texto
+
+    idx_nome = idx_cargo - 1
+    while idx_nome > 0 and not linhas[idx_nome].strip():
+        idx_nome -= 1
+    prefixo, _, nome = linhas[idx_nome].rpartition(". ")
+    nome = nome.strip()
+    if not nome or len(nome) > 80 or len(nome.split()) < 2 or re.search(r"\d", nome):
+        return texto
+    if len("\n".join(linhas[idx_cargo:])) > 300:
+        return texto
+
+    manter = linhas[:idx_nome] + ([f"{prefixo}."] if prefixo else [])
+    return "\n".join(manter).strip()
+
+
+def extrair_itens_numerados(texto: str) -> list[tuple[str, str]]:
+    """Retorna [(numero, texto_do_item)] para os itens de primeiro nível do
+    texto-fonte — da posição após o número até o próximo item de primeiro
+    nível (inclui o texto de subitens/alíneas do próprio item).
+
+    Não corta na primeira "." — citações legais dentro do próprio item
+    (ex.: "Lei nº 8.429/1992") têm ponto embutido no meio do rótulo, e um
+    corte ingênuo trunca o texto antes do fim do rótulo real.
+    """
+    matches = list(PADRAO_ITEM_NUMERADO.finditer(texto))
+    itens = []
+    for i, match in enumerate(matches):
+        fim = matches[i + 1].start() if i + 1 < len(matches) else len(texto)
+        item_texto = texto[match.end() : fim].strip()
+        if item_texto:
+            itens.append((match.group(1), item_texto))
+    return itens
+
+
+def checar_ordem_confiavel(pdf_path: Path, pagina_inicio: int, pagina_fim: int) -> bool:
+    """Validação de sanidade contra embaralhamento multi-coluna.
+
+    `page.get_text()` (usado em `extrair_secao_objetos_avaliacao`) não
+    garante ordem de leitura correta em layouts de múltiplas colunas — ele
+    pode intercalar texto da coluna esquerda com a direita. Essa função
+    inspeciona os blocos de texto (`get_text("blocks")`, que vêm com
+    coordenadas x0) nas páginas do intervalo dado: se blocos de texto
+    *longos* (corpo de texto, não títulos/assinaturas curtos) começam em
+    margens x0 bem diferentes na mesma página, é sinal de colunas lado a
+    lado — a ordem de `get_text()` pode estar errada e o resultado deve
+    ser revisado manualmente antes de confiar em lote.
+
+    Validado ao vivo (2026-09-19) contra `Ed_1_2025_PF_Administrativo_
+    Abertura_atualizado_ret_5.pdf`, páginas 44–62: layout de coluna única
+    (todo bloco de corpo de texto com x0 ≈ 42.5). A página 62 tem um bloco
+    de assinatura centralizado (x0 ≈ 218) que dispara falso positivo se a
+    checagem não ignorar blocos curtos — por isso o piso de
+    `TAMANHO_MINIMO_BLOCO_COLUNA`.
+    """
+    doc = pymupdf.open(pdf_path)
+    margem_tolerancia = 50  # pontos; acima disso, considera colunas distintas
+    for i in range(pagina_inicio - 1, min(pagina_fim, len(doc))):
+        blocks = doc[i].get_text("blocks")
+        x0s = [b[0] for b in blocks if len(b[4].strip()) >= TAMANHO_MINIMO_BLOCO_COLUNA]
+        if not x0s:
+            continue
+        if max(x0s) - min(x0s) > margem_tolerancia:
+            logger.warning(
+                f"Página {i + 1} de {pdf_path.name} tem blocos de corpo de texto "
+                f"com x0 variando de {min(x0s):.1f} a {max(x0s):.1f} — possível "
+                "layout multi-coluna; revisar a ordem do texto extraído antes "
+                "de confiar no output em lote."
+            )
+            return False
+    return True
+
+
+def dividir_por_cargo_e_materia(
+    secao_texto: str,
+    cargo_padrao: str | None = None,
+    nivel_padrao: str | None = None,
+    cargo_numero_padrao: int | None = None,
+) -> list[ChunkTaxonomia]:
+    """Chunking: separa o texto da seção de objetos de avaliação em blocos
+    por cargo e por matéria, prontos para virar prompt de extração LLM.
+
+    Percorre os cabeçalhos de cargo (`CARGO N: <nome>`) e de matéria
+    (`NOME DA MATÉRIA: ...`) em ordem de aparição no texto, mantendo qual é
+    o cargo corrente. Dois formatos reais coexistem no mesmo edital:
+    - cargo com matérias nomeadas à parte (ex: "CARGO 1: ADMINISTRADOR"
+      seguido de "ADMINISTRAÇÃO GERAL E PÚBLICA:", "GESTÃO DE PESSOAS:" etc.)
+      → 1 chunk por matéria, todos com o mesmo `cargo`;
+    - cargo de especialidade sem matéria nomeada à parte (ex: "CARGO 7:
+      MÉDICO CLÍNICO" com o conteúdo programático direto embaixo) → 1
+      chunk cujo `materia` é o próprio nome do cargo.
+    Matérias fora de qualquer cargo (bloco de CONHECIMENTOS BÁSICOS) saem
+    com `cargo=None`.
+
+    Um terceiro tipo de marcador, o cabeçalho de bloco (`CONHECIMENTOS
+    BÁSICOS/ESPECÍFICOS PARA ... NÍVEL SUPERIOR/MÉDIO`, ver PADRAO_BLOCO),
+    não gera chunk: define `tipo_conhecimento`/`nivel` de todo chunk até o
+    próximo bloco, zera o cargo corrente (um bloco básico depois de um
+    específico não pode herdar cargo) e serve de fronteira — sem ele, o
+    próprio cabeçalho do bloco seguinte grudava na cauda do chunk anterior.
+    """
+    marcadores = []
+    for m in PADRAO_BLOCO.finditer(secao_texto):
+        marcadores.append((m.start(), m.end(), "bloco", (TIPO_CONHECIMENTO[m.group(1)], _nivel_do_bloco(m.group(2)))))
+    for m in PADRAO_CARGO.finditer(secao_texto):
+        rotulo_cargo = f"CARGO {m.group(1)}: {m.group(2).strip()}"
+        marcadores.append((m.start(), m.end(), "cargo", (rotulo_cargo, int(m.group(1)))))
+    for m in PADRAO_MATERIA.finditer(secao_texto):
+        marcadores.append((m.start(), m.end(), "materia", re.sub(r"\s+", " ", m.group(1).strip())))
+    marcadores.sort(key=lambda x: x[0])
+
+    if not any(tipo != "bloco" for _, _, tipo, _ in marcadores):
+        return []
+
+    chunks: list[ChunkTaxonomia] = []
+    cargo_atual: str | None = None
+    cargo_numero_atual: int | None = None
+    tipo_conhecimento_atual: str | None = None
+    nivel_atual: str | None = None
+    for idx, (_, fim_cabecalho, tipo, rotulo) in enumerate(marcadores):
+        proximo_inicio = marcadores[idx + 1][0] if idx + 1 < len(marcadores) else len(secao_texto)
+        texto_bloco = _limpar_ruido_edital(secao_texto[fim_cabecalho:proximo_inicio].strip())
+
+        if tipo == "bloco":
+            tipo_conhecimento_atual, nivel_bloco = rotulo
+            nivel_atual = nivel_bloco if nivel_bloco is not None else nivel_padrao
+            if tipo_conhecimento_atual == "especifico" and cargo_padrao is not None:
+                cargo_atual = f"CARGO 1: {cargo_padrao}" if not cargo_padrao.startswith("CARGO") else cargo_padrao
+                cargo_numero_atual = cargo_numero_padrao if cargo_numero_padrao is not None else 1
+            else:
+                cargo_atual, cargo_numero_atual = None, None
+            if nivel_atual is None:
+                logger.warning(
+                    f"Bloco '{secao_texto[marcadores[idx][0]:fim_cabecalho].strip()}' sem nível único "
+                    "(médio/superior) — matérias desse bloco ficam com nivel=None."
+                )
+            continue
+
+        classificacao = {
+            "tipo_conhecimento": tipo_conhecimento_atual,
+            "nivel": nivel_atual,
+        }
+        if tipo == "cargo":
+            cargo_atual, cargo_numero_atual = rotulo
+            itens = extrair_itens_numerados(texto_bloco)
+            if not itens:
+                # Não há itens programáticos diretos: qualquer texto intermediário
+                # (ex.: quebra de linha do título do cargo no PDF) é continuação do rótulo
+                if texto_bloco:
+                    cargo_limpo = _limpar_ruido_edital(f"{cargo_atual} {texto_bloco}").strip()
+                    cargo_atual = re.sub(r"[ \t]+", " ", cargo_limpo)
+            else:
+                m_primeiro_item = PADRAO_ITEM_NUMERADO.search(texto_bloco)
+                prefixo_materia = texto_bloco[:m_primeiro_item.start()].strip() if m_primeiro_item else ""
+                if prefixo_materia and len(prefixo_materia) >= 3 and prefixo_materia.isupper():
+                    materia_nome = re.sub(r"\s+", " ", prefixo_materia)
+                    texto_final = texto_bloco[m_primeiro_item.start():].strip()
+                else:
+                    materia_nome = cargo_atual.split(": ", 1)[-1]
+                    texto_final = texto_bloco
+
+                chunks.append(
+                    ChunkTaxonomia(
+                        cargo=cargo_atual,
+                        materia=materia_nome,
+                        texto=texto_final,
+                        offset_inicio=fim_cabecalho,
+                        offset_fim=proximo_inicio,
+                        cargo_numero=cargo_numero_atual,
+                        **classificacao,
+                    )
+                )
+            continue
+
+        chunks.append(
+            ChunkTaxonomia(
+                cargo=cargo_atual,
+                materia=rotulo,
+                texto=texto_bloco,
+                offset_inicio=fim_cabecalho,
+                offset_fim=proximo_inicio,
+                cargo_numero=cargo_numero_atual,
+                **classificacao,
+            )
+        )
+
+    return chunks

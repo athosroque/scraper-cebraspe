@@ -6,3 +6,8 @@ logs/
 data/
 .ruff_cache/
 .pytest_cache/
+revisao_piloto/*.db*
+revisao_piloto/*.bak*
+revisao_piloto/relatorio/
+*.bak
+.claude/

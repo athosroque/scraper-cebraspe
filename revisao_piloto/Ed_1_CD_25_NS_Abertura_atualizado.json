@@ -1,0 +1,1085 @@
+{
+  "edital": "Ed_1_CD_25_NS_Abertura_atualizado.pdf",
+  "concurso": {
+    "slug": "CD_25_NS",
+    "orgao": "CD",
+    "ano": 2025
+  },
+  "cargos": [
+    {
+      "numero": 1,
+      "nome": "ANALISTA LEGISLATIVO – ATRIBUIÇÃO: PROCESSO LEGISLATIVO E GESTÃO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 2,
+      "nome": "TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "nivel": "superior"
+    }
+  ],
+  "total_chunks": 15,
+  "extraidos_com_sucesso": 15,
+  "falhas": 0,
+  "chunks_com_falha": [],
+  "resultados": [
+    {
+      "chunk_index": 0,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos de gêneros variados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Reconhecimento de tipos e gêneros textuais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+              "Emprego de tempos e modos verbais"
+            ]
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Emprego das classes de palavras",
+              "Relações de coordenação entre orações e entre termos da oração",
+              "Relações de subordinação entre orações e entre termos da oração",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Regência verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação dos pronomes átonos"
+            ]
+          },
+          {
+            "nome": "Reescrita de frases e parágrafos do texto",
+            "subtopicos": [
+              "Significação das palavras",
+              "Substituição de palavras ou de trechos de texto",
+              "Reorganização da estrutura de orações e de períodos do texto",
+              "Reescrita de textos de diferentes gêneros e níveis de formalidade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 1,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA INGLESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA INGLESA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Língua Inglesa",
+        "topicos": [
+          {
+            "nome": "Compreensão de textos variados",
+            "subtopicos": [
+              "domínio do vocabulário e da estrutura da língua",
+              "ideias principais e secundárias, explícitas e implícitas",
+              "relações intratextuais e intertextuais"
+            ]
+          },
+          {
+            "nome": "Itens gramaticais relevantes para compreensão de conteúdos semânticos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conhecimento e uso das formas contemporâneas da linguagem inglesa",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia_chunk": "RACIOCÍNIO LÓGICO E ANALÍTICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "RACIOCÍNIO LÓGICO E ANALÍTICO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Raciocínio Lógico",
+        "topicos": [
+          {
+            "nome": "Lógica sentencial (ou proposicional)",
+            "subtopicos": [
+              "Proposições simples e compostas",
+              "Tabelas-verdade",
+              "Equivalências"
+            ]
+          },
+          {
+            "nome": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a estrutura daquelas relações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Compreensão e análise da lógica de uma situação, utilizando as funções intelectuais: raciocínio verbal, raciocínio matemático, raciocínio sequencial, reconhecimento de padrões, orientação espacial e temporal, formação de conceitos, discriminação de elementos Compreensão de dados apresentados em gráficos e tabelas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Problemas de lógica e raciocínio",
+            "subtopicos": [
+              "Problemas de contagem e noções de probabilidade"
+            ]
+          },
+          {
+            "nome": "Falácias",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de estatística: média, moda, mediana e desvio padrão",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia_chunk": "DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Noções de organização administrativa",
+            "subtopicos": [
+              "Centralização, descentralização, concentração e desconcentração",
+              "Administração direta, indireta e funcional",
+              "Autarquias, fundações, empresas públicas e sociedades de economia mista"
+            ]
+          },
+          {
+            "nome": "Ato administrativo",
+            "subtopicos": [
+              "Conceito, requisitos, atributos, classificação e espécies, extinção, nulidades e revogação"
+            ]
+          },
+          {
+            "nome": "Agentes públicos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Disposições constitucionais aplicáveis",
+              "Disposições doutrinárias: conceito",
+              "Disposições doutrinárias: espécies",
+              "Disposições doutrinárias: cargo, emprego e função pública",
+              "Requisição",
+              "Regime jurídico dos servidores públicos federais: admissão, demissão, concurso público, estágio probatório, vencimento básico, acumulação, regime disciplinar, licença e seguridade social"
+            ]
+          },
+          {
+            "nome": "Poderes administrativos",
+            "subtopicos": [
+              "Discricionário, hierárquico, disciplinar, regulamentar e de polícia",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Controle da administração pública",
+            "subtopicos": [
+              "Controle exercido pela administração pública",
+              "Controle judicial",
+              "Controle legislativo"
+            ]
+          },
+          {
+            "nome": "Responsabilidade civil do Estado",
+            "subtopicos": [
+              "Responsabilidade civil do Estado no direito brasileiro",
+              "Responsabilidade por ato comissivo do Estado",
+              "Responsabilidade por omissão do Estado",
+              "Requisitos para a demonstração da responsabilidade do Estado",
+              "Causas excludentes e atenuantes da responsabilidade do Estado"
+            ]
+          },
+          {
+            "nome": "Improbidade Administrativa (Lei nº 8.429/1992)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei de Acesso à Informação (Lei nº 12.527/2011)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Geral de Proteção de Dados (Lei nº 13.709/2018)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo Administrativo Federal (Lei nº 9.784/1999)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia_chunk": "ADMINISTRAÇÃO PÚBLICA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ADMINISTRAÇÃO PÚBLICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "Administração pública: do modelo racional-legal ao paradigma pós-burocrático",
+            "subtopicos": [
+              "Estado oligárquico e patrimonial, Estado autoritário e burocrático, Estado do bem-estar, Estado regulador"
+            ]
+          },
+          {
+            "nome": "Transparência da administração pública",
+            "subtopicos": [
+              "Controle social e cidadania",
+              "Accountability"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": [
+              "Gestão por resultados na produção de serviços públicos",
+              "Gestão por competências"
+            ]
+          },
+          {
+            "nome": "Comunicação na gestão pública e gestão de redes organizacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de governança pública",
+            "subtopicos": []
+          },
+          {
+            "nome": "Governabilidade e governança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Intermediação de interesses (clientelismo, corporativismo e neocorporativismo)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Políticas públicas",
+            "subtopicos": [
+              "O ciclo das políticas públicas: construção de agenda, formulação da política e processo decisório",
+              "Políticas públicas no Estado brasileiro contemporâneo",
+              "Descentralização e democracia",
+              "Participação, atores sociais e controle social",
+              "Gestão local, cidadania e equidade social",
+              "Corrupção e políticas públicas: fatores que influenciam a incidência de corrupção e fatores que promovem a qualidade das políticas públicas"
+            ]
+          },
+          {
+            "nome": "Reformas administrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mudanças institucionais: conselhos, organizações sociais (OS), organização da sociedade civil de interesse público (OSCIP), agência reguladora, agência executiva, consórcios públicos",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 5,
+      "cargo": "CARGO 1: ANALISTA LEGISLATIVO – ATRIBUIÇÃO: PROCESSO LEGISLATIVO E GESTÃO",
+      "materia_chunk": "REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E CÓDIGO DE ÉTICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E CÓDIGO DE ÉTICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Regimento Interno e Legislação da Câmara dos Deputados",
+        "topicos": [
+          {
+            "nome": "Regimento Interno da Câmara dos Deputados",
+            "subtopicos": [
+              "Resolução nº 17/1989 – CD, e alterações"
+            ]
+          },
+          {
+            "nome": "Regimento Comum do Congresso Nacional",
+            "subtopicos": [
+              "Resolução nº 1/1970 – CN, e alterações (arts. 1º a 71 e 134 a 140)",
+              "Resolução nº 3/1990 – CN",
+              "Resolução nº 1/2002 – CN"
+            ]
+          },
+          {
+            "nome": "Código de Ética e Decoro Parlamentar da Câmara dos Deputados",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 6,
+      "cargo": "CARGO 1: ANALISTA LEGISLATIVO – ATRIBUIÇÃO: PROCESSO LEGISLATIVO E GESTÃO",
+      "materia_chunk": "DIREITO CONSTITUCIONAL E PROCESSO LEGISLATIVO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "DIREITO CONSTITUCIONAL E PROCESSO LEGISLATIVO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação",
+        "topicos": [
+          {
+            "nome": "Constituição da República Federativa do Brasil de 1988",
+            "subtopicos": [
+              "Conceito, classificações, princípios fundamentais, emendas constitucionais."
+            ]
+          },
+          {
+            "nome": "Direitos e garantias fundamentais",
+            "subtopicos": [
+              "Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos políticos, partidos políticos."
+            ]
+          },
+          {
+            "nome": "Organização político-administrativa",
+            "subtopicos": [
+              "União, estados, Distrito Federal e municípios."
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Disposições gerais, servidores públicos."
+            ]
+          },
+          {
+            "nome": "Poder Legislativo",
+            "subtopicos": [
+              "Congresso Nacional, Câmara dos Deputados, Senado Federal, deputados e senadores, atribuições, competências, reuniões e comissões."
+            ]
+          },
+          {
+            "nome": "Poder Executivo",
+            "subtopicos": [
+              "Atribuições do presidente da República e dos ministros de Estado."
+            ]
+          },
+          {
+            "nome": "Poder Judiciário",
+            "subtopicos": [
+              "Disposições gerais.",
+              "Órgãos do Poder Judiciário.",
+              "Competências.",
+              "Conselho Nacional de Justiça (CNJ).",
+              "Composição e competência."
+            ]
+          },
+          {
+            "nome": "Funções essenciais à Justiça",
+            "subtopicos": [
+              "Ministério Público, advocacia e defensoria públicas."
+            ]
+          },
+          {
+            "nome": "Defesa do Estado e das Instituições Democráticas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Complementar nº 95/1998",
+            "subtopicos": []
+          },
+          {
+            "nome": "Crimes de Responsabilidade e abuso de autoridade",
+            "subtopicos": [
+              "Lei nº 1.079/1950.",
+              "Lei nº 13.869/2019 (crimes de abuso de autoridade)."
+            ]
+          },
+          {
+            "nome": "Procedimento Legislativo",
+            "subtopicos": [
+              "Tipos de procedimento, ordinário, abreviado, sumário, sumaríssimo, especial e concentrado.",
+              "Etapas e noções básicas.",
+              "Comissões, pareceres, deliberação, votação, sanção e veto."
+            ]
+          },
+          {
+            "nome": "Matérias Legislativas",
+            "subtopicos": [
+              "Projeto de lei ordinária, complementar e delegada.",
+              "Medida provisória.",
+              "Projeto de decreto legislativo e projeto de resolução.",
+              "Proposta de Emenda à Constituição (PEC).",
+              "Indicações, pareceres, requerimentos e vetos.",
+              "Iniciativa Legislativa: Presidência da República, Congresso Nacional, tribunais e cidadãos."
+            ]
+          },
+          {
+            "nome": "Fiscalização Contábil, Financeira e Orçamentária",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo Legislativo Orçamentário",
+            "subtopicos": [
+              "Plano Plurianual (PPA).",
+              "Lei de Diretrizes Orçamentárias (LDO).",
+              "Lei Orçamentária Anual (LOA).",
+              "As interfaces entre LDO, LOA, Lei nº 4.320/1964 e Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal).",
+              "Elaboração e aprovação das leis de matéria orçamentária.",
+              "Proposta orçamentária e sua integração com PPA e LDO.",
+              "Execução financeira e créditos."
+            ]
+          },
+          {
+            "nome": "Conceito e instrumentos de execução financeira",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 7,
+      "cargo": "CARGO 1: ANALISTA LEGISLATIVO – ATRIBUIÇÃO: PROCESSO LEGISLATIVO E GESTÃO",
+      "materia_chunk": "CIÊNCIA POLÍTICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "CIÊNCIA POLÍTICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Ciência Política",
+        "topicos": [
+          {
+            "nome": "Ciência Política",
+            "subtopicos": []
+          },
+          {
+            "nome": "Teoria política",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regimes políticos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistemas e formas de governo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Representação política",
+            "subtopicos": []
+          },
+          {
+            "nome": "Poderes e relações entre poderes",
+            "subtopicos": [
+              "Executivo",
+              "Legislativo",
+              "Judiciário"
+            ]
+          },
+          {
+            "nome": "Sistemas eleitorais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Teoria dos partidos políticos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Organização política brasileira",
+            "subtopicos": []
+          },
+          {
+            "nome": "Política internacional contemporânea",
+            "subtopicos": []
+          },
+          {
+            "nome": "Teoria do Estado e formação dos Estados nacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Formação do Estado brasileiro",
+            "subtopicos": []
+          },
+          {
+            "nome": "História do voto e dos partidos no Brasil",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 8,
+      "cargo": "CARGO 1: ANALISTA LEGISLATIVO – ATRIBUIÇÃO: PROCESSO LEGISLATIVO E GESTÃO",
+      "materia_chunk": "GOVERNANÇA, ESTRATÉGIA E GESTÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "GOVERNANÇA, ESTRATÉGIA E GESTÃO",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração Gerencial",
+        "topicos": [
+          {
+            "nome": "Governança",
+            "subtopicos": [
+              "Histórico da governança corporativa (primórdios e grandes marcos no mundo)",
+              "Conceito de governança corporativa",
+              "Princípios da governança corporativa: Responsabilidade, transparência, equidade e Accountability",
+              "Teorias de governança corporativa: teoria da agência e teoria dos stakeholders",
+              "Abordagem comportamental na governança",
+              "Governança e áreas de controle: controles internos, auditoria e compliance",
+              "Gestão de riscos e integridade"
+            ]
+          },
+          {
+            "nome": "Estratégia",
+            "subtopicos": [
+              "Conceito",
+              "Fundamentos de estratégia",
+              "Condições necessárias para se desenvolver a estratégia",
+              "Questões-chave em estratégia"
+            ]
+          },
+          {
+            "nome": "Planejamento estratégico",
+            "subtopicos": [
+              "Conceitos, métodos e técnicas",
+              "Modelos de gestão e estruturas organizacionais",
+              "Planejamento institucional",
+              "Escolas de planejamento estratégico",
+              "Ferramentas de planejamento estratégico",
+              "Análise SWOT",
+              "Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas",
+              "Indicadores e sistema de medição de desempenho organizacional",
+              "Tipos de indicadores",
+              "Variáveis componentes dos indicadores"
+            ]
+          },
+          {
+            "nome": "Gestão de Pessoas",
+            "subtopicos": [
+              "Comportamento organizacional: relações indivíduo/organização, motivação, desempenho, engajamento, trabalho em equipe e colaboração",
+              "Clima e cultura organizacional, saúde mental e bem-estar",
+              "Desenvolvimento e treinamento de pessoal: levantamento de necessidades, programação, execução e avaliação",
+              "Gestão por competências: abordagens e ferramentas, mapeamento e desenvolvimento das competências",
+              "Desenvolvimento de pessoas como estratégia de gestão e a interação dessa atividade com as demais funções do processo de gestão de pessoas",
+              "Liderança: natureza e estilos de liderança"
+            ]
+          },
+          {
+            "nome": "Gestão por resultados na produção de serviços públicos",
+            "subtopicos": [
+              "Métricas de aferição de resultados",
+              "Trabalho híbrido"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de conflitos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão da mudança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de Projetos",
+            "subtopicos": [
+              "Ciclo de vida e organização do projeto",
+              "Processos de gerenciamento de projetos",
+              "Áreas de conhecimento em gerenciamento de projeto",
+              "Ferramentas e técnicas de apoio ao gerenciamento de projetos",
+              "PMBOK 7ª edição",
+              "Escritório de projetos (PMO)",
+              "Conceitos de gestão de programas e de gestão de portfólio de projetos"
+            ]
+          },
+          {
+            "nome": "Gestão de Processos",
+            "subtopicos": [
+              "Gerenciamento de processos de negócio (BPM CBOK v.4.0)",
+              "Conceitos, modelagem de processos, análise de processos, desenho de processos, gerenciamento de desempenho de processos, transformação de processos, tecnologias de BPM",
+              "Tipologia dos processos",
+              "Hierarquia do processo: macroprocesso, processo, subprocesso, atividades e tarefa",
+              "Reengenharia de processos",
+              "Abordagens de melhoria de processos",
+              "Notação BPMN",
+              "Escritório de processos: conceitos e atuação"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 9,
+      "cargo": "CARGO 1: ANALISTA LEGISLATIVO – ATRIBUIÇÃO: PROCESSO LEGISLATIVO E GESTÃO",
+      "materia_chunk": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO E DADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO E DADOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Conceitos básicos de hardware e software",
+            "subtopicos": [
+              "Funcionamento do computador",
+              "Conhecimentos dos componentes"
+            ]
+          },
+          {
+            "nome": "Noções de sistema operacional (ambiente Windows 10 e 11) e MSOffice M365 (Word, Excel, PowerPoint, OneDrive, Sharepoint e Teams)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e intranet",
+              "Programas de navegação (Microsoft Edge, Mozilla Firefox, Google Chrome e similares)",
+              "Ferramentas de comunicação e colaboração: correio eletrônico (webmail, cliente de e-mail), aplicativos de comunicação (Microsoft Teams, Google Meet)",
+              "Redes sociais",
+              "Computação na nuvem (cloud computing)"
+            ]
+          },
+          {
+            "nome": "Conceitos gerais de segurança e governança digital",
+            "subtopicos": [
+              "Segurança da informação: procedimentos de cópia de segurança (backup), noções de vírus, worms e pragas virtuais",
+              "Programas de proteção (antivírus, firewall, anti-spyware)",
+              "Ameaças digitais (phishing, pharming)"
+            ]
+          },
+          {
+            "nome": "Tecnologias emergentes no setor público",
+            "subtopicos": [
+              "Conceitos básicos de inteligência artificial",
+              "Técnicas de prompts"
+            ]
+          },
+          {
+            "nome": "Ética e responsabilidade digital no serviço público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ciência de Dados",
+            "subtopicos": [
+              "Definição",
+              "Importância",
+              "Aplicações"
+            ]
+          },
+          {
+            "nome": "Dados",
+            "subtopicos": [
+              "Conceitos, atributos, métricas, transformação de dados"
+            ]
+          },
+          {
+            "nome": "Governança da informação",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Constituição Federal",
+        "topicos": [
+          {
+            "nome": "Constituição Federal de 1988",
+            "subtopicos": [
+              "conceito",
+              "contexto histórico",
+              "características",
+              "estrutura do texto"
+            ]
+          },
+          {
+            "nome": "Poder constituinte",
+            "subtopicos": [
+              "conceito",
+              "espécies",
+              "limites"
+            ]
+          },
+          {
+            "nome": "Princípios Fundamentais. Direitos e garantias fundamentais",
+            "subtopicos": [
+              "direitos e deveres individuais e coletivos",
+              "direitos sociais",
+              "nacionalidade",
+              "direitos políticos e partidos políticos"
+            ]
+          },
+          {
+            "nome": "Organização do Estado",
+            "subtopicos": [
+              "organização político-administrativa",
+              "União",
+              "estados",
+              "municípios",
+              "Distrito Federal e territórios",
+              "Intervenção Federal"
+            ]
+          },
+          {
+            "nome": "Administração Pública",
+            "subtopicos": [
+              "disposições gerais",
+              "servidores públicos civis e militares"
+            ]
+          },
+          {
+            "nome": "Poder Legislativo",
+            "subtopicos": [
+              "o Congresso Nacional e suas Casas (atribuições, competências, reuniões e comissões)"
+            ]
+          },
+          {
+            "nome": "Regime jurídico-constitucional dos parlamentares",
+            "subtopicos": []
+          },
+          {
+            "nome": "Processo Legislativo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fiscalização contábil, financeira e orçamentária",
+            "subtopicos": []
+          },
+          {
+            "nome": "Defesa do Estado e das instituições democráticas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Regimento Interno da Câmara dos Deputados",
+            "subtopicos": [
+              "Resolução nº 17/1989 – CD, e alterações – Disposições preliminares: arts. 1º a 13",
+              "Resolução nº 17/1989 – CD, e alterações – Órgãos da Câmara: arts. 14 a 22",
+              "Resolução nº 17/1989 – CD, e alterações – Sessões da Câmara: arts. 65 a 78",
+              "Resolução nº 17/1989 – CD, e alterações – Exercício do mandato: arts. 226 a 243"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 11,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia_chunk": "ADMINISTRAÇÃO GERAL",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ADMINISTRAÇÃO GERAL",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Administração",
+        "topicos": [
+          {
+            "nome": "Noções de Administração",
+            "subtopicos": [
+              "Fundamentos e evolução da administração. Abordagem sistêmica",
+              "Fundamentos, teorias e escolas da administração e seu impacto na gestão de pessoas"
+            ]
+          },
+          {
+            "nome": "Noções de gestão de pessoas",
+            "subtopicos": [
+              "Comportamento organizacional: relações indivíduo/organização, motivação, desempenho, engajamento, trabalho em equipe e colaboração",
+              "Clima e cultura organizacional",
+              "Desenvolvimento e treinamento de pessoal: levantamento de necessidades, programação, execução e avaliação",
+              "Gestão por competências: abordagens e ferramentas, mapeamento e desenvolvimento das competências",
+              "Recrutamento e seleção",
+              "Liderança: natureza e estilos de liderança"
+            ]
+          },
+          {
+            "nome": "Gestão por resultados na produção de serviços públicos",
+            "subtopicos": [
+              "Métricas de aferição de resultados",
+              "Trabalho híbrido"
+            ]
+          },
+          {
+            "nome": "Noções de gestão patrimonial",
+            "subtopicos": [
+              "Controle de bens",
+              "Inventário"
+            ]
+          },
+          {
+            "nome": "Governança e estratégia",
+            "subtopicos": [
+              "Conceito",
+              "Fundamentos de estratégia",
+              "Planejamento estratégico: conceitos, métodos e técnicas",
+              "Ferramentas de planejamento estratégico: Análise SWOT; Balanced scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas",
+              "Indicadores de desempenho: tipos de indicadores; variáveis componentes dos indicadores",
+              "Histórico da governança corporativa (primórdios e grandes marcos no mundo)",
+              "Conceito de governança corporativa",
+              "Governança e áreas de controle: Controles internos, auditoria e compliance",
+              "Gestão de riscos e integridade"
+            ]
+          },
+          {
+            "nome": "Noções de gestão de projetos",
+            "subtopicos": [
+              "Ciclo de vida e organização do projeto",
+              "Ferramentas e técnicas de apoio ao gerenciamento de projetos",
+              "Escritório de projetos (PMO)",
+              "Conceitos de gestão de programas e de gestão de portfólio de projetos"
+            ]
+          },
+          {
+            "nome": "Noções de gestão de processos",
+            "subtopicos": [
+              "Conceitos, modelagem de processos, análise de processos, desenho de processos, gerenciamento de desempenho de processos, transformação de processos, tecnologias de BPM",
+              "Hierarquia do processo: macroprocesso, processo, subprocesso, atividades e tarefa"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 12,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia_chunk": "LICITAÇÕES E CONTRATOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "LICITAÇÕES E CONTRATOS",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Legislação de Licitações e Contratos Administrativos",
+        "topicos": [
+          {
+            "nome": "Lei nº 14.133/2021",
+            "subtopicos": [
+              "Licitação Pública: conceito, princípios, finalidade do procedimento licitatório, fiscalização contratual, modalidades, dispensa e inexigibilidade de licitação"
+            ]
+          },
+          {
+            "nome": "Contratos administrativos",
+            "subtopicos": [
+              "Características do contrato administrativo",
+              "Formalização, gestão e fiscalização do contrato",
+              "Planejamento e fiscalização contratual",
+              "Cláusulas e indicadores de nível de serviço",
+              "Papel do fiscalizador do contrato",
+              "Papel do preposto da contratada",
+              "Acompanhamento da execução contratual",
+              "Registro e notificação de irregularidades",
+              "Penalidades e sanções administrativas",
+              "Tipos de penalidades previstas na Lei nº 14.133/2021",
+              "Aspectos orçamentários e financeiros da execução do contrato",
+              "Equilíbrio econômico-financeiro",
+              "Garantia contratual",
+              "Alteração do objeto: acréscimos e supressões",
+              "Prorrogação do prazo de vigência e de execução",
+              "Ciclo de vida do contrato",
+              "Riscos contratuais e gestão econômico-financeira do contrato"
+            ]
+          },
+          {
+            "nome": "Contratos de terceirização: cautelas em relação à responsabilidade trabalhista",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidades da administração e da contratada",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de contratos administrativos",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 13,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia_chunk": "TECNOLOGIA DA INFORMAÇÃO, DADOS E NOÇOES DE ESTATÍSTICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "TECNOLOGIA DA INFORMAÇÃO, DADOS E NOÇOES DE ESTATÍSTICA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Conceitos básicos de hardware e software",
+            "subtopicos": [
+              "Funcionamento do computador",
+              "Conhecimentos dos componentes"
+            ]
+          },
+          {
+            "nome": "Noções de sistema operacional (ambiente Windows 10 e 11) e MSOffice M365 (Word, Excel, PowerPoint, OneDrive, Sharepoint e Teams)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e intranet",
+              "Programas de navegação (Microsoft Edge, Mozilla Firefox, Google Chrome e similares)",
+              "Ferramentas de comunicação e colaboração: correio eletrônico (webmail, cliente de e-mail), aplicativos de comunicação (Microsoft Teams, Google Meet)",
+              "Redes sociais",
+              "Computação na nuvem (cloud computing)",
+              "Acesso à distância a computadores, transferência de informação e arquivos"
+            ]
+          },
+          {
+            "nome": "Conceitos gerais de segurança e governança digital",
+            "subtopicos": [
+              "Segurança da informação: procedimentos de cópia de segurança (backup), noções de vírus, worms e pragas virtuais",
+              "Programas de proteção (antivírus, firewall, anti-spyware)",
+              "Ameaças digitais (phishing, pharming)"
+            ]
+          },
+          {
+            "nome": "Tecnologias emergentes no setor público",
+            "subtopicos": [
+              "Conceitos básicos de inteligência artificial",
+              "Técnicas de prompts"
+            ]
+          },
+          {
+            "nome": "Ética e responsabilidade digital no serviço público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Dados",
+            "subtopicos": [
+              "Conceitos, atributos, métricas, transformação de dados",
+              "Análise de dados: Agrupamentos; Tendências. Projeções"
+            ]
+          },
+          {
+            "nome": "Governança de dados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Governança da informação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de Big Data",
+            "subtopicos": []
+          },
+          {
+            "nome": "Dados estruturados e não estruturados",
+            "subtopicos": [
+              "Dados abertos",
+              "Coleta, tratamento, armazenamento, integração e recuperação de dados",
+              "Processos de ETL",
+              "Representação de dados numéricos, textuais e estruturados"
+            ]
+          },
+          {
+            "nome": "Noções de bancos de dados relacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Exploração de dados: conceituação e características",
+            "subtopicos": []
+          },
+          {
+            "nome": "Técnicas para pré-processamento de dados",
+            "subtopicos": [
+              "Técnicas e tarefas de mineração de dados",
+              "Classificação",
+              "Regras de associação",
+              "Análise de agrupamentos (clusterização)"
+            ]
+          },
+          {
+            "nome": "Estatística e probabilidade básicas",
+            "subtopicos": [
+              "Medidas de tendência central",
+              "Medidas de dispersão",
+              "Distribuição de probabilidade",
+              "Formulação e validação de hipóteses",
+              "Amostragem, viés e erro",
+              "Normalização e padronização",
+              "Outliers",
+              "Conceitos básicos de probabilidade"
+            ]
+          },
+          {
+            "nome": "Visualização de dados",
+            "subtopicos": [
+              "Princípios de visualização de dados",
+              "Tipos de gráficos (histograma, linha, barra, dispersão, box plot)",
+              "Ferramentas de visualização de dados (Power BI, Tableau e Data Studio)",
+              "Storytelling para visualização de dados"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 14,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia_chunk": "NOÇÕES DE ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "NOÇÕES DE ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "apenas_discursiva": false,
+      "taxonomia_extraida": {
+        "materia": "Programação, execução e controle de recursos orçamentários e financeiros",
+        "topicos": [
+          {
+            "nome": "Programação, execução e controle de recursos orçamentários e financeiros",
+            "subtopicos": [
+              "Pré-empenho, empenho, liquidação e pagamento da despesa",
+              "Guia de Recolhimento da União (GRU)",
+              "Sistemas de informações",
+              "Controle e pagamento de restos a pagar e de despesas de exercícios anteriores",
+              "Suprimento de fundos"
+            ]
+          },
+          {
+            "nome": "Retenção e recolhimento de tributos incidentes sobre bens e serviços",
+            "subtopicos": []
+          }
+        ]
+      }
+    }
+  ],
+  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+}

@@ -12,15 +12,13 @@ Template version: 1.2
 
 ## 2. Pré-requisitos
 
-- `study-rag-agent` — `completed`. Fornece a instância PostgreSQL + pgvector
-  (`study-rag-db`, rede Docker `homelab_default`, porta publicada `5434`,
-  banco `study_rag`) e a tabela `itens_estudo`, à qual as novas tabelas deste
-  projeto se referenciam por FK opcional. Verifique com
-  `./agents/list-status.sh study-rag-agent`.
-- `llm-gateway` — `completed`. Fornece o LiteLLM (`:4000`, modelo
-  `glm-5.3-flash`) usado na Etapa 4 de extração — reaproveitar essa infra,
-  nunca instanciar client para outro provedor. Verifique com
-  `./agents/list-status.sh llm-gateway`.
+- Nenhum projeto do portfólio. O banco da Fase 5 é o Postgres **próprio**
+  deste projeto (`scraper-cebraspe-db`, ver §4 e ADR-026). O cruzamento com o
+  `study-rag-agent` (`itens_estudo`) é uma etapa futura (Etapa 7 do
+  `task.md`), não um pré-requisito.
+- `OpenRouter` — Provedor de inferência para o modelo `z-ai/glm-5.3-flash`
+  usado na Etapa 4 de extração e no Telegram Bot via requisições REST diretas,
+  com observabilidade e telemetria no Langfuse via SDK oficial (OTel, ver ADR-023).
 
 ## 3. Arquitetura
 
@@ -29,11 +27,13 @@ encerrados do CEBRASPE, filtra por ano via slug da URL e mapeia PDFs de
 Edital/Prova/Gabarito → **Downloader** baixa e valida os PDFs, organizando em
 `data/<ano>/CEBRASPE/<orgao>/{Editais,Provas,Gabaritos}/` → **Parser**
 (PyMuPDF) recorta seções validadas manualmente na fase exploratória →
-**Extração LLM** (via `llm-gateway`/`glm-5.3-flash`) produz taxonomia
+**Extração LLM** (via OpenRouter direto / `glm-5.3-flash`) produz taxonomia
 matéria→tópico→subtópico estruturada, com checkpoint humano → **DB writer**
-grava em tabelas novas (star schema: dimensões matéria/tópico/órgão/cargo/ano
-+ fatos concurso/cargo/taxonomia) na mesma instância Postgres do
-`study-rag-agent`, referenciando `itens_estudo` por FK opcional sem alterá-la.
+grava em star schema (dimensões matéria/tópico/órgão/cargo/ano + fatos
+concurso/cargo/taxonomia) no Postgres próprio do projeto
+(`scraper-cebraspe-db`), sem FK para outros projetos — o cruzamento com
+`itens_estudo` do `study-rag-agent` é feito depois por chave natural
+normalizada (ADR-026).
 Provas e Gabaritos baixados entram numa fila `pendente` para um pipeline de
 extração de questões futuro (fora do escopo deste projeto).
 
@@ -47,8 +47,14 @@ extração de questões futuro (fora do escopo deste projeto).
 - python-dotenv
 - requests >=2.31 (download de PDFs na Etapa 3, fora do contexto Playwright)
 - pytest + ruff (CI universal do portfólio)
-- PostgreSQL 16 + pgvector — reaproveitado de `study-rag-agent`, não é
-  serviço próprio deste projeto
+- langfuse >=3,<4 — SDK oficial de observabilidade (OTel), ver ADR-023
+- PostgreSQL 16 (`postgres:16-alpine`) — serviço próprio
+  `scraper-cebraspe-db` no `docker-compose.yml` deste projeto, porta
+  `127.0.0.1:5435`, banco/usuário `cebraspe`, volume
+  `scraper_cebraspe_pgdata` (ADR-026). Sem pgvector por ora
+- sqlite-utils >=3.36 — só pra construir `revisao_piloto/revisao.db` (banco
+  de apoio à revisão humana da Etapa 4); Datasette roda via Docker
+  (`datasetteproject/datasette`), não é dependência do venv
 
 ## 5. Progresso
 
@@ -70,14 +76,38 @@ extração de questões futuro (fora do escopo deste projeto).
       cobrindo slugify, validação de PDF, dedup e resolução de href.
       Auditado ao vivo em 2026-09-19 contra PDFs reais do CEBRASPE — sem
       falhas encontradas no downloader em si.
-- [ ] Fase 4 — Extração híbrida: seções validadas documentadas; parser +
-      chunking; extração LLM com checkpoint humano aprovado em ≥1 edital
-      piloto
-- [ ] Fase 5 — Banco de estatísticas: tabelas novas criadas em `study-rag-db`
-      com FK para `itens_estudo`; `stats_writer.py` grava sem alterar
-      `itens_estudo`; fila `pendente` populada
-- [ ] Fase 6 — Piloto: fluxo ponta a ponta em 1–2 concursos grandes de 2025
-      encerrados, log sem bloqueios/timeouts, base aprovada manualmente
+- [ ] Fase 4 — Extração híbrida: `edital_parser.py` (seção "OBJETOS DE
+      AVALIAÇÃO" + chunking por cargo/matéria) e `taxonomia_extractor.py`
+      (LLM via OpenRouter direto, validado contra `TaxonomiaEdital`) implementados
+      e validados ao vivo contra editais reais de 2025: `PF_25_ADM` (39 chunks),
+      `TCU_25_TEFC` (10 chunks), `IBAMA_25` (33 chunks), `STM_25` (53 chunks)
+      e `CD_25_NS` (15 chunks), totalizando 150 chunks processados com 100% de sucesso.
+      Checkpoint `scripts/revisar_taxonomia_piloto.py` e `scripts/reprocessar_falhas_piloto.py`
+      consolidados em `revisao_piloto/`, com trilha de auditoria completa
+      (`<edital>.auditoria.json`) e navegável via Datasette local e público
+      (`https://datasette.projetoathos.com.br`).
+      Parser robustecido contra quebras reais do Cebraspe: normalização `\xa0`,
+      absorção de títulos multi-linha de cargo, suporte a `CONHECIMENTOS GERAIS`,
+      cabeçalhos de matérias multi-linha com conectivos e prefixos de matéria sem dois-pontos.
+      Validação heurística de-para (`scripts/validar_taxonomia.py`) refinada para
+      eliminar falsos positivos: normalização Unicode NFC (acentos combinantes NFD),
+      mapeamento de ligaduras de fonte (`Ɵ` -> `ti`, `Ō` -> `ft`, `ﬃ` -> `ffi`),
+      cobertura uniforme de tópicos + subtópicos e match por fronteira de palavra `\b`.
+      Relatórios HTML e banco `revisao.db` gerados automaticamente via
+      `scripts/atualizar_revisao.py` (ADR-019). Os 3 alertas residuais foram
+      tratados no pipeline (ADR-025): reinjeção determinística de item omitido
+      pelo LLM e severidade `informativo` para paráfrase leve. A base de 2025
+      fica com 0 alertas bloqueantes e 2 informativos. Suite com 186 testes
+      automatizados aprovados em `pytest`. **Falta a revisão humana em si** (aprovar/reprovar a
+      qualidade da extração) — não marcar `[x]` até isso acontecer.
+- [ ] Fase 5 — Banco de estatísticas: star schema criado no Postgres próprio
+      (`scraper-cebraspe-db`, container já no ar desde 2026-09-21, ADR-026)
+      com chaves naturais normalizadas; `stats_writer.py` grava de forma
+      idempotente; fila `pendente` populada
+- [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
+      parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
+      `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
+      de inferência (0 alertas de validação no `CD_25_NS`). Falta a gravação e aprovação no Postgres (Fase 5).
 
 ## 6. Patterns
 
@@ -88,9 +118,10 @@ extração de questões futuro (fora do escopo deste projeto).
   para o próximo — nunca aborta o lote inteiro.
 - Slugify determinístico (acentos/espaços → forma normalizada única) para
   nomes de órgão usados em paths de disco.
-- Toda chamada LLM passa pelo `llm-gateway` (`:4000`, `glm-5.3-flash`).
-- Toda tabela nova referencia `itens_estudo` por FK opcional, nunca duplica
-  ou altera suas colunas.
+- Toda chamada LLM é feita diretamente à API REST do OpenRouter (`z-ai/glm-5.3-flash`).
+- Banco próprio, sem FK entre projetos: dimensões carregam chave natural
+  normalizada (`slug`, `materia_normalizada`, tópico normalizado) para o
+  cruzamento futuro com `itens_estudo` via tabela de mapeamento (ADR-026).
 - Priorização de cargo grande (INSS, PF, PRF, ...) também é feita pelo slug
   da URL, dividido em segmentos por `_`/`-` e comparado contra um set de
   keywords — nunca com `\b` de regex direto no slug (underscore é `\w`, não
@@ -113,6 +144,117 @@ extração de questões futuro (fora do escopo deste projeto).
   `urljoin(page.url, href)` antes de comparar contra a URL base — o atributo
   cru do HTML pode vir relativo, e o `.href` (propriedade JS resolvida) não
   é o que `get_attribute` devolve.
+- Cabeçalho de matéria/cargo em edital sempre casado com um padrão que
+  aceita dígitos, vírgula e parênteses no meio (`[A-ZÀ-Ú0-9 /,()\-]`), não
+  só letras/espaço/hífen — títulos reais como `CARGO 7: MÉDICO CLÍNICO` e
+  `ADMINISTRAÇÃO FINANCEIRA, ORÇAMENTÁRIA E ORÇAMENTO PÚBLICO:` têm esses
+  caracteres.
+- Chunking de edital sempre nos dois níveis (cargo E matéria), nunca só um —
+  cargos de especialidade (ex: áreas médicas) não têm matéria nomeada à
+  parte, o conteúdo vem direto embaixo do cabeçalho `CARGO N: <nome>`.
+- Checagem de layout multi-coluna (`checar_ordem_confiavel`) só considera
+  blocos de texto com tamanho mínimo (`TAMANHO_MINIMO_BLOCO_COLUNA`) — um
+  bloco curto isolado (título, assinatura) tem x0 diferente da margem do
+  corpo sem indicar colunas paralelas de conteúdo.
+- Chamada ao modelo de raciocínio (`glm-5.3-flash`) sempre com
+  `max_tokens` generoso — um orçamento baixo é consumido pelo `reasoning_content`
+  antes do `content` final, que volta `null` mesmo sem erro de rede.
+- Chaves do OpenRouter são dedicadas por serviço (`TELEGRAM_OPENROUTER_API_KEY`
+  e `OPENROUTER_API_KEY`), mapeadas a projetos independentes no Langfuse.
+- Todo passo derivado do checkpoint de revisão (validação de-para, relatório
+  HTML, banco Datasette, restart do container) é acionado automaticamente
+  ao final do pipeline de extração/reprocessamento
+  (`scripts/atualizar_revisao.py`, chamado por `revisar_taxonomia_piloto.py`
+  e `reprocessar_falhas_piloto.py`) — nunca deixado como passo manual
+  separado. O restart do Datasette é best-effort (loga aviso, nunca lança
+  exceção) pra não derrubar o pipeline de extração por causa de
+  infraestrutura local indisponível.
+- Todo chunk carrega `tipo_conhecimento`/`nivel` herdados do cabeçalho de
+  bloco `CONHECIMENTOS BÁSICOS/ESPECÍFICOS PARA ... NÍVEL SUPERIOR/MÉDIO`
+  (`PADRAO_BLOCO`), além de `cargo_numero`, `materia_normalizada` e
+  `apenas_discursiva` (lista única em `CAMPOS_CLASSIFICACAO_CHUNK`). O
+  concurso (`slug`/`orgao`/`ano`) vem do manifesto do downloader
+  (`resolver_concurso_do_pdf`), não do path em disco (a pasta é por órgão).
+  Esses campos vêm só do parser/manifesto, então extração antiga é
+  completada com `scripts/backfill_classificacao_chunks.py` sem chamar o
+  LLM (ADR-020).
+- Falha *semântica* do LLM (resposta estruturalmente válida mas com
+  conteúdo errado — ex: `nome` de tópico igual ao numeral do item da
+  fonte) é corrigida por reparo local determinístico quando o dado pra
+  corrigir já está disponível (texto-fonte), nunca por repetir a mesma
+  chamada ao LLM torcendo por sorte — sem contexto do erro, uma repetição
+  não tem garantia de corrigir e não deixa rastro distinto de um retry por
+  falha de rede. Ver ADR-021.
+- Toda falha na chamada ao OpenRouter (`_chamar_llm_uma_vez`) devolve um
+  status técnico específico (`falha_timeout`, `falha_conexao`,
+  `falha_rate_limit`, `falha_http`, `falha_rede`, `falha_conteudo_vazio`,
+  `falha_parse_json`, `falha_validacao_schema`), nunca um `motivo_falha`
+  genérico — persistido no `status` do chunk e replicado em
+  `metadata["tipo_erro"]` no Langfuse, pra distinguir falha transitória
+  (timeout/conexão/rate-limit, retry tende a resolver) de falha que se
+  repete com os mesmos parâmetros (conteúdo vazio/parse/schema, retry
+  sozinho não ajuda). Ver ADR-022.
+- Telemetria de observabilidade exclusivamente via SDK oficial `langfuse` (OTel),
+  com observation (`generation`) aberta imediatamente antes da chamada HTTP para
+  medição precisa da latência real de rede/inferência. Ver ADR-023.
+- Normalização de whitespace no PyMuPDF: substituir sempre espaços não-separáveis
+  (`\xa0`) por espaço ASCII (`" "`) logo na extração de texto das páginas (`extrair_texto_paginas`
+  e detecção de cargo preliminar). PDFs do CEBRASPE contêm `\xa0` nos cabeçalhos
+  de seções e blocos, o que faz buscas literais e regexes falharem silenciosamente.
+- Títulos de cargos multi-linha sem itens no parser: quando um cabeçalho de cargo
+  quebra linhas no layout do PDF e o bloco subsequente não contém itens
+  numerados (`extrair_itens_numerados`), o texto deve ser acumulado ao rótulo do
+  cargo (`f"{cargo_atual} {texto_bloco}"`), evitando criar chunks vazios sem matéria.
+- Variações de blocos de matérias: mapear `CONHECIMENTOS GERAIS` para tipo básico
+  (`"basico"`) e aceitar prefixação numérica de itens no edital (`PADRAO_BLOCO`
+  com `(?:\d+(?:\.\d+)*\s+)?`).
+- Colons parentéticos em matérias: cabeçalhos com restrição entre parênteses
+  (ex.: `LÍNGUA INGLESA (APENAS PARA O CARGO 3: ...):`) exigem regex que capture
+  o parêntese fechado antes do colon delimitador (`(?:\s*\([^)]*\))?:`), impedindo
+  que o colon interno trunque o nome da matéria.
+- Detecção determinística de cargo e nível único: editais com cargo único (ex.:
+  `TCU_25_TEFC`) não repetem cargos nem declaração de nível na seção de Objetos
+  de Avaliação; inspecionar as páginas preliminares (`DO CARGO DE...` e `REQUISITOS:`)
+  para injetar `cargo_padrao` e `nivel_padrao` automaticamente no chunking.
+- Resiliência na validação de taxonomia contra PDFs:
+  1. Compor caracteres Unicode via `unicodedata.normalize("NFC", texto)` antes
+     de remover pontuação (`[^\w]`), evitando que acentos combinantes decompostos
+     (NFD) sejam descartados.
+  2. Substituir ligaduras tipográficas corrompidas de fontes do CEBRASPE
+     (`MAPA_LIGATURAS_FONTES`: `Ɵ`→`ti`, `Ō`→`ft`, `ﬃ`→`ffi`, `ﬁ`→`fi`, etc.).
+  3. Validar cobertura de itens numerados contra tópicos OU subtópicos
+     (`todos_extraidos`), reconhecendo quando o LLM subordina itens como subtópicos.
+  4. Permitir casamento por fronteira de palavras (`\b`) e igualdade exata para
+     termos com 3 ou mais caracteres (ex.: "Crime", "Atos"), reservando o piso
+     de 6 caracteres apenas para match de substring livre.
+  5. Só classificar tópico como `topico_extra` se ele não tiver correspondência
+     nem estiver contido no texto integral normalizado do chunk (`texto_fonte_norm`).
+- Cabeçalhos de matérias multi-linha em editais: `PADRAO_MATERIA` só aceita quebras
+  de linha se a linha anterior terminar com conectivos (`E|OU|DE|DA|DO|DOS|DAS` ou vírgula),
+  evitando incorporar indevidamente títulos de cargo em layouts multi-linha como matérias falsas.
+- Matérias sem dois-pontos delimitadores antes do item 1: quando um bloco sob cabeçalho
+  de cargo contém itens numerados imediatos mas possui um prefixo em caixa alta antes do primeiro
+  item (ex: `NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO ... 1`), o prefixo é
+  extraído como nome da matéria e o corpo do chunk inicia a partir do item 1, evitando que a
+  matéria receba o nome do cargo ou perca seu conteúdo.
+- Filtro de editais de abertura no crawler: casar sempre com fronteira de palavra
+  `\bABERTURA\b` (`re.search(r'EDITAL.*?\bABERTURA\b', text)`), impedindo que editais
+  administrativos de retificação com palavras como "reabertura" sejam classificados
+  como editais de abertura.
+
+- Item de primeiro nível omitido pelo LLM é reinjetado localmente a partir
+  do texto-fonte (`reinjetar_itens_ausentes`, logo depois do reparo de nome
+  numérico), sem nova chamada ao LLM, e só quando o item é simples (sem
+  subitens `N.1`, ≤ 150 chars). Item complexo continua `topico_ausente`
+  para revisão humana. Ver ADR-025.
+- Alerta de validação tem severidade: paráfrase leve (qualificador entre
+  parênteses, erro de digitação da fonte corrigido pelo LLM, similaridade
+  ≥ 0,92) vira `topico_divergencia_leve` `informativo`, visível mas fora de
+  `total_alertas`. Reparo e validador usam a mesma comparação textual
+  (`src/comparacao_texto.py`).
+- Assinatura do fim da seção (nome + cargo do signatário) é removida em
+  `_limpar_ruido_edital` ancorando no **cargo** (`PADRAO_CARGO_ASSINATURA`)
+  no fim do texto, nunca no nome em caixa alta.
 
 ## 7. Anti-patterns
 
@@ -129,18 +271,84 @@ extração de questões futuro (fora do escopo deste projeto).
 - Nunca modelar tópico/subtópico como duas listas paralelas — perde a
   hierarquia que a Fase 5 precisa para estatística.
 - Nunca reabrir a decisão de tecnologia de banco — PostgreSQL 16 já é o
-  padrão do portfólio e a instância do `study-rag-agent` já está disponível.
-- Nunca hardcodar credenciais do LiteLLM/Postgres no código — usar `.env`
+  padrão do portfólio.
+- Nunca gravar tabelas deste projeto no `study-rag-db` nem criar FK para
+  `itens_estudo` — o `study-rag-db` tem ciclo de vida, credenciais e
+  reconfiguração próprios, e acoplar os dois quebra um a cada mudança do
+  outro. Cruzamento só por chave natural na Etapa 7 (ADR-026).
+- Nunca hardcodar credenciais de API/Postgres no código — usar `.env`
   (ver Segurança).
 - Nunca usar `\b` de regex direto sobre um slug com underscore para detectar
   keywords — `_` é `\w`, então `\bINSS\b` não dispara em `INSS_25`. Dividir
   o slug em segmentos primeiro.
+- Nunca casar cabeçalho de matéria/cargo em edital só com letras/espaço/
+  hífen — perde silenciosamente todo cabeçalho com dígito (`CARGO N:`),
+  vírgula ou parênteses, e o conteúdo correspondente é engolido pelo chunk
+  anterior sem erro nenhum. Achado ao vivo em 2026-09-19 (chunk de 41850
+  chars engolindo ~14 cargos), ver seção 12 e `LESSONS.md`.
+- Nunca chamar modelo de raciocínio com `max_tokens` baixo pra `glm-5.3-flash` — o
+  `content` volta `null` mesmo sem erro de rede se o orçamento acabar no
+  `reasoning_content`.
+- Nunca usar SDKs pesados de LLM (como litellm ou langchain) na chamada de inferência
+  — chamadas diretas REST via `requests`/`httpx` mantêm a stack enxuta e confiável.
+  Isso se refere à chamada de inferência do modelo; para observabilidade, usa-se
+  o SDK oficial do Langfuse (OTel, ver ADR-023).
+- Nunca enviar telemetria via `POST /api/public/ingestion` (REST manual) —
+  endpoint legado entra em sunset em 2026-11-16, passando a aceitar apenas scores
+  e rejeitando traces e generations. Usar o SDK oficial `langfuse` (ADR-023).
+- Nunca deixar um passo do pipeline (extração → artefatos derivados) como
+  "rode manualmente depois" — este projeto já foi mordido 2x por isso
+  (`run()` nunca chamando `download_concurso_pdfs`, achado de 2026-09-19;
+  href relativo silenciosamente descartando 100% dos links, ADR-008): a
+  falha de esquecer o passo manual não lança erro, só deixa o artefato
+  seguinte desatualizado sem sinal nenhum. Ver ADR-019.
+- Nunca identificar matéria só pelo nome (nem por `(cargo, materia)`). O
+  bloco básico repete os mesmos nomes (LÍNGUA PORTUGUESA, RACIOCÍNIO
+  LÓGICO, ...) em superior e médio com conteúdo diferente. A chave mínima é
+  `(concurso, tipo_conhecimento, nivel, cargo, materia)`. Ver ADR-020 e
+  `LESSONS.md`.
+- Nunca deduzir o concurso pelo path `data/<ano>/CEBRASPE/<orgao>/`: dois
+  concursos do mesmo órgão no mesmo ano dividem a pasta. O slug só existe
+  na URL de origem guardada no manifesto.
+- Nunca aceitar `nome` de tópico puramente numérico como extração válida —
+  `Topico.nome: str` do Pydantic aceita "1" numa boa (estruturalmente
+  válido), mas é sinal de que o LLM confundiu o numeral do item da fonte
+  com o texto do tópico, não um tópico legítimo. Achado real: 2 chunks
+  inteiros (Contabilidade) com `status="sucesso"` e todo `nome` numérico,
+  86 dos 88 alertas de validação de um teste completo. Ver ADR-021.
+- Nunca capturar `requests.RequestException`/erro de parse de forma
+  genérica e devolver um único `motivo_falha=None` para tudo — timeout,
+  conexão recusada, HTTP 429/5xx, conteúdo vazio e schema inválido são
+  causas-raiz diferentes com decisões de reprocessamento diferentes
+  (transitório vs. precisa de ajuste); colapsar tudo em `status="falha"`
+  esconde isso do relatório HTML/Datasette e do Langfuse. Ver ADR-022.
+- Nunca aplicar `[^\w]` ou normalização NFKD direta sobre texto bruto extraído de
+  PDF sem antes compor caracteres combinantes via `NFC` — caracteres em NFD
+  (como `i` + `\u0301`) perdem o acento isolado e geram divergência com a saída do LLM.
+- Nunca validar cobertura de itens do edital comparando apenas o campo
+  `topico["nome"]` — o modelo frequentemente estrutura itens como `subtopicos`,
+  e ignorá-los gera falsos positivos em massa de `topico_ausente`.
+- Nunca emitir alerta de `topico_extra` apenas por ausência de casamento direto
+  com um item numerado individual — se o termo constar no corpo do texto-fonte
+  do chunk, trata-se de um tópico válido do texto programático, não alucinação.
+- Nunca criar um chunk novo diretamente a partir de quebra de linha de cabeçalho
+  de cargo sem checar se o bloco intermediário possui itens numerados programáticos.
+
+- Nunca silenciar um alerta de validação sem antes perguntar se o dado está
+  errado. Perda de conteúdo (item omitido) se corrige no dado; paráfrase
+  explicável se rebaixa para informativo. Canonicalizar o nome extraído
+  para o texto literal da fonte reintroduz erro de digitação do PDF. Ver
+  ADR-025.
+- Nunca usar casamento tolerante contra o texto-fonte **inteiro** numa
+  checagem por item: um tópico parafraseado de um item passa a "cobrir" a
+  omissão de outro item do mesmo chunk.
 
 ## 8. Segurança
 
-- Credenciais: `POSTGRES_HOST/PORT/DB/USER/PASSWORD` (apontando para
-  `study-rag-db`) e `LITELLM_BASE_URL`/`LITELLM_API_KEY` — todas em `.env`
-  local, nunca hardcoded.
+- Credenciais: `POSTGRES_HOST/PORT/DB/USER/PASSWORD` (apontando para o
+  banco próprio `scraper-cebraspe-db`; a senha não tem default no compose —
+  vazia, o container não sobe) e `OPENROUTER_API_KEY`/`TELEGRAM_OPENROUTER_API_KEY` — todas
+  em `.env` local, nunca hardcoded.
 - `.env` está no `.gitignore` deste projeto.
 - Nunca commitar PDFs baixados (`data/`) nem logs (`logs/`) — ambos no
   `.gitignore`.
@@ -153,12 +361,55 @@ extração de questões futuro (fora do escopo deste projeto).
 
 1. `python3 -m venv venv && source venv/bin/activate`
 2. `pip install -r requirements.txt && playwright install chromium`
-3. `cp .env.example .env` e preencher com as credenciais do `study-rag-db`
-   (host `localhost` + porta `5434` se rodando fora de container; host
-   `study-rag-db` + porta `5432` se este projeto vier a rodar dentro da rede
-   `homelab_default`)
+3. `cp .env.example .env` e preencher `POSTGRES_PASSWORD` (host `localhost`
+   + porta `5435` fora de container; host `scraper-cebraspe-db` + porta
+   `5432` dentro da rede `homelab_default`)
+3.1. `docker compose up -d scraper-cebraspe-db` — sobe o Postgres próprio
+   (a 1ª subida cria banco/usuário a partir do `.env`; trocar a senha depois
+   exige `ALTER USER`, o volume já está inicializado)
 4. `python -m src.spider` — roda a Etapa 2 isolada para validação
 5. `pytest` para validar (spider + downloader)
+
+## 9.2. Revisão via Datasette (Etapa 4 — checkpoint de revisão humana)
+
+Navega a trilha de auditoria (entrada/saída do parser+chunking+LLM) e a
+taxonomia extraída lado a lado, sem frontend próprio. Exposto externamente
+via rede `homelab_default` com Traefik e Cloudflare Tunnel, acessível em
+`https://datasette.projetoathos.com.br`, protegido por Cloudflare Zero Trust
+(SSO restrito a `athoslobin@hotmail.com`). **Não é** o banco de produção
+da Fase 5 (esse é o Postgres próprio `scraper-cebraspe-db`).
+
+Além das tabelas (`chunks`/`taxonomia_topicos`/`taxonomia_subtopicos`/
+`alertas_validacao`), o mesmo container serve em `/relatorio/index.html`
+um **relatório HTML de página única por edital** — texto-fonte e taxonomia
+extraída lado a lado por chunk, com os alertas de
+`scripts/validar_taxonomia.py` destacados — pra não precisar alternar entre
+tabelas pra fazer o de-para manualmente (ver §12, decisão de 2026-09-21).
+
+**Não é preciso rodar nada manualmente depois de uma extração.**
+`scripts/revisar_taxonomia_piloto.py` e `scripts/reprocessar_falhas_piloto.py`
+chamam `scripts/atualizar_revisao.py` automaticamente ao final — validação
+de-para, relatório HTML, banco `revisao.db` e restart do container Datasette
+ficam sempre em dia com o `<edital>.json` mais recente, sem passo manual
+(ver ADR-019). O restart é best-effort: se o Docker/container não estiver
+disponível, só loga aviso, nunca derruba o pipeline de extração.
+
+Setup inicial (subir o container pela primeira vez) ou re-sincronizar os
+artefatos depois de editar um `.json` na mão, fora do pipeline de extração:
+
+```bash
+cd /home/athos/homelab/scraper_cebraspe
+python -m scripts.atualizar_revisao   # roda validação + relatório + banco + restart em sequência
+docker compose up -d                  # 1ª vez, ou depois de mudar o `command` do docker-compose.yml
+# Acesse: https://datasette.projetoathos.com.br (tabelas)
+# e https://datasette.projetoathos.com.br/relatorio/index.html (página única)
+```
+
+Mudou o `command` do `docker-compose.yml` (ex.: nova flag `--static`)?
+`restart` (automático ou manual) não recarrega — precisa recriar o
+container: `docker compose up -d`.
+
+`docker compose down` para derrubar.
 
 ## 9.1. Uso do downloader (Etapa 3)
 
@@ -179,8 +430,29 @@ resultado = download_concurso_pdfs(
 - `data/<ano>/CEBRASPE/<orgao>/{Editais,Provas,Gabaritos}/` — PDFs baixados
   (ignorado pelo git, volume grande demais)
 - `logs/scraper_cebraspe.log` — log de execução (ignorado)
-- Tabelas novas em `study-rag-db` (star schema de estatísticas de concursos)
+- Tabelas em `scraper-cebraspe-db` (Postgres próprio, star schema de
+  estatísticas de concursos)
 - `task.md` — roteiro de execução por etapas (versionado)
+- `revisao_piloto/<edital>.json` + `<edital>.auditoria.json` — resultado da
+  extração e trilha de auditoria de entrada/saída por edital (versionado,
+  conteúdo público de edital)
+- `revisao_piloto/<edital>.validacao.json` — alertas heurísticos de
+  `scripts/validar_taxonomia.py` (candidatos a tópico ausente/extra por
+  chunk; versionado, sempre regenerável)
+- `revisao_piloto/revisao.db` — banco SQLite derivado dos JSONs acima, servido
+  via Datasette (ignorado pelo git, sempre regenerável por
+  `scripts/gerar_db_datasette.py`)
+- `revisao_piloto/relatorio/*.html` — relatório de revisão de página única
+  por edital + índice (ignorado pelo git, sempre regenerável por
+  `scripts/gerar_relatorio_revisao.py`), servido como estático pelo
+  Datasette (ver §9.2)
+- `docker-compose.yml` — serviço Datasette local para revisão (ver §9.2)
+- `scripts/reconciliar_taxonomia.py [json ...]` — aplica a reinjeção de
+  item ausente (ADR-025) a extrações já salvas, sem LLM, com backup
+  `.pre_reconciliacao.bak`
+- `scripts/backfill_classificacao_chunks.py <pdf> [json]` — completa
+  concurso/nível/tipo de conhecimento em extração já feita, sem LLM
+  (ADR-020)
 
 ## 11. Documentação
 
@@ -191,7 +463,10 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-026). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
+
 **Decisão:** Extrair o ano do sufixo `_YY` no slug da URL do concurso (ex:
 `_25` → 2025), em vez de regex `2025` no texto do link.
 **Motivo:** Teste ao vivo no site confirmou que o texto de cada card é sempre
@@ -210,6 +485,9 @@ Prova e Gabarito só existem para concursos já realizados.
 objetivo de PDFs de prova/gabarito.
 
 ### 2026-09-19 — Novas tabelas na mesma instância Postgres do study-rag-agent
+
+> **Substituída em 2026-09-21 pelo ADR-026** (banco próprio) — ver a última
+> entrada deste log.
 **Decisão:** Tabelas de estatísticas deste projeto vivem em `study-rag-db`
 (mesma instância, rede `homelab_default`), desenhadas como star schema, com
 FK opcional para `itens_estudo`.
@@ -310,6 +588,428 @@ PDFs reais de um desses concursos (`AGSUS_25_CCE`).
 trade-off. Reforça a lição já registrada em `LESSONS.md` de sempre validar
 o crawler contra o DOM real, nunca assumir a forma de um atributo HTML sem
 inspecionar ao vivo.
+
+### 2026-09-19 — Etapa 4: só a seção "OBJETOS DE AVALIAÇÃO" vale a pena extrair
+**Decisão:** `edital_parser.py` recorta exclusivamente a seção "OBJETOS DE
+AVALIAÇÃO (HABILIDADES E CONHECIMENTOS)" do edital (usa o texto do
+marcador, não o número do item — varia por concurso).
+**Motivo:** Análise manual do edital real `PF_25_ADM` (68 páginas): é a
+única seção com estrutura matéria→tópico→subtópico, o dado que a Fase 5
+(banco de estatísticas) precisa. Cronograma, critérios de desempate e
+requisitos/atividades por cargo (vistos nas páginas 1–3 e 63–64) são dados
+operacionais do concurso — não conteúdo de estudo — e não servem ao
+objetivo do projeto (cruzar estatísticas de incidência de tópico por
+matéria/ano para planos de estudo).
+**Alternativas descartadas:** Extrair também requisitos/atividades por
+cargo (dá pra montar uma dimensão "cargo" mais rica) — descartado por
+agora porque foge do escopo de "conteúdo de estudo" da Etapa 4; pode virar
+uma dimensão auxiliar na Fase 5 se fizer falta, sem precisar mudar o parser.
+
+### 2026-09-19 — Chunking em dois níveis (cargo + matéria), não só matéria
+**Decisão:** `dividir_por_cargo_e_materia` percorre cabeçalhos de cargo
+(`CARGO N: <nome>`) e de matéria juntos, mantendo o cargo corrente; gera 1
+chunk por matéria nomeada, e 1 chunk pelo próprio cargo quando ele não tem
+matéria nomeada à parte (especialidades médicas: o cabeçalho do cargo já é
+o rótulo do conteúdo).
+**Motivo:** O `task.md` pede chunking "por cargo, ... disciplinas" — os
+dois eixos coexistem de verdade no mesmo edital (ver achado abaixo e em
+`LESSONS.md`): cargos administrativos agrupam várias matérias nomeadas;
+cargos de especialidade (Médico Clínico, Médico Ortopedista, ...) não têm
+matéria própria, só o nome do cargo mesmo. Um chunking só-por-matéria perde
+a associação com o cargo (necessária pra Fase 5 relacionar taxonomia →
+cargo → concurso); um chunking só-por-cargo perde a granularidade de
+matéria nos cargos administrativos.
+**Alternativas descartadas:** Chunking só por matéria (primeira versão) —
+comprovadamente quebrado: perdeu silenciosamente ~14 cargos inteiros dentro
+de 1 chunk de 41850 chars, por o regex de matéria não reconhecer cabeçalhos
+com dígito/vírgula/parênteses. Ver `LESSONS.md`.
+
+### 2026-09-19 — Extração LLM via `requests` direto, não LangChain
+**Decisão:** `taxonomia_extractor.py` faz POST direto (`requests`) para
+`{LITELLM_BASE_URL}/chat/completions`, sem adicionar `langchain-openai`
+como dependência nova.
+**Motivo:** O `study-rag-agent` usa `langchain_openai.ChatOpenAI` contra o
+mesmo LiteLLM, mas ele já depende de LangChain pro grafo inteiro (LangGraph).
+O `scraper_cebraspe` tem stack enxuta e já depende de `requests` (Etapa 3).
+O LiteLLM expõe um schema compatível com a API de chat da OpenAI — não há
+ganho em trazer uma dependência pesada só para 1 chamada de extração.
+**Alternativas descartadas:** `langchain-openai` (mesmo padrão do
+`study-rag-agent`) — rejeitado por trazer uma dependência nova grande sem
+necessidade; SDK oficial `openai` — mesma objeção, `requests` já resolve.
+
+### 2026-09-19 — Chave de API do LiteLLM: virtual key gerada, nunca a master key
+**Decisão:** Gerada uma virtual key (`key_alias: scraper-cebraspe`, escopo
+`models: ["glm-5.3-flash"]`) via `POST {LITELLM_BASE_URL}/key/generate` com
+a master key do `study-rag-agent`, salva só em `.env` local (gitignored).
+**Motivo:** A master key do LiteLLM está documentada em texto puro no
+`CLAUDE.md`/`docker-compose.yml` do `study-rag-agent` (issue de segurança
+conhecida, fora do escopo deste projeto — ver seção 8). Usá-la direto nas
+chamadas de extração deste projeto propagaria esse problema; uma virtual
+key escopada segue o mesmo padrão já usado lá para o "Hermes Agent".
+**Alternativas descartadas:** Usar a master key direto — descartado por
+segurança (nenhum motivo técnico pra precisar de uma master key só pra
+chamar 1 modelo).
+
+### 2026-09-19 — `run()` nunca chamava o downloader; registro de idempotência mentia
+**Decisão:** `CebraspeSpider.run()` agora chama `download_concurso_pdfs`
+logo após `map_pdf_links` e só marca o slug como processado
+(`mark_processed`) depois do download rodar — nunca antes.
+**Motivo:** Auditoria ao vivo (`python -m src.spider` rodado pelo usuário)
+mostrou que `run()` mapeava os PDFs, logava as contagens e já marcava o
+concurso como "processado" em `data/processed_concursos.json` **sem nunca
+chamar `download_concurso_pdfs`** — a Etapa 2 e a Etapa 3 nunca tinham sido
+ligadas, apesar de ambas constarem como `[x]` no Progresso. Resultado real
+encontrado: 13 slugs no registro, mas só 1 (`PF_25_ADM`) com pasta de
+download de verdade; os outros 12 (`AGSUS_25_CCE`, `TCU_25_TEFC`, etc.)
+seriam pulados para sempre em execuções futuras sem nunca ter baixado nada.
+Registro limpo manualmente para conter só `PF_25_ADM`.
+**Efeito colateral corrigido junto:** nessa mesma auditoria, o
+`map_pdf_links` também tinha regredido — voltou a descartar o texto do link
+de cada prova (guardava só a URL, perdendo a distinção CB1/CB2/DISC descrita
+na decisão de 2026-09-19 sobre cargo↔prova) e a logar só contagens
+agregadas, sem sinalizar PDFs não classificados. Reaplicado o formato
+`{"url": ..., "texto": ...}` e o log `[PROVA-PDF]`/`nao_classificados`.
+Como `download_concurso_pdfs` esperava `list[str]` de URLs, ele foi ajustado
+para aceitar também `list[dict]` nessa forma e persistir o texto em
+`<concurso_dir>/provas_texto_link.json` (chave = nome do arquivo baixado),
+para a Etapa 4 consumir depois sem precisar reconstruir a informação a
+partir do PDF (que não a contém).
+**Risco de processo identificado:** este diretório nunca foi commitado em
+nenhuma branch (raiz do `homelab` está com `scraper_cebraspe/` totalmente
+untracked); existe uma worktree separada (`worktree-scraper-cebraspe-etapa3`)
+com commits próprios da Etapa 2/3 que nunca foi mergeada de volta. É provável
+que essa regressão tenha entrado ao sincronizar arquivos entre as duas
+cópias sem levar em conta o ajuste de `texto`. Recomendado começar a
+commitar este projeto para não perder trabalho de novo (ver aviso ao
+usuário na conversa).
+**Alternativas descartadas:** Nenhuma — bug de wiring, sem trade-off.
+
+### 2026-09-20 — Trilha de auditoria de entrada/saída do parser+extractor
+**Decisão:** `scripts/revisar_taxonomia_piloto.py` agora salva, além do
+`<edital>.json` de resultado, um `<edital>.auditoria.json` com os metadados
+do corte de seção (páginas/chars totais do PDF, offsets, se achou o
+marcador de fim) e, por chunk, cargo/matéria/offsets/tamanho/**o texto
+exato enviado ao LLM**/status. `ChunkTaxonomia` ganhou `offset_inicio`/
+`offset_fim` e um `chunk_index` estável (posição na lista de chunking) foi
+adicionado a `auditoria_chunks`, `resultados` e `chunks_com_falha` pra ligar
+os dois arquivos sem depender do par `(cargo, materia)` como string.
+**Motivo:** `logs/scraper_cebraspe.log` só registrava contagens agregadas
+(quantos chunks, quantas falhas) — não dava pra auditar depois se o corte
+da seção "OBJETOS DE AVALIAÇÃO" descartou/reteve o texto certo, nem
+inspecionar o texto que efetivamente foi pro LLM em cada chunk que falhou.
+**Alternativas descartadas:** Registrar isso só no log (texto de 39 chunks
+por edital não cabe legível em log de linha única); casar auditoria↔resultado
+só por `(cargo, materia)` — frágil pra cargos com matéria repetida/nula.
+
+### 2026-09-20 — Revisão navegável via Datasette e Traefik/Cloudflare Tunnel
+**Decisão:** Novo `scripts/gerar_db_datasette.py` lê todos os pares
+`revisao_piloto/<edital>.json`+`<edital>.auditoria.json` (funciona também
+com o arquivo legado sem auditoria) e reconstrói do zero
+`revisao_piloto/revisao.db` (`sqlite-utils`, tabelas `editais`/`chunks`/
+`taxonomia_topicos`/`taxonomia_subtopicos`, FTS5 habilitado em texto de
+chunk e nomes de tópico/subtópico). Novo `docker-compose.yml` sobe
+`datasetteproject/datasette` servindo esse banco. Antes restrito ao
+`127.0.0.1:8011`, a pedido do usuário o serviço foi exposto via Traefik
+na rede `homelab_default` e associado ao Cloudflare Tunnel em
+`datasette.projetoathos.com.br`, com autenticação restrita via SSO para
+o email do usuário.
+**Motivo:** Ferramenta de apoio ao checkpoint de revisão humana da Etapa 4
+(`status_revisao_humana: PENDENTE`) — precisa navegar/comparar entrada
+(chunk enviado ao LLM) e saída (taxonomia extraída) lado a lado sem escrever
+frontend. Reconstrução completa (não incremental) porque na escala do
+piloto (poucos editais) upsert só adiciona risco de linha obsoleta sem
+ganho. A exposição via Cloudflare Tunnel foi necessária para permitir a
+revisão fora da rede local. **Isso não é e não substitui** o banco de
+produção da Fase 5 (Postgres próprio `scraper-cebraspe-db`, ADR-026) —
+é descartável/regenerável a qualquer momento a partir dos JSONs.
+**Alternativas descartadas:** Upsert incremental — complexidade sem
+benefício na escala atual; Postgres em vez de SQLite pra essa ferramenta —
+rejeitado porque duplicaria a decisão já fechada da Fase 5 pra um uso
+completamente diferente (revisão descartável vs. estatística de produção).
+
+### 2026-09-20 — Retry + max_tokens/timeout maiores para reduzir falhas de extração; reasoning-off descartado
+**Decisão:** `extrair_taxonomia_chunk` (`src/taxonomia_extractor.py`) ganhou
+retry com backoff (3 tentativas, 5s/15s) e `max_tokens`/`timeout`/
+`reasoning` parametrizáveis (default reproduz produção). Novo default de
+produção: `MAX_TOKENS=24576` (era 8192), `REQUEST_TIMEOUT=240` (era 120s).
+`edital_parser.py` ganhou `_limpar_ruido_edital` — remove nota de
+retificação de edital embutida no meio do texto programático (achado no
+chunk `PSICÓLOGO ORGANIZACIONAL`) antes de virar `ChunkTaxonomia.texto`.
+**Motivo:** Comparando dois runs reais completos do mesmo edital (39
+chunks, 2026-09-19 e 2026-09-20), só 2 das 5 falhas de cada run coincidiam
+— a falha é majoritariamente não-determinística, não estrutural por chunk.
+Um experimento controlado (`scripts/experimento_falhas_llm.py`, 20 chamadas
+reais, 1 tentativa por config pra isolar o efeito) nos 5 chunks que
+falharam no run de 20/09 comparou: baseline (8192/120s) 2/5 sucesso;
+`max_tokens=24576,timeout=240s` **5/5**; `thinking: disabled` 3/5 (mesmo
+chunk falhou com a mesma assinatura ligado e desligado — z-ai/OpenRouter
+provavelmente ignora o parâmetro); `thinking:disabled`+texto limpo 4/5.
+Achado extra: no chunk maior (6977 chars), a falha não era só reasoning —
+o `content` (JSON) em si veio cortado no meio
+(`json.JSONDecodeError: Unterminated string`, ~7510 chars) com
+`max_tokens=8192`, confirmando que o teto também é insuficiente pro output
+final em chunks grandes, não só pro reasoning. `max_tokens`/`timeout`
+maiores foi a única config que fechou 5/5 — adotada como default. Fecha o
+item `validacao-pendente` registrado em `LESSONS.md`.
+**Alternativas descartadas:** Desligar reasoning via `thinking`/
+`reasoning_effort` como mitigação de produção — tecnicamente repassado pelo
+LiteLLM (`openrouter/chat/transformation.py`, confirmado no pacote
+instalado) mas sem evidência de que o backend obedece; resultado do
+experimento (3/5, mesma assinatura de falha que o baseline num caso) não
+justifica confiar nisso sem verificação mais forte — se algum dia isso for
+revisitado, precisa de um teste isolado que prove a diferença de
+comportamento, não só taxa de sucesso agregada. Fallback pra modelo sem
+reasoning já no gateway (`tencent/hy3:free`, `xiaomi/mimo-v2.5-pro`) —
+descartado por agora, qualidade da extração nessa tarefa específica nunca
+foi verificada. Generalizar a limpeza de ruído pro cabeçalho de transição
+de seção do chunk `TÉCNICO EM COMUNICAÇÃO SOCIAL` (`CONHECIMENTOS
+ESPECÍFICOS PARA O CARGO DE NÍVEL MÉDIO` grudado na cauda) — descartado por
+enquanto, é um caso só, regex genérico demais arrisca cortar conteúdo
+legítimo de outro edital.
+
+### 2026-09-21 — Desacoplamento total do LiteLLM e migração para OpenRouter direto
+
+**Decisão:** Remoção completa do SDK `litellm` do repositório (`requirements.txt`, ambiente virtual e código-fonte). O bot do Telegram (`src/telegram_bot.py`) e o extrator de taxonomia (`src/taxonomia_extractor.py`) agora chamam diretamente o endpoint REST do OpenRouter (`https://openrouter.ai/api/v1/chat/completions`) com chaves dedicadas (`TELEGRAM_OPENROUTER_API_KEY` e `OPENROUTER_API_KEY`) e enviam telemetria assíncrona ao Langfuse diretamente via REST (`/api/public/ingestion`).
+**Motivo:** Evita sobrecarga de SDKs intermediários, incompatibilidades com callbacks de OpenTelemetry/Langfuse v3 e conflito de compartilhamento de chaves e métricas entre serviços distintos.
+**Alternativas descartadas:** Manter LiteLLM apenas no Telegram Bot — descartado para eliminar complexidade desnecessária e manter padrão arquitetural único e enxuto em todo o repositório.
+
+### 2026-09-21 — Validação heurística de-para + relatório de página única para o checkpoint de revisão humana
+
+**Decisão:** Dois scripts novos, ligados por `chunk_index`: `scripts/validar_taxonomia.py`
+compara, por chunk, os itens numerados de primeiro nível do texto-fonte
+(`texto_enviado_llm` em `.auditoria.json`) contra `topico["nome"]` extraído
+(`.json`), gerando `<edital>.validacao.json` com alertas `topico_ausente`
+(item na fonte sem correspondência extraída), `topico_extra` (tópico
+extraído sem correspondência literal na fonte) e `chunk_sem_extracao`
+(chunk com `status="falha"` e itens na fonte). A comparação é por **texto
+normalizado** do item completo (substring), não por número — o LLM não
+preserva a numeração original de forma consistente entre chunks do mesmo
+edital, então um diff por número sozinho gera falso-positivo maciço (ver
+`LESSONS.md`). `scripts/gerar_relatorio_revisao.py` consome o mesmo trio de
+JSONs e gera um relatório HTML estático de página única por edital (texto-
+fonte e taxonomia lado a lado por chunk, alertas destacados), servido pelo
+Datasette via `--static relatorio:/data/relatorio` (`docker-compose.yml`) —
+sem plugin novo, reaproveitando Traefik/Cloudflare Tunnel já configurados.
+`gerar_db_datasette.py` ganhou a tabela `alertas_validacao` e a coluna
+`editais.total_alertas` (carregamento opcional do `.validacao.json`, mesmo
+padrão condicional do `.auditoria.json`).
+**Motivo:** Usuário relatou dificuldade em fazer o de-para manual entre
+texto do edital e taxonomia extraída navegando as tabelas separadas do
+Datasette, e pediu uma forma de sinalizar automaticamente tópico que
+"ficou de fora" da extração. Validado contra o edital piloto real (39
+chunks): a primeira versão (diff por número) gerou 385 alertas; a versão
+final gerou 2, ambos achados genuínos (não ruído de heurística) — um caso
+onde o LLM consolidou 2 itens duplicados do próprio edital num tópico só, e
+um caso de numeração corrompida no texto extraído do PDF-fonte (chunk
+`TÉCNICO EM COMUNICAÇÃO SOCIAL`).
+**Alternativas descartadas:** Diff por número de item — descartado depois
+de comprovar que o LLM não preserva numeração de forma confiável entre
+chunks (mesmo edital, mesma extração); validação via segundo LLM como
+"juiz" — descartada por ora (mais cara, não-determinística, e a heurística
+textual já convergiu pra sinal/ruído aceitável no piloto); view/canned
+query dentro do próprio Datasette em vez de relatório HTML separado —
+descartada porque o renderizador tabular padrão do Datasette não faz layout
+de duas colunas nem destaque de texto, exigiria plugin novo pra um ganho
+menor que gerar o HTML estático direto.
+
+### 2026-09-21 — Pipeline automático dos artefatos de revisão a cada extração
+
+**Decisão:** Novo `scripts/atualizar_revisao.py`
+(`atualizar_artefatos_revisao`) encapsula a sequência
+`validar_taxonomia` → `gerar_relatorio_revisao` → `gerar_db_datasette` →
+restart do container Datasette, e passa a ser chamado automaticamente ao
+final de `scripts/revisar_taxonomia_piloto.py` (`revisar_edital_piloto`) e
+`scripts/reprocessar_falhas_piloto.py` (`reprocessar_falhas`, quando há
+sucesso novo) — substitui a lógica de restart que já existia duplicada só
+em `reprocessar_falhas_piloto.py`. O restart é best-effort: captura
+`OSError`/`returncode != 0` e só loga aviso, nunca lança exceção — o
+pipeline de extração (que já pagou a chamada LLM) não pode falhar por causa
+do Datasette local estar fora do ar.
+**Motivo:** Usuário pediu que o fluxo de validação (ADR-017/ADR-018)
+"entre no pipeline, rode automaticamente a cada extração" em vez de exigir
+4 comandos manuais depois de cada rodada. Mesma classe de risco já
+documentada 2x neste projeto (`run()` nunca chamando o downloader, achado
+de 2026-09-19; href relativo do ADR-008): passo manual esquecido não lança
+erro, só deixa o artefato seguinte desatualizado silenciosamente.
+**Alternativas descartadas:** Hook de `git commit`/pre-commit — descartado
+por acoplar controle de versão a infraestrutura local sem necessidade;
+cron/systemd timer regenerando periodicamente — descartado por atrasar a
+atualização (objetivo é "logo após a extração") e desperdiçar ciclos na
+escala atual do piloto; propagar exceção se o restart do Datasette falhar —
+descartado por quebrar o retorno da extração por um problema de
+infraestrutura não relacionado ao resultado já salvo em disco. Ver
+ADR-019 para o detalhamento completo.
+
+### 2026-09-21 — Classificação de chunk por nível, tipo de conhecimento e concurso
+
+**Decisão:** O chunking passa a reconhecer o cabeçalho de bloco
+`CONHECIMENTOS BÁSICOS/ESPECÍFICOS PARA ... NÍVEL SUPERIOR/MÉDIO` como um
+terceiro tipo de marcador, que define `tipo_conhecimento`/`nivel` dos chunks
+seguintes. Cada chunk ganha também `cargo_numero`, `materia_normalizada` e
+`apenas_discursiva`. O `<edital>.json` ganha `concurso` (slug/órgão/ano,
+resolvido pelo manifesto do downloader) e `cargos` (número/nome/nível).
+**Motivo:** O usuário quer filtrar questões por nível, básico/específico e
+tópico do edital. No piloto, os básicos de superior e de médio saíam
+idênticos (`cargo=None`, mesmo nome de matéria), e o concurso não aparecia
+em nenhum artefato. O piloto foi completado por backfill (tudo vem do
+parser), e o filtro `PF_25_ADM` × nível × tipo foi validado no banco de
+revisão: 39/39 chunks classificados e 0 alertas de classificação.
+**Alternativas descartadas:** Distinguir por posição/`chunk_index` (não é
+filtro); pedir o nível ao LLM (o dado é determinístico no cabeçalho);
+reorganizar `data/` por concurso (fica como follow-up, o manifesto já
+resolve). Ver ADR-020.
+
+### 2026-09-21 — Reparo local determinístico para nome de tópico numérico
+
+**Decisão:** Um teste de ponta a ponta do zero contra `PF_25_ADM` achou 88
+alertas de validação (vs. 2 históricos, ADR-018) — causa: em 2 dos 39
+chunks (CARGO 3: CONTADOR — "CONTABILIDADE APLICADA AO SETOR PÚBLICO" e
+"MATEMÁTICA FINANCEIRA"), o LLM preencheu `topico["nome"]` com o numeral do
+item da fonte ("1", "2", ...) em vez do texto do tópico — estruturalmente
+válido (`status="sucesso"`), semanticamente errado. Em vez de um retry cego
+reaproveitando o loop genérico (mesma chamada, mesmo prompt, sem contexto
+do erro — desenho inicial, descartado), a correção final é um **reparo
+local determinístico, sem chamada nova ao LLM**: o texto-fonte já tem o
+item completo pra cada numeral, mapeado pela mesma extração de itens
+numerados que `validar_taxonomia.py` já usa (`extrair_itens_numerados`,
+movida para `src/edital_parser.py` pra reparo e validação nunca
+divergirem). Complementado por reforço do prompt (mitigação na origem, sem
+garantia) e um quinto tipo de alerta passivo (`topico_nome_numerico`) como
+rede de segurança para dados já persistidos ou casos que o reparo não
+cubra. `reprocessar_falhas_piloto.py` ganhou `--chunks 17,21` para forçar
+reprocessamento por `chunk_index` mesmo com `status="sucesso"`. Refinamento
+adicional na mesma sessão: quando o reparo não mapeia todo numeral,
+`extrair_taxonomia_chunk` passa a devolver `tuple[TaxonomiaEdital | None,
+str | None]` (antes só `TaxonomiaEdital | None`) — o motivo, quando
+identificado, vira o `status` persistido do chunk
+(`STATUS_FALHA_NOME_NUMERICO_NAO_MAPEADO =
+"falha_nome_numerico_nao_mapeado"`), não o `"falha"` genérico de
+rede/timeout/parse. A seleção padrão de `reprocessar_falhas_piloto.py`
+(sem `--chunks`) e `gerar_relatorio_revisao.py::renderizar_chunk` foram
+generalizados de `status == "falha"` para `status not in (None,
+"sucesso")`, senão o novo status específico escaparia do reprocessamento
+automático e do aviso "sem taxonomia" no relatório HTML.
+**Motivo:** O dono do projeto rejeitou o retry cego original por não passar
+contexto nenhum ao LLM (repetir a tarefa sem corrigir nada, arriscando
+consumir tokens à toa) e pediu uma etapa específica, transparente e
+rastreável. O reparo local resolve isso por completo: custo zero de
+tokens, determinístico, e rastreável por log com tag própria
+(`[REPARO_NOME_NUMERICO]`/`[REPARO_NOME_NUMERICO_FALHOU]`) e por metadata
+estruturado (`status: "reparado"|"falhou"`) no Langfuse para os dois
+desfechos — sem misturar com retry de falha técnica. Depois, o próprio
+dono pediu explicitamente um status diferente de "falha" genérica para
+esse caso semântico, já que repetir a chamada pode não resolver (não é
+instabilidade transitória). Verificado contra os dados reais do achado
+(restaurados do `.bak`): reparo local corrigiu 32 + 11 tópicos sem nenhuma
+chamada ao LLM; reprocessamento real via `--chunks 17,21` (LLM de verdade,
+prompt reforçado) devolveu `total_alertas` a 2 (os mesmos genuínos do
+ADR-018).
+**Alternativas descartadas:** Retry cego reaproveitando o loop genérico
+(desenho original); uma chamada LLM corretiva dedicada (mais robusta a
+casos não cobertos pelo reparo local, mas custa tokens sempre que o bug
+ocorre — fica como possível fallback futuro); validator Pydantic em
+`Topico.nome` (não tem acesso ao texto-fonte, que o reparo precisa);
+persistir só o flag de reparo bem-sucedido sem mudar o contrato de retorno
+de `extrair_taxonomia_chunk` (não cobria o desfecho de falha, que era
+justamente o que precisava de um status próprio). Ver ADR-021.
+
+### 2026-09-21 — Classificação de erros/exceções na chamada ao OpenRouter
+
+**Decisão:** `_chamar_llm_uma_vez` (`src/taxonomia_extractor.py`) parou de
+colapsar toda falha técnica no mesmo `motivo_falha=None` → `status="falha"`
+genérico. Cada tipo de exceção/etapa ganhou status próprio: timeout
+(`requests.exceptions.Timeout` → `falha_timeout`), conexão recusada
+(`ConnectionError` → `falha_conexao`), HTTP 429 (`falha_rate_limit`), outro
+HTTP de erro (`falha_http`), qualquer outra `RequestException` não
+classificada (`falha_rede`), resposta sem `content`/`finish_reason`
+truncado (`falha_conteudo_vazio`), JSON malformado (`falha_parse_json`) e
+JSON válido mas fora do schema `TaxonomiaEdital` (`falha_validacao_schema`)
+— além do `falha_nome_numerico_nao_mapeado` já existente do ADR-021. Nova
+função `_falha_chamada` centraliza log com tag própria por tipo
+(`[FALHA_TIMEOUT]`, `[FALHA_CONEXAO]`, `[FALHA_RATE_LIMIT]`, `[FALHA_HTTP]`,
+`[FALHA_REDE]`) e registro no Langfuse. Todo caminho de falha (inclusive o
+semântico do ADR-021) agora inclui `metadata["tipo_erro"] = <status>` no
+Langfuse, filtrável no dashboard sem abrir log.
+**Motivo:** Pedido do dono do projeto para rastrear "os diferentes tipos de
+erros ou exceções dos scripts de cada chamada ou etapa para o
+openrouter/langfuse" — mesma exigência de rastreabilidade do ADR-021,
+estendida a todo o espectro de falha técnica (não só o caso semântico).
+Timeout/conexão/rate-limit são tipicamente transitórios (retry tende a
+resolver); conteúdo vazio/parse/schema tendem a se repetir com os mesmos
+parâmetros (retry sozinho não ajuda) — misturar os dois no mesmo "falha"
+esconde essa diferença do relatório HTML/Datasette e do Langfuse.
+Nenhum consumidor do `status` do chunk precisou mudar: a generalização já
+feita no ADR-021 (`status not in (None, "sucesso")`) absorve qualquer novo
+status técnico automaticamente.
+**Alternativas descartadas:** Manter status técnico único e diferenciar só
+via `metadata["tipo_erro"]` no Langfuse — descartado porque o `status` é o
+campo que aparece no relatório HTML/Datasette, não só no Langfuse; um
+status por código HTTP individual (`falha_http_401`, `falha_http_500`, ...)
+— descartado por ora, sem caso de uso concreto que precise da granularidade
+completa; classificar por regex na mensagem de exceção em vez de por tipo
+de exceção Python — descartado, a hierarquia tipada do `requests` já é mais
+robusta que casar texto de mensagem de erro. Ver ADR-022.
+
+### 2026-09-21 — Migração da telemetria Langfuse para SDK oficial (OTel)
+
+**Decisão:** Migração completa da camada de observabilidade em `src/taxonomia_extractor.py` e `src/telegram_bot.py` de requisições manuais REST (`POST /api/public/ingestion`) para o SDK oficial `langfuse.Langfuse` (v3, OTel). As generations passam a ser abertas imediatamente antes da requisição HTTP ao OpenRouter (`_abrir_generation`), fornecendo medição de latência real. O fechamento e envio são centralizados em `_registrar_langfuse` (síncrono e não bloqueante, com exportação em thread em segundo plano e flush via `atexit`).
+**Motivo:** A API REST v3 de ingestão do Langfuse entra em sunset em 2026-11-16 (passando a aceitar apenas scores e rejeitando traces/generations). Além disso, requisições REST manuais com `requests.post` sem checagem de resposta silenciavam falhas como HTTP 401 por chave inválida. O SDK oficial já constava nas dependências (`langfuse>=3,<4`), tornando a migração de custo zero de dependências.
+**Alternativas descartadas:** Manter o endpoint REST até a data limite (acumularia débito técnico crítico); exportador OTLP cru via requests (reinventaria buffer e retry já validados no SDK). Ver ADR-023.
+
+### 2026-09-21 — Expansão da extração 2025 (IBAMA, STM, TCU) e eliminação de falsos positivos na validação
+
+**Decisão:** Expansão do pipeline de extração e validação para mais 3 grandes editais de 2025: `IBAMA_25` (33 chunks), `STM_25` (53 chunks) e `TCU_25_TEFC` (10 chunks), somando com `PF_25_ADM` (39 chunks) um total de 135 chunks processados com 100% de sucesso na chamada LLM. Para acomodar as peculiaridades dos novos editais, `edital_parser.py` recebeu normalização de espaços `\xa0`, suporte a títulos de cargo multi-linha sem itens, colons parentéticos em matérias (`(?:\s*\([^)]*\))?:`), cabeçalhos `CONHECIMENTOS GERAIS` e detecção de cargo único/nível em páginas preliminares. Em `validar_taxonomia.py`, foram implementadas 5 heurísticas de eliminação de falsos positivos: composição NFC preliminar, substituição de ligaduras corrompidas de fontes do CEBRASPE (`Ɵ`→`ti`, etc.), verificação de cobertura conjunta em tópicos e subtópicos, correspondência exata/fronteira `\b` para termos com >= 3 caracteres e checagem em texto integral do chunk antes de apontar `topico_extra`.
+**Motivo:** A primeira execução do validador sobre o edital do IBAMA retornou 1.271 alertas em 33 chunks já auditados como sucesso no LLM. A investigação comprovou que se tratava quase exclusivamente de ruído heurístico (fontes embutidas do CEBRASPE com glifos privados para ligaduras, acentos em NFD e itens alocados pelo modelo em `subtopicos`). Com os ajustes, os alertas no IBAMA caíram para apenas 1 (achado real), e a base consolidada de 135 chunks de 2025 estabilizou com apenas 3 alertas no total (PF: 1, STM: 1, IBAMA: 1, TCU: 0).
+**Alternativas descartadas:** Afrouxar a validação para verificar apenas contagem agregada de tópicos (perderia a rastreabilidade item a item); aceitar acentos corrompidos nas saídas sem tratamento determinístico (poluiria o banco de estatísticas final).
+
+### 2026-09-21 — Coleta e extração da Câmara dos Deputados 2025 (CD_25_NS) e refinamentos do parser
+
+**Decisão:** Coleta estruturada completa do concurso `CD_25_NS` (Câmara dos Deputados 2025 - Nível Superior), integrando 2 editais, 7 cadernos de provas (objetivas e discursivas) e 4 gabaritos definitivos ao repositório local. A extração híbrida do edital de abertura atualizado foi concluída com 15/15 chunks com 100% de sucesso na chamada LLM e 0 alertas de validação, elevando a base consolidada de 2025 para 5 concursos e 150 chunks. Para viabilizar a extração limpa das matérias do edital da Câmara, implementou-se em `src/edital_parser.py`: (1) reconhecimento de quebras de linha em cabeçalhos de matéria condicionadas a conectivos (`(?:,\s*|\s+(?:E|OU|DE|DA|DO|DOS|DAS))\s*\n`), permitindo casar títulos multi-linha como "REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E CÓDIGO DE ÉTICA" sem absorver indevidamente títulos de cargos multi-linha; (2) detecção determinística de prefixos de matéria em caixa alta antes do primeiro item numerado quando o edital omite o delimitador dois-pontos antes do item 1 (caso de "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS 1 Constituição..."). Em `src/spider.py`, aplicou-se fronteira de palavra `\bABERTURA\b` na regex de editais para evitar falsos positivos com termos administrativos como "reabertura".
+**Motivo:** O edital da Câmara dos Deputados possui um formato tipográfico com longos títulos de matérias com quebras de linha conectivas e omissão de dois-pontos no primeiro bloco de matéria do Cargo 2. Sem os ajustes, o Cargo 1 acumulava o título da matéria no rótulo do cargo, e o Cargo 2 era catalogado com a própria matéria repetindo o nome do cargo. Além disso, no crawler, editais administrativos de retificação citando "reabertura de período de acesso à prova" estavam sendo mapeados erroneamente como editais de abertura.
+**Alternativas descartadas:** Tratar os nomes das matérias por substituição pontual via hardcoding no parser (quebraria a generalização para futuros editais federais do CEBRASPE); relaxar `PADRAO_MATERIA` para qualquer quebra de linha (regrediu testes de cargos com layout quebrado no IBAMA). Ver ADR-024.
+
+### 2026-09-21 — Tratamento automático dos 3 alertas residuais da validação
+
+**Decisão:** Cada alerta residual tinha uma causa diferente, então o tratamento
+também é diferente. (1) IBAMA_25 #32: o LLM omitiu o item `1 IN Ibama 05/2021.`.
+Nova etapa `reinjetar_itens_ausentes` (pós-LLM, sem nova chamada) reinjeta item
+de primeiro nível omitido, só se for simples. (2) PF_25_ADM #31 (qualificador
+entre parênteses para desambiguar item repetido no edital) e (3) STM_25 #31
+(erro de digitação `bBiblioteca` corrigido pelo LLM): viram
+`topico_divergencia_leve` com severidade `informativo`, fora de
+`total_alertas`. A comparação textual foi movida para `src/comparacao_texto.py`,
+compartilhada entre reparo e validador. Também entraram a remoção da assinatura
+do fim da seção (presente nos 5 editais) e duas regras novas no prompt.
+Backfill via `scripts/reconciliar_taxonomia.py`.
+**Motivo:** O dono do projeto pediu uma etapa automática no pipeline para os
+alertas residuais, com prós e contras de cada alternativa. O diagnóstico
+mostrou 1 perda real de dado e 2 falsos positivos. Suprimir tudo esconderia a
+perda; forçar o nome literal da fonte reintroduziria o erro de digitação.
+Resultado: 3 → 0 alertas bloqueantes, 2 informativos visíveis, e 1 único
+tópico alterado na base.
+**Alternativas descartadas:** Reprocessar o chunk automaticamente (retry cego,
+ADR-021); chamada corretiva ao LLM (tokens, não determinística, sem caso real
+que exija); campo `numero` no `Topico` (schema + reextração); lista de alertas
+aceitos (não é automática, fica para a revisão humana). Ver ADR-025.
+
+### 2026-09-21 — Banco Postgres próprio, independente do study-rag-agent
+
+**Decisão:** A Fase 5 passa a usar um Postgres 16 próprio
+(`scraper-cebraspe-db`, `postgres:16-alpine`, banco/usuário `cebraspe`, porta
+`127.0.0.1:5435`, rede `homelab_default`) em vez da instância `study-rag-db`.
+Nenhuma FK para `itens_estudo`: as dimensões carregam chave natural
+normalizada, e o cruzamento vira a Etapa 7 do `task.md` (tabela de mapeamento
++ `postgres_fdw` ou camada analítica).
+**Motivo:** Revisão do plano da Etapa 5 pelo dono do projeto, antes de haver
+código de banco. Os domínios são diferentes (material de estudo pessoal ×
+dados públicos de concursos). A FK prevista tinha a direção errada e ficaria
+sempre `NULL`. O `study-rag-db` precisa ser reconfigurado (`postgres/postgres`,
+porta `5434` em `0.0.0.0`), e acoplar os dois quebraria um a cada mudança do
+outro. A senha do banco novo não tem default no compose.
+**Alternativas descartadas:** Manter a decisão de 2026-09-19; outro database
+na mesma instância (mantém a dependência operacional e ainda exige
+`postgres_fdw` para JOIN); schema dentro de `study_rag` (maior acoplamento).
+Ver ADR-026, que substitui o ADR-003.
 
 ## 13. LESSONS.md (do projeto)
 
