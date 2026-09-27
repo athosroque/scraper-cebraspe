@@ -131,12 +131,11 @@ determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
       registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B/5B.1 e 5D–5E.
-- **⚡ Prioridade atual: Etapas 5A.1 → 5B.1 → 5D → 5E do `task.md`** (5A
+- **⚡ Prioridade atual: Etapas 5B.1 → 5D → 5E do `task.md`** (5A
       concluída, ADR-028; 5B concluída com aprovação humana em 2026-09-27,
       ADR-029; 5C e 5C.1 concluídas, ADR-031). A 5D (classificação das
-      questões por LLM) depende da 5A.1 (12 matérias do `PF_25_ADM` com nome
-      de cargo em vez de disciplina, ADR-032) e da 5B.1 (divisão de nomes
-      compostos, ADR-030).
+      questões por LLM) depende da 5B.1 (divisão de nomes compostos,
+      ADR-030).
 
 
 ## 6. Patterns
