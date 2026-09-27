@@ -14,6 +14,8 @@ from telegram.ext import (
     filters,
 )
 
+from src.llm_openrouter import REASONING_PADRAO
+
 load_dotenv()
 
 # Configura log
@@ -29,7 +31,9 @@ if ALLOWED_USER_ID:
 
 # OpenRouter (acesso direto REST via httpx, sem proxy)
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-OPENROUTER_API_KEY = os.getenv("TELEGRAM_OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("TELEGRAM_OPENROUTER_API_KEY") or os.getenv(
+    "OPENROUTER_API_KEY", ""
+)
 MODEL_NAME = os.getenv("TELEGRAM_OPENROUTER_MODEL", "z-ai/glm-5.3-flash")
 
 # Langfuse via SDK oficial (OTel, credenciais dedicadas do Telegram com fallback)
@@ -38,8 +42,12 @@ LANGFUSE_HOST = (
     or os.getenv("LANGFUSE_HOST")
     or os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com")
 )
-LANGFUSE_PUBLIC_KEY = os.getenv("TELEGRAM_LANGFUSE_PUBLIC_KEY") or os.getenv("LANGFUSE_PUBLIC_KEY", "")
-LANGFUSE_SECRET_KEY = os.getenv("TELEGRAM_LANGFUSE_SECRET_KEY") or os.getenv("LANGFUSE_SECRET_KEY", "")
+LANGFUSE_PUBLIC_KEY = os.getenv("TELEGRAM_LANGFUSE_PUBLIC_KEY") or os.getenv(
+    "LANGFUSE_PUBLIC_KEY", ""
+)
+LANGFUSE_SECRET_KEY = os.getenv("TELEGRAM_LANGFUSE_SECRET_KEY") or os.getenv(
+    "LANGFUSE_SECRET_KEY", ""
+)
 
 PROJECT_CONTEXT = ""
 
@@ -109,7 +117,11 @@ def _langfuse_client() -> Langfuse | None:
     """
     if not (LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY):
         return None
-    return Langfuse(public_key=LANGFUSE_PUBLIC_KEY, secret_key=LANGFUSE_SECRET_KEY, host=LANGFUSE_HOST)
+    return Langfuse(
+        public_key=LANGFUSE_PUBLIC_KEY,
+        secret_key=LANGFUSE_SECRET_KEY,
+        host=LANGFUSE_HOST,
+    )
 
 
 def _abrir_generation(prompt: str, model: str):
@@ -188,6 +200,8 @@ async def chamar_openrouter(
         "model": model_name,
         "messages": messages,
         "temperature": 0.2,
+        # Limite de reasoning comum a toda chamada LLM do projeto.
+        **REASONING_PADRAO,
     }
 
     user_prompt = messages[-1]["content"] if messages else ""
@@ -273,7 +287,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = update.effective_user.id if update.effective_user else None
 
     # Adiciona indicativo de digitando
-    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action="typing"
+    )
 
     try:
         messages = [
@@ -292,7 +308,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     except Exception as e:  # noqa: BLE001
         logger.error(f"Erro ao processar mensagem do Telegram: {e}")
-        await update.message.reply_text(f"Ocorreu um erro ao processar sua requisição: {e!s}")
+        await update.message.reply_text(
+            f"Ocorreu um erro ao processar sua requisição: {e!s}"
+        )
 
 
 def main() -> None:
@@ -308,7 +326,9 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler(["ajuda", "help"], ajuda))
     application.add_handler(CommandHandler("reload_context", reload_context))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
+    )
 
     logger.info("Iniciando o bot...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)

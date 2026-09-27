@@ -57,7 +57,9 @@ def normalizar(texto: str) -> str:
     texto = unicodedata.normalize("NFC", texto)
     # Troca qualquer pontuação/hífen por espaço
     texto = re.sub(r"[^\w]", " ", texto, flags=re.UNICODE)
-    sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    sem_acento = (
+        unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    )
     return re.sub(r"\s+", " ", sem_acento.lower()).strip()
 
 
@@ -68,9 +70,13 @@ def contido(nome_norm: str, item_norm: str) -> bool:
         return False
     if nome_norm == item_norm:
         return True
-    if len(nome_norm) >= 3 and re.search(r"\b" + re.escape(nome_norm) + r"\b", item_norm):
+    if len(nome_norm) >= 3 and re.search(
+        r"\b" + re.escape(nome_norm) + r"\b", item_norm
+    ):
         return True
-    if len(item_norm) >= 3 and re.search(r"\b" + re.escape(item_norm) + r"\b", nome_norm):
+    if len(item_norm) >= 3 and re.search(
+        r"\b" + re.escape(item_norm) + r"\b", nome_norm
+    ):
         return True
     if len(nome_norm) >= TAMANHO_MINIMO_SUBSTRING and nome_norm in item_norm:
         return True
@@ -98,6 +104,39 @@ def divergencia_leve(nome: str, textos_item: list[str], texto_fonte_norm: str) -
         return False
     for item_texto in textos_item:
         for candidato in {normalizar(item_texto), normalizar(rotulo_item(item_texto))}:
-            if candidato and SequenceMatcher(None, nome_norm, candidato).ratio() >= SIMILARIDADE_MINIMA_DIVERGENCIA_LEVE:
+            if (
+                candidato
+                and SequenceMatcher(None, nome_norm, candidato).ratio()
+                >= SIMILARIDADE_MINIMA_DIVERGENCIA_LEVE
+            ):
                 return True
     return False
+
+
+# Números de cargo citados num texto (link de caderno ou restrição de matéria
+# no edital). O intervalo exige "de" ("cargos de 1 a 14") para "cargo 1 a 3
+# horas" não virar [1, 2, 3].
+PADRAO_CARGOS_MENCIONADOS = re.compile(
+    r"\bcargos?\s+(?:de\s+(\d+)\s+a\s+(\d+)|((?:\d+\s*(?:,|e|/|\s)\s*)*\d+))\b",
+    re.IGNORECASE,
+)
+
+
+def extrair_cargos_do_texto(texto: str) -> list[int]:
+    """Cargos citados no texto, na ordem em que aparecem e sem repetição.
+
+    Aceita intervalo ('cargos de 1 a 14'), lista ('cargos 2, 4, 5 e 7') e
+    várias menções separadas por texto ('cargo 1: ... e para o cargo 8: ...').
+    Lista vazia = o texto não cita cargo (ex.: TCU, cargo único) — quem chama
+    decide o que fazer.
+    """
+    resultado: list[int] = []
+    for m in PADRAO_CARGOS_MENCIONADOS.finditer(texto or ""):
+        if m.group(1):
+            nums = range(int(m.group(1)), int(m.group(2)) + 1)
+        else:
+            nums = (int(n) for n in re.findall(r"\d+", m.group(3)))
+        for n in nums:
+            if n not in resultado:
+                resultado.append(n)
+    return resultado

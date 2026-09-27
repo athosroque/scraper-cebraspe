@@ -8,7 +8,7 @@ LOGS_DIR.mkdir(exist_ok=True)
 logger = logging.getLogger("scraper_cebraspe")
 logger.setLevel(logging.INFO)
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 # File handler
 file_handler = logging.FileHandler(LOGS_DIR / "scraper_cebraspe.log")

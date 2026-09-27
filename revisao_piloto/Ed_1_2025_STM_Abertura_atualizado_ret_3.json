@@ -122,7 +122,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 1,
@@ -169,7 +170,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 2,
@@ -214,7 +216,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 3,
@@ -223,7 +226,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "LÍNGUA INGLESA (APENAS PARA O CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – \nESPECIALIDADE: ANÁLISE DE SISTEMAS E PARA O CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO \nESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO)",
+      "materia_normalizada": "LÍNGUA INGLESA",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Língua Inglesa",
@@ -237,7 +240,11 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": [
+        3,
+        6
+      ]
     },
     {
       "chunk_index": 4,
@@ -246,7 +253,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "DIREITO CONSTITUCIONAL (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E \nPARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "materia_normalizada": "DIREITO CONSTITUCIONAL",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Constituição",
@@ -340,7 +347,11 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": [
+        1,
+        8
+      ]
     },
     {
       "chunk_index": 5,
@@ -349,7 +360,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "DIREITO PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E \nPARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "materia_normalizada": "DIREITO PENAL MILITAR",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Direito Penal Militar",
@@ -385,7 +396,11 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": [
+        1,
+        8
+      ]
     },
     {
       "chunk_index": 6,
@@ -394,7 +409,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "DIREITO PROCESSUAL PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: \nADMINISTRATIVA E PARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+      "materia_normalizada": "DIREITO PROCESSUAL PENAL MILITAR",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Direito Processual Penal Militar",
@@ -412,7 +427,11 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": [
+        1,
+        8
+      ]
     },
     {
       "chunk_index": 7,
@@ -485,7 +504,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 8,
@@ -540,7 +560,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 9,
@@ -623,7 +644,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 10,
@@ -746,7 +768,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 11,
@@ -837,7 +860,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 12,
@@ -873,7 +897,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 13,
@@ -988,7 +1013,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 14,
@@ -1015,7 +1041,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 15,
@@ -1075,7 +1102,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 16,
@@ -1084,7 +1112,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 3,
-      "materia_normalizada": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "materia_normalizada": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO (PDPJ-Br)",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Linguagem de programação Java",
@@ -1161,7 +1189,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 17,
@@ -1217,7 +1246,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 18,
@@ -1279,7 +1309,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 19,
@@ -1353,7 +1384,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 20,
@@ -1441,7 +1473,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 21,
@@ -1605,7 +1638,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 22,
@@ -1717,7 +1751,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 23,
@@ -1764,7 +1799,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 24,
@@ -1844,7 +1880,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 25,
@@ -1905,7 +1942,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 26,
@@ -2095,7 +2133,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 27,
@@ -2150,7 +2189,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 28,
@@ -2266,7 +2306,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 29,
@@ -2322,7 +2363,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 30,
@@ -2365,7 +2407,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 31,
@@ -2374,7 +2417,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 6,
-      "materia_normalizada": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO \n(PDPJ-Br)",
+      "materia_normalizada": "ARQUITETURA DE DESENVOLVIMENTO DA PLATAFORMA DIGITAL DO PODER JUDICIÁRIO BRASILEIRO (PDPJ-Br)",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Conhecimentos Específicos - Desenvolvimento de Software",
@@ -2457,7 +2500,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 32,
@@ -2535,7 +2579,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 33,
@@ -2660,7 +2705,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 34,
@@ -2799,7 +2845,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 35,
@@ -2942,7 +2989,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 36,
@@ -3102,7 +3150,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 37,
@@ -3250,7 +3299,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 38,
@@ -3361,7 +3411,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 39,
@@ -3505,7 +3556,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 40,
@@ -3528,7 +3580,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 41,
@@ -3652,7 +3705,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 42,
@@ -3713,7 +3767,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 43,
@@ -3768,7 +3823,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 44,
@@ -3846,7 +3902,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 45,
@@ -3882,7 +3939,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 46,
@@ -3925,7 +3983,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 47,
@@ -3979,7 +4038,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 48,
@@ -4091,7 +4151,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 49,
@@ -4174,7 +4235,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 50,
@@ -4233,7 +4295,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 51,
@@ -4377,7 +4440,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 52,
@@ -4477,8 +4541,9 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     }
   ],
-  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+  "status_revisao_humana": "APROVADO — revisão humana da Fase 4 concluída (registrada em 2026-09-22)"
 }

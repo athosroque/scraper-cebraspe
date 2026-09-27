@@ -25,7 +25,8 @@
       "offset_fim_secao": 1569,
       "chars": 1024,
       "texto_enviado_llm": "1 Compreensão e interpretação de textos de gêneros variados. 2 Reconhecimento \nde tipos e gêneros textuais. 3 Domínio da ortografia. 4 Domínio dos mecanismos de coesão textual. 4.1 \nEmprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de \nsequenciação textual. 4.2 Emprego de tempos e modos verbais. 5 Domínio da estrutura morfossintática do \nperíodo. 5.1 Emprego das classes de palavras. 5.2 Relações de coordenação entre orações e entre termos da \noração. 5.3 Relações de subordinação entre orações e entre termos da oração. 5.4 Emprego dos sinais de \npontuação. 5.5 Concordância verbal e nominal. 5.6 Regência verbal e nominal. 5.7 Emprego do sinal indicativo \nde crase. 5.8 Colocação dos pronomes átonos. 6 Reescrita de frases e parágrafos do texto. 6.1 Significação \ndas palavras. 6.2 Substituição de palavras ou de trechos de texto. 6.3 Reorganização da estrutura de orações \ne de períodos do texto. 6.4 Reescrita de textos de diferentes gêneros e níveis de formalidade.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 1,
@@ -40,7 +41,8 @@
       "offset_fim_secao": 1912,
       "chars": 325,
       "texto_enviado_llm": "1 Compreensão de textos variados: domínio do vocabulário e da estrutura da língua, ideias \nprincipais e secundárias, explícitas e implícitas, relações intratextuais e intertextuais. 2 Itens gramaticais \nrelevantes para compreensão de conteúdos semânticos. 3 Conhecimento e uso das formas contemporâneas \nda linguagem inglesa.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 2,
@@ -55,7 +57,8 @@
       "offset_fim_secao": 2787,
       "chars": 837,
       "texto_enviado_llm": "1 Lógica sentencial (ou proposicional). 1.1 Proposições simples e \ncompostas. 1.2 Tabelas-verdade. 1.3 Equivalências. 2 Estrutura lógica de relações arbitrárias entre pessoas, \nlugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das \ncondições usadas para estabelecer a estrutura daquelas relações. 3 Compreensão e análise da lógica de uma \nsituação, utilizando as funções intelectuais: raciocínio verbal, raciocínio matemático, raciocínio sequencial, \nreconhecimento de padrões, orientação espacial e temporal, formação de conceitos, discriminação de \nelementos Compreensão de dados apresentados em gráficos e tabelas. 4 Problemas de lógica e raciocínio. \n4.1 Problemas de contagem e noções de probabilidade. 5 Falácias. 6 Noções de estatística: média, moda, \nmediana e desvio padrão.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 3,
@@ -70,7 +73,8 @@
       "offset_fim_secao": 4379,
       "chars": 1566,
       "texto_enviado_llm": "1 Noções de organização administrativa. 1.1 Centralização, descentralização, \nconcentração e desconcentração. 1.2 Administração direta, indireta e funcional. 1.3 Autarquias, fundações, \nempresas públicas e sociedades de economia mista. 2 Ato administrativo. 2.1 Conceito, requisitos, atributos, \nclassificação e espécies, extinção, nulidades e revogação. 3 Agentes públicos. 3.1 Legislação pertinente. 3.2 \nDisposições constitucionais aplicáveis. 3.3 Disposições doutrinárias. 3.3.1 Conceito. 3.3.2 Espécies. 3.3.3 \nCargo, emprego e função pública. 3.4 Requisição. 3.5 Regime jurídico dos servidores públicos federais: \nadmissão, demissão, concurso público, estágio probatório, vencimento básico, acumulação, regime \ndisciplinar, licença e seguridade social. 4 Poderes administrativos. 4.1 Discricionário, hierárquico, disciplinar, \nregulamentar e de polícia. 4.2 Uso e abuso do poder. 5 Controle da administração pública. 5.1 Controle \nexercido pela administração pública. 5.2 Controle judicial. 5.3 Controle legislativo. 6 Responsabilidade civil \ndo Estado. 6.1 Responsabilidade civil do Estado no direito brasileiro. 6.1.1 Responsabilidade por ato comissivo \ndo Estado. 6.1.2 Responsabilidade por omissão do Estado. 6.2 Requisitos para a demonstração da \nresponsabilidade do Estado. 6.3 Causas excludentes e atenuantes da responsabilidade do Estado. 7 \nImprobidade Administrativa (Lei nº 8.429/1992). 8 Lei de Acesso à Informação (Lei nº 12.527/2011). 9 Lei \nGeral de Proteção de Dados (Lei nº 13.709/2018). 10 Processo Administrativo Federal (Lei nº 9.784/1999).",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 4,
@@ -85,7 +89,8 @@
       "offset_fim_secao": 5868,
       "chars": 1464,
       "texto_enviado_llm": "1 Administração pública: do modelo racional-legal ao paradigma pós-\nburocrático. 1.1 Estado oligárquico e patrimonial, Estado autoritário e burocrático, Estado do bem-estar, \nEstado regulador.  2 Transparência da administração pública. 2.1 Controle social e cidadania. 2.2 \nAccountability. 3 Excelência nos serviços públicos. 3.1 Gestão por resultados na produção de serviços \npúblicos. 3.2 Gestão por competências. 4 Comunicação na gestão pública e gestão de redes organizacionais. 5 \nPrincípios de governança pública. 6 Governabilidade e governança. 7 Intermediação de interesses \n(clientelismo, corporativismo e neocorporativismo).  8 Políticas públicas. 8.1 O ciclo das políticas públicas: \nconstrução de agenda, formulação da política e processo decisório. 8.2 Políticas públicas no Estado brasileiro \ncontemporâneo. 8.2.1 Descentralização e democracia. 8.2.2 Participação, atores sociais e controle social. \n8.2.3 Gestão local, cidadania e equidade social. 8.2.4 Corrupção e políticas públicas: fatores que influenciam \na incidência de corrupção e fatores que promovem a qualidade das políticas públicas. 9 Reformas \nadministrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e \nresponsabilização) e reforma do aparelho do Estado. 10 Mudanças institucionais: conselhos, organizações \nsociais (OS), organização da sociedade civil de interesse público (OSCIP), agência reguladora, agência \nexecutiva, consórcios públicos.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 5,
@@ -100,7 +105,8 @@
       "offset_fim_secao": 6409,
       "chars": 328,
       "texto_enviado_llm": "1 Regimento Interno da Câmara dos Deputados. 1.1 Resolução nº 17/1989 – CD, e \nalterações. 2 Regimento Comum do Congresso Nacional. 2.1 Resolução nº 1/1970 – CN, e alterações (arts. \n1ºa 71 e 134 a 140). 2.2 Resolução nº 3/1990 – CN. 2.3 Resolução nº 1/2002 – CN. 3 Código de Ética e Decoro \nParlamentar da Câmara dos Deputados.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 6,
@@ -115,7 +121,8 @@
       "offset_fim_secao": 8778,
       "chars": 2319,
       "texto_enviado_llm": "1 Constituição da República Federativa do Brasil de \n1988. 1.1 Conceito, classificações, princípios fundamentais, emendas constitucionais. 2 Direitos e garantias \nfundamentais. 2.1 Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos \npolíticos, partidos políticos. 3 Organização político-administrativa. 3.1 União, estados, Distrito Federal e \nmunicípios. 4 Administração pública. 4.1 Disposições gerais, servidores públicos. 5 Poder Legislativo. 5.1 \nCongresso Nacional, Câmara dos Deputados, Senado Federal, deputados e senadores, atribuições, \ncompetências, reuniões e comissões. 6 Poder Executivo. 6.1 Atribuições do presidente da República e dos \n\n \n \nministros de Estado. 7 Poder Judiciário. 7.1 Disposições gerais. 7.2 Órgãos do Poder Judiciário. 7.2.1 \nCompetências. 7.3 Conselho Nacional de Justiça (CNJ). 7.3.1 Composição e competência. 8 Funções essenciais \nà Justiça. 8.1 Ministério Público, advocacia e defensoria públicas. 9 Defesa do Estado e das Instituições \nDemocráticas. 10 Lei Complementar nº 95/1998. 11 Crimes de Responsabilidade e abuso de autoridade. 11.1 \nLei nº 1.079/1950. 11.2 Lei nº 13.869/2019 (crimes de abuso de autoridade). 12 Procedimento Legislativo. \n12.1 Tipos de procedimento, ordinário, abreviado, sumário, sumaríssimo, especial e concentrado. 12.2 Etapas \ne noções básicas. 12.2.1 Comissões, pareceres, deliberação, votação, sanção e veto. 13 Matérias Legislativas. \n13.1 Projeto de lei ordinária, complementar e delegada. 13.2 Medida provisória. 13.3 Projeto de decreto \nlegislativo e projeto de resolução. 13.4 Proposta de Emenda à Constituição (PEC). 13.5 Indicações, pareceres, \nrequerimentos e vetos. 13.6 Iniciativa Legislativa: Presidência da República, Congresso Nacional, tribunais e \ncidadãos. 14 Fiscalização Contábil, Financeira e Orçamentária. 15 Processo Legislativo Orçamentário. 15.1 \nPlano Plurianual (PPA). 15.2 Lei de Diretrizes Orçamentárias (LDO). 15.3 Lei Orçamentária Anual (LOA). 15.4 \nAs interfaces entre LDO, LOA, Lei nº 4.320/1964 e Lei Complementar nº 101/2000 (Lei de Responsabilidade \nFiscal). 15.5 Elaboração e aprovação das leis de matéria orçamentária. 15.6 Proposta orçamentária e sua \nintegração com PPA e LDO. 15.7 Execução financeira e créditos. 16 Conceito e instrumentos de execução \nfinanceira.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 7,
@@ -130,7 +137,8 @@
       "offset_fim_secao": 9258,
       "chars": 460,
       "texto_enviado_llm": "1 Ciência Política. 2 Teoria política. 3 Regimes políticos. 4 Sistemas e formas de governo. \n5 Representação política. 6 Poderes e relações entre poderes: Executivo, Legislativo e Judiciário. 7 Sistemas \neleitorais. 8 Teoria dos partidos políticos. 9 Organização política brasileira. 10 Política internacional \ncontemporânea. 11 Teoria do Estado e formação dos Estados nacionais. 12 Formação do Estado brasileiro. \n13 História do voto e dos partidos no Brasil.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 8,
@@ -145,7 +153,8 @@
       "offset_fim_secao": 12248,
       "chars": 2953,
       "texto_enviado_llm": "1 Governança. 1.1 Histórico da governança corporativa (primórdios \ne grandes marcos no mundo). 1.2 Conceito de governança corporativa. 1.3 Princípios da governança \ncorporativa: Responsabilidade, transparência, equidade e Accountability. 1.4 Teorias de governança \ncorporativa: teoria da agência e teoria dos stakeholders. 1.5 Abordagem comportamental na governança. 1.6 \nGovernança e áreas de controle: controles internos, auditoria e compliance. 1.7 Gestão de riscos e \nintegridade. 2 Estratégia. 2.1 Conceito. 2.2 Fundamentos de estratégia. 2.3 Condições necessárias para se \ndesenvolver a estratégia. 2.4 Questões-chave em estratégia. 3 Planejamento estratégico. 3.1 Conceitos, \nmétodos e técnicas. 3.2 Modelos de gestão e estruturas organizacionais. 3.3 Planejamento institucional. 3.4 \nEscolas de planejamento estratégico. 3.5 Ferramentas de planejamento estratégico. 3.5.1 Análise SWOT. \n3.5.2 Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas \nestratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas.  \n3.5.3 Indicadores e sistema de medição de desempenho organizacional. 3.5.3.1 Tipos de indicadores.  3.5.3.2 \nVariáveis componentes dos indicadores. 4 Gestão de Pessoas. 4.1 Comportamento organizacional: relações \nindivíduo/organização, motivação, desempenho, engajamento, trabalho em equipe e colaboração. 4.2 Clima \ne cultura organizacional, saúde mental e bem-estar. 4.3 Desenvolvimento e treinamento de pessoal: \nlevantamento de necessidades, programação, execução e avaliação. 4.4 Gestão por competências: \nabordagens e ferramentas, mapeamento e desenvolvimento das competências.  4.5 Desenvolvimento de \npessoas como estratégia de gestão e a interação dessa atividade com as demais funções do processo de \ngestão de pessoas. 4.6 Liderança: natureza e estilos de liderança. 5 Gestão por resultados na produção de \nserviços públicos. 5.1 Métricas de aferição de resultados. 5.2 Trabalho híbrido.  6 Gerenciamento de conflitos. \n7 Gestão da mudança. 8 Gestão de Projetos. 8.1 Ciclo de vida e organização do projeto. 8.2 Processos de \ngerenciamento de projetos. 8.3 Áreas de conhecimento em gerenciamento de projeto. 8.4 Ferramentas e \ntécnicas de apoio ao gerenciamento de projetos. 8.4.1 PMBOK 7ª edição. 8.5 Escritório de projetos (PMO). \n8.6 Conceitos de gestão de programas e de gestão de portfólio de projetos. 9 Gestão de Processos. 9.1 \n\n \n \nGerenciamento de processos de negócio (BPM CBOK v.4.0). 9.2 Conceitos, modelagem de processos, análise \nde processos, desenho de processos, gerenciamento de desempenho de processos, transformação de \nprocessos, tecnologias de BPM. 9.3 Tipologia dos processos. 9.4 Hierarquia do processo: macroprocesso, \nprocesso, subprocesso, atividades e tarefa. 9.5 Reengenharia de processos. 9.6 Abordagens de melhoria de \nprocessos. 9.7 Notação BPMN. 9.8 Escritório de processos: conceitos e atuação.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 9,
@@ -160,7 +169,8 @@
       "offset_fim_secao": 13585,
       "chars": 1290,
       "texto_enviado_llm": "1 Conceitos básicos de hardware e software. 1.1 \nFuncionamento do computador. 1.2 Conhecimentos dos componentes.  2 Noções de sistema operacional \n(ambiente Windows 10 e 11) e MSOffice M365 (Word, Excel, PowerPoint, OneDrive, Sharepoint e Teams). 3 \nRedes de computadores. 3.1 Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e \nintranet. 3.2 Programas de navegação (Microsoft Edge, Mozilla Firefox, Google Chrome e similares). 3.3 \nFerramentas de comunicação e colaboração: correio eletrônico (webmail, cliente de e-mail), aplicativos de \ncomunicação (Microsoft Teams, Google Meet). 3.4 Redes sociais. 3.5 Computação na nuvem (cloud \ncomputing). 4 Conceitos gerais de segurança e governança digital. 4.1 Segurança da informação: \nprocedimentos de cópia de segurança (backup), noções de vírus, worms e pragas virtuais. 4.2 Programas de \nproteção (antivírus, firewall, anti-spyware). 4.3 Ameaças digitais (phishing, pharming). 5 Tecnologias \nemergentes no setor público. 5.1 Conceitos básicos de inteligência artificial. 5.2 Técnicas de prompts. 6 Ética \ne responsabilidade digital no serviço público. 7 Ciência de Dados. 7.1 Definição. 7.2 Importância. 7.3 \nAplicações. 8 Dados. 8.1 Conceitos, atributos, métricas, transformação de dados. 9 Governança da \ninformação.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 10,
@@ -175,7 +185,8 @@
       "offset_fim_secao": 14872,
       "chars": 1121,
       "texto_enviado_llm": "1 \nConstituição Federal de 1988: conceito, contexto histórico, características, estrutura do texto. 2 Poder \nconstituinte: conceito, espécies, limites. 3 Princípios Fundamentais. Direitos e garantias fundamentais: \ndireitos e deveres individuais e coletivos, direitos sociais, nacionalidade, direitos políticos e partidos políticos. \n4 Organização do Estado: organização político-administrativa, União, estados, municípios, Distrito Federal e \nterritórios. Intervenção Federal. 5 Administração Pública: disposições gerais, servidores públicos civis e \nmilitares. 6 Poder Legislativo: o Congresso Nacional e suas Casas (atribuições, competências, reuniões e \ncomissões). 7 Regime jurídico-constitucional dos parlamentares. 8 Processo Legislativo. 9 Fiscalização \ncontábil, financeira e orçamentária. 10 Defesa do Estado e das instituições democráticas. 11 Regimento \nInterno da Câmara dos Deputados. 11.1 Resolução nº 17/1989 – CD, e alterações. 11.1.1 Disposições \npreliminares: arts. 1º a 13. 11.1.2 Órgãos da Câmara: arts. 14 a 22. 11.1.3 Sessões da Câmara: arts. 65 a 78. \n11.1.4 Exercício do mandato: arts. 226 a 243.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 11,
@@ -190,7 +201,8 @@
       "offset_fim_secao": 17087,
       "chars": 2191,
       "texto_enviado_llm": "1 Noções de Administração 1.1 Fundamentos e evolução da administração. \nAbordagem sistêmica. 1.2 Fundamentos, teorias e escolas da administração e seu impacto na gestão de \npessoas. 2 Noções de gestão de pessoas 2.1 Comportamento organizacional: relações indivíduo/organização, \nmotivação, desempenho, engajamento, trabalho em equipe e colaboração. 2.2 Clima e cultura \norganizacional. 2.3 Desenvolvimento e treinamento de pessoal: levantamento de necessidades, \nprogramação, execução e avaliação. 2.4 Gestão por competências: abordagens e ferramentas, mapeamento \ne desenvolvimento das competências. 2.5 Recrutamento e seleção. 2.6 Liderança: natureza e estilos de \nliderança. 3 Gestão por resultados na produção de serviços públicos. 3.1 Métricas de aferição de resultados. \n3.2 Trabalho híbrido. 4 Noções de gestão patrimonial. 4.1 Controle de bens. 4.2 Inventário. 5. Governança e \nestratégia: 5.1 Conceito. 5.2 Fundamentos de estratégia. 5.3 Planejamento estratégico. 5.3.1 Conceitos, \nmétodos e técnicas. 5.4 Ferramentas de planejamento estratégico. 5.4.1 Análise SWOT. 5.4.2 Balanced \nscorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, \n\n \n \nobjetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas. 5.5 Indicadores \nde desempenho. 5.5.1 Tipos de indicadores. 5.5.2 Variáveis componentes dos indicadores. 5.6 Histórico da \ngovernança corporativa (primórdios e grandes marcos no mundo). 5.7 Conceito de governança corporativa. \n5.8 Governança e áreas de controle: Controles internos, auditoria e compliance. 5.9 Gestão de riscos e \nintegridade. 6 Noções de gestão de projetos. 6.1 Ciclo de vida e organização do projeto. 6.2 Ferramentas e \ntécnicas de apoio ao gerenciamento de projetos. 6.3 Escritório de projetos (PMO). 6.4 Conceitos de gestão \nde programas e de gestão de portfólio de projetos. 7 Noções de gestão de processos. 7.1 Conceitos, \nmodelagem de processos, análise de processos, desenho de processos, gerenciamento de desempenho de \nprocessos, transformação de processos, tecnologias de BPM. 7.2 Hierarquia do processo: macroprocesso, \nprocesso, subprocesso, atividades e tarefa.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 12,
@@ -205,7 +217,8 @@
       "offset_fim_secao": 18319,
       "chars": 1205,
       "texto_enviado_llm": "1 Lei nº 14.133/2021. 1.1 Licitação Pública: conceito, princípios, finalidade do \nprocedimento licitatório, fiscalização contratual, modalidades, dispensa e inexigibilidade de licitação. 2 \nContratos administrativos. 2.1 Características do contrato administrativo. 2.2 Formalização, gestão e \nfiscalização do contrato. 2.2.1 Planejamento e fiscalização contratual. 2.2.2 Cláusulas e indicadores de nível \nde serviço. 2.2.3 Papel do fiscalizador do contrato. 2.2.4 Papel do preposto da contratada. 2.2.5 \nAcompanhamento da execução contratual. 2.2.6 Registro e notificação de irregularidades. 2.3 Penalidades e \nsanções administrativas. 2.3.1 Tipos de penalidades previstas na Lei nº 14.133/2021. 2.4. Aspectos \norçamentários e financeiros da execução do contrato.  2.5 Equilíbrio econômico-financeiro. 2.6 Garantia \ncontratual. 2.7 Alteração do objeto: acréscimos e supressões. 2.8 Prorrogação do prazo de vigência e de \nexecução. 2.9 Ciclo de vida do contrato. 2.10 Riscos contratuais e gestão econômico-financeira do contrato. \n3 Contratos de terceirização: cautelas em relação à responsabilidade trabalhista. 4 Responsabilidades da \nadministração e da contratada. 5 Gestão de contratos administrativos.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 13,
@@ -220,7 +233,8 @@
       "offset_fim_secao": 21050,
       "chars": 2503,
       "texto_enviado_llm": "1 Conceitos básicos de hardware e \nsoftware. 1.1 Funcionamento do computador. 1.2 Conhecimentos dos componentes.  2 Noções de sistema \noperacional (ambiente Windows 10 e 11) e MSOffice M365 (Word, Excel, PowerPoint, OneDrive, Sharepoint \ne Teams) 3 Redes de computadores. 3.1 Conceitos básicos, ferramentas, aplicativos e procedimentos de \nInternet e intranet. 3.2 Programas de navegação (Microsoft Edge, Mozilla Firefox, Google Chrome e similares). \n3.3 Ferramentas de comunicação e colaboração: correio eletrônico (webmail, cliente de e-mail), aplicativos \nde comunicação (Microsoft Teams, Google Meet). 3.4 Redes sociais. 3.5 Computação na nuvem (cloud \ncomputing). 3.6 Acesso à distância a computadores, transferência de informação e arquivos. 4 Conceitos \ngerais de segurança e governança digital. 4.1 Segurança da informação: procedimentos de cópia de segurança \n(backup), noções de vírus, worms e pragas virtuais. 4.2 Programas de proteção (antivírus, firewall, anti-\nspyware). 4.3 Ameaças digitais (phishing, pharming). 5 Tecnologias emergentes no setor público. 5.1 \nConceitos básicos de inteligência artificial. 5.2 Técnicas de prompts. 6 Ética e responsabilidade digital no \nserviço público. 7 Dados. 7.1 Conceitos, atributos, métricas, transformação de dados. 7.2 Análise de dados. \n7.2.1 Agrupamentos. 7.2.2 Tendências. Projeções. 8 Governança de dados. 9 Governança da informação. 10 \nNoções de Big Data. 11 Dados estruturados e não estruturados. 11.1 Dados abertos. 11.2 Coleta, tratamento, \narmazenamento, integração e recuperação de dados. 11.3 Processos de ETL. 11.4 Representação de dados \nnuméricos, textuais e estruturados. 12 Noções de bancos de dados relacionais. 13 Exploração de dados: \nconceituação e características. 14 Técnicas para pré-processamento de dados. 14.1 Técnicas e tarefas de \nmineração de dados. 14.2 Classificação. 14.3 Regras de associação. 14.4 Análise de agrupamentos \n(clusterização). 15 Estatística e probabilidade básicas. 15.1 Medidas de tendência central. 15.2 Medidas de \ndispersão. 15.3 Distribuição de probabilidade. 15.4 Formulação e validação de hipóteses. 15.5 Amostragem, \nviés e erro. 15.6 Normalização e padronização. 15.7 Outliers. 15.8 Conceitos básicos de probabilidade. 16 \nVisualização de dados. 16.1 Princípios de visualização de dados. 16.2 Tipos de gráficos (histograma, linha, \n\n \n \nbarra, dispersão, box plot). 16.3 Ferramentas de visualização de dados (Power BI, Tableau e Data Studio). 16.4 \nStorytelling para visualização de dados.",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     },
     {
       "chunk_index": 14,
@@ -235,7 +249,8 @@
       "offset_fim_secao": 21633,
       "chars": 520,
       "texto_enviado_llm": "1 Programação, execução e controle de \nrecursos orçamentários e financeiros. 1.1 Pré-empenho, empenho, liquidação e pagamento da despesa. 1.2 \nGuia de Recolhimento da União (GRU). 1.3 Sistemas de informações. 1.4 Controle e pagamento de restos a \npagar e de despesas de exercícios anteriores. 1.5 Suprimento de fundos. 2 Retenção e recolhimento de \ntributos incidentes sobre bens e serviços. \n \n \nMAURO LIMEIRA MENA BARRETO \nPresidente da Comissão Organizadora de Governança  \ndo Concurso Público da Câmara dos Deputados",
-      "status": "sucesso"
+      "status": "sucesso",
+      "cargos_restritos": null
     }
   ]
 }

@@ -77,7 +77,8 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
     # comparar. Chunk sem bloco ou sem nível não entra nos filtros por
     # nível/tipo de conhecimento, e isso não pode passar em silêncio.
     if "tipo_conhecimento" in chunk_auditoria and (
-        chunk_auditoria.get("tipo_conhecimento") is None or chunk_auditoria.get("nivel") is None
+        chunk_auditoria.get("tipo_conhecimento") is None
+        or chunk_auditoria.get("nivel") is None
     ):
         alertas.append(
             {
@@ -143,20 +144,24 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
         t_nome = topico.get("nome", "")
         if t_nome and not t_nome.strip().isdigit():
             topicos_extraidos.append((t_idx, t_nome))
-            todos_extraidos.append({
-                "texto": t_nome,
-                "norm": normalizar(t_nome),
-                "tipo": "topico",
-                "topico_idx": t_idx,
-            })
+            todos_extraidos.append(
+                {
+                    "texto": t_nome,
+                    "norm": normalizar(t_nome),
+                    "tipo": "topico",
+                    "topico_idx": t_idx,
+                }
+            )
         for s in topico.get("subtopicos", []):
             if s and isinstance(s, str) and not s.strip().isdigit():
-                todos_extraidos.append({
-                    "texto": s,
-                    "norm": normalizar(s),
-                    "tipo": "subtopico",
-                    "topico_idx": t_idx,
-                })
+                todos_extraidos.append(
+                    {
+                        "texto": s,
+                        "norm": normalizar(s),
+                        "tipo": "subtopico",
+                        "topico_idx": t_idx,
+                    }
+                )
 
     topicos_usados: set[int] = set()
 
@@ -170,7 +175,8 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
                     topicos_usados.add(el["topico_idx"])
 
         if not match_encontrado and any(
-            divergencia_leve(el["texto"], [item_texto], item_norm) for el in todos_extraidos
+            divergencia_leve(el["texto"], [item_texto], item_norm)
+            for el in todos_extraidos
         ):
             # O mesmo par (item, tópico parafraseado) já gera um
             # `topico_divergencia_leve` do lado do tópico — alertar aqui
@@ -209,7 +215,9 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
             t_norm = normalizar(t_nome)
             if contido(t_norm, texto_fonte_norm):
                 continue
-            if divergencia_leve(t_nome, [texto for _, texto in itens_fonte], texto_fonte_norm):
+            if divergencia_leve(
+                t_nome, [texto for _, texto in itens_fonte], texto_fonte_norm
+            ):
                 alertas.append(
                     {
                         **base,
@@ -234,7 +242,9 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
     return alertas
 
 
-def validar_arquivos_concurso(resultado: dict, data_dir: Path | None = None) -> list[dict]:
+def validar_arquivos_concurso(
+    resultado: dict, data_dir: Path | None = None
+) -> list[dict]:
     """Verifica se os PDFs de Provas e Gabaritos, o arquivo de metadados dos links
     (provas_texto_link.json) e o registro em processed_concursos.json existem.
 
@@ -320,9 +330,13 @@ def validar_arquivos_concurso(resultado: dict, data_dir: Path | None = None) -> 
     return alertas
 
 
-def validar_edital(resultado: dict, auditoria: dict, data_dir: Path | None = None) -> dict:
+def validar_edital(
+    resultado: dict, auditoria: dict, data_dir: Path | None = None
+) -> dict:
     resultado_por_index = {
-        item["chunk_index"]: item for item in resultado["resultados"] if item.get("chunk_index") is not None
+        item["chunk_index"]: item
+        for item in resultado["resultados"]
+        if item.get("chunk_index") is not None
     }
 
     alertas = []
@@ -343,7 +357,6 @@ def validar_edital(resultado: dict, auditoria: dict, data_dir: Path | None = Non
     }
 
 
-
 def _carregar_par(json_path: Path) -> tuple[dict, dict | None]:
     resultado = json.loads(json_path.read_text(encoding="utf-8"))
     auditoria_path = json_path.parent / f"{json_path.stem}.auditoria.json"
@@ -356,7 +369,8 @@ def main(revisao_dir: Path = REVISAO_DIR_PADRAO) -> None:
     jsons = sorted(
         p
         for p in revisao_dir.glob("*.json")
-        if not p.name.endswith(".auditoria.json") and not p.name.endswith(".validacao.json")
+        if not p.name.endswith(".auditoria.json")
+        and not p.name.endswith(".validacao.json")
     )
     if not jsons:
         logger.warning(f"Nenhum <edital>.json encontrado em {revisao_dir}.")
@@ -365,12 +379,16 @@ def main(revisao_dir: Path = REVISAO_DIR_PADRAO) -> None:
     for json_path in jsons:
         resultado, auditoria = _carregar_par(json_path)
         if auditoria is None:
-            logger.warning(f"{resultado['edital']}: sem .auditoria.json — pulando validação (formato legado).")
+            logger.warning(
+                f"{resultado['edital']}: sem .auditoria.json — pulando validação (formato legado)."
+            )
             continue
 
         validacao = validar_edital(resultado, auditoria)
         out_path = json_path.parent / f"{json_path.stem}.validacao.json"
-        out_path.write_text(json.dumps(validacao, ensure_ascii=False, indent=2), encoding="utf-8")
+        out_path.write_text(
+            json.dumps(validacao, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         logger.info(
             f"{validacao['edital']}: {validacao['total_alertas']} alerta(s) de validação "
             f"+ {validacao['total_informativos']} informativo(s) em {out_path}."

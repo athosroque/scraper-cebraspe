@@ -38,12 +38,19 @@ class TestExtrairItensNumerados:
         assert itens[0][1] == "Lógica de primeira ordem."
 
     def test_texto_sem_numeracao_nao_gera_itens(self):
-        assert extrair_itens_numerados("Conteúdo em prosa livre, sem marcação numérica nenhuma.") == []
+        assert (
+            extrair_itens_numerados(
+                "Conteúdo em prosa livre, sem marcação numérica nenhuma."
+            )
+            == []
+        )
 
 
 class TestNormalizar:
     def test_remove_numero_de_prefixo_com_espaco_ou_ponto(self):
-        assert normalizar("1 Compreensão e interpretação") == normalizar("1. Compreensão e interpretação")
+        assert normalizar("1 Compreensão e interpretação") == normalizar(
+            "1. Compreensão e interpretação"
+        )
 
     def test_hifen_unicode_nao_gruda_palavras(self):
         # U+2010 (hífen tipográfico) usado no PDF-fonte vs "-" ASCII usado pelo LLM
@@ -51,10 +58,14 @@ class TestNormalizar:
 
     def test_acento_combinante_decomposto_normaliza_igual_ao_precomposto(self):
         # Domi\u0301nio (decomposto NFD) vs Domínio (precomposto NFC)
-        assert normalizar("Domi\u0301nio da ortografia oficial.") == normalizar("Domínio da ortografia oficial")
+        assert normalizar("Domi\u0301nio da ortografia oficial.") == normalizar(
+            "Domínio da ortografia oficial"
+        )
 
     def test_ligaturas_e_caracteres_corrompidos_sao_normalizados(self):
-        assert normalizar("ÉƟca no serviço público") == normalizar("Ética no serviço público")
+        assert normalizar("ÉƟca no serviço público") == normalizar(
+            "Ética no serviço público"
+        )
         assert normalizar("MicrosoŌ Oﬃce 365") == normalizar("Microsoft Office 365")
 
 
@@ -72,16 +83,25 @@ class TestCompararChunk:
         return {
             "cargo": None,
             "materia_chunk": "MATERIA X",
-            "taxonomia_extraida": {"materia": "Matéria X", "topicos": [{"nome": n, "subtopicos": []} for n in nomes_topicos]},
+            "taxonomia_extraida": {
+                "materia": "Matéria X",
+                "topicos": [{"nome": n, "subtopicos": []} for n in nomes_topicos],
+            },
         }
 
     def test_conjuntos_iguais_nao_gera_alerta(self):
-        chunk = self._chunk_auditoria("1 Fundamentos da matéria. 2 Aplicações práticas.")
-        resultado = self._resultado_chunk(["Fundamentos da matéria", "Aplicações práticas"])
+        chunk = self._chunk_auditoria(
+            "1 Fundamentos da matéria. 2 Aplicações práticas."
+        )
+        resultado = self._resultado_chunk(
+            ["Fundamentos da matéria", "Aplicações práticas"]
+        )
         assert comparar_chunk(chunk, resultado) == []
 
     def test_item_presente_na_fonte_e_ausente_na_extracao_gera_alerta_ausente(self):
-        chunk = self._chunk_auditoria("1 Fundamentos da matéria. 2 Aplicações práticas avançadas.")
+        chunk = self._chunk_auditoria(
+            "1 Fundamentos da matéria. 2 Aplicações práticas avançadas."
+        )
         resultado = self._resultado_chunk(["Fundamentos da matéria"])
         alertas = comparar_chunk(chunk, resultado)
         assert len(alertas) == 1
@@ -90,15 +110,22 @@ class TestCompararChunk:
 
     def test_topico_extraido_sem_correspondencia_na_fonte_gera_alerta_extra(self):
         chunk = self._chunk_auditoria("1 Fundamentos da matéria.")
-        resultado = self._resultado_chunk(["Fundamentos da matéria", "Tópico inventado que não está no texto"])
+        resultado = self._resultado_chunk(
+            ["Fundamentos da matéria", "Tópico inventado que não está no texto"]
+        )
         alertas = comparar_chunk(chunk, resultado)
         assert len(alertas) == 1
         assert alertas[0]["tipo"] == "topico_extra"
-        assert alertas[0]["topico_nome_extraido"] == "Tópico inventado que não está no texto"
+        assert (
+            alertas[0]["topico_nome_extraido"]
+            == "Tópico inventado que não está no texto"
+        )
 
     def test_extracao_sem_numero_de_prefixo_ainda_casa_pelo_texto(self):
         chunk = self._chunk_auditoria("1 Estruturas lógicas. 2 Lógica de argumentação.")
-        resultado = self._resultado_chunk(["Estruturas lógicas", "Lógica de argumentação"])
+        resultado = self._resultado_chunk(
+            ["Estruturas lógicas", "Lógica de argumentação"]
+        )
         assert comparar_chunk(chunk, resultado) == []
 
     def test_item_classificado_como_subtopico_e_marcado_como_incluido(self):
@@ -135,14 +162,22 @@ class TestCompararChunk:
         assert comparar_chunk(chunk, None) == []
 
     def test_materia_sem_numeracao_nao_gera_alerta(self):
-        chunk = self._chunk_auditoria("Texto corrido sem nenhuma marcação numérica de tópico.")
-        resultado = self._resultado_chunk(["Texto corrido sem nenhuma marcação numérica de tópico"])
+        chunk = self._chunk_auditoria(
+            "Texto corrido sem nenhuma marcação numérica de tópico."
+        )
+        resultado = self._resultado_chunk(
+            ["Texto corrido sem nenhuma marcação numérica de tópico"]
+        )
         assert comparar_chunk(chunk, resultado) == []
 
-    def test_numero_repetido_na_fonte_flag_so_a_ocorrencia_sem_match_com_posicao_correta(self):
+    def test_numero_repetido_na_fonte_flag_so_a_ocorrencia_sem_match_com_posicao_correta(
+        self,
+    ):
         # Simula o achado real do edital piloto (chunk 32): numeração
         # duplicada por corrupção do texto do PDF-fonte.
-        chunk = self._chunk_auditoria("1 Comunicação pública. 2 Área X. 1 Fundamentos e finalidades.")
+        chunk = self._chunk_auditoria(
+            "1 Comunicação pública. 2 Área X. 1 Fundamentos e finalidades."
+        )
         resultado = self._resultado_chunk(["Comunicação pública", "Área X"])
         alertas = comparar_chunk(chunk, resultado)
         assert len(alertas) == 1
@@ -151,13 +186,21 @@ class TestCompararChunk:
         assert alertas[0]["posicao_item"] == 2
 
     def test_chunk_classificado_nao_gera_alerta_de_classificacao(self):
-        chunk = {**self._chunk_auditoria("1 Fundamentos."), "tipo_conhecimento": "basico", "nivel": "medio"}
+        chunk = {
+            **self._chunk_auditoria("1 Fundamentos."),
+            "tipo_conhecimento": "basico",
+            "nivel": "medio",
+        }
         assert comparar_chunk(chunk, self._resultado_chunk(["Fundamentos"])) == []
 
     def test_chunk_sem_nivel_gera_alerta_chunk_sem_classificacao(self):
         # ADR-020: bloco "PARA TODOS OS CARGOS" (ou chunk fora de bloco)
         # sai sem nível — some dos filtros por nível, então tem que alertar.
-        chunk = {**self._chunk_auditoria("1 Fundamentos."), "tipo_conhecimento": "basico", "nivel": None}
+        chunk = {
+            **self._chunk_auditoria("1 Fundamentos."),
+            "tipo_conhecimento": "basico",
+            "nivel": None,
+        }
         alertas = comparar_chunk(chunk, self._resultado_chunk(["Fundamentos"]))
         assert [a["tipo"] for a in alertas] == ["chunk_sem_classificacao"]
 
@@ -217,7 +260,9 @@ class TestSeveridadeDivergenciaLeve:
             "7 Educação corporativa. 7.1 Escolas de governo. 11 Educação corporativa. "
             "11.1 Atuação do pedagogo no âmbito corporativo."
         )
-        resultado = self._resultado(["Educação corporativa", "Educação corporativa (atuação do pedagogo)"])
+        resultado = self._resultado(
+            ["Educação corporativa", "Educação corporativa (atuação do pedagogo)"]
+        )
         alertas = comparar_chunk(chunk, resultado)
         assert [a["tipo"] for a in alertas] == ["topico_divergencia_leve"]
         assert alertas[0]["severidade"] == "informativo"
@@ -239,21 +284,29 @@ class TestSeveridadeDivergenciaLeve:
 
     def test_nome_parecido_mas_diferente_continua_extra(self):
         chunk = self._chunk("1 Gestão de pessoas. 2 Gamificação.")
-        resultado = self._resultado(["Gestão de pessoas", "Gamificação", "Gestão de projetos"])
+        resultado = self._resultado(
+            ["Gestão de pessoas", "Gamificação", "Gestão de projetos"]
+        )
         alertas = comparar_chunk(chunk, resultado)
         assert [a["tipo"] for a in alertas] == ["topico_extra"]
         assert "severidade" not in alertas[0]
 
     def test_topico_inventado_de_outro_dominio_continua_extra(self):
         chunk = self._chunk("1 Gamificação. 2 Mídias para educação.")
-        resultado = self._resultado(["Gamificação", "Mídias para educação", "Kubernetes avançado"])
+        resultado = self._resultado(
+            ["Gamificação", "Mídias para educação", "Kubernetes avançado"]
+        )
         assert [a["tipo"] for a in comparar_chunk(chunk, resultado)] == ["topico_extra"]
 
     def test_parafrase_de_um_item_nao_esconde_omissao_de_outro(self):
         # O parêntese de um tópico não pode servir de "casamento tolerante"
         # pra um item diferente que o LLM realmente omitiu.
-        chunk = self._chunk("1 Educação corporativa. 2 Gamificação. 3 Lei nº 8.112/1990.")
-        resultado = self._resultado(["Educação corporativa (atuação do pedagogo)", "Gamificação"])
+        chunk = self._chunk(
+            "1 Educação corporativa. 2 Gamificação. 3 Lei nº 8.112/1990."
+        )
+        resultado = self._resultado(
+            ["Educação corporativa (atuação do pedagogo)", "Gamificação"]
+        )
         tipos = [a["tipo"] for a in comparar_chunk(chunk, resultado)]
         assert "topico_ausente" in tipos
 
@@ -263,13 +316,24 @@ class TestSeveridadeDivergenciaLeve:
             "resultados": [
                 {
                     "chunk_index": 0,
-                    **self._resultado(["Fundamentos (visão geral)", "Aplicações", "Tópico inventado qualquer"]),
+                    **self._resultado(
+                        [
+                            "Fundamentos (visão geral)",
+                            "Aplicações",
+                            "Tópico inventado qualquer",
+                        ]
+                    ),
                 }
             ],
         }
-        auditoria = {"chunks": [self._chunk("1 Fundamentos. 1.1 Histórico. 2 Aplicações.")]}
+        auditoria = {
+            "chunks": [self._chunk("1 Fundamentos. 1.1 Histórico. 2 Aplicações.")]
+        }
         validacao = validar_edital(resultado, auditoria)
-        assert [a["tipo"] for a in validacao["alertas"]] == ["topico_divergencia_leve", "topico_extra"]
+        assert [a["tipo"] for a in validacao["alertas"]] == [
+            "topico_divergencia_leve",
+            "topico_extra",
+        ]
         assert validacao["total_informativos"] == 1
         assert validacao["total_alertas"] == 1
 
@@ -324,7 +388,8 @@ class TestValidarEdital:
 class TestMain:
     def test_edital_sem_auditoria_e_pulado_sem_erro(self, tmp_path, caplog):
         (tmp_path / "Edital_Legado.json").write_text(
-            json.dumps({"edital": "Edital_Legado.pdf", "resultados": []}), encoding="utf-8"
+            json.dumps({"edital": "Edital_Legado.pdf", "resultados": []}),
+            encoding="utf-8",
         )
         main(tmp_path)
         assert not (tmp_path / "Edital_Legado.validacao.json").exists()
@@ -337,7 +402,10 @@ class TestMain:
                     "chunk_index": 0,
                     "cargo": None,
                     "materia_chunk": "MATERIA A",
-                    "taxonomia_extraida": {"materia": "Matéria A", "topicos": [{"nome": "1 Único tópico", "subtopicos": []}]},
+                    "taxonomia_extraida": {
+                        "materia": "Matéria A",
+                        "topicos": [{"nome": "1 Único tópico", "subtopicos": []}],
+                    },
                 }
             ],
         }
@@ -352,12 +420,18 @@ class TestMain:
                 }
             ]
         }
-        (tmp_path / "Edital_A.json").write_text(json.dumps(resultado, ensure_ascii=False), encoding="utf-8")
-        (tmp_path / "Edital_A.auditoria.json").write_text(json.dumps(auditoria, ensure_ascii=False), encoding="utf-8")
+        (tmp_path / "Edital_A.json").write_text(
+            json.dumps(resultado, ensure_ascii=False), encoding="utf-8"
+        )
+        (tmp_path / "Edital_A.auditoria.json").write_text(
+            json.dumps(auditoria, ensure_ascii=False), encoding="utf-8"
+        )
 
         main(tmp_path)
 
-        saida = json.loads((tmp_path / "Edital_A.validacao.json").read_text(encoding="utf-8"))
+        saida = json.loads(
+            (tmp_path / "Edital_A.validacao.json").read_text(encoding="utf-8")
+        )
         assert saida["total_alertas"] == 0
 
 
@@ -422,4 +496,3 @@ class TestValidarArquivosConcurso:
 
         alertas = validar_arquivos_concurso(resultado, data_dir=tmp_path)
         assert alertas == []
-

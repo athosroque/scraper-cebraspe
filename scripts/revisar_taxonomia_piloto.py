@@ -73,7 +73,9 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
         # tópico numérico sem correspondência na fonte, ver ADR-021) de falha
         # técnica genérica (rede/timeout/parse) — só a última vira "falha".
         status = "sucesso" if taxonomia is not None else (motivo_falha or "falha")
-        logger.info(f"[{chunk_index + 1}/{total}] {status} — faltam {total - chunk_index - 1}")
+        logger.info(
+            f"[{chunk_index + 1}/{total}] {status} — faltam {total - chunk_index - 1}"
+        )
         auditoria_chunks.append(
             {
                 "chunk_index": chunk_index,
@@ -112,7 +114,11 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
         # Concurso de origem (slug/órgão/ano) e cargos com nível — base dos
         # filtros por concurso e por nível; ver ADR-020.
         "concurso": resolver_concurso_do_pdf(pdf_path),
-        "cargos": mapear_cargos(chunks, cargo_padrao=secao.cargo_detectado, nivel_padrao=secao.nivel_detectado),
+        "cargos": mapear_cargos(
+            chunks,
+            cargo_padrao=secao.cargo_detectado,
+            nivel_padrao=secao.nivel_detectado,
+        ),
         "total_chunks": len(chunks),
         "extraidos_com_sucesso": len(resultados),
         "falhas": len(falhas),
@@ -122,7 +128,9 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
     }
 
     saida_path.parent.mkdir(parents=True, exist_ok=True)
-    saida_path.write_text(json.dumps(saida, indent=2, ensure_ascii=False), encoding="utf-8")
+    saida_path.write_text(
+        json.dumps(saida, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     logger.info(
         f"Resultado salvo em {saida_path} — "
         f"{len(resultados)}/{len(chunks)} chunks extraídos, {len(falhas)} falhas"
@@ -144,8 +152,12 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
         "chunks": auditoria_chunks,
     }
     auditoria_path = saida_path.parent / f"{pdf_path.stem}.auditoria.json"
-    auditoria_path.write_text(json.dumps(auditoria, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"Auditoria de entrada/saída (parser+extractor) salva em {auditoria_path}")
+    auditoria_path.write_text(
+        json.dumps(auditoria, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    logger.info(
+        f"Auditoria de entrada/saída (parser+extractor) salva em {auditoria_path}"
+    )
 
     atualizar_artefatos_revisao(saida_path.parent)
 
@@ -154,13 +166,19 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Uso: python -m scripts.revisar_taxonomia_piloto <caminho_do_pdf> [saida.json]")
+        print(
+            "Uso: python -m scripts.revisar_taxonomia_piloto <caminho_do_pdf> [saida.json]"
+        )
         sys.exit(1)
 
     pdf_arg = Path(sys.argv[1])
     if len(sys.argv) > 2:
         saida_arg = Path(sys.argv[2])
     else:
-        saida_arg = Path(__file__).resolve().parent.parent / "revisao_piloto" / f"{pdf_arg.stem}.json"
+        saida_arg = (
+            Path(__file__).resolve().parent.parent
+            / "revisao_piloto"
+            / f"{pdf_arg.stem}.json"
+        )
 
     revisar_edital_piloto(pdf_arg, saida_arg)

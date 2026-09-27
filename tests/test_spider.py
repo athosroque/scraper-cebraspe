@@ -32,7 +32,9 @@ class TestGetContestLinksResolveHref:
             monkeypatch,
             [
                 _make_link("MAIS INFORMAÇÕES", "/concursos/PF_25_ADM"),
-                _make_link("MAIS INFORMAÇÕES", "/concursos/ABIN_17"),  # outro ano, deve ser filtrado
+                _make_link(
+                    "MAIS INFORMAÇÕES", "/concursos/ABIN_17"
+                ),  # outro ano, deve ser filtrado
             ],
         )
         contests = spider.get_contest_links(page)
@@ -44,7 +46,12 @@ class TestGetContestLinksResolveHref:
     def test_mantem_href_absoluto_inalterado(self, monkeypatch):
         spider, page = self._spider_with_links(
             monkeypatch,
-            [_make_link("MAIS INFORMAÇÕES", "https://www.cebraspe.org.br/concursos/TCU_25_TEFC")],
+            [
+                _make_link(
+                    "MAIS INFORMAÇÕES",
+                    "https://www.cebraspe.org.br/concursos/TCU_25_TEFC",
+                )
+            ],
         )
         contests = spider.get_contest_links(page)
 
@@ -85,7 +92,9 @@ class TestMapPdfLinks:
         page.locator.return_value.element_handles.return_value = links
         return spider, page
 
-    def test_classifica_padrao_resposta_discursiva_como_gabarito_e_nao_prova(self, monkeypatch):
+    def test_classifica_padrao_resposta_discursiva_como_gabarito_e_nao_prova(
+        self, monkeypatch
+    ):
         spider, page = self._spider_with_page(
             monkeypatch,
             [
@@ -100,7 +109,9 @@ class TestMapPdfLinks:
         assert len(pdf_map["provas"]) == 0
         assert "padrao.pdf" in pdf_map["gabaritos"][0]
 
-    def test_edital_resultado_de_prova_vai_para_nao_classificados_e_nao_provas(self, monkeypatch):
+    def test_edital_resultado_de_prova_vai_para_nao_classificados_e_nao_provas(
+        self, monkeypatch
+    ):
         spider, page = self._spider_with_page(
             monkeypatch,
             [
@@ -146,4 +157,3 @@ class TestMapPdfLinks:
         assert len(pdf_map["editais_abertura"]) == 1
         assert "ed1.pdf" in pdf_map["editais_abertura"][0]
         assert len(pdf_map["nao_classificados"]) == 1
-

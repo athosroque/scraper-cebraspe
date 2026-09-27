@@ -8,9 +8,7 @@ from src.telegram_bot import chamar_openrouter, is_allowed, load_project_context
 
 def test_chamar_openrouter_sucesso():
     fake_response_data = {
-        "choices": [
-            {"message": {"content": "Resposta do modelo"}}
-        ],
+        "choices": [{"message": {"content": "Resposta do modelo"}}],
         "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
     }
 
@@ -19,13 +17,15 @@ def test_chamar_openrouter_sucesso():
     mock_resp.raise_for_status = lambda: None
     mock_resp.json = lambda: fake_response_data
 
-    with patch("httpx.AsyncClient.post", new=AsyncMock(return_value=mock_resp)), \
-         patch("src.telegram_bot._registrar_langfuse") as mock_langfuse:
+    with (
+        patch("httpx.AsyncClient.post", new=AsyncMock(return_value=mock_resp)),
+        patch("src.telegram_bot._registrar_langfuse") as mock_langfuse,
+    ):
         messages = [{"role": "user", "content": "Olá"}]
         resposta = asyncio.run(
             chamar_openrouter(
                 messages=messages,
-                api_key="sk-or-test-key",
+                api_key="mock-test-key",  # nosec
                 base_url="https://openrouter.ai/api/v1",
                 model="z-ai/glm-5.3-flash",
                 user_id=123,
@@ -50,6 +50,7 @@ def test_chamar_openrouter_sem_chave():
 
 def test_is_allowed():
     from unittest.mock import MagicMock
+
     update = MagicMock()
     update.effective_user.id = 1871867397
 
@@ -73,3 +74,31 @@ def test_load_project_context():
     assert "taxonomia_extractor.py" in contexto
     assert "OpenRouter" in contexto
     assert "Langfuse" in contexto
+
+
+def test_payload_do_bot_tem_reasoning_3000():
+    import asyncio
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    from src import telegram_bot
+
+    resposta = MagicMock()
+    resposta.raise_for_status.return_value = None
+    resposta.json.return_value = {
+        "choices": [{"message": {"content": "oi"}}],
+        "usage": {},
+    }
+    cliente = MagicMock()
+    cliente.__aenter__ = AsyncMock(return_value=cliente)
+    cliente.__aexit__ = AsyncMock(return_value=None)
+    cliente.post = AsyncMock(return_value=resposta)
+    with (
+        patch.object(telegram_bot.httpx, "AsyncClient", return_value=cliente),
+        patch.object(telegram_bot, "_abrir_generation", return_value=None),
+    ):
+        asyncio.run(
+            telegram_bot.chamar_openrouter(
+                [{"role": "user", "content": "oi"}], api_key="x"
+            )
+        )
+    assert cliente.post.call_args.kwargs["json"]["reasoning"] == {"max_tokens": 3000}

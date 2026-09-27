@@ -43,7 +43,11 @@ AUDITORIA_PADRAO = (
     / "revisao_piloto"
     / "Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.auditoria.json"
 )
-SAIDA_PADRAO = Path(__file__).resolve().parent.parent / "revisao_piloto" / "experimento_falhas.json"
+SAIDA_PADRAO = (
+    Path(__file__).resolve().parent.parent
+    / "revisao_piloto"
+    / "experimento_falhas.json"
+)
 
 CONFIGURACOES: dict[str, dict] = {
     "baseline": {},
@@ -60,11 +64,15 @@ def carregar_chunks_com_falha(auditoria_path: Path) -> list[dict]:
     auditoria = json.loads(auditoria_path.read_text(encoding="utf-8"))
     falhas = [c for c in auditoria["chunks"] if c["status"] == "falha"]
     if not falhas:
-        logger.warning(f"Nenhum chunk com status=falha encontrado em {auditoria_path.name}.")
+        logger.warning(
+            f"Nenhum chunk com status=falha encontrado em {auditoria_path.name}."
+        )
     return falhas
 
 
-def rodar_experimento(auditoria_path: Path = AUDITORIA_PADRAO, saida_path: Path = SAIDA_PADRAO) -> dict:
+def rodar_experimento(
+    auditoria_path: Path = AUDITORIA_PADRAO, saida_path: Path = SAIDA_PADRAO
+) -> dict:
     chunks_falhos = carregar_chunks_com_falha(auditoria_path)
     total_chamadas = len(chunks_falhos) * len(CONFIGURACOES)
     logger.info(
@@ -77,9 +85,15 @@ def rodar_experimento(auditoria_path: Path = AUDITORIA_PADRAO, saida_path: Path 
         for nome_config, params_config in CONFIGURACOES.items():
             params = dict(params_config)
             limpar = params.pop("limpar_texto", False)
-            texto = _limpar_ruido_edital(chunk["texto_enviado_llm"]) if limpar else chunk["texto_enviado_llm"]
+            texto = (
+                _limpar_ruido_edital(chunk["texto_enviado_llm"])
+                if limpar
+                else chunk["texto_enviado_llm"]
+            )
 
-            logger.info(f"[{chunk['cargo'] or 'sem cargo'} / {chunk['materia']}] config={nome_config}")
+            logger.info(
+                f"[{chunk['cargo'] or 'sem cargo'} / {chunk['materia']}] config={nome_config}"
+            )
             taxonomia = extrair_taxonomia_chunk(texto, tentativas=1, **params)
             status = "sucesso" if taxonomia is not None else "falha"
             logger.info(f"  -> {status}")
@@ -96,7 +110,9 @@ def rodar_experimento(auditoria_path: Path = AUDITORIA_PADRAO, saida_path: Path 
             )
 
     saida = {"auditoria_origem": str(auditoria_path), "resultados": resultados}
-    saida_path.write_text(json.dumps(saida, indent=2, ensure_ascii=False), encoding="utf-8")
+    saida_path.write_text(
+        json.dumps(saida, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     logger.info(f"Resultado do experimento salvo em {saida_path}")
 
     _imprimir_resumo(resultados)

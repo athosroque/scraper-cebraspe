@@ -1,5 +1,25 @@
 # Lições — scraper-cebraspe
 
+### [tags: edital-parser, regex, modelagem, cebraspe, postgres]
+**Sintoma:** `dim_materia` tinha 106 matérias, mas 4 eram a mesma matéria do
+STM com a restrição de cargo no nome (`DIREITO PENAL MILITAR (APENAS PARA O
+CARGO 1: ... E PARA O CARGO 8: ...)`), e havia espaço duplo no IBAMA. Na
+primeira correção, a regex `\([^)]*\)` parava no primeiro `)` e
+`ANALISTA (TI)` deixava o resto da cláusula no nome. Restrição sem número de
+cargo (`PARA OS CARGOS DE NÍVEL SUPERIOR`) era apagada e a matéria passava a
+valer para todos os cargos.
+**Causa:** a chave natural da matéria vinha do nome cru. O ADR-024 já tinha
+aceitado o parêntese com `:` interno para não truncar o nome, mas não separou
+a restrição. A primeira correção removia do nome antes de saber se tinha
+extraído algum cargo.
+**Solução (ADR-028):** a restrição vira `cargos_restritos` e só sai do nome
+quando há número de cargo; sem número, fica no nome e loga
+`[RESTRICAO_SEM_CARGO]`. A regex aceita um nível de parêntese interno. O
+número de cargo vem de `extrair_cargos_do_texto`, a mesma função do writer.
+**Custo do aprendizado:** ~40 min, somando a auditoria da entrega da 5A, que
+achou os dois casos de borda com testes de mesa (não aparecem nos 5 editais
+atuais).
+
 ### [tags: edital-parser, spider, chunking, multiline, regex, camara-dos-deputados]
 **Sintoma:** Na coleta e extração do concurso da Câmara dos Deputados (`CD_25_NS`):
 1. O Cargo 1 absorvia a primeira linha de um título de matéria multi-linha (`REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E`) dentro do seu próprio rótulo de cargo, e a matéria resultante ficava truncada apenas como `CÓDIGO DE ÉTICA`.
@@ -399,3 +419,66 @@ distribuição de tamanhos e pega esse tipo de colisão.
 **Pegadinha na implementação:** o casamento tolerante por parêntese, se comparado contra o **texto-fonte inteiro**, deixa um tópico parafraseado de um item "cobrir" a omissão de **outro** item do mesmo chunk. Nas checagens por item, compare só contra o texto daquele item (há teste pra isso).
 **Achado lateral:** os 5 editais de 2025 terminam a seção com a assinatura (nome + cargo) colada no último item, em 4 formatos diferentes. Ancorar a remoção no **cargo** do signatário no fim do texto, não no nome em caixa alta: o STM tem nome sem caixa alta e o PF tem o nome na mesma linha do último item.
 **Custo do aprendizado:** ~40 min. **Lição maior:** antes de automatizar o tratamento de alertas, classificar cada um por "o dado está errado?". Consertar dado e rebaixar severidade são respostas diferentes para perguntas diferentes.
+
+### [tags: llm, glm, sinonimos, validacao, pydantic, lista-fechada]
+**Sintoma:** na proposta de sinônimos (Etapa 5B), um lote de 74 assuntos
+falhou duas vezes com `falha_validacao_schema` ("72 validation errors"),
+com o JSON bem formado e todos os IDs certos.
+**Causa:** o prompt pedia `nome_canonico` em todo grupo, mas o
+`glm-5.3-flash` omite o campo nos grupos de 1 ID (sem sinônimo, não vê o que
+nomear). Com o campo obrigatório no Pydantic, um detalhe cosmético derrubou
+o lote inteiro, e a segunda tentativa repetiu o comportamento.
+**Solução:** campo opcional no schema e nome determinístico (o da regra)
+quando falta num grupo de 2+ IDs. O que importa para a validação (cada ID
+em exatamente um grupo) continua estrito. Achado junto: proposta de
+assunto/subassunto que junta nomes **iguais** de matérias diferentes fica
+redundante quando o dono aprova a matéria (a regra junta sozinha), então a
+reexecução das regras a remove e o relatório avisa.
+**Lição:** em schema de resposta de LLM, obrigatório só o que a validação
+precisa; o resto tem default. Campo obrigatório "de conveniência" vira
+falha de lote inteiro.
+**Custo do aprendizado:** ~15 min, mais uma reexecução do nível de assunto
+(4 chamadas, US$ 0,0024).
+
+### [tags: prova-parser, segmentacao, recuo, cebraspe, pdf-parsing]
+**Sintoma:** Em cadernos com diagramação de 1 coluna (ex: `094_PF_007_01`), itens com enunciado de apenas 1 linha física (itens 55 e 62) engoliam a primeira linha do texto-base seguinte ("Um paciente de 66 anos de idade...").
+**Causa:** A função `_recuo_item` media o deslocamento da linha seguinte aceitando qualquer delta entre `8 < delta < 30`. Quando o item tinha apenas 1 linha física, ela media o delta da 1ª linha do texto-base seguinte (~28.3 pt), capturando o recuo de parágrafo como se fosse recuo de continuação do item.
+**Solução (ADR-031):** Calibrar a janela de medição de `_recuo_item` para a faixa estrita de `12 < delta < 24 pt` (~18 pt real no CEBRASPE), mantendo uma margem segura de separação em relação ao recuo de parágrafo (~28–29 pt) de textos-base.
+**Custo do aprendizado:** ~20 min entre inspeção geométrica, teste de regressão em `TestSegmentacao` e reprocessamento completo.
+
+### [tags: prova-parser, gabarito-parser, pymupdf, hash-url, ordem-visual]
+**Sintoma:** Gabaritos com nomes em hash (TCU e Câmara dos Deputados) baixados pelo crawler não traziam o código do caderno no nome do arquivo nem na URL; e o fluxo interno de objetos retornado pelo PyMuPDF não seguia a ordem de leitura em cadernos de duas colunas.
+**Causa:** Os servidores do CEBRASPE usam hashes aleatórios em links de download de certos gabaritos; no PDF de prova, a ordem dos blocos nos bytes brutos reflete a ordem em que foram gerados no software de diagramação, não a ordem geométrica visual.
+**Solução (ADR-031):**
+1. O leitor de gabaritos extrai o código impresso do caderno (`108_TCUTEFC_...`, `167_CDNS_...`) diretamente do conteúdo do PDF, vinculando 100% dos gabaritos com provas sem depender da URL.
+2. O parser de provas implementa segmentação geométrica em colunas e ordena por `(coluna, y0, x0)` antes de recortar itens por span tipográfico.
+3. Cadernos geram 140 arquivos JSON em `questoes/` mantidos localmente (gitignored por volume), garantindo reprodutibilidade determinística sem sobrecarregar o git.
+**Custo do aprendizado:** ~35 min no desenvolvimento e validação dos 70 cadernos reais.
+
+### [tags: gabarito-parser, discursivas, cebraspe, regex, definitivo]
+**Sintoma:** Dois riscos de falso positivo identificados na revisão da Etapa 5C
+(nenhum afetou os dados reais: os 70 gabaritos/padrões coletados são todos
+definitivos e os 107 quesitos não mudaram):
+1. O padrão de resposta definitivo do cargo 2 da PF cita "definitivo" no corpo
+   ("o diagnóstico precoce, ainda que não definitivo"). Uma busca solta pela
+   palavra no texto inteiro classificaria como definitivo um padrão
+   preliminar com a mesma redação.
+2. Confirmado com entrada sintética: no caderno discursivo, uma linha do
+   enunciado que comece com "1 " (ex.: "1 de janeiro...") virava o quesito 1,
+   o "1" real era engolido e a soma de `[valor]` continuava batendo, então
+   `soma_quesitos_divergente` não disparava.
+**Causa:**
+1. A palavra "definitivo" aparece tanto no cabeçalho do documento quanto no
+   conteúdo técnico da resposta.
+2. `PADRAO_QUESITO` casa qualquer linha que comece com 1–2 dígitos e era
+   aplicado ao bloco inteiro da questão, incluindo o enunciado antes do
+   comando.
+**Solução (ADR-031):**
+1. `classificar_versao` olha só o cabeçalho (primeiros 600 caracteres no
+   padrão de resposta, 2000 na grade), com fallback pelo prefixo do nome do
+   arquivo (`Gab_Definitivo_` / `Gab_Preliminar_`); nunca aceita match solto
+   no corpo.
+2. Quesitos só são procurados a partir do verbo de comando (`redija`,
+   `elabore`, `aborde`, `discorra`, etc.).
+**Custo do aprendizado:** ~25 min em auditoria e testes sintéticos (o risco
+não gerou retrabalho em dados).

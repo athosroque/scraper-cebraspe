@@ -34,7 +34,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "LÍNGUA  PORTUGUESA",
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Língua Portuguesa",
@@ -96,7 +96,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 1,
@@ -163,7 +164,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 2,
@@ -226,7 +228,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 3,
@@ -263,7 +266,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 4,
@@ -272,7 +276,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "LOGÍSTICA  E  PATRIMÔNIO",
+      "materia_normalizada": "LOGÍSTICA E PATRIMÔNIO",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Administração de Recursos Materiais e Patrimoniais",
@@ -290,7 +294,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 5,
@@ -351,7 +356,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 6,
@@ -412,7 +418,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 7,
@@ -421,7 +428,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "LÍNGUA  PORTUGUESA",
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Língua Portuguesa",
@@ -483,7 +490,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 8,
@@ -537,7 +545,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 9,
@@ -576,7 +585,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 10,
@@ -637,7 +647,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 11,
@@ -698,7 +709,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 12,
@@ -753,7 +765,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 13,
@@ -762,7 +775,7 @@
       "tipo_conhecimento": "basico",
       "nivel": "superior",
       "cargo_numero": null,
-      "materia_normalizada": "NOÇÕES  DE  DIREITO  ADMINISTRATIVO",
+      "materia_normalizada": "NOÇÕES DE DIREITO ADMINISTRATIVO",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Direito Administrativo",
@@ -848,7 +861,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 14,
@@ -945,7 +959,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 15,
@@ -954,7 +969,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 1,
-      "materia_normalizada": "DIREITO  ADMINISTRATIVO",
+      "materia_normalizada": "DIREITO ADMINISTRATIVO",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Direito Administrativo",
@@ -1091,7 +1106,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 16,
@@ -1191,7 +1207,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 17,
@@ -1200,7 +1217,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 1,
-      "materia_normalizada": "ADMINISTRAÇÃO  ORÇAMENTÁRIA,  FINANCEIRA  E  ORÇAMENTO  PÚBLICO",
+      "materia_normalizada": "ADMINISTRAÇÃO ORÇAMENTÁRIA, FINANCEIRA E ORÇAMENTO PÚBLICO",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Orçamento Público",
@@ -1279,7 +1296,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 18,
@@ -1288,7 +1306,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 1,
-      "materia_normalizada": "CONTABILIDADE  PÚBLICA",
+      "materia_normalizada": "CONTABILIDADE PÚBLICA",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Contabilidade Pública",
@@ -1447,7 +1465,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 19,
@@ -1487,7 +1506,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 20,
@@ -1496,7 +1516,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 2,
-      "materia_normalizada": "LEGISLAÇÃO  AMBIENTAL",
+      "materia_normalizada": "LEGISLAÇÃO AMBIENTAL",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Legislação Ambiental",
@@ -1538,7 +1558,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 21,
@@ -1547,7 +1568,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 2,
-      "materia_normalizada": "PROTEÇÃO  DE  RECURSOS  GENÉTICOS",
+      "materia_normalizada": "PROTEÇÃO DE RECURSOS GENÉTICOS",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Proteção dos Recursos Genéticos",
@@ -1565,7 +1586,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 22,
@@ -1589,7 +1611,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 23,
@@ -1598,7 +1621,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 2,
-      "materia_normalizada": "PROTEÇÃO  DE  RECURSOS  PESQUEIROS",
+      "materia_normalizada": "PROTEÇÃO DE RECURSOS PESQUEIROS",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Proteção de Recursos Pesqueiros",
@@ -1614,7 +1637,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 24,
@@ -1638,7 +1662,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 25,
@@ -1681,7 +1706,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 26,
@@ -1727,7 +1753,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 27,
@@ -1774,7 +1801,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 28,
@@ -1783,7 +1811,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 2,
-      "materia_normalizada": "LICENCIAMENTO  AMBIENTAL  FEDERAL",
+      "materia_normalizada": "LICENCIAMENTO AMBIENTAL FEDERAL",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Licenciamento Ambiental Federal",
@@ -1849,7 +1877,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 29,
@@ -2021,7 +2050,8 @@
             "subtopicos": []
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 30,
@@ -2126,7 +2156,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 31,
@@ -2135,7 +2166,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 2,
-      "materia_normalizada": "MONITORAMENTO  AMBIENTAL",
+      "materia_normalizada": "MONITORAMENTO AMBIENTAL",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Monitoramento Ambiental",
@@ -2173,7 +2204,8 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     },
     {
       "chunk_index": 32,
@@ -2182,7 +2214,7 @@
       "tipo_conhecimento": "especifico",
       "nivel": "superior",
       "cargo_numero": 3,
-      "materia_normalizada": "MANEJO,  CONSERVAÇÃO  E  REABILITAÇÃO  DA  FAUNA  SILVESTRE",
+      "materia_normalizada": "MANEJO, CONSERVAÇÃO E REABILITAÇÃO DA FAUNA SILVESTRE",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
         "materia": "Zoologia e Manejo de Fauna",
@@ -2263,8 +2295,9 @@
             ]
           }
         ]
-      }
+      },
+      "cargos_restritos": null
     }
   ],
-  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+  "status_revisao_humana": "APROVADO — revisão humana da Fase 4 concluída (registrada em 2026-09-22)"
 }

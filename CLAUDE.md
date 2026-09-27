@@ -7,7 +7,7 @@ Template version: 1.2
 - **ID:** `scraper-cebraspe` (diretório físico: `scraper_cebraspe/`)
 - **Nome legível:** Scraper CEBRASPE — Coleta Estruturada de Editais, Provas e Gabaritos
 - **Guia de referência:** `task.md` (roteiro de implementação por etapas, neste diretório)
-- **Status:** in-progress:phase-4
+- **Status:** in-progress:phase-6
 - **Repositório GitHub:** homelab local / a versionar
 
 ## 2. Pré-requisitos
@@ -34,8 +34,15 @@ concurso/cargo/taxonomia) no Postgres próprio do projeto
 (`scraper-cebraspe-db`), sem FK para outros projetos — o cruzamento com
 `itens_estudo` do `study-rag-agent` é feito depois por chave natural
 normalizada (ADR-026).
-Provas e Gabaritos baixados entram numa fila `pendente` para um pipeline de
-extração de questões futuro (fora do escopo deste projeto).
+Provas e Gabaritos baixados entram na fila `fila_extracao_questoes`. O
+consumidor dela (extração de questões, gabarito e discursiva, seguida da
+classificação por assunto) passou a ser prioridade do projeto: Etapas 5C/5D do
+`task.md`.
+Camada canônica (Etapa 5B, ADR-029): `canonico/sinonimos.json` (versionado)
+liga cada nome de matéria/tópico/subtópico a um canônico, por regra
+determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
+`aprovado` chega ao banco (`materia_canonica`/`assunto_canonico`/
+`subassunto_canonico`).
 
 ## 4. Stack fixada
 
@@ -76,7 +83,7 @@ extração de questões futuro (fora do escopo deste projeto).
       cobrindo slugify, validação de PDF, dedup e resolução de href.
       Auditado ao vivo em 2026-09-19 contra PDFs reais do CEBRASPE — sem
       falhas encontradas no downloader em si.
-- [ ] Fase 4 — Extração híbrida: `edital_parser.py` (seção "OBJETOS DE
+- [x] Fase 4 — Extração híbrida: `edital_parser.py` (seção "OBJETOS DE
       AVALIAÇÃO" + chunking por cargo/matéria) e `taxonomia_extractor.py`
       (LLM via OpenRouter direto, validado contra `TaxonomiaEdital`) implementados
       e validados ao vivo contra editais reais de 2025: `PF_25_ADM` (39 chunks),
@@ -97,17 +104,40 @@ extração de questões futuro (fora do escopo deste projeto).
       `scripts/atualizar_revisao.py` (ADR-019). Os 3 alertas residuais foram
       tratados no pipeline (ADR-025): reinjeção determinística de item omitido
       pelo LLM e severidade `informativo` para paráfrase leve. A base de 2025
-      fica com 0 alertas bloqueantes e 2 informativos. Suite com 186 testes
-      automatizados aprovados em `pytest`. **Falta a revisão humana em si** (aprovar/reprovar a
-      qualidade da extração) — não marcar `[x]` até isso acontecer.
-- [ ] Fase 5 — Banco de estatísticas: star schema criado no Postgres próprio
-      (`scraper-cebraspe-db`, container já no ar desde 2026-09-21, ADR-026)
-      com chaves naturais normalizadas; `stats_writer.py` grava de forma
-      idempotente; fila `pendente` populada
+      fica com 0 alertas bloqueantes e 2 informativos. **Revisão humana feita
+      pelo dono e registrada em 2026-09-23** nos 5 `<edital>.json`
+      (`status_revisao_humana`; o texto do status mantém "2026-09-22", como
+      pedia a spec), ingerida como `status_revisao = 'aprovado'` (ADR-028).
+- [x] Fase 5 — Banco de estatísticas: star schema criado no Postgres próprio
+      (`scraper-cebraspe-db`, ADR-026) com chaves naturais normalizadas
+      (`src/sql/schema_estatisticas.sql`); `src/stats_writer.py` grava de
+      forma idempotente (reexecução com contagens idênticas, validado ao vivo
+      em 2026-09-22) e roda no fim de `scripts/atualizar_revisao.py`; fila
+      `fila_extracao_questoes` populada. Carga real: 5 concursos, 31 cargos,
+      1485 tópicos, 70 provas, 145 PDFs na fila e 3 editais administrativos
+      pulados. Depois da Etapa 5A: os 5 concursos estão `aprovado` e
+      `dim_materia` tem 102 matérias (as 4 variantes "(APENAS PARA ...)"
+      viraram a matéria base + `cargos_restritos`). Ver ADR-027 e ADR-028.
+- [x] Etapa 5C — Extração de questões, gabaritos e discursivas: `src/gabarito_parser.py`,
+      `src/prova_parser.py`, `src/questoes_writer.py` e consumidor `scripts/extrair_questoes.py`.
+      70 cadernos processados (2.800 itens, 129 anulados, 34 discursivas / 107 quesitos, 145 PDFs na fila).
+      Gabaritos em hash (TCU/CD) ligados pelo código impresso no PDF. Bug de recuo em `_recuo_item`
+      corrigido para a faixa estrita de 12 a 24 pt. JSONs gerados em `questoes/` mantidos localmente
+      (`questoes/` no `.gitignore`). 374 testes no pytest e ruff verde (ADR-031).
+- [x] Etapa 5C.1 — Correções da extração (Sessões 1 a 5, correcoes-etapa-5c.md): posição dos itens por x0 (cluster/moda); alertas no item no Postgres (alertas text[], utilizavel boolean, view vw_questoes_utilizaveis); fila reprocessada por assinatura_grupo; lock pg_try_advisory_lock (5031001); gabarito definitivo x preliminar no cabeçalho; quesitos discursivos após comando; tema anafórico rejeitado; padrão ligado por chave de título. 435 testes (+1 xfail) no pytest e base inalterada (ADR-031).
 - [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
       parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
-      de inferência (0 alertas de validação no `CD_25_NS`). Falta a gravação e aprovação no Postgres (Fase 5).
+      de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
+      Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
+      registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B/5B.1 e 5D–5E.
+- **⚡ Prioridade atual: Etapas 5B/5B.1 → 5D → 5E do `task.md`** (5A
+      concluída, ADR-028; 5B implementada, aguardando aprovação humana, ADR-029;
+      5B.1 divisão de nomes compostos; 5C e 5C.1 concluídas, ADR-031). A 5D (classificação das
+      questões por LLM) depende da aprovação humana das 106 propostas de
+      sinônimos em `relatorio/sinonimos.html` (ADR-029) e da 5B.1 (divisão de
+      nomes compostos).
+
 
 ## 6. Patterns
 
@@ -118,7 +148,9 @@ extração de questões futuro (fora do escopo deste projeto).
   para o próximo — nunca aborta o lote inteiro.
 - Slugify determinístico (acentos/espaços → forma normalizada única) para
   nomes de órgão usados em paths de disco.
-- Toda chamada LLM é feita diretamente à API REST do OpenRouter (`z-ai/glm-5.3-flash`).
+- Toda chamada LLM é feita diretamente à API REST do OpenRouter (`z-ai/glm-5.3-flash`),
+  pelo núcleo `src/llm_openrouter.chamar_llm_json` (status tipados, Langfuse,
+  gancho `pos_validacao`). Uso novo não monta payload próprio.
 - Banco próprio, sem FK entre projetos: dimensões carregam chave natural
   normalizada (`slug`, `materia_normalizada`, tópico normalizado) para o
   cruzamento futuro com `itens_estudo` via tabela de mapeamento (ADR-026).
@@ -159,6 +191,13 @@ extração de questões futuro (fora do escopo deste projeto).
 - Chamada ao modelo de raciocínio (`glm-5.3-flash`) sempre com
   `max_tokens` generoso — um orçamento baixo é consumido pelo `reasoning_content`
   antes do `content` final, que volta `null` mesmo sem erro de rede.
+- Toda chamada LLM com reasoning limitado a 3000 tokens via `REASONING_PADRAO`
+  do `src/llm_openrouter.py` (fonte única: default de `chamar_llm_json`,
+  reexportado pelo extrator de taxonomia e usado no payload do bot do
+  Telegram). Decisão do dono em 2026-09-25. Defaults atuais do extrator:
+  `MAX_TOKENS=12000`, `REQUEST_TIMEOUT=120`, reasoning 3000 — vieram do merge
+  `b823c31` e substituíram os `24576`/`240` registrados na decisão de
+  2026-09-20 (§12), que ficam só como histórico.
 - Chaves do OpenRouter são dedicadas por serviço (`TELEGRAM_OPENROUTER_API_KEY`
   e `OPENROUTER_API_KEY`), mapeadas a projetos independentes no Langfuse.
 - Todo passo derivado do checkpoint de revisão (validação de-para, relatório
@@ -256,6 +295,58 @@ extração de questões futuro (fora do escopo deste projeto).
   `_limpar_ruido_edital` ancorando no **cargo** (`PADRAO_CARGO_ASSINATURA`)
   no fim do texto, nunca no nome em caixa alta.
 
+- Fatos de um concurso (`taxonomia_itens`, `provas`) são substituídos
+  numa transação a cada carga; dimensões usam upsert por chave natural
+  (`comparacao_texto.normalizar`). Cargos usam upsert em `(concurso, numero)`
+  porque `provas_cargos` aponta para eles. Ver ADR-027.
+- A fila `fila_extracao_questoes` usa upsert por `sha256` e o writer nunca
+  altera `status`, que pertence ao consumidor.
+- Tipo/cargos de caderno vêm de `classificar_prova_por_texto` sobre o texto
+  do link já normalizado. Aceita `CONHECIMENTOS GERAIS` (CG) como básico, e
+  texto sem cargo significa "todos os cargos do concurso" (TCU). Edital
+  administrativo em `Provas/` fica fora da fila, com log.
+- Estatística "oficial" só em `vw_incidencia_topico`, que filtra
+  `status_revisao = 'aprovado'`; `vw_incidencia_topico_todas` é para inspeção.
+- Restrição de cargo no nome da matéria (`(APENAS/SOMENTE PARA O(S)
+  CARGO(S) ...)`, `PADRAO_RESTRICAO_CARGO`) sai de `materia_normalizada` e
+  vira `cargos_restritos: list[int] | None`. Só sai do nome quando tem número
+  de cargo; sem número (`PARA OS CARGOS DE NÍVEL SUPERIOR`), fica no nome e
+  loga `[RESTRICAO_SEM_CARGO]`. Espaços repetidos são colapsados. Ver ADR-028.
+- Número de cargo em texto (link de caderno ou restrição de matéria) vem só
+  de `comparacao_texto.extrair_cargos_do_texto`, usada pelo parser e pelo
+  writer.
+- Aprovação da revisão humana é o `status_revisao_humana` do `<edital>.json`
+  (`APROVADO...`). O writer relê o JSON a cada carga.
+- O backfill confere o alinhamento pelo texto: o texto atual do chunk tem de
+  ser prefixo do `texto_enviado_llm` salvo (a assinatura final foi removida
+  depois, ADR-025), além de matéria/cargo.
+
+- Sinônimo (Etapa 5B, ADR-029): regra determinística conservadora
+  (`canonico.chave_regra`: "noções de" → `nocoes`, artigo inicial, parêntese,
+  forma única de norma `lei 9784 1999`, plural simples) junta e aprova
+  sozinha; o resto vai ao LLM por lista fechada de IDs e escopo (matéria →
+  assunto dentro da matéria → subassunto dentro do assunto) e sai
+  `proposto`. Proposta nunca muda o mapeamento: até a aprovação, cada nome
+  fica no grupo aprovado de antes (identidade).
+- Decisão humana de sinônimo só via `scripts/aprovar_sinonimos.py` (ou
+  `canonico.aprovar/rejeitar/mover/renomear`), gravada no JSON. As regras
+  reexecutadas nunca mexem em grupo `llm`/`humano`.
+- `scripts/propor_sinonimos.py` custa tokens e **não** roda no pipeline
+  automático; `atualizar_revisao.py` roda só regras + relatório. Blocos já
+  avaliados ficam em `avaliados_llm` e não são reenviados.
+- Resposta de LLM sobre lista fechada é validada localmente (cada ID em
+  exatamente um grupo, nada inventado, nada entre blocos) com falha tipada; a
+  segunda tentativa leva o erro no prompt.
+- Subtópico é linha (`dim_subtopico` + `taxonomia_subitens`), não JSONB.
+- Segmentação de cadernos de prova: número do item distinguido por x0 na margem da coluna (cluster/moda); duplicado/fora de ordem é bloqueante; recuo de continuação de item medido na faixa estrita de 12 a 24 pt (~18 pt real); gabaritos definitivos em hash (TCU/Câmara) ligados aos cadernos pelo código impresso no corpo do PDF (ADR-031).
+- Assinatura de grupo por hash na fila (`fila_extracao_questoes.assinatura_grupo`) garante reprocessamento automático quando os gabaritos ligados mudam, em qualquer status; `--reprocessar-erros` cobre órfãos e falhas.
+- Advisory lock de sessão (`pg_try_advisory_lock(5_031_001)`) garante consumidor de execução única sem concorrência destrutiva na fila.
+- Versão do gabarito (`definitivo` × `preliminar`) classificada exclusivamente pelo cabeçalho (ou prefixo do nome de arquivo), com preferência determinística pelo definitivo e alertas informativos (`mais_de_um_gabarito` / `gabarito_preliminar`).
+- Caderno discursivo: quesitos extraídos estritamente a partir do comando (`redija`, `elabore`, `aborde`, `discorra`), evitando confusão com datas; tema anafórico rejeitado para `None` com alerta `tema_anaforico`.
+- Padrão de resposta ligado preferencialmente por chave de título (`_chave_titulo`), garantindo ordem semântica correta mesmo com seções fora de ordem no PDF (chave ausente ou repetida cai na ligação por ordem); alertas `sem_quesitos` e `quesito_sem_valor`.
+- Figuras: vinculadas à linha logo acima na mesma coluna com sobreposição horizontal (exceção item → preâmbulo).
+- JSONs brutos de questões (`questoes/`) mantidos localmente e no `.gitignore` por volumetria, sendo regeneráveis de forma determinística por `scripts/extrair_questoes.py` (ADR-031).
+
 ## 7. Anti-patterns
 
 - Nunca comparar `get_attribute("href")` direto contra uma URL absoluta
@@ -342,6 +433,27 @@ extração de questões futuro (fora do escopo deste projeto).
 - Nunca usar casamento tolerante contra o texto-fonte **inteiro** numa
   checagem por item: um tópico parafraseado de um item passa a "cobrir" a
   omissão de outro item do mesmo chunk.
+- Nunca deixar a restrição de cargo no nome da matéria (duplica
+  `dim_materia`), nem apagá-la do nome sem ter extraído os números de cargo
+  (a matéria passa a valer para todos os cargos sem aviso).
+- Nunca aprovar concurso com `UPDATE` direto no banco: a próxima carga do
+  writer reverte a partir do JSON.
+- Nunca agrupar matéria/assunto/subassunto por similaridade de texto sem
+  aprovação humana: `atos` × `contratos administrativos` (0,89), `ativos` ×
+  `passivos` (0,90), `gestão de processos` × `de pessoas` (0,89). Similaridade
+  só sugere; quem junta é regra determinística ou o dono (ADR-029).
+- Nunca aprovar sinônimo com `UPDATE` no banco nem editando só o banco: a
+  fonte é `canonico/sinonimos.json`, e a próxima carga reverte.
+- Nunca deixar o agente aprovar proposta do LLM em nome do dono; só grupo
+  `regra` é aprovado automaticamente.
+- Nunca casar a restrição com `\([^)]*\)`: um parêntese interno
+  (`ANALISTA (TI)`) corta a cláusula no meio e o resto fica no nome.
+- Nunca permitir janela ampla de recuo de linha de item (> 24 pt, ex.: 8–30 pt) no parser de provas — captura a primeira linha com recuo de parágrafo (~28–29 pt) do texto-base subsequente após itens de 1 linha física (ADR-031).
+- Nunca confiar na ordem do fluxo interno de objetos do PDF (PyMuPDF blocks) para determinar a ordem de leitura em cadernos sem ordenar visualmente por coordenadas `(coluna, y0, x0)` (ADR-031).
+- Nunca confiar em `span["flags"] & 16` ou "Bold" para segmentar itens de provas (apenas 9,64% dos cadernos do CEBRASPE usam fonte com flag negrito; a segmentação real é por x0 na margem via cluster/moda).
+- Nunca procurar "definitivo" solto no corpo do padrão de resposta ou gabarito (o padrão do cargo 2 da PF cita "definitivo" no texto discursivo; um preliminar com a mesma redação seria classificado como definitivo). Avaliar estritamente o cabeçalho (primeiros 600 caracteres no padrão de resposta, 2000 na grade — ver `classificar_versao`) ou o nome do arquivo.
+- Nunca extrair quesitos numerados antes do verbo de comando da prova discursiva (datas como "1 de janeiro..." no enunciado viram falso quesito 1).
+- Nunca commitar arquivos JSON de questões extraídas (`questoes/`) no git — mantidos localmente e no `.gitignore` por volumetria, sendo 100% regeneráveis sob demanda (ADR-031).
 
 ## 8. Segurança
 
@@ -431,7 +543,9 @@ resultado = download_concurso_pdfs(
   (ignorado pelo git, volume grande demais)
 - `logs/scraper_cebraspe.log` — log de execução (ignorado)
 - Tabelas em `scraper-cebraspe-db` (Postgres próprio, star schema de
-  estatísticas de concursos)
+  estatísticas de concursos, DDL em `src/sql/schema_estatisticas.sql`),
+  gravadas por `python -m src.stats_writer` (também automático no fim de
+  `scripts/atualizar_revisao.py`, ADR-027)
 - `task.md` — roteiro de execução por etapas (versionado)
 - `revisao_piloto/<edital>.json` + `<edital>.auditoria.json` — resultado da
   extração e trilha de auditoria de entrada/saída por edital (versionado,
@@ -450,7 +564,14 @@ resultado = download_concurso_pdfs(
 - `scripts/reconciliar_taxonomia.py [json ...]` — aplica a reinjeção de
   item ausente (ADR-025) a extrações já salvas, sem LLM, com backup
   `.pre_reconciliacao.bak`
-- `scripts/backfill_classificacao_chunks.py <pdf> [json]` — completa
+- `canonico/sinonimos.json` — camada canônica de sinônimos (versionado,
+  fonte da verdade; ~2 MB, um registro por linha). IDs estáveis no ADR-029
+- `scripts/propor_sinonimos.py` (LLM, explícito), `scripts/aprovar_sinonimos.py`
+  (`--aprovar/--rejeitar/--mover ENTRADA:GRUPO|NOVO/--renomear GRUPO=Nome`) e
+  `revisao_piloto/relatorio/sinonimos.html` (regenerável, linkado do
+  `index.html`, em `https://datasette.projetoathos.com.br/relatorio/sinonimos.html`)
+- `scripts/backfill_classificacao_chunks.py [<pdf> [json]]` — sem argumentos,
+  roda em todos os editais de `revisao_piloto/` (`backfill_lote`); completa
   concurso/nível/tipo de conhecimento em extração já feita, sem LLM
   (ADR-020)
 
@@ -463,7 +584,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-026). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-031, com ADR-030 reservado à 5B.1). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
 
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
 
@@ -1010,6 +1131,105 @@ outro. A senha do banco novo não tem default no compose.
 na mesma instância (mantém a dependência operacional e ainda exige
 `postgres_fdw` para JOIN); schema dentro de `study_rag` (maior acoplamento).
 Ver ADR-026, que substitui o ADR-003.
+
+### 2026-09-22 — Star schema de estatísticas, gravação idempotente e fila de provas
+
+**Decisão:** DDL em `src/sql/schema_estatisticas.sql`: dimensões
+`dim_orgao`/`dim_ano`/`dim_materia`/`dim_topico`/`dim_cargo`, fatos
+`concursos`/`cargos_editais`/`taxonomia_itens` (1 tópico de 1 chunk,
+subtópicos em `JSONB`), `provas` + ponte `provas_cargos` e
+`fila_extracao_questoes`. `src/stats_writer.py` faz upsert das dimensões por
+chave natural e substitui os fatos de cada concurso numa transação. A fila
+usa upsert por `sha256` sem tocar `status`. O writer roda no fim de
+`atualizar_revisao.py` (best-effort). Dado pendente de revisão entra
+marcado, e a view de estatística oficial só conta `aprovado`.
+**Motivo:** Etapa 5 do `task.md`. A substituição por concurso evita tópico
+órfão depois de uma reextração. A fila preserva o estado do consumidor. O
+texto do link, a única fonte de tipo e cargos do caderno, tem formatos
+variados (intervalo, lista, cargo único, sem cargo, CB/CG) e lixo legado
+(editais administrativos e padrões de resposta em `Provas/`). O
+classificador trata esses casos e foi testado contra todos os textos reais.
+**Alternativas descartadas:** upsert linha a linha nos fatos (deixa órfão);
+uma linha por subtópico (sem uso estatístico ainda); não gravar dado
+pendente (a aprovação precisa chegar ao banco — via JSON, ADR-028); `nivel` em `provas` (é
+atributo do cargo). Ver ADR-027.
+
+### 2026-09-23 — Restrição de cargo fora do nome da matéria e aprovação da Fase 4
+
+**Decisão:** A restrição `(APENAS/SOMENTE PARA O(S) CARGO(S) ...)` sai do nome
+da matéria e vira `cargos_restritos`, gravado como `INTEGER[]` em
+`taxonomia_itens`. Espaços repetidos são colapsados. `extrair_cargos_do_texto`
+foi para `comparacao_texto`, usada pelo parser e pelo writer. A aprovação
+da Fase 4 entrou no `status_revisao_humana` dos 5 JSONs. Na auditoria da
+entrega, entraram também: restrição sem número fica no nome, parêntese
+aninhado, várias restrições e checagem do backfill pelo texto.
+**Motivo:** Etapa 5A. A restrição no nome duplicava matérias no STM, e o
+espaço duplo duplicava no IBAMA (`dim_materia` de 106 para 102).
+**Alternativas descartadas:** restrição no nome; `UPDATE` no banco
+(revertido pelo writer); regex própria de cargo no parser (divergiria do
+writer). Ver ADR-028.
+
+### 2026-09-25 — Camada canônica de sinônimos e reasoning padrão de 3000 tokens
+
+**Decisão:** Etapa 5B. `canonico/sinonimos.json` guarda entradas (nomes com
+a mesma chave de regra no mesmo pai) e grupos canônicos com ID estável,
+origem e status. Regras determinísticas juntam e aprovam sozinhas; o LLM
+propõe o resto por lista fechada de IDs, em 3 passos (matéria, assunto,
+subassunto), e tudo sai `proposto`. O mapeamento só muda com aprovação
+(`aprovar_sinonimos.py`); sem decisão, cada nome é o próprio canônico
+(identidade). O núcleo de chamada ao OpenRouter virou
+`src/llm_openrouter.chamar_llm_json`, e o dono fixou reasoning de 3000
+tokens em toda chamada (`REASONING_PADRAO`, fonte única). Os defaults do
+extrator continuam 12000/120 (merge `b823c31`), não os 24576/240 da decisão
+de 2026-09-20. No banco, tabelas canônicas com o ID do JSON, `nocoes` em
+`dim_materia` e subtópico como linha (`dim_subtopico` + `taxonomia_subitens`).
+**Motivo:** o dono decidiu regra + LLM + aprovação humana, e a similaridade
+de texto tem falsos positivos medidos. Canônico NULL até a revisão tiraria
+~4 mil nomes sem sinônimo da estatística; a identidade dá o resultado de
+antes sem inventar nada. Execução real: 20 chamadas, US$ 0,0139, 106
+propostas pendentes (3 matérias, 40 assuntos, 63 subassuntos).
+**Alternativas descartadas:** similaridade de texto; LLM sobre todas as
+entradas de uma vez; rodar o LLM no pipeline automático (custa tokens a
+cada extração); IDs estáveis no prompt (IDs locais curtos erram menos).
+Ver ADR-029.
+
+### 2026-09-25 — Extração determinística de questões, gabaritos e discursivas dos cadernos (Etapa 5C)
+
+**Decisão:** Extração 100% determinística sem LLM para cadernos de provas e
+gabaritos dos 5 concursos de 2025. `src/gabarito_parser.py` lê a grade de
+respostas (C/E/X), extrai o código do caderno impresso no corpo do PDF
+(resolvendo gabaritos com nome em hash do TCU e CD) e lê o padrão de resposta
+discursivo. `src/prova_parser.py` segmenta em duas colunas por ordenação
+visual, isola itens pelo span próprio em negrito, extrai textos-base
+compartilhados, recorta figuras raster para `data/.../figuras/` vinculando
+por interseção vertical, extrai quesitos discursivos com `valor_pontos` e
+pontuação total conferida, e calibra o recuo de continuação do item na janela
+estrita de 12 a 24 pt (~18 pt real), eliminando a captura indevida de
+parágrafos de texto-base (~28–29 pt). `src/questoes_writer.py` persiste em
+`textos_base`, `questoes` e `discursivas` no Postgres próprio, e
+`scripts/extrair_questoes.py` consome a fila. Os arquivos JSON gerados em
+`questoes/` são mantidos localmente (`questoes/` no `.gitignore`) por volume,
+sendo 100% regeneráveis sob demanda. 70 cadernos processados, 2.800 itens
+(129 anulados), 34 discursivas / 107 quesitos, 145 PDFs na fila concluídos,
+0 falhas e 374 testes verdes no pytest.
+**Motivo:** Etapa 5C do `task.md`. O objetivo real é saber o que a banca cobra
+e viabilizar simulados com refazer de prova.
+**Alternativas descartadas:** Chamada ao LLM para estruturar questões (custo e
+não-determinismo desnecessários quando a grade e a numeração são regulares);
+commitar 140 JSONs pesados no git (sobrecarregaria o repositório com dados
+geráveis por script); tolerância genérica de recuo 8–30 pt (engolia a 1ª linha
+do texto-base após item de 1 linha). Ver ADR-031.
+
+### 2026-09-27 — Correções da extração dos cadernos (Etapa 5C.1, Sessões 1 a 5, ADR-031)
+
+**Decisão:** Consolidação das correções e robustez do pipeline de extração de cadernos e gabaritos em 5 sessões (ADR-031):
+1. **Posição dos itens:** Identificação de itens por x0 na margem da coluna via moda/cluster em vez de flag negrito de fonte (apenas 9,64% das fontes do CEBRASPE usavam flag negrito); itens duplicados ou fora de ordem são bloqueantes; trechos sem recuo anexados ao item com alerta informativo `trecho_sem_recuo_anexado_ao_item`. Vinculação de figuras raster à linha logo acima na mesma coluna com sobreposição horizontal (exceção item → preâmbulo).
+2. **Alertas no banco:** Persistência de `alertas text[]` e flag `utilizavel boolean` na tabela `questoes` com view `vw_questoes_utilizaveis` para isolar itens que exigem revisão.
+3. **Fila e concorrência:** Reprocessamento automático de grupos via hash sha256 (`fila_extracao_questoes.assinatura_grupo`) em qualquer status quando a composição de gabaritos muda; flag `--reprocessar-erros` para tratar falhas e órfãos; advisory lock de sessão (`pg_try_advisory_lock(5_031_001)`) garantindo consumidor de execução única sem concorrência destrutiva na fila.
+4. **Versão de gabarito e discursivas:** Classificação de versão (`definitivo` × `preliminar`) estritamente pelo cabeçalho (ou prefixo do arquivo) com preferência determinística pelo definitivo e alertas informativos (`mais_de_um_gabarito`, `gabarito_preliminar`). Quesitos discursivos extraídos estritamente após o primeiro verbo de comando (`redija`, `elabore`, `aborde`, `discorra`), evitando confusão com datas; tema anafórico rejeitado para `None` com alerta `tema_anaforico`; padrão de resposta ligado preferencialmente por chave de título (`_chave_titulo`), caindo na ligação por ordem se alguma chave faltar ou se repetir; número da questão tirado do título (`Questão N`), com repetição ou buraco gerando o alerta informativo `numeracao_discursiva`; alertas `sem_quesitos` e `quesito_sem_valor`; remoção do rodapé repetido e do cabeçalho institucional em caixa alta no fim da seção do padrão.
+5. **Documentação e alinhamento:** Remoção do plano obsoleto `concluir-etapa-5c.md`, documentação de gotchas em `LESSONS.md`, alinhamento de contagens (123 textos-base) e ADR-031 atualizado. 435 testes aprovados (+1 xfail) e suite 100% verde.
+**Motivo:** Correções identificadas na revisão da Etapa 5C antes do avanço para a Etapa 5D (`correcoes-etapa-5c.md`).
+**Alternativas descartadas:** Confiar em flags de fonte para segmentação de itens; buscar "definitivo" no corpo do documento (o padrão do cargo 2 da PF cita a palavra no texto); capturar quesitos antes do comando discursivo (falso positivo em datas); reprocessamento apenas de status pendentes (não pegava gabaritos associados a posteriori). Ver ADR-031.
 
 ## 13. LESSONS.md (do projeto)
 

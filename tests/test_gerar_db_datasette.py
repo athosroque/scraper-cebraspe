@@ -15,7 +15,9 @@ def _resultado_com_auditoria():
         "total_chunks": 3,
         "extraidos_com_sucesso": 2,
         "falhas": 1,
-        "chunks_com_falha": [{"chunk_index": 2, "cargo": None, "materia_esperada": "MATERIA C"}],
+        "chunks_com_falha": [
+            {"chunk_index": 2, "cargo": None, "materia_esperada": "MATERIA C"}
+        ],
         "resultados": [
             {
                 "chunk_index": 0,
@@ -112,11 +114,15 @@ def _resultado_legado_sem_auditoria():
 
 
 class TestGerarDb:
-    def test_gera_banco_com_dados_de_edital_com_auditoria_e_sem_auditoria(self, tmp_path):
+    def test_gera_banco_com_dados_de_edital_com_auditoria_e_sem_auditoria(
+        self, tmp_path
+    ):
         resultado_a, auditoria_a = _resultado_com_auditoria()
         _escrever_json(tmp_path / "Edital_A.json", resultado_a)
         _escrever_json(tmp_path / "Edital_A.auditoria.json", auditoria_a)
-        _escrever_json(tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria())
+        _escrever_json(
+            tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria()
+        )
 
         db_path = gerar_db(tmp_path)
         db = sqlite_utils.Database(db_path)
@@ -140,8 +146,12 @@ class TestGerarDb:
         chunk_falho = next(db["chunks"].rows_where("status = 'falha'"))
         assert chunk_falho["materia"] == "MATERIA C"
 
-    def test_chunk_legado_sem_auditoria_tem_chunk_index_nulo_mas_liga_topico(self, tmp_path):
-        _escrever_json(tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria())
+    def test_chunk_legado_sem_auditoria_tem_chunk_index_nulo_mas_liga_topico(
+        self, tmp_path
+    ):
+        _escrever_json(
+            tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria()
+        )
 
         db = sqlite_utils.Database(gerar_db(tmp_path))
         chunk = next(db["chunks"].rows_where("edital = ?", ["Edital_Legado.pdf"]))
@@ -191,7 +201,9 @@ class TestGerarDb:
         assert not db["editais"].exists()
 
     def test_rebuild_apaga_estado_anterior(self, tmp_path):
-        _escrever_json(tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria())
+        _escrever_json(
+            tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria()
+        )
         db_path = gerar_db(tmp_path)
         assert sqlite_utils.Database(db_path)["editais"].count == 1
 
@@ -233,7 +245,9 @@ class TestGerarDb:
         assert alerta["chunk_id"] == chunk_a["id"]
 
     def test_sem_validacao_json_total_alertas_fica_nulo_sem_erro(self, tmp_path):
-        _escrever_json(tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria())
+        _escrever_json(
+            tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria()
+        )
 
         db = sqlite_utils.Database(gerar_db(tmp_path))
         edital = next(db["editais"].rows)
@@ -241,10 +255,17 @@ class TestGerarDb:
         assert not db["alertas_validacao"].exists()
 
     def test_validacao_json_nao_e_tratado_como_json_de_edital(self, tmp_path):
-        _escrever_json(tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria())
+        _escrever_json(
+            tmp_path / "Edital_Legado.json", _resultado_legado_sem_auditoria()
+        )
         _escrever_json(
             tmp_path / "Edital_Legado.validacao.json",
-            {"edital": "Edital_Legado.pdf", "total_chunks_analisados": 1, "total_alertas": 0, "alertas": []},
+            {
+                "edital": "Edital_Legado.pdf",
+                "total_chunks_analisados": 1,
+                "total_alertas": 0,
+                "alertas": [],
+            },
         )
 
         db = sqlite_utils.Database(gerar_db(tmp_path))
@@ -255,18 +276,32 @@ class TestGerarDb:
         # sair distinguível na tabela filtrável (taxonomia_topicos).
         resultado, auditoria = _resultado_com_auditoria()
         classificacao = {
-            0: {"tipo_conhecimento": "basico", "nivel": "superior", "cargo_numero": None},
+            0: {
+                "tipo_conhecimento": "basico",
+                "nivel": "superior",
+                "cargo_numero": None,
+            },
             1: {"tipo_conhecimento": "basico", "nivel": "medio", "cargo_numero": None},
-            2: {"tipo_conhecimento": "especifico", "nivel": "medio", "cargo_numero": 15},
+            2: {
+                "tipo_conhecimento": "especifico",
+                "nivel": "medio",
+                "cargo_numero": 15,
+            },
         }
-        for item in auditoria["chunks"] + resultado["resultados"] + resultado["chunks_com_falha"]:
+        for item in (
+            auditoria["chunks"]
+            + resultado["resultados"]
+            + resultado["chunks_com_falha"]
+        ):
             item.update(
                 classificacao[item["chunk_index"]],
                 materia_normalizada="LÍNGUA PORTUGUESA",
                 apenas_discursiva=False,
             )
         resultado["concurso"] = {"slug": "PF_25_ADM", "orgao": "PF", "ano": 2025}
-        resultado["cargos"] = [{"numero": 15, "nome": "AGENTE ADMINISTRATIVO", "nivel": "medio"}]
+        resultado["cargos"] = [
+            {"numero": 15, "nome": "AGENTE ADMINISTRATIVO", "nivel": "medio"}
+        ]
         _escrever_json(tmp_path / "Edital_A.json", resultado)
         _escrever_json(tmp_path / "Edital_A.auditoria.json", auditoria)
 

@@ -37,12 +37,16 @@ def reconciliar(json_path: Path) -> dict[int, list[str]]:
     reinjetados]}` só dos chunks alterados (vazio == nada a fazer, nada gravado)."""
     auditoria_path = json_path.parent / f"{json_path.stem}.auditoria.json"
     if not auditoria_path.exists():
-        logger.warning(f"{json_path.name}: sem .auditoria.json — sem texto-fonte pra reconciliar, pulando.")
+        logger.warning(
+            f"{json_path.name}: sem .auditoria.json — sem texto-fonte pra reconciliar, pulando."
+        )
         return {}
 
     resultado = json.loads(json_path.read_text(encoding="utf-8"))
     auditoria = json.loads(auditoria_path.read_text(encoding="utf-8"))
-    texto_por_index = {c["chunk_index"]: c.get("texto_enviado_llm") or "" for c in auditoria["chunks"]}
+    texto_por_index = {
+        c["chunk_index"]: c.get("texto_enviado_llm") or "" for c in auditoria["chunks"]
+    }
 
     alterados: dict[int, list[str]] = {}
     for item in resultado["resultados"]:
@@ -61,14 +65,18 @@ def reconciliar(json_path: Path) -> dict[int, list[str]]:
         if not bak.exists():
             shutil.copy2(json_path, bak)
             logger.info(f"Backup criado: {bak.name}")
-        json_path.write_text(json.dumps(resultado, indent=2, ensure_ascii=False), encoding="utf-8")
+        json_path.write_text(
+            json.dumps(resultado, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
         logger.info(f"{json_path.name}: itens reinjetados por chunk {alterados}.")
     else:
         logger.info(f"{json_path.name}: nada a reconciliar.")
     return alterados
 
 
-def main(json_paths: list[Path], atualizar_artefatos: bool = True) -> dict[str, dict[int, list[str]]]:
+def main(
+    json_paths: list[Path], atualizar_artefatos: bool = True
+) -> dict[str, dict[int, list[str]]]:
     resumo = {p.name: reconciliar(p) for p in json_paths}
     if atualizar_artefatos and any(resumo.values()):
         atualizar_artefatos_revisao(json_paths[0].parent)

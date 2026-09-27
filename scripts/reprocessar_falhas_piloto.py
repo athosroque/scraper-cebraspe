@@ -53,10 +53,16 @@ def _criar_backup_se_necessario(json_path: Path, auditoria_path: Path) -> None:
             logger.info(f"Backup criado: {bak_auditoria.name}")
 
 
-def _salvar_incremento(json_path: Path, resultado: dict, auditoria_path: Path, auditoria: dict) -> None:
+def _salvar_incremento(
+    json_path: Path, resultado: dict, auditoria_path: Path, auditoria: dict
+) -> None:
     """Salva os dois JSONs em disco garantindo consistência imediata."""
-    json_path.write_text(json.dumps(resultado, indent=2, ensure_ascii=False), encoding="utf-8")
-    auditoria_path.write_text(json.dumps(auditoria, indent=2, ensure_ascii=False), encoding="utf-8")
+    json_path.write_text(
+        json.dumps(resultado, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    auditoria_path.write_text(
+        json.dumps(auditoria, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
 
 def reprocessar_falhas(
@@ -69,7 +75,9 @@ def reprocessar_falhas(
 
     auditoria_path = json_path.parent / f"{json_path.stem}.auditoria.json"
     if not auditoria_path.exists():
-        raise FileNotFoundError(f"Auditoria correspondente não encontrada: {auditoria_path}")
+        raise FileNotFoundError(
+            f"Auditoria correspondente não encontrada: {auditoria_path}"
+        )
 
     _criar_backup_se_necessario(json_path, auditoria_path)
 
@@ -82,11 +90,15 @@ def reprocessar_falhas(
     # que o filtro de falha nunca pegaria sozinho.
     if chunk_indices_forcados:
         indices_forcados = set(chunk_indices_forcados)
-        chunks_selecionados = [c for c in auditoria["chunks"] if c.get("chunk_index") in indices_forcados]
+        chunks_selecionados = [
+            c for c in auditoria["chunks"] if c.get("chunk_index") in indices_forcados
+        ]
         indices_encontrados = {c.get("chunk_index") for c in chunks_selecionados}
         indices_nao_encontrados = indices_forcados - indices_encontrados
         if indices_nao_encontrados:
-            logger.warning(f"chunk_index(es) não encontrado(s) em {json_path.name}: {sorted(indices_nao_encontrados)}")
+            logger.warning(
+                f"chunk_index(es) não encontrado(s) em {json_path.name}: {sorted(indices_nao_encontrados)}"
+            )
         motivo = "forçado(s) via --chunks"
     else:
         # Qualquer status que não seja "sucesso" conta como falha aqui —
@@ -95,12 +107,16 @@ def reprocessar_falhas(
         # campo "status" (formato legado) fica de fora por segurança: não dá
         # pra saber se teve sucesso ou falha sem essa informação.
         chunks_selecionados = [
-            c for c in auditoria["chunks"] if c.get("status") is not None and c.get("status") != "sucesso"
+            c
+            for c in auditoria["chunks"]
+            if c.get("status") is not None and c.get("status") != "sucesso"
         ]
         motivo = "com falha"
 
     if not chunks_selecionados:
-        logger.info(f"Nenhum chunk {motivo} em {json_path.name}. Totalmente consolidado!")
+        logger.info(
+            f"Nenhum chunk {motivo} em {json_path.name}. Totalmente consolidado!"
+        )
         return resultado
 
     logger.info(
@@ -124,7 +140,9 @@ def reprocessar_falhas(
         taxonomia, motivo_falha = extrair_taxonomia_chunk(texto)
         if taxonomia is None:
             status_falha = motivo_falha or "falha"
-            logger.error(f"  -> Chunk #{chunk_index} não pôde ser reprocessado com sucesso ({status_falha}).")
+            logger.error(
+                f"  -> Chunk #{chunk_index} não pôde ser reprocessado com sucesso ({status_falha})."
+            )
             # Atualiza o status mesmo na falha — necessário pro reprocessamento
             # forçado (--chunks) de um chunk que estava "sucesso" (malformado):
             # sem isso, uma falha na nova tentativa deixava o status antigo
@@ -148,18 +166,26 @@ def reprocessar_falhas(
             "chunk_index": chunk_index,
             "cargo": cargo,
             "materia_chunk": materia,
-            **{campo: chunk[campo] for campo in CAMPOS_CLASSIFICACAO_CHUNK if campo in chunk},
+            **{
+                campo: chunk[campo]
+                for campo in CAMPOS_CLASSIFICACAO_CHUNK
+                if campo in chunk
+            },
             "taxonomia_extraida": taxonomia.model_dump(),
         }
         # Substitui se já existir, senão adiciona
-        resultados_atuais = [r for r in resultado["resultados"] if r.get("chunk_index") != chunk_index]
+        resultados_atuais = [
+            r for r in resultado["resultados"] if r.get("chunk_index") != chunk_index
+        ]
         resultados_atuais.append(novo_item)
         resultados_atuais.sort(key=lambda x: x.get("chunk_index", 0))
         resultado["resultados"] = resultados_atuais
 
         # Remove da lista de chunks_com_falha
         resultado["chunks_com_falha"] = [
-            f for f in resultado.get("chunks_com_falha", []) if f.get("chunk_index") != chunk_index
+            f
+            for f in resultado.get("chunks_com_falha", [])
+            if f.get("chunk_index") != chunk_index
         ]
         resultado["extraidos_com_sucesso"] = len(resultado["resultados"])
         resultado["falhas"] = len(resultado["chunks_com_falha"])
@@ -172,7 +198,9 @@ def reprocessar_falhas(
 
         # Persistência incremental imediata
         _salvar_incremento(json_path, resultado, auditoria_path, auditoria)
-        logger.info(f"  -> Progresso persistido incrementalmente ({resultado['extraidos_com_sucesso']}/{resultado['total_chunks']}).")
+        logger.info(
+            f"  -> Progresso persistido incrementalmente ({resultado['extraidos_com_sucesso']}/{resultado['total_chunks']})."
+        )
 
     logger.info(
         f"Reprocessamento concluído: {sucessos_novos} novo(s) sucesso(s), "
@@ -188,8 +216,16 @@ def reprocessar_falhas(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("json_path", nargs="?", type=Path, default=JSON_PADRAO, help="Caminho do <edital>.json")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "json_path",
+        nargs="?",
+        type=Path,
+        default=JSON_PADRAO,
+        help="Caminho do <edital>.json",
+    )
     parser.add_argument(
         "--chunks",
         type=str,

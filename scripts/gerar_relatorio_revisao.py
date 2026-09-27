@@ -100,7 +100,10 @@ def _renderizar_taxonomia(taxonomia: dict | None) -> str:
         return "<p><em>Sem taxonomia extraída.</em></p>"
     itens = []
     for topico in taxonomia["topicos"]:
-        subitens = "".join(f"<li class='subtopico'>{escape(s)}</li>" for s in topico.get("subtopicos", []))
+        subitens = "".join(
+            f"<li class='subtopico'>{escape(s)}</li>"
+            for s in topico.get("subtopicos", [])
+        )
         itens.append(
             f"<li class='topico'><strong>{escape(topico['nome'])}</strong>"
             f"{'<ul>' + subitens + '</ul>' if subitens else ''}</li>"
@@ -133,19 +136,34 @@ def _renderizar_alertas_chunk(alertas: list[dict]) -> str:
     return f"<div class='alertas-chunk'>{''.join(linhas)}</div>"
 
 
-ROTULOS_TIPO_CONHECIMENTO = {"basico": "Básico", "especifico": "Específico", "complementar": "Complementar"}
+ROTULOS_TIPO_CONHECIMENTO = {
+    "basico": "Básico",
+    "especifico": "Específico",
+    "complementar": "Complementar",
+}
 ROTULOS_NIVEL = {"superior": "Superior", "medio": "Médio"}
 
 
 def _renderizar_classificacao(chunk_auditoria: dict) -> str:
     if "tipo_conhecimento" not in chunk_auditoria:
         return ""  # auditoria anterior ao ADR-020
-    tipo = ROTULOS_TIPO_CONHECIMENTO.get(chunk_auditoria.get("tipo_conhecimento"), "sem bloco")
+    tipo = ROTULOS_TIPO_CONHECIMENTO.get(
+        chunk_auditoria.get("tipo_conhecimento"), "sem bloco"
+    )
     nivel = ROTULOS_NIVEL.get(chunk_auditoria.get("nivel"), "sem nível")
     rotulo = f"{tipo} · {nivel}"
     if chunk_auditoria.get("apenas_discursiva"):
         rotulo += " · só discursiva"
-    sem = " sem" if chunk_auditoria.get("tipo_conhecimento") is None or chunk_auditoria.get("nivel") is None else ""
+    if chunk_auditoria.get("cargos_restritos"):
+        rotulo += " · só cargos " + ", ".join(
+            str(n) for n in chunk_auditoria["cargos_restritos"]
+        )
+    sem = (
+        " sem"
+        if chunk_auditoria.get("tipo_conhecimento") is None
+        or chunk_auditoria.get("nivel") is None
+        else ""
+    )
     return f"<span class='classificacao{sem}'>{escape(rotulo)}</span>"
 
 
@@ -154,9 +172,13 @@ def _rotulo_concurso(resultado: dict) -> str:
     return f"{concurso['slug']} — " if concurso.get("slug") else ""
 
 
-def renderizar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None, alertas: list[dict]) -> str:
+def renderizar_chunk(
+    chunk_auditoria: dict, resultado_chunk: dict | None, alertas: list[dict]
+) -> str:
     posicoes_ausentes = {
-        a["posicao_item"] for a in alertas if a["tipo"] == "topico_ausente" and a.get("posicao_item") is not None
+        a["posicao_item"]
+        for a in alertas
+        if a["tipo"] == "topico_ausente" and a.get("posicao_item") is not None
     }
     materia = escape(chunk_auditoria.get("materia") or "")
     cargo = escape(chunk_auditoria.get("cargo") or "—")
@@ -176,7 +198,9 @@ def renderizar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None, alerta
 
     texto_fonte = chunk_auditoria.get("texto_enviado_llm") or ""
     fonte_html = _destacar_itens_ausentes(texto_fonte, posicoes_ausentes)
-    taxonomia_html = _renderizar_taxonomia(resultado_chunk.get("taxonomia_extraida") if resultado_chunk else None)
+    taxonomia_html = _renderizar_taxonomia(
+        resultado_chunk.get("taxonomia_extraida") if resultado_chunk else None
+    )
 
     corpo = (
         "<div class='cols'>"
@@ -184,12 +208,16 @@ def renderizar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None, alerta
         f"<div class='col taxonomia'>{taxonomia_html}</div>"
         "</div>"
     )
-    return f"<div class='chunk'>{header}{_renderizar_alertas_chunk(alertas)}{corpo}</div>"
+    return (
+        f"<div class='chunk'>{header}{_renderizar_alertas_chunk(alertas)}{corpo}</div>"
+    )
 
 
 def renderizar_edital(resultado: dict, auditoria: dict, validacao: dict | None) -> str:
     resultado_por_index = {
-        item["chunk_index"]: item for item in resultado["resultados"] if item.get("chunk_index") is not None
+        item["chunk_index"]: item
+        for item in resultado["resultados"]
+        if item.get("chunk_index") is not None
     }
     alertas_por_chunk: dict[int | None, list[dict]] = {}
     for alerta in (validacao or {}).get("alertas", []):
@@ -252,6 +280,9 @@ def renderizar_index(editais: list[dict]) -> str:
 <body>
 <h1>Revisão de editais (Etapa 4)</h1>
 <ul class="index-lista">{itens}</ul>
+<h2>Camada canônica (Etapa 5B)</h2>
+<ul class="index-lista"><li><a href="sinonimos.html">Sinônimos canônicos</a>
+<span class="badge">matéria → assunto → subassunto, com aprovação humana</span></li></ul>
 </body></html>
 """
 
@@ -259,9 +290,17 @@ def renderizar_index(editais: list[dict]) -> str:
 def _carregar_trio(json_path: Path) -> tuple[dict, dict | None, dict | None]:
     resultado = json.loads(json_path.read_text(encoding="utf-8"))
     auditoria_path = json_path.parent / f"{json_path.stem}.auditoria.json"
-    auditoria = json.loads(auditoria_path.read_text(encoding="utf-8")) if auditoria_path.exists() else None
+    auditoria = (
+        json.loads(auditoria_path.read_text(encoding="utf-8"))
+        if auditoria_path.exists()
+        else None
+    )
     validacao_path = json_path.parent / f"{json_path.stem}.validacao.json"
-    validacao = json.loads(validacao_path.read_text(encoding="utf-8")) if validacao_path.exists() else None
+    validacao = (
+        json.loads(validacao_path.read_text(encoding="utf-8"))
+        if validacao_path.exists()
+        else None
+    )
     return resultado, auditoria, validacao
 
 
@@ -272,14 +311,17 @@ def gerar_relatorios(revisao_dir: Path = REVISAO_DIR_PADRAO) -> Path:
     jsons = sorted(
         p
         for p in revisao_dir.glob("*.json")
-        if not p.name.endswith(".auditoria.json") and not p.name.endswith(".validacao.json")
+        if not p.name.endswith(".auditoria.json")
+        and not p.name.endswith(".validacao.json")
     )
 
     editais_index = []
     for json_path in jsons:
         resultado, auditoria, validacao = _carregar_trio(json_path)
         if auditoria is None:
-            logger.warning(f"{resultado['edital']}: sem .auditoria.json — pulando relatório (formato legado).")
+            logger.warning(
+                f"{resultado['edital']}: sem .auditoria.json — pulando relatório (formato legado)."
+            )
             continue
 
         html = renderizar_edital(resultado, auditoria, validacao)
@@ -293,10 +335,16 @@ def gerar_relatorios(revisao_dir: Path = REVISAO_DIR_PADRAO) -> Path:
                 "total_alertas": validacao["total_alertas"] if validacao else 0,
             }
         )
-        logger.info(f"{resultado['edital']}: relatório gerado em {saida_dir / arquivo_html}.")
+        logger.info(
+            f"{resultado['edital']}: relatório gerado em {saida_dir / arquivo_html}."
+        )
 
-    (saida_dir / "index.html").write_text(renderizar_index(editais_index), encoding="utf-8")
-    logger.info(f"Índice de relatórios gerado em {saida_dir / 'index.html'} — {len(editais_index)} edital(is).")
+    (saida_dir / "index.html").write_text(
+        renderizar_index(editais_index), encoding="utf-8"
+    )
+    logger.info(
+        f"Índice de relatórios gerado em {saida_dir / 'index.html'} — {len(editais_index)} edital(is)."
+    )
     return saida_dir
 
 

@@ -4,8 +4,10 @@ import pymupdf
 import pytest
 
 from src.edital_parser import (
+    CAMPOS_CLASSIFICACAO_CHUNK,
     PADRAO_CARGO,
     PADRAO_MATERIA,
+    PADRAO_RESTRICAO_CARGO,
     ChunkTaxonomia,
     _limpar_ruido_edital,
     detectar_cargo_e_nivel_edital,
@@ -75,6 +77,23 @@ class TestPadroes:
         assert m is not None
         assert m.group(1) == "2"
 
+    @pytest.mark.parametrize(
+        ("texto", "esperado"),
+        [
+            (
+                "(APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E PARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+                True,
+            ),
+            ("(APENAS PARA O CARGO 3: ANALISTA... E PARA O CARGO 6: TÉCNICO...)", True),
+            ("(SOMENTE PARA OS CARGOS DE 1 A 14)", True),
+            ("(apenas para os cargos 1 e 2)", True),
+            ("(HABILIDADES E CONHECIMENTOS)", False),
+            ("(SOMENTE PARA A PROVA DISCURSIVA)", False),
+        ],
+    )
+    def test_padrao_restricao_cargo(self, texto, esperado):
+        assert bool(PADRAO_RESTRICAO_CARGO.search(texto)) == esperado
+
 
 class TestDividirPorCargoEMateria:
     def test_materia_sem_cargo_associado(self):
@@ -115,14 +134,19 @@ class TestDividirPorCargoEMateria:
         assert all(isinstance(c, ChunkTaxonomia) for c in chunks)
 
     def test_secao_sem_cabecalhos_retorna_lista_vazia(self):
-        assert dividir_por_cargo_e_materia("texto sem nenhum cabeçalho reconhecível") == []
+        assert (
+            dividir_por_cargo_e_materia("texto sem nenhum cabeçalho reconhecível") == []
+        )
 
     def test_chunks_carregam_offsets_dentro_da_secao(self):
         # Offsets necessários pra trilha de auditoria (revisar_taxonomia_piloto.py):
         # devem apontar de volta pro texto exato que gerou cada chunk.
         chunks = dividir_por_cargo_e_materia(SECAO_TESTE)
         for chunk in chunks:
-            assert SECAO_TESTE[chunk.offset_inicio : chunk.offset_fim].strip() == chunk.texto
+            assert (
+                SECAO_TESTE[chunk.offset_inicio : chunk.offset_fim].strip()
+                == chunk.texto
+            )
 
     def test_cargo_multilinha_sem_itens_absorve_titulo_e_nao_gera_chunk_falso(self):
         texto = (
@@ -166,7 +190,10 @@ class TestExtrairSecaoObjetosAvaliacaoDetalhada:
         # Sem "ANEXO I": corta até o fim do PDF, marcador_fim_encontrado=False.
         pdf_path = _criar_pdf_teste(
             tmp_path,
-            ["Página de rosto, irrelevante.", "OBJETOS DE AVALIAÇÃO\nConteudo da secao."],
+            [
+                "Página de rosto, irrelevante.",
+                "OBJETOS DE AVALIAÇÃO\nConteudo da secao.",
+            ],
         )
         secao = extrair_secao_objetos_avaliacao_detalhada(pdf_path)
         assert secao is not None
@@ -178,7 +205,9 @@ class TestExtrairSecaoObjetosAvaliacaoDetalhada:
     def test_metadados_de_corte_com_marcador_fim(self, tmp_path):
         pdf_path = _criar_pdf_teste(
             tmp_path,
-            ["OBJETOS DE AVALIAÇÃO\nConteudo da secao.\nANEXO I\nTexto de anexo, fora da secao."],
+            [
+                "OBJETOS DE AVALIAÇÃO\nConteudo da secao.\nANEXO I\nTexto de anexo, fora da secao."
+            ],
         )
         secao = extrair_secao_objetos_avaliacao_detalhada(pdf_path)
         assert secao is not None
@@ -236,8 +265,13 @@ class TestRemoverAssinaturaFinal:
         ],
     )
     def test_remove_assinatura_em_linhas_proprias(self, assinatura):
-        texto = "12 Anatomia. 13 Proteção da Fauna. 13.1 Lei nº 5.197/1967." + assinatura
-        assert remover_assinatura_final(texto) == "12 Anatomia. 13 Proteção da Fauna. 13.1 Lei nº 5.197/1967."
+        texto = (
+            "12 Anatomia. 13 Proteção da Fauna. 13.1 Lei nº 5.197/1967." + assinatura
+        )
+        assert (
+            remover_assinatura_final(texto)
+            == "12 Anatomia. 13 Proteção da Fauna. 13.1 Lei nº 5.197/1967."
+        )
 
     def test_remove_nome_colado_na_mesma_linha_do_ultimo_item(self):
         # Formato real do PF_25_ADM.
@@ -250,7 +284,9 @@ class TestRemoverAssinaturaFinal:
         )
 
     def test_presidente_no_meio_do_conteudo_nao_e_removido(self):
-        texto = "7.3 Poder Executivo. 7.3.1 \nPresidente da República. 7.3.1.1 Atribuições."
+        texto = (
+            "7.3 Poder Executivo. 7.3.1 \nPresidente da República. 7.3.1.1 Atribuições."
+        )
         assert remover_assinatura_final(texto) == texto
 
     def test_linha_de_cargo_sem_nome_antes_nao_e_removida(self):
@@ -258,7 +294,12 @@ class TestRemoverAssinaturaFinal:
         assert remover_assinatura_final(texto) == texto
 
     def test_limpar_ruido_tambem_remove_assinatura(self):
-        assert _limpar_ruido_edital("1 Epidemiologia.\nRODRIGO AGOSTINHO\nPresidente do Ibama") == "1 Epidemiologia."
+        assert (
+            _limpar_ruido_edital(
+                "1 Epidemiologia.\nRODRIGO AGOSTINHO\nPresidente do Ibama"
+            )
+            == "1 Epidemiologia."
+        )
 
 
 class TestChunkingRemoveRuido:
@@ -327,7 +368,11 @@ class TestBlocosDeConhecimento:
     def test_mesma_materia_em_niveis_diferentes_fica_distinguivel(self):
         # Regressão do problema original: os dois chunks de LÍNGUA
         # PORTUGUESA saíam idênticos (cargo=None, mesmo nome).
-        portugues = [c for c in dividir_por_cargo_e_materia(SECAO_BLOCOS) if c.materia == "LÍNGUA PORTUGUESA"]
+        portugues = [
+            c
+            for c in dividir_por_cargo_e_materia(SECAO_BLOCOS)
+            if c.materia == "LÍNGUA PORTUGUESA"
+        ]
         assert {(c.nivel, c.texto) for c in portugues} == {
             ("superior", "1 Conteúdo superior."),
             ("medio", "1 Conteúdo médio."),
@@ -338,7 +383,9 @@ class TestBlocosDeConhecimento:
             assert "CONHECIMENTOS" not in chunk.texto
 
     def test_materia_somente_discursiva_vira_flag_e_sai_do_nome_normalizado(self):
-        atualidades = next(c for c in dividir_por_cargo_e_materia(SECAO_BLOCOS) if c.apenas_discursiva)
+        atualidades = next(
+            c for c in dividir_por_cargo_e_materia(SECAO_BLOCOS) if c.apenas_discursiva
+        )
         assert atualidades.materia == "ATUALIDADES (SOMENTE PARA A PROVA DISCURSIVA)"
         assert atualidades.materia_normalizada == "ATUALIDADES"
         assert metadados_chunk(atualidades) == {
@@ -347,7 +394,120 @@ class TestBlocosDeConhecimento:
             "cargo_numero": None,
             "materia_normalizada": "ATUALIDADES",
             "apenas_discursiva": True,
+            "cargos_restritos": None,
         }
+
+    def test_chunk_com_restricao_de_cargo_extrai_cargos_restritos_e_limpa_materia(self):
+        chunk = ChunkTaxonomia(
+            cargo=None,
+            materia="DIREITO PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA JUDICIÁRIO – ÁREA: ADMINISTRATIVA E PARA O CARGO 8: TÉCNICO JUDICIÁRIO – ÁREA: ADMINISTRATIVA)",
+            texto="1 Crime militar.",
+            tipo_conhecimento="especifico",
+            nivel="superior",
+        )
+        assert chunk.cargos_restritos == [1, 8]
+        assert chunk.materia_normalizada == "DIREITO PENAL MILITAR"
+        assert chunk.apenas_discursiva is False
+        assert metadados_chunk(chunk)["cargos_restritos"] == [1, 8]
+
+    def test_chunk_com_restricao_multilinha_stm(self):
+        materia_stm = (
+            "LÍNGUA INGLESA (APENAS PARA O CARGO 3: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – \n"
+            "ESPECIALIDADE: ANÁLISE DE SISTEMAS E PARA O CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO \n"
+            "ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO)"
+        )
+        chunk = ChunkTaxonomia(
+            cargo=None,
+            materia=materia_stm,
+            texto="1 Compreensão de texto em língua inglesa.",
+        )
+        assert chunk.cargos_restritos == [3, 6]
+        assert chunk.materia_normalizada == "LÍNGUA INGLESA"
+
+    def test_chunk_sem_restricao_tem_cargos_restritos_none(self):
+        chunk = ChunkTaxonomia(
+            cargo=None, materia="DIREITO CONSTITUCIONAL", texto="1 CF/88."
+        )
+        assert chunk.cargos_restritos is None
+        assert chunk.materia_normalizada == "DIREITO CONSTITUCIONAL"
+
+    def test_colapso_espacos_multiplos_em_materia_normalizada(self):
+        chunk = ChunkTaxonomia(
+            cargo=None, materia="LÍNGUA   PORTUGUESA", texto="1 Texto."
+        )
+        assert chunk.cargos_restritos is None
+        assert chunk.materia_normalizada == "LÍNGUA PORTUGUESA"
+
+    def test_restricao_com_parentese_interno_sai_inteira_do_nome(self):
+        chunk = ChunkTaxonomia(
+            cargo=None,
+            materia="LÍNGUA INGLESA (APENAS PARA O CARGO 3: ANALISTA (TI) E PARA O CARGO 6: TÉCNICO)",
+            texto="1 Texto.",
+        )
+        assert chunk.cargos_restritos == [3, 6]
+        assert chunk.materia_normalizada == "LÍNGUA INGLESA"
+
+    def test_varias_restricoes_somam_os_cargos(self):
+        chunk = ChunkTaxonomia(
+            cargo=None,
+            materia="X (APENAS PARA O CARGO 1) (APENAS PARA O CARGO 2)",
+            texto="1 Texto.",
+        )
+        assert chunk.cargos_restritos == [1, 2]
+        assert chunk.materia_normalizada == "X"
+
+    @pytest.mark.parametrize(
+        "materia",
+        [
+            "ÉTICA (SOMENTE PARA OS CARGOS DE NÍVEL SUPERIOR)",
+            "ÉTICA (APENAS PARA O CARGO DE ANALISTA)",
+        ],
+    )
+    def test_restricao_sem_numero_de_cargo_fica_no_nome(self, materia):
+        # Tirar do nome sem guardar os cargos faria a matéria valer para todos.
+        chunk = ChunkTaxonomia(cargo=None, materia=materia, texto="1 Texto.")
+        assert chunk.cargos_restritos is None
+        assert chunk.materia_normalizada == materia
+
+    def test_dividir_avisa_restricao_sem_numero(self, caplog):
+        secao = (
+            "\nCONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR\n"
+            "ÉTICA (SOMENTE PARA OS CARGOS DE NÍVEL SUPERIOR): 1 Texto.\n"
+        )
+        with caplog.at_level("WARNING"):
+            dividir_por_cargo_e_materia(secao)
+        assert "[RESTRICAO_SEM_CARGO]" in caplog.text
+
+    def test_dividir_loga_cargos_restritos(self, caplog):
+        secao = (
+            "\nCONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR\n"
+            "LÍNGUA INGLESA (APENAS PARA OS CARGOS 3 E 6): 1 Texto.\n"
+        )
+        with caplog.at_level("INFO"):
+            dividir_por_cargo_e_materia(secao)
+        assert "[RESTRICAO_CARGO]" in caplog.text
+        assert "'LÍNGUA INGLESA' → só cargos [3, 6]" in caplog.text
+
+    def test_campos_classificacao_chunk_inclui_cargos_restritos(self):
+        assert "cargos_restritos" in CAMPOS_CLASSIFICACAO_CHUNK
+
+    def test_dividir_por_cargo_e_materia_com_restricao_e_espacos_duplos(self):
+        secao = (
+            "\nCONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR\n"
+            "LÍNGUA  PORTUGUESA: 1 Texto.\n"
+            "DIREITO PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA E PARA O CARGO 8: TÉCNICO): 1 Crime.\n"
+        )
+        chunks = dividir_por_cargo_e_materia(secao)
+        assert len(chunks) == 2
+        assert chunks[0].materia == "LÍNGUA PORTUGUESA"
+        assert chunks[0].materia_normalizada == "LÍNGUA PORTUGUESA"
+        assert chunks[0].cargos_restritos is None
+        assert (
+            chunks[1].materia
+            == "DIREITO PENAL MILITAR (APENAS PARA O CARGO 1: ANALISTA E PARA O CARGO 8: TÉCNICO)"
+        )
+        assert chunks[1].materia_normalizada == "DIREITO PENAL MILITAR"
+        assert chunks[1].cargos_restritos == [1, 8]
 
     def test_novo_bloco_zera_o_cargo_corrente(self):
         secao = (
@@ -356,8 +516,16 @@ class TestBlocosDeConhecimento:
             "CONHECIMENTOS BÁSICOS PARA O CARGO DE NÍVEL MÉDIO\n"
             "LÍNGUA PORTUGUESA: 1 Texto.\n"
         )
-        portugues = next(c for c in dividir_por_cargo_e_materia(secao) if c.materia == "LÍNGUA PORTUGUESA")
-        assert (portugues.cargo, portugues.cargo_numero, portugues.tipo_conhecimento) == (None, None, "basico")
+        portugues = next(
+            c
+            for c in dividir_por_cargo_e_materia(secao)
+            if c.materia == "LÍNGUA PORTUGUESA"
+        )
+        assert (
+            portugues.cargo,
+            portugues.cargo_numero,
+            portugues.tipo_conhecimento,
+        ) == (None, None, "basico")
 
     def test_bloco_sem_nivel_unico_deixa_nivel_none(self):
         secao = (
@@ -372,7 +540,9 @@ class TestBlocosDeConhecimento:
     def test_conhecimentos_especificos_com_dois_pontos_continua_sendo_materia(self):
         secao = "\nCONHECIMENTOS ESPECÍFICOS: 1 Conteúdo na mesma linha.\n"
         chunks = dividir_por_cargo_e_materia(secao)
-        assert [(c.materia, c.tipo_conhecimento) for c in chunks] == [("CONHECIMENTOS ESPECÍFICOS", None)]
+        assert [(c.materia, c.tipo_conhecimento) for c in chunks] == [
+            ("CONHECIMENTOS ESPECÍFICOS", None)
+        ]
 
     def test_mapear_cargos_herda_nivel_do_bloco_especifico(self):
         assert mapear_cargos(dividir_por_cargo_e_materia(SECAO_BLOCOS)) == [
@@ -414,8 +584,18 @@ class TestBlocosDeConhecimento:
                 nivel="medio",
             )
         ]
-        cargos = mapear_cargos(chunks, cargo_padrao="TÉCNICO FEDERAL DE CONTROLE EXTERNO", nivel_padrao="medio")
-        assert cargos == [{"numero": 1, "nome": "TÉCNICO FEDERAL DE CONTROLE EXTERNO", "nivel": "medio"}]
+        cargos = mapear_cargos(
+            chunks,
+            cargo_padrao="TÉCNICO FEDERAL DE CONTROLE EXTERNO",
+            nivel_padrao="medio",
+        )
+        assert cargos == [
+            {
+                "numero": 1,
+                "nome": "TÉCNICO FEDERAL DE CONTROLE EXTERNO",
+                "nivel": "medio",
+            }
+        ]
 
     def test_materia_multilinha_com_conectivo_reconhecida(self):
         texto = (
@@ -427,7 +607,10 @@ class TestBlocosDeConhecimento:
         chunks = dividir_por_cargo_e_materia(texto)
         assert len(chunks) == 1
         assert chunks[0].cargo == "CARGO 1: ANALISTA LEGISLATIVO – ATRIBUIÇÃO: GESTÃO"
-        assert chunks[0].materia == "REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E CÓDIGO DE ÉTICA"
+        assert (
+            chunks[0].materia
+            == "REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E CÓDIGO DE ÉTICA"
+        )
         assert chunks[0].texto == "1 Regimento Interno."
 
     def test_materia_sem_dois_pontos_sob_cargo_reconhecida_antes_do_item_1(self):
@@ -439,8 +622,12 @@ class TestBlocosDeConhecimento:
         )
         chunks = dividir_por_cargo_e_materia(texto)
         assert len(chunks) == 1
-        assert chunks[0].cargo == "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE"
-        assert chunks[0].materia == "NOÇÕES DE DIREITO CONSTITUCIONAL E REGIMENTO INTERNO"
+        assert (
+            chunks[0].cargo == "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE"
+        )
+        assert (
+            chunks[0].materia == "NOÇÕES DE DIREITO CONSTITUCIONAL E REGIMENTO INTERNO"
+        )
         assert chunks[0].texto.startswith("1\nConstituição Federal")
 
 
@@ -454,9 +641,13 @@ PDF_TCU = (
 )
 
 
-@pytest.mark.skipif(not PDF_PILOTO.exists(), reason="PDF piloto não baixado (data/ é gitignored)")
+@pytest.mark.skipif(
+    not PDF_PILOTO.exists(), reason="PDF piloto não baixado (data/ é gitignored)"
+)
 def test_edital_piloto_real_classifica_os_4_blocos():
-    chunks = dividir_por_cargo_e_materia(extrair_secao_objetos_avaliacao_detalhada(PDF_PILOTO).texto)
+    chunks = dividir_por_cargo_e_materia(
+        extrair_secao_objetos_avaliacao_detalhada(PDF_PILOTO).texto
+    )
     assert len(chunks) == 39
     faixas = {
         range(6): ("basico", "superior"),
@@ -465,13 +656,25 @@ def test_edital_piloto_real_classifica_os_4_blocos():
         range(33, 39): ("especifico", "medio"),
     }
     for faixa, esperado in faixas.items():
-        assert {(chunks[i].tipo_conhecimento, chunks[i].nivel) for i in faixa} == {esperado}
-    assert [c.materia_normalizada for c in chunks if c.apenas_discursiva] == ["ATUALIDADES"]
-    assert {c["nivel"] for c in mapear_cargos(chunks) if c["numero"] <= 14} == {"superior"}
-    assert mapear_cargos(chunks)[-1] == {"numero": 15, "nome": "AGENTE ADMINISTRATIVO", "nivel": "medio"}
+        assert {(chunks[i].tipo_conhecimento, chunks[i].nivel) for i in faixa} == {
+            esperado
+        }
+    assert [c.materia_normalizada for c in chunks if c.apenas_discursiva] == [
+        "ATUALIDADES"
+    ]
+    assert {c["nivel"] for c in mapear_cargos(chunks) if c["numero"] <= 14} == {
+        "superior"
+    }
+    assert mapear_cargos(chunks)[-1] == {
+        "numero": 15,
+        "nome": "AGENTE ADMINISTRATIVO",
+        "nivel": "medio",
+    }
 
 
-@pytest.mark.skipif(not PDF_TCU.exists(), reason="PDF TCU não baixado (data/ é gitignored)")
+@pytest.mark.skipif(
+    not PDF_TCU.exists(), reason="PDF TCU não baixado (data/ é gitignored)"
+)
 def test_edital_tcu_real_cargo_unico_e_nivel_medio():
     info = detectar_cargo_e_nivel_edital(PDF_TCU)
     assert info["cargo"] == "TÉCNICO FEDERAL DE CONTROLE EXTERNO"
@@ -490,9 +693,15 @@ def test_edital_tcu_real_cargo_unico_e_nivel_medio():
     assert all(c.nivel == "medio" for c in chunks)
     assert all(chunks[i].cargo is None for i in range(5))
     assert all(chunks[i].tipo_conhecimento == "basico" for i in range(5))
-    assert all(chunks[i].cargo == "CARGO 1: TÉCNICO FEDERAL DE CONTROLE EXTERNO" for i in range(5, 10))
+    assert all(
+        chunks[i].cargo == "CARGO 1: TÉCNICO FEDERAL DE CONTROLE EXTERNO"
+        for i in range(5, 10)
+    )
     assert all(chunks[i].tipo_conhecimento == "especifico" for i in range(5, 10))
 
-    cargos = mapear_cargos(chunks, cargo_padrao=secao.cargo_detectado, nivel_padrao=secao.nivel_detectado)
-    assert cargos == [{"numero": 1, "nome": "TÉCNICO FEDERAL DE CONTROLE EXTERNO", "nivel": "medio"}]
-
+    cargos = mapear_cargos(
+        chunks, cargo_padrao=secao.cargo_detectado, nivel_padrao=secao.nivel_detectado
+    )
+    assert cargos == [
+        {"numero": 1, "nome": "TÉCNICO FEDERAL DE CONTROLE EXTERNO", "nivel": "medio"}
+    ]

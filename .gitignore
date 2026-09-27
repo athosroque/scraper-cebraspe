@@ -11,3 +11,4 @@ revisao_piloto/*.bak*
 revisao_piloto/relatorio/
 *.bak
 .claude/
+questoes/

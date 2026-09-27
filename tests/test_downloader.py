@@ -24,7 +24,10 @@ def fake_response(content: bytes, content_type: str = "application/pdf"):
 
 class TestSlugify:
     def test_normaliza_acentos_e_espacos(self):
-        assert downloader.slugify("Tribunal de Justiça do Ceará") == "TRIBUNAL_DE_JUSTICA_DO_CEARA"
+        assert (
+            downloader.slugify("Tribunal de Justiça do Ceará")
+            == "TRIBUNAL_DE_JUSTICA_DO_CEARA"
+        )
 
     def test_string_vazia_usa_fallback(self):
         assert downloader.slugify("") == "ORGAO_DESCONHECIDO"
@@ -50,8 +53,12 @@ class TestIsValidPdf:
 class TestDownloadPdf:
     def test_baixa_e_grava_arquivo_novo(self, tmp_path):
         manifest = {}
-        with patch.object(downloader.requests, "get", return_value=fake_response(PDF_BYTES)) as mock_get:
-            path = downloader.download_pdf("https://x.test/edital.pdf", tmp_path, manifest)
+        with patch.object(
+            downloader.requests, "get", return_value=fake_response(PDF_BYTES)
+        ) as mock_get:
+            path = downloader.download_pdf(
+                "https://x.test/edital.pdf", tmp_path, manifest
+            )
 
         assert path is not None
         assert path.exists()
@@ -65,15 +72,23 @@ class TestDownloadPdf:
         manifest = {"https://x.test/edital.pdf": {"hash": "x", "path": str(existing)}}
 
         with patch.object(downloader.requests, "get") as mock_get:
-            path = downloader.download_pdf("https://x.test/edital.pdf", tmp_path, manifest)
+            path = downloader.download_pdf(
+                "https://x.test/edital.pdf", tmp_path, manifest
+            )
 
         assert path == existing
         mock_get.assert_not_called()
 
     def test_rejeita_conteudo_invalido_e_nao_grava(self, tmp_path):
         manifest = {}
-        with patch.object(downloader.requests, "get", return_value=fake_response(HTML_BYTES, "text/html")):
-            path = downloader.download_pdf("https://x.test/quebrado.pdf", tmp_path, manifest)
+        with patch.object(
+            downloader.requests,
+            "get",
+            return_value=fake_response(HTML_BYTES, "text/html"),
+        ):
+            path = downloader.download_pdf(
+                "https://x.test/quebrado.pdf", tmp_path, manifest
+            )
 
         assert path is None
         assert list(tmp_path.iterdir()) == []
@@ -81,7 +96,9 @@ class TestDownloadPdf:
 
     def test_dedup_por_hash_reaproveita_arquivo_existente(self, tmp_path):
         manifest = {}
-        with patch.object(downloader.requests, "get", return_value=fake_response(PDF_BYTES)):
+        with patch.object(
+            downloader.requests, "get", return_value=fake_response(PDF_BYTES)
+        ):
             path_a = downloader.download_pdf("https://x.test/a.pdf", tmp_path, manifest)
             path_b = downloader.download_pdf("https://x.test/b.pdf", tmp_path, manifest)
 
@@ -90,8 +107,14 @@ class TestDownloadPdf:
 
     def test_falha_de_rede_retorna_none(self, tmp_path):
         manifest = {}
-        with patch.object(downloader.requests, "get", side_effect=downloader.requests.ConnectionError("timeout")):
-            path = downloader.download_pdf("https://x.test/edital.pdf", tmp_path, manifest)
+        with patch.object(
+            downloader.requests,
+            "get",
+            side_effect=downloader.requests.ConnectionError("timeout"),
+        ):
+            path = downloader.download_pdf(
+                "https://x.test/edital.pdf", tmp_path, manifest
+            )
 
         assert path is None
         assert manifest == {}
@@ -111,7 +134,9 @@ class TestDownloadConcursoPdfs:
             "https://x.test/prova.pdf": fake_response(PDF_BYTES + b"2"),
             "https://x.test/gabarito.pdf": fake_response(PDF_BYTES + b"3"),
         }
-        with patch.object(downloader.requests, "get", side_effect=lambda url, **kw: respostas[url]):
+        with patch.object(
+            downloader.requests, "get", side_effect=lambda url, **kw: respostas[url]
+        ):
             resultado = downloader.download_concurso_pdfs(
                 "Tribunal de Justiça do Ceará", 2025, pdf_map, data_dir=tmp_path
             )
@@ -128,19 +153,35 @@ class TestDownloadConcursoPdfs:
             "provas": [],
             "gabaritos": [],
         }
-        with patch.object(downloader.requests, "get", side_effect=downloader.requests.ConnectionError("timeout")):
-            resultado = downloader.download_concurso_pdfs("Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path)
+        with patch.object(
+            downloader.requests,
+            "get",
+            side_effect=downloader.requests.ConnectionError("timeout"),
+        ):
+            resultado = downloader.download_concurso_pdfs(
+                "Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path
+            )
 
         assert resultado == {"editais_abertura": [], "provas": [], "gabaritos": []}
 
     def test_reexecucao_nao_rebaixa_pdf_ja_presente(self, tmp_path):
-        pdf_map = {"editais_abertura": ["https://x.test/edital.pdf"], "provas": [], "gabaritos": []}
+        pdf_map = {
+            "editais_abertura": ["https://x.test/edital.pdf"],
+            "provas": [],
+            "gabaritos": [],
+        }
 
-        with patch.object(downloader.requests, "get", return_value=fake_response(PDF_BYTES)) as mock_get:
-            downloader.download_concurso_pdfs("Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path)
+        with patch.object(
+            downloader.requests, "get", return_value=fake_response(PDF_BYTES)
+        ) as mock_get:
+            downloader.download_concurso_pdfs(
+                "Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path
+            )
             assert mock_get.call_count == 1
 
-            downloader.download_concurso_pdfs("Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path)
+            downloader.download_concurso_pdfs(
+                "Qualquer Orgao", 2025, pdf_map, data_dir=tmp_path
+            )
             assert mock_get.call_count == 1
 
 
@@ -148,15 +189,21 @@ class TestResolverConcursoDoPdf:
     def _preparar(self, tmp_path, urls: list[str]):
         orgao_dir = tmp_path / "2025" / "CEBRASPE" / "PF"
         (orgao_dir / "Editais").mkdir(parents=True)
-        manifest = {url: {"hash": "x", "path": f"/outra/copia/{url.rsplit('/', 1)[-1]}"} for url in urls}
-        (orgao_dir / downloader.MANIFEST_FILENAME).write_text(json.dumps(manifest), encoding="utf-8")
+        manifest = {
+            url: {"hash": "x", "path": f"/outra/copia/{url.rsplit('/', 1)[-1]}"}
+            for url in urls
+        }
+        (orgao_dir / downloader.MANIFEST_FILENAME).write_text(
+            json.dumps(manifest), encoding="utf-8"
+        )
         return orgao_dir / "Editais"
 
     def test_resolve_slug_orgao_e_ano_pela_url_do_manifesto(self, tmp_path):
         # O path gravado no manifesto aponta pra outra cópia do repo (achado
         # real: worktree antiga) — o casamento tem que ser pelo nome do arquivo.
         editais = self._preparar(
-            tmp_path, ["https://cdn.cebraspe.org.br/concursos/PF_25_ADM/arquivos/Ed_1.pdf"]
+            tmp_path,
+            ["https://cdn.cebraspe.org.br/concursos/PF_25_ADM/arquivos/Ed_1.pdf"],
         )
         assert downloader.resolver_concurso_do_pdf(editais / "Ed_1.pdf") == {
             "slug": "PF_25_ADM",

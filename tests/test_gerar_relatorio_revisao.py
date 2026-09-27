@@ -14,7 +14,9 @@ def _fixture_basica():
         "extraidos_com_sucesso": 1,
         "falhas": 1,
         "status_revisao_humana": "PENDENTE — teste.",
-        "chunks_com_falha": [{"chunk_index": 1, "cargo": None, "materia_esperada": "MATERIA B"}],
+        "chunks_com_falha": [
+            {"chunk_index": 1, "cargo": None, "materia_esperada": "MATERIA B"}
+        ],
         "resultados": [
             {
                 "chunk_index": 0,
@@ -22,7 +24,9 @@ def _fixture_basica():
                 "materia_chunk": "MATERIA A",
                 "taxonomia_extraida": {
                     "materia": "Matéria A",
-                    "topicos": [{"nome": "1 Tópico um", "subtopicos": ["1.1 Subtópico"]}],
+                    "topicos": [
+                        {"nome": "1 Tópico um", "subtopicos": ["1.1 Subtópico"]}
+                    ],
                 },
             }
         ],
@@ -114,7 +118,9 @@ class TestGerarRelatorios:
 
         assert "falha na extração" in html
 
-    def test_chunk_com_status_especifico_tambem_mostra_aviso_sem_taxonomia(self, tmp_path):
+    def test_chunk_com_status_especifico_tambem_mostra_aviso_sem_taxonomia(
+        self, tmp_path
+    ):
         # Não só o "falha" genérico — um status específico de falha semântica
         # (ex.: STATUS_FALHA_NOME_NUMERICO_NAO_MAPEADO, ver ADR-021) também
         # precisa ser reconhecido como "sem taxonomia", não renderizado como
@@ -160,3 +166,22 @@ class TestGerarRelatorios:
 
         assert "Edital_A.pdf" in index_html
         assert "Edital_A.html" in index_html
+
+    def test_cargos_restritos_aparecem_na_classificacao_do_chunk(self, tmp_path):
+        resultado, auditoria, validacao = _fixture_basica()
+        auditoria["chunks"][0].update(
+            {
+                "tipo_conhecimento": "especifico",
+                "nivel": "superior",
+                "cargos_restritos": [1, 8],
+            }
+        )
+        _escrever_json(tmp_path / "Edital_A.json", resultado)
+        _escrever_json(tmp_path / "Edital_A.auditoria.json", auditoria)
+        _escrever_json(tmp_path / "Edital_A.validacao.json", validacao)
+
+        html = (gerar_relatorios(tmp_path) / "Edital_A.html").read_text(
+            encoding="utf-8"
+        )
+
+        assert "só cargos 1, 8" in html

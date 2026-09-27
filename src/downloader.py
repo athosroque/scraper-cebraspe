@@ -49,7 +49,9 @@ def slugify(nome: str) -> str:
     (acentos e espaços removidos/normalizados), evitando pastas duplicadas
     para o mesmo órgão em `data/<ano>/CEBRASPE/<orgao_slug>/`.
     """
-    sem_acento = unicodedata.normalize("NFKD", nome).encode("ascii", "ignore").decode("ascii")
+    sem_acento = (
+        unicodedata.normalize("NFKD", nome).encode("ascii", "ignore").decode("ascii")
+    )
     slug = re.sub(r"[^A-Za-z0-9]+", "_", sem_acento).strip("_").upper()
     return slug or "ORGAO_DESCONHECIDO"
 
@@ -80,8 +82,14 @@ def _is_valid_pdf(content: bytes, content_type: str | None) -> bool:
     """
     if not content.startswith(PDF_MAGIC_BYTES):
         return False
-    if content_type and "pdf" not in content_type.lower() and "octet-stream" not in content_type.lower():
-        logger.warning(f"Content-Type inesperado para PDF com magic bytes válidos: {content_type}")
+    if (
+        content_type
+        and "pdf" not in content_type.lower()
+        and "octet-stream" not in content_type.lower()
+    ):
+        logger.warning(
+            f"Content-Type inesperado para PDF com magic bytes válidos: {content_type}"
+        )
     return True
 
 
@@ -108,7 +116,10 @@ def resolver_concurso_do_pdf(pdf_path: Path) -> dict | None:
     manifest = _load_manifest(pdf_path.parent.parent / MANIFEST_FILENAME)
     slugs = set()
     for url, entry in manifest.items():
-        if pdf_path.name not in (_filename_from_url(url), Path(entry.get("path", "")).name):
+        if pdf_path.name not in (
+            _filename_from_url(url),
+            Path(entry.get("path", "")).name,
+        ):
             continue
         match = re.search(r"/concursos/([^/]+)/", url)
         if match:
@@ -122,10 +133,16 @@ def resolver_concurso_do_pdf(pdf_path: Path) -> dict | None:
         return None
 
     slug = slugs.pop()
-    return {"slug": slug, "orgao": extract_orgao_from_slug(slug), "ano": extract_year_from_slug(slug)}
+    return {
+        "slug": slug,
+        "orgao": extract_orgao_from_slug(slug),
+        "ano": extract_year_from_slug(slug),
+    }
 
 
-def download_pdf(url: str, dest_dir: Path, manifest: dict[str, dict[str, str]]) -> Path | None:
+def download_pdf(
+    url: str, dest_dir: Path, manifest: dict[str, dict[str, str]]
+) -> Path | None:
     """Baixa um PDF, validando magic bytes e deduplicando por URL e por hash.
 
     Retorna o path final do arquivo (novo ou reaproveitado de uma execução
@@ -151,7 +168,9 @@ def download_pdf(url: str, dest_dir: Path, manifest: dict[str, dict[str, str]]) 
     content_type = response.headers.get("Content-Type")
 
     if not _is_valid_pdf(content, content_type):
-        logger.error(f"Conteúdo inválido (não é PDF) em {url} — Content-Type: {content_type}")
+        logger.error(
+            f"Conteúdo inválido (não é PDF) em {url} — Content-Type: {content_type}"
+        )
         return None
 
     content_hash = hashlib.sha256(content).hexdigest()
@@ -159,14 +178,19 @@ def download_pdf(url: str, dest_dir: Path, manifest: dict[str, dict[str, str]]) 
     for entry in manifest.values():
         if entry.get("hash") == content_hash and Path(entry["path"]).exists():
             existing_path = Path(entry["path"])
-            logger.info(f"Conteúdo duplicado de outro link já baixado, reaproveitando {existing_path}")
+            logger.info(
+                f"Conteúdo duplicado de outro link já baixado, reaproveitando {existing_path}"
+            )
             manifest[url] = {"hash": content_hash, "path": str(existing_path)}
             return existing_path
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest_path = dest_dir / _filename_from_url(url)
 
-    if dest_path.exists() and hashlib.sha256(dest_path.read_bytes()).hexdigest() != content_hash:
+    if (
+        dest_path.exists()
+        and hashlib.sha256(dest_path.read_bytes()).hexdigest() != content_hash
+    ):
         # Nome de arquivo colide mas conteúdo é diferente: desambigua com o hash.
         dest_path = dest_dir / f"{dest_path.stem}_{content_hash[:8]}{dest_path.suffix}"
 
