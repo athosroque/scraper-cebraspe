@@ -446,9 +446,15 @@ enviar o bloco de uma etapa específica para o agente construir.
   "noções") **e** falsos positivos reais que devem ficar separados (atos ×
   contratos administrativos, ativos × passivos, gestão de processos × de
   pessoas).
-- `[ ]` **Checkpoint:** o dono aprova os sinônimos antes da Etapa 5D.
+- `[x]` **Checkpoint:** o dono aprova os sinônimos antes da Etapa 5D.
+  **Feito em 2026-09-27** (commits `b5b2e77` e `214f2d2`). Rejeitadas
+  `SL-065b9773e6` (nome composto, vai para a 5B.1) e `ML-badfd45efe` (TI +
+  Estatística numa matéria só). "Procedimentos Contábeis Patrimoniais
+  conforme MCASP" saiu do grupo do manual e virou `AH-20068a5851`. As
+  outras 104 propostas foram aprovadas. Resultado: 89 matérias, 1148
+  assuntos e 2493 subassuntos canônicos, nenhuma proposta pendente.
 
-> **Implementada em 2026-09-25 (ADR-029), aguardando aprovação humana.**
+> **Implementada em 2026-09-25 (ADR-029). Aprovação humana concluída em 2026-09-27.**
 > `canonico/sinonimos.json` (entradas + grupos, IDs estáveis `M-/A-/S-`,
 > `MR-/AR-/SR-`, `ML-/AL-/SL-`, `MH-/AH-/SH-`), `src/canonico.py`,
 > `src/llm_openrouter.py` (`chamar_llm_json`, reasoning padrão de 3000
@@ -475,6 +481,91 @@ enviar o bloco de uma etapa específica para o agente construir.
 >   1259/1259 tópicos e 2689/2689 subtópicos mapeados; `taxonomia_subitens`
 >   3127 linhas; 18 matérias com `nocoes`. Carga idempotente.
 > - `pytest`: 316 testes.
+
+## Etapa 5A.1: Nome de disciplina para matéria que veio do nome do cargo (antes da 5D)
+> **Por que existe (achado na revisão da 5B, 2026-09-27):** cargo de
+> especialidade não tem cabeçalho de matéria no edital, então o parser usa o
+> nome do cargo como matéria (`dividir_por_cargo_e_materia`, ramo `else` do
+> marcador `cargo`). O resultado é que `dim_materia` fica com nome de
+> profissão, não de disciplina. Medido reexecutando o parser nos 5 editais:
+> são **12 chunks, todos do `PF_25_ADM`** (chunks 15 e 22–32). Os 4 casos
+> parecidos de STM (`COMUNICAÇÃO SOCIAL`), IBAMA (`QUALIDADE AMBIENTAL`,
+> `MANEJO, CONSERVAÇÃO...`) e TCU (`CONTROLE EXTERNO`) têm cabeçalho real e
+> ficam fora. O CD chunk 10 é o caso "prefixo sem dois-pontos" (ADR-024),
+> também fora.
+>
+> **Efeito:** a regra de sinônimos nunca junta `ESTATÍSTICO` com
+> `Estatística` de outro concurso, e a 5D mandaria nomes de cargo como
+> candidatos de classificação. O LLM já devolve um nome de disciplina em
+> `taxonomia_extraida.materia` (pago na extração, hoje ignorado):
+>
+> | chunk | matéria gravada | nome do LLM | casa com canônico existente |
+> |---|---|---|---|
+> | 15 | ASSISTENTE SOCIAL | Serviço Social | — |
+> | 22 | ENFERMEIRO | Enfermagem | — |
+> | 23 | ESTATÍSTICO | Estatística | — |
+> | 24 | FARMACÊUTICO | Farmacologia ⚠️ | — |
+> | 25 | MÉDICO CLÍNICO | Clínica Médica | — |
+> | 26 | MÉDICO ORTOPEDISTA | Ortopedia e Traumatologia | — |
+> | 27 | MÉDICO PSIQUIATRA | Psiquiatria | — |
+> | 28 | NUTRICIONISTA | Nutrição | — |
+> | 29 | PSICÓLOGO CLÍNICO | Psicologia Clínica | — |
+> | 30 | PSICÓLOGO ORGANIZACIONAL | Psicologia ⚠️ | — |
+> | 31 | TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA | Fundamentos da Educação ⚠️ | — |
+> | 32 | TÉCNICO EM COMUNICAÇÃO SOCIAL | Comunicação Social | `COMUNICAÇÃO SOCIAL` (STM) |
+>
+> ⚠️ = nome do LLM discutível (Farmacologia é parte de Farmácia;
+> "Psicologia" perde o "Organizacional"; Pedagogia virou um tema dela). Por
+> isso o nome do LLM é **só sugestão**: nunca aprova sozinho.
+>
+> **Decisões desta etapa:**
+> - A fonte continua fiel ao edital: `materia`/`materia_normalizada` do
+>   chunk seguem sendo o nome do cargo (o backfill e o alinhamento
+>   texto↔auditoria não mudam). A disciplina entra na **camada canônica**,
+>   pelo mesmo caminho de aprovação da 5B (ADR-029).
+> - Sem chamada nova ao LLM: a sugestão é o `taxonomia_extraida.materia`
+>   já salvo. Custo zero de tokens.
+> - A hierarquia não muda (matéria → assunto → subassunto). Só o nome e o
+>   agrupamento da matéria canônica mudam.
+
+- `[ ]` **Parser:** `ChunkTaxonomia.materia_origem`
+  (`"cabecalho"` | `"prefixo"` | `"cargo"`), preenchido nos três ramos de
+  `dividir_por_cargo_e_materia`, e incluído em `CAMPOS_CLASSIFICACAO_CHUNK`.
+  Log `[MATERIA_DO_CARGO]` quando a origem for `cargo`.
+- `[ ]` **Backfill sem LLM:** `scripts/backfill_classificacao_chunks.py`
+  completa `materia_origem` nos 5 `<edital>.json` já extraídos. Esperado:
+  12 `cargo` (PF), 1 `prefixo` (CD), o resto `cabecalho`.
+- `[ ]` **Camada canônica** (`src/canonico.py`): a entrada de matéria
+  guarda `nome_de_cargo: true` e `sugestoes_llm` (os
+  `taxonomia_extraida.materia` dos chunks dela). Para essas entradas, a regra
+  gera uma proposta `proposto` (nunca `aprovado`):
+  - se a chave de regra da sugestão bate com um grupo aprovado → proposta de
+    **juntar** a esse grupo (ex.: chunk 32 → `COMUNICAÇÃO SOCIAL`);
+  - senão → proposta de **renomear** o grupo da entrada para a sugestão.
+  Sem aprovação, o mapeamento continua igual (identidade), como na 5B.
+- `[ ]` **Aprovação:** usa o que já existe em `scripts/aprovar_sinonimos.py`
+  (`--aprovar`, `--rejeitar`, `--renomear` para corrigir os ⚠️, `--mover`).
+  Nada novo na CLI, a não ser que a implementação mostre necessidade.
+- `[ ]` **Relatório:** `sinonimos.html` ganha a seção "Matérias com nome de
+  cargo": nome gravado, cargo, concurso, sugestão do LLM, grupo proposto e
+  as 3 primeiras linhas do texto do chunk (para o dono decidir sem abrir o
+  PDF).
+- `[ ]` **Banco:** `dim_materia.nome_de_cargo boolean`. As views de
+  estatística já usam o nome canônico, então não mudam.
+- `[ ]` **Testes:** os três valores de `materia_origem` com formatos reais
+  (PF cargo 5, CD cargo 2 com prefixo, matéria com cabeçalho); o backfill
+  mantém o alinhamento; sugestão com a mesma chave de um grupo aprovado vira
+  proposta de junção; sugestão nunca é aprovada sozinha; mapeamento
+  inalterado antes da aprovação; os 4 casos de STM/IBAMA/TCU continuam
+  `cabecalho`.
+- `[ ]` **Checkpoint humano:** o dono aprova ou renomeia as 12 propostas.
+- `[ ]` **Documentação:** ADR-032 (matéria com nome de cargo); padrão e
+  anti-padrão novos no `CLAUDE.md` §6/§7.
+
+**Critério de pronto:** 12 entradas marcadas `nome_de_cargo`, 12 propostas
+no relatório, nenhuma chamada ao LLM, `pytest` e `ruff` verdes. Depois da
+aprovação, `materia_canonica` mostra nome de disciplina para os 12, e
+`TÉCNICO EM COMUNICAÇÃO SOCIAL` soma com `COMUNICAÇÃO SOCIAL` do STM.
 
 ## Etapa 5B.1: Divisão de nomes compostos (1 nome → N canônicos), com aprovação humana
 > **Por que existe (achado na revisão da 5B, 2026-09-25):** alguns editais
@@ -612,8 +703,9 @@ enviar o bloco de uma etapa específica para o agente construir.
   arquivo mantém os números da 5C.
 
 ## Etapa 5D: Classificação das questões por matéria/assunto (LLM, lista fechada)
-- `[ ]` Pré-requisito: sinônimos aprovados (5B), nomes compostos divididos
-  (5B.1) e questões extraídas (5C).
+- `[ ]` Pré-requisito: sinônimos aprovados (5B, feito), matéria com nome de
+  cargo resolvida (5A.1), nomes compostos divididos (5B.1) e questões
+  extraídas (5C).
 - `[ ]` `scripts/classificar_questoes.py`: para cada caderno, os candidatos
   são **só** os assuntos canônicos do edital aplicáveis àquele caderno (tipo
   básico/específico, nível, cargos via `provas_cargos` e `cargos_restritos`).
