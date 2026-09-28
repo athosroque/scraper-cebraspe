@@ -616,8 +616,10 @@ enviar o bloco de uma etapa específica para o agente construir.
 > regra). `pytest`: 476 testes (+1 xfail); `ruff` verde.
 
 ## Etapa 5B.2: Curadoria da árvore do piloto (LLM com lista fechada + aprovação do dono)
-> **Plano detalhado e autocontido:** `plano-etapa-5b2.md` (neste
-> diretório), em 2 sessões, uma por conversa. Aqui fica só o resumo.
+> **Detalhes da implementação e da decisão do dono:** ADR-030, seção
+> "Implementação (Etapa 5B.2)". O plano das 2 sessões
+> (`plano-etapa-5b2.md`) foi removido ao concluir a etapa e fica no
+> histórico do git. Aqui fica só o resumo.
 >
 > **Decisões do dono (2026-09-28, não reabrir):** `A-4529f205f7`
 > "Licitações e contratos administrativos" é **dividido** entre
