@@ -58,7 +58,11 @@ def _formatar_detalhe_proposta(arv: arvore.ArvoreMestre, p: arvore.Proposta) -> 
         pai_s = f"{pai.nome} ({p.args['pai']})" if pai else p.args["pai"]
         return f"{no_s} → pai {pai_s}"
     elif p.tipo == "criar":
-        return f"({p.args['nivel']}) {p.args['nome']!r} sob {p.args.get('pai')}"
+        pai = arv.nos.get(p.args.get("pai")) if p.args.get("pai") else None
+        pai_s = (
+            f"{pai.nome} ({p.args['pai']})" if pai else (p.args.get("pai") or "raiz")
+        )
+        return f"({p.args['nivel']}) {p.args['nome']!r} sob {pai_s}"
     elif p.tipo == "remapear":
         de_no = arv.nos.get(p.args["de"])
         de_s = f"{de_no.nome} ({p.args['de']})" if de_no else p.args["de"]
@@ -141,7 +145,7 @@ def listar_propostas(
 def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> list[str]:
     """Aplica as operações pedidas e devolve uma linha de log por operação."""
     feitas = []
-    if args.criar:
+    if args.criar is not None:
         nivel_pai, nome = _dividir(args.criar, "=", "NIVEL:PAI=Nome")
         nivel, _, pai = nivel_pai.partition(":")
         if nivel not in arvore.NIVEIS:
@@ -150,32 +154,40 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
             )
         no_id = arvore.criar_no(arv, nivel, nome, pai.strip() or None)
         feitas.append(f"criado {no_id} ({nivel}) {nome!r}")
-    if args.renomear:
+    if args.renomear is not None:
         no_id, nome = _dividir(args.renomear, "=", "NO=Nome")
         arvore.renomear_no(arv, _exigir_no(arv, no_id), nome)
         feitas.append(f"renomeado {no_id} → {nome!r}")
-    if args.mover:
+    if args.mover is not None:
         no_id, pai = _dividir(args.mover, ":", "NO:PAI")
         arvore.mover_no(arv, _exigir_no(arv, no_id), _exigir_no(arv, pai))
         feitas.append(f"movido {no_id} → pai {pai}")
-    if args.fundir:
+    if args.fundir is not None:
         origem, destino = _dividir(args.fundir, ":", "ORIGEM:DESTINO")
         arvore.fundir_nos(arv, _exigir_no(arv, origem), _exigir_no(arv, destino))
         feitas.append(f"fundido {origem} → {destino}")
-    if args.mapear:
+    if args.mapear is not None:
         item, nos = _dividir(args.mapear, ":", "ITEM:NO1,NO2")
         ids = [_exigir_no(arv, n.strip()) for n in nos.split(",") if n.strip()]
         arvore.mapear(arv, item, ids, origem="humano", status="aprovado")
         feitas.append(f"mapeado {item!r} → {', '.join(ids)}")
-    if args.aprovar_proposta:
+    if args.aprovar_proposta is not None:
         ids = [p.strip() for p in args.aprovar_proposta.split(",") if p.strip()]
+        if not ids:
+            raise arvore.ArvoreInvalida("Nenhuma proposta informada para aprovação")
         arvore.aprovar_propostas(arv, ids)
         feitas.append(f"propostas aprovadas: {', '.join(ids)}")
-    if args.rejeitar_proposta:
+    if args.rejeitar_proposta is not None:
         ids = [p.strip() for p in args.rejeitar_proposta.split(",") if p.strip()]
+        if not ids:
+            raise arvore.ArvoreInvalida("Nenhuma proposta informada para rejeição")
         for pid in ids:
             if pid not in arv.propostas:
                 raise arvore.ArvoreInvalida(f"Proposta {pid} não existe")
+            if arv.propostas[pid].status == "aprovado":
+                raise arvore.ArvoreInvalida(
+                    f"Proposta {pid} já foi aprovada e não pode ser rejeitada"
+                )
         for pid in ids:
             arvore.rejeitar_proposta(arv, pid)
         feitas.append(f"propostas rejeitadas: {', '.join(ids)}")
@@ -185,7 +197,7 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
         ("rejeitar", arvore.rejeitar),
     ):
         valor = getattr(args, acao)
-        if valor:
+        if valor is not None:
             item, no_id = _dividir(valor, ":", "ITEM:NO")
             funcao(arv, item, no_id)
             feitas.append(f"{acao} {item!r} × {no_id}")
@@ -249,11 +261,11 @@ def main(argv: list[str] | None = None) -> int:
         "aprovar_proposta",
         "rejeitar_proposta",
     )
-    if not any(getattr(args, op) for op in operacoes) and not args.html:
+    if not any(getattr(args, op) is not None for op in operacoes) and not args.html:
         parser.print_help()
         return 2
 
-    if any(getattr(args, op) for op in operacoes):
+    if any(getattr(args, op) is not None for op in operacoes):
         arv = arvore.carregar(args.arvore)
         try:
             feitas = aplicar_operacoes(arv, args)

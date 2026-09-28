@@ -91,6 +91,8 @@ def criar_no(
         no_pai = arvore.nos.get(pai)
         if not no_pai:
             raise ArvoreInvalida(f"Pai {pai} não existe")
+        if no_pai.status == "aposentado":
+            raise ArvoreInvalida(f"Não é possível criar nó sob o nó aposentado {pai}")
         if no_pai.nivel != NIVEL_PAI[nivel]:
             raise ArvoreInvalida(
                 f"Nível do pai ({no_pai.nivel}) inválido para nó {nivel}"
@@ -390,7 +392,7 @@ def materia_do_no(arv: ArvoreMestre, no_id: str) -> str:
     return ""
 
 
-def _canonizar_args(args: dict) -> dict:
+def _canonizar_args(args: dict, tipo: str | None = None) -> dict:
     canon = {}
     for k in sorted(args.keys()):
         v = args[k]
@@ -398,11 +400,23 @@ def _canonizar_args(args: dict) -> dict:
             canon[k] = sorted(v)
         else:
             canon[k] = v
+
+    if tipo == "remapear" and "para" in canon:
+        p = canon["para"]
+        if isinstance(p, str):
+            canon["para"] = [p]
+        elif isinstance(p, (list, tuple, set)):
+            canon["para"] = sorted(p)
+    elif tipo == "aposentar" and "no_id" in canon and "no" not in canon:
+        canon["no"] = canon.pop("no_id")
+
     return canon
 
 
 def _gerar_id_proposta(tipo: str, args: dict) -> str:
-    args_json = json.dumps(_canonizar_args(args), sort_keys=True, ensure_ascii=False)
+    args_json = json.dumps(
+        _canonizar_args(args, tipo=tipo), sort_keys=True, ensure_ascii=False
+    )
     digest = hashlib.sha1(f"{tipo}:{args_json}".encode()).hexdigest()[:10]
     return f"P-{digest}"
 
@@ -477,18 +491,44 @@ def propor(
     if tipo not in ("fundir", "mover", "criar", "remapear", "aposentar"):
         raise ArvoreInvalida(f"Tipo de proposta inválido: {tipo!r}")
 
-    args_canonicos = _canonizar_args(args)
+    if origem not in ("regra", "llm", "humano"):
+        raise ArvoreInvalida(f"Origem {origem!r} inválida (use regra, llm, humano)")
+
+    args_canonicos = _canonizar_args(args, tipo=tipo)
+
     if tipo == "criar":
         if args_canonicos.get("nivel") not in NIVEIS:
             raise ArvoreInvalida(
                 f"Nível {args_canonicos.get('nivel')!r} inválido (use {', '.join(NIVEIS)})"
             )
+        if not args_canonicos.get("nome") or not str(args_canonicos["nome"]).strip():
+            raise ArvoreInvalida("Argumento 'nome' obrigatório para criar nó")
         if "id" not in args_canonicos:
             no_id = _gerar_id(
                 args_canonicos["nivel"],
                 f"{args_canonicos.get('pai') or ''}|{args_canonicos['nome']}",
             )
             args_canonicos["id"] = no_id
+    elif tipo == "fundir":
+        if not args_canonicos.get("origem") or not args_canonicos.get("destino"):
+            raise ArvoreInvalida(
+                "Argumentos 'origem' e 'destino' obrigatórios para fundir"
+            )
+    elif tipo == "mover":
+        if not args_canonicos.get("no") or not args_canonicos.get("pai"):
+            raise ArvoreInvalida("Argumentos 'no' e 'pai' obrigatórios para mover")
+    elif tipo == "remapear":
+        if (
+            not args_canonicos.get("item")
+            or not args_canonicos.get("de")
+            or not args_canonicos.get("para")
+        ):
+            raise ArvoreInvalida(
+                "Argumentos 'item', 'de' e 'para' obrigatórios para remapear"
+            )
+    elif tipo == "aposentar":
+        if not args_canonicos.get("no"):
+            raise ArvoreInvalida("Argumento 'no' obrigatório para aposentar")
 
     prop_id = _gerar_id_proposta(tipo, args_canonicos)
 
@@ -505,17 +545,22 @@ def propor(
     # que liberam o nó alvo (e eventuais movimentos/fusões de filhos do nó alvo),
     # sem executar propostas não relacionadas que possam conflitar com alternativas.
     if tipo == "aposentar":
-        no_alvo = args_canonicos.get("no") or args_canonicos.get("no_id", "")
+        no_alvo = args_canonicos.get("no", "")
         for p in copia.propostas.values():
             if p.status == "proposto":
-                if p.tipo == "remapear" and p.args.get("de") == no_alvo:
+                if p.tipo == "remapear" and (
+                    p.args.get("de") == no_alvo
+                    or resolver_no(copia, p.args.get("de", "")) == no_alvo
+                ):
                     try:
                         _executar_operacao(copia, p.tipo, p.args, origem=p.origem)
                     except ArvoreInvalida:
                         pass
-                elif p.tipo in ("mover", "fundir"):
+                elif p.tipo in ("mover", "fundir", "aposentar"):
                     filho_id = (
-                        p.args.get("no") if p.tipo == "mover" else p.args.get("origem")
+                        p.args.get("no")
+                        if p.tipo in ("mover", "aposentar")
+                        else p.args.get("origem")
                     )
                     filho_no = copia.nos.get(filho_id)
                     if filho_no and filho_no.pai == no_alvo:
@@ -564,7 +609,8 @@ def aprovar_propostas(arv: ArvoreMestre, ids: list[str]) -> list[str]:
     Se houver dependências no mesmo lote (ex.: remapear antes de aposentar, ou
     criar antes de mover), resolve em múltiplas passagens preservando atomicidade.
     """
-    for pid in ids:
+    ids_unicos = list(dict.fromkeys(ids))
+    for pid in ids_unicos:
         if pid not in arv.propostas:
             raise ArvoreInvalida(f"Proposta {pid} não existe")
         prop = arv.propostas[pid]
@@ -576,7 +622,7 @@ def aprovar_propostas(arv: ArvoreMestre, ids: list[str]) -> list[str]:
             )
 
     copia = copy.deepcopy(arv)
-    tentativas = list(ids)
+    tentativas = list(ids_unicos)
     ultimo_erro = None
 
     while tentativas:
@@ -602,7 +648,32 @@ def aprovar_propostas(arv: ArvoreMestre, ids: list[str]) -> list[str]:
     arv.nos = copia.nos
     arv.mapeamentos = copia.mapeamentos
     arv.propostas = copia.propostas
-    return ids
+    return ids_unicos
+
+
+def _remover_no_proposto_se_orfao(arv: ArvoreMestre, no_id: str) -> None:
+    if no_id not in arv.nos or arv.nos[no_id].status != "proposto":
+        return
+    referenciado = (
+        any(n.pai == no_id for n in arv.nos.values() if n.id != no_id)
+        or any(n.fundido_em == no_id for n in arv.nos.values())
+        or any(m.no_id == no_id for maps in arv.mapeamentos.values() for m in maps)
+        or any(
+            p.status == "proposto"
+            and (
+                p.args.get("no") == no_id
+                or p.args.get("pai") == no_id
+                or p.args.get("origem") == no_id
+                or p.args.get("destino") == no_id
+                or p.args.get("de") == no_id
+                or (isinstance(p.args.get("para"), list) and no_id in p.args["para"])
+                or p.args.get("para") == no_id
+            )
+            for p in arv.propostas.values()
+        )
+    )
+    if not referenciado:
+        del arv.nos[no_id]
 
 
 def rejeitar_proposta(arv: ArvoreMestre, id: str) -> None:
@@ -622,33 +693,17 @@ def rejeitar_proposta(arv: ArvoreMestre, id: str) -> None:
             prop.args["nivel"],
             f"{prop.args.get('pai') or ''}|{prop.args['nome']}",
         )
-        if no_id in arv.nos:
-            referenciado = (
-                any(n.pai == no_id for n in arv.nos.values() if n.id != no_id)
-                or any(n.fundido_em == no_id for n in arv.nos.values())
-                or any(
-                    m.no_id == no_id for maps in arv.mapeamentos.values() for m in maps
-                )
-                or any(
-                    p.id != id
-                    and p.status == "proposto"
-                    and (
-                        p.args.get("no") == no_id
-                        or p.args.get("pai") == no_id
-                        or p.args.get("origem") == no_id
-                        or p.args.get("destino") == no_id
-                        or p.args.get("de") == no_id
-                        or (
-                            isinstance(p.args.get("para"), list)
-                            and no_id in p.args["para"]
-                        )
-                        or p.args.get("para") == no_id
-                    )
-                    for p in arv.propostas.values()
-                )
+        _remover_no_proposto_se_orfao(arv, no_id)
+
+    # Limpar eventuais nós propostos cujas propostas de criação já foram rejeitadas
+    # mas que foram mantidos devido a referências que agora não existem mais
+    for p in arv.propostas.values():
+        if p.tipo == "criar" and p.status == "rejeitado":
+            nid = p.args.get("id") or _gerar_id(
+                p.args["nivel"],
+                f"{p.args.get('pai') or ''}|{p.args['nome']}",
             )
-            if not referenciado:
-                del arv.nos[no_id]
+            _remover_no_proposto_se_orfao(arv, nid)
 
 
 PADRAO_DECOMPOSICAO = re.compile(r"[,;]|\s+e\s+", re.IGNORECASE)

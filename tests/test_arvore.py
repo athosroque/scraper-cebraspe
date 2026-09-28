@@ -641,3 +641,152 @@ def test_aprovar_mapeamento_para_aposentado_falha():
 
     with pytest.raises(ArvoreInvalida, match="nó aposentado"):
         aprovar(arv, "item|teste", a1)
+
+
+def test_criar_no_sob_aposentado_falha():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    aposentar_no(arv, a1)
+
+    with pytest.raises(ArvoreInvalida, match="sob o nó aposentado"):
+        criar_no(arv, "subassunto", "S1", a1)
+
+
+def test_propor_origem_invalida_falha():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    m2 = criar_no(arv, "materia", "M2", None)
+
+    with pytest.raises(ArvoreInvalida, match="Origem .* inválida"):
+        propor(
+            arv,
+            "fundir",
+            {"origem": m1, "destino": m2},
+            "invalido",  # type: ignore
+            "justificativa",
+        )
+
+
+def test_propor_argumentos_obrigatorios_faltantes():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+
+    with pytest.raises(ArvoreInvalida, match="nome.*obrigatório"):
+        propor(arv, "criar", {"nivel": "assunto", "pai": m1}, "llm", "just")
+
+    with pytest.raises(ArvoreInvalida, match="origem.*destino.*obrigatórios"):
+        propor(arv, "fundir", {"origem": m1}, "regra", "just")
+
+    with pytest.raises(ArvoreInvalida, match="no.*pai.*obrigatórios"):
+        propor(arv, "mover", {"no": a1}, "humano", "just")
+
+    with pytest.raises(ArvoreInvalida, match="item.*de.*para.*obrigatórios"):
+        propor(arv, "remapear", {"item": "x", "de": a1}, "regra", "just")
+
+    with pytest.raises(ArvoreInvalida, match="Argumento 'no' obrigatório"):
+        propor(arv, "aposentar", {}, "regra", "just")
+
+
+def test_propor_canonicalizacao_equivalente():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    a2 = criar_no(arv, "assunto", "A2", m1)
+    mapear(arv, "item", [a1])
+
+    p1 = propor(
+        arv,
+        "remapear",
+        {"item": "item", "de": a1, "para": a2},
+        "regra",
+        "remapeamento str",
+        "M1",
+    )
+    p2 = propor(
+        arv,
+        "remapear",
+        {"item": "item", "de": a1, "para": [a2]},
+        "regra",
+        "remapeamento lista",
+        "M1",
+    )
+    assert p1 == p2
+    assert len(arv.propostas) == 1
+
+    p_apo1 = propor(arv, "aposentar", {"no": a2}, "regra", "apo1", "M1")
+    p_apo2 = propor(arv, "aposentar", {"no_id": a2}, "regra", "apo2", "M1")
+    assert p_apo1 == p_apo2
+
+
+def test_aprovar_propostas_com_ids_duplicados():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    a2 = criar_no(arv, "assunto", "A2", m1)
+    mapear(arv, "item", [a1])
+
+    p_criar = propor(
+        arv,
+        "criar",
+        {"nivel": "subassunto", "pai": a1, "nome": "Sub"},
+        "llm",
+        "criar",
+        "M1",
+    )
+    p_rem = propor(
+        arv,
+        "remapear",
+        {"item": "item", "de": a1, "para": [a2]},
+        "regra",
+        "rem",
+        "M1",
+    )
+
+    # Duplicatas no lote não devem causar conflito de estado interno
+    aprovados = aprovar_propostas(arv, [p_criar, p_criar, p_rem, p_rem])
+    assert set(aprovados) == {p_criar, p_rem}
+    assert arv.propostas[p_criar].status == "aprovado"
+    assert arv.propostas[p_rem].status == "aprovado"
+
+
+def test_rejeitar_proposta_limpa_orfaos_em_cadeia():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    p_criar = propor(
+        arv,
+        "criar",
+        {"nivel": "assunto", "pai": m1, "nome": "Assunto Temporario"},
+        "llm",
+        "criar",
+        "M1",
+    )
+    no_temp = arv.propostas[p_criar].args["id"]
+
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    s1 = criar_no(arv, "subassunto", "S1", a1)
+    p_mover = propor(
+        arv, "mover", {"no": s1, "pai": no_temp}, "llm", "mover para temp", "M1"
+    )
+
+    # Rejeitar criação primeiro: o nó ainda é referenciado por p_mover, logo permanece
+    rejeitar_proposta(arv, p_criar)
+    assert no_temp in arv.nos
+
+    # Rejeitar p_mover em seguida: agora o nó temp ficou sem referências e deve ser removido
+    rejeitar_proposta(arv, p_mover)
+    assert no_temp not in arv.nos
+
+
+def test_propor_aposentar_com_filho_proposto_aposentar():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    s1 = criar_no(arv, "subassunto", "S1", a1)
+
+    p_apo_filho = propor(arv, "aposentar", {"no": s1}, "regra", "apo filho", "M1")
+    p_apo_pai = propor(arv, "aposentar", {"no": a1}, "regra", "apo pai", "M1")
+
+    assert p_apo_filho in arv.propostas
+    assert p_apo_pai in arv.propostas

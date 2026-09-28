@@ -244,3 +244,59 @@ def test_cli_aprovar_proposta_lote_com_dependencia(ambiente):
     assert arv_atual.nos[s_comp].status == "aposentado"
     assert arv_atual.propostas[p_apo].status == "aprovado"
     assert arv_atual.propostas[p_rem].status == "aprovado"
+
+
+def test_cli_rejeitar_proposta_lote_com_erro_atomico(ambiente, capsys):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p1 = propor(
+        arv, "fundir", {"origem": "A-2", "destino": "A-1"}, "regra", "fusão", "M-1"
+    )
+    p2 = propor(
+        arv,
+        "criar",
+        {"nivel": "assunto", "pai": "M-2", "nome": "Novo P"},
+        "humano",
+        "criar",
+        "M-2",
+    )
+    salvar(arv, path)
+
+    # Aprova p1 previamente
+    assert rodar("--aprovar-proposta", p1) == 0
+
+    # Tenta rejeitar p2 e p1 (p1 já aprovada)
+    antes = path.read_text(encoding="utf-8")
+    assert rodar("--rejeitar-proposta", f"{p2},{p1}") == 1
+    assert "já foi aprovada" in capsys.readouterr().err
+    # p2 não deve ter sido rejeitada
+    assert path.read_text(encoding="utf-8") == antes
+    arv_atual = carregar(path)
+    assert arv_atual.propostas[p2].status == "proposto"
+
+
+def test_cli_propostas_formatacao_criar_materia_sob_raiz(ambiente, capsys):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p = propor(
+        arv,
+        "criar",
+        {"nivel": "materia", "pai": None, "nome": "Processo Legislativo"},
+        "humano",
+        "nova materia",
+    )
+    salvar(arv, path)
+
+    assert rodar("--propostas") == 0
+    out = capsys.readouterr().out
+    assert "sob raiz" in out
+    assert p in out
+
+
+def test_cli_aprovar_e_rejeitar_proposta_vazia_falha(ambiente, capsys):
+    _, _, rodar = ambiente
+    assert rodar("--aprovar-proposta", "") == 1
+    assert "Nenhuma proposta informada" in capsys.readouterr().err
+
+    assert rodar("--rejeitar-proposta", "") == 1
+    assert "Nenhuma proposta informada" in capsys.readouterr().err
