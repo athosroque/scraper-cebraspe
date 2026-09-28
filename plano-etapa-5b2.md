@@ -112,7 +112,7 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
 
 ## Sessão B: `scripts/propor_arvore.py` (LLM), rodada real e checkpoint do dono
 
-- `[ ]` **Script** no molde de `scripts/propor_sinonimos.py`:
+- `[x]` **Script** no molde de `scripts/propor_sinonimos.py`:
   `chamar_llm_json` (`src/llm_openrouter.py`, com `REASONING_PADRAO`),
   `Contabilidade`, checkpoint por lote, Langfuse
   `nome_trace="propor_arvore"` e segunda tentativa com o erro no prompt
@@ -138,7 +138,7 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
   - Flags: `--materias M-..,M-..`, `--so-regras` (só a detecção da Sessão
     A), `--dry-run` e `--reavaliar`. A matéria avaliada fica marcada por hash
     da subárvore, e a reexecução só paga pelo que mudou.
-- `[ ]` **Testes** (`tests/test_propor_arvore.py`, LLM mockado como em
+- `[x]` **Testes** (`tests/test_propor_arvore.py`, LLM mockado como em
   `test_propor_sinonimos.py`): ID inventado, nível errado e ciclo viram falha
   tipada; segunda tentativa com o erro no prompt; propostas gravadas como
   `proposto`/`llm`; idempotência por hash.

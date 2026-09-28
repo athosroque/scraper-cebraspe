@@ -154,6 +154,28 @@ estatística de edital.
 - **Ponto de partida da 5B.2:** `Disposições gerais` / `Servidores públicos`
   / o composto dão 3 / 3 / 4 em `vw_edital_cobra_subassunto`.
 
+## Implementação (Etapa 5B.2)
+
+- **Script de Proposição LLM (`scripts/propor_arvore.py`):**
+  - Implementado no molde de `scripts/propor_sinonimos.py`, utilizando `chamar_llm_json` com `REASONING_PADRAO = {"reasoning": {"max_tokens": 3000}}` via OpenRouter e telemetria Langfuse (`nome_trace="propor_arvore"`).
+  - Suporta as flags CLI `--materias`, `--so-regras`, `--dry-run` e `--reavaliar`, além de `--arvore` e `revisao_dir`.
+  - Checkpoint por lote salvando `arvore.json` atomicamente após cada matéria avaliada.
+  - Idempotência por hash SHA-1 da subárvore armazenado em arquivo sidecar (`.propor_arvore_cache.json`): reexecuções só avaliam o que foi alterado, a menos que `--reavaliar` seja informado.
+- **Validação Local e Resiliência (ADR-021/022):**
+  - Subárvores apresentadas com IDs locais curtos (`n1`, `n2`...) para economia de tokens e precisão.
+  - Resposta validada via Pydantic (`RespostaProposicaoArvore` com lista de `PropostaOperacaoLLM`).
+  - Validação semântica pós-resposta (`pos_validacao`):
+    - ID inexistente/inventado convertido em falha tipada `STATUS_FALHA_ID_DESCONHECIDO` (`"falha_id_desconhecido"`).
+    - Nível inválido, fusão entre níveis distintos ou ciclo convertido em `STATUS_FALHA_OPERACAO_INVALIDA` (`"falha_operacao_invalida"`) via simulação em cópia isolada (`copy.deepcopy` e `arvore.propor`).
+  - Segunda tentativa automática incluindo o erro específico e instruções de correção no prompt (não é retry cego).
+  - Todas as propostas do modelo são gravadas com `status = 'proposto'` e `origem = 'llm'`.
+- **Tratamento de Escopos Especiais e Decisões do Dono:**
+  - **Matérias com menos de 2 assuntos:** puladas automaticamente sem chamada ao LLM.
+  - **Matérias compostas da Câmara dos Deputados (`M-841dde7520` e `M-d5adcb4de4`):** criada proposta `criar` para a nova matéria "Processo Legislativo" com `origem = 'humano'` (registrando a decisão do dono de 2026-09-28); assuntos das compostas redistribuídos via `fundir` ou `mover` para Direito Constitucional (`M-5edb4898a0`), Processo Legislativo ou Regimento Interno (`M-e96f4dbbb5`); propostas `remapear` para os 2 itens de nível matéria (`direito constitucional e processo legislativo` e `nocoes de direito constitucional e de regimento interno da camara dos deputados`) e propostas de aposentadoria (`aposentar`) das matérias compostas.
+  - **Licitações e Contratos (`M-6f50f4f1dd`):** prompt orienta a redistribuição dos subassuntos de `A-4529f205f7` para os irmãos `A-2261b82645` (Licitação) e `A-91e52e6c2e` (Contratos administrativos), gerando proposta `aposentar` de `A-4529f205f7` assim que todos os filhos tiverem destinos atribuídos.
+- **Cobertura de Testes (`tests/test_propor_arvore.py`):**
+  - Testes com LLM mockado cobrindo casos válidos, IDs inventados, níveis errados, ciclos, 2ª tentativa assistida por feedback, idempotência de hash, `--dry-run`, `--so-regras`, escopo CD e Licitações.
+
 ## Alternativas Consideradas
 
 - **Manter a árvore emergente e implementar a "divisão de nomes compostos"
