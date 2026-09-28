@@ -1,7 +1,7 @@
 # ADR-029: Camada Canônica de Sinônimos (Matéria → Assunto → Subassunto) com Aprovação Humana
 
 ## Status
-Aceito (a proposta do LLM aguarda a aprovação do dono — checkpoint da Etapa 5B)
+Aceito. Aprovação do dono concluída em 2026-09-27. **A partir de 2026-09-28, os grupos aprovados são a semente da árvore mestre (ADR-030)**; depois da semeadura, `sinonimos.json` fica congelado como histórico.
 
 ## Data
 2026-09-25

@@ -11,11 +11,21 @@ enviar o bloco de uma etapa específica para o agente construir.
 > `LESSONS.md`. Alvo confirmado: **concursos ENCERRADOS de 2025** (edital,
 > prova e gabarito já publicados) — não 2026 em andamento.
 
-> **⚡ Prioridade atual (2026-09-25):** Etapas **5B/5B.1 → 5D → 5E**
-> (sinônimos, divisão de nomes compostos, classificação das questões, estatísticas por nível
-> e simulado). A 5A foi concluída em 2026-09-23 (ADR-028), a 5B aguarda aprovação das
-> propostas (ADR-029) e a 5C foi concluída em 2026-09-25 (ADR-031). A 5D depende da aprovação
-> da 5B/5B.1 e da 5C.
+> **🎯 Objetivo do produto (redefinido em 2026-09-28, ADR-030):** um **site
+> público de questões** (item de portfólio), no estilo Gran Questões, com mais
+> filtros e estatísticas da base de concursos. Escopo inicial: só o piloto
+> 2025 (5 concursos, ~2.800 itens). A **questão** é a entidade central e o
+> **subassunto** é a unidade de estudo. Estatísticas, em ordem de
+> importância: (1) o que mais cai na prova; (2) o que o edital cobra; (3)
+> edital × prova; (4) desempenho pessoal do usuário.
+
+> **⚡ Prioridade atual (2026-09-28):** Etapas **5B.1 → 5B.2 → 5D → 5E → 5F**
+> (árvore mestre, curadoria da árvore, classificação das questões,
+> estatísticas e site). A 5A (ADR-028), a 5B (ADR-029, sinônimos aprovados em
+> 2026-09-27), a 5C e a 5C.1 (ADR-031) estão concluídas. A antiga 5B.1
+> ("divisão de nomes compostos") foi **substituída** pela árvore mestre
+> (ADR-030): num mapeamento N:N, o nome composto é só um item que aponta
+> para dois nós.
 
 ## Etapa 1: Preparação do Ambiente e Modelos de Dados
 - `[x]` Completar `requirements.txt`: já tem `playwright`, `pymupdf`,
@@ -303,7 +313,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ---
 
-# ⚡ PRIORIDADE (2026-09-22): Etapas 5A–5E (5A concluída em 2026-09-23; 5B implementada em 2026-09-25, aguardando aprovação dos sinônimos; 5C e 5C.1 concluídas em 2026-09-27) — questões, sinônimos, estatísticas por nível e simulado
+# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-28): Etapas 5A–5F (5A, 5B, 5C e 5C.1 concluídas; próximas: 5B.1 árvore mestre → 5B.2 curadoria → 5D → 5E → 5F site) — questões, árvore de assuntos, estatísticas e site público
 
 > **Por que existe:** a Etapa 5 entregou o banco com a **taxonomia dos
 > editais**, ou seja, o que o edital lista. O objetivo real do projeto é
@@ -321,7 +331,12 @@ enviar o bloco de uma etapa específica para o agente construir.
 > - Extrair **todas** as questões dos cadernos, o tema da discursiva e o
 >   gabarito, ligados a cargo, ano, nível, banca e órgão.
 > - Simulado como **página web** (servida no Datasette com SSO). Bot do
->   Telegram não, por ora.
+>   Telegram não, por ora. *(Revisto em 2026-09-28: o simulado vai para o
+>   site público da Etapa 5F; o Datasette fica só para revisão do dono.)*
+> - *(2026-09-28, ADR-030)* A taxonomia é uma **árvore mestre curada**
+>   (matéria → assunto → subassunto), semeada com os grupos aprovados da 5B.
+>   Item de edital e questão **apontam** para nós da árvore (N:N); eles não
+>   definem a árvore.
 >
 > **Achados medidos nos dados reais (2026-09-22) que moldam o desenho:**
 > - Hoje são 106 matérias (102 depois da Etapa 5A, que fundiu as 4 variantes
@@ -448,7 +463,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   pessoas).
 - `[x]` **Checkpoint:** o dono aprova os sinônimos antes da Etapa 5D.
   **Feito em 2026-09-27** (commits `b5b2e77` e `214f2d2`). Rejeitadas
-  `SL-065b9773e6` (nome composto, vai para a 5B.1) e `ML-badfd45efe` (TI +
+  `SL-065b9773e6` (nome composto, resolvido por mapeamento N:N na árvore mestre, 5B.1/5B.2) e `ML-badfd45efe` (TI +
   Estatística numa matéria só). "Procedimentos Contábeis Patrimoniais
   conforme MCASP" saiu do grupo do manual e virou `AH-20068a5851`. As
   outras 104 propostas foram aprovadas. Resultado: 89 matérias, 1148
@@ -482,73 +497,142 @@ enviar o bloco de uma etapa específica para o agente construir.
 >   3127 linhas; 18 matérias com `nocoes`. Carga idempotente.
 > - `pytest`: 316 testes.
 
-## Etapa 5B.1: Divisão de nomes compostos (1 nome → N canônicos), com aprovação humana
-> **Por que existe (achado na revisão da 5B, 2026-09-25):** alguns editais
-> colam dois itens num nome só, e a 5B só permite que cada nome pertença a
-> **um** grupo. Exemplo medido: em DIREITO CONSTITUCIONAL → assunto
-> "Administração pública" (arts. 37–42 da CF), STM (2×), IBAMA cargo 1 e CD
-> cargo 2 listam `Disposições gerais` e `Servidores públicos` como subtópicos
-> separados; PF, TCU, IBAMA básico e CD cargo 1 listam um item só,
-> `Disposições gerais, servidores públicos`. São 8 **ocorrências**
-> (concurso × cargo/bloco; o mesmo concurso pode aparecer mais de uma vez,
-> ex.: STM básico e STM cargo 7), e não 8 editais. Hoje a estatística fica
-> 4 + 4 + 4 ocorrências em três subassuntos. O certo é 8 + 8 em dois (8 + 7
-> se `servidores públicos civis e militares`, do CD cargo 2, não for
-> aprovado como sinônimo de `Servidores públicos`). Juntar o
-> nome composto a uma das partes (proposta `SL-065b9773e6`) conta
-> "servidores públicos" como "disposições gerais": **rejeitar na revisão da
-> 5B** e resolver aqui. O mesmo acontece no nível de matéria:
-> `DIREITO CONSTITUCIONAL E PROCESSO LEGISLATIVO` e `NOÇÕES DE DIREITO
-> CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS` (CD_25_NS)
-> são matérias separadas de `DIREITO CONSTITUCIONAL`, e os tópicos de
-> Constitucional do CD não somam com os dos outros concursos.
+## Etapa 5B.1: Árvore mestre semeada com a 5B (modelo, semeadura e banco), sem LLM
+> **Por que existe (decisão de 2026-09-28, ADR-030):** o objetivo do projeto
+> é um site público de questões. A taxonomia da 5B **nasce dos editais**: o
+> pai de cada nome é o pai que ele tem no edital, e cada edital novo traz
+> nomes novos que precisam de aprovação. Com só 5 concursos, esse modelo já
+> criou três problemas:
+> - **Nome composto:** `Disposições gerais, servidores públicos` (PF, TCU,
+>   IBAMA básico, CD cargo 1) é um item só, mas é o mesmo conteúdo que
+>   `Disposições gerais` + `Servidores públicos` (STM 2×, IBAMA cargo 1, CD
+>   cargo 2). Hoje dá 4 + 4 + 4 em três subassuntos, e o certo é 8 + 8 em
+>   dois (a proposta `SL-065b9773e6`, que juntava o composto a uma das
+>   partes, foi rejeitada).
+> - **Matéria composta:** o CD põe "Poder Legislativo", "Administração
+>   pública" etc. debaixo de `DIREITO CONSTITUCIONAL E PROCESSO LEGISLATIVO`
+>   (16 assuntos, 9 com a mesma chave de regra de um assunto de Direito
+>   Constitucional) e de `NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO
+>   INTERNO…` (11 assuntos: 6 batem com Constitucional e 1 com Regimento).
+>   Esses assuntos não somam com os dos outros concursos.
+> - **Granularidade diferente:** o mesmo conteúdo é assunto num edital e
+>   subassunto em outro.
 >
-> **Hierarquia não muda:** matéria → assunto → subassunto. A divisão só
-> diz que um nome de origem cobre **mais de um** canônico do mesmo nível e
-> do mesmo pai. Nunca divide entre níveis nem entre pais diferentes.
+> Sites de questões usam uma **árvore fixa e curada**, e o edital e a questão
+> apontam para ela. Com isso, os três casos viram mapeamento: o composto
+> aponta para 2 nós, o assunto do CD aponta para o nó de Direito
+> Constitucional e o item de outra granularidade aponta para o nó do nível
+> certo. **Nada da 5B se perde:** os grupos aprovados (89 matérias, 1148
+> assuntos e 2493 subassuntos) viram os nós, e os mapeamentos aprovados viram
+> os primeiros apontamentos.
 
-- `[ ]` `canonico/sinonimos.json`: nova operação `divisao` por entrada
-  (`partes: [ID canônico, ...]`, `origem`, `status`, ID estável `MD-/AD-/SD-`).
-  Uma entrada com divisão `aprovada` mapeia para todas as partes; sem
-  divisão aprovada, continua 1:1 como hoje. Nada `proposto` entra na
-  estatística.
-- `[ ]` Detecção de candidatos, determinística e conservadora
-  (`src/canonico.py`): o nome se divide em `,`, ` e ` e `;`, e **cada
-  pedaço** tem a mesma chave de regra de uma entrada **irmã já existente**
-  (mesmo pai, em outro concurso). Sai como `proposto`, com `origem = regra`.
-  Candidato sem todas as partes existentes não é proposto; pedaço solto
-  nunca vira canônico novo sozinho.
-- `[ ]` Proposta pelo LLM (opcional, via `scripts/propor_sinonimos.py
-  --divisoes`), só para o que a regra não achou. A validação de lista
-  fechada vale para as partes: ID desconhecido ou de outro pai é falha
-  tipada. Reasoning padrão (3000).
-- `[ ]` `scripts/aprovar_sinonimos.py`: `--dividir ID:PARTE1,PARTE2` (divisão
-  manual), e `--aprovar`/`--rejeitar` também aceitam IDs de divisão. O
-  relatório `sinonimos.html` ganha a seção "Nomes compostos", mostrando para
-  cada candidato os concursos/cargos/níveis e os irmãos que justificam cada
-  parte (o mesmo quadro usado na revisão deste achado).
-- `[ ]` Banco: pontes N:N no lugar da FK única quando houver divisão —
-  `dim_materia_canonica` (`materia_id`, `materia_canonica_id`),
-  `dim_topico_assunto` e `dim_subtopico_subassunto`, com a FK atual mantida
-  como "parte principal" ou removida (decidir e registrar no ADR). As views de
-  estatística de edital contam cada parte uma vez por ocorrência
-  (concurso × cargo/bloco). **Não somar o
-  mesmo item duas vezes na mesma parte.** Idempotência por concurso (ADR-027).
-- `[ ]` Testes: `Disposições gerais, servidores públicos` → as 2 partes
-  (com irmãos presentes); nome composto sem irmão para uma parte → não
-  proposto; vírgula interna que não separa itens (ex.: `Lei nº 8.112/1990,
-  de 11 de dezembro`) → não proposto; divisão de matéria do CD; contagem da
-  view antes/depois (4+4+4 → 8+8).
-- `[ ]` Documentação: ADR-030 (divisão de nomes compostos). Os ADRs
-  seguintes passam para ADR-031 (extração de questões) e ADR-032
-  (classificação, estatísticas e simulado). `CLAUDE.md`: pattern e
-  anti-pattern "nunca juntar nome composto a uma de suas partes".
-- **Pronto quando:** a divisão de "Administração pública" da CF deixa
-  "Disposições gerais" e "Servidores públicos" com as 8 ocorrências cada; a
-  matéria Direito Constitucional do CD_25_NS soma com a dos outros
-  concursos (se a divisão for aprovada); `pytest` e `ruff` verdes.
-- **Checkpoint:** o dono aprova as divisões junto com os sinônimos, antes da
-  Etapa 5D.
+- `[ ]` **Fonte da verdade versionada:** `canonico/arvore.json`, com uma
+  linha por registro, como o `sinonimos.json`:
+  - **nós:** `id`, `nivel` (`materia` | `assunto` | `subassunto`), `nome`,
+    `pai` (ID de nó; `null` na matéria), `origem` (`semente` | `humano` |
+    `llm`), `status` (`ativo` | `proposto` | `fundido`), `fundido_em` (ID
+    do nó de destino, quando fundido). O **pai pertence ao nó**, não ao
+    edital.
+  - **mapeamentos:** chave natural do item de edital (a mesma do banco:
+    `materia`, `(materia, topico)`, `(materia, topico, subtopico)`) → **lista
+    de nós**, com `origem` (`semente` | `regra` | `llm` | `humano`) e
+    `status` (`proposto` | `aprovado` | `rejeitado`). O item pode apontar
+    para um nó de **qualquer nível** (granularidade diferente), e a
+    estatística soma subindo a árvore.
+- `[ ]` **IDs estáveis:** o nó semeado **herda o ID do grupo aprovado da 5B**
+  (`M-/MR-/ML-/MH-`, `A-…`, `S-…`), então quem já aponta para esses IDs
+  continua válido. Nó criado depois: `NM-/NA-/NS-` + sha1. **Fundir** nunca
+  apaga um ID: o nó de origem vira `fundido`, com `fundido_em`, e toda
+  leitura resolve o redirecionamento (`resolver_no`).
+- `[ ]` `scripts/semear_arvore.py`: lê `sinonimos.json` e cria 1 nó por
+  grupo aprovado (pai = grupo aprovado do escopo) e 1 mapeamento `semente`
+  por nome de origem. É determinístico e idempotente (a 2ª execução não gera
+  diff), e roda uma vez. Depois disso, `sinonimos.json` fica congelado como
+  histórico da 5B (ADR-029) e o pipeline para de escrevê-lo.
+- `[ ]` `src/arvore.py`, com as operações de curadoria:
+  - `criar_no`, `renomear_no`, `mover_no` (troca o pai, dentro do nível de
+    cima), `fundir_nos(origem, destino)`;
+  - `mapear(item, [nós])` e `desmapear`;
+  - validação: nível do pai = nível do nó − 1; sem ciclo; nó `fundido` não
+    recebe mapeamento novo.
+
+  Toda operação humana vira `status = aprovado`/`ativo`. A proposta do LLM
+  (5B.2) sai `proposto` e nunca muda a estatística antes da aprovação
+  (mesmo invariante da 5B).
+- `[ ]` **Item novo de edital (pipeline, ADR-019):** mapeamento automático
+  por regra quando a `chave_regra` (`src/canonico.py`, reaproveitada) do nome
+  bate com um nome já mapeado **no mesmo nó-pai efetivo** (o nó para onde o
+  pai do item aponta). O que a regra não resolve fica sem mapeamento e
+  aparece no relatório como pendente. Nunca se cria nó novo automaticamente.
+- `[ ]` `scripts/curar_arvore.py` (CLI das operações: `--mapear
+  ITEM:NO1,NO2`, `--fundir ORIGEM:DESTINO`, `--mover NO:PAI`, `--criar
+  "NIVEL:PAI=Nome"`, `--renomear NO=Nome`, `--aprovar`/`--rejeitar`) e
+  `revisao_piloto/relatorio/arvore.html`: a árvore navegável, com os itens
+  de edital (concurso/cargo/nível) em cada nó, os itens sem mapeamento e as
+  propostas pendentes. Substitui o `sinonimos.html`.
+- `[ ]` **Banco:** `no_arvore` (`id`, `nivel`, `nome`, `pai_id`, `status`,
+  `fundido_em`), com as pontes `materia_no`, `topico_no` e `subtopico_no`
+  (`dim_* id` → `no_id`, N:N), carregadas só com mapeamento `aprovado`. Uma
+  view auxiliar `vw_no_caminho` dá o caminho completo de cada nó (matéria ›
+  assunto › subassunto) e resolve os fundidos. `materia_canonica`,
+  `assunto_canonico`, `subassunto_canonico` e as FKs `*_canonico_id` das
+  dimensões **saem** (nada fora da 5B as usa). A carga é idempotente.
+- `[ ]` **Views de "o que o edital cobra"**, a partir da árvore expandida
+  por cargo:
+  - `vw_arvore_edital_por_cargo`: 1 linha por (item do edital × cargo ×
+    nó), com concurso, órgão, banca, ano, nível, tipo de conhecimento,
+    cargo, nomes de origem e o caminho do nó. O chunk básico
+    (`cargo_edital_id` NULL) vira 1 linha para cada cargo do nível,
+    respeitando `cargos_restritos`. O tópico sem subtópico entra no nó do
+    assunto.
+  - `vw_edital_cobra_subassunto`, `vw_edital_cobra_assunto` e
+    `vw_edital_cobra_materia`: ocorrência = `taxonomia_itens.id` distinto,
+    então o composto e as partes no mesmo item nunca contam 2×. A variante
+    oficial filtra `status_revisao = 'aprovado'`.
+- `[ ]` **Testes:** semeadura (contagem de nós = grupos aprovados, 2ª
+  execução sem diff); fundir preserva o ID por redirecionamento; mover
+  valida nível e ciclo; composto mapeado para 2 nós conta 1× em cada; item
+  mapeado para um nó de nível acima soma no assunto; expansão do básico por
+  cargo com `cargos_restritos`; item novo mapeado por regra só dentro do
+  mesmo nó-pai efetivo.
+- `[ ]` **Documentação:** ADR-030 (já escrito com a decisão; completar com a
+  implementação), `CLAUDE.md` (§3, §5, §6, §7, §10) e o ADR-029 marcado como
+  semente do ADR-030.
+- **Pronto quando:** a árvore semeada reproduz os números da 5B (89 / 1148 /
+  2493 nós, 100% dos nomes mapeados), o banco carrega as pontes, as views de
+  "edital cobra" funcionam com filtro por cargo, e `pytest`/`ruff` estão
+  verdes. **A curadoria de conteúdo não entra aqui (5B.2).**
+
+## Etapa 5B.2: Curadoria da árvore do piloto (LLM com lista fechada + aprovação do dono)
+- `[ ]` Aplicar os três casos conhecidos como **proposta**, para o dono
+  aprovar:
+  - `S-7b3b2a86ce` (`Disposições gerais, servidores públicos`) →
+    `S-10973fad79` + `S-de2a8684f9`;
+  - `Licitações e contratos administrativos` (`A-4529f205f7`) →
+    `A-2261b82645` + `A-91e52e6c2e`, **se** o dono entender que são dois
+    assuntos;
+  - as duas matérias compostas do CD: cada assunto delas aponta para um nó
+    de Direito Constitucional (`M-5edb4898a0`), de Regimento Interno
+    (`M-e96f4dbbb5`) ou de uma matéria nova `Processo Legislativo`, se o
+    dono aprovar criá-la. Os nós das matérias compostas viram `fundido`.
+- `[ ]` Detecção determinística de nome composto (`,`, `;`, ` e `): cada
+  pedaço tem a `chave_regra` de um nó irmão já existente. Medido em
+  2026-09-27: 0 matérias, 1 assunto e 1 subassunto (os dois de cima).
+- `[ ]` `scripts/propor_arvore.py` (LLM explícito, fora do pipeline, com
+  `REASONING_PADRAO`): por matéria, envia a subárvore com IDs e propõe
+  (a) fusões de nós irmãos, (b) movimentos de granularidade (um assunto que
+  deveria ser subassunto de outro) e (c) mapeamentos de compostos. A lista é
+  fechada e a validação é local: ID desconhecido, nível errado ou ciclo é
+  falha tipada (ADR-022), e a 2ª tentativa leva o erro no prompt. Tudo sai
+  `proposto`.
+- `[ ]` Relatório `arvore.html` com as propostas agrupadas por matéria. O
+  dono decide pela CLI (`curar_arvore.py`) ou passa as decisões na conversa.
+  **O agente nunca aprova em nome do dono.**
+- **Pronto quando:** "Disposições gerais" e "Servidores públicos" têm 8
+  ocorrências cada em `vw_edital_cobra_subassunto` (7 se `servidores
+  públicos civis e militares`, do CD cargo 2, não for fundido);
+  "Direito Constitucional" soma os assuntos do CD; não há proposta pendente.
+- **Checkpoint:** o dono aprova a árvore antes da Etapa 5D.
 
 ## Etapa 5C: Extração determinística de questões, gabaritos e discursivas (sem LLM)
 - `[x]` Tirar o "fora do escopo" da fila `fila_extracao_questoes` (Etapa 5,
@@ -617,77 +701,117 @@ enviar o bloco de uma etapa específica para o agente construir.
 - **Pronto quando:** as 5 sessões estão marcadas e a verificação padrão do
   arquivo mantém os números da 5C.
 
-## Etapa 5D: Classificação das questões por matéria/assunto (LLM, lista fechada)
-- `[ ]` Pré-requisito: sinônimos aprovados (5B, feito), nomes compostos
-  divididos (5B.1) e questões extraídas (5C).
-- `[ ]` `scripts/classificar_questoes.py`: para cada caderno, os candidatos
-  são **só** os assuntos canônicos do edital aplicáveis àquele caderno (tipo
-  básico/específico, nível, cargos via `provas_cargos` e `cargos_restritos`).
-  O LLM recebe um lote (um texto-base com seus itens, ou cerca de 10 itens) e
-  o rótulo de seção, e devolve
-  `{numero: materia_id, assunto_id, subassunto_id | null, confianca}` ou
-  `fora_do_edital`. ID fora da lista de candidatos é falha tipada (ADR-022),
-  nunca aceito.
-- `[ ]` Estimativa: cerca de 3.300 itens, cerca de 350 chamadas.
-- `[ ]` Banco: `questoes_classificacao` (`questao_id`,
-  `materia_canonica_id`, `assunto_canonico_id`, `subassunto_canonico_id`,
-  `confianca`, `origem`, `status`).
-- `[ ]` Revisão humana: relatório por caderno, ordenado por menor
-  confiança. As views oficiais só usam classificação `aprovada`.
-- **Checkpoint:** o dono aprova a classificação (começando pela amostra de
-  baixa confiança).
+## Etapa 5D: Classificação das questões na árvore mestre (LLM, lista fechada)
+- `[ ]` Pré-requisito: árvore aprovada (5B.1 + 5B.2) e questões extraídas
+  (5C, feito).
+- `[ ]` `scripts/classificar_questoes.py`: a questão é classificada no
+  **nó mais específico** da árvore, de preferência um subassunto; um
+  assunto, quando nenhum subassunto serve.
+  - **Candidatos preferenciais:** os nós para onde apontam os itens do
+    edital aplicáveis ao caderno (tipo básico/específico, nível, cargos via
+    `provas_cargos` e `cargos_restritos`).
+  - **Candidatos de reserva:** a subárvore global das matérias desses nós.
+    Uma questão cobrada fora do edital ainda cai na árvore.
+  - O LLM recebe um lote (um texto-base com seus itens, ou ~10 itens), o
+    rótulo de seção e a lista de candidatos com IDs. Devolve
+    `{numero: no_id, confianca, fora_do_edital: bool}`. ID fora da lista é
+    falha tipada (ADR-022), nunca aceito.
+- `[ ]` Estimativa: ~2.800 itens objetivos + 34 discursivas, ~300 chamadas.
+- `[ ]` Banco: `questao_no` (`questao_id`, `no_id`, `confianca`,
+  `fora_do_edital`, `origem`, `status`), N:N para a questão
+  interdisciplinar. As views oficiais só usam `aprovado`.
+- `[ ]` Revisão humana: relatório por caderno, ordenado pela menor
+  confiança. A aprovação pode ser em lote acima de um limiar de confiança
+  escolhido pelo dono, com a amostra de baixa confiança revisada item a
+  item.
+- **Checkpoint:** o dono aprova a classificação, começando pela amostra de
+  baixa confiança.
 
-## Etapa 5E: Estatísticas por nível e simulado
-- `[ ]` Views, todas filtráveis por `nivel`, `ano`, `orgao`, `banca`,
-  `cargo` e `concurso`:
-  - `vw_questoes`: linha plana com questão, gabarito, matéria/assunto/
-    subassunto canônicos e o contexto de concurso;
-  - `vw_assunto_mais_cobrado`: nº de questões e % da prova por assunto ×
-    matéria × nível (e ano/órgão), com as anuladas à parte. "Quais questões
-    são deste assunto" = filtrar `vw_questoes` pelo assunto;
-  - `vw_comparativo_nivel`: a mesma matéria/assunto/subassunto em médio ×
-    superior, lado a lado;
-  - `vw_edital_vs_prova`: listado no edital × efetivamente cobrado (inclui
-    "no edital, nunca cobrado");
-  - `vw_certo_errado_por_assunto`: proporção C/E e anulações;
-  - `vw_peso_materia_cargo`: questões por matéria em cada prova de cargo;
-  - `vw_discursivas`: tema por matéria/cargo/nível.
+## Etapa 5E: Estatísticas (views no banco)
+- `[ ]` Todas as views sobem pela árvore (matéria › assunto › subassunto) e
+  são filtráveis por `banca`, `orgao`, `ano`, `concurso`, `cargo`, `nivel` e
+  `tipo_conhecimento`. O item básico é expandido por cargo, como na
+  `vw_arvore_edital_por_cargo` da 5B.1.
+  - `vw_questoes`: linha plana com a questão, o gabarito, o caminho do nó e
+    o contexto de concurso (base da busca do site);
+  - **(1) o que mais cai:** `vw_prova_cobra_subassunto` /
+    `_assunto` / `_materia`: nº e % de questões por nó, com as anuladas à
+    parte;
+  - **(2) o que o edital cobra:** as views `vw_edital_cobra_*` da 5B.1;
+  - **(3) edital × prova:** `vw_edital_vs_prova` (no edital e nunca
+    cobrado; cobrado fora do edital; razão cobrança/previsão por nó);
+  - `vw_comparativo_nivel` (médio × superior), `vw_certo_errado_por_no`
+    (proporção C/E e anulações), `vw_peso_materia_cargo` e
+    `vw_discursivas` (tema por matéria/cargo/nível).
 - `[ ]` Matéria que é o próprio cargo: cargo de especialidade não tem
   cabeçalho de matéria no edital, e o parser usa o nome do cargo como
   matéria (`ESTATÍSTICO`, `ENFERMEIRO`...). Medido em 2026-09-27: 12
   chunks, todos do `PF_25_ADM` (chunks 15 e 22–32); STM, IBAMA e TCU têm
   cabeçalho real. **Não renomear para disciplina:** o edital não faz essa
   classificação, e tudo que é cobrado já está nos assuntos/tópicos
-  canonizados (decisão do dono, 2026-09-27). Só marcar a origem:
+  (decisão do dono, 2026-09-27). Só marcar a origem:
   `ChunkTaxonomia.materia_origem` (`cabecalho` | `prefixo` | `cargo`) nos
   três ramos de `dividir_por_cargo_e_materia`, em
   `CAMPOS_CLASSIFICACAO_CHUNK`, completado por backfill sem LLM (esperado:
   12 `cargo`, 1 `prefixo` do CD, o resto `cabecalho`), e
-  `dim_materia.nome_de_cargo boolean`. Views e simulado mostram essas
+  `dim_materia.nome_de_cargo boolean`. As views e o site mostram essas
   matérias como "Conhecimentos específicos — <cargo>", não como disciplina.
-- `[ ]` Simulado (página web): `scripts/gerar_simulado.py <slug> <cargo>` gera
-  `revisao_piloto/relatorio/simulados/<slug>_cargo<N>.html`, servido pelo
-  Datasette/SSO. Básico + específico na ordem original, texto-base e
-  figuras, botões Certo/Errado/Branco, cronômetro e discursiva com os
-  quesitos. A correção no fim segue a regra CEBRASPE (certo +1, errado −1,
-  branco 0; anulada não conta) e mostra o desempenho por matéria/assunto. O
-  `index.html` lista os simulados, gerados automaticamente no pipeline
-  (ADR-019).
-- `[ ]` Documentação: ADR-029 (camada canônica, já escrito na Etapa 5B),
-  ADR-031 (extração de questões), ADR-032 (classificação, estatísticas e
-  simulado). O ADR-028 foi usado pela Etapa 5A e o ADR-030 pela 5B.1. No
-  `CLAUDE.md`: fases, patterns e o anti-pattern "nunca agrupar por
-  similaridade de texto sem aprovação".
-- **Pronto quando:** as consultas de exemplo funcionam (top 10 assuntos de
-  LÍNGUA PORTUGUESA em superior × médio; questões de um assunto filtradas por
-  nível), e o simulado `PF_25_ADM` cargo 1 é aberto no navegador,
-  respondido e corrigido, com a pontuação conferida à mão.
+- `[ ]` Documentação: ADR-032 (classificação e estatísticas). `CLAUDE.md`:
+  fases e patterns.
+- **Pronto quando:** as consultas de exemplo funcionam: top 10 subassuntos
+  de LÍNGUA PORTUGUESA em superior × médio; questões de um subassunto
+  filtradas por cargo e nível; "no edital, nunca cobrado" do `PF_25_ADM`
+  cargo 1.
+
+## Etapa 5F: Site público de questões (portfólio)
+> **Por que existe (2026-09-28):** o produto é um site público no estilo Gran
+> Questões, com mais filtros e estatísticas. O Datasette continua só como
+> ferramenta de revisão do dono (SSO). **Cada subetapa é uma sessão.** Antes
+> da 5F.1, detalhar as subetapas num arquivo autocontido
+> (`plano-etapa-5f.md`), no padrão do `correcoes-etapa-5c.md`.
+
+- `[ ]` **5F.0 — Decisões (ADR-033):**
+  - stack da API e do frontend;
+  - autenticação (provedor próprio × OAuth);
+  - hospedagem no Xeon via Traefik + Cloudflare Tunnel, **sem** o Zero
+    Trust do Datasette;
+  - separação entre o banco de conteúdo (`scraper-cebraspe-db`, somente
+    leitura para o site) e os dados de usuário;
+  - checagem de direitos de republicação das provas do CEBRASPE (documento
+    público; citar a fonte).
+- `[ ]` **5F.1 — API de leitura:** busca de questões com filtros
+  combináveis (banca, órgão, ano, concurso, cargo, nível, tipo, matéria ›
+  assunto › subassunto, anuladas, "já resolvidas/erradas" com login),
+  paginação e detalhe da questão (texto-base, figuras, gabarito). Lê
+  `vw_questoes`.
+- `[ ]` **5F.2 — Frontend de resolução:** lista filtrável, resolver
+  Certo/Errado com a correção imediata, texto-base e figuras, e a árvore de
+  filtros navegável.
+- `[ ]` **5F.3 — Contas e histórico:** cadastro/login, tabela de respostas
+  (`usuario`, `questao`, `resposta`, `acertou`, `respondida_em`) e
+  **(4) desempenho pessoal** por nó da árvore (onde mais erra), com os
+  mesmos filtros.
+- `[ ]` **5F.4 — Páginas de estatística:** (1) o que mais cai, (2) o que o
+  edital cobra e (3) edital × prova, por concurso/cargo/nível, a partir das
+  views da 5E.
+- `[ ]` **5F.5 — Simulado:** refazer a prova de um concurso/cargo (básico +
+  específico na ordem original, cronômetro, discursiva com os quesitos). A
+  correção segue a regra CEBRASPE (certo +1, errado −1, branco 0; anulada
+  não conta) e mostra o desempenho por nó. Substitui o simulado em HTML
+  estático planejado antes para a 5E.
+- `[ ]` **5F.6 — Deploy público:** Traefik/Cloudflare, rate limit, headers
+  de segurança, backup do banco de usuários, CI (ruff/pytest + testes da
+  API).
+- **Pronto quando:** o site está no ar com as 2.800 questões do piloto
+  filtráveis pela árvore, um usuário cadastrado resolve questões e vê o
+  próprio desempenho, e as três estatísticas e o simulado `PF_25_ADM` cargo
+  1 funcionam, com a pontuação conferida à mão.
 
 ---
 
 
 ## Etapa 6: Teste Piloto e Validação
-> **Depende das Etapas 5B–5E, incluindo a 5B.1** (prioridade 2026-09-22; a 5A foi concluída em 2026-09-23).
+> **Depende das Etapas 5B.1–5E** (árvore, classificação e estatísticas; a 5A foi concluída em 2026-09-23). O site (5F) pode seguir em paralelo depois da 5E.
 
 - `[ ]` Rodar o fluxo completo ponta a ponta (Crawler → Downloader → Parser
   → LLM → DB) para **1–2 concursos grandes de 2025 já encerrados** (ex:

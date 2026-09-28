@@ -43,6 +43,17 @@ liga cada nome de matéria/tópico/subtópico a um canônico, por regra
 determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
 `aprovado` chega ao banco (`materia_canonica`/`assunto_canonico`/
 `subassunto_canonico`).
+**Objetivo do produto (2026-09-28, ADR-030):** um **site público de
+questões** (portfólio, estilo Gran Questões), começando pelo piloto 2025. A
+questão é a entidade central, e o subassunto é a unidade de estudo. As
+estatísticas, em ordem: o que mais cai na prova; o que o edital cobra;
+edital × prova; desempenho pessoal. **Árvore mestre** (Etapas 5B.1/5B.2):
+`canonico/arvore.json` guarda nós matéria → assunto → subassunto, com o pai
+no próprio nó, semeados com os grupos aprovados da 5B (mesmo ID). Item de
+edital e questão apontam para nós (N:N). Depois da semeadura,
+`sinonimos.json` fica congelado como histórico. As views no Postgres (5E)
+alimentam o site (5F: API, frontend, contas, histórico, simulado). O
+Datasette continua só como ferramenta de revisão do dono.
 
 ## 4. Stack fixada
 
@@ -130,12 +141,13 @@ determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
-      registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B/5B.1 e 5D–5E.
-- **⚡ Prioridade atual: Etapas 5B.1 → 5D → 5E do `task.md`** (5A
-      concluída, ADR-028; 5B concluída com aprovação humana em 2026-09-27,
-      ADR-029; 5C e 5C.1 concluídas, ADR-031). A 5D (classificação das
-      questões por LLM) depende da 5B.1 (divisão de nomes compostos,
-      ADR-030).
+      registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
+- **⚡ Prioridade atual: Etapas 5B.1 → 5B.2 → 5D → 5E → 5F do `task.md`**
+      (ADR-030, 2026-09-28): árvore mestre semeada com a 5B → curadoria da
+      árvore (checkpoint do dono) → classificação das questões na árvore →
+      estatísticas → site público. A 5A, a 5B (aprovada em 2026-09-27) e a
+      5C/5C.1 estão concluídas. A antiga 5B.1 ("divisão de nomes
+      compostos") foi substituída pelo mapeamento N:N da árvore.
 
 
 ## 6. Patterns
@@ -337,6 +349,16 @@ determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
   exatamente um grupo, nada inventado, nada entre blocos) com falha tipada; a
   segunda tentativa leva o erro no prompt.
 - Subtópico é linha (`dim_subtopico` + `taxonomia_subitens`), não JSONB.
+- Árvore mestre (ADR-030): o pai pertence ao **nó**, não ao edital. Item de
+  edital e questão **apontam** para nós (N:N, qualquer nível), e a
+  estatística soma subindo a árvore. O nome composto aponta para N nós, e o
+  item de uma matéria composta aponta para o nó da matéria certa.
+- O ID de nó é estável. O nó semeado herda o ID do grupo aprovado da 5B.
+  Fundir marca `fundido` + `fundido_em` e nunca apaga ID; toda leitura
+  resolve o redirecionamento.
+- Estatística "edital cobra": ocorrência = `taxonomia_itens.id` distinto,
+  com o item básico expandido por cargo (`cargos_restritos` respeitado).
+  "Prova cobra": questão distinta. O mesmo item nunca conta 2× no mesmo nó.
 - Segmentação de cadernos de prova: número do item distinguido por x0 na margem da coluna (cluster/moda); duplicado/fora de ordem é bloqueante; recuo de continuação de item medido na faixa estrita de 12 a 24 pt (~18 pt real); gabaritos definitivos em hash (TCU/Câmara) ligados aos cadernos pelo código impresso no corpo do PDF (ADR-031).
 - Assinatura de grupo por hash na fila (`fila_extracao_questoes.assinatura_grupo`) garante reprocessamento automático quando os gabaritos ligados mudam, em qualquer status; `--reprocessar-erros` cobre órfãos e falhas.
 - Advisory lock de sessão (`pg_try_advisory_lock(5_031_001)`) garante consumidor de execução única sem concorrência destrutiva na fila.
@@ -445,6 +467,17 @@ determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
   fonte é `canonico/sinonimos.json`, e a próxima carga reverte.
 - Nunca deixar o agente aprovar proposta do LLM em nome do dono; só grupo
   `regra` é aprovado automaticamente.
+- Nunca juntar um nome composto (`Disposições gerais, servidores
+  públicos`) a uma de suas partes: isso conta uma parte como a outra. Ele
+  aponta para os N nós (ADR-030).
+- Nunca derivar o pai de um nó da árvore do edital de origem: a matéria
+  composta do CD separaria os assuntos de Constitucional dos outros
+  concursos (ADR-030).
+- Nunca criar nó da árvore automaticamente a partir de nome novo de edital:
+  o que a regra não mapeia fica pendente para a curadoria.
+- Nunca classificar a questão só entre os nós do edital do caderno: a
+  questão fora do edital ficaria sem nó, e o "edital × prova" perderia o
+  lado "cobrado fora do edital".
 - Nunca casar a restrição com `\([^)]*\)`: um parêntese interno
   (`ANALISTA (TI)`) corta a cláusula no meio e o resto fica no nome.
 - Nunca permitir janela ampla de recuo de linha de item (> 24 pt, ex.: 8–30 pt) no parser de provas — captura a primeira linha com recuo de parágrafo (~28–29 pt) do texto-base subsequente após itens de 1 linha física (ADR-031).
@@ -583,7 +616,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-031, com ADR-030 reservado à 5B.1). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-031). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
 
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
 
@@ -1229,6 +1262,30 @@ do texto-base após item de 1 linha). Ver ADR-031.
 5. **Documentação e alinhamento:** Remoção do plano obsoleto `concluir-etapa-5c.md`, documentação de gotchas em `LESSONS.md`, alinhamento de contagens (123 textos-base) e ADR-031 atualizado. 435 testes aprovados (+1 xfail) e suite 100% verde.
 **Motivo:** Correções identificadas na revisão da Etapa 5C antes do avanço para a Etapa 5D (`correcoes-etapa-5c.md`).
 **Alternativas descartadas:** Confiar em flags de fonte para segmentação de itens; buscar "definitivo" no corpo do documento (o padrão do cargo 2 da PF cita a palavra no texto); capturar quesitos antes do comando discursivo (falso positivo em datas); reprocessamento apenas de status pendentes (não pegava gabaritos associados a posteriori). Ver ADR-031.
+
+### 2026-09-28 — Site público de questões como objetivo e árvore mestre semeada com a 5B
+
+**Decisão:** O objetivo do produto passa a ser um site público de questões
+(portfólio, estilo Gran Questões), começando pelo piloto 2025, com a questão
+como entidade central e o subassunto como unidade de estudo. As
+estatísticas, em ordem, são: o que mais cai na prova, o que o edital cobra,
+edital × prova e desempenho pessoal. A taxonomia vira uma **árvore mestre
+curada** (`canonico/arvore.json`), semeada com os grupos aprovados da 5B
+(mesmo ID). Item de edital e questão apontam para nós (N:N). O roteiro passa
+a ser 5B.1 (árvore e banco) → 5B.2 (curadoria) → 5D (questão na árvore) →
+5E (views) → 5F (site). A antiga 5B.1 ("divisão de nomes compostos") foi
+descartada antes de ser implementada.
+**Motivo:** Ao planejar a divisão de nomes compostos, o modelo de árvore
+emergente dos editais exigiu mecanismos especiais para o composto
+(`Disposições gerais, servidores públicos`) e para a matéria composta do CD
+(realocação de 16 + 11 assuntos), e mesmo assim não resolvia a granularidade
+diferente entre editais. O dono apontou que a arquitetura misturava o
+objetivo do produto (site de questões) com estatística de edital. Numa
+árvore fixa com mapeamento N:N, os três casos viram mapeamento comum.
+**Alternativas descartadas:** divisão 1 → N com realocação de filhos (plano
+original); árvore do zero (perderia a revisão da 5B); taxonomia de terceiros
+(sem fonte aberta, risco autoral); simulado estático no Datasette (movido
+para o site). Ver ADR-030.
 
 ## 13. LESSONS.md (do projeto)
 

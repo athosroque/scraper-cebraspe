@@ -36,5 +36,6 @@ Este diretório armazena os Registros de Decisões de Arquitetura (**Architectur
 | [ADR-026](ADR-026-banco-postgres-proprio.md) | 2026-09-21 | Banco PostgreSQL próprio, independente do study-rag-agent | Aceito |
 | [ADR-027](ADR-027-star-schema-estatisticas.md) | 2026-09-22 | Star schema de estatísticas, gravação idempotente e fila de provas | Aceito |
 | [ADR-028](ADR-028-cargos-restritos-e-aprovacao-fase4.md) | 2026-09-23 | Restrição de cargo fora do nome da matéria e registro da aprovação da Fase 4 | Aceito |
-| [ADR-029](ADR-029-camada-canonica-sinonimos.md) | 2026-09-25 | Camada canônica de sinônimos (matéria → assunto → subassunto) com aprovação humana e reasoning padrão de 3000 tokens | Aceito (propostas aguardando aprovação) |
+| [ADR-029](ADR-029-camada-canonica-sinonimos.md) | 2026-09-25 | Camada canônica de sinônimos (matéria → assunto → subassunto) com aprovação humana e reasoning padrão de 3000 tokens | Aceito (aprovado em 2026-09-27; semente da árvore mestre do ADR-030) |
+| [ADR-030](ADR-030-arvore-mestre-e-site-de-questoes.md) | 2026-09-28 | Árvore mestre de assuntos semeada com a 5B e site público de questões como objetivo do produto | Aceito (implementação nas Etapas 5B.1–5F) |
 | [ADR-031](ADR-031-extracao-questoes-cadernos.md) | 2026-09-25 | Extração determinística de questões, gabaritos e discursivas dos cadernos de prova | Aceito |
