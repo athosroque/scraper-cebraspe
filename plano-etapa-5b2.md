@@ -52,7 +52,7 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
 
 ## Sessão A: propostas de operação, status `aposentado`, detecção de composto, relatório e CLI (sem LLM)
 
-- `[ ]` **Propostas no `arvore.json`** (`src/arvore.py`):
+- `[x]` **Propostas no `arvore.json`** (`src/arvore.py`):
   - nova seção `propostas`, com uma linha por proposta e ordenada por ID.
     `carregar`/`salvar` leem e gravam a seção, e o JSON antigo, sem ela,
     continua sendo lido;
@@ -71,17 +71,17 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
     (`copy.deepcopy`), e a inválida levanta `ArvoreInvalida` sem gravar;
   - `aprovar_propostas(arv, ids)` aplica na ordem, tudo ou nada (pode usar
     um nó `criar` aprovado no mesmo lote). `rejeitar_proposta(arv, id)`.
-- `[ ]` **Status de nó `aposentado`:** para composto sem uso. Exige nenhum
+- `[x]` **Status de nó `aposentado`:** para composto sem uso. Exige nenhum
   filho ativo e nenhum mapeamento aprovado. Não redireciona: `mapear`,
   `mover_no` e `fundir_nos` recusam o aposentado como alvo. O `arvore.html`
   não o mostra na árvore.
-- `[ ]` **Banco:** em `src/sql/schema_estatisticas.sql` (CHECK de
+- `[x]` **Banco:** em `src/sql/schema_estatisticas.sql` (CHECK de
   `no_arvore.status`, hoje `('ativo','proposto','fundido')`), incluir
   `'aposentado'` de forma idempotente (DROP/ADD CONSTRAINT), no padrão em
   que o schema já é reaplicado. `vw_no_caminho` já filtra `status = 'ativo'`.
   Conferir `stats_writer.py` (carga de `no_arvore` e das pontes só com
   `aprovado`). As propostas **não** vão para o banco.
-- `[ ]` **Detecção determinística de composto:**
+- `[x]` **Detecção determinística de composto:**
   `arvore.detectar_compostos(arv)` divide o nome de cada nó ativo em `,`,
   `;` e ` e `. Se **cada** pedaço tem a `canonico.chave_regra` de um irmão
   ativo (mesmo pai efetivo), gera `remapear` (item do composto → irmãos) +
@@ -89,16 +89,16 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
   0 matérias, `A-4529f205f7` e `S-7b3b2a86ce`. O `aposentar` de
   `A-4529f205f7` só valida depois que os 21 filhos tiverem destino
   (Sessão B).
-- `[ ]` **Relatório** (`scripts/gerar_relatorio_arvore.py`): "Propostas
+- `[x]` **Relatório** (`scripts/gerar_relatorio_arvore.py`): "Propostas
   pendentes" **agrupadas por matéria**. Cada proposta mostra o ID `P-…`, o
   tipo, o antes → depois (nomes + IDs), a justificativa, a origem e o comando
   pronto. O topo mostra os indicadores do critério de pronto: ocorrências de
   "Disposições gerais" e "Servidores públicos" calculadas do JSON +
   `coletar_ocorrencias`, sem banco.
-- `[ ]` **CLI** (`scripts/curar_arvore.py`): `--aprovar-proposta P1,P2`
+- `[x]` **CLI** (`scripts/curar_arvore.py`): `--aprovar-proposta P1,P2`
   (lote, tudo ou nada), `--rejeitar-proposta P1,...` e `--propostas [M-..]`
   (lista no terminal). As operações diretas continuam iguais.
-- `[ ]` **Testes:** em `tests/test_arvore.py`, propor/aprovar/rejeitar cada
+- `[x]` **Testes:** em `tests/test_arvore.py`, propor/aprovar/rejeitar cada
   tipo, proposta inválida não gravada, lote tudo ou nada, `criar` + `mover`
   no mesmo lote, `aposentar` recusado com filho/mapeamento, mapear para
   aposentado falha e ida e volta do JSON (com e sem `propostas`). Em

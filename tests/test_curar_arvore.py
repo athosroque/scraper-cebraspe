@@ -3,7 +3,15 @@
 import pytest
 
 from scripts import curar_arvore
-from src.arvore import ArvoreMestre, Mapeamento, carregar, criar_no, mapear, salvar
+from src.arvore import (
+    ArvoreMestre,
+    Mapeamento,
+    carregar,
+    criar_no,
+    mapear,
+    propor,
+    salvar,
+)
 
 
 @pytest.fixture
@@ -94,3 +102,96 @@ def test_erros_nao_gravam(ambiente, capsys, args, mensagem):
 
 def test_sem_argumentos_mostra_ajuda():
     assert curar_arvore.main([]) == 2
+
+
+def test_cli_propostas_listagem_e_filtro(ambiente, capsys):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p1 = propor(
+        arv, "fundir", {"origem": "A-2", "destino": "A-1"}, "regra", "fusão", "M-1"
+    )
+    p2 = propor(
+        arv,
+        "criar",
+        {"nivel": "assunto", "pai": "M-2", "nome": "Novo P"},
+        "humano",
+        "criar em M-2",
+        "M-2",
+    )
+    salvar(arv, path)
+
+    # Listagem geral
+    assert rodar("--propostas") == 0
+    out = capsys.readouterr().out
+    assert p1 in out
+    assert p2 in out
+    assert "M-1" in out
+    assert "M-2" in out
+
+    # Listagem filtrada por matéria
+    assert rodar("--propostas", "M-1") == 0
+    out_filtrada = capsys.readouterr().out
+    assert p1 in out_filtrada
+    assert p2 not in out_filtrada
+
+
+def test_cli_aprovar_proposta_lote(ambiente):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p1 = propor(
+        arv, "fundir", {"origem": "A-2", "destino": "A-1"}, "regra", "fusão", "M-1"
+    )
+    p2 = propor(
+        arv,
+        "criar",
+        {"nivel": "assunto", "pai": "M-2", "nome": "Sintaxe"},
+        "humano",
+        "novo assunto",
+        "M-2",
+    )
+    salvar(arv, path)
+
+    assert rodar("--aprovar-proposta", f"{p1},{p2}") == 0
+    arv_atual = carregar(path)
+    assert arv_atual.propostas[p1].status == "aprovado"
+    assert arv_atual.propostas[p2].status == "aprovado"
+    assert arv_atual.nos["A-2"].status == "fundido"
+    novo_id = arv_atual.propostas[p2].args["id"]
+    assert arv_atual.nos[novo_id].status == "ativo"
+
+
+def test_cli_aprovar_proposta_tudo_ou_nada_falha(ambiente, capsys):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p1 = propor(
+        arv, "fundir", {"origem": "A-2", "destino": "A-1"}, "regra", "fusão", "M-1"
+    )
+    salvar(arv, path)
+    antes = path.read_text(encoding="utf-8")
+
+    # Passa p1 e uma proposta inexistente
+    assert rodar("--aprovar-proposta", f"{p1},P-inexistente") == 1
+    assert "não existe" in capsys.readouterr().err
+    # Arquivo não foi modificado
+    assert path.read_text(encoding="utf-8") == antes
+    assert carregar(path).nos["A-2"].status == "ativo"
+
+
+def test_cli_rejeitar_proposta(ambiente):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p = propor(
+        arv,
+        "criar",
+        {"nivel": "assunto", "pai": "M-1", "nome": "Temporário"},
+        "llm",
+        "descartar",
+        "M-1",
+    )
+    novo_id = arv.propostas[p].args["id"]
+    salvar(arv, path)
+
+    assert rodar("--rejeitar-proposta", p) == 0
+    arv_atual = carregar(path)
+    assert arv_atual.propostas[p].status == "rejeitado"
+    assert novo_id not in arv_atual.nos

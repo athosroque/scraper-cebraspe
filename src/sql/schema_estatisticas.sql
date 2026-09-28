@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS no_arvore (
     nome TEXT NOT NULL,
     pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
     origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
-    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido')),
+    status TEXT NOT NULL CONSTRAINT no_arvore_status_check CHECK (status IN ('ativo', 'proposto', 'fundido', 'aposentado')),
     -- Nó fundido nunca é apagado: aponta para o destino (ver `vw_no_caminho`).
     fundido_em TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED
 );
@@ -88,6 +88,9 @@ DROP TABLE IF EXISTS assunto_canonico CASCADE;
 DROP TABLE IF EXISTS materia_canonica CASCADE;
 ALTER TABLE no_arvore ADD COLUMN IF NOT EXISTS fundido_em TEXT
     REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE no_arvore DROP CONSTRAINT IF EXISTS no_arvore_status_check;
+ALTER TABLE no_arvore ADD CONSTRAINT no_arvore_status_check
+    CHECK (status IN ('ativo', 'proposto', 'fundido', 'aposentado'));
 
 CREATE TABLE IF NOT EXISTS dim_cargo (
     id SERIAL PRIMARY KEY,

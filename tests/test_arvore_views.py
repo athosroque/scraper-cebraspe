@@ -69,6 +69,9 @@ def _arvore() -> ArvoreMestre:
     criar_no(
         arv, "assunto", "Proposta", "M-LP", status="proposto", id_override="A-PROP"
     )
+    criar_no(
+        arv, "assunto", "Aposentado", "M-LP", status="aposentado", id_override="A-APO"
+    )
 
     mapear(arv, DA, ["M-DA"])
     mapear(arv, COMPOSTO, ["A-DG", "A-SP"])  # composto → 2 nós
@@ -209,3 +212,12 @@ class TestEditalCobra:
             assert cur.fetchall() == [
                 ("A-OLD", "A-OR", "Língua Portuguesa > Ortografia")
             ]
+
+    def test_no_aposentado_nao_polui_views(self, carregado):
+        assert "A-APO" not in self._contagem(carregado, "vw_edital_cobra_assunto")
+        assert "A-APO" not in self._contagem(carregado, "vw_edital_cobra_assunto_todas")
+        with carregado.cursor() as cur:
+            cur.execute("SELECT status FROM no_arvore WHERE id = 'A-APO'")
+            assert cur.fetchone() == ("aposentado",)
+            cur.execute("SELECT id FROM vw_no_caminho WHERE id = 'A-APO'")
+            assert cur.fetchone() is None

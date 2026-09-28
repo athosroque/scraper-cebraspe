@@ -7782,5 +7782,11 @@
   "tecnologia da informacao|seguranca da informacao|nocoes de malware": [{"no_id": "S-35ab3a8c71", "origem": "semente", "status": "aprovado"}],
   "tecnologia da informacao|seguranca da informacao|procedimentos de backup": [{"no_id": "S-408baf00c1", "origem": "semente", "status": "aprovado"}],
   "tecnologia da informacao|seguranca da informacao|procedimentos de seguranca": [{"no_id": "S-55c93600ca", "origem": "semente", "status": "aprovado"}]
+ },
+ "propostas": {
+  "P-1681be10b8": {"id": "P-1681be10b8", "tipo": "aposentar", "args": {"no": "S-7b3b2a86ce"}, "origem": "regra", "justificativa": "Aposentadoria de nó composto S-7b3b2a86ce ('Disposições gerais, servidores públicos') sem uso", "status": "proposto", "materia": "M-5edb4898a0"},
+  "P-884672e1ef": {"id": "P-884672e1ef", "tipo": "remapear", "args": {"de": "A-4529f205f7", "item": "direito administrativo|licitacoes e contratos administrativos", "para": ["A-2261b82645", "A-91e52e6c2e"]}, "origem": "regra", "justificativa": "Remapeamento determinístico de composto A-4529f205f7 ('Licitações e contratos administrativos') para os irmãos A-2261b82645, A-91e52e6c2e", "status": "proposto", "materia": "M-6f50f4f1dd"},
+  "P-c25352fd8c": {"id": "P-c25352fd8c", "tipo": "remapear", "args": {"de": "S-7b3b2a86ce", "item": "nocoes de direito constitucional|administracao publica|disposicoes gerais servidores publicos", "para": ["S-10973fad79", "S-de2a8684f9"]}, "origem": "regra", "justificativa": "Remapeamento determinístico de composto S-7b3b2a86ce ('Disposições gerais, servidores públicos') para os irmãos S-10973fad79, S-de2a8684f9", "status": "proposto", "materia": "M-5edb4898a0"},
+  "P-fba2ea47e4": {"id": "P-fba2ea47e4", "tipo": "remapear", "args": {"de": "S-7b3b2a86ce", "item": "direito constitucional|administracao publica|disposicoes gerais servidores publicos", "para": ["S-10973fad79", "S-de2a8684f9"]}, "origem": "regra", "justificativa": "Remapeamento determinístico de composto S-7b3b2a86ce ('Disposições gerais, servidores públicos') para os irmãos S-10973fad79, S-de2a8684f9", "status": "proposto", "materia": "M-5edb4898a0"}
  }
 }

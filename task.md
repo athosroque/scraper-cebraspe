@@ -625,7 +625,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 > matérias compostas do CD vão para uma **matéria nova "Processo
 > Legislativo"**. O composto que fica sem uso vira o status novo
 > `aposentado` (não `fundido`, porque fundir redireciona para um nó só).
-- `[ ]` **Sessão A (sem LLM):** propostas de operação no `arvore.json`
+- `[x]` **Sessão A (sem LLM):** propostas de operação no `arvore.json`
   (`fundir`, `mover`, `criar`, `remapear`, `aposentar`), validadas numa
   cópia e aprovadas em lote, tudo ou nada; status `aposentado` (JSON +
   CHECK no Postgres); `detectar_compostos` por `chave_regra` (esperado:

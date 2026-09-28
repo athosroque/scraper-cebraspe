@@ -44,6 +44,75 @@ def _exigir_no(arv: arvore.ArvoreMestre, no_id: str) -> str:
     return no_id
 
 
+def _formatar_detalhe_proposta(arv: arvore.ArvoreMestre, p: arvore.Proposta) -> str:
+    if p.tipo == "fundir":
+        orig = arv.nos.get(p.args["origem"])
+        dest = arv.nos.get(p.args["destino"])
+        orig_s = f"{orig.nome} ({p.args['origem']})" if orig else p.args["origem"]
+        dest_s = f"{dest.nome} ({p.args['destino']})" if dest else p.args["destino"]
+        return f"{orig_s} → {dest_s}"
+    elif p.tipo == "mover":
+        no = arv.nos.get(p.args["no"])
+        pai = arv.nos.get(p.args["pai"])
+        no_s = f"{no.nome} ({p.args['no']})" if no else p.args["no"]
+        pai_s = f"{pai.nome} ({p.args['pai']})" if pai else p.args["pai"]
+        return f"{no_s} → pai {pai_s}"
+    elif p.tipo == "criar":
+        return f"({p.args['nivel']}) {p.args['nome']!r} sob {p.args.get('pai')}"
+    elif p.tipo == "remapear":
+        de_no = arv.nos.get(p.args["de"])
+        de_s = f"{de_no.nome} ({p.args['de']})" if de_no else p.args["de"]
+        destinos = (
+            p.args["para"] if isinstance(p.args["para"], list) else [p.args["para"]]
+        )
+        para_s = ", ".join(
+            f"{arv.nos[d].nome} ({d})" if d in arv.nos else d for d in destinos
+        )
+        return f"{p.args['item']!r}: {de_s} → {para_s}"
+    elif p.tipo == "aposentar":
+        no_id = p.args.get("no") or p.args.get("no_id", "")
+        no = arv.nos.get(no_id)
+        no_s = f"{no.nome} ({no_id})" if no else no_id
+        return f"aposentar {no_s}"
+    return str(p.args)
+
+
+def listar_propostas(
+    arv: arvore.ArvoreMestre, filtro_materia: str | None = None
+) -> list[str]:
+    pendentes = [
+        p
+        for p in arv.propostas.values()
+        if p.status == "proposto"
+        and (
+            not filtro_materia
+            or filtro_materia == p.materia
+            or filtro_materia == getattr(arv.nos.get(p.materia), "nome", "")
+        )
+    ]
+    if not pendentes:
+        return ["Nenhuma proposta pendente."]
+
+    linhas = []
+    por_materia: dict[str, list[arvore.Proposta]] = {}
+    for p in pendentes:
+        por_materia.setdefault(p.materia, []).append(p)
+
+    for m_id, props in sorted(por_materia.items()):
+        m_no = arv.nos.get(m_id)
+        m_nome = m_no.nome if m_no else (m_id or "Sem matéria")
+        linhas.append(f"=== Matéria: {m_nome} ({m_id}) ===")
+        for p in sorted(props, key=lambda x: x.id):
+            detalhe = _formatar_detalhe_proposta(arv, p)
+            linhas.append(f"[{p.id}] {p.tipo.upper()} ({p.origem}): {detalhe}")
+            if p.justificativa:
+                linhas.append(f"  Justificativa: {p.justificativa}")
+            linhas.append(
+                f"  Aprovar: python -m scripts.curar_arvore --aprovar-proposta {p.id}"
+            )
+    return linhas
+
+
 def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> list[str]:
     """Aplica as operações pedidas e devolve uma linha de log por operação."""
     feitas = []
@@ -73,6 +142,15 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
         ids = [_exigir_no(arv, n.strip()) for n in nos.split(",") if n.strip()]
         arvore.mapear(arv, item, ids, origem="humano", status="aprovado")
         feitas.append(f"mapeado {item!r} → {', '.join(ids)}")
+    if args.aprovar_proposta:
+        ids = [p.strip() for p in args.aprovar_proposta.split(",") if p.strip()]
+        arvore.aprovar_propostas(arv, ids)
+        feitas.append(f"propostas aprovadas: {', '.join(ids)}")
+    if args.rejeitar_proposta:
+        ids = [p.strip() for p in args.rejeitar_proposta.split(",") if p.strip()]
+        for pid in ids:
+            arvore.rejeitar_proposta(arv, pid)
+        feitas.append(f"propostas rejeitadas: {', '.join(ids)}")
     for acao, funcao in (
         ("desmapear", arvore.desmapear),
         ("aprovar", arvore.aprovar),
@@ -100,6 +178,21 @@ def main(argv: list[str] | None = None) -> int:
         "--criar", help="NIVEL:PAI=Nome — cria nó (matéria: 'materia:=Nome')"
     )
     parser.add_argument("--renomear", help="NO=Nome — renomeia o nó")
+    parser.add_argument(
+        "--aprovar-proposta",
+        help="P1,P2... — aprova propostas em lote (tudo ou nada)",
+    )
+    parser.add_argument(
+        "--rejeitar-proposta",
+        help="P1,P2... — rejeita propostas",
+    )
+    parser.add_argument(
+        "--propostas",
+        nargs="?",
+        const="",
+        metavar="MATERIA",
+        help="Lista propostas pendentes no terminal (opcional: [M-..])",
+    )
     parser.add_argument("--html", action="store_true", help="Regenera o arvore.html")
     parser.add_argument(
         "--arvore", type=Path, default=arvore.ARVORE_PADRAO, help=argparse.SUPPRESS
@@ -108,6 +201,13 @@ def main(argv: list[str] | None = None) -> int:
         "--revisao-dir", type=Path, default=REVISAO_DIR_PADRAO, help=argparse.SUPPRESS
     )
     args = parser.parse_args(argv)
+
+    if args.propostas is not None:
+        arv = arvore.carregar(args.arvore)
+        filtro = args.propostas.strip() or None
+        for linha in listar_propostas(arv, filtro):
+            print(linha)
+        return 0
 
     operacoes = (
         "mapear",
@@ -118,6 +218,8 @@ def main(argv: list[str] | None = None) -> int:
         "mover",
         "criar",
         "renomear",
+        "aprovar_proposta",
+        "rejeitar_proposta",
     )
     if not any(getattr(args, op) for op in operacoes) and not args.html:
         parser.print_help()

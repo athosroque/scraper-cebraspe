@@ -42,6 +42,15 @@ ul.arvore, ul.arvore ul { list-style: none; padding-left: 1.2rem;
 .ocorrencias { font-size: 0.8rem; opacity: 0.7; }
 details > summary { cursor: pointer; }
 code { font-size: 0.85em; }
+.indicadores-curadoria { background: color-mix(in srgb, CanvasText 5%, Canvas);
+    padding: 0.8rem 1rem; border-radius: 6px; margin: 1rem 0; font-size: 0.95rem; }
+.tipo-proposta { font-weight: 600; color: #2563eb; }
+.cmd-aprovar { display: inline-block; margin: 0.3rem 0; padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, CanvasText 8%, Canvas); border-radius: 4px; }
+.lista-propostas { list-style: none; padding-left: 0; }
+.proposta-item { margin-bottom: 0.8rem; padding: 0.5rem; border-left: 3px solid #2563eb;
+    background: color-mix(in srgb, CanvasText 2%, Canvas); }
+.justificativa { opacity: 0.85; }
 """
 
 
@@ -81,6 +90,43 @@ def _formatar_ocorrencias(ocs: set[Ocorrencia]) -> str:
     return f" <span class='ocorrencias'>[{escape(texto)}]</span>"
 
 
+def _formatar_antes_depois(arvore: arv_mod.ArvoreMestre, p: arv_mod.Proposta) -> str:
+    def n_txt(nid: str) -> str:
+        no = arvore.nos.get(nid)
+        return f"{no.nome} ({nid})" if no else nid
+
+    if p.tipo == "fundir":
+        return f"{n_txt(p.args['origem'])} → {n_txt(p.args['destino'])}"
+    elif p.tipo == "mover":
+        return f"{n_txt(p.args['no'])} → novo pai {n_txt(p.args['pai'])}"
+    elif p.tipo == "criar":
+        pai_s = n_txt(p.args["pai"]) if p.args.get("pai") else "raiz"
+        return f"+ ({p.args['nivel']}) {p.args['nome']!r} sob {pai_s}"
+    elif p.tipo == "remapear":
+        destinos = (
+            p.args["para"] if isinstance(p.args["para"], list) else [p.args["para"]]
+        )
+        para_s = ", ".join(n_txt(d) for d in destinos)
+        return f"📄 {p.args['item']}: {n_txt(p.args['de'])} → {para_s}"
+    elif p.tipo == "aposentar":
+        nid = p.args.get("no") or p.args.get("no_id", "")
+        return f"🚫 aposentar {n_txt(nid)}"
+    return str(p.args)
+
+
+def _contar_ocorrencias_no(
+    arvore: arv_mod.ArvoreMestre,
+    no_id: str,
+    ocorrencias: dict[str, set[Ocorrencia]],
+) -> int:
+    ocs: set[Ocorrencia] = set()
+    for item, maps in arvore.mapeamentos.items():
+        for m in maps:
+            if m.status == "aprovado" and arv_mod.resolver_no(arvore, m.no_id) == no_id:
+                ocs |= ocorrencias.get(item, set())
+    return len(ocs)
+
+
 def renderizar_arvore(
     arvore: arv_mod.ArvoreMestre, ocorrencias: dict[str, set[Ocorrencia]]
 ) -> str:
@@ -89,20 +135,20 @@ def renderizar_arvore(
         for chave in ocorrencias
         if not any(m.status == "aprovado" for m in arvore.mapeamentos.get(chave, []))
     )
-    propostas: list[tuple[str, str]] = []
+    propostas_legado: list[tuple[str, str]] = []
     itens_por_no: dict[str, list[str]] = {}
     for item, mapeamentos in sorted(arvore.mapeamentos.items()):
         for m in mapeamentos:
             no_id = arv_mod.resolver_no(arvore, m.no_id)
             if m.status == "proposto":
-                propostas.append((item, no_id))
+                propostas_legado.append((item, no_id))
             elif m.status == "aprovado":
                 itens_por_no.setdefault(no_id, []).append(item)
 
     filhos: dict[str, list[str]] = {}
     raizes: list[str] = []
     for no_id, no in arvore.nos.items():
-        if no.status == "fundido":
+        if no.status in ("fundido", "aposentado"):
             continue
         if no.pai:
             filhos.setdefault(arv_mod.resolver_no(arvore, no.pai), []).append(no_id)
@@ -131,13 +177,74 @@ def renderizar_arvore(
         corpo = f"<ul>{itens}{sub}</ul>" if itens or sub else ""
         return f"<li><details><summary>{rotulo}</summary>{corpo}</details></li>"
 
-    nos_propostos = sorted(i for i, n in arvore.nos.items() if n.status == "proposto")
+    propostas_op = [p for p in arvore.propostas.values() if p.status == "proposto"]
+    nos_propostos = sorted(
+        i
+        for i, n in arvore.nos.items()
+        if n.status == "proposto"
+        and not any(p.tipo == "criar" and p.args.get("id") == i for p in propostas_op)
+    )
+    total_propostas = len(propostas_op) + len(propostas_legado) + len(nos_propostos)
+
+    # Indicadores de critério de pronto (Etapa 5B.2)
+    qtd_dg = _contar_ocorrencias_no(arvore, "S-10973fad79", ocorrencias)
+    qtd_sp = _contar_ocorrencias_no(arvore, "S-de2a8684f9", ocorrencias)
+
+    # Agrupar propostas por matéria
+    propostas_por_materia: dict[str, list[arv_mod.Proposta]] = {}
+    for p in propostas_op:
+        propostas_por_materia.setdefault(p.materia, []).append(p)
+
+    propostas_blocos = []
+    for m_id, props in sorted(propostas_por_materia.items()):
+        m_no = arvore.nos.get(m_id)
+        m_nome = m_no.nome if m_no else (m_id or "Sem matéria")
+        itens_bloco = []
+        for p in sorted(props, key=lambda x: x.id):
+            antes_depois = _formatar_antes_depois(arvore, p)
+            itens_bloco.append(
+                f"<li class='proposta-item'>"
+                f"<strong><code>{escape(p.id)}</code></strong> "
+                f"<span class='tipo-proposta'>[{escape(p.tipo.upper())}]</span> "
+                f"<em>({escape(p.origem)})</em>: "
+                f"<span>{escape(antes_depois)}</span>"
+                f"<br><small class='justificativa'>{escape(p.justificativa)}</small>"
+                f"<br><pre class='cmd-aprovar'><code>python -m scripts.curar_arvore --aprovar-proposta {escape(p.id)}</code></pre>"
+                f"</li>"
+            )
+        propostas_blocos.append(
+            f"<h3>Matéria: {escape(m_nome)} <code>{escape(m_id)}</code></h3>"
+            f"<ul class='lista-propostas'>{''.join(itens_bloco)}</ul>"
+        )
+
+    if propostas_legado or nos_propostos:
+        itens_legado = [
+            *(
+                f"<li>mapear <code>{escape(item)}</code> → {escape(nome_no(no_id))}</li>"
+                for item, no_id in propostas_legado
+            ),
+            *(f"<li>nó {escape(nome_no(no_id))}</li>" for no_id in nos_propostos),
+        ]
+        propostas_blocos.append(
+            f"<h3>Outras propostas pendentes (legado)</h3><ul>{''.join(itens_legado)}</ul>"
+        )
+
+    if not propostas_blocos:
+        propostas_blocos.append("<p>Nenhuma proposta pendente.</p>")
+
     partes = [
         "<h1>Árvore mestre</h1>",
         (
-            f"<p>{sum(n.status != 'fundido' for n in arvore.nos.values())} nós · "
+            f"<div class='indicadores-curadoria'>"
+            f"<strong>Indicadores de Curadoria (Critério Etapa 5B.2):</strong> "
+            f"<span>Disposições gerais (<code>S-10973fad79</code>): <strong>{qtd_dg}/8</strong></span> · "
+            f"<span>Servidores públicos (<code>S-de2a8684f9</code>): <strong>{qtd_sp}/8</strong></span>"
+            f"</div>"
+        ),
+        (
+            f"<p>{sum(n.status == 'ativo' for n in arvore.nos.values())} nós ativos · "
             f"{len(arvore.mapeamentos)} itens mapeados · {len(sem_mapeamento)} sem mapeamento "
-            f"aprovado · {len(propostas)} mapeamentos e {len(nos_propostos)} nós propostos</p>"
+            f"aprovado · {total_propostas} propostas pendentes</p>"
         ),
         f"<h2>Itens sem mapeamento aprovado ({len(sem_mapeamento)})</h2><ul>",
         *(
@@ -145,13 +252,8 @@ def renderizar_arvore(
             for c in sem_mapeamento
         ),
         "</ul>",
-        f"<h2>Propostas pendentes ({len(propostas) + len(nos_propostos)})</h2><ul>",
-        *(
-            f"<li>mapear <code>{escape(item)}</code> → {escape(nome_no(no_id))}</li>"
-            for item, no_id in propostas
-        ),
-        *(f"<li>nó {escape(nome_no(no_id))}</li>" for no_id in nos_propostos),
-        "</ul>",
+        f"<h2>Propostas pendentes ({total_propostas})</h2>",
+        "".join(propostas_blocos),
         "<h2>Árvore</h2><ul class='arvore'>",
         *(render_no(r) for r in sorted(raizes, key=lambda x: arvore.nos[x].nome)),
         "</ul>",
