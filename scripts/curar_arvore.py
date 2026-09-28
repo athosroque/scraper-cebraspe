@@ -175,22 +175,23 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
         ids = [p.strip() for p in args.aprovar_proposta.split(",") if p.strip()]
         if not ids:
             raise arvore.ArvoreInvalida("Nenhuma proposta informada para aprovação")
-        arvore.aprovar_propostas(arv, ids)
-        feitas.append(f"propostas aprovadas: {', '.join(ids)}")
+        ids_aprovados = arvore.aprovar_propostas(arv, ids)
+        feitas.append(f"propostas aprovadas: {', '.join(ids_aprovados)}")
     if args.rejeitar_proposta is not None:
         ids = [p.strip() for p in args.rejeitar_proposta.split(",") if p.strip()]
         if not ids:
             raise arvore.ArvoreInvalida("Nenhuma proposta informada para rejeição")
-        for pid in ids:
+        ids_unicos = list(dict.fromkeys(ids))
+        for pid in ids_unicos:
             if pid not in arv.propostas:
                 raise arvore.ArvoreInvalida(f"Proposta {pid} não existe")
             if arv.propostas[pid].status == "aprovado":
                 raise arvore.ArvoreInvalida(
                     f"Proposta {pid} já foi aprovada e não pode ser rejeitada"
                 )
-        for pid in ids:
+        for pid in ids_unicos:
             arvore.rejeitar_proposta(arv, pid)
-        feitas.append(f"propostas rejeitadas: {', '.join(ids)}")
+        feitas.append(f"propostas rejeitadas: {', '.join(ids_unicos)}")
     for acao, funcao in (
         ("desmapear", arvore.desmapear),
         ("aprovar", arvore.aprovar),

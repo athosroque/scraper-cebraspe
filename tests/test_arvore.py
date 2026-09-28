@@ -790,3 +790,111 @@ def test_propor_aposentar_com_filho_proposto_aposentar():
 
     assert p_apo_filho in arv.propostas
     assert p_apo_pai in arv.propostas
+
+
+def test_rejeitar_proposta_limpa_orfaos_cadeia_multinivel():
+    arv = ArvoreMestre()
+    m = criar_no(arv, "materia", "M", None)
+    pa = propor(
+        arv, "criar", {"nivel": "assunto", "pai": m, "nome": "A"}, "llm", "just"
+    )
+    nid_a = arv.propostas[pa].args["id"]
+    pb = propor(
+        arv, "criar", {"nivel": "subassunto", "pai": nid_a, "nome": "B"}, "llm", "just"
+    )
+    nid_b = arv.propostas[pb].args["id"]
+
+    s_existente = criar_no(arv, "assunto", "A_ex", m)
+    pc = propor(arv, "mover", {"no": nid_b, "pai": s_existente}, "llm", "just")
+
+    assert nid_a in arv.nos
+    assert nid_b in arv.nos
+
+    rejeitar_proposta(arv, pa)
+    rejeitar_proposta(arv, pb)
+    rejeitar_proposta(arv, pc)
+
+    assert nid_a not in arv.nos
+    assert nid_b not in arv.nos
+
+
+def test_aposentar_no_com_filho_resolvido_por_fusao_em_cadeia_falha():
+    arv = ArvoreMestre()
+    m = criar_no(arv, "materia", "M", None)
+    a1 = criar_no(arv, "assunto", "A1", m)
+    a2 = criar_no(arv, "assunto", "A2", m)
+    a3 = criar_no(arv, "assunto", "A3", m)
+    s = criar_no(arv, "subassunto", "S", a1)
+    fundir_nos(arv, a1, a2)
+    fundir_nos(arv, a2, a3)
+    # Simula estado em que pai aponta para a1 na hierarquia resolvida
+    arv.nos[s].pai = a1
+
+    with pytest.raises(ArvoreInvalida, match="filhos ativos/propostos"):
+        aposentar_no(arv, a3)
+
+
+def test_proposta_dataclass_materia_opcional_retrocompatibilidade():
+    p_dict = {
+        "id": "P-123",
+        "tipo": "aposentar",
+        "args": {"no": "S-1"},
+        "origem": "regra",
+        "justificativa": "teste",
+        "status": "proposto",
+    }
+    prop = Proposta(**p_dict)
+    assert prop.materia == ""
+    assert prop.id == "P-123"
+
+
+def test_executar_operacao_missing_keys_raises_arvore_invalida():
+    from src.arvore import _executar_operacao
+
+    arv = ArvoreMestre()
+    with pytest.raises(ArvoreInvalida, match="origem.*destino"):
+        _executar_operacao(arv, "fundir", {"origem": "X"})
+    with pytest.raises(ArvoreInvalida, match="no.*pai"):
+        _executar_operacao(arv, "mover", {"no": "X"})
+    with pytest.raises(ArvoreInvalida, match="nivel.*nome"):
+        _executar_operacao(arv, "criar", {"nivel": "assunto"})
+    with pytest.raises(ArvoreInvalida, match="item.*de.*para"):
+        _executar_operacao(arv, "remapear", {"item": "X", "de": "Y"})
+    with pytest.raises(ArvoreInvalida, match="Argumento 'no' obrigatório"):
+        _executar_operacao(arv, "aposentar", {})
+
+
+def test_inferir_materia_proposta_remapear_fallback_destinos():
+    arv = ArvoreMestre()
+    m = criar_no(arv, "materia", "Mat", None)
+    a = criar_no(arv, "assunto", "Assunto", m)
+    s = criar_no(arv, "subassunto", "Sub", a)
+    mapear(arv, "item|teste", [s])
+
+    p = propor(
+        arv,
+        "remapear",
+        {"item": "item|teste", "de": s, "para": [s]},
+        "regra",
+        "teste",
+    )
+    assert arv.propostas[p].materia == m
+
+
+def test_remover_no_proposto_se_orfao_respeita_aliases_fundidos():
+    from src.arvore import _remover_no_proposto_se_orfao
+
+    arv = ArvoreMestre()
+    m = criar_no(arv, "materia", "M", None)
+    p_criar = propor(
+        arv, "criar", {"nivel": "assunto", "pai": m, "nome": "Temp"}, "llm", "just"
+    )
+    nid_temp = arv.propostas[p_criar].args["id"]
+
+    a1 = criar_no(arv, "assunto", "A1", m)
+    a2 = criar_no(arv, "assunto", "A2", m)
+    fundir_nos(arv, a1, a2)
+    # Referencia via alias a1 que resolve para a2, e depois a2 aponta para nid_temp
+    arv.nos[a2].pai = nid_temp
+    _remover_no_proposto_se_orfao(arv, nid_temp)
+    assert nid_temp in arv.nos

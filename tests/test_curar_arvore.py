@@ -300,3 +300,35 @@ def test_cli_aprovar_e_rejeitar_proposta_vazia_falha(ambiente, capsys):
 
     assert rodar("--rejeitar-proposta", "") == 1
     assert "Nenhuma proposta informada" in capsys.readouterr().err
+
+
+def test_cli_aprovar_e_rejeitar_proposta_com_ids_duplicados_deduplica_log(
+    ambiente, capsys
+):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p1 = propor(
+        arv,
+        "criar",
+        {"nivel": "subassunto", "pai": "A-1", "nome": "Sub1"},
+        "humano",
+        "c1",
+        "M-1",
+    )
+    p2 = propor(
+        arv,
+        "criar",
+        {"nivel": "subassunto", "pai": "A-1", "nome": "Sub2"},
+        "humano",
+        "c2",
+        "M-1",
+    )
+    salvar(arv, path)
+
+    assert rodar("--aprovar-proposta", f"{p1},{p1}") == 0
+    out = capsys.readouterr().out
+    assert out.strip() == f"propostas aprovadas: {p1}"
+
+    assert rodar("--rejeitar-proposta", f"{p2},{p2}") == 0
+    out_rej = capsys.readouterr().out
+    assert out_rej.strip() == f"propostas rejeitadas: {p2}"
