@@ -314,7 +314,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ---
 
-# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-28): Etapas 5A–5F (5A, 5B, 5C e 5C.1 concluídas; próximas: 5B.1 árvore mestre → 5B.2 curadoria → 5D → 5E → 5F site) — questões, árvore de assuntos, estatísticas e site público
+# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-28): Etapas 5A–5F (5A, 5B, 5B.1, 5C e 5C.1 concluídas; próximas: 5B.2 curadoria → 5D → 5E → 5F site) — questões, árvore de assuntos, estatísticas e site público
 
 > **Por que existe:** a Etapa 5 entregou o banco com a **taxonomia dos
 > editais**, ou seja, o que o edital lista. O objetivo real do projeto é
@@ -616,34 +616,32 @@ enviar o bloco de uma etapa específica para o agente construir.
 > regra). `pytest`: 476 testes (+1 xfail); `ruff` verde.
 
 ## Etapa 5B.2: Curadoria da árvore do piloto (LLM com lista fechada + aprovação do dono)
-- `[ ]` Aplicar os três casos conhecidos como **proposta**, para o dono
-  aprovar:
-  - `S-7b3b2a86ce` (`Disposições gerais, servidores públicos`) →
-    `S-10973fad79` + `S-de2a8684f9`;
-  - `Licitações e contratos administrativos` (`A-4529f205f7`) →
-    `A-2261b82645` + `A-91e52e6c2e`, **se** o dono entender que são dois
-    assuntos;
-  - as duas matérias compostas do CD: cada assunto delas aponta para um nó
-    de Direito Constitucional (`M-5edb4898a0`), de Regimento Interno
-    (`M-e96f4dbbb5`) ou de uma matéria nova `Processo Legislativo`, se o
-    dono aprovar criá-la. Os nós das matérias compostas viram `fundido`.
-- `[ ]` Detecção determinística de nome composto (`,`, `;`, ` e `): cada
-  pedaço tem a `chave_regra` de um nó irmão já existente. Medido em
-  2026-09-27: 0 matérias, 1 assunto e 1 subassunto (os dois de cima).
-- `[ ]` `scripts/propor_arvore.py` (LLM explícito, fora do pipeline, com
-  `REASONING_PADRAO`): por matéria, envia a subárvore com IDs e propõe
-  (a) fusões de nós irmãos, (b) movimentos de granularidade (um assunto que
-  deveria ser subassunto de outro) e (c) mapeamentos de compostos. A lista é
-  fechada e a validação é local: ID desconhecido, nível errado ou ciclo é
-  falha tipada (ADR-022), e a 2ª tentativa leva o erro no prompt. Tudo sai
-  `proposto`.
-- `[ ]` Relatório `arvore.html` com as propostas agrupadas por matéria. O
-  dono decide pela CLI (`curar_arvore.py`) ou passa as decisões na conversa.
-  **O agente nunca aprova em nome do dono.**
+> **Plano detalhado e autocontido:** `plano-etapa-5b2.md` (neste
+> diretório), em 2 sessões, uma por conversa. Aqui fica só o resumo.
+>
+> **Decisões do dono (2026-09-28, não reabrir):** `A-4529f205f7`
+> "Licitações e contratos administrativos" é **dividido** entre
+> `A-2261b82645` e `A-91e52e6c2e`. Os assuntos de processo legislativo das
+> matérias compostas do CD vão para uma **matéria nova "Processo
+> Legislativo"**. O composto que fica sem uso vira o status novo
+> `aposentado` (não `fundido`, porque fundir redireciona para um nó só).
+- `[ ]` **Sessão A (sem LLM):** propostas de operação no `arvore.json`
+  (`fundir`, `mover`, `criar`, `remapear`, `aposentar`), validadas numa
+  cópia e aprovadas em lote, tudo ou nada; status `aposentado` (JSON +
+  CHECK no Postgres); `detectar_compostos` por `chave_regra` (esperado:
+  `A-4529f205f7` e `S-7b3b2a86ce`); `arvore.html` com as propostas
+  agrupadas por matéria; CLI `--aprovar-proposta`, `--rejeitar-proposta` e
+  `--propostas`; testes.
+- `[ ]` **Sessão B (LLM + checkpoint):** `scripts/propor_arvore.py` (por
+  matéria; escopo composto do CD com Constitucional, Regimento e Processo
+  Legislativo; destino dos 21 filhos de Licitações), rodada real,
+  **decisão do dono** sobre cada `P-…` e ADR-030 atualizado.
 - **Pronto quando:** "Disposições gerais" e "Servidores públicos" têm 8
   ocorrências cada em `vw_edital_cobra_subassunto` (7 se `servidores
   públicos civis e militares`, do CD cargo 2, não for fundido);
-  "Direito Constitucional" soma os assuntos do CD; não há proposta pendente.
+  "Direito Constitucional" soma os assuntos do CD; `M-841dde7520`,
+  `M-d5adcb4de4`, `A-4529f205f7` e `S-7b3b2a86ce` estão `aposentado`; não há
+  proposta pendente.
 - **Checkpoint:** o dono aprova a árvore antes da Etapa 5D.
 
 ## Etapa 5C: Extração determinística de questões, gabaritos e discursivas (sem LLM)
