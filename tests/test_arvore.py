@@ -14,6 +14,7 @@ from src.arvore import (
     criar_no,
     desmapear,
     detectar_compostos,
+    detectar_homonimos,
     fundir_nos,
     mapear,
     mover_no,
@@ -522,11 +523,52 @@ def test_detectar_compostos_fixture():
 
 
 def test_detectar_compostos_dados_reais():
+    # Os 2 compostos da 5B.2 foram aposentados e não voltam a ser detectados;
+    # o que a regra achar agora tem de ter cada parte num irmão ativo.
     arv = carregar()
     detectados = detectar_compostos(arv)
-    assert set(detectados.keys()) == {"A-4529f205f7", "S-7b3b2a86ce"}
-    assert detectados["A-4529f205f7"] == ["A-2261b82645", "A-91e52e6c2e"]
-    assert detectados["S-7b3b2a86ce"] == ["S-10973fad79", "S-de2a8684f9"]
+    assert not {"A-4529f205f7", "S-7b3b2a86ce"} & detectados.keys()
+    assert arv.nos["A-4529f205f7"].status == "aposentado"
+    assert arv.nos["S-7b3b2a86ce"].status == "aposentado"
+    for composto, irmaos in detectados.items():
+        pai = resolver_no(arv, arv.nos[composto].pai)
+        for irmao in irmaos:
+            assert arv.nos[irmao].status == "ativo"
+            assert resolver_no(arv, arv.nos[irmao].pai) == pai
+
+
+def test_detectar_homonimos_propoe_fusao_no_irmao_mais_usado():
+    arv = ArvoreMestre()
+    m = criar_no(arv, "materia", "Direito", None, id_override="M-1")
+    a = criar_no(arv, "assunto", "Administração pública", m, id_override="A-1")
+    s1 = criar_no(arv, "subassunto", "Disposições gerais", a, id_override="S-1")
+    s2 = criar_no(arv, "subassunto", "Disposições gerais.", a, id_override="S-2")
+    criar_no(arv, "subassunto", "Servidores públicos", a, id_override="S-3")
+    mapear(arv, "direito|adm|dg 1", [s2])
+    mapear(arv, "direito|adm|dg 2", [s2])
+    mapear(arv, "direito|adm|dg 3", [s1])
+
+    detectados = detectar_homonimos(arv)
+
+    assert detectados == {"S-2": ["S-1"]}
+    (prop,) = arv.propostas.values()
+    assert (prop.tipo, prop.origem, prop.status) == ("fundir", "regra", "proposto")
+    assert prop.args == {"origem": "S-1", "destino": "S-2"}
+    aprovar_propostas(arv, [prop.id])
+    assert resolver_no(arv, "S-1") == "S-2"
+    assert detectar_homonimos(arv) == {}
+
+
+def test_detectar_homonimos_ignora_mesmo_nome_em_pais_diferentes():
+    arv = ArvoreMestre()
+    m = criar_no(arv, "materia", "Direito", None, id_override="M-1")
+    a1 = criar_no(arv, "assunto", "Poder Judiciário", m, id_override="A-1")
+    a2 = criar_no(arv, "assunto", "Poder Legislativo", m, id_override="A-2")
+    criar_no(arv, "subassunto", "Disposições gerais", a1, id_override="S-1")
+    criar_no(arv, "subassunto", "Disposições gerais", a2, id_override="S-2")
+
+    assert detectar_homonimos(arv) == {}
+    assert arv.propostas == {}
 
 
 def test_propor_alternativas_aposentar_e_mover():

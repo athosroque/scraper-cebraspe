@@ -839,3 +839,51 @@ def detectar_compostos(arv: ArvoreMestre) -> dict[str, list[str]]:
             pass
 
     return detectados
+
+
+def detectar_homonimos(arv: ArvoreMestre) -> dict[str, list[str]]:
+    """Propõe `fundir` (origem 'regra') para irmãos ativos com a mesma `chave_regra`.
+
+    Fundir dois assuntos junta os filhos sob o destino, mas não funde os
+    subassuntos de mesmo nome que vieram de cada lado. O destino é o irmão com
+    mais apontamentos aprovados e filhos ativos (empate: menor ID).
+
+    Devolve dict {destino_id: [origem_id, ...]}.
+    """
+    uso: dict[str, int] = {}
+    for maps in arv.mapeamentos.values():
+        for m in maps:
+            if m.status == "aprovado":
+                alvo = resolver_no(arv, m.no_id)
+                uso[alvo] = uso.get(alvo, 0) + 1
+    for n in arv.nos.values():
+        if n.status == "ativo" and n.pai:
+            pai = resolver_no(arv, n.pai)
+            uso[pai] = uso.get(pai, 0) + 1
+
+    grupos: dict[tuple[str, str, str], list[str]] = {}
+    for no in arv.nos.values():
+        if no.status != "ativo" or not no.pai:
+            continue
+        chave = canonico.chave_regra(no.nome).chave
+        grupos.setdefault((resolver_no(arv, no.pai), no.nivel, chave), []).append(no.id)
+
+    detectados: dict[str, list[str]] = {}
+    for ids in grupos.values():
+        if len(ids) < 2:
+            continue
+        destino, *origens = sorted(ids, key=lambda i: (-uso.get(i, 0), i))
+        detectados[destino] = origens
+        for origem in origens:
+            propor(
+                arv,
+                tipo="fundir",
+                args={"origem": origem, "destino": destino},
+                origem="regra",
+                justificativa=(
+                    f"Irmãos homônimos: {arv.nos[origem].nome!r} ({origem}) e "
+                    f"{arv.nos[destino].nome!r} ({destino}) sob o mesmo pai"
+                ),
+                materia=materia_do_no(arv, destino),
+            )
+    return detectados

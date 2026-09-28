@@ -729,6 +729,8 @@ def propor_arvore(
         )
         detectados = arvore.detectar_compostos(arv)
         logger.info(f"[ARVORE] Compostos detectados: {detectados}")
+        homonimos = arvore.detectar_homonimos(arv)
+        logger.info(f"[ARVORE] Irmãos homônimos detectados: {homonimos}")
         if not dry_run:
             arvore.salvar(arv, arvore_path)
             try:
