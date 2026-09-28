@@ -56,6 +56,7 @@ enviar o bloco de uma etapa específica para o agente construir.
         nome: str
         subtopicos: List[str] = []
 
+
     class TaxonomiaEdital(BaseModel):
         materia: str
         topicos: List[Topico]
@@ -526,7 +527,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 > assuntos e 2493 subassuntos) viram os nós, e os mapeamentos aprovados viram
 > os primeiros apontamentos.
 
-- `[ ]` **Fonte da verdade versionada:** `canonico/arvore.json`, com uma
+- `[x]` **Fonte da verdade versionada:** `canonico/arvore.json`, com uma
   linha por registro, como o `sinonimos.json`:
   - **nós:** `id`, `nivel` (`materia` | `assunto` | `subassunto`), `nome`,
     `pai` (ID de nó; `null` na matéria), `origem` (`semente` | `humano` |
@@ -539,17 +540,17 @@ enviar o bloco de uma etapa específica para o agente construir.
     `status` (`proposto` | `aprovado` | `rejeitado`). O item pode apontar
     para um nó de **qualquer nível** (granularidade diferente), e a
     estatística soma subindo a árvore.
-- `[ ]` **IDs estáveis:** o nó semeado **herda o ID do grupo aprovado da 5B**
+- `[x]` **IDs estáveis:** o nó semeado **herda o ID do grupo aprovado da 5B**
   (`M-/MR-/ML-/MH-`, `A-…`, `S-…`), então quem já aponta para esses IDs
   continua válido. Nó criado depois: `NM-/NA-/NS-` + sha1. **Fundir** nunca
   apaga um ID: o nó de origem vira `fundido`, com `fundido_em`, e toda
   leitura resolve o redirecionamento (`resolver_no`).
-- `[ ]` `scripts/semear_arvore.py`: lê `sinonimos.json` e cria 1 nó por
+- `[x]` `scripts/semear_arvore.py`: lê `sinonimos.json` e cria 1 nó por
   grupo aprovado (pai = grupo aprovado do escopo) e 1 mapeamento `semente`
   por nome de origem. É determinístico e idempotente (a 2ª execução não gera
   diff), e roda uma vez. Depois disso, `sinonimos.json` fica congelado como
   histórico da 5B (ADR-029) e o pipeline para de escrevê-lo.
-- `[ ]` `src/arvore.py`, com as operações de curadoria:
+- `[x]` `src/arvore.py`, com as operações de curadoria:
   - `criar_no`, `renomear_no`, `mover_no` (troca o pai, dentro do nível de
     cima), `fundir_nos(origem, destino)`;
   - `mapear(item, [nós])` e `desmapear`;
@@ -559,25 +560,25 @@ enviar o bloco de uma etapa específica para o agente construir.
   Toda operação humana vira `status = aprovado`/`ativo`. A proposta do LLM
   (5B.2) sai `proposto` e nunca muda a estatística antes da aprovação
   (mesmo invariante da 5B).
-- `[ ]` **Item novo de edital (pipeline, ADR-019):** mapeamento automático
+- `[x]` **Item novo de edital (pipeline, ADR-019):** mapeamento automático
   por regra quando a `chave_regra` (`src/canonico.py`, reaproveitada) do nome
   bate com um nome já mapeado **no mesmo nó-pai efetivo** (o nó para onde o
   pai do item aponta). O que a regra não resolve fica sem mapeamento e
   aparece no relatório como pendente. Nunca se cria nó novo automaticamente.
-- `[ ]` `scripts/curar_arvore.py` (CLI das operações: `--mapear
+- `[x]` `scripts/curar_arvore.py` (CLI das operações: `--mapear
   ITEM:NO1,NO2`, `--fundir ORIGEM:DESTINO`, `--mover NO:PAI`, `--criar
   "NIVEL:PAI=Nome"`, `--renomear NO=Nome`, `--aprovar`/`--rejeitar`) e
   `revisao_piloto/relatorio/arvore.html`: a árvore navegável, com os itens
   de edital (concurso/cargo/nível) em cada nó, os itens sem mapeamento e as
   propostas pendentes. Substitui o `sinonimos.html`.
-- `[ ]` **Banco:** `no_arvore` (`id`, `nivel`, `nome`, `pai_id`, `status`,
+- `[x]` **Banco:** `no_arvore` (`id`, `nivel`, `nome`, `pai_id`, `status`,
   `fundido_em`), com as pontes `materia_no`, `topico_no` e `subtopico_no`
   (`dim_* id` → `no_id`, N:N), carregadas só com mapeamento `aprovado`. Uma
   view auxiliar `vw_no_caminho` dá o caminho completo de cada nó (matéria ›
   assunto › subassunto) e resolve os fundidos. `materia_canonica`,
   `assunto_canonico`, `subassunto_canonico` e as FKs `*_canonico_id` das
   dimensões **saem** (nada fora da 5B as usa). A carga é idempotente.
-- `[ ]` **Views de "o que o edital cobra"**, a partir da árvore expandida
+- `[x]` **Views de "o que o edital cobra"**, a partir da árvore expandida
   por cargo:
   - `vw_arvore_edital_por_cargo`: 1 linha por (item do edital × cargo ×
     nó), com concurso, órgão, banca, ano, nível, tipo de conhecimento,
@@ -589,19 +590,30 @@ enviar o bloco de uma etapa específica para o agente construir.
     `vw_edital_cobra_materia`: ocorrência = `taxonomia_itens.id` distinto,
     então o composto e as partes no mesmo item nunca contam 2×. A variante
     oficial filtra `status_revisao = 'aprovado'`.
-- `[ ]` **Testes:** semeadura (contagem de nós = grupos aprovados, 2ª
+- `[x]` **Testes:** semeadura (contagem de nós = grupos aprovados, 2ª
   execução sem diff); fundir preserva o ID por redirecionamento; mover
   valida nível e ciclo; composto mapeado para 2 nós conta 1× em cada; item
   mapeado para um nó de nível acima soma no assunto; expansão do básico por
   cargo com `cargos_restritos`; item novo mapeado por regra só dentro do
   mesmo nó-pai efetivo.
-- `[ ]` **Documentação:** ADR-030 (já escrito com a decisão; completar com a
+- `[x]` **Documentação:** ADR-030 (já escrito com a decisão; completar com a
   implementação), `CLAUDE.md` (§3, §5, §6, §7, §10) e o ADR-029 marcado como
   semente do ADR-030.
 - **Pronto quando:** a árvore semeada reproduz os números da 5B (89 / 1148 /
   2493 nós, 100% dos nomes mapeados), o banco carrega as pontes, as views de
   "edital cobra" funcionam com filtro por cargo, e `pytest`/`ruff` estão
   verdes. **A curadoria de conteúdo não entra aqui (5B.2).**
+
+> **Resultado (2026-09-28):** árvore com 3730 nós (89 / 1148 / 2493) e 4050
+> mapeamentos `semente` (100% dos nomes). Banco: pontes 102 / 1259 / 2689,
+> `vw_arvore_edital_por_cargo` com 9569 linhas (os 1485 itens estão
+> cobertos), `vw_edital_cobra_*` com 89 / 1148 / 2493 nós e 18 matérias com
+> `nocoes`. Ponto de partida da 5B.2: `Disposições gerais` / `Servidores
+> públicos` / composto = 3 / 3 / 4. A primeira entrega (`c514f26`/`25de48c`)
+> foi revisada. Foram corrigidos: CLI, regra do pipeline, relatório,
+> `nocoes`, resolução de fundido e nó proposto no banco, semente que
+> sobrescrevia a curadoria e testes ausentes (views no Postgres, CLI e
+> regra). `pytest`: 476 testes (+1 xfail); `ruff` verde.
 
 ## Etapa 5B.2: Curadoria da árvore do piloto (LLM com lista fechada + aprovação do dono)
 - `[ ]` Aplicar os três casos conhecidos como **proposta**, para o dono
@@ -843,11 +855,3 @@ enviar o bloco de uma etapa específica para o agente construir.
   `mart`/dbt) que lê os dois. Decisão a registrar em ADR próprio.
 - `[ ]` Caso de uso-alvo: "tópicos mais cobrados por matéria/ano que ainda não
   têm item de estudo" → plano de estudo priorizado.
-
-## Etapa 5B.1 — Correções
-- `[x]` Consolidar leitura/escrita e formato do `arvore.json` em `src/arvore.py` (uma linha por registro).
-- `[x]` Reescrever regra do pipeline (`mapear_novos_itens_por_regra`) sobre a API de `src/arvore.py`.
-- `[x]` Corrigir a CLI `curar_arvore.py` e argumentos incorretos.
-- `[x]` No banco, gravar `no_id` resolvido, ignorar fundidos/propostos, restaurar `vw_incidencia_topico(_todas)` e recalcular `nocoes`.
-- `[x]` Melhorar `arvore.html` (itens de edital por nó com concurso/cargo/nível e pendentes).
-- `[x]` Link corrigido no index.html.

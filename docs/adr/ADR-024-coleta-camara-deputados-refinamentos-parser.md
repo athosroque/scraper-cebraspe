@@ -35,12 +35,12 @@ Durante a expansão da base de concursos de 2025 com a inclusão de mais um cert
    A regex foi estendida para suportar quebras de linha em títulos de matéria exclusivamente quando a linha anterior é finalizada por conectivos, preposições ou vírgulas:
    ```python
    PADRAO_MATERIA = re.compile(
-       r'\n(?!CARGO\s+\d)'
-       r'('
-       r'[A-ZÀ-Ú][A-ZÀ-Ú0-9 /,–\-]{2,90}'
-       r'(?:(?:,\s*|\s+(?:E|OU|DE|DA|DO|DOS|DAS))\s*\n\s*[A-ZÀ-Ú0-9 /,–\-]{2,90})?'
-       r'(?:\s*\([^)]*\))?'
-       r'):\s*'
+       r"\n(?!CARGO\s+\d)"
+       r"("
+       r"[A-ZÀ-Ú][A-ZÀ-Ú0-9 /,–\-]{2,90}"
+       r"(?:(?:,\s*|\s+(?:E|OU|DE|DA|DO|DOS|DAS))\s*\n\s*[A-ZÀ-Ú0-9 /,–\-]{2,90})?"
+       r"(?:\s*\([^)]*\))?"
+       r"):\s*"
    )
    ```
    Dessa forma, títulos longos continuados como `... CONGRESSO NACIONAL E\nCÓDIGO DE ÉTICA:` são casados integralmente como uma única matéria, normalizando os espaços em branco sem absorver linhas soltas de cargos multi-linha (preservando o comportamento validado no edital do IBAMA).
@@ -49,10 +49,12 @@ Durante a expansão da base de concursos de 2025 com a inclusão de mais um cert
    Em `dividir_por_cargo_e_materia` (`src/edital_parser.py`), ao analisar um bloco sob `tipo == "cargo"` que contenha itens numerados imediatos, o parser inspeciona o texto precedente ao primeiro item (`PADRAO_ITEM_NUMERADO.search(texto_bloco)`). Se houver um prefixo textual em caixa alta (tamanho >= 3), ele é extraído como nome da matéria e o corpo do chunk passa a iniciar a partir do item `1`:
    ```python
    m_primeiro_item = PADRAO_ITEM_NUMERADO.search(texto_bloco)
-   prefixo_materia = texto_bloco[:m_primeiro_item.start()].strip() if m_primeiro_item else ""
+   prefixo_materia = (
+       texto_bloco[: m_primeiro_item.start()].strip() if m_primeiro_item else ""
+   )
    if prefixo_materia and len(prefixo_materia) >= 3 and prefixo_materia.isupper():
        materia_nome = re.sub(r"\s+", " ", prefixo_materia)
-       texto_final = texto_bloco[m_primeiro_item.start():].strip()
+       texto_final = texto_bloco[m_primeiro_item.start() :].strip()
    else:
        materia_nome = cargo_atual.split(": ", 1)[-1]
        texto_final = texto_bloco
@@ -61,7 +63,7 @@ Durante a expansão da base de concursos de 2025 com a inclusão de mais um cert
 3. **Fronteira de palavra na classificação de editais de abertura:**
    Em `src/spider.py`, a regex foi refinada para exigir fronteira de palavra:
    ```python
-   re.search(r'EDITAL.*?\bABERTURA\b', text)
+   re.search(r"EDITAL.*?\bABERTURA\b", text)
    ```
    impedindo que retificações citando "reabertura" sejam tratadas como cadernos normativos de abertura.
 

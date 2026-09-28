@@ -38,10 +38,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from scripts import gerar_relatorio_arvore as relatorio_arvore
 from scripts.extrair_questoes import processar_fila
 from scripts.gerar_db_datasette import REVISAO_DIR_PADRAO, gerar_db
 from scripts.gerar_relatorio_revisao import gerar_relatorios
 from scripts.validar_taxonomia import main as validar_taxonomia
+from src import canonico
 from src.logger import logger
 from src.stats_writer import gravar_estatisticas, listar_jsons_edital
 
@@ -69,20 +71,15 @@ def _reiniciar_datasette() -> None:
         logger.warning(f"Erro ao tentar reiniciar o Datasette: {e}")
 
 
-def atualizar_sinonimos(revisao_dir: Path) -> None:
+def atualizar_arvore(revisao_dir: Path) -> None:
     """Atualiza a árvore e o relatório (sem LLM). Best-effort:
     um erro aqui não pode derrubar a extração que já pagou o LLM."""
     if not listar_jsons_edital(revisao_dir):
-        logger.info(
-            f"[CANONICO] {revisao_dir}: nenhum edital, árvore não atualizada."
-        )
+        logger.info(f"[CANONICO] {revisao_dir}: nenhum edital, árvore não atualizada.")
         return
     try:
-        from src.canonico import mapear_novos_itens_por_regra
-        mapear_novos_itens_por_regra(revisao_dir)
-        
-        from scripts.gerar_relatorio_arvore import gerar_relatorio_arvore
-        gerar_relatorio_arvore()
+        canonico.mapear_novos_itens_por_regra(revisao_dir)
+        relatorio_arvore.gerar_relatorio_arvore()
     except Exception as e:  # noqa: BLE001
         logger.warning(f"[CANONICO] Não foi possível atualizar a árvore: {e}")
 
@@ -114,7 +111,7 @@ def atualizar_artefatos_revisao(
     )
     validar_taxonomia(revisao_dir)
     gerar_relatorios(revisao_dir)
-    atualizar_sinonimos(revisao_dir)
+    atualizar_arvore(revisao_dir)
     gerar_db(revisao_dir)
 
     if reiniciar_datasette:

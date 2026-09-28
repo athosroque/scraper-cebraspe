@@ -1,85 +1,143 @@
 #!/usr/bin/env python3
+"""CLI de curadoria da árvore mestre (Etapa 5B.1, ADR-030).
+
+Toda decisão do dono passa por aqui (ou por `src.arvore`) e fica gravada em
+`canonico/arvore.json`; o banco é recarregado a partir dele. Operação humana
+sai `aprovado`/`ativo`. O item de edital é a chave natural unida por `|`
+(`materia`, `materia|topico`, `materia|topico|subtopico`), como aparece no
+`arvore.html`.
+
+Uso:
+    python -m scripts.curar_arvore --mapear 'materia|topico:NO1,NO2'
+    python -m scripts.curar_arvore --desmapear 'materia|topico:NO1'
+    python -m scripts.curar_arvore --aprovar 'materia|topico:NO1'
+    python -m scripts.curar_arvore --rejeitar 'materia|topico:NO1'
+    python -m scripts.curar_arvore --fundir ORIGEM:DESTINO
+    python -m scripts.curar_arvore --mover NO:NOVO_PAI
+    python -m scripts.curar_arvore --criar 'assunto:PAI=Nome'   # matéria: 'materia:=Nome'
+    python -m scripts.curar_arvore --renomear 'NO=Novo nome'
+    python -m scripts.curar_arvore --html
+"""
+
 import argparse
 import sys
 from pathlib import Path
 
-PROJETO_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJETO_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-try:
-    from src import arvore
-except ImportError:
-    arvore = None
-
-from scripts.gerar_relatorio_arvore import gerar_relatorio_arvore
+from scripts.gerar_relatorio_arvore import REVISAO_DIR_PADRAO, gerar_relatorio_arvore
+from src import arvore
 
 
-def main():
-    parser = argparse.ArgumentParser(description="CLI de curadoria da árvore mestre")
-    parser.add_argument("--mapear", help="Mapeia um item de edital para um ou mais nós: ITEM:NO1,NO2 (ex: 'Matéria|Assunto:A-123,A-456')")
-    parser.add_argument("--desmapear", help="Remove o mapeamento de um item: ITEM:NO")
-    parser.add_argument("--fundir", help="Funde dois nós: ORIGEM:DESTINO")
-    parser.add_argument("--mover", help="Move um nó para outro pai: NO:PAI")
-    parser.add_argument("--criar", help="Cria um novo nó: NIVEL:PAI=Nome (use PAI nulo ou vazio para matéria, ex: materia:=Nova Matéria)")
-    parser.add_argument("--renomear", help="Renomeia um nó: NO=Nome")
-    parser.add_argument("--aprovar", help="Aprova o mapeamento: ITEM:NO")
-    parser.add_argument("--rejeitar", help="Rejeita o mapeamento: ITEM:NO")
-    parser.add_argument("--html", help="Gera o relatório arvore.html", action="store_true")
+def _dividir(valor: str, separador: str, formato: str) -> tuple[str, str]:
+    esquerda, sep, direita = (
+        valor.rpartition(separador) if separador == ":" else valor.partition(separador)
+    )
+    if not sep or not esquerda.strip() or not direita.strip():
+        raise arvore.ArvoreInvalida(f"Formato esperado: {formato} (recebido {valor!r})")
+    return esquerda.strip(), direita.strip()
 
-    args = parser.parse_args()
 
-    # Operações de curadoria
-    if any([args.mapear, args.desmapear, args.fundir, args.mover, args.criar, args.renomear, args.aprovar, args.rejeitar]):
-        if arvore is None:
-            print("Erro: src.arvore não encontrado.", file=sys.stderr)
-            sys.exit(1)
+def _exigir_no(arv: arvore.ArvoreMestre, no_id: str) -> str:
+    if no_id not in arv.nos:
+        raise arvore.ArvoreInvalida(f"Nó {no_id} não existe")
+    return no_id
 
-        arv = arvore.carregar()
 
-        if args.mapear:
-            item_str, nos_str = args.mapear.split(":", 1)
-            nos = nos_str.split(",")
-            arvore.mapear(arv, item_str, nos, origem="humano", status="aprovado")
+def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> list[str]:
+    """Aplica as operações pedidas e devolve uma linha de log por operação."""
+    feitas = []
+    if args.criar:
+        nivel_pai, nome = _dividir(args.criar, "=", "NIVEL:PAI=Nome")
+        nivel, _, pai = nivel_pai.partition(":")
+        if nivel not in arvore.NIVEIS:
+            raise arvore.ArvoreInvalida(
+                f"Nível {nivel!r} inválido (use {', '.join(arvore.NIVEIS)})"
+            )
+        no_id = arvore.criar_no(arv, nivel, nome, pai.strip() or None)
+        feitas.append(f"criado {no_id} ({nivel}) {nome!r}")
+    if args.renomear:
+        no_id, nome = _dividir(args.renomear, "=", "NO=Nome")
+        arvore.renomear_no(arv, _exigir_no(arv, no_id), nome)
+        feitas.append(f"renomeado {no_id} → {nome!r}")
+    if args.mover:
+        no_id, pai = _dividir(args.mover, ":", "NO:PAI")
+        arvore.mover_no(arv, _exigir_no(arv, no_id), _exigir_no(arv, pai))
+        feitas.append(f"movido {no_id} → pai {pai}")
+    if args.fundir:
+        origem, destino = _dividir(args.fundir, ":", "ORIGEM:DESTINO")
+        arvore.fundir_nos(arv, _exigir_no(arv, origem), _exigir_no(arv, destino))
+        feitas.append(f"fundido {origem} → {destino}")
+    if args.mapear:
+        item, nos = _dividir(args.mapear, ":", "ITEM:NO1,NO2")
+        ids = [_exigir_no(arv, n.strip()) for n in nos.split(",") if n.strip()]
+        arvore.mapear(arv, item, ids, origem="humano", status="aprovado")
+        feitas.append(f"mapeado {item!r} → {', '.join(ids)}")
+    for acao, funcao in (
+        ("desmapear", arvore.desmapear),
+        ("aprovar", arvore.aprovar),
+        ("rejeitar", arvore.rejeitar),
+    ):
+        valor = getattr(args, acao)
+        if valor:
+            item, no_id = _dividir(valor, ":", "ITEM:NO")
+            funcao(arv, item, no_id)
+            feitas.append(f"{acao} {item!r} × {no_id}")
+    return feitas
 
-        if args.desmapear:
-            item_str, no_str = args.desmapear.split(":", 1)
-            arvore.desmapear(arv, item_str, no_str)
 
-        if args.fundir:
-            origem, destino = args.fundir.split(":")
-            arvore.fundir_nos(arv, origem, destino)
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Curadoria da árvore mestre (ADR-030)")
+    parser.add_argument(
+        "--mapear", help="ITEM:NO1,NO2 — aponta o item para os nós (aprovado)"
+    )
+    parser.add_argument("--desmapear", help="ITEM:NO — remove o apontamento")
+    parser.add_argument("--aprovar", help="ITEM:NO — aprova um apontamento proposto")
+    parser.add_argument("--rejeitar", help="ITEM:NO — rejeita um apontamento proposto")
+    parser.add_argument("--fundir", help="ORIGEM:DESTINO — funde nós do mesmo nível")
+    parser.add_argument("--mover", help="NO:PAI — troca o pai (nível de cima)")
+    parser.add_argument(
+        "--criar", help="NIVEL:PAI=Nome — cria nó (matéria: 'materia:=Nome')"
+    )
+    parser.add_argument("--renomear", help="NO=Nome — renomeia o nó")
+    parser.add_argument("--html", action="store_true", help="Regenera o arvore.html")
+    parser.add_argument(
+        "--arvore", type=Path, default=arvore.ARVORE_PADRAO, help=argparse.SUPPRESS
+    )
+    parser.add_argument(
+        "--revisao-dir", type=Path, default=REVISAO_DIR_PADRAO, help=argparse.SUPPRESS
+    )
+    args = parser.parse_args(argv)
 
-        if args.mover:
-            no, pai = args.mover.split(":")
-            if pai.lower() in ("null", "none", ""):
-                pai = None
-            arvore.mover_no(arv, no, pai)
+    operacoes = (
+        "mapear",
+        "desmapear",
+        "aprovar",
+        "rejeitar",
+        "fundir",
+        "mover",
+        "criar",
+        "renomear",
+    )
+    if not any(getattr(args, op) for op in operacoes) and not args.html:
+        parser.print_help()
+        return 2
 
-        if args.criar:
-            nivel_pai, nome = args.criar.split("=", 1)
-            nivel, pai = nivel_pai.split(":", 1)
-            if pai.lower() in ("null", "none", ""):
-                pai = None
-            arvore.criar_no(arv, nivel, nome, pai)
+    if any(getattr(args, op) for op in operacoes):
+        arv = arvore.carregar(args.arvore)
+        try:
+            feitas = aplicar_operacoes(arv, args)
+        except arvore.ArvoreInvalida as e:
+            # Nada é gravado: as operações da mesma chamada valem juntas ou nenhuma.
+            print(f"Erro: {e}", file=sys.stderr)
+            return 1
+        arvore.salvar(arv, args.arvore)
+        for linha in feitas:
+            print(linha)
 
-        if args.renomear:
-            no, nome = args.renomear.split("=", 1)
-            arvore.renomear_no(arv, no, nome)
-            
-        if args.aprovar:
-            item_str, no_str = args.aprovar.split(":", 1)
-            arvore.aprovar(arv, item_str, no_str)
-            
-        if args.rejeitar:
-            item_str, no_str = args.rejeitar.split(":", 1)
-            arvore.rejeitar(arv, item_str, no_str)
-            
-        arvore.salvar(arv)
-        print("Árvore salva com sucesso.")
+    gerar_relatorio_arvore(args.revisao_dir, args.arvore)
+    return 0
 
-    if args.html:
-        gerar_relatorio_arvore()
-        print("Relatório arvore.html gerado.")
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

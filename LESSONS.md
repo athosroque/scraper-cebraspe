@@ -1,5 +1,26 @@
 # Lições — scraper-cebraspe
 
+### [tags: arvore-mestre, json, testes, falha-silenciosa, postgres]
+**Sintoma:** a primeira entrega da 5B.1 foi dada como pronta com 445 testes
+verdes. Na prática, a regra do pipeline casava 0 de 1259 assuntos, o
+`arvore.html` punha os 4050 itens sob `None`, a CLI quebrava em `--mapear`,
+`--criar` e `--desmapear`, e `dim_materia.nocoes` tinha deixado de ser
+calculado. Nenhum desses problemas gerava erro.
+**Causa:** três módulos liam o `arvore.json` com `json.load` direto, cada um
+com o seu palpite de formato: chave `str(tupla)` (`"('a', 'b')"`) em vez de
+`"a|b"`, e campo `no` em vez de `no_id`. `dict.get` devolvia `None`, e o
+código seguia sem mapear nada. Os testes só cobriam `src/arvore.py`
+isolado e trocavam a regra e o relatório por monkeypatch, então o caminho
+real nunca rodava contra o JSON real.
+**Solução (ADR-030):** um único módulo lê e escreve o arquivo
+(`src/arvore.py`: `carregar`, `salvar`, `chave_item`); os outros usam as
+dataclasses. Entraram testes que exercitam o formato de ponta a ponta:
+CLI sobre um arquivo temporário, a regra com nomes reais de
+`NomesOrigem` e as views no Postgres com uma árvore pequena. Na revisão,
+conferir no dado real: "a regra mapeou algo?", "o relatório tem itens?".
+**Custo do aprendizado:** ~1h30 entre a revisão das duas entregas e a
+correção.
+
 ### [tags: edital-parser, regex, modelagem, cebraspe, postgres]
 **Sintoma:** `dim_materia` tinha 106 matérias, mas 4 eram a mesma matéria do
 STM com a restrição de cargo no nome (`DIREITO PENAL MILITAR (APENAS PARA O

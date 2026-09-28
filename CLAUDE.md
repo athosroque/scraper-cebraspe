@@ -38,11 +38,10 @@ Provas e Gabaritos baixados entram na fila `fila_extracao_questoes`. O
 consumidor dela (extração de questões, gabarito e discursiva, seguida da
 classificação por assunto) passou a ser prioridade do projeto: Etapas 5C/5D do
 `task.md`.
-Camada canônica (Etapa 5B, ADR-029): `canonico/sinonimos.json` (versionado)
-liga cada nome de matéria/tópico/subtópico a um canônico, por regra
-determinística, proposta do LLM (lista fechada) e aprovação humana; só grupo
-`aprovado` chega ao banco (`materia_canonica`/`assunto_canonico`/
-`subassunto_canonico`).
+Camada canônica (Etapa 5B, ADR-029): `canonico/sinonimos.json` juntou os
+nomes de matéria/tópico/subtópico por regra determinística, proposta do LLM
+(lista fechada) e aprovação humana. Desde a 5B.1 é só histórico congelado:
+os grupos aprovados viraram os nós da árvore mestre (abaixo).
 **Objetivo do produto (2026-09-28, ADR-030):** um **site público de
 questões** (portfólio, estilo Gran Questões), começando pelo piloto 2025. A
 questão é a entidade central, e o subassunto é a unidade de estudo. As
@@ -50,8 +49,11 @@ estatísticas, em ordem: o que mais cai na prova; o que o edital cobra;
 edital × prova; desempenho pessoal. **Árvore mestre** (Etapas 5B.1/5B.2):
 `canonico/arvore.json` guarda nós matéria → assunto → subassunto, com o pai
 no próprio nó, semeados com os grupos aprovados da 5B (mesmo ID). Item de
-edital e questão apontam para nós (N:N). Depois da semeadura,
-`sinonimos.json` fica congelado como histórico. As views no Postgres (5E)
+edital e questão apontam para nós (N:N). Toda leitura e escrita do JSON
+passa por `src/arvore.py`; a curadoria é `scripts/curar_arvore.py`, e o
+pipeline só mapeia item novo por regra. No banco: `no_arvore` + pontes
+`materia_no`/`topico_no`/`subtopico_no` e as views `vw_no_caminho`,
+`vw_arvore_edital_por_cargo` e `vw_edital_cobra_*`. As views no Postgres (5E)
 alimentam o site (5F: API, frontend, contas, histórico, simulado). O
 Datasette continua só como ferramenta de revisão do dono.
 
@@ -136,13 +138,22 @@ Datasette continua só como ferramenta de revisão do dono.
       corrigido para a faixa estrita de 12 a 24 pt. JSONs gerados em `questoes/` mantidos localmente
       (`questoes/` no `.gitignore`). 374 testes no pytest e ruff verde (ADR-031).
 - [x] Etapa 5C.1 — Correções da extração (Sessões 1 a 5, correcoes-etapa-5c.md): posição dos itens por x0 (cluster/moda); alertas no item no Postgres (alertas text[], utilizavel boolean, view vw_questoes_utilizaveis); fila reprocessada por assinatura_grupo; lock pg_try_advisory_lock (5031001); gabarito definitivo x preliminar no cabeçalho; quesitos discursivos após comando; tema anafórico rejeitado; padrão ligado por chave de título. 435 testes (+1 xfail) no pytest e base inalterada (ADR-031).
+- [x] Etapa 5B.1 — Árvore mestre semeada com a 5B (ADR-030): `canonico/arvore.json`
+      (3730 nós: 89/1148/2493, 4050 mapeamentos `semente`, 100% dos nomes),
+      `src/arvore.py`, `scripts/semear_arvore.py` (recusa sobrescrever árvore
+      curada), `scripts/curar_arvore.py`, regra do pipeline
+      (`canonico.mapear_novos_itens_por_regra`) e `arvore.html`. Banco:
+      `no_arvore` + pontes (102/1259/2689), `vw_no_caminho` (resolve fundido,
+      só cadeia ativa), `vw_arvore_edital_por_cargo` (9569 linhas, 1485/1485
+      itens) e `vw_edital_cobra_{materia,assunto,subassunto}` (+ `_todas`).
+      Tabelas `*_canonico` removidas. 476 testes (+1 xfail), ruff verde.
 - [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
       parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
       registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
-- **⚡ Prioridade atual: Etapas 5B.1 → 5B.2 → 5D → 5E → 5F do `task.md`**
+- **⚡ Prioridade atual: Etapas 5B.2 → 5D → 5E → 5F do `task.md`**
       (ADR-030, 2026-09-28): árvore mestre semeada com a 5B → curadoria da
       árvore (checkpoint do dono) → classificação das questões na árvore →
       estatísticas → site público. A 5A, a 5B (aprovada em 2026-09-27) e a
@@ -316,8 +327,9 @@ Datasette continua só como ferramenta de revisão do dono.
   do link já normalizado. Aceita `CONHECIMENTOS GERAIS` (CG) como básico, e
   texto sem cargo significa "todos os cargos do concurso" (TCU). Edital
   administrativo em `Provas/` fica fora da fila, com log.
-- Estatística "oficial" só em `vw_incidencia_topico`, que filtra
-  `status_revisao = 'aprovado'`; `vw_incidencia_topico_todas` é para inspeção.
+- Estatística "oficial" só em view que filtra `status_revisao = 'aprovado'`
+  (`vw_incidencia_topico`, `vw_edital_cobra_*`); a variante `_todas` é para
+  inspeção.
 - Restrição de cargo no nome da matéria (`(APENAS/SOMENTE PARA O(S)
   CARGO(S) ...)`, `PADRAO_RESTRICAO_CARGO`) sai de `materia_normalizada` e
   vira `cargos_restritos: list[int] | None`. Só sai do nome quando tem número
@@ -339,12 +351,12 @@ Datasette continua só como ferramenta de revisão do dono.
   assunto dentro da matéria → subassunto dentro do assunto) e sai
   `proposto`. Proposta nunca muda o mapeamento: até a aprovação, cada nome
   fica no grupo aprovado de antes (identidade).
-- Decisão humana de sinônimo só via `scripts/aprovar_sinonimos.py` (ou
-  `canonico.aprovar/rejeitar/mover/renomear`), gravada no JSON. As regras
-  reexecutadas nunca mexem em grupo `llm`/`humano`.
+- Decisão humana de sinônimo (5B, histórico) foi via
+  `scripts/aprovar_sinonimos.py`. Desde a 5B.1 o `sinonimos.json` está
+  congelado, e o pipeline não o escreve mais.
 - `scripts/propor_sinonimos.py` custa tokens e **não** roda no pipeline
-  automático; `atualizar_revisao.py` roda só regras + relatório. Blocos já
-  avaliados ficam em `avaliados_llm` e não são reenviados.
+  automático. Blocos já avaliados ficam em `avaliados_llm` e não são
+  reenviados.
 - Resposta de LLM sobre lista fechada é validada localmente (cada ID em
   exatamente um grupo, nada inventado, nada entre blocos) com falha tipada; a
   segunda tentativa leva o erro no prompt.
@@ -356,6 +368,24 @@ Datasette continua só como ferramenta de revisão do dono.
 - O ID de nó é estável. O nó semeado herda o ID do grupo aprovado da 5B.
   Fundir marca `fundido` + `fundido_em` e nunca apaga ID; toda leitura
   resolve o redirecionamento.
+- `canonico/arvore.json` só é lido e escrito por `src/arvore.py`
+  (`carregar`/`salvar`, uma linha por registro, ordenado por ID). A chave do
+  item é a chave natural do banco unida por `|` (`arvore.chave_item`), e o
+  apontamento é `{no_id, origem, status}`.
+- Decisão do dono na árvore só via `scripts/curar_arvore.py` (ou as funções
+  de `src/arvore.py`): `--mapear`, `--desmapear`, `--aprovar`, `--rejeitar`,
+  `--fundir`, `--mover`, `--criar`, `--renomear`. Operação humana sai
+  `aprovado`/`ativo`; mapear de novo um apontamento proposto o aprova. Erro de
+  validação não grava nada.
+- Item novo de edital (pipeline, `atualizar_revisao.atualizar_arvore`):
+  `canonico.mapear_novos_itens_por_regra` copia os nós de um item aprovado com
+  a mesma `chave_regra` **no mesmo nó-pai efetivo**. Regra ambígua ou pai sem
+  nó fica pendente no `arvore.html`.
+- A carga (`stats_writer.aplicar_arvore`) grava **todos** os nós com o status
+  (as pontes nunca ficam sem FK) e as pontes só com apontamento `aprovado`,
+  já resolvido. `vw_no_caminho` só expõe a cadeia `ativa` (nó proposto não
+  conta antes da aprovação) e dá o `no_efetivo` do fundido. `dim_materia.nocoes`
+  vem de `chave_regra(nome).nocoes`, com ou sem mapeamento.
 - Estatística "edital cobra": ocorrência = `taxonomia_itens.id` distinto,
   com o item básico expandido por cargo (`cargos_restritos` respeitado).
   "Prova cobra": questão distinta. O mesmo item nunca conta 2× no mesmo nó.
@@ -463,8 +493,16 @@ Datasette continua só como ferramenta de revisão do dono.
   aprovação humana: `atos` × `contratos administrativos` (0,89), `ativos` ×
   `passivos` (0,90), `gestão de processos` × `de pessoas` (0,89). Similaridade
   só sugere; quem junta é regra determinística ou o dono (ADR-029).
-- Nunca aprovar sinônimo com `UPDATE` no banco nem editando só o banco: a
-  fonte é `canonico/sinonimos.json`, e a próxima carga reverte.
+- Nunca aprovar sinônimo ou mapeamento da árvore com `UPDATE` no banco nem
+  editando só o banco: a fonte é `canonico/arvore.json` (antes,
+  `sinonimos.json`), e a próxima carga reverte.
+- Nunca ler ou escrever `canonico/arvore.json` com `json.load`/`json.dump`
+  direto: o primeiro código da 5B.1 fez isso, montou a chave com `str(tupla)`
+  e leu o campo `no` em vez de `no_id`. A regra do pipeline casou 0 de 1259
+  assuntos e o relatório pôs os 4050 itens sob `None`, sem erro nenhum. Use
+  `src/arvore.py` (`carregar`, `salvar`, `chave_item`).
+- Nunca rodar `scripts/semear_arvore.py --forcar` depois da curadoria: a
+  semente reescreve a árvore do zero e apaga toda decisão do dono.
 - Nunca deixar o agente aprovar proposta do LLM em nome do dono; só grupo
   `regra` é aprovado automaticamente.
 - Nunca juntar um nome composto (`Disposições gerais, servidores
@@ -561,9 +599,9 @@ container: `docker compose up -d`.
 from src.downloader import download_concurso_pdfs
 
 resultado = download_concurso_pdfs(
-    orgao="TJ_CE",       # ou contest["orgao"] retornado por get_contest_links
+    orgao="TJ_CE",  # ou contest["orgao"] retornado por get_contest_links
     ano=2025,
-    pdf_map=pdfs,        # dict retornado por spider.map_pdf_links
+    pdf_map=pdfs,  # dict retornado por spider.map_pdf_links
 )
 # resultado = {"editais_abertura": [...], "provas": [...], "gabaritos": [...]}
 # paths dos arquivos efetivamente baixados/reaproveitados
@@ -596,12 +634,19 @@ resultado = download_concurso_pdfs(
 - `scripts/reconciliar_taxonomia.py [json ...]` — aplica a reinjeção de
   item ausente (ADR-025) a extrações já salvas, sem LLM, com backup
   `.pre_reconciliacao.bak`
-- `canonico/sinonimos.json` — camada canônica de sinônimos (versionado,
-  fonte da verdade; ~2 MB, um registro por linha). IDs estáveis no ADR-029
-- `scripts/propor_sinonimos.py` (LLM, explícito), `scripts/aprovar_sinonimos.py`
-  (`--aprovar/--rejeitar/--mover ENTRADA:GRUPO|NOVO/--renomear GRUPO=Nome`) e
-  `revisao_piloto/relatorio/sinonimos.html` (regenerável, linkado do
-  `index.html`, em `https://datasette.projetoathos.com.br/relatorio/sinonimos.html`)
+- `canonico/arvore.json` — árvore mestre (versionado, fonte da verdade da
+  taxonomia desde a 5B.1; um registro por linha): nós e mapeamentos
+  item de edital → nós. Semeada uma vez por `scripts/semear_arvore.py`
+- `scripts/curar_arvore.py` (`--mapear ITEM:NO1,NO2`, `--desmapear/--aprovar/
+  --rejeitar ITEM:NO`, `--fundir ORIGEM:DESTINO`, `--mover NO:PAI`,
+  `--criar NIVEL:PAI=Nome`, `--renomear NO=Nome`, `--html`) e
+  `revisao_piloto/relatorio/arvore.html` (regenerável, linkado do
+  `index.html`, em `https://datasette.projetoathos.com.br/relatorio/arvore.html`):
+  árvore navegável com os itens de edital de cada nó (concurso · cargo ·
+  nível), os itens sem mapeamento e as propostas pendentes
+- `canonico/sinonimos.json` — camada canônica da 5B (ADR-029), **congelada**
+  como histórico desde a 5B.1. `scripts/propor_sinonimos.py`,
+  `scripts/aprovar_sinonimos.py` e `sinonimos.html` ficam só como histórico
 - `scripts/backfill_classificacao_chunks.py [<pdf> [json]]` — sem argumentos,
   roda em todos os editais de `revisao_piloto/` (`backfill_lote`); completa
   concurso/nível/tipo de conhecimento em extração já feita, sem LLM
@@ -1289,11 +1334,25 @@ para o site). Ver ADR-030.
 
 
 
-### 2026-09-28 — Ferramental de curadoria e Árvore Mestre (Etapa 5B.1)
+### 2026-09-28 — Árvore mestre implementada (Etapa 5B.1)
 
-**Decisão:** Criação de tooling para a manipulação da Árvore Mestre (`scripts/curar_arvore.py` com argparse para mapear, fundir, mover, criar, renomear e aprovar nós) e a geração de relatório HTML dinâmico navegável (`scripts/gerar_relatorio_arvore.py`). Inclusão do mapeamento automático de itens novos por regra diretamente na extração (`mapear_novos_itens_por_regra` no `src/canonico.py`, chamado no pipeline por `scripts/atualizar_revisao.py`).
-**Motivo:** Suporte à Etapa 5B.1 (Árvore mestre independente) decidida no ADR-030. Itens do edital precisam ser agrupados e mapeados de forma flexível e a curadoria será realizada via CLI ou pela aprovação de propostas geradas.
-**Alternativas descartadas:** Gerar e parsear os relatórios no backend Python sem CLI (dificultaria a auditoria); colocar as regras de mapeamento diretamente na persistência do banco em vez do artefato canônico (feriria a política de que o json é a fonte de verdade).
+**Decisão:** `canonico/arvore.json` semeado com os grupos aprovados da 5B
+(3730 nós, 4050 mapeamentos `semente`), com leitura e escrita só por
+`src/arvore.py`. A curadoria é `scripts/curar_arvore.py`, e o pipeline só
+mapeia item novo por regra no mesmo nó-pai efetivo, sem criar nó. No banco,
+`no_arvore` recebe todos os nós com o status. As pontes recebem só
+apontamento aprovado, já resolvido. `vw_no_caminho` expõe só a cadeia ativa
+e resolve o fundido, e as views `vw_edital_cobra_*` sobem a árvore contando
+`taxonomia_itens.id` distinto (variante oficial e `_todas`).
+**Motivo:** Etapa 5B.1 do ADR-030. A primeira entrega (`c514f26`/`25de48c`)
+tinha a CLI quebrada, a regra do pipeline sem efeito (chave `str(tupla)` e
+campo `no`), o relatório sem itens, `nocoes` perdido, as views sem resolver
+fundido e testes pedidos ausentes. A revisão corrigiu tudo e acrescentou
+testes das views no Postgres.
+**Alternativas descartadas:** deixar nó proposto fora de `no_arvore` (a
+ponte para ele quebraria a FK na 5B.2); `nocoes` por prefixo `nocoes de`
+(perde `nocoes sobre devops`); `semear_arvore.py` sobrescrevendo sempre
+(apagaria a curadoria numa reexecução). Ver ADR-030.
 
 ## 13. LESSONS.md (do projeto)
 

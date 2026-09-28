@@ -36,12 +36,14 @@ Criar `scripts/atualizar_revisao.py`, com a função
 encapsula a sequência completa:
 
 ```python
-def atualizar_artefatos_revisao(revisao_dir=REVISAO_DIR_PADRAO, reiniciar_datasette=True):
-    validar_taxonomia(revisao_dir)      # scripts.validar_taxonomia.main
-    gerar_relatorios(revisao_dir)       # scripts.gerar_relatorio_revisao.gerar_relatorios
-    gerar_db(revisao_dir)               # scripts.gerar_db_datasette.gerar_db
+def atualizar_artefatos_revisao(
+    revisao_dir=REVISAO_DIR_PADRAO, reiniciar_datasette=True
+):
+    validar_taxonomia(revisao_dir)  # scripts.validar_taxonomia.main
+    gerar_relatorios(revisao_dir)  # scripts.gerar_relatorio_revisao.gerar_relatorios
+    gerar_db(revisao_dir)  # scripts.gerar_db_datasette.gerar_db
     if reiniciar_datasette:
-        _reiniciar_datasette()          # docker compose restart scraper-cebraspe-datasette
+        _reiniciar_datasette()  # docker compose restart scraper-cebraspe-datasette
 ```
 
 E chamá-la automaticamente nos dois pontos de entrada do pipeline de

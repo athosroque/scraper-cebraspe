@@ -453,6 +453,7 @@ class TestGravacaoPostgres:
 
     def test_arvore_so_carrega_aprovado(self, conn, tmp_path):
         import json
+
         resultado = _resultado(
             topicos_especificos=(
                 "Atos administrativos",
@@ -473,16 +474,34 @@ class TestGravacaoPostgres:
         arvore_path.parent.mkdir(parents=True, exist_ok=True)
         arvore_dados = {
             "nos": {
-                "M-1": {"id": "M-1", "nivel": "materia", "nome": "DIREITO", "pai": None, "origem": "semente", "status": "ativo"}
+                "M-1": {
+                    "id": "M-1",
+                    "nivel": "materia",
+                    "nome": "DIREITO",
+                    "pai": None,
+                    "origem": "semente",
+                    "status": "ativo",
+                }
             },
             "mapeamentos": {
-                "nocoes de direito": [{"no_id": "M-1", "origem": "humano", "status": "proposto"}]
-            }
+                "nocoes de direito": [
+                    {"no_id": "M-1", "origem": "humano", "status": "proposto"}
+                ]
+            },
         }
-        arvore_path.write_text(json.dumps(arvore_dados, ensure_ascii=False), encoding="utf-8")
+        arvore_path.write_text(
+            json.dumps(arvore_dados, ensure_ascii=False), encoding="utf-8"
+        )
 
-        stats_writer.gravar_estatisticas(revisao_dir, data_dir, conn=conn, arvore_path=arvore_path)
+        stats_writer.gravar_estatisticas(
+            revisao_dir, data_dir, conn=conn, arvore_path=arvore_path
+        )
         with conn.cursor() as cur:
             cur.execute("SELECT count(*) FROM materia_no")
             assert cur.fetchone()[0] == 0
-
+            # `nocoes` vem da regra sobre o nome, com ou sem mapeamento aprovado.
+            cur.execute("SELECT chave, nocoes FROM dim_materia ORDER BY chave")
+            assert cur.fetchall() == [
+                ("lingua portuguesa", False),
+                ("nocoes de direito", True),
+            ]

@@ -61,8 +61,12 @@ divirjam sobre o que é "o item de origem"):
 # src/edital_parser.py
 PADRAO_ITEM_NUMERADO = re.compile(r"(?<!\d\.)\b(\d{1,3})\s+(?=[A-ZÀ-Ú(])")
 
-def extrair_itens_numerados(texto: str) -> list[tuple[str, str]]:
-    ...  # [(numero, texto_do_item), ...] — ver ADR-017 pro racional do regex
+
+def extrair_itens_numerados(
+    texto: str,
+) -> list[
+    tuple[str, str]
+]: ...  # [(numero, texto_do_item), ...] — ver ADR-017 pro racional do regex
 ```
 
 `src/taxonomia_extractor.py` ganha o reparo, chamado dentro de

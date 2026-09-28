@@ -87,9 +87,15 @@ PADRAO_ITEM_NUMERADO = re.compile(r"(?<!\d\.)\b(\d{1,3})\s+(?=[A-ZÀ-Ú(])")
 ```python
 def normalizar(texto: str) -> str:
     texto = texto.strip()
-    texto = re.sub(r"^\d+(\.\d+)*\.?\s+", "", texto)          # remove prefixo numérico ("1 ", "3.1 ", "1. ")
-    texto = re.sub(r"[^\w]", " ", texto, flags=re.UNICODE)     # pontuação/hífen (incl. Unicode) -> espaço
-    sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    texto = re.sub(
+        r"^\d+(\.\d+)*\.?\s+", "", texto
+    )  # remove prefixo numérico ("1 ", "3.1 ", "1. ")
+    texto = re.sub(
+        r"[^\w]", " ", texto, flags=re.UNICODE
+    )  # pontuação/hífen (incl. Unicode) -> espaço
+    sem_acento = (
+        unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    )
     return re.sub(r"\s+", " ", sem_acento.lower()).strip()
 ```
 
@@ -101,6 +107,7 @@ tipográfico descrito no Contexto.
 
 ```python
 TAMANHO_MINIMO_SUBSTRING = 6
+
 
 def _contido(nome_norm: str, item_norm: str) -> bool:
     return len(nome_norm) >= TAMANHO_MINIMO_SUBSTRING and nome_norm in item_norm

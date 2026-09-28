@@ -1,7 +1,7 @@
 # ADR-030: Árvore Mestre de Assuntos (Semeada com a 5B) e Site Público de Questões como Objetivo do Produto
 
 ## Status
-Aceito (decisão de direção; a implementação é das Etapas 5B.1, 5B.2, 5D, 5E e 5F do `task.md`)
+Aceito (decisão de direção; a Etapa 5B.1 está implementada, e as Etapas 5B.2, 5D, 5E e 5F vêm a seguir no `task.md`)
 
 ## Data
 2026-09-28
@@ -109,6 +109,50 @@ estatística de edital.
     pelas pontes. Nada fora da 5B as usava.
   - O site acrescenta ao projeto infraestrutura nova (API, auth, dados de
     usuário, exposição pública sem Zero Trust).
+
+## Implementação (Etapa 5B.1, 2026-09-28)
+
+- **Arquivo:** `canonico/arvore.json`, com `nos` (`id`, `nivel`, `nome`,
+  `pai`, `origem`, `status`, `fundido_em`) e `mapeamentos` (chave do item →
+  lista de `{no_id, origem, status}`). A chave do item é a chave natural do
+  banco unida por `|` (`materia`, `materia|topico`,
+  `materia|topico|subtopico`). Uma linha por registro, ordenado por ID.
+  Leitura e escrita só por `src/arvore.py` (`carregar`, `salvar`,
+  `chave_item`).
+- **Semente:** `scripts/semear_arvore.py` reproduz a 5B: 89 matérias, 1148
+  assuntos e 2493 subassuntos (3730 nós) e 4050 mapeamentos `semente`, com
+  100% dos nomes mapeados. Rodar de novo sobre o mesmo `sinonimos.json` não
+  gera diff. Se a árvore em disco já foi curada, o script se recusa a
+  sobrescrever sem `--forcar`.
+- **Operações** (`src/arvore.py`): `criar_no`, `renomear_no`, `mover_no`,
+  `fundir_nos` (os filhos passam para o destino), `mapear`, `desmapear`,
+  `aprovar`, `rejeitar` e `resolver_no`. Validação: nível do pai, ciclo, ID
+  repetido, nó inexistente e apontamento inexistente. Toda falha levanta
+  `ArvoreInvalida`. A CLI `scripts/curar_arvore.py` não grava nada quando uma
+  operação falha.
+- **Pipeline:** `canonico.mapear_novos_itens_por_regra` (chamado por
+  `atualizar_revisao.atualizar_arvore`) copia os nós aprovados de um item com
+  a mesma `chave_regra` e o mesmo conjunto de nós do pai. Regra ambígua ou
+  pai sem nó fica pendente no `arvore.html`, que mostra os itens por nó
+  (concurso · cargo · nível), os pendentes e as propostas.
+- **Banco:** `no_arvore` recebe todos os nós com o status, e as pontes
+  `materia_no`/`topico_no`/`subtopico_no` recebem só apontamento `aprovado`,
+  com o nó resolvido. `vw_no_caminho` expõe só a cadeia `ativa`, com o
+  `no_efetivo` e o caminho do destino para o nó fundido. Por isso, nó
+  proposto não entra na estatística e a ponte nunca fica sem FK.
+  `vw_arvore_edital_por_cargo` expande o chunk básico para os cargos do
+  nível, respeitando `cargos_restritos` (9569 linhas; os 1485 itens estão
+  cobertos). `vw_edital_cobra_base` liga cada item ao nó que ele cobra em
+  cada nível, subindo a árvore. `vw_edital_cobra_{materia,assunto,subassunto}`
+  (oficial, `aprovado`) e `..._todas` contam `taxonomia_itens.id` distinto.
+  As tabelas `*_canonico` e as FKs `*_canonico_id` saíram.
+- **Testes:** semeadura e recusa de sobrescrever; operações e validações;
+  CLI de ponta a ponta; regra só no mesmo nó-pai efetivo; no Postgres, o
+  composto conta 1× em cada nó, o item em nível acima soma no assunto, o
+  fundido resolve, o proposto não conta e o básico é expandido por cargo com
+  `cargos_restritos`.
+- **Ponto de partida da 5B.2:** `Disposições gerais` / `Servidores públicos`
+  / o composto dão 3 / 3 / 4 em `vw_edital_cobra_subassunto`.
 
 ## Alternativas Consideradas
 

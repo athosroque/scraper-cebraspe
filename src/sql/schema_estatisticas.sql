@@ -54,8 +54,9 @@ CREATE TABLE IF NOT EXISTS no_arvore (
     nome TEXT NOT NULL,
     pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
     origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
-    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido'))
-
+    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido')),
+    -- Nó fundido nunca é apagado: aponta para o destino (ver `vw_no_caminho`).
+    fundido_em TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE IF NOT EXISTS materia_no (
@@ -85,6 +86,8 @@ ALTER TABLE IF EXISTS dim_subtopico DROP COLUMN IF EXISTS subassunto_canonico_id
 DROP TABLE IF EXISTS subassunto_canonico CASCADE;
 DROP TABLE IF EXISTS assunto_canonico CASCADE;
 DROP TABLE IF EXISTS materia_canonica CASCADE;
+ALTER TABLE no_arvore ADD COLUMN IF NOT EXISTS fundido_em TEXT
+    REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED;
 
 CREATE TABLE IF NOT EXISTS dim_cargo (
     id SERIAL PRIMARY KEY,
@@ -139,38 +142,6 @@ CREATE TABLE IF NOT EXISTS taxonomia_itens (
     cargos_restritos INTEGER[],
     UNIQUE (concurso_id, chunk_index, topico_ordem)
 );
-
--- Árvore Mestre (Etapa 5B.1, ADR-030) ------------------------------------------
--- Derivada de `canonico/arvore.json`. O ID é estável, herdado da 5B ou sha1.
-
-CREATE TABLE IF NOT EXISTS no_arvore (
-    id TEXT PRIMARY KEY,
-    nivel TEXT NOT NULL CHECK (nivel IN ('materia', 'assunto', 'subassunto')),
-    nome TEXT NOT NULL,
-    pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
-    origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
-    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido'))
-
-);
-
-CREATE TABLE IF NOT EXISTS materia_no (
-    materia_id INTEGER NOT NULL REFERENCES dim_materia (id) ON DELETE CASCADE,
-    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
-    PRIMARY KEY (materia_id, no_id)
-);
-
-CREATE TABLE IF NOT EXISTS topico_no (
-    topico_id INTEGER NOT NULL REFERENCES dim_topico (id) ON DELETE CASCADE,
-    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
-    PRIMARY KEY (topico_id, no_id)
-);
-
-CREATE TABLE IF NOT EXISTS subtopico_no (
-    subtopico_id INTEGER NOT NULL REFERENCES dim_subtopico (id) ON DELETE CASCADE,
-    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
-    PRIMARY KEY (subtopico_id, no_id)
-);
-
 
 -- Migração idempotente para bancos existentes antes da introdução da coluna:
 ALTER TABLE taxonomia_itens ADD COLUMN IF NOT EXISTS cargos_restritos INTEGER[];
@@ -364,22 +335,58 @@ DROP VIEW IF EXISTS vw_arvore_edital_por_cargo CASCADE;
 DROP VIEW IF EXISTS vw_edital_cobra_subassunto CASCADE;
 DROP VIEW IF EXISTS vw_edital_cobra_assunto CASCADE;
 DROP VIEW IF EXISTS vw_edital_cobra_materia CASCADE;
+DROP VIEW IF EXISTS vw_edital_cobra_base CASCADE;
 
+-- Caminho de cada nó (matéria > assunto > subassunto). Só nó `ativo` com
+-- toda a cadeia `ativa` entra: nó `proposto` (e o que estiver abaixo dele)
+-- não muda estatística antes da aprovação. O nó `fundido` aparece com o
+-- caminho do destino (`no_efetivo`), resolvendo o redirecionamento.
 CREATE OR REPLACE VIEW vw_no_caminho AS
 WITH RECURSIVE hierarquia AS (
-    SELECT id, nivel, nome, pai_id, status,
-           nome AS caminho
+    SELECT id, nivel, nome, pai_id,
+           nome AS caminho,
+           id AS materia_id,
+           NULL::text AS assunto_id
     FROM no_arvore
-    WHERE pai_id IS NULL
-    
+    WHERE pai_id IS NULL AND status = 'ativo'
+
     UNION ALL
-    
-    SELECT n.id, n.nivel, n.nome, n.pai_id, n.status,
-           h.caminho || ' > ' || n.nome
+
+    SELECT n.id, n.nivel, n.nome, n.pai_id,
+           h.caminho || ' > ' || n.nome,
+           h.materia_id,
+           CASE WHEN n.nivel = 'assunto' THEN n.id ELSE h.assunto_id END
     FROM no_arvore n
     INNER JOIN hierarquia h ON n.pai_id = h.id
+    WHERE n.status = 'ativo'
+),
+resolucao AS (
+    SELECT id AS no_id, id AS atual, 0 AS passos
+    FROM no_arvore
+
+    UNION ALL
+
+    SELECT r.no_id, n.fundido_em, r.passos + 1
+    FROM resolucao r
+    INNER JOIN no_arvore n ON n.id = r.atual
+    WHERE n.status = 'fundido' AND n.fundido_em IS NOT NULL AND r.passos < 20
+),
+efetivo AS (
+    SELECT DISTINCT ON (no_id) no_id, atual
+    FROM resolucao
+    ORDER BY no_id, passos DESC
 )
-SELECT * FROM hierarquia;
+SELECT
+    e.no_id AS id,
+    h.id AS no_efetivo,
+    h.nivel,
+    h.nome,
+    h.pai_id,
+    h.caminho,
+    h.materia_id,
+    h.assunto_id
+FROM efetivo e
+INNER JOIN hierarquia h ON h.id = e.atual;
 
 CREATE OR REPLACE VIEW vw_taxonomia_detalhe AS
 SELECT
@@ -503,8 +510,11 @@ SELECT
     e.cargo,
     nc.caminho,
     nc.nivel AS no_nivel,
-    nc.id AS no_id,
+    nc.no_efetivo AS no_id,
+    nc.materia_id AS no_materia_id,
+    nc.assunto_id AS no_assunto_id,
     e.taxonomia_item_id,
+    e.cargo_edital_id,
     m.origem_map
 FROM mapeamentos m
 INNER JOIN expansao_cargos e ON e.taxonomia_item_id = m.taxonomia_item_id AND e.cargo_edital_id = m.cargo_edital_id
@@ -512,45 +522,65 @@ INNER JOIN vw_no_caminho nc ON nc.id = m.no_id
 INNER JOIN concursos c ON c.id = e.concurso_id
 INNER JOIN dim_orgao o ON o.id = c.orgao_id;
 
-CREATE OR REPLACE VIEW vw_edital_cobra_subassunto AS
-SELECT no_id, caminho, count(DISTINCT taxonomia_item_id) AS ocorrencias
+-- "O que o edital cobra" (ADR-030): cada linha liga um item do edital ao nó
+-- que ele cobra em cada nível, subindo a árvore. O item mapeado para um nó de
+-- nível acima soma nesse nível e acima dele, nunca abaixo.
+CREATE OR REPLACE VIEW vw_edital_cobra_base AS
+SELECT DISTINCT taxonomia_item_id, status_revisao, 'subassunto' AS nivel_alvo, no_id AS alvo_id
 FROM vw_arvore_edital_por_cargo
-WHERE status_revisao = 'aprovado' AND no_nivel = 'subassunto'
-GROUP BY no_id, caminho;
+WHERE no_nivel = 'subassunto'
+UNION
+SELECT DISTINCT taxonomia_item_id, status_revisao, 'assunto', no_assunto_id
+FROM vw_arvore_edital_por_cargo
+WHERE no_assunto_id IS NOT NULL
+UNION
+SELECT DISTINCT taxonomia_item_id, status_revisao, 'materia', no_materia_id
+FROM vw_arvore_edital_por_cargo;
+
+-- Ocorrência = `taxonomia_itens.id` distinto: o composto e as partes no mesmo
+-- item nunca contam 2× no mesmo nó. A variante sem sufixo é a oficial
+-- (`status_revisao = 'aprovado'`); `_todas` é para inspeção.
+CREATE OR REPLACE VIEW vw_edital_cobra_subassunto_todas AS
+SELECT b.alvo_id AS no_id, nc.caminho, count(DISTINCT b.taxonomia_item_id) AS ocorrencias
+FROM vw_edital_cobra_base b
+INNER JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE b.nivel_alvo = 'subassunto'
+GROUP BY b.alvo_id, nc.caminho;
+
+CREATE OR REPLACE VIEW vw_edital_cobra_subassunto AS
+SELECT b.alvo_id AS no_id, nc.caminho, count(DISTINCT b.taxonomia_item_id) AS ocorrencias
+FROM vw_edital_cobra_base b
+INNER JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE b.nivel_alvo = 'subassunto' AND b.status_revisao = 'aprovado'
+GROUP BY b.alvo_id, nc.caminho;
+
+CREATE OR REPLACE VIEW vw_edital_cobra_assunto_todas AS
+SELECT b.alvo_id AS no_id, nc.caminho, count(DISTINCT b.taxonomia_item_id) AS ocorrencias
+FROM vw_edital_cobra_base b
+INNER JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE b.nivel_alvo = 'assunto'
+GROUP BY b.alvo_id, nc.caminho;
 
 CREATE OR REPLACE VIEW vw_edital_cobra_assunto AS
-SELECT 
-    COALESCE(pai.id, no.no_id) AS no_id, 
-    COALESCE(pai.caminho, no.caminho) AS caminho, 
-    count(DISTINCT taxonomia_item_id) AS ocorrencias
-FROM vw_arvore_edital_por_cargo no
-LEFT JOIN vw_no_caminho pai ON no.no_nivel = 'subassunto' AND pai.id = (SELECT p.pai_id FROM no_arvore p WHERE p.id = no.no_id)
-WHERE status_revisao = 'aprovado' AND no.no_nivel IN ('assunto', 'subassunto')
-GROUP BY COALESCE(pai.id, no.no_id), COALESCE(pai.caminho, no.caminho);
+SELECT b.alvo_id AS no_id, nc.caminho, count(DISTINCT b.taxonomia_item_id) AS ocorrencias
+FROM vw_edital_cobra_base b
+INNER JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE b.nivel_alvo = 'assunto' AND b.status_revisao = 'aprovado'
+GROUP BY b.alvo_id, nc.caminho;
+
+CREATE OR REPLACE VIEW vw_edital_cobra_materia_todas AS
+SELECT b.alvo_id AS no_id, nc.caminho, count(DISTINCT b.taxonomia_item_id) AS ocorrencias
+FROM vw_edital_cobra_base b
+INNER JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE b.nivel_alvo = 'materia'
+GROUP BY b.alvo_id, nc.caminho;
 
 CREATE OR REPLACE VIEW vw_edital_cobra_materia AS
-WITH materias AS (
-    SELECT 
-        no.taxonomia_item_id,
-        CASE
-            WHEN no.no_nivel = 'materia' THEN no.no_id
-            WHEN no.no_nivel = 'assunto' THEN (SELECT p.pai_id FROM no_arvore p WHERE p.id = no.no_id)
-            WHEN no.no_nivel = 'subassunto' THEN (
-                SELECT a.pai_id FROM no_arvore s
-                INNER JOIN no_arvore a ON s.pai_id = a.id
-                WHERE s.id = no.no_id
-            )
-        END AS materia_id
-    FROM vw_arvore_edital_por_cargo no
-    WHERE no.status_revisao = 'aprovado'
-)
-SELECT 
-    nc.id AS no_id, 
-    nc.caminho AS caminho, 
-    count(DISTINCT m.taxonomia_item_id) AS ocorrencias
-FROM materias m
-INNER JOIN vw_no_caminho nc ON nc.id = m.materia_id
-GROUP BY nc.id, nc.caminho;
+SELECT b.alvo_id AS no_id, nc.caminho, count(DISTINCT b.taxonomia_item_id) AS ocorrencias
+FROM vw_edital_cobra_base b
+INNER JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE b.nivel_alvo = 'materia' AND b.status_revisao = 'aprovado'
+GROUP BY b.alvo_id, nc.caminho;
 
 -- Incidência de tópico entre concursos, incluindo os ainda pendentes de
 -- revisão (para inspecionar o piloto).

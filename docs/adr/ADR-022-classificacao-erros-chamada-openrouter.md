@@ -43,13 +43,15 @@ solta — sempre um valor específico, exceto o fallback já documentado em
 `extrair_taxonomia_chunk` para uma cadeia de tentativas vazia):
 
 ```python
-STATUS_FALHA_TIMEOUT = "falha_timeout"                    # requests.exceptions.Timeout
-STATUS_FALHA_CONEXAO = "falha_conexao"                    # requests.exceptions.ConnectionError
-STATUS_FALHA_RATE_LIMIT = "falha_rate_limit"              # HTTPError, status_code == 429
-STATUS_FALHA_HTTP = "falha_http"                          # HTTPError, qualquer outro status_code
-STATUS_FALHA_REDE = "falha_rede"                          # RequestException não classificada acima
-STATUS_FALHA_CONTEUDO_VAZIO = "falha_conteudo_vazio"      # content vazio (finish_reason truncado)
-STATUS_FALHA_PARSE_JSON = "falha_parse_json"              # json.JSONDecodeError
+STATUS_FALHA_TIMEOUT = "falha_timeout"  # requests.exceptions.Timeout
+STATUS_FALHA_CONEXAO = "falha_conexao"  # requests.exceptions.ConnectionError
+STATUS_FALHA_RATE_LIMIT = "falha_rate_limit"  # HTTPError, status_code == 429
+STATUS_FALHA_HTTP = "falha_http"  # HTTPError, qualquer outro status_code
+STATUS_FALHA_REDE = "falha_rede"  # RequestException não classificada acima
+STATUS_FALHA_CONTEUDO_VAZIO = (
+    "falha_conteudo_vazio"  # content vazio (finish_reason truncado)
+)
+STATUS_FALHA_PARSE_JSON = "falha_parse_json"  # json.JSONDecodeError
 STATUS_FALHA_VALIDACAO_SCHEMA = "falha_validacao_schema"  # pydantic.ValidationError
 STATUS_FALHA_NOME_NUMERICO_NAO_MAPEADO = "falha_nome_numerico_nao_mapeado"  # ADR-021
 ```

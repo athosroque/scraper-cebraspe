@@ -928,84 +928,73 @@ def _rotulo_grupo(estado: dict, nivel: str, gid: str) -> str:
     return g["nome"]
 
 
-def mapear_novos_itens_por_regra(revisao_dir: Path, arvore_path: Path | None = None) -> None:
-    from src.arvore import ARVORE_PADRAO, carregar, chave_item, resolver_no, salvar
-    if arvore_path is None:
-        arvore_path = ARVORE_PADRAO
-    
+def mapear_novos_itens_por_regra(
+    revisao_dir: Path, arvore_path: Path | None = None
+) -> int:
+    """Mapeia item novo de edital para a árvore mestre por regra (ADR-030).
+
+    O item sem mapeamento herda os nós de um item já aprovado com a mesma
+    `chave_regra` **no mesmo nó-pai efetivo** (os nós para onde o pai do
+    item aponta). Regra ambígua (dois itens com nós diferentes) ou item cujo
+    pai não tem nó ficam pendentes para a curadoria. Nunca cria nó.
+    Devolve quantos itens foram mapeados.
+    """
+    from src import arvore as arv_mod
+
+    arvore_path = arvore_path or arv_mod.ARVORE_PADRAO
     if not arvore_path.exists():
-        return
-        
-    arvore = carregar(arvore_path)
+        return 0
+    arvore = arv_mod.carregar(arvore_path)
     nomes = coletar_nomes(revisao_dir)
-    mudou = False
-    
-    # helper para saber os pais resolvidos e regras já mapeadas
-    # indice: (nivel, pai_efetivo_id, chave_regra_str) -> no_id (primeiro mapeamento aprovado)
-    indice = {}
-    
-    def get_pai_efetivo(item_pai: str) -> str | None:
-        maps = arvore.mapeamentos.get(item_pai, [])
-        for m in maps:
-            if m.status == "aprovado":
-                return resolver_no(arvore, m.no_id)
-        return None
 
-    # Mapeamentos locais para carregar regras existentes
-    for nivel in ("materia", "assunto", "subassunto"):
+    def nos_aprovados(chave: str) -> frozenset[str]:
+        return frozenset(
+            arv_mod.resolver_no(arvore, m.no_id)
+            for m in arvore.mapeamentos.get(chave, [])
+            if m.status == "aprovado"
+        )
+
+    def assinatura(nivel: str, chave_origem, nome: str):
+        """(nível, nós do pai, chave de regra), ou None se não dá para comparar."""
+        regra = chave_regra(nome).chave
+        if not regra:
+            return None
+        partes = (chave_origem,) if isinstance(chave_origem, str) else chave_origem
+        pais = (
+            nos_aprovados(arv_mod.chave_item(partes[:-1]))
+            if len(partes) > 1
+            else frozenset()
+        )
+        if len(partes) > 1 and not pais:
+            return None
+        return (nivel, pais, regra)
+
+    novos = 0
+    # Nível a nível: o assunto mapeado agora já serve de pai para o subassunto.
+    for nivel in NIVEIS:
         fonte = getattr(nomes, nivel)
+        indice: dict[tuple, set[frozenset[str]]] = {}
+        pendentes = []
         for chave_origem, info in fonte.items():
-            chave_str = chave_item(chave_origem if isinstance(chave_origem, tuple) else (chave_origem,))
-            maps = arvore.mapeamentos.get(chave_str, [])
-            aprovados = [resolver_no(arvore, m.no_id) for m in maps if m.status == "aprovado"]
-            
-            regra = chave_regra(info["nome"]).chave
-            if not regra or not aprovados:
+            chave = arv_mod.chave_item(chave_origem)
+            sig = assinatura(nivel, chave_origem, info["nome"])
+            if chave in arvore.mapeamentos:
+                nos = nos_aprovados(chave)
+                if sig and nos:
+                    indice.setdefault(sig, set()).add(nos)
+            elif sig:
+                pendentes.append((chave, sig))
+        for chave, sig in pendentes:
+            candidatos = indice.get(sig, set())
+            if len(candidatos) != 1:
                 continue
-                
-            pai_efetivo = None
-            if nivel == "assunto":
-                pai_str = chave_item(chave_origem[:1])
-                pai_efetivo = get_pai_efetivo(pai_str)
-            elif nivel == "subassunto":
-                pai_str = chave_item(chave_origem[:2])
-                pai_efetivo = get_pai_efetivo(pai_str)
-                
-            idx_key = (nivel, pai_efetivo, regra)
-            if idx_key not in indice:
-                indice[idx_key] = aprovados[0] # Guarda o primeiro nó para o qual essa regra mapeia
+            (nos,) = candidatos
+            arv_mod.mapear(
+                arvore, chave, sorted(nos), origem="regra", status="aprovado"
+            )
+            novos += 1
 
-    # Agora mapeia os não mapeados
-    for nivel in ("materia", "assunto", "subassunto"):
-        fonte = getattr(nomes, nivel)
-        for chave_origem, info in fonte.items():
-            chave_str = chave_item(chave_origem if isinstance(chave_origem, tuple) else (chave_origem,))
-            
-            if arvore.mapeamentos.get(chave_str):
-                continue
-                
-            regra = chave_regra(info["nome"]).chave
-            if not regra:
-                continue
-                
-            pai_efetivo = None
-            if nivel == "assunto":
-                pai_str = chave_item(chave_origem[:1])
-                pai_efetivo = get_pai_efetivo(pai_str)
-            elif nivel == "subassunto":
-                pai_str = chave_item(chave_origem[:2])
-                pai_efetivo = get_pai_efetivo(pai_str)
-                
-            if nivel != "materia" and not pai_efetivo:
-                continue
-                
-            idx_key = (nivel, pai_efetivo, regra)
-            if idx_key in indice:
-                from src.arvore import mapear
-                mapear(arvore, chave_str, [indice[idx_key]], origem="regra", status="aprovado")
-                mudou = True
-
-    if mudou:
-        salvar(arvore, arvore_path)
-
-
+    if novos:
+        arv_mod.salvar(arvore, arvore_path)
+        logger.info(f"[ARVORE] {novos} item(ns) novo(s) mapeado(s) por regra.")
+    return novos

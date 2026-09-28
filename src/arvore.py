@@ -85,7 +85,7 @@ def criar_no(
 
     no_id = id_override or _gerar_id(nivel, f"{pai or ''}|{nome}")
     if no_id in arvore.nos:
-        return no_id  # Ou lançar erro se quiser
+        raise ArvoreInvalida(f"Nó {no_id} já existe ({arvore.nos[no_id].nome})")
 
     arvore.nos[no_id] = NoArvore(
         id=no_id,
@@ -118,6 +118,8 @@ def _verificar_ciclo(arvore: ArvoreMestre, no_id: str, novo_pai: str) -> None:
 
 
 def mover_no(arvore: ArvoreMestre, no_id: str, novo_pai: str) -> None:
+    if not novo_pai:
+        raise ArvoreInvalida("Informe o novo pai (matéria não se move)")
     no_id = resolver_no(arvore, no_id)
     no = arvore.nos.get(no_id)
     if not no:
@@ -184,40 +186,55 @@ def mapear(
 
     lista = arvore.mapeamentos.setdefault(item, [])
     for n in resolvidos:
-        if not any(m.no_id == n for m in lista):
+        existente = next((m for m in lista if m.no_id == n), None)
+        if existente is None:
             lista.append(Mapeamento(no_id=n, origem=origem, status=status))
+        elif status == "aprovado" and existente.status != "aprovado":
+            # Mapear de novo um apontamento proposto/rejeitado é a decisão do dono.
+            existente.origem = origem
+            existente.status = "aprovado"
+
+
+def _mapeamentos_do_no(arvore: ArvoreMestre, item: str, no_id: str) -> list[Mapeamento]:
+    """Apontamentos de `item` para `no_id` (aceita o ID original ou o resolvido)."""
+    alvo = resolver_no(arvore, no_id)
+    encontrados = [
+        m
+        for m in arvore.mapeamentos.get(item, [])
+        if m.no_id == no_id or resolver_no(arvore, m.no_id) == alvo
+    ]
+    if not encontrados:
+        raise ArvoreInvalida(f"Item {item!r} não aponta para o nó {no_id}")
+    return encontrados
 
 
 def desmapear(arvore: ArvoreMestre, item: str, no_id: str) -> None:
-    no_id_original = no_id
-    no_id_resolvido = resolver_no(arvore, no_id)
-
-    if item in arvore.mapeamentos:
-        arvore.mapeamentos[item] = [
-            m
-            for m in arvore.mapeamentos[item]
-            if m.no_id not in (no_id_original, no_id_resolvido)
-        ]
-        if not arvore.mapeamentos[item]:
-            del arvore.mapeamentos[item]
+    remover = _mapeamentos_do_no(arvore, item, no_id)
+    restantes = [
+        m for m in arvore.mapeamentos[item] if all(m is not r for r in remover)
+    ]
+    if restantes:
+        arvore.mapeamentos[item] = restantes
+    else:
+        del arvore.mapeamentos[item]
 
 
 def aprovar(arvore: ArvoreMestre, item: str, no_id: str) -> None:
-    if item in arvore.mapeamentos:
-        for m in arvore.mapeamentos[item]:
-            if m.no_id == no_id or resolver_no(arvore, m.no_id) == no_id:
-                m.status = "aprovado"
+    for m in _mapeamentos_do_no(arvore, item, no_id):
+        m.status = "aprovado"
 
 
 def rejeitar(arvore: ArvoreMestre, item: str, no_id: str) -> None:
-    if item in arvore.mapeamentos:
-        for m in arvore.mapeamentos[item]:
-            if m.no_id == no_id or resolver_no(arvore, m.no_id) == no_id:
-                m.status = "rejeitado"
+    for m in _mapeamentos_do_no(arvore, item, no_id):
+        m.status = "rejeitado"
 
 
-def chave_item(tupla: tuple[str, ...]) -> str:
-    return "|".join(tupla)
+def chave_item(chave: str | tuple[str, ...]) -> str:
+    """Chave do item de edital no JSON: a chave natural do banco unida por `|`
+    (`materia`, `materia|topico`, `materia|topico|subtopico`)."""
+    if isinstance(chave, str):
+        return chave
+    return "|".join(chave)
 
 
 def carregar(path: Path = ARVORE_PADRAO) -> ArvoreMestre:

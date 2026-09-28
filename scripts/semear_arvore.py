@@ -1,48 +1,81 @@
-import logging
+"""Semeia `canonico/arvore.json` com os grupos aprovados da 5B (ADR-030).
+
+Cada grupo aprovado de `sinonimos.json` vira um nó com o **mesmo ID** (pai =
+grupo aprovado do escopo), e cada nome de origem vira um mapeamento
+`semente`. Determinístico: rodar de novo sobre o mesmo `sinonimos.json` não
+gera diff. Roda uma vez; depois a árvore é curada e o `sinonimos.json` fica
+congelado. Se a árvore em disco já diverge da semente (curadoria feita), o
+script se recusa a sobrescrever sem `--forcar`.
+
+Uso:
+    python -m scripts.semear_arvore [--forcar]
+"""
+
+import sys
 from pathlib import Path
 
-from src.arvore import ARVORE_PADRAO, ArvoreMestre, criar_no, mapear, salvar
-from src.canonico import SINONIMOS_PADRAO, carregar, indice_aprovado
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+from src.arvore import (
+    ARVORE_PADRAO,
+    NIVEIS,
+    ArvoreInvalida,
+    ArvoreMestre,
+    carregar,
+    chave_item,
+    criar_no,
+    mapear,
+    salvar,
+)
+from src.canonico import SINONIMOS_PADRAO, indice_aprovado
+from src.canonico import carregar as carregar_sinonimos
+from src.logger import logger
 
-def _chave_natural(chave_tupla) -> str:
-    if isinstance(chave_tupla, str):
-        return chave_tupla
-    return "|".join(chave_tupla)
 
-def semear(sinonimos_path: Path = SINONIMOS_PADRAO, arvore_path: Path = ARVORE_PADRAO) -> None:
-    estado_sin = carregar(sinonimos_path)
-    indice = indice_aprovado(estado_sin)
-    
+def arvore_semente(sinonimos_path: Path = SINONIMOS_PADRAO) -> ArvoreMestre:
+    indice = indice_aprovado(carregar_sinonimos(sinonimos_path))
     arvore = ArvoreMestre()
-    
-    # Criar os nós:
-    for nivel in ["materia", "assunto", "subassunto"]:
+    for nivel in NIVEIS:
         for gid, info in indice.grupos.get(nivel, {}).items():
             criar_no(
-                arvore=arvore,
-                nivel=nivel,
-                nome=info["nome"],
-                pai=info["pai"],
+                arvore,
+                nivel,
+                info["nome"],
+                info["pai"],
                 origem="semente",
                 status="ativo",
-                id_override=gid
+                id_override=gid,
             )
-            
-    # Criar mapeamentos
-    for chave, gid in indice.materia.items():
-        mapear(arvore, _chave_natural(chave), [gid], origem="semente", status="aprovado")
-        
-    for chave, gid in indice.assunto.items():
-        mapear(arvore, _chave_natural(chave), [gid], origem="semente", status="aprovado")
-        
-    for chave, gid in indice.subassunto.items():
-        mapear(arvore, _chave_natural(chave), [gid], origem="semente", status="aprovado")
-        
+    for nivel in NIVEIS:
+        for chave, gid in getattr(indice, nivel).items():
+            mapear(
+                arvore, chave_item(chave), [gid], origem="semente", status="aprovado"
+            )
+    return arvore
+
+
+def semear(
+    sinonimos_path: Path = SINONIMOS_PADRAO,
+    arvore_path: Path = ARVORE_PADRAO,
+    forcar: bool = False,
+) -> ArvoreMestre:
+    arvore = arvore_semente(sinonimos_path)
+    if arvore_path.exists() and not forcar and carregar(arvore_path) != arvore:
+        raise ArvoreInvalida(
+            f"{arvore_path} já foi curado e diverge da semente; "
+            "use --forcar para descartar a curadoria"
+        )
     salvar(arvore, arvore_path)
-    logger.info("Semeada arvore.json com sucesso.")
+    contagem = {n: sum(no.nivel == n for no in arvore.nos.values()) for n in NIVEIS}
+    logger.info(
+        f"[ARVORE] semeada: {contagem} nós, {len(arvore.mapeamentos)} mapeamentos"
+    )
+    return arvore
+
 
 if __name__ == "__main__":
-    semear()
+    try:
+        semear(forcar="--forcar" in sys.argv[1:])
+    except ArvoreInvalida as e:
+        print(f"Erro: {e}", file=sys.stderr)
+        sys.exit(1)

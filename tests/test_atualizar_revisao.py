@@ -175,6 +175,7 @@ class TestSinonimosNoPipeline:
         chamadas = []
         import scripts.gerar_relatorio_arvore
         import src.canonico
+
         monkeypatch.setattr(
             src.canonico,
             "mapear_novos_itens_por_regra",
@@ -193,7 +194,7 @@ class TestSinonimosNoPipeline:
     def test_sem_edital_nao_escreve_sinonimos(self, monkeypatch, tmp_path):
         revisao = tmp_path / "revisao"
         revisao.mkdir()
-        atualizar_revisao.atualizar_sinonimos(revisao)
+        atualizar_revisao.atualizar_arvore(revisao)
         assert not (tmp_path / "canonico").exists()
 
     def test_erro_nos_sinonimos_so_loga_aviso(self, monkeypatch, tmp_path):
@@ -205,5 +206,6 @@ class TestSinonimosNoPipeline:
             raise ValueError("json corrompido")
 
         import src.canonico
+
         monkeypatch.setattr(src.canonico, "mapear_novos_itens_por_regra", _falha)
-        atualizar_revisao.atualizar_sinonimos(tmp_path)
+        atualizar_revisao.atualizar_arvore(tmp_path)
