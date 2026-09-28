@@ -195,20 +195,23 @@ def fundir_nos(arvore: ArvoreMestre, origem_id: str, destino_id: str) -> None:
 
 
 def aposentar_no(arvore: ArvoreMestre, no_id: str) -> None:
-    no_id = resolver_no(arvore, no_id)
     no = arvore.nos.get(no_id)
     if not no:
         raise ArvoreInvalida(f"Nó {no_id} não existe")
+    if no.status == "fundido":
+        raise ArvoreInvalida(f"Nó fundido {no_id} não pode ser aposentado")
     if no.status == "aposentado":
         return
 
-    # Exige nenhum filho ativo
+    # Exige nenhum filho ativo ou proposto
     filhos_ativos = [
-        f.id for f in arvore.nos.values() if f.pai == no_id and f.status == "ativo"
+        f.id
+        for f in arvore.nos.values()
+        if f.pai == no_id and f.status in ("ativo", "proposto")
     ]
     if filhos_ativos:
         raise ArvoreInvalida(
-            f"Nó {no_id} possui filhos ativos ({len(filhos_ativos)}) e não pode ser aposentado"
+            f"Nó {no_id} possui filhos ativos/propostos ({len(filhos_ativos)}) e não pode ser aposentado"
         )
 
     # Exige nenhum mapeamento aprovado
@@ -281,6 +284,12 @@ def desmapear(arvore: ArvoreMestre, item: str, no_id: str) -> None:
 
 
 def aprovar(arvore: ArvoreMestre, item: str, no_id: str) -> None:
+    alvo = resolver_no(arvore, no_id)
+    no = arvore.nos.get(alvo)
+    if no and no.status == "aposentado":
+        raise ArvoreInvalida(
+            f"Não é possível aprovar mapeamento para o nó aposentado {no_id}"
+        )
     for m in _mapeamentos_do_no(arvore, item, no_id):
         m.status = "aprovado"
 
@@ -410,6 +419,10 @@ def _executar_operacao(
             args["nivel"], f"{args.get('pai') or ''}|{args['nome']}"
         )
         if no_id in arv.nos:
+            if arv.nos[no_id].status != "proposto":
+                raise ArvoreInvalida(
+                    f"Nó {no_id} já existe com status {arv.nos[no_id].status}"
+                )
             arv.nos[no_id].status = "ativo"
         else:
             criar_no(
@@ -487,12 +500,29 @@ def propor(
 
     # Validar em cópia isolada (deepcopy)
     copia = copy.deepcopy(arv)
-    for p in copia.propostas.values():
-        if p.status == "proposto":
-            try:
-                _executar_operacao(copia, p.tipo, p.args, origem=p.origem)
-            except ArvoreInvalida:
-                pass
+
+    # Para propostas de aposentadoria, simulamos apenas os remapeamentos pendentes
+    # que liberam o nó alvo (e eventuais movimentos/fusões de filhos do nó alvo),
+    # sem executar propostas não relacionadas que possam conflitar com alternativas.
+    if tipo == "aposentar":
+        no_alvo = args_canonicos.get("no") or args_canonicos.get("no_id", "")
+        for p in copia.propostas.values():
+            if p.status == "proposto":
+                if p.tipo == "remapear" and p.args.get("de") == no_alvo:
+                    try:
+                        _executar_operacao(copia, p.tipo, p.args, origem=p.origem)
+                    except ArvoreInvalida:
+                        pass
+                elif p.tipo in ("mover", "fundir"):
+                    filho_id = (
+                        p.args.get("no") if p.tipo == "mover" else p.args.get("origem")
+                    )
+                    filho_no = copia.nos.get(filho_id)
+                    if filho_no and filho_no.pai == no_alvo:
+                        try:
+                            _executar_operacao(copia, p.tipo, p.args, origem=p.origem)
+                        except ArvoreInvalida:
+                            pass
 
     if tipo == "criar":
         criar_no(
@@ -529,16 +559,44 @@ def propor(
 
 
 def aprovar_propostas(arv: ArvoreMestre, ids: list[str]) -> list[str]:
-    """Aplica as propostas na ordem especificada, tudo ou nada (atômico)."""
+    """Aplica as propostas com execução transacional atômica (tudo ou nada).
+
+    Se houver dependências no mesmo lote (ex.: remapear antes de aposentar, ou
+    criar antes de mover), resolve em múltiplas passagens preservando atomicidade.
+    """
     for pid in ids:
         if pid not in arv.propostas:
             raise ArvoreInvalida(f"Proposta {pid} não existe")
+        prop = arv.propostas[pid]
+        if prop.status == "aprovado":
+            raise ArvoreInvalida(f"Proposta {pid} já foi aprovada")
+        if prop.status == "rejeitado":
+            raise ArvoreInvalida(
+                f"Proposta {pid} já foi rejeitada e não pode ser aprovada"
+            )
 
     copia = copy.deepcopy(arv)
-    for pid in ids:
-        prop = copia.propostas[pid]
-        _executar_operacao(copia, prop.tipo, prop.args, origem=prop.origem)
-        prop.status = "aprovado"
+    tentativas = list(ids)
+    ultimo_erro = None
+
+    while tentativas:
+        progresso = False
+        proxima_rodada = []
+        for pid in tentativas:
+            prop = copia.propostas[pid]
+            snapshot = copy.deepcopy(copia)
+            try:
+                _executar_operacao(copia, prop.tipo, prop.args, origem=prop.origem)
+                prop.status = "aprovado"
+                progresso = True
+            except ArvoreInvalida as e:
+                copia = snapshot
+                proxima_rodada.append(pid)
+                ultimo_erro = e
+
+        if not progresso:
+            raise ultimo_erro or ArvoreInvalida("Falha ao aprovar lote de propostas")
+        tentativas = proxima_rodada
 
     # Tudo deu certo: atualiza árvore real
     arv.nos = copia.nos
@@ -552,6 +610,11 @@ def rejeitar_proposta(arv: ArvoreMestre, id: str) -> None:
         raise ArvoreInvalida(f"Proposta {id} não existe")
 
     prop = arv.propostas[id]
+    if prop.status == "aprovado":
+        raise ArvoreInvalida(f"Proposta {id} já foi aprovada e não pode ser rejeitada")
+    if prop.status == "rejeitado":
+        return
+
     prop.status = "rejeitado"
 
     if prop.tipo == "criar":

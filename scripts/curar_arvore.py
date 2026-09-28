@@ -26,7 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.gerar_relatorio_arvore import REVISAO_DIR_PADRAO, gerar_relatorio_arvore
-from src import arvore
+from src import arvore, canonico
 
 
 def _dividir(valor: str, separador: str, formato: str) -> tuple[str, str]:
@@ -77,17 +77,36 @@ def _formatar_detalhe_proposta(arv: arvore.ArvoreMestre, p: arvore.Proposta) -> 
     return str(p.args)
 
 
+ORDEM_TIPOS = {
+    "criar": 1,
+    "mover": 2,
+    "fundir": 3,
+    "remapear": 4,
+    "aposentar": 5,
+}
+
+
+def _chave_ordem_proposta(p: arvore.Proposta) -> tuple[int, str]:
+    return (ORDEM_TIPOS.get(p.tipo, 99), p.id)
+
+
 def listar_propostas(
     arv: arvore.ArvoreMestre, filtro_materia: str | None = None
 ) -> list[str]:
+    filtro = filtro_materia.strip() if filtro_materia else None
     pendentes = [
         p
         for p in arv.propostas.values()
         if p.status == "proposto"
         and (
-            not filtro_materia
-            or filtro_materia == p.materia
-            or filtro_materia == getattr(arv.nos.get(p.materia), "nome", "")
+            not filtro
+            or filtro == p.materia
+            or filtro.lower() == getattr(arv.nos.get(p.materia), "nome", "").lower()
+            or (
+                p.materia in arv.nos
+                and canonico.chave_regra(filtro).chave
+                == canonico.chave_regra(arv.nos[p.materia].nome).chave
+            )
         )
     ]
     if not pendentes:
@@ -101,8 +120,14 @@ def listar_propostas(
     for m_id, props in sorted(por_materia.items()):
         m_no = arv.nos.get(m_id)
         m_nome = m_no.nome if m_no else (m_id or "Sem matéria")
+        props_ordenadas = sorted(props, key=_chave_ordem_proposta)
         linhas.append(f"=== Matéria: {m_nome} ({m_id}) ===")
-        for p in sorted(props, key=lambda x: x.id):
+        if len(props_ordenadas) > 1:
+            todos_ids = ",".join(p.id for p in props_ordenadas)
+            linhas.append(
+                f"  Aprovar todas da matéria: python -m scripts.curar_arvore --aprovar-proposta {todos_ids}"
+            )
+        for p in props_ordenadas:
             detalhe = _formatar_detalhe_proposta(arv, p)
             linhas.append(f"[{p.id}] {p.tipo.upper()} ({p.origem}): {detalhe}")
             if p.justificativa:
@@ -148,6 +173,9 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
         feitas.append(f"propostas aprovadas: {', '.join(ids)}")
     if args.rejeitar_proposta:
         ids = [p.strip() for p in args.rejeitar_proposta.split(",") if p.strip()]
+        for pid in ids:
+            if pid not in arv.propostas:
+                raise arvore.ArvoreInvalida(f"Proposta {pid} não existe")
         for pid in ids:
             arvore.rejeitar_proposta(arv, pid)
         feitas.append(f"propostas rejeitadas: {', '.join(ids)}")

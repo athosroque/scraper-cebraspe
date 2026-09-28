@@ -195,3 +195,52 @@ def test_cli_rejeitar_proposta(ambiente):
     arv_atual = carregar(path)
     assert arv_atual.propostas[p].status == "rejeitado"
     assert novo_id not in arv_atual.nos
+
+
+def test_cli_propostas_filtro_case_insensitive(ambiente, capsys):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    p = propor(
+        arv,
+        "criar",
+        {"nivel": "assunto", "pai": "M-1", "nome": "Novo Assunto"},
+        "humano",
+        "teste",
+        "M-1",
+    )
+    salvar(arv, path)
+
+    # Nome exato da matéria M-1 no fixture é "Direito"
+    assert rodar("--propostas", "direito") == 0
+    out = capsys.readouterr().out
+    assert p in out
+
+    assert rodar("--propostas", "DIREITO") == 0
+    out2 = capsys.readouterr().out
+    assert p in out2
+
+
+def test_cli_aprovar_proposta_lote_com_dependencia(ambiente):
+    path, _, rodar = ambiente
+    arv = carregar(path)
+    s_comp = criar_no(arv, "subassunto", "Composto", "A-1")
+    s_dest = criar_no(arv, "subassunto", "Destino", "A-1")
+    mapear(arv, "item|teste", [s_comp])
+
+    p_rem = propor(
+        arv,
+        "remapear",
+        {"item": "item|teste", "de": s_comp, "para": [s_dest]},
+        "regra",
+        "remapear",
+        "M-1",
+    )
+    p_apo = propor(arv, "aposentar", {"no": s_comp}, "regra", "aposentar", "M-1")
+    salvar(arv, path)
+
+    # Passa aposentar antes de remapear
+    assert rodar("--aprovar-proposta", f"{p_apo},{p_rem}") == 0
+    arv_atual = carregar(path)
+    assert arv_atual.nos[s_comp].status == "aposentado"
+    assert arv_atual.propostas[p_apo].status == "aprovado"
+    assert arv_atual.propostas[p_rem].status == "aprovado"

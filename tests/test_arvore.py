@@ -527,3 +527,117 @@ def test_detectar_compostos_dados_reais():
     assert set(detectados.keys()) == {"A-4529f205f7", "S-7b3b2a86ce"}
     assert detectados["A-4529f205f7"] == ["A-2261b82645", "A-91e52e6c2e"]
     assert detectados["S-7b3b2a86ce"] == ["S-10973fad79", "S-de2a8684f9"]
+
+
+def test_propor_alternativas_aposentar_e_mover():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    m2 = criar_no(arv, "materia", "M2", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    a2 = criar_no(arv, "assunto", "A2", m1)
+
+    p_aposentar = propor(
+        arv, "aposentar", {"no": a1}, "regra", "aposentar sem uso", "M1"
+    )
+    p_mover = propor(
+        arv, "mover", {"no": a1, "pai": m2}, "llm", "alternativa mover", "M1"
+    )
+    p_fundir = propor(
+        arv, "fundir", {"origem": a1, "destino": a2}, "llm", "alternativa fundir", "M1"
+    )
+
+    assert p_aposentar in arv.propostas
+    assert p_mover in arv.propostas
+    assert p_fundir in arv.propostas
+    assert arv.propostas[p_aposentar].status == "proposto"
+    assert arv.propostas[p_mover].status == "proposto"
+    assert arv.propostas[p_fundir].status == "proposto"
+
+
+def test_propor_alternativas_fundir_concorrente():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    m2 = criar_no(arv, "materia", "M2", None)
+    m3 = criar_no(arv, "materia", "M3", None)
+
+    p1 = propor(arv, "fundir", {"origem": m1, "destino": m2}, "llm", "opcao 1")
+    p2 = propor(arv, "fundir", {"origem": m1, "destino": m3}, "llm", "opcao 2")
+
+    assert p1 in arv.propostas
+    assert p2 in arv.propostas
+
+
+def test_aprovar_propostas_fora_de_ordem_com_dependencia():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    s1 = criar_no(arv, "subassunto", "S1", a1)
+    s2 = criar_no(arv, "subassunto", "S2", a1)
+    s_comp = criar_no(arv, "subassunto", "S_COMP", a1)
+    mapear(arv, "item|teste", [s_comp])
+
+    p_rem = propor(
+        arv,
+        "remapear",
+        {"item": "item|teste", "de": s_comp, "para": [s1, s2]},
+        "regra",
+        "remapear",
+        "M1",
+    )
+    p_apo = propor(arv, "aposentar", {"no": s_comp}, "regra", "aposentar", "M1")
+
+    # Passa aposentar antes de remapear no lote
+    aprovados = aprovar_propostas(arv, [p_apo, p_rem])
+    assert set(aprovados) == {p_apo, p_rem}
+    assert arv.nos[s_comp].status == "aposentado"
+    assert arv.propostas[p_apo].status == "aprovado"
+    assert arv.propostas[p_rem].status == "aprovado"
+
+
+def test_aprovar_proposta_ja_aprovada_ou_rejeitada_falha():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    m2 = criar_no(arv, "materia", "M2", None)
+    p = propor(arv, "fundir", {"origem": m1, "destino": m2}, "regra", "fusao", "M1")
+
+    aprovar_propostas(arv, [p])
+    assert arv.propostas[p].status == "aprovado"
+
+    with pytest.raises(ArvoreInvalida, match="já foi aprovada"):
+        aprovar_propostas(arv, [p])
+
+    with pytest.raises(ArvoreInvalida, match="já foi aprovada"):
+        rejeitar_proposta(arv, p)
+
+
+def test_aposentar_no_fundido_falha():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    m2 = criar_no(arv, "materia", "M2", None)
+    fundir_nos(arv, m1, m2)
+
+    with pytest.raises(ArvoreInvalida, match="Nó fundido"):
+        aposentar_no(arv, m1)
+    # Garante que m2 não foi afetado
+    assert arv.nos[m2].status == "ativo"
+
+
+def test_aposentar_com_filho_proposto_falha():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    criar_no(arv, "assunto", "A_PROP", m1, status="proposto")
+
+    with pytest.raises(ArvoreInvalida, match="filhos ativos/propostos"):
+        aposentar_no(arv, m1)
+
+
+def test_aprovar_mapeamento_para_aposentado_falha():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    # Mapeamento proposto
+    mapear(arv, "item|teste", [a1], status="proposto")
+    aposentar_no(arv, a1)
+
+    with pytest.raises(ArvoreInvalida, match="nó aposentado"):
+        aprovar(arv, "item|teste", a1)

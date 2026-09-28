@@ -191,6 +191,11 @@ def renderizar_arvore(
     qtd_sp = _contar_ocorrencias_no(arvore, "S-de2a8684f9", ocorrencias)
 
     # Agrupar propostas por matéria
+    ORDEM_TIPOS = {"criar": 1, "mover": 2, "fundir": 3, "remapear": 4, "aposentar": 5}
+
+    def _chave_ordem_proposta(p: arv_mod.Proposta) -> tuple[int, str]:
+        return (ORDEM_TIPOS.get(p.tipo, 99), p.id)
+
     propostas_por_materia: dict[str, list[arv_mod.Proposta]] = {}
     for p in propostas_op:
         propostas_por_materia.setdefault(p.materia, []).append(p)
@@ -199,8 +204,16 @@ def renderizar_arvore(
     for m_id, props in sorted(propostas_por_materia.items()):
         m_no = arvore.nos.get(m_id)
         m_nome = m_no.nome if m_no else (m_id or "Sem matéria")
+        props_ordenadas = sorted(props, key=_chave_ordem_proposta)
+        todos_ids = ",".join(p.id for p in props_ordenadas)
+        cmd_todas = (
+            f"<div class='cmd-aprovar-todas'><small>Aprovar todas desta matéria:</small><br>"
+            f"<pre class='cmd-aprovar'><code>python -m scripts.curar_arvore --aprovar-proposta {escape(todos_ids)}</code></pre></div>"
+            if len(props_ordenadas) > 1
+            else ""
+        )
         itens_bloco = []
-        for p in sorted(props, key=lambda x: x.id):
+        for p in props_ordenadas:
             antes_depois = _formatar_antes_depois(arvore, p)
             itens_bloco.append(
                 f"<li class='proposta-item'>"
@@ -214,6 +227,7 @@ def renderizar_arvore(
             )
         propostas_blocos.append(
             f"<h3>Matéria: {escape(m_nome)} <code>{escape(m_id)}</code></h3>"
+            f"{cmd_todas}"
             f"<ul class='lista-propostas'>{''.join(itens_bloco)}</ul>"
         )
 
