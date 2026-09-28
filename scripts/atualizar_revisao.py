@@ -41,9 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.extrair_questoes import processar_fila
 from scripts.gerar_db_datasette import REVISAO_DIR_PADRAO, gerar_db
 from scripts.gerar_relatorio_revisao import gerar_relatorios
-from scripts.gerar_relatorio_sinonimos import gerar_relatorio_sinonimos
 from scripts.validar_taxonomia import main as validar_taxonomia
-from src.canonico import atualizar_por_regras, caminho_sinonimos
 from src.logger import logger
 from src.stats_writer import gravar_estatisticas, listar_jsons_edital
 

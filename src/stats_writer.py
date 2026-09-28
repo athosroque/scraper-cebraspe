@@ -41,7 +41,7 @@ import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import Json, execute_batch
 
-from src import canonico, gabarito_parser
+from src import gabarito_parser
 from src.comparacao_texto import extrair_cargos_do_texto, normalizar
 from src.downloader import (
     DATA_DIR,
@@ -768,29 +768,32 @@ def aplicar_arvore(conn, arvore_path) -> dict[str, int]:
         logger.warning(f"[ARVORE] {arvore_path} não existe — nenhuma árvore carregada.")
         return {}
 
-    with open(arvore_path, "r", encoding="utf-8") as f:
-        dados = json.load(f)
+    from src.arvore import carregar, resolver_no
+    arvore = carregar(arvore_path)
     
-    nos = dados.get("nos", {})
-    mapeamentos = dados.get("mapeamentos", {})
+    nos_para_inserir = []
+    for no_id, no in arvore.nos.items():
+        if no.status in ("fundido", "proposto"):
+            continue
+        pai_id = resolver_no(arvore, no.pai) if no.pai else None
+        nos_para_inserir.append((no_id, no.nivel, no.nome, pai_id, no.origem, no.status))
 
     with conn, conn.cursor() as cur:
-        # Load nos
-        if nos:
+        # Load nos (only non-fundido and non-proposto)
+        if nos_para_inserir:
             execute_batch(
                 cur,
-                "INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status, fundido_em) VALUES (%s, %s, %s, %s, %s, %s, %s) "
+                "INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status) VALUES (%s, %s, %s, %s, %s, %s) "
                 "ON CONFLICT (id) DO UPDATE SET nivel = EXCLUDED.nivel, nome = EXCLUDED.nome, "
-                "pai_id = EXCLUDED.pai_id, origem = EXCLUDED.origem, status = EXCLUDED.status, fundido_em = EXCLUDED.fundido_em",
-                [(no_id, d["nivel"], d["nome"], d["pai"], d["origem"], d["status"], d.get("fundido_em")) for no_id, d in nos.items()],
+                "pai_id = EXCLUDED.pai_id, origem = EXCLUDED.origem, status = EXCLUDED.status",
+                nos_para_inserir,
             )
             # Delete removed nos
-            cur.execute("DELETE FROM no_arvore WHERE NOT (id = ANY(%s))", (list(nos.keys()),))
+            cur.execute("DELETE FROM no_arvore WHERE NOT (id = ANY(%s))", ([n[0] for n in nos_para_inserir],))
         else:
             cur.execute("DELETE FROM no_arvore")
 
         # Load mapeamentos
-        # First, mapping chaves to their DB IDs
         cur.execute("SELECT id, chave FROM dim_materia")
         materia_ids = {chave: id_ for id_, chave in cur.fetchall()}
         
@@ -804,8 +807,11 @@ def aplicar_arvore(conn, arvore_path) -> dict[str, int]:
         topico_nos = []
         subtopico_nos = []
         
-        for chave, lista_nos in mapeamentos.items():
-            aprovados = [n["no_id"] for n in lista_nos if n.get("status") == "aprovado"]
+        # recalculate nocoes for dim_materia based on rules
+        cur.execute("UPDATE dim_materia SET nocoes = false")
+        
+        for chave, lista_nos in arvore.mapeamentos.items():
+            aprovados = [resolver_no(arvore, n.no_id) for n in lista_nos if n.status == "aprovado"]
             if not aprovados:
                 continue
                 
@@ -814,6 +820,9 @@ def aplicar_arvore(conn, arvore_path) -> dict[str, int]:
                 # materia
                 materia_id = materia_ids.get(chave)
                 if materia_id:
+                    # nocoes logic is set to true if the original chave is nocoes
+                    if chave.startswith("nocoes de"):
+                        cur.execute("UPDATE dim_materia SET nocoes = true WHERE id = %s", (materia_id,))
                     for no_id in aprovados:
                         materia_nos.append((materia_id, no_id))
             elif len(parts) == 2:
@@ -834,20 +843,21 @@ def aplicar_arvore(conn, arvore_path) -> dict[str, int]:
         cur.execute("DELETE FROM subtopico_no")
         
         if materia_nos:
-            execute_batch(cur, "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, %s)", materia_nos)
+            execute_batch(cur, "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, %s)", list(set(materia_nos)))
         if topico_nos:
-            execute_batch(cur, "INSERT INTO topico_no (topico_id, no_id) VALUES (%s, %s)", topico_nos)
+            execute_batch(cur, "INSERT INTO topico_no (topico_id, no_id) VALUES (%s, %s)", list(set(topico_nos)))
         if subtopico_nos:
-            execute_batch(cur, "INSERT INTO subtopico_no (subtopico_id, no_id) VALUES (%s, %s)", subtopico_nos)
+            execute_batch(cur, "INSERT INTO subtopico_no (subtopico_id, no_id) VALUES (%s, %s)", list(set(subtopico_nos)))
 
     totais = {
-        "nos": len(nos),
-        "materia_no": len(materia_nos),
-        "topico_no": len(topico_nos),
-        "subtopico_no": len(subtopico_nos)
+        "nos": len(nos_para_inserir),
+        "materia_no": len(set(materia_nos)),
+        "topico_no": len(set(topico_nos)),
+        "subtopico_no": len(set(subtopico_nos))
     }
     logger.info(f"[ARVORE] banco: {totais['nos']} nós, pontes: {totais['materia_no']} matérias, {totais['topico_no']} tópicos, {totais['subtopico_no']} subtópicos mapeados.")
     return totais
+
 
 def listar_jsons_edital(revisao_dir: Path) -> list[Path]:
     return sorted(

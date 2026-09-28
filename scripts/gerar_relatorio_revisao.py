@@ -281,7 +281,7 @@ def renderizar_index(editais: list[dict]) -> str:
 <h1>Revisão de editais (Etapa 4)</h1>
 <ul class="index-lista">{itens}</ul>
 <h2>Camada canônica (Etapa 5B)</h2>
-<ul class="index-lista"><li><a href="sinonimos.html">Sinônimos canônicos</a>
+<ul class="index-lista"><li><a href="arvore.html">Árvore Mestre</a>
 <span class="badge">matéria → assunto → subassunto, com aprovação humana</span></li></ul>
 </body></html>
 """

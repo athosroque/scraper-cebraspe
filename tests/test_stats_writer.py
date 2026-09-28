@@ -473,10 +473,10 @@ class TestGravacaoPostgres:
         arvore_path.parent.mkdir(parents=True, exist_ok=True)
         arvore_dados = {
             "nos": {
-                "M-1": {"nivel": "materia", "nome": "DIREITO", "pai": None, "origem": "semente", "status": "ativo"}
+                "M-1": {"id": "M-1", "nivel": "materia", "nome": "DIREITO", "pai": None, "origem": "semente", "status": "ativo"}
             },
             "mapeamentos": {
-                "nocoes de direito": [{"no_id": "M-1", "status": "proposto"}]
+                "nocoes de direito": [{"no_id": "M-1", "origem": "humano", "status": "proposto"}]
             }
         }
         arvore_path.write_text(json.dumps(arvore_dados, ensure_ascii=False), encoding="utf-8")

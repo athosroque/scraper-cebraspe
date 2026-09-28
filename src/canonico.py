@@ -928,113 +928,84 @@ def _rotulo_grupo(estado: dict, nivel: str, gid: str) -> str:
     return g["nome"]
 
 
-def mapear_novos_itens_por_regra(revisao_dir: Path):
-    PROJETO_DIR = Path(__file__).resolve().parent.parent
-    ARVORE_JSON = PROJETO_DIR / "canonico" / "arvore.json"
+def mapear_novos_itens_por_regra(revisao_dir: Path, arvore_path: Path | None = None) -> None:
+    from src.arvore import ARVORE_PADRAO, carregar, chave_item, resolver_no, salvar
+    if arvore_path is None:
+        arvore_path = ARVORE_PADRAO
     
-    if not ARVORE_JSON.exists():
+    if not arvore_path.exists():
         return
         
-    try:
-        with open(ARVORE_JSON, "r", encoding="utf-8") as f:
-            arvore = json.load(f)
-    except Exception:
-        return
-
-    nos = arvore.get("nos", {})
-    if isinstance(nos, list):
-        nos = {n["id"]: n for n in nos}
-    mapeamentos = arvore.get("mapeamentos", {})
-    
+    arvore = carregar(arvore_path)
     nomes = coletar_nomes(revisao_dir)
-    
-    # helper para converter chaves em strings pra busca no JSON
-    def to_key(k):
-        return str(k)
-        
     mudou = False
     
-    # Construir índice: (nivel, pai_efetivo_id, chave_regra_str) -> no_id mapeado
-    # Para iterar os mapeamentos já existentes
+    # helper para saber os pais resolvidos e regras já mapeadas
+    # indice: (nivel, pai_efetivo_id, chave_regra_str) -> no_id (primeiro mapeamento aprovado)
     indice = {}
     
-    # Precisamos saber o nível de cada item. Como a chave em 'mapeamentos' é string, pode ser difícil.
-    # Mas coletar_nomes nos dá as chaves exatas em seu formato original.
-    # Vamos primeiro construir uma busca reversa das chaves que já estão nos NomesOrigem.
-    
-    # Processar nível a nível para garantir que o pai esteja resolvido
-    niveis = ["materia", "assunto", "subassunto"]
-    
-    # Armazena pra onde cada item real aponta (para resolver o pai)
-    # mapping_local: chave real (tupla/str) -> list de no_ids
-    mapping_local = {}
-    for item_str, maps in mapeamentos.items():
-        # A chave em json é string, vamos tentar parear com as chaves reais dps
-        # ou apenas indexar por chave_str
-        mapping_local[item_str] = [m.get("no") or m.get("id") or (m.get("nos")[0] if m.get("nos") else None) for m in maps if m.get("status") == "aprovado"]
+    def get_pai_efetivo(item_pai: str) -> str | None:
+        maps = arvore.mapeamentos.get(item_pai, [])
+        for m in maps:
+            if m.status == "aprovado":
+                return resolver_no(arvore, m.no_id)
+        return None
 
-    for nivel in niveis:
+    # Mapeamentos locais para carregar regras existentes
+    for nivel in ("materia", "assunto", "subassunto"):
         fonte = getattr(nomes, nivel)
         for chave_origem, info in fonte.items():
-            chave_str = to_key(chave_origem)
+            chave_str = chave_item(chave_origem if isinstance(chave_origem, tuple) else (chave_origem,))
+            maps = arvore.mapeamentos.get(chave_str, [])
+            aprovados = [resolver_no(arvore, m.no_id) for m in maps if m.status == "aprovado"]
             
-            # Se já está mapeado e aprovado, adiciona ao índice de regras para ajudar os novos
-            if chave_str in mapeamentos and mapeamentos[chave_str] and any(m.get("status") == "aprovado" for m in mapeamentos[chave_str]):
-                # Quais nós estão mapeados?
-                nos_aprovados = [m.get("no") or m.get("id") or (m.get("nos")[0] if m.get("nos") else None) for m in mapeamentos[chave_str] if m.get("status") == "aprovado"]
-                regra = chave_regra(info["nome"]).chave
+            regra = chave_regra(info["nome"]).chave
+            if not regra or not aprovados:
+                continue
                 
-                # Descobrir o pai_efetivo
-                pai_efetivo = None
-                if nivel == "assunto":
-                    pai_origem = chave_origem[0]
-                    pai_str = to_key(pai_origem)
-                    pais = mapping_local.get(pai_str, [])
-                    if pais: pai_efetivo = pais[0]
-                elif nivel == "subassunto":
-                    pai_origem = chave_origem[:2]
-                    pai_str = to_key(pai_origem)
-                    pais = mapping_local.get(pai_str, [])
-                    if pais: pai_efetivo = pais[0]
+            pai_efetivo = None
+            if nivel == "assunto":
+                pai_str = chave_item(chave_origem[:1])
+                pai_efetivo = get_pai_efetivo(pai_str)
+            elif nivel == "subassunto":
+                pai_str = chave_item(chave_origem[:2])
+                pai_efetivo = get_pai_efetivo(pai_str)
                 
-                if nos_aprovados:
-                    # Indexar a regra
-                    idx_key = (nivel, pai_efetivo, regra)
-                    if idx_key not in indice:
-                        indice[idx_key] = nos_aprovados
-                        
-            # Se não está mapeado
-            elif chave_str not in mapeamentos or not mapeamentos[chave_str]:
-                regra = chave_regra(info["nome"]).chave
-                if not regra: continue
+            idx_key = (nivel, pai_efetivo, regra)
+            if idx_key not in indice:
+                indice[idx_key] = aprovados[0] # Guarda o primeiro nó para o qual essa regra mapeia
+
+    # Agora mapeia os não mapeados
+    for nivel in ("materia", "assunto", "subassunto"):
+        fonte = getattr(nomes, nivel)
+        for chave_origem, info in fonte.items():
+            chave_str = chave_item(chave_origem if isinstance(chave_origem, tuple) else (chave_origem,))
+            
+            if arvore.mapeamentos.get(chave_str):
+                continue
                 
-                # Descobrir o pai_efetivo para este item
-                pai_efetivo = None
-                if nivel == "assunto":
-                    pai_origem = chave_origem[0]
-                    pai_str = to_key(pai_origem)
-                    pais = mapping_local.get(pai_str, [])
-                    if pais: pai_efetivo = pais[0]
-                elif nivel == "subassunto":
-                    pai_origem = chave_origem[:2]
-                    pai_str = to_key(pai_origem)
-                    pais = mapping_local.get(pai_str, [])
-                    if pais: pai_efetivo = pais[0]
+            regra = chave_regra(info["nome"]).chave
+            if not regra:
+                continue
                 
-                if nivel != "materia" and not pai_efetivo:
-                    continue # Sem pai mapeado, impossível mapear por regra
-                    
-                idx_key = (nivel, pai_efetivo, regra)
-                if idx_key in indice:
-                    # Achou regra correspondente! Mapear automaticamente
-                    novo_map = []
-                    for nid in indice[idx_key]:
-                        novo_map.append({"no": nid, "origem": "regra", "status": "aprovado"})
-                    mapeamentos[chave_str] = novo_map
-                    mapping_local[chave_str] = indice[idx_key]
-                    mudou = True
+            pai_efetivo = None
+            if nivel == "assunto":
+                pai_str = chave_item(chave_origem[:1])
+                pai_efetivo = get_pai_efetivo(pai_str)
+            elif nivel == "subassunto":
+                pai_str = chave_item(chave_origem[:2])
+                pai_efetivo = get_pai_efetivo(pai_str)
+                
+            if nivel != "materia" and not pai_efetivo:
+                continue
+                
+            idx_key = (nivel, pai_efetivo, regra)
+            if idx_key in indice:
+                from src.arvore import mapear
+                mapear(arvore, chave_str, [indice[idx_key]], origem="regra", status="aprovado")
+                mudou = True
 
     if mudou:
-        with open(ARVORE_JSON, "w", encoding="utf-8") as f:
-            json.dump(arvore, f, ensure_ascii=False, indent=1)
+        salvar(arvore, arvore_path)
+
 

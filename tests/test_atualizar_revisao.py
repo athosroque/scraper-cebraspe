@@ -173,8 +173,8 @@ class TestSinonimosNoPipeline:
             atualizar_revisao, "listar_jsons_edital", lambda d: [d / "Ed.json"]
         )
         chamadas = []
-        import src.canonico
         import scripts.gerar_relatorio_arvore
+        import src.canonico
         monkeypatch.setattr(
             src.canonico,
             "mapear_novos_itens_por_regra",

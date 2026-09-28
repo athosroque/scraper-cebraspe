@@ -843,3 +843,11 @@ enviar o bloco de uma etapa específica para o agente construir.
   `mart`/dbt) que lê os dois. Decisão a registrar em ADR próprio.
 - `[ ]` Caso de uso-alvo: "tópicos mais cobrados por matéria/ano que ainda não
   têm item de estudo" → plano de estudo priorizado.
+
+## Etapa 5B.1 — Correções
+- `[x]` Consolidar leitura/escrita e formato do `arvore.json` em `src/arvore.py` (uma linha por registro).
+- `[x]` Reescrever regra do pipeline (`mapear_novos_itens_por_regra`) sobre a API de `src/arvore.py`.
+- `[x]` Corrigir a CLI `curar_arvore.py` e argumentos incorretos.
+- `[x]` No banco, gravar `no_id` resolvido, ignorar fundidos/propostos, restaurar `vw_incidencia_topico(_todas)` e recalcular `nocoes`.
+- `[x]` Melhorar `arvore.html` (itens de edital por nó com concurso/cargo/nível e pendentes).
+- `[x]` Link corrigido no index.html.

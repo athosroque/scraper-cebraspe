@@ -1,24 +1,40 @@
 import json
-from pathlib import Path
+import sys
 from html import escape
+from pathlib import Path
 
 PROJETO_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJETO_DIR))
+from src.arvore import carregar, resolver_no
+from src.canonico import coletar_nomes
+
 ARVORE_JSON = PROJETO_DIR / "canonico" / "arvore.json"
-HTML_OUT = PROJETO_DIR / "revisao_piloto" / "relatorio" / "arvore.html"
+REVISAO_DIR = PROJETO_DIR / "revisao_piloto"
+HTML_OUT = REVISAO_DIR / "relatorio" / "arvore.html"
 
 def gerar_relatorio_arvore():
     try:
-        with open(ARVORE_JSON, "r", encoding="utf-8") as f:
-            arvore = json.load(f)
-    except Exception as e:
+        arvore = carregar(ARVORE_JSON)
+    except (OSError, json.JSONDecodeError) as e:
         print(f"Erro ao carregar {ARVORE_JSON}: {e}")
         return
 
-    nos = arvore.get("nos", {})
-    if isinstance(nos, list):
-        nos = {n["id"]: n for n in nos}
-        
-    mapeamentos = arvore.get("mapeamentos", {})
+    # Coletar contexto dos itens de edital
+    nomes = coletar_nomes(REVISAO_DIR)
+    
+    # Criar um dict item_str -> lista de (concurso, cargo, nivel)
+    from src.arvore import chave_item
+    contexto_item = {}
+    for nivel in ("materia", "assunto", "subassunto"):
+        fonte = getattr(nomes, nivel)
+        for chave, info in fonte.items():
+            chave_str = chave_item(chave if isinstance(chave, tuple) else (chave,))
+            # info["concursos"] set de slugs
+            contexto_item[chave_str] = {
+                "concursos": list(info.get("concursos", set())),
+                "cargos": list(info.get("cargos", set())),
+                "niveis": list(info.get("niveis", set()))
+            }
 
     html = ["<!DOCTYPE html><html><head><meta charset='utf-8'><title>Árvore Mestre</title>"]
     html.append("<style>")
@@ -32,18 +48,22 @@ def gerar_relatorio_arvore():
     html.append("</style></head><body>")
     html.append("<h1>Relatório da Árvore Mestre</h1>")
 
-    # Mapeamentos pendentes (não resolvidos ou com nó fundido/inválido)
     pendentes = []
-    
-    # Agrupar itens de edital por nó
     itens_por_no = {}
-    for item, maps in mapeamentos.items():
+    
+    # Adicionar itens que estão nos editais mas sem nenhum mapeamento na árvore (ou lista vazia)
+    for chave_str in contexto_item:
+        if chave_str not in arvore.mapeamentos or not arvore.mapeamentos[chave_str]:
+            pendentes.append((chave_str, "Sem mapeamento"))
+
+    for item, maps in arvore.mapeamentos.items():
         if not maps:
-            pendentes.append((item, "Sem mapeamento"))
+            if not any(p[0] == item for p in pendentes):
+                pendentes.append((item, "Sem mapeamento"))
             continue
         for m in maps:
-            no_id = m.get("no") or m.get("id") or (m.get("nos")[0] if m.get("nos") else None)
-            status = m.get("status", "")
+            no_id = resolver_no(arvore, m.no_id)
+            status = m.status
             if status == "proposto":
                 pendentes.append((item, f"Proposto para {no_id}"))
             elif status == "aprovado":
@@ -52,18 +72,17 @@ def gerar_relatorio_arvore():
                 itens_por_no[no_id].append(item)
 
     if pendentes:
-        html.append("<h2>Mapeamentos Pendentes / Propostos</h2><ul>")
+        html.append("<h2>Mapeamentos Pendentes / Propostos / Sem mapeamento</h2><ul>")
         for p in pendentes:
             html.append(f"<li>{escape(str(p[0]))}: {escape(str(p[1]))}</li>")
         html.append("</ul>")
 
-    # Construir hierarquia de nós
     filhos = {}
     raizes = []
-    for nid, no in nos.items():
-        if no.get("status") == "fundido":
+    for nid, no in arvore.nos.items():
+        if no.status == "fundido":
             continue
-        pai = no.get("pai")
+        pai = resolver_no(arvore, no.pai) if no.pai else None
         if pai:
             if pai not in filhos:
                 filhos[pai] = []
@@ -74,11 +93,11 @@ def gerar_relatorio_arvore():
     html.append("<h2>Árvore</h2>")
     
     def render_no(nid):
-        no = nos.get(nid)
+        no = arvore.nos.get(nid)
         if not no: return ""
-        nivel = no.get("nivel", "desconhecido")
-        nome = no.get("nome", "Sem nome")
-        status = no.get("status", "")
+        nivel = no.nivel
+        nome = no.nome
+        status = no.status
         
         css_class = f"no-{nivel}"
         if status == "proposto": css_class += " status-proposto"
@@ -89,13 +108,16 @@ def gerar_relatorio_arvore():
         if itens:
             out += "<ul>"
             for item in itens:
-                out += f"<li class='item-edital'>📄 {escape(str(item))}</li>"
+                ctx = contexto_item.get(item, {})
+                c_str = ""
+                if ctx:
+                    c_str = f" [Concursos: {','.join(ctx['concursos'])} | Níveis: {','.join(ctx['niveis'])}]"
+                out += f"<li class='item-edital'>📄 {escape(str(item))}{escape(c_str)}</li>"
             out += "</ul>"
             
         if nid in filhos:
             out += "<ul>"
-            # Sort filhos by name
-            filhos_ordenados = sorted(filhos[nid], key=lambda x: nos[x].get("nome", ""))
+            filhos_ordenados = sorted(filhos[nid], key=lambda x: arvore.nos[x].nome)
             for f in filhos_ordenados:
                 out += render_no(f)
             out += "</ul>"
@@ -103,7 +125,7 @@ def gerar_relatorio_arvore():
         return out
 
     html.append("<ul>")
-    raizes_ordenadas = sorted(raizes, key=lambda x: nos[x].get("nome", ""))
+    raizes_ordenadas = sorted(raizes, key=lambda x: arvore.nos[x].nome)
     for r in raizes_ordenadas:
         html.append(render_no(r))
     html.append("</ul>")

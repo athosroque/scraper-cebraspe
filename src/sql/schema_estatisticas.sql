@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS no_arvore (
     nome TEXT NOT NULL,
     pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
     origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
-    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido')),
-    fundido_em TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED
+    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido'))
+
 );
 
 CREATE TABLE IF NOT EXISTS materia_no (
@@ -149,8 +149,8 @@ CREATE TABLE IF NOT EXISTS no_arvore (
     nome TEXT NOT NULL,
     pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
     origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
-    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido')),
-    fundido_em TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED
+    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido'))
+
 );
 
 CREATE TABLE IF NOT EXISTS materia_no (
@@ -367,14 +367,14 @@ DROP VIEW IF EXISTS vw_edital_cobra_materia CASCADE;
 
 CREATE OR REPLACE VIEW vw_no_caminho AS
 WITH RECURSIVE hierarquia AS (
-    SELECT id, nivel, nome, pai_id, status, fundido_em,
+    SELECT id, nivel, nome, pai_id, status,
            nome AS caminho
     FROM no_arvore
     WHERE pai_id IS NULL
     
     UNION ALL
     
-    SELECT n.id, n.nivel, n.nome, n.pai_id, n.status, n.fundido_em,
+    SELECT n.id, n.nivel, n.nome, n.pai_id, n.status,
            h.caminho || ' > ' || n.nome
     FROM no_arvore n
     INNER JOIN hierarquia h ON n.pai_id = h.id
@@ -551,3 +551,33 @@ SELECT
 FROM materias m
 INNER JOIN vw_no_caminho nc ON nc.id = m.materia_id
 GROUP BY nc.id, nc.caminho;
+
+-- Incidência de tópico entre concursos, incluindo os ainda pendentes de
+-- revisão (para inspecionar o piloto).
+CREATE OR REPLACE VIEW vw_incidencia_topico_todas AS
+SELECT
+    materia,
+    topico,
+    ano,
+    nivel,
+    tipo_conhecimento,
+    count(DISTINCT concurso) AS concursos,
+    count(*) AS ocorrencias,
+    array_agg(DISTINCT concurso ORDER BY concurso) AS lista_concursos
+FROM vw_taxonomia_detalhe
+GROUP BY materia, topico, ano, nivel, tipo_conhecimento;
+
+-- Estatística "oficial": só concursos com revisão humana aprovada.
+CREATE OR REPLACE VIEW vw_incidencia_topico AS
+SELECT
+    materia,
+    topico,
+    ano,
+    nivel,
+    tipo_conhecimento,
+    count(DISTINCT concurso) AS concursos,
+    count(*) AS ocorrencias,
+    array_agg(DISTINCT concurso ORDER BY concurso) AS lista_concursos
+FROM vw_taxonomia_detalhe
+WHERE status_revisao = 'aprovado'
+GROUP BY materia, topico, ano, nivel, tipo_conhecimento;
