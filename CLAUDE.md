@@ -147,15 +147,24 @@ Datasette continua só como ferramenta de revisão do dono.
       só cadeia ativa), `vw_arvore_edital_por_cargo` (9569 linhas, 1485/1485
       itens) e `vw_edital_cobra_{materia,assunto,subassunto}` (+ `_todas`).
       Tabelas `*_canonico` removidas. 476 testes (+1 xfail), ruff verde.
+- [x] Etapa 5B.2 — Curadoria da árvore (ADR-030): propostas de operação no
+      `arvore.json` (`fundir`/`mover`/`criar`/`remapear`/`aposentar`,
+      aprovação em lote tudo ou nada), status `aposentado`,
+      `detectar_compostos` e `detectar_homonimos` (regra) e
+      `scripts/propor_arvore.py` (LLM por matéria). Rodada real de 83
+      chamadas e 210 propostas: o dono rejeitou 29 e aprovou o resto. Árvore:
+      3577 nós ativos, 148 fundidos e 6 aposentados; matéria nova "Processo
+      Legislativo". "Disposições gerais" 8 e "Servidores públicos" 7 em
+      `vw_edital_cobra_subassunto`. 538 testes (+1 xfail), ruff verde.
 - [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
       parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
       registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
-- **⚡ Prioridade atual: Etapas 5B.2 → 5D → 5E → 5F do `task.md`**
-      (ADR-030, 2026-09-28): árvore mestre semeada com a 5B → curadoria da
-      árvore (checkpoint do dono) → classificação das questões na árvore →
+- **⚡ Prioridade atual: Etapas 5D → 5E → 5F do `task.md`**
+      (ADR-030, 2026-09-28): árvore mestre curada e aprovada (5B.1/5B.2) →
+      classificação das questões na árvore →
       estatísticas → site público. A 5A, a 5B (aprovada em 2026-09-27) e a
       5C/5C.1 estão concluídas. A antiga 5B.1 ("divisão de nomes
       compostos") foi substituída pelo mapeamento N:N da árvore.

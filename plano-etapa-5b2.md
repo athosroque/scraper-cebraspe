@@ -142,12 +142,12 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
   `test_propor_sinonimos.py`): ID inventado, nível errado e ciclo viram falha
   tipada; segunda tentativa com o erro no prompt; propostas gravadas como
   `proposto`/`llm`; idempotência por hash.
-- `[ ]` **Rodada real:** `--so-regras` → `--dry-run` (revisar os prompts) →
+- `[x]` **Rodada real:** `--so-regras` → `--dry-run` (revisar os prompts) →
   rodada real (~60–90 chamadas, custo no log final). Gerar o `arvore.html`.
-- `[ ]` **Checkpoint do dono:** o dono decide pela CLI ou diz na conversa
+- `[x]` **Checkpoint do dono:** o dono decide pela CLI ou diz na conversa
   quais `P-…` aprovar ou rejeitar. O agente só executa o que o dono
   disser. Depois, recarregar o banco (`python -m src.stats_writer`).
-- `[ ]` **Documentação:** ADR-030, seção "Implementação (Etapa 5B.2)"
+- `[x]` **Documentação:** ADR-030, seção "Implementação (Etapa 5B.2)"
   (propostas de operação, `aposentado`, `propor_arvore.py`, números da
   rodada e decisões do dono). `task.md` com a 5B.2 `[x]`. `LESSONS.md`, se
   houver gotcha.
@@ -158,3 +158,11 @@ automaticamente por regra. Nunca se cria nó novo automaticamente.
   `A-4529f205f7` e `S-7b3b2a86ce` estão `aposentado`; não há proposta
   pendente.
 - **Checkpoint:** o dono aprova a árvore antes da Etapa 5D.
+
+> **Resultado (2026-09-28):** 210 propostas revisadas; o dono rejeitou 29 e
+> aprovou 181, mais 2 propostas `humano` (LC 95/1998 → Processo Legislativo;
+> regime dos parlamentares → Direito Constitucional) e 54 de regra (50
+> fusões de irmãos homônimos, `arvore.detectar_homonimos`, e 2 compostos
+> novos). Banco recarregado: "Disposições gerais" 8, "Servidores públicos" 7,
+> os 4 compostos `aposentado`, nenhuma proposta pendente. Detalhes no
+> ADR-030.

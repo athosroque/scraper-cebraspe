@@ -19,8 +19,8 @@ enviar o bloco de uma etapa específica para o agente construir.
 > importância: (1) o que mais cai na prova; (2) o que o edital cobra; (3)
 > edital × prova; (4) desempenho pessoal do usuário.
 
-> **⚡ Prioridade atual (2026-09-28):** Etapas **5B.1 → 5B.2 → 5D → 5E → 5F**
-> (árvore mestre, curadoria da árvore, classificação das questões,
+> **⚡ Prioridade atual (2026-09-28):** Etapas **5D → 5E → 5F** (5B.1 e
+> 5B.2 concluídas: árvore mestre curada; próximas: classificação das questões,
 > estatísticas e site). A 5A (ADR-028), a 5B (ADR-029, sinônimos aprovados em
 > 2026-09-27), a 5C e a 5C.1 (ADR-031) estão concluídas. A antiga 5B.1
 > ("divisão de nomes compostos") foi **substituída** pela árvore mestre
@@ -632,7 +632,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   `A-4529f205f7` e `S-7b3b2a86ce`); `arvore.html` com as propostas
   agrupadas por matéria; CLI `--aprovar-proposta`, `--rejeitar-proposta` e
   `--propostas`; testes.
-- `[ ]` **Sessão B (LLM + checkpoint):** `scripts/propor_arvore.py` (por
+- `[x]` **Sessão B (LLM + checkpoint):** `scripts/propor_arvore.py` (por
   matéria; escopo composto do CD com Constitucional, Regimento e Processo
   Legislativo; destino dos 21 filhos de Licitações), rodada real,
   **decisão do dono** sobre cada `P-…` e ADR-030 atualizado.
@@ -643,6 +643,14 @@ enviar o bloco de uma etapa específica para o agente construir.
   `M-d5adcb4de4`, `A-4529f205f7` e `S-7b3b2a86ce` estão `aposentado`; não há
   proposta pendente.
 - **Checkpoint:** o dono aprova a árvore antes da Etapa 5D.
+
+> **Resultado (2026-09-28):** rodada real com 83 chamadas (US$ 0,02) e 210
+> propostas. O dono rejeitou 29 e aprovou o resto. Na aplicação apareceram
+> 50 pares de subassuntos homônimos, que uma regra nova
+> (`arvore.detectar_homonimos`) fundiu. Banco: "Disposições gerais" 8 e
+> "Servidores públicos" 7 em `vw_edital_cobra_subassunto`, `M-841dde7520`,
+> `M-d5adcb4de4`, `A-4529f205f7` e `S-7b3b2a86ce` `aposentado`, nenhuma
+> proposta pendente. Árvore: 3577 nós ativos. Ver ADR-030.
 
 ## Etapa 5C: Extração determinística de questões, gabaritos e discursivas (sem LLM)
 - `[x]` Tirar o "fora do escopo" da fila `fila_extracao_questoes` (Etapa 5,

@@ -175,6 +175,33 @@ estatística de edital.
   - **Licitações e Contratos (`M-6f50f4f1dd`):** prompt orienta a redistribuição dos subassuntos de `A-4529f205f7` para os irmãos `A-2261b82645` (Licitação) e `A-91e52e6c2e` (Contratos administrativos), gerando proposta `aposentar` de `A-4529f205f7` assim que todos os filhos tiverem destinos atribuídos.
 - **Cobertura de Testes (`tests/test_propor_arvore.py`):**
   - Testes com LLM mockado cobrindo casos válidos, IDs inventados, níveis errados, ciclos, 2ª tentativa assistida por feedback, idempotência de hash, `--dry-run`, `--so-regras`, escopo CD e Licitações.
+- **Rodada real (2026-09-28):** 83 chamadas, 1 falha tipada
+  (`falha_operacao_invalida`), US$ 0,02. Com as 4 propostas de regra da
+  Sessão A, ficaram 210 pendentes (125 `fundir` e 75 `mover` do LLM, 5
+  `remapear` e 4 `aposentar` de regra, 1 `criar` humano).
+- **Decisão do dono:** 29 rejeitadas. Os motivos foram: composto fundido numa
+  parte só, que repete o erro do `SL-065b9773e6` (`P-b3484bc14e`,
+  `P-399e81f097`, `P-7c43589a00`); temas diferentes tratados como iguais
+  (direção defensiva → ofensiva, AVP → realizável a longo prazo); perda de
+  granularidade de subtemas clássicos (lei penal no tempo e no espaço,
+  nulidades); destino errado. A LC 95/1998 foi para Processo Legislativo, e
+  o regime jurídico dos parlamentares para Direito Constitucional (2
+  propostas `humano`). As outras 181 foram aprovadas.
+- **Irmãos homônimos:** `fundir` de dois assuntos junta os filhos, mas não
+  funde os subassuntos de mesmo nome vindos de cada lado. Depois do lote,
+  eram 50 pares (entre eles "Disposições gerais" sob "Administração
+  pública", que travava o indicador em 7/8). `arvore.detectar_homonimos`
+  propõe `fundir` (origem `regra`) no irmão com mais uso e roda junto com
+  `--so-regras`. A mesma rodada achou 2 compostos novos, criados pela
+  curadoria: "Capacidade e direitos da personalidade" e "Distrito Federal e
+  territórios". Essas 54 propostas de regra foram aprovadas.
+- **Resultado:** 3577 nós ativos, 148 fundidos e 6 aposentados (`M-841dde7520`,
+  `M-d5adcb4de4`, `A-4529f205f7`, `S-7b3b2a86ce` e os 2 compostos novos).
+  Nenhuma proposta está pendente. Em `vw_edital_cobra_subassunto`,
+  "Disposições gerais" tem 8 ocorrências e "Servidores públicos" tem 7
+  (`servidores públicos civis e militares`, do CD cargo 2, não foi
+  fundido). Direito Constitucional soma 97 ocorrências em 31 assuntos, e
+  Processo Legislativo soma 17.
 
 ## Alternativas Consideradas
 

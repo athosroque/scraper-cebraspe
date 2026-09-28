@@ -1,5 +1,25 @@
 # Lições — scraper-cebraspe
 
+### [tags: arvore-mestre, curadoria, llm, falha-silenciosa]
+**Sintoma:** depois de aprovar as fusões da 5B.2, "Disposições gerais" ficou
+com 7 ocorrências, e não 8, embora cada proposta estivesse correta. A árvore
+tinha 50 pares de subassuntos irmãos com o mesmo nome. Além disso, a
+rodada do LLM tinha proposto de novo fundir "Disposições gerais, servidores
+públicos" só em "Servidores públicos", o erro do `SL-065b9773e6` já
+rejeitado na 5B, apesar da regra no prompt.
+**Causa:** `fundir_nos` de dois assuntos passa os filhos da origem para o
+destino, mas não compara esses filhos com os que o destino já tinha. Cada
+proposta sozinha é válida, e a duplicata só aparece depois do lote. O LLM
+não enxerga a regra de composto como proibição, porque a fusão numa parte
+é estruturalmente válida.
+**Solução (ADR-030):** `arvore.detectar_homonimos` roda depois de cada
+lote (`propor_arvore.py --so-regras`) e propõe `fundir` por regra entre
+irmãos com a mesma `chave_regra`. Antes de aprovar um lote grande, simular
+numa cópia (`copy.deepcopy` + `aprovar_propostas`) e medir o indicador e
+os homônimos. Proposta de LLM que funde um nome composto numa parte só é
+rejeitada na revisão.
+**Custo do aprendizado:** ~30min de revisão e simulação.
+
 ### [tags: arvore-mestre, json, testes, falha-silenciosa, postgres]
 **Sintoma:** a primeira entrega da 5B.1 foi dada como pronta com 445 testes
 verdes. Na prática, a regra do pipeline casava 0 de 1259 assuntos, o
