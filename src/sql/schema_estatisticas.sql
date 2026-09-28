@@ -9,31 +9,6 @@
 -- schema de propósito — o teste de integração roda num schema temporário via
 -- `search_path`.
 
--- Camada canônica (Etapa 5B, ADR-029) ------------------------------------------
--- Derivada de `canonico/sinonimos.json`: só grupo `aprovado` é carregado. O ID
--- é o ID estável do JSON (TEXT), para a classificação de questões (5D) poder
--- apontar para ele entre recargas.
-
-CREATE TABLE IF NOT EXISTS materia_canonica (
-    id TEXT PRIMARY KEY,
-    nome TEXT NOT NULL,
-    origem TEXT NOT NULL CHECK (origem IN ('regra', 'llm', 'humano'))
-);
-
-CREATE TABLE IF NOT EXISTS assunto_canonico (
-    id TEXT PRIMARY KEY,
-    materia_canonica_id TEXT NOT NULL REFERENCES materia_canonica (id),
-    nome TEXT NOT NULL,
-    origem TEXT NOT NULL CHECK (origem IN ('regra', 'llm', 'humano'))
-);
-
-CREATE TABLE IF NOT EXISTS subassunto_canonico (
-    id TEXT PRIMARY KEY,
-    assunto_canonico_id TEXT NOT NULL REFERENCES assunto_canonico (id),
-    nome TEXT NOT NULL,
-    origem TEXT NOT NULL CHECK (origem IN ('regra', 'llm', 'humano'))
-);
-
 -- Dimensões ------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS dim_orgao (
@@ -51,8 +26,7 @@ CREATE TABLE IF NOT EXISTS dim_materia (
     id SERIAL PRIMARY KEY,
     chave TEXT NOT NULL UNIQUE,
     nome TEXT NOT NULL,
-    nocoes BOOLEAN NOT NULL DEFAULT false,
-    materia_canonica_id TEXT REFERENCES materia_canonica (id)
+    nocoes BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS dim_topico (
@@ -60,7 +34,6 @@ CREATE TABLE IF NOT EXISTS dim_topico (
     materia_id INTEGER NOT NULL REFERENCES dim_materia (id),
     chave TEXT NOT NULL,
     nome TEXT NOT NULL,
-    assunto_canonico_id TEXT REFERENCES assunto_canonico (id),
     UNIQUE (materia_id, chave)
 );
 
@@ -69,14 +42,49 @@ CREATE TABLE IF NOT EXISTS dim_subtopico (
     topico_id INTEGER NOT NULL REFERENCES dim_topico (id),
     chave TEXT NOT NULL,
     nome TEXT NOT NULL,
-    subassunto_canonico_id TEXT REFERENCES subassunto_canonico (id),
     UNIQUE (topico_id, chave)
 );
 
--- Migração idempotente de bancos criados antes da Etapa 5B:
-ALTER TABLE dim_materia ADD COLUMN IF NOT EXISTS nocoes BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE dim_materia ADD COLUMN IF NOT EXISTS materia_canonica_id TEXT REFERENCES materia_canonica (id);
-ALTER TABLE dim_topico ADD COLUMN IF NOT EXISTS assunto_canonico_id TEXT REFERENCES assunto_canonico (id);
+-- Árvore Mestre (Etapa 5B.1, ADR-030) ------------------------------------------
+-- Derivada de `canonico/arvore.json`. O ID é estável, herdado da 5B ou sha1.
+
+CREATE TABLE IF NOT EXISTS no_arvore (
+    id TEXT PRIMARY KEY,
+    nivel TEXT NOT NULL CHECK (nivel IN ('materia', 'assunto', 'subassunto')),
+    nome TEXT NOT NULL,
+    pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
+    origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
+    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido')),
+    fundido_em TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED
+);
+
+CREATE TABLE IF NOT EXISTS materia_no (
+    materia_id INTEGER NOT NULL REFERENCES dim_materia (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
+    PRIMARY KEY (materia_id, no_id)
+);
+
+CREATE TABLE IF NOT EXISTS topico_no (
+    topico_id INTEGER NOT NULL REFERENCES dim_topico (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
+    PRIMARY KEY (topico_id, no_id)
+);
+
+CREATE TABLE IF NOT EXISTS subtopico_no (
+    subtopico_id INTEGER NOT NULL REFERENCES dim_subtopico (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
+    PRIMARY KEY (subtopico_id, no_id)
+);
+
+
+-- Migração idempotente de bancos criados antes da Etapa 5B.1:
+ALTER TABLE IF EXISTS dim_materia DROP COLUMN IF EXISTS materia_canonica_id CASCADE;
+ALTER TABLE IF EXISTS dim_topico DROP COLUMN IF EXISTS assunto_canonico_id CASCADE;
+ALTER TABLE IF EXISTS dim_subtopico DROP COLUMN IF EXISTS subassunto_canonico_id CASCADE;
+
+DROP TABLE IF EXISTS subassunto_canonico CASCADE;
+DROP TABLE IF EXISTS assunto_canonico CASCADE;
+DROP TABLE IF EXISTS materia_canonica CASCADE;
 
 CREATE TABLE IF NOT EXISTS dim_cargo (
     id SERIAL PRIMARY KEY,
@@ -131,6 +139,38 @@ CREATE TABLE IF NOT EXISTS taxonomia_itens (
     cargos_restritos INTEGER[],
     UNIQUE (concurso_id, chunk_index, topico_ordem)
 );
+
+-- Árvore Mestre (Etapa 5B.1, ADR-030) ------------------------------------------
+-- Derivada de `canonico/arvore.json`. O ID é estável, herdado da 5B ou sha1.
+
+CREATE TABLE IF NOT EXISTS no_arvore (
+    id TEXT PRIMARY KEY,
+    nivel TEXT NOT NULL CHECK (nivel IN ('materia', 'assunto', 'subassunto')),
+    nome TEXT NOT NULL,
+    pai_id TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED,
+    origem TEXT NOT NULL CHECK (origem IN ('semente', 'humano', 'llm', 'regra')),
+    status TEXT NOT NULL CHECK (status IN ('ativo', 'proposto', 'fundido')),
+    fundido_em TEXT REFERENCES no_arvore (id) DEFERRABLE INITIALLY DEFERRED
+);
+
+CREATE TABLE IF NOT EXISTS materia_no (
+    materia_id INTEGER NOT NULL REFERENCES dim_materia (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
+    PRIMARY KEY (materia_id, no_id)
+);
+
+CREATE TABLE IF NOT EXISTS topico_no (
+    topico_id INTEGER NOT NULL REFERENCES dim_topico (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
+    PRIMARY KEY (topico_id, no_id)
+);
+
+CREATE TABLE IF NOT EXISTS subtopico_no (
+    subtopico_id INTEGER NOT NULL REFERENCES dim_subtopico (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id) ON DELETE CASCADE,
+    PRIMARY KEY (subtopico_id, no_id)
+);
+
 
 -- Migração idempotente para bancos existentes antes da introdução da coluna:
 ALTER TABLE taxonomia_itens ADD COLUMN IF NOT EXISTS cargos_restritos INTEGER[];
@@ -319,6 +359,27 @@ DROP VIEW IF EXISTS vw_incidencia_topico CASCADE;
 DROP VIEW IF EXISTS vw_incidencia_topico_todas CASCADE;
 DROP VIEW IF EXISTS vw_taxonomia_detalhe CASCADE;
 DROP VIEW IF EXISTS vw_subtopico_detalhe CASCADE;
+DROP VIEW IF EXISTS vw_no_caminho CASCADE;
+DROP VIEW IF EXISTS vw_arvore_edital_por_cargo CASCADE;
+DROP VIEW IF EXISTS vw_edital_cobra_subassunto CASCADE;
+DROP VIEW IF EXISTS vw_edital_cobra_assunto CASCADE;
+DROP VIEW IF EXISTS vw_edital_cobra_materia CASCADE;
+
+CREATE OR REPLACE VIEW vw_no_caminho AS
+WITH RECURSIVE hierarquia AS (
+    SELECT id, nivel, nome, pai_id, status, fundido_em,
+           nome AS caminho
+    FROM no_arvore
+    WHERE pai_id IS NULL
+    
+    UNION ALL
+    
+    SELECT n.id, n.nivel, n.nome, n.pai_id, n.status, n.fundido_em,
+           h.caminho || ' > ' || n.nome
+    FROM no_arvore n
+    INNER JOIN hierarquia h ON n.pai_id = h.id
+)
+SELECT * FROM hierarquia;
 
 CREATE OR REPLACE VIEW vw_taxonomia_detalhe AS
 SELECT
@@ -334,12 +395,8 @@ SELECT
     m.nome AS materia,
     m.chave AS materia_chave,
     m.nocoes,
-    mc.id AS materia_canonica_id,
-    mc.nome AS materia_canonica,
     t.nome AS topico,
     t.chave AS topico_chave,
-    ac.id AS assunto_canonico_id,
-    ac.nome AS assunto_canonico,
     ti.apenas_discursiva,
     (SELECT count(*) FROM taxonomia_subitens AS s WHERE s.taxonomia_item_id = ti.id) AS total_subtopicos
 FROM taxonomia_itens AS ti
@@ -347,11 +404,8 @@ INNER JOIN concursos AS c ON ti.concurso_id = c.id
 INNER JOIN dim_orgao AS o ON c.orgao_id = o.id
 INNER JOIN dim_materia AS m ON ti.materia_id = m.id
 INNER JOIN dim_topico AS t ON ti.topico_id = t.id
-LEFT JOIN materia_canonica AS mc ON m.materia_canonica_id = mc.id
-LEFT JOIN assunto_canonico AS ac ON t.assunto_canonico_id = ac.id
 LEFT JOIN cargos_editais AS ce ON ti.cargo_edital_id = ce.id;
 
--- 1 linha por subtópico, com o canônico de cada nível (Etapa 5B).
 CREATE OR REPLACE VIEW vw_subtopico_detalhe AS
 SELECT
     d.concurso,
@@ -362,58 +416,138 @@ SELECT
     d.nivel,
     d.cargo_numero,
     d.materia,
-    d.materia_canonica,
     d.topico,
-    d.assunto_canonico,
     si.ordem AS subtopico_ordem,
     si.nome AS subtopico,
-    st.chave AS subtopico_chave,
-    sc.id AS subassunto_canonico_id,
-    sc.nome AS subassunto_canonico
+    st.chave AS subtopico_chave
 FROM taxonomia_subitens AS si
 INNER JOIN taxonomia_itens AS ti ON si.taxonomia_item_id = ti.id
 INNER JOIN dim_subtopico AS st ON si.subtopico_id = st.id
-LEFT JOIN subassunto_canonico AS sc ON st.subassunto_canonico_id = sc.id
 INNER JOIN LATERAL (
     SELECT c.slug AS concurso, o.sigla AS orgao, c.ano, c.status_revisao, ti.tipo_conhecimento, ti.nivel,
-           ce.numero AS cargo_numero, m.nome AS materia, mc.nome AS materia_canonica, t.nome AS topico,
-           ac.nome AS assunto_canonico
+           ce.numero AS cargo_numero, m.nome AS materia, t.nome AS topico
     FROM concursos AS c
     INNER JOIN dim_orgao AS o ON c.orgao_id = o.id
     INNER JOIN dim_materia AS m ON m.id = ti.materia_id
     INNER JOIN dim_topico AS t ON t.id = ti.topico_id
-    LEFT JOIN materia_canonica AS mc ON m.materia_canonica_id = mc.id
-    LEFT JOIN assunto_canonico AS ac ON t.assunto_canonico_id = ac.id
     LEFT JOIN cargos_editais AS ce ON ce.id = ti.cargo_edital_id
     WHERE c.id = ti.concurso_id
 ) AS d ON true;
 
--- Incidência de tópico entre concursos, incluindo os ainda pendentes de
--- revisão (para inspecionar o piloto).
-CREATE OR REPLACE VIEW vw_incidencia_topico_todas AS
+CREATE OR REPLACE VIEW vw_arvore_edital_por_cargo AS
+WITH expansao_cargos AS (
+    SELECT 
+        ti.id AS taxonomia_item_id,
+        ti.concurso_id,
+        ti.materia_id,
+        ti.topico_id,
+        ti.tipo_conhecimento,
+        ti.apenas_discursiva,
+        ce.id AS cargo_edital_id,
+        ce.numero AS cargo_numero,
+        ce.nome AS cargo,
+        ce.nivel AS nivel
+    FROM taxonomia_itens ti
+    CROSS JOIN cargos_editais ce
+    WHERE ce.concurso_id = ti.concurso_id 
+      AND ti.cargo_edital_id IS NULL
+      AND (ti.cargos_restritos IS NULL OR ce.numero = ANY(ti.cargos_restritos))
+      AND ce.nivel = ti.nivel
+    
+    UNION ALL
+    
+    SELECT
+        ti.id AS taxonomia_item_id,
+        ti.concurso_id,
+        ti.materia_id,
+        ti.topico_id,
+        ti.tipo_conhecimento,
+        ti.apenas_discursiva,
+        ce.id AS cargo_edital_id,
+        ce.numero AS cargo_numero,
+        ce.nome AS cargo,
+        ce.nivel AS nivel
+    FROM taxonomia_itens ti
+    INNER JOIN cargos_editais ce ON ce.id = ti.cargo_edital_id
+),
+mapeamentos AS (
+    -- Matéria
+    SELECT e.taxonomia_item_id, e.cargo_edital_id, mn.no_id, 'materia' AS origem_map
+    FROM expansao_cargos e
+    INNER JOIN materia_no mn ON mn.materia_id = e.materia_id
+    
+    UNION ALL
+    
+    -- Tópico
+    SELECT e.taxonomia_item_id, e.cargo_edital_id, tn.no_id, 'topico' AS origem_map
+    FROM expansao_cargos e
+    INNER JOIN topico_no tn ON tn.topico_id = e.topico_id
+    
+    UNION ALL
+    
+    -- Subtópico
+    SELECT e.taxonomia_item_id, e.cargo_edital_id, sn.no_id, 'subtopico' AS origem_map
+    FROM expansao_cargos e
+    INNER JOIN taxonomia_subitens si ON si.taxonomia_item_id = e.taxonomia_item_id
+    INNER JOIN subtopico_no sn ON sn.subtopico_id = si.subtopico_id
+)
 SELECT
-    materia,
-    topico,
-    ano,
-    nivel,
-    tipo_conhecimento,
-    count(DISTINCT concurso) AS concursos,
-    count(*) AS ocorrencias,
-    array_agg(DISTINCT concurso ORDER BY concurso) AS lista_concursos
-FROM vw_taxonomia_detalhe
-GROUP BY materia, topico, ano, nivel, tipo_conhecimento;
+    c.slug AS concurso,
+    o.sigla AS orgao,
+    c.banca,
+    c.ano,
+    c.status_revisao,
+    e.nivel,
+    e.tipo_conhecimento,
+    e.cargo_numero,
+    e.cargo,
+    nc.caminho,
+    nc.nivel AS no_nivel,
+    nc.id AS no_id,
+    e.taxonomia_item_id,
+    m.origem_map
+FROM mapeamentos m
+INNER JOIN expansao_cargos e ON e.taxonomia_item_id = m.taxonomia_item_id AND e.cargo_edital_id = m.cargo_edital_id
+INNER JOIN vw_no_caminho nc ON nc.id = m.no_id
+INNER JOIN concursos c ON c.id = e.concurso_id
+INNER JOIN dim_orgao o ON o.id = c.orgao_id;
 
--- Estatística "oficial": só concursos com revisão humana aprovada.
-CREATE OR REPLACE VIEW vw_incidencia_topico AS
-SELECT
-    materia,
-    topico,
-    ano,
-    nivel,
-    tipo_conhecimento,
-    count(DISTINCT concurso) AS concursos,
-    count(*) AS ocorrencias,
-    array_agg(DISTINCT concurso ORDER BY concurso) AS lista_concursos
-FROM vw_taxonomia_detalhe
-WHERE status_revisao = 'aprovado'
-GROUP BY materia, topico, ano, nivel, tipo_conhecimento;
+CREATE OR REPLACE VIEW vw_edital_cobra_subassunto AS
+SELECT no_id, caminho, count(DISTINCT taxonomia_item_id) AS ocorrencias
+FROM vw_arvore_edital_por_cargo
+WHERE status_revisao = 'aprovado' AND no_nivel = 'subassunto'
+GROUP BY no_id, caminho;
+
+CREATE OR REPLACE VIEW vw_edital_cobra_assunto AS
+SELECT 
+    COALESCE(pai.id, no.no_id) AS no_id, 
+    COALESCE(pai.caminho, no.caminho) AS caminho, 
+    count(DISTINCT taxonomia_item_id) AS ocorrencias
+FROM vw_arvore_edital_por_cargo no
+LEFT JOIN vw_no_caminho pai ON no.no_nivel = 'subassunto' AND pai.id = (SELECT p.pai_id FROM no_arvore p WHERE p.id = no.no_id)
+WHERE status_revisao = 'aprovado' AND no.no_nivel IN ('assunto', 'subassunto')
+GROUP BY COALESCE(pai.id, no.no_id), COALESCE(pai.caminho, no.caminho);
+
+CREATE OR REPLACE VIEW vw_edital_cobra_materia AS
+WITH materias AS (
+    SELECT 
+        no.taxonomia_item_id,
+        CASE
+            WHEN no.no_nivel = 'materia' THEN no.no_id
+            WHEN no.no_nivel = 'assunto' THEN (SELECT p.pai_id FROM no_arvore p WHERE p.id = no.no_id)
+            WHEN no.no_nivel = 'subassunto' THEN (
+                SELECT a.pai_id FROM no_arvore s
+                INNER JOIN no_arvore a ON s.pai_id = a.id
+                WHERE s.id = no.no_id
+            )
+        END AS materia_id
+    FROM vw_arvore_edital_por_cargo no
+    WHERE no.status_revisao = 'aprovado'
+)
+SELECT 
+    nc.id AS no_id, 
+    nc.caminho AS caminho, 
+    count(DISTINCT m.taxonomia_item_id) AS ocorrencias
+FROM materias m
+INNER JOIN vw_no_caminho nc ON nc.id = m.materia_id
+GROUP BY nc.id, nc.caminho;

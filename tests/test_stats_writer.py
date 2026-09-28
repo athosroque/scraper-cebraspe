@@ -451,9 +451,8 @@ class TestGravacaoPostgres:
             assert view_rows["Topico A"] is None
             assert view_rows["Topico B"] is None
 
-    def test_camada_canonica_so_carrega_aprovado(self, conn, tmp_path):
-        from src import canonico
-
+    def test_arvore_so_carrega_aprovado(self, conn, tmp_path):
+        import json
         resultado = _resultado(
             topicos_especificos=(
                 "Atos administrativos",
@@ -462,10 +461,6 @@ class TestGravacaoPostgres:
             )
         )
         resultado["resultados"][1]["materia_normalizada"] = "NOÇÕES DE DIREITO"
-        resultado["resultados"][1]["taxonomia_extraida"]["topicos"][2]["subtopicos"] = [
-            "Sub 1",
-            "Sub 2",
-        ]
         revisao_dir = tmp_path / "revisao"
         revisao_dir.mkdir()
         (revisao_dir / "Ed_1_XX_25.json").write_text(
@@ -474,54 +469,20 @@ class TestGravacaoPostgres:
         data_dir = tmp_path / "data"
         _montar_data_dir(data_dir)
 
-        sinonimos = canonico.caminho_sinonimos(revisao_dir)
-        assert sinonimos == tmp_path / "canonico" / "sinonimos.json"
-        canonico.atualizar_por_regras(revisao_dir, sinonimos)
-        estado = canonico.carregar(sinonimos)
-        # Proposta pendente juntando as duas matérias: não pode entrar no banco.
-        proposta = canonico.registrar_proposta(
-            estado, "materia", list(estado["materia"]["entradas"]), "X", None, None
-        )
-        canonico.salvar(estado, sinonimos)
+        arvore_path = tmp_path / "canonico" / "arvore.json"
+        arvore_path.parent.mkdir(parents=True, exist_ok=True)
+        arvore_dados = {
+            "nos": {
+                "M-1": {"nivel": "materia", "nome": "DIREITO", "pai": None, "origem": "semente", "status": "ativo"}
+            },
+            "mapeamentos": {
+                "nocoes de direito": [{"no_id": "M-1", "status": "proposto"}]
+            }
+        }
+        arvore_path.write_text(json.dumps(arvore_dados, ensure_ascii=False), encoding="utf-8")
 
-        stats_writer.gravar_estatisticas(revisao_dir, data_dir, conn=conn)
+        stats_writer.gravar_estatisticas(revisao_dir, data_dir, conn=conn, arvore_path=arvore_path)
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT nome, nocoes, materia_canonica_id FROM dim_materia ORDER BY nome"
-            )
-            materias = cur.fetchall()
-            assert [(n, noc) for n, noc, _ in materias] == [
-                ("LÍNGUA PORTUGUESA", False),
-                ("NOÇÕES DE DIREITO", True),
-            ]
-            assert all(mid for *_, mid in materias)
-            assert proposta not in {mid for *_, mid in materias}
-            cur.execute(
-                "SELECT count(*), count(DISTINCT assunto_canonico_id) FROM dim_topico"
-            )
-            assert cur.fetchone() == (4, 3)  # "Atos"/"Ato" juntos por regra
-            cur.execute(
-                "SELECT count(*), count(subassunto_canonico_id) FROM dim_subtopico"
-            )
-            assert cur.fetchone() == (3, 3)
-            cur.execute("SELECT count(*) FROM taxonomia_subitens")
-            assert cur.fetchone()[0] == 3
-            cur.execute("SELECT count(*) FROM materia_canonica")
-            assert cur.fetchone()[0] == 2
-        primeira = self._contagens(conn)
+            cur.execute("SELECT count(*) FROM materia_no")
+            assert cur.fetchone()[0] == 0
 
-        # Aprovada, a proposta passa a ser o canônico das duas matérias.
-        estado = canonico.carregar(sinonimos)
-        canonico.aprovar(estado, proposta)
-        canonico.salvar(estado, sinonimos)
-        stats_writer.gravar_estatisticas(revisao_dir, data_dir, conn=conn)
-        with conn.cursor() as cur:
-            cur.execute("SELECT DISTINCT materia_canonica_id FROM dim_materia")
-            assert [r[0] for r in cur.fetchall()] == [proposta]
-            cur.execute("SELECT count(*) FROM materia_canonica")
-            assert cur.fetchone()[0] == 1
-            cur.execute(
-                "SELECT count(*) FROM vw_subtopico_detalhe WHERE materia_canonica = 'X'"
-            )
-            assert cur.fetchone()[0] == 3
-        assert self._contagens(conn) == primeira

@@ -760,125 +760,94 @@ def _limpar_dimensoes_orfas(conn) -> dict[str, int]:
     return {"materias": len(materias), "topicos": topicos, "subtopicos": subtopicos}
 
 
-def aplicar_canonico(
-    conn, indice: canonico.IndiceCanonico
-) -> dict[str, tuple[int, int]]:
-    """Carrega os grupos aprovados nas tabelas canônicas e grava o ID em
-    cada dimensão (NULL quando o nome não tem grupo aprovado). Tudo numa
-    transação; tabelas canônicas por upsert + remoção dos IDs que saíram, para
-    o ID continuar estável para quem aponta para ele (Etapa 5D).
-
-    Retorna, por nível, `(dimensões mapeadas, total)`.
+def aplicar_arvore(conn, arvore_path) -> dict[str, int]:
+    """Carrega a árvore mestre aprovada em no_arvore e as pontes N:N.
+    Tudo numa transação; tabelas limpas e recarregadas para idempotência.
     """
-    materias = indice.grupos.get("materia", {})
-    assuntos = {
-        g: d
-        for g, d in indice.grupos.get("assunto", {}).items()
-        if d["pai"] in materias
-    }
-    subassuntos = {
-        g: d
-        for g, d in indice.grupos.get("subassunto", {}).items()
-        if d["pai"] in assuntos
-    }
-    for nivel, total, carregados in (
-        ("assunto", indice.grupos.get("assunto", {}), assuntos),
-        ("subassunto", indice.grupos.get("subassunto", {}), subassuntos),
-    ):
-        if len(carregados) != len(total):
-            logger.warning(
-                f"[CANONICO] {len(total) - len(carregados)} grupos de {nivel} sem pai aprovado, fora do banco."
-            )
+    if not arvore_path.exists():
+        logger.warning(f"[ARVORE] {arvore_path} não existe — nenhuma árvore carregada.")
+        return {}
 
-    resultado: dict[str, tuple[int, int]] = {}
+    with open(arvore_path, "r", encoding="utf-8") as f:
+        dados = json.load(f)
+    
+    nos = dados.get("nos", {})
+    mapeamentos = dados.get("mapeamentos", {})
+
     with conn, conn.cursor() as cur:
-        execute_batch(
-            cur,
-            "INSERT INTO materia_canonica (id, nome, origem) VALUES (%s, %s, %s) "
-            "ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, origem = EXCLUDED.origem",
-            [(g, d["nome"], d["origem"]) for g, d in materias.items()],
-        )
-        execute_batch(
-            cur,
-            "INSERT INTO assunto_canonico (id, materia_canonica_id, nome, origem) VALUES (%s, %s, %s, %s) "
-            "ON CONFLICT (id) DO UPDATE SET materia_canonica_id = EXCLUDED.materia_canonica_id, "
-            "nome = EXCLUDED.nome, origem = EXCLUDED.origem",
-            [(g, d["pai"], d["nome"], d["origem"]) for g, d in assuntos.items()],
-        )
-        execute_batch(
-            cur,
-            "INSERT INTO subassunto_canonico (id, assunto_canonico_id, nome, origem) VALUES (%s, %s, %s, %s) "
-            "ON CONFLICT (id) DO UPDATE SET assunto_canonico_id = EXCLUDED.assunto_canonico_id, "
-            "nome = EXCLUDED.nome, origem = EXCLUDED.origem",
-            [(g, d["pai"], d["nome"], d["origem"]) for g, d in subassuntos.items()],
-        )
-
-        cur.execute("SELECT id, chave, nome FROM dim_materia")
-        linhas = [
-            (
-                indice.materia.get(chave)
-                if indice.materia.get(chave) in materias
-                else None,
-                canonico.chave_regra(nome).nocoes,
-                id_,
+        # Load nos
+        if nos:
+            execute_batch(
+                cur,
+                "INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status, fundido_em) VALUES (%s, %s, %s, %s, %s, %s, %s) "
+                "ON CONFLICT (id) DO UPDATE SET nivel = EXCLUDED.nivel, nome = EXCLUDED.nome, "
+                "pai_id = EXCLUDED.pai_id, origem = EXCLUDED.origem, status = EXCLUDED.status, fundido_em = EXCLUDED.fundido_em",
+                [(no_id, d["nivel"], d["nome"], d["pai"], d["origem"], d["status"], d.get("fundido_em")) for no_id, d in nos.items()],
             )
-            for id_, chave, nome in cur.fetchall()
-        ]
-        execute_batch(
-            cur,
-            "UPDATE dim_materia SET materia_canonica_id = %s, nocoes = %s WHERE id = %s",
-            linhas,
-        )
-        resultado["materia"] = (sum(1 for linha in linhas if linha[0]), len(linhas))
+            # Delete removed nos
+            cur.execute("DELETE FROM no_arvore WHERE NOT (id = ANY(%s))", (list(nos.keys()),))
+        else:
+            cur.execute("DELETE FROM no_arvore")
 
-        cur.execute(
-            "SELECT t.id, m.chave, t.chave FROM dim_topico t JOIN dim_materia m ON m.id = t.materia_id"
-        )
-        linhas = []
-        for id_, m, t in cur.fetchall():
-            gid = indice.assunto.get((m, t))
-            linhas.append((gid if gid in assuntos else None, id_))
-        execute_batch(
-            cur, "UPDATE dim_topico SET assunto_canonico_id = %s WHERE id = %s", linhas
-        )
-        resultado["assunto"] = (sum(1 for linha in linhas if linha[0]), len(linhas))
+        # Load mapeamentos
+        # First, mapping chaves to their DB IDs
+        cur.execute("SELECT id, chave FROM dim_materia")
+        materia_ids = {chave: id_ for id_, chave in cur.fetchall()}
+        
+        cur.execute("SELECT t.id, m.chave || '|' || t.chave FROM dim_topico t JOIN dim_materia m ON m.id = t.materia_id")
+        topico_ids = {chave: id_ for id_, chave in cur.fetchall()}
+        
+        cur.execute("SELECT s.id, m.chave || '|' || t.chave || '|' || s.chave FROM dim_subtopico s JOIN dim_topico t ON t.id = s.topico_id JOIN dim_materia m ON m.id = t.materia_id")
+        subtopico_ids = {chave: id_ for id_, chave in cur.fetchall()}
+        
+        materia_nos = []
+        topico_nos = []
+        subtopico_nos = []
+        
+        for chave, lista_nos in mapeamentos.items():
+            aprovados = [n["no_id"] for n in lista_nos if n.get("status") == "aprovado"]
+            if not aprovados:
+                continue
+                
+            parts = chave.split("|")
+            if len(parts) == 1:
+                # materia
+                materia_id = materia_ids.get(chave)
+                if materia_id:
+                    for no_id in aprovados:
+                        materia_nos.append((materia_id, no_id))
+            elif len(parts) == 2:
+                # topico
+                topico_id = topico_ids.get(chave)
+                if topico_id:
+                    for no_id in aprovados:
+                        topico_nos.append((topico_id, no_id))
+            elif len(parts) == 3:
+                # subtopico
+                subtopico_id = subtopico_ids.get(chave)
+                if subtopico_id:
+                    for no_id in aprovados:
+                        subtopico_nos.append((subtopico_id, no_id))
 
-        cur.execute(
-            "SELECT s.id, m.chave, t.chave, s.chave FROM dim_subtopico s "
-            "JOIN dim_topico t ON t.id = s.topico_id JOIN dim_materia m ON m.id = t.materia_id"
-        )
-        linhas = []
-        for id_, m, t, sub in cur.fetchall():
-            gid = indice.subassunto.get((m, t, sub))
-            linhas.append((gid if gid in subassuntos else None, id_))
-        execute_batch(
-            cur,
-            "UPDATE dim_subtopico SET subassunto_canonico_id = %s WHERE id = %s",
-            linhas,
-        )
-        resultado["subassunto"] = (sum(1 for linha in linhas if linha[0]), len(linhas))
+        cur.execute("DELETE FROM materia_no")
+        cur.execute("DELETE FROM topico_no")
+        cur.execute("DELETE FROM subtopico_no")
+        
+        if materia_nos:
+            execute_batch(cur, "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, %s)", materia_nos)
+        if topico_nos:
+            execute_batch(cur, "INSERT INTO topico_no (topico_id, no_id) VALUES (%s, %s)", topico_nos)
+        if subtopico_nos:
+            execute_batch(cur, "INSERT INTO subtopico_no (subtopico_id, no_id) VALUES (%s, %s)", subtopico_nos)
 
-        cur.execute(
-            "DELETE FROM subassunto_canonico WHERE NOT (id = ANY(%s))",
-            (list(subassuntos) or [""],),
-        )
-        cur.execute(
-            "DELETE FROM assunto_canonico WHERE NOT (id = ANY(%s))",
-            (list(assuntos) or [""],),
-        )
-        cur.execute(
-            "DELETE FROM materia_canonica WHERE NOT (id = ANY(%s))",
-            (list(materias) or [""],),
-        )
-
-    logger.info(
-        "[CANONICO] banco: "
-        + ", ".join(f"{nivel} {m}/{t} mapeados" for nivel, (m, t) in resultado.items())
-        + f" · canônicos aprovados: {len(materias)} matérias, {len(assuntos)} assuntos, "
-        f"{len(subassuntos)} subassuntos."
-    )
-    return resultado
-
+    totais = {
+        "nos": len(nos),
+        "materia_no": len(materia_nos),
+        "topico_no": len(topico_nos),
+        "subtopico_no": len(subtopico_nos)
+    }
+    logger.info(f"[ARVORE] banco: {totais['nos']} nós, pontes: {totais['materia_no']} matérias, {totais['topico_no']} tópicos, {totais['subtopico_no']} subtópicos mapeados.")
+    return totais
 
 def listar_jsons_edital(revisao_dir: Path) -> list[Path]:
     return sorted(
@@ -893,7 +862,7 @@ def gravar_estatisticas(
     revisao_dir: Path = REVISAO_DIR_PADRAO,
     data_dir: Path = DATA_DIR,
     conn=None,
-    sinonimos_path: Path | None = None,
+    arvore_path: Path | None = None,
 ) -> dict[str, int]:
     """Carga completa: schema, concursos extraídos, provas, fila e camada canônica."""
     proprio = conn is None
@@ -926,14 +895,8 @@ def gravar_estatisticas(
                 totais[chave] += contagem[chave]
 
         _limpar_dimensoes_orfas(conn)
-        sinonimos_path = sinonimos_path or canonico.caminho_sinonimos(revisao_dir)
-        if not sinonimos_path.exists():
-            logger.warning(
-                f"[CANONICO] {sinonimos_path} não existe — canônicos ficam NULL."
-            )
-        aplicar_canonico(
-            conn, canonico.indice_aprovado(canonico.carregar(sinonimos_path))
-        )
+        arvore_path = arvore_path or (PROJETO_DIR / 'canonico' / 'arvore.json')
+        aplicar_arvore(conn, arvore_path)
         revisao = (
             ", ".join(f"{n} {status}" for status, n in sorted(por_status.items()))
             or "nenhum"

@@ -1287,6 +1287,14 @@ original); árvore do zero (perderia a revisão da 5B); taxonomia de terceiros
 (sem fonte aberta, risco autoral); simulado estático no Datasette (movido
 para o site). Ver ADR-030.
 
+
+
+### 2026-09-28 — Ferramental de curadoria e Árvore Mestre (Etapa 5B.1)
+
+**Decisão:** Criação de tooling para a manipulação da Árvore Mestre (`scripts/curar_arvore.py` com argparse para mapear, fundir, mover, criar, renomear e aprovar nós) e a geração de relatório HTML dinâmico navegável (`scripts/gerar_relatorio_arvore.py`). Inclusão do mapeamento automático de itens novos por regra diretamente na extração (`mapear_novos_itens_por_regra` no `src/canonico.py`, chamado no pipeline por `scripts/atualizar_revisao.py`).
+**Motivo:** Suporte à Etapa 5B.1 (Árvore mestre independente) decidida no ADR-030. Itens do edital precisam ser agrupados e mapeados de forma flexível e a curadoria será realizada via CLI ou pela aprovação de propostas geradas.
+**Alternativas descartadas:** Gerar e parsear os relatórios no backend Python sem CLI (dificultaria a auditoria); colocar as regras de mapeamento diretamente na persistência do banco em vez do artefato canônico (feriria a política de que o json é a fonte de verdade).
+
 ## 13. LESSONS.md (do projeto)
 
 Ver `LESSONS.md` neste diretório — protocolo padrão descrito no `CLAUDE.md`

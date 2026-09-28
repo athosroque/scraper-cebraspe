@@ -72,19 +72,21 @@ def _reiniciar_datasette() -> None:
 
 
 def atualizar_sinonimos(revisao_dir: Path) -> None:
-    """Regras determinísticas + relatório de sinônimos (sem LLM). Best-effort:
+    """Atualiza a árvore e o relatório (sem LLM). Best-effort:
     um erro aqui não pode derrubar a extração que já pagou o LLM."""
     if not listar_jsons_edital(revisao_dir):
         logger.info(
-            f"[CANONICO] {revisao_dir}: nenhum edital, sinônimos não atualizados."
+            f"[CANONICO] {revisao_dir}: nenhum edital, árvore não atualizada."
         )
         return
     try:
-        path = caminho_sinonimos(revisao_dir)
-        atualizar_por_regras(revisao_dir, path)
-        gerar_relatorio_sinonimos(revisao_dir, path)
+        from src.canonico import mapear_novos_itens_por_regra
+        mapear_novos_itens_por_regra(revisao_dir)
+        
+        from scripts.gerar_relatorio_arvore import gerar_relatorio_arvore
+        gerar_relatorio_arvore()
     except Exception as e:  # noqa: BLE001
-        logger.warning(f"[CANONICO] Não foi possível atualizar os sinônimos: {e}")
+        logger.warning(f"[CANONICO] Não foi possível atualizar a árvore: {e}")
 
 
 def _gravar_banco_estatisticas(revisao_dir: Path) -> None:

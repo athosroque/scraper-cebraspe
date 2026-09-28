@@ -173,21 +173,22 @@ class TestSinonimosNoPipeline:
             atualizar_revisao, "listar_jsons_edital", lambda d: [d / "Ed.json"]
         )
         chamadas = []
+        import src.canonico
+        import scripts.gerar_relatorio_arvore
         monkeypatch.setattr(
-            atualizar_revisao,
-            "atualizar_por_regras",
-            lambda d, p: chamadas.append(("regras", p)),
+            src.canonico,
+            "mapear_novos_itens_por_regra",
+            lambda d: chamadas.append(("regras", d)),
         )
         monkeypatch.setattr(
-            atualizar_revisao,
-            "gerar_relatorio_sinonimos",
-            lambda d, p: chamadas.append(("relatorio", p)),
+            scripts.gerar_relatorio_arvore,
+            "gerar_relatorio_arvore",
+            lambda: chamadas.append(("relatorio",)),
         )
         atualizar_revisao.atualizar_artefatos_revisao(
             tmp_path, reiniciar_datasette=False, gravar_banco=False
         )
-        caminho = tmp_path.resolve().parent / "canonico" / "sinonimos.json"
-        assert chamadas == [("regras", caminho), ("relatorio", caminho)]
+        assert chamadas == [("regras", tmp_path), ("relatorio",)]
 
     def test_sem_edital_nao_escreve_sinonimos(self, monkeypatch, tmp_path):
         revisao = tmp_path / "revisao"
@@ -200,8 +201,9 @@ class TestSinonimosNoPipeline:
             atualizar_revisao, "listar_jsons_edital", lambda d: [d / "Ed.json"]
         )
 
-        def _falha(d, p):
+        def _falha(d):
             raise ValueError("json corrompido")
 
-        monkeypatch.setattr(atualizar_revisao, "atualizar_por_regras", _falha)
+        import src.canonico
+        monkeypatch.setattr(src.canonico, "mapear_novos_itens_por_regra", _falha)
         atualizar_revisao.atualizar_sinonimos(tmp_path)
