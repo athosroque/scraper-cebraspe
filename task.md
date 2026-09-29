@@ -314,7 +314,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ---
 
-# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-29): Etapas 5A–5F (5A, 5B, 5B.1, 5B.2, 5C e 5C.1 concluídas; próximas: 5D classificação → 5E → 5F site) — questões, árvore de assuntos, estatísticas e site público
+# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-29): Etapas 5A–5F (5A, 5B, 5B.1, 5B.2, 5C, 5C.1 e 5D concluídas; próximas: 5E estatísticas → 5F site) — questões, árvore de assuntos, estatísticas e site público
 
 > **Por que existe:** a Etapa 5 entregou o banco com a **taxonomia dos
 > editais**, ou seja, o que o edital lista. O objetivo real do projeto é
@@ -731,8 +731,8 @@ enviar o bloco de uma etapa específica para o agente construir.
 > `fora_do_edital` calculado localmente pelo conjunto do nó (preferencial × reserva);
 > fonte da verdade em `canonico/classificacao_questoes.json` (banco Postgres é derivado e recarregável).
 - `[x]` **Sessão A (sem LLM):** modelo (`src/classificacao.py`), candidatos preferenciais e de reserva + montagem de lotes (`src/candidatos_questao.py`), tabelas no banco (`questao_no`, `discursiva_no`, `vw_questao_no`), carga idempotente em `stats_writer.py` e testes.
-- `[ ]` **Sessão B (LLM + rodada real):** `scripts/classificar_questoes.py` (prompt contextualizado, IDs locais `C1..Cn`, validação estrita, reserva para `nenhum_serve`, idempotência), rodada real nos cadernos e testes mockados.
-- `[ ]` **Sessão C (revisão e checkpoint do dono):** relatório HTML (`scripts/gerar_relatorio_classificacao.py`), CLI de curadoria (`scripts/curar_classificacao.py`), decisão/aprovação pelo dono e documentação (ADR-032 parte 5D, `CLAUDE.md`, `task.md`).
+- `[x]` **Sessão B (LLM + rodada real):** `scripts/classificar_questoes.py` (prompt contextualizado, IDs locais `C1..Cn`, validação estrita, reserva para `nenhum_serve`, idempotência), rodada real nos cadernos e testes mockados. (2.834 questões processadas, 450 chamadas, $0.1939 USD, 0 falhas).
+- `[x]` **Sessão C (revisão e checkpoint do dono):** relatório HTML (`scripts/gerar_relatorio_classificacao.py`), CLI de curadoria (`scripts/curar_classificacao.py`), decisão/aprovação pelo dono e documentação (ADR-032, `CLAUDE.md`, `task.md`). Concluída em 2026-09-29 com 100% de aprovação pelo dono (3.029 apontamentos aprovados, 0 pendências).
 - **Pronto quando:** toda questão utilizável (2.800) e discursiva (34) tem registro canônico; 0 pendências após decisão do dono; `vw_questao_no` cobre os dados aprovados; reextração preserva classificações; pytest e ruff verdes.
 
 ## Etapa 5E: Estatísticas (views no banco)

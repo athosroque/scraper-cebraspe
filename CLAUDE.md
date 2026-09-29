@@ -154,20 +154,23 @@ Datasette continua só como ferramenta de revisão do dono.
       `scripts/propor_arvore.py` (LLM por matéria). Rodada real de 83
       chamadas e 210 propostas: o dono rejeitou 29 e aprovou o resto. Árvore:
       3577 nós ativos, 148 fundidos e 6 aposentados; matéria nova "Processo
-      Legislativo". "Disposições gerais" 8 e "Servidores públicos" 7 em
-      `vw_edital_cobra_subassunto`. 538 testes (+1 xfail), ruff verde.
+- [x] Etapa 5D — Classificação das questões na árvore mestre (ADR-032): fonte canônica
+      `canonico/classificacao_questoes.json` (2.834 registros, chave estável
+      `<concurso>|<caderno>|<numero>`, hash SHA-1 do enunciado), `src/classificacao.py`,
+      `src/candidatos_questao.py` (preferencial × reserva), `scripts/classificar_questoes.py`
+      (450 chamadas LLM, $0.1939 USD, 0 falhas finais), `scripts/gerar_relatorio_classificacao.py`
+      (`classificacao.html`), `scripts/curar_classificacao.py` (`--mapear`, `--aprovar`,
+      `--rejeitar`, `--aprovar-lote`, `--pendentes`). Banco derivado: `questao_no`,
+      `discursiva_no` e view `vw_questao_no`. Testes no pytest e ruff verde.
 - [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
       parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
       registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
-- **⚡ Prioridade atual: Etapas 5D → 5E → 5F do `task.md`**
-      (ADR-030, 2026-09-28): árvore mestre curada e aprovada (5B.1/5B.2) →
-      classificação das questões na árvore →
-      estatísticas → site público. A 5A, a 5B (aprovada em 2026-09-27) e a
-      5C/5C.1 estão concluídas. A antiga 5B.1 ("divisão de nomes
-      compostos") foi substituída pelo mapeamento N:N da árvore.
+- **⚡ Prioridade atual: Etapas 5E → 5F do `task.md`**
+      (ADR-030, 2026-09-28): árvore mestre curada (5B) e questões classificadas (5D) →
+      estatísticas (5E) → site público (5F).
 
 
 ## 6. Patterns
@@ -656,6 +659,16 @@ resultado = download_concurso_pdfs(
 - `canonico/sinonimos.json` — camada canônica da 5B (ADR-029), **congelada**
   como histórico desde a 5B.1. `scripts/propor_sinonimos.py`,
   `scripts/aprovar_sinonimos.py` e `sinonimos.html` ficam só como histórico
+- `canonico/classificacao_questoes.json` — base canônica da Etapa 5D (ADR-032, versionado,
+  um registro por linha): amarração estável `<concurso>|<caderno>|<numero>` a até 2 nós
+  da árvore mestre, com hash SHA-1 do enunciado e confiança categórica (`alta`, `media`, `baixa`)
+- `scripts/curar_classificacao.py` (`--mapear CHAVE:NO1[,NO2]`, `--aprovar/--rejeitar CHAVE:NO`,
+  `--aprovar-lote --confianca alta [--caderno X]`, `--pendentes`, `--html`, `--aplicar-banco`) e
+  `revisao_piloto/relatorio/classificacao.html` (regenerável, linkado do `index.html` e servido
+  em `https://datasette.projetoathos.com.br/relatorio/classificacao.html`): auditoria visual com
+  texto-base expansível, gabarito e comandos CLI copiáveis
+- `scripts/classificar_questoes.py` — inferência em 2 passadas (preferencial × reserva) via LLM
+  com OpenRouter e Langfuse (não roda no pipeline padrão para isolar custos)
 - `scripts/backfill_classificacao_chunks.py [<pdf> [json]]` — sem argumentos,
   roda em todos os editais de `revisao_piloto/` (`backfill_lote`); completa
   concurso/nível/tipo de conhecimento em extração já feita, sem LLM
@@ -670,7 +683,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-031). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-032). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
 
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
 
@@ -1343,25 +1356,27 @@ para o site). Ver ADR-030.
 
 
 
-### 2026-09-28 — Árvore mestre implementada (Etapa 5B.1)
+### 2026-09-29 — Classificação das questões na árvore mestre (Etapa 5D)
 
-**Decisão:** `canonico/arvore.json` semeado com os grupos aprovados da 5B
-(3730 nós, 4050 mapeamentos `semente`), com leitura e escrita só por
-`src/arvore.py`. A curadoria é `scripts/curar_arvore.py`, e o pipeline só
-mapeia item novo por regra no mesmo nó-pai efetivo, sem criar nó. No banco,
-`no_arvore` recebe todos os nós com o status. As pontes recebem só
-apontamento aprovado, já resolvido. `vw_no_caminho` expõe só a cadeia ativa
-e resolve o fundido, e as views `vw_edital_cobra_*` sobem a árvore contando
-`taxonomia_itens.id` distinto (variante oficial e `_todas`).
-**Motivo:** Etapa 5B.1 do ADR-030. A primeira entrega (`c514f26`/`25de48c`)
-tinha a CLI quebrada, a regra do pipeline sem efeito (chave `str(tupla)` e
-campo `no`), o relatório sem itens, `nocoes` perdido, as views sem resolver
-fundido e testes pedidos ausentes. A revisão corrigiu tudo e acrescentou
-testes das views no Postgres.
-**Alternativas descartadas:** deixar nó proposto fora de `no_arvore` (a
-ponte para ele quebraria a FK na 5B.2); `nocoes` por prefixo `nocoes de`
-(perde `nocoes sobre devops`); `semear_arvore.py` sobrescrevendo sempre
-(apagaria a curadoria numa reexecução). Ver ADR-030.
+**Decisão:** Ponte semântica entre as 2.800 questões objetivas e 34 discursivas
+extraídas e a árvore mestre curada (3.577 nós). Fonte da verdade canônica em
+`canonico/classificacao_questoes.json` (chave estável `<slug>|<caderno>|<numero>`,
+hash SHA-1 do enunciado), com confiança categórica (`alta`, `media`, `baixa`) e
+cardinalidade até 2 nós (`principal` e opcional `secundario`). O cálculo de
+`fora_do_edital` é estritamente local (duas passadas: preferencial do edital do
+cargo com flag `false`; reserva das matérias do caderno com flag `true`). Se
+nenhum nó servir, registra `sem_no = true` (sem criação automática de nós pelo
+pipeline). Banco Postgres é derivado (`questao_no`, `discursiva_no` e view
+`vw_questao_no`). Relatório HTML em `classificacao.html` com ordenação por
+criticidade (`sem_no` → `baixa` → `media` → `alta`) e CLI de curadoria humana
+`scripts/curar_classificacao.py` sob governança soberana do dono.
+**Motivo:** Etapa 5D do ADR-030 e ADR-032. Rodada real concluída com 450 chamadas
+ao LLM ($0.1939 USD, 0 falhas finais): 2.412 nós alta, 613 média, 3 baixa e 1
+item sem nó.
+**Alternativas descartadas:** Enviar a árvore inteira no prompt (estouro de
+contexto); permitir que o LLM crie nós automaticamente (alucinação taxonômica);
+amarrar por IDs seriais de banco (incompatível com DELETE+INSERT de cadernos).
+Ver ADR-032.
 
 ## 13. LESSONS.md (do projeto)
 

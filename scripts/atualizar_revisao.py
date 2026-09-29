@@ -39,6 +39,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts import gerar_relatorio_arvore as relatorio_arvore
+from scripts import gerar_relatorio_classificacao as relatorio_classificacao
 from scripts.extrair_questoes import processar_fila
 from scripts.gerar_db_datasette import REVISAO_DIR_PADRAO, gerar_db
 from scripts.gerar_relatorio_revisao import gerar_relatorios
@@ -84,6 +85,16 @@ def atualizar_arvore(revisao_dir: Path) -> None:
         logger.warning(f"[CANONICO] Não foi possível atualizar a árvore: {e}")
 
 
+def atualizar_classificacao(revisao_dir: Path) -> None:
+    """Atualiza o relatório visual de classificação (sem LLM). Best-effort."""
+    try:
+        relatorio_classificacao.gerar_relatorio_classificacao(revisao_dir=revisao_dir)
+    except Exception as e:  # noqa: BLE001
+        logger.warning(
+            f"[CLASSIFICACAO] Não foi possível atualizar o relatório de classificação: {e}"
+        )
+
+
 def _gravar_banco_estatisticas(revisao_dir: Path) -> None:
     # Exception genérica de propósito: conexão recusada, senha ausente no
     # .env ou erro de SQL não podem derrubar a extração que já pagou o LLM —
@@ -112,6 +123,7 @@ def atualizar_artefatos_revisao(
     validar_taxonomia(revisao_dir)
     gerar_relatorios(revisao_dir)
     atualizar_arvore(revisao_dir)
+    atualizar_classificacao(revisao_dir)
     gerar_db(revisao_dir)
 
     if reiniciar_datasette:

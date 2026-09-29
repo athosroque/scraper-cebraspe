@@ -283,6 +283,9 @@ def renderizar_index(editais: list[dict]) -> str:
 <h2>Camada canônica (Etapa 5B)</h2>
 <ul class="index-lista"><li><a href="arvore.html">Árvore Mestre</a>
 <span class="badge">matéria → assunto → subassunto, com aprovação humana</span></li></ul>
+<h2>Classificação de Questões (Etapa 5D)</h2>
+<ul class="index-lista"><li><a href="classificacao.html">Classificação de Questões na Árvore Mestre</a>
+<span class="badge">auditoria de itens, confiança e curadoria humana</span></li></ul>
 </body></html>
 """
 

@@ -343,7 +343,7 @@ WHERE qn.status = 'aprovado';
 
 #### Checklist
 
-- `[ ]` **Relatório visual de classificação (`scripts/gerar_relatorio_classificacao.py`):**
+- `[x]` **Relatório visual de classificação (`scripts/gerar_relatorio_classificacao.py`):**
   - Gera `revisao_piloto/relatorio/classificacao.html` (com link adicionado no `index.html` da revisão).
   - Organização por caderno, com sumário no topo exibindo indicadores-chave: total de itens, distribuição por confiança (`baixa`, `media`, `alta`), total de itens fora do edital e contagem de itens `sem_no`.
   - Ordenação dos itens dentro de cada caderno por prioridade de atenção humana:
@@ -353,7 +353,7 @@ WHERE qn.status = 'aprovado';
     4. Questões com confiança `alta`.
   - Exibição de cada item: enunciado completo, texto-base associado (em componente recolhível `<details>` para economia de espaço), gabarito oficial, árvore de caminho completo do nó mapeado (`Matéria › Assunto › Subassunto`), selo visual em destaque quando `fora_do_edital = true`, e justificativa emitida pelo modelo.
   - Integrado à rotina padrão de `scripts/atualizar_revisao.py`.
-- `[ ]` **CLI de curadoria humana (`scripts/curar_classificacao.py`):**
+- `[x]` **CLI de curadoria humana (`scripts/curar_classificacao.py`):**
   - Comandos para intervenção pontual e em lote:
     - `--mapear CHAVE:NO1[,NO2]`: atribui nós manualmente a uma questão (sai imediatamente com `origem: "humano"`, `status: "aprovado"`).
     - `--aprovar CHAVE:NO`: aprova uma proposta específica de classificação.
@@ -362,16 +362,16 @@ WHERE qn.status = 'aprovado';
     - `--pendentes`: lista no terminal o resumo de itens aguardando decisão humana (`sem_no` e confiança `baixa`).
     - `--html`: regenera o relatório `classificacao.html`.
   - **Invariante:** o script valida rigorosamente que toda aprovação execute somente sob comando direto do usuário humano.
-- `[ ]` **Testes da CLI e Relatório (`tests/test_curar_classificacao.py`):**
+- `[x]` **Testes da CLI e Relatório (`tests/test_curar_classificacao.py`):**
   - Validação das flags `--mapear`, `--aprovar`, `--rejeitar`, `--aprovar-lote`.
   - Verificação de renderização do HTML e contagem dos indicadores.
-- `[ ]` **Checkpoint do Dono:**
+- `[x]` **Checkpoint do Dono:**
   - O dono do projeto inspeciona `classificacao.html` (via interface Datasette/Traefik).
   - Revisão e decisão item a item para as questões `sem_no` e com confiança `baixa`.
   - Decisão sobre os itens com confiança `media`.
   - Execução de aprovação em lote das classificações com confiança `alta`.
   - Carga final do banco de dados: `python -m src.stats_writer`.
-- `[ ]` **Documentação e Encerramento:**
+- `[x]` **Documentação e Encerramento:**
   - Criação do `docs/adr/ADR-032-classificacao-questoes-arvore.md` documentando o modelo conceitual, os resultados medidos da rodada real, custos, aprendizados e decisões de curadoria.
   - Atualização do `CLAUDE.md` (§3 Arquitetura, §5 Scripts de Revisão e Banco, §6 Comandos Frequentes, §7 Invariantes do Pipeline).
   - Atualização do `task.md` (marcando as tarefas da 5D como concluídas).
