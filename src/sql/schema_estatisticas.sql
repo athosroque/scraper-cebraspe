@@ -372,6 +372,9 @@ CREATE INDEX IF NOT EXISTS idx_discursiva_no_status ON discursiva_no (status);
 
 -- Views ----------------------------------------------------------------------
 
+DROP VIEW IF EXISTS vw_discursivas CASCADE;
+DROP VIEW IF EXISTS vw_peso_materia_cargo CASCADE;
+DROP VIEW IF EXISTS vw_edital_vs_prova CASCADE;
 DROP VIEW IF EXISTS vw_prova_cobra_no CASCADE;
 DROP FUNCTION IF EXISTS fn_prova_cobra CASCADE;
 DROP VIEW IF EXISTS vw_comparativo_nivel CASCADE;
@@ -1098,3 +1101,244 @@ CROSS JOIN totais_universo t
 GROUP BY b.alvo_id, nc.caminho, nc.nivel, t.total_medio, t.total_superior
 HAVING count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') > 0
     OR count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') > 0;
+
+-- Cruzamento Edital × Prova por (concurso × cargo × nó).
+-- Compara a cobertura do edital com as questões efetivamente cobradas na prova.
+-- Respeita a regra de cobertura descendente (Decisão 5, ADR-032):
+-- - Um item previsto no edital em nó X cobre X e todos os descendentes de X.
+-- - 'cobrado_no_edital': previsto no edital (direto ou via ancestral) e cobrado na prova.
+-- - 'no_edital_nunca_cobrado': previsto no edital, mas com zero questões cobradas nele ou em seus descendentes.
+-- - 'cobrado_fora_do_edital': cobrado na prova, porém sem ancestral-ou-igual previsto no edital daquele cargo.
+-- Na prática o item de edital aponta também para o nó da matéria (materia_no),
+-- então "fora" aparece quando a matéria nem consta no edital do cargo, ou
+-- quando o item não tem matéria mapeada.
+-- Níveis misturados: a questão classificada direto num assunto não desce para
+-- o subassunto previsto abaixo dele, que pode aparecer como nunca cobrado.
+CREATE OR REPLACE VIEW vw_edital_vs_prova AS
+WITH edital_base AS (
+    SELECT
+        concurso, orgao, banca, ano, cargo_edital_id, cargo_numero, cargo, nivel,
+        no_id, no_nivel, no_assunto_id, no_materia_id, taxonomia_item_id
+    FROM vw_arvore_edital_por_cargo
+    WHERE status_revisao = 'aprovado'
+),
+-- Nós que o edital do cargo aponta diretamente. A cobertura descendente
+-- procura o nó da questão ou um ancestral dele SÓ aqui: a subida abaixo
+-- (edital_nos) põe o assunto/matéria-pai de todo item previsto, e usá-la
+-- faria um subassunto irmão, nunca previsto, parecer coberto.
+edital_direto AS MATERIALIZED (
+    SELECT DISTINCT cargo_edital_id, no_id FROM edital_base
+),
+edital_subida AS (
+    SELECT concurso, orgao, banca, ano, cargo_edital_id, cargo_numero, cargo, nivel,
+           'subassunto'::text AS no_nivel, no_id, taxonomia_item_id
+    FROM edital_base
+    WHERE no_nivel = 'subassunto'
+
+    UNION
+
+    SELECT concurso, orgao, banca, ano, cargo_edital_id, cargo_numero, cargo, nivel,
+           'assunto'::text AS no_nivel, no_assunto_id AS no_id, taxonomia_item_id
+    FROM edital_base
+    WHERE no_assunto_id IS NOT NULL
+
+    UNION
+
+    SELECT concurso, orgao, banca, ano, cargo_edital_id, cargo_numero, cargo, nivel,
+           'materia'::text AS no_nivel, no_materia_id AS no_id, taxonomia_item_id
+    FROM edital_base
+    WHERE no_materia_id IS NOT NULL
+),
+edital_nos AS (
+    SELECT
+        concurso, orgao, banca, ano,
+        cargo_edital_id, cargo_numero, cargo, nivel,
+        no_id, no_nivel,
+        count(DISTINCT taxonomia_item_id) AS previsao
+    FROM edital_subida
+    GROUP BY
+        concurso, orgao, banca, ano,
+        cargo_edital_id, cargo_numero, cargo, nivel,
+        no_id, no_nivel
+),
+prova_nos AS (
+    SELECT
+        b.concurso, b.orgao, b.banca, b.ano,
+        b.cargo_edital_id, b.cargo_numero, b.cargo, b.nivel,
+        b.alvo_id AS no_id,
+        b.nivel_alvo AS no_nivel,
+        count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada) AS questoes
+    FROM vw_prova_cobra_base b
+    GROUP BY
+        b.concurso, b.orgao, b.banca, b.ano,
+        b.cargo_edital_id, b.cargo_numero, b.cargo, b.nivel,
+        b.alvo_id, b.nivel_alvo
+),
+combinado AS (
+    SELECT
+        COALESCE(e.concurso, p.concurso) AS concurso,
+        COALESCE(e.orgao, p.orgao) AS orgao,
+        COALESCE(e.banca, p.banca) AS banca,
+        COALESCE(e.ano, p.ano) AS ano,
+        COALESCE(e.cargo_edital_id, p.cargo_edital_id) AS cargo_edital_id,
+        COALESCE(e.cargo_numero, p.cargo_numero) AS cargo_numero,
+        COALESCE(e.cargo, p.cargo) AS cargo,
+        COALESCE(e.nivel, p.nivel) AS nivel,
+        COALESCE(e.no_id, p.no_id) AS no_id,
+        COALESCE(e.no_nivel, p.no_nivel) AS no_nivel,
+        (COALESCE(e.previsao, 0) > 0) AS no_edital_direto,
+        COALESCE(e.previsao, 0) AS previsao,
+        COALESCE(p.questoes, 0) AS questoes
+    FROM edital_nos e
+    FULL OUTER JOIN prova_nos p ON p.cargo_edital_id = e.cargo_edital_id
+                               AND p.no_nivel = e.no_nivel
+                               AND p.no_id = e.no_id
+)
+SELECT
+    c.concurso,
+    c.orgao,
+    c.banca,
+    c.ano,
+    c.cargo_edital_id,
+    c.cargo_numero,
+    c.cargo,
+    c.nivel,
+    c.no_id,
+    nc.nome AS no_nome,
+    c.no_nivel,
+    nc.caminho,
+    nc.materia_id,
+    nc.assunto_id,
+    (c.no_edital_direto OR EXISTS (
+        SELECT 1 FROM edital_direto ed
+        WHERE ed.cargo_edital_id = c.cargo_edital_id
+          AND ed.no_id IN (c.no_id, nc.assunto_id, nc.materia_id)
+    )) AS no_edital,
+    c.previsao,
+    c.questoes,
+    CASE
+        WHEN c.previsao > 0 THEN round(c.questoes * 1.0 / c.previsao, 2)
+        ELSE NULL
+    END AS razao,
+    CASE
+        WHEN c.previsao > 0 AND c.questoes > 0 THEN 'cobrado_no_edital'
+        WHEN c.previsao > 0 AND c.questoes = 0 THEN 'no_edital_nunca_cobrado'
+        WHEN c.previsao = 0 AND c.questoes > 0 THEN
+            CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM edital_direto ed
+                    WHERE ed.cargo_edital_id = c.cargo_edital_id
+                      AND ed.no_id IN (c.no_id, nc.assunto_id, nc.materia_id)
+                ) THEN 'cobrado_no_edital'
+                ELSE 'cobrado_fora_do_edital'
+            END
+    END AS situacao
+FROM combinado c
+JOIN vw_no_caminho nc ON nc.id = c.no_id;
+
+-- Peso percentual de cada matéria por cargo (a prova do cargo = básico + específico).
+-- A questão com nós em 2 matérias conta nas duas: a soma de `pct_da_prova`
+-- do cargo pode passar de 100%.
+-- Trata matérias com nome de cargo (`nome_de_cargo = true`) como
+-- "Conhecimentos específicos — <cargo>" para clareza na visualização do candidato.
+CREATE OR REPLACE VIEW vw_peso_materia_cargo AS
+WITH totais_cargo AS (
+    SELECT
+        b.concurso,
+        b.cargo_edital_id,
+        count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada) AS total_cargo
+    FROM vw_prova_cobra_base b
+    WHERE b.nivel_alvo = 'materia'
+    GROUP BY b.concurso, b.cargo_edital_id
+),
+materia_info AS (
+    SELECT mn.no_id, bool_or(m.nome_de_cargo) AS nome_de_cargo, bool_or(m.nocoes) AS nocoes
+    FROM materia_no mn
+    JOIN dim_materia m ON m.id = mn.materia_id
+    GROUP BY mn.no_id
+)
+SELECT
+    b.concurso,
+    b.orgao,
+    b.banca,
+    b.ano,
+    b.cargo_edital_id,
+    b.cargo_numero,
+    b.cargo,
+    b.nivel,
+    b.alvo_id AS materia_id,
+    nc.nome AS materia_nome,
+    COALESCE(mi.nome_de_cargo, false) AS nome_de_cargo,
+    CASE
+        WHEN COALESCE(mi.nome_de_cargo, false) THEN 'Conhecimentos específicos — ' || b.cargo
+        ELSE nc.nome
+    END AS rotulo_materia,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada) AS questoes,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE b.anulada) AS anuladas,
+    tc.total_cargo,
+    round(
+        count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada) * 100.0 / NULLIF(tc.total_cargo, 0),
+        2
+    ) AS pct_da_prova
+FROM vw_prova_cobra_base b
+JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+JOIN totais_cargo tc ON tc.concurso = b.concurso AND tc.cargo_edital_id = b.cargo_edital_id
+LEFT JOIN materia_info mi ON mi.no_id = b.alvo_id
+WHERE b.nivel_alvo = 'materia'
+GROUP BY
+    b.concurso, b.orgao, b.banca, b.ano,
+    b.cargo_edital_id, b.cargo_numero, b.cargo, b.nivel,
+    b.alvo_id, nc.nome, mi.nome_de_cargo, tc.total_cargo;
+
+-- Discursivas analíticas ligadas aos nós da árvore mestre (Etapa 5D/5E, ADR-032).
+-- Exibe tema, título, quesitos, gabarito/padrão de resposta e matérias associadas.
+-- Discursivas NÃO entram nas contagens de questões das views de incidência objetiva.
+CREATE OR REPLACE VIEW vw_discursivas AS
+WITH materia_info AS (
+    SELECT mn.no_id, bool_or(m.nome_de_cargo) AS nome_de_cargo, bool_or(m.nocoes) AS nocoes
+    FROM materia_no mn
+    JOIN dim_materia m ON m.id = mn.materia_id
+    GROUP BY mn.no_id
+)
+SELECT
+    d.id AS discursiva_id,
+    c.slug AS concurso,
+    o.sigla AS orgao,
+    c.banca,
+    c.ano,
+    ce.id AS cargo_edital_id,
+    ce.numero AS cargo_numero,
+    ce.nome AS cargo,
+    ce.nivel,
+    d.numero,
+    d.titulo,
+    d.tema,
+    d.enunciado,
+    d.quesitos,
+    d.padrao_resposta,
+    nc.no_efetivo AS no_id,
+    nc.nome AS no_nome,
+    nc.nivel AS no_nivel,
+    nc.caminho,
+    nc.materia_id,
+    nc.assunto_id,
+    dn.papel,
+    dn.confianca,
+    dn.fora_do_edital,
+    COALESCE(mi.nome_de_cargo, false) AS nome_de_cargo,
+    CASE
+        WHEN COALESCE(mi.nome_de_cargo, false) THEN 'Conhecimentos específicos — ' || ce.nome
+        ELSE na_mat.nome
+    END AS rotulo_materia,
+    c.status_revisao
+FROM discursivas d
+JOIN provas p ON p.id = d.prova_id
+JOIN concursos c ON c.id = p.concurso_id
+JOIN dim_orgao o ON o.id = c.orgao_id
+JOIN provas_cargos pc ON pc.prova_id = p.id
+JOIN cargos_editais ce ON ce.id = pc.cargo_edital_id
+JOIN discursiva_no dn ON dn.discursiva_id = d.id
+JOIN vw_no_caminho nc ON nc.id = dn.no_id
+LEFT JOIN materia_info mi ON mi.no_id = nc.materia_id
+LEFT JOIN no_arvore na_mat ON na_mat.id = nc.materia_id
+WHERE dn.status = 'aprovado' AND c.status_revisao = 'aprovado';

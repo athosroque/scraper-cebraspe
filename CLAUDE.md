@@ -165,15 +165,25 @@ Datasette continua só como ferramenta de revisão do dono.
       (`classificacao.html`), `scripts/curar_classificacao.py` (`--mapear`, `--aprovar`,
       `--rejeitar`, `--aprovar-lote`, `--pendentes`). Banco derivado: `questao_no`,
       `discursiva_no` e view `vw_questao_no`. Testes no pytest e ruff verde.
+- [x] Etapa 5E — Estatísticas e Views de Incidência (ADR-032): Sessões A, B e C
+      concluídas ($0.00 USD, 100% determinístico). Backfill de `materia_origem` (150 chunks)
+      e colunas `dim_materia.nome_de_cargo` e `taxonomia_itens.materia_origem`.
+      Views analíticas em `src/sql/schema_estatisticas.sql`: `vw_questoes_contexto`,
+      `vw_questoes`, `vw_prova_cobra_base`, `vw_prova_cobra_no` (+ atalhos `_subassunto`,
+      `_assunto`, `_materia`), função `fn_prova_cobra` (leitura oficial com desduplicação
+      canônica de enunciados repetidos e média com peso igual por concurso),
+      `vw_certo_errado_por_no`, `vw_comparativo_nivel`, `vw_edital_vs_prova` (cobertura
+      descendente), `vw_peso_materia_cargo` e `vw_discursivas` (64 linhas analíticas).
+      Reconciliação total: 2.781 questões utilizáveis (2.652 válidas + 129 anuladas),
+      19 ilegíveis descartadas. 4.055 pares expandidos na consistência 5D × 5E com 0
+      divergências. 609 testes (+1 xfail) no pytest e ruff 100% verde.
 - [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
       parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
       registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
-- **⚡ Prioridade atual: Etapas 5E → 5F do `task.md`**
-      (ADR-030, 2026-09-28): árvore mestre curada (5B) e questões classificadas (5D) →
-      estatísticas (5E) → site público (5F).
+- **⚡ Prioridade atual: Etapa 5F do `task.md`** (Site público de questões: 5F.0 Design System e Arquitetura).
 
 
 ## 6. Patterns
@@ -412,6 +422,10 @@ Datasette continua só como ferramenta de revisão do dono.
 - Padrão de resposta ligado preferencialmente por chave de título (`_chave_titulo`), garantindo ordem semântica correta mesmo com seções fora de ordem no PDF (chave ausente ou repetida cai na ligação por ordem); alertas `sem_quesitos` e `quesito_sem_valor`.
 - Figuras: vinculadas à linha logo acima na mesma coluna com sobreposição horizontal (exceção item → preâmbulo).
 - JSONs brutos de questões (`questoes/`) mantidos localmente e no `.gitignore` por volumetria, sendo regeneráveis de forma determinística por `scripts/extrair_questoes.py` (ADR-031).
+- Estatística de prova sobe a árvore e conta questão distinta (`count(DISTINCT questao_canonica_id)`): questão em subassunto soma em subassunto, assunto e matéria; questão em assunto soma em assunto e matéria, nunca descendo. Leitura com filtros agregados no site é feita via `fn_prova_cobra(...)` para garantir cálculo de percentual médio sob os filtros e desduplicação correta de questões básicas aplicadas em múltiplos cargos (ADR-032).
+- Cobertura descendente edital × prova (`vw_edital_vs_prova`): item de edital em nó X cobre X e todos os descendentes de X. Na prova, o apontamento sobe; na comparação, checa se há ancestral-ou-igual previsto no edital daquele cargo (`cobrado_no_edital`, `no_edital_nunca_cobrado`, `cobrado_fora_do_edital`).
+- Peso por matéria em cargo (`vw_peso_materia_cargo`): proporção de cada matéria dentro do total da prova do cargo (básico + específico); matérias identificadas como nome de cargo (`nome_de_cargo = true`) são formatadas como `"Conhecimentos específicos — <cargo>"`.
+- Discursivas analíticas (`vw_discursivas`): isola estritamente os temas e quesitos das 64 discursivas associadas aos nós da árvore mestre, sem interferir nem computar nas contagens das views de questões objetivas.
 
 ## 7. Anti-patterns
 
@@ -539,6 +553,8 @@ Datasette continua só como ferramenta de revisão do dono.
 - Nunca procurar "definitivo" solto no corpo do padrão de resposta ou gabarito (o padrão do cargo 2 da PF cita "definitivo" no texto discursivo; um preliminar com a mesma redação seria classificado como definitivo). Avaliar estritamente o cabeçalho (primeiros 600 caracteres no padrão de resposta, 2000 na grade — ver `classificar_versao`) ou o nome do arquivo.
 - Nunca extrair quesitos numerados antes do verbo de comando da prova discursiva (datas como "1 de janeiro..." no enunciado viram falso quesito 1).
 - Nunca commitar arquivos JSON de questões extraídas (`questoes/`) no git — mantidos localmente e no `.gitignore` por volumetria, sendo 100% regeneráveis sob demanda (ADR-031).
+- Nunca somar linhas de views agregadas por cargo (`vw_prova_cobra_*`): cadernos básicos cobrem múltiplos cargos; somar linhas de cargos diferentes duplica questões básicas no denominador e no numerador. Para consultas que cruzam ou agregam múltiplos cargos/concursos, usar sempre a função oficial `fn_prova_cobra(...)` ou filtrar estritamente por um cargo individual (ADR-032).
+- Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança
 

@@ -737,10 +737,9 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ## Etapa 5E: Estatísticas (views no banco)
 > **Plano de execução em 3 sessões (A `materia_origem`, B base plana + "o que
-> mais cai", C edital × prova + fechamento):** `plano-etapa-5e.md`. Remover
-> ao concluir a etapa. Aqui fica só o resumo.
+> mais cai", C edital × prova + fechamento):** `plano-etapa-5e.md` (concluído em 2026-09-29).
 
-- `[ ]` Todas as views sobem pela árvore (matéria › assunto › subassunto) e
+- `[x]` Todas as views sobem pela árvore (matéria › assunto › subassunto) e
   são filtráveis por `banca`, `orgao`, `ano`, `concurso`, `cargo`, `nivel` e
   `tipo_conhecimento`. O item básico é expandido por cargo, como na
   `vw_arvore_edital_por_cargo` da 5B.1.
@@ -755,7 +754,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   - `vw_comparativo_nivel` (médio × superior), `vw_certo_errado_por_no`
     (proporção C/E e anulações), `vw_peso_materia_cargo` e
     `vw_discursivas` (tema por matéria/cargo/nível).
-- `[ ]` Matéria que é o próprio cargo: cargo de especialidade não tem
+- `[x]` Matéria que é o próprio cargo: cargo de especialidade não tem
   cabeçalho de matéria no edital, e o parser usa o nome do cargo como
   matéria (`ESTATÍSTICO`, `ENFERMEIRO`...). Medido em 2026-09-27: 12
   chunks, todos do `PF_25_ADM` (chunks 15 e 22–32); STM, IBAMA e TCU têm
@@ -768,12 +767,12 @@ enviar o bloco de uma etapa específica para o agente construir.
   12 `cargo`, 1 `prefixo` do CD, o resto `cabecalho`), e
   `dim_materia.nome_de_cargo boolean`. As views e o site mostram essas
   matérias como "Conhecimentos específicos — <cargo>", não como disciplina.
-- `[ ]` Documentação: ADR-032 (classificação e estatísticas). `CLAUDE.md`:
+- `[x]` Documentação: ADR-032 (classificação e estatísticas). `CLAUDE.md`:
   fases e patterns.
 - **Pronto quando:** as consultas de exemplo funcionam: top 10 subassuntos
   de LÍNGUA PORTUGUESA em superior × médio; questões de um subassunto
   filtradas por cargo e nível; "no edital, nunca cobrado" do `PF_25_ADM`
-  cargo 1.
+  cargo 1. Concluída com 100% de sucesso em 2026-09-29.
 
 ## Etapa 5F: Site público de questões (portfólio)
 > **Por que existe (2026-09-28):** o produto é um site público no estilo Gran

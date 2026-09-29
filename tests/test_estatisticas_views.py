@@ -634,3 +634,329 @@ class TestEstatisticasViews:
                 """
             )
             assert cur.fetchone()[0] == Decimal("75.00")
+
+    def test_vw_peso_materia_cargo(self, conn, dados):
+        """vw_peso_materia_cargo calcula proporção por matéria no cargo e formata rótulos."""
+        with conn.cursor() as cur:
+            # Em CONC_B, cargo 1 tem q8 (M-LP) e q9 (M-DIR)
+            cur.execute(
+                """
+                SELECT materia_id, materia_nome, rotulo_materia, questoes, anuladas, total_cargo, pct_da_prova
+                FROM vw_peso_materia_cargo
+                WHERE concurso = 'CONC_B' AND cargo_numero = 1
+                ORDER BY materia_id
+                """
+            )
+            rows = cur.fetchall()
+            assert len(rows) == 2
+            row_dir = next(r for r in rows if r[0] == "M-DIR")
+            assert row_dir[1] == "Direito Constitucional"
+            assert row_dir[2] == "Direito Constitucional"  # nome_de_cargo = False
+            assert row_dir[3] == 1  # questoes
+            assert row_dir[4] == 0  # anuladas
+            assert row_dir[5] == 2  # total_cargo
+            assert row_dir[6] == Decimal("50.00")  # pct_da_prova
+
+            row_lp = next(r for r in rows if r[0] == "M-LP")
+            assert row_lp[3] == 1
+            assert row_lp[5] == 2
+            assert row_lp[6] == Decimal("50.00")
+
+    def test_vw_peso_materia_cargo_rotulo_nome_de_cargo(self, conn, dados):
+        """Matéria com nome_de_cargo=True é exibida como 'Conhecimentos específicos — <cargo>'."""
+        with conn.cursor() as cur:
+            # Inserir um nó de matéria especial com nome_de_cargo
+            cur.execute(
+                """
+                INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status)
+                VALUES ('M-ESP', 'materia', 'Especialista', NULL, 'humano', 'ativo')
+                """
+            )
+            cur.execute("SELECT id FROM dim_materia WHERE chave = 'cargo_especial'")
+            dm_esp_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, 'M-ESP')",
+                (dm_esp_id,),
+            )
+            # Associar uma questão a M-ESP em CONC_A cargo 1
+            cur.execute(
+                """
+                INSERT INTO questoes (prova_id, numero, enunciado, gabarito, anulada, utilizavel)
+                VALUES (%s, 99, 'Questão Especial 99', 'C', false, true)
+                RETURNING id
+                """,
+                (dados["provas"]["001"],),
+            )
+            q_esp_id = cur.fetchone()[0]
+            cur.execute(
+                """
+                INSERT INTO questao_no (questao_id, no_id, papel, confianca, origem, status)
+                VALUES (%s, 'M-ESP', 'principal', 'alta', 'humano', 'aprovado')
+                """,
+                (q_esp_id,),
+            )
+            cur.execute(
+                """
+                SELECT rotulo_materia, nome_de_cargo
+                FROM vw_peso_materia_cargo
+                WHERE concurso = 'CONC_A' AND cargo_numero = 1 AND materia_id = 'M-ESP'
+                """
+            )
+            row = cur.fetchone()
+            assert row[0] == "Conhecimentos específicos — ANALISTA JUDICIÁRIO"
+            assert row[1] is True
+
+    def test_vw_edital_vs_prova_situacoes_e_cobertura_descendente(self, conn, dados):
+        """vw_edital_vs_prova classifica situações e aplica cobertura descendente."""
+        with conn.cursor() as cur:
+            conc_a_id = dados["concursos"]["CONC_A"]
+            cargo_1_id = dados["cargos"][(conc_a_id, 1)]
+
+            cur.execute("SELECT id FROM dim_materia WHERE chave = 'lingua_portuguesa'")
+            dm_lp_id = cur.fetchone()[0]
+
+            cur.execute(
+                """
+                INSERT INTO dim_topico (materia_id, chave, nome)
+                VALUES (%s, 'ortografia', 'Ortografia')
+                RETURNING id
+                """,
+                (dm_lp_id,),
+            )
+            top_ort_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO topico_no (topico_id, no_id) VALUES (%s, 'A-ORT')",
+                (top_ort_id,),
+            )
+
+            cur.execute(
+                """
+                INSERT INTO dim_subtopico (topico_id, chave, nome)
+                VALUES (%s, 'hifen', 'Emprego do hífen'),
+                       (%s, 'sem_questao', 'Tópico Nunca Cobrado')
+                RETURNING chave, id
+                """,
+                (top_ort_id, top_ort_id),
+            )
+            subtopicos = dict(cur.fetchall())
+            cur.execute(
+                "INSERT INTO subtopico_no (subtopico_id, no_id) VALUES (%s, 'S-HIFEN')",
+                (subtopicos["hifen"],),
+            )
+
+            # Criar nó nunca cobrado na árvore
+            cur.execute(
+                """
+                INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status)
+                VALUES ('S-NUNC', 'subassunto', 'Tópico Nunca Cobrado', 'A-ORT', 'humano', 'ativo')
+                """
+            )
+            cur.execute(
+                "INSERT INTO subtopico_no (subtopico_id, no_id) VALUES (%s, 'S-NUNC')",
+                (subtopicos["sem_questao"],),
+            )
+
+            # Itens de edital:
+            # 1. edital aponta para S-HIFEN (subassunto)
+            cur.execute(
+                """
+                INSERT INTO taxonomia_itens (concurso_id, cargo_edital_id, materia_id, topico_id, nivel, tipo_conhecimento, chunk_index, topico_ordem, topico_nome)
+                VALUES (%s, %s, %s, %s, 'superior', 'basico', 0, 1, 'Ortografia')
+                RETURNING id
+                """,
+                (conc_a_id, cargo_1_id, dm_lp_id, top_ort_id),
+            )
+            ti_1 = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO taxonomia_subitens (taxonomia_item_id, subtopico_id, ordem, nome) VALUES (%s, %s, 1, 'Emprego do hífen')",
+                (ti_1, subtopicos["hifen"]),
+            )
+
+            # 2. edital aponta para S-NUNC (nunca cobrado)
+            cur.execute(
+                """
+                INSERT INTO taxonomia_itens (concurso_id, cargo_edital_id, materia_id, topico_id, nivel, tipo_conhecimento, chunk_index, topico_ordem, topico_nome)
+                VALUES (%s, %s, %s, %s, 'superior', 'basico', 1, 1, 'Ortografia')
+                RETURNING id
+                """,
+                (conc_a_id, cargo_1_id, dm_lp_id, top_ort_id),
+            )
+            ti_2 = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO taxonomia_subitens (taxonomia_item_id, subtopico_id, ordem, nome) VALUES (%s, %s, 1, 'Tópico Nunca Cobrado')",
+                (ti_2, subtopicos["sem_questao"]),
+            )
+
+            # Consultar vw_edital_vs_prova para cargo 1:
+            # S-HIFEN: previsto e cobrado (q4 está em S-HIFEN) -> 'cobrado_no_edital'
+            # S-NUNC: previsto e 0 questões cobradas -> 'no_edital_nunca_cobrado'
+            # M-LP: previsto (sobe de S-HIFEN e S-NUNC) e cobrado -> 'cobrado_no_edital'
+            cur.execute(
+                """
+                SELECT no_id, no_nivel, no_edital, previsao, questoes, razao, situacao
+                FROM vw_edital_vs_prova
+                WHERE concurso = 'CONC_A' AND cargo_numero = 1 AND no_id IN ('S-HIFEN', 'S-NUNC', 'M-LP')
+                ORDER BY no_id
+                """
+            )
+            res = {r[0]: r for r in cur.fetchall()}
+            assert "S-HIFEN" in res
+            assert res["S-HIFEN"][2] is True  # no_edital
+            assert res["S-HIFEN"][3] >= 1  # previsao
+            assert res["S-HIFEN"][4] >= 1  # questoes
+            assert res["S-HIFEN"][6] == "cobrado_no_edital"
+
+            assert "S-NUNC" in res
+            assert res["S-NUNC"][2] is True
+            assert res["S-NUNC"][3] >= 1
+            assert res["S-NUNC"][4] == 0  # questoes
+            assert res["S-NUNC"][6] == "no_edital_nunca_cobrado"
+
+            assert "M-LP" in res
+            assert res["M-LP"][6] == "cobrado_no_edital"
+
+    def test_vw_discursivas(self, conn, dados):
+        """vw_discursivas expõe dados analíticos e não entra nas contagens de questões objetivas."""
+        with conn.cursor() as cur:
+            # 1. Inserir discursiva aprovada e discursiva pendente
+            cur.execute(
+                """
+                INSERT INTO discursivas (prova_id, numero, titulo, tema, enunciado, quesitos, padrao_resposta)
+                VALUES
+                (%s, 1, 'Título D1', 'Tema Constitucional', 'Enunciado D1', '["Q1", "Q2"]'::jsonb, 'Padrão D1'),
+                (%s, 2, 'Título D2', 'Tema Proposto', 'Enunciado D2', '[]'::jsonb, 'Padrão D2')
+                RETURNING id, numero
+                """,
+                (dados["provas"]["001"], dados["provas"]["001"]),
+            )
+            d_rows = dict(cur.fetchall())
+            d1_id = next(k for k, v in d_rows.items() if v == 1)
+            d2_id = next(k for k, v in d_rows.items() if v == 2)
+
+            cur.execute(
+                """
+                INSERT INTO discursiva_no (discursiva_id, no_id, papel, confianca, origem, status)
+                VALUES
+                (%s, 'A-CONST', 'principal', 'alta', 'humano', 'aprovado'),
+                (%s, 'A-CONST', 'principal', 'alta', 'humano', 'proposto')
+                """,
+                (d1_id, d2_id),
+            )
+
+            # 2. Consultar vw_discursivas: apenas d1 deve aparecer
+            cur.execute(
+                """
+                SELECT discursiva_id, numero, titulo, tema, no_id, no_nome, confianca, status_revisao
+                FROM vw_discursivas
+                WHERE concurso = 'CONC_A'
+                """
+            )
+            rows = cur.fetchall()
+            assert len(rows) == 1
+            assert rows[0][0] == d1_id
+            assert rows[0][1] == 1
+            assert rows[0][2] == "Título D1"
+            assert rows[0][3] == "Tema Constitucional"
+            assert rows[0][4] == "A-CONST"
+            assert rows[0][6] == "alta"
+            assert rows[0][7] == "aprovado"
+
+            # 3. Discursiva NÃO pode alterar as contagens de vw_prova_cobra_base nem vw_peso_materia_cargo
+            cur.execute(
+                "SELECT count(*) FROM vw_prova_cobra_base WHERE alvo_id = 'A-CONST' AND concurso = 'CONC_A'"
+            )
+            assert cur.fetchone()[0] == 0
+
+    def test_vw_edital_vs_prova_irmao_fora_do_edital_e_consistencia_5d(
+        self, conn, dados
+    ):
+        """Subassunto irmão de um previsto, sem ancestral apontado pelo edital,
+        é `cobrado_fora_do_edital` e bate com o `fora_do_edital` da 5D."""
+        with conn.cursor() as cur:
+            conc_a_id = dados["concursos"]["CONC_A"]
+            cargo_1_id = dados["cargos"][(conc_a_id, 1)]
+            cur.execute(
+                """
+                INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status) VALUES
+                ('M-ADM', 'materia', 'Direito Administrativo', NULL, 'humano', 'ativo'),
+                ('A-ATOS', 'assunto', 'Atos administrativos', 'M-ADM', 'humano', 'ativo'),
+                ('S-ATO1', 'subassunto', 'Conceito', 'A-ATOS', 'humano', 'ativo'),
+                ('S-ATO2', 'subassunto', 'Anulação', 'A-ATOS', 'humano', 'ativo')
+                """
+            )
+            # Matéria e tópico sem nó: o edital só aponta para S-ATO1.
+            cur.execute(
+                "INSERT INTO dim_materia (chave, nome) VALUES ('adm', 'ADM') RETURNING id"
+            )
+            dm_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO dim_topico (materia_id, chave, nome) VALUES (%s, 'atos', 'Atos') RETURNING id",
+                (dm_id,),
+            )
+            top_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO dim_subtopico (topico_id, chave, nome) VALUES (%s, 'conceito', 'Conceito') RETURNING id",
+                (top_id,),
+            )
+            sub_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO subtopico_no (subtopico_id, no_id) VALUES (%s, 'S-ATO1')",
+                (sub_id,),
+            )
+            cur.execute(
+                """
+                INSERT INTO taxonomia_itens (concurso_id, cargo_edital_id, materia_id, topico_id,
+                    nivel, tipo_conhecimento, chunk_index, topico_ordem, topico_nome)
+                VALUES (%s, %s, %s, %s, 'superior', 'especifico', 9, 1, 'Atos')
+                RETURNING id
+                """,
+                (conc_a_id, cargo_1_id, dm_id, top_id),
+            )
+            ti_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO taxonomia_subitens (taxonomia_item_id, subtopico_id, ordem, nome) VALUES (%s, %s, 1, 'Conceito')",
+                (ti_id, sub_id),
+            )
+            cur.execute(
+                """
+                INSERT INTO questoes (prova_id, numero, enunciado, gabarito, anulada, utilizavel)
+                VALUES (%s, 50, 'Anulação do ato', 'C', false, true) RETURNING id
+                """,
+                (dados["provas"]["001"],),
+            )
+            q_id = cur.fetchone()[0]
+            cur.execute(
+                """
+                INSERT INTO questao_no (questao_id, no_id, papel, confianca, origem, status, fora_do_edital)
+                VALUES (%s, 'S-ATO2', 'principal', 'alta', 'humano', 'aprovado', true)
+                """,
+                (q_id,),
+            )
+            cur.execute(
+                """
+                SELECT no_id, no_edital, previsao, questoes, situacao
+                FROM vw_edital_vs_prova
+                WHERE cargo_edital_id = %s AND no_id IN ('S-ATO1', 'S-ATO2', 'A-ATOS')
+                """,
+                (cargo_1_id,),
+            )
+            res = {r[0]: r[1:] for r in cur.fetchall()}
+            assert res["S-ATO2"] == (False, 0, 1, "cobrado_fora_do_edital")
+            assert res["S-ATO1"][3] == "no_edital_nunca_cobrado"
+            # O assunto-pai agrega o irmão previsto e a questão: aparece como cobrado.
+            assert res["A-ATOS"][3] == "cobrado_no_edital"
+
+            # Consistência 5D × 5E no nó da própria questão.
+            cur.execute(
+                """
+                SELECT count(*) FILTER (
+                    WHERE (evp.situacao = 'cobrado_fora_do_edital') <> qn.fora_do_edital)
+                FROM vw_questao_no qn
+                JOIN vw_questoes_contexto ctx ON ctx.questao_id = qn.questao_id
+                JOIN vw_edital_vs_prova evp ON evp.cargo_edital_id = ctx.cargo_edital_id
+                                           AND evp.no_id = qn.no_id
+                WHERE qn.questao_id = %s
+                """,
+                (q_id,),
+            )
+            assert cur.fetchone()[0] == 0

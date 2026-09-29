@@ -59,9 +59,9 @@ Os desafios técnicos resolvidos envolveram:
   - Testes automatizados cobrindo I/O canônico, geração de candidatos, particionamento de lotes, CLI de curadoria e persistência idempotente no PostgreSQL.
   - Base de dados totalmente preparada para o cálculo das estatísticas de incidência da Etapa 5E.
 
-## Estatísticas e Views de Incidência (Etapa 5E — Sessões A e B)
+## Estatísticas e Views de Incidência (Etapa 5E — Concluída em 2026-09-29)
 
-Na Etapa 5E, o modelo dimensional e as views analíticas foram desenvolvidos para responder às consultas centrais de produto do site de questões (*"o que mais cai"*, navegação e busca de questões, proporção Certo/Errado e comparativo de níveis), sem nenhuma dependência de LLM (custo financeiro $0).
+Na Etapa 5E, o modelo dimensional e as views analíticas foram desenvolvidos para responder às consultas centrais de produto do site de questões (*"o que mais cai"*, busca de questões, proporção Certo/Errado, comparativo de níveis, edital × prova, peso por matéria e discursivas analíticas), sem nenhuma dependência de LLM (custo financeiro $0).
 
 ### 1. Decisões de Modelagem e Agregação
 
@@ -86,7 +86,14 @@ Na Etapa 5E, o modelo dimensional e as views analíticas foram desenvolvidos par
    - Todas as classificações aprovadas somam nas contagens gerais (questão multidisciplinar cobra ambos os tópicos); a coluna `so_principal` é exposta para alternância no frontend.
 7. **Matéria-Cargo (`nome_de_cargo`):**
    - Identificada deterministicamente na Sessão A (`taxonomia_itens.materia_origem` = `cargo` e `dim_materia.nome_de_cargo = true`).
-   - Apresentada na `vw_questoes` com o rótulo formatado `"Conhecimentos específicos — <cargo>"`.
+   - Apresentada na `vw_questoes` e `vw_peso_materia_cargo` com o rótulo formatado `"Conhecimentos específicos — <cargo>"`.
+8. **Cobertura Descendente Edital × Prova (Decisão 5):**
+   - Um item previsto no edital em nó X cobre X e todos os descendentes de X.
+   - `situacao`:
+     - `'cobrado_no_edital'`: previsto no edital (direto ou via ancestral) e cobrado na prova;
+     - `'no_edital_nunca_cobrado'`: previsto no edital, mas com zero questões cobradas nele ou em seus descendentes;
+     - `'cobrado_fora_do_edital'`: cobrado na prova, porém sem ancestral-ou-igual previsto no edital daquele cargo.
+   - Subida hierárquica na prova garante que questões em subassuntos contam no assunto do edital, eliminando falsos "nunca cobrado".
 
 ### 2. Views Implementadas (`src/sql/schema_estatisticas.sql`)
 
@@ -94,8 +101,25 @@ Na Etapa 5E, o modelo dimensional e as views analíticas foram desenvolvidos par
 - `vw_questoes`: Base para a busca do site (5F.1), ligando o enunciado e textos-base à árvore e dimensões de filtro.
 - `vw_prova_cobra_base`: Base normalizada da subida hierárquica, filtrando concursos aprovados e questões utilizáveis.
 - `fn_prova_cobra(p_nivel_alvo, p_banca, p_orgao, p_ano, p_concurso, p_cargo_numero, p_nivel, p_tipo_conhecimento)`: **interface de leitura do site** para "o que mais cai". Filtra a base primeiro e conta depois, então a questão básica aplicada em N cargos conta 1× em qualquer combinação de filtros. Devolve `total_universo` (denominador do `pct_do_universo`) e o `pct_medio_por_concurso` calculado **sob os filtros**.
-- `vw_prova_cobra_no` (+ atalhos `vw_prova_cobra_{subassunto,assunto,materia}`): grão máximo (concurso × cargo × tipo × nó), para inspeção e consulta de um cargo só. **Não somar** `questoes` entre linhas nem reagregar os %: na revisão, somar a view deu 443 questões de Língua Portuguesa superior contra 101 distintas. O `pct_medio_por_concurso` dessas views é o global (sem filtro).
-- Denominadores: `pct_do_universo` = questões válidas distintas do universo filtrado (na view, do cargo × tipo); `pct_medio_por_concurso` = % do nó dentro da matéria no concurso (subassunto/assunto) ou dentro do concurso (matéria), média com peso igual por concurso.
-- Desempenho: `vw_prova_cobra_base` calcula o par (questão × cargo × nó) uma vez (CTE materializada) e a função materializa `vw_no_caminho`; consulta caiu de ~7,8 s para 0,1–0,3 s.
+- `vw_prova_cobra_no` (+ atalhos `vw_prova_cobra_{subassunto,assunto,materia}`): grão máximo (concurso × cargo × tipo × nó), para inspeção e consulta de um cargo só.
 - `vw_certo_errado_por_no`: Taxa de itens certos, errados e anulados por nó hierárquico.
 - `vw_comparativo_nivel`: Comparativo lado a lado de incidência Médio × Superior com diferença percentual.
+- `vw_edital_vs_prova`: Cruzamento (concurso × cargo × nó) com previsão do edital, questões da prova, razão e situação (`cobrado_no_edital`, `no_edital_nunca_cobrado`, `cobrado_fora_do_edital`). 7.051 linhas geradas em ~0,38s.
+- `vw_peso_materia_cargo`: Peso percentual de cada matéria dentro da prova de cada cargo (básico + específico), com formatação de `nome_de_cargo = true` como `"Conhecimentos específicos — <cargo>"`. 274 linhas em ~0,23s.
+- `vw_discursivas`: 64 linhas analíticas com tema, título, quesitos, gabarito e nós associados. Discursivas rigorosamente isoladas das contagens objetivas.
+
+### 3. Reconciliação e Aceite Final (Consultas do "Pronto Quando")
+
+1. **Top 10 Subassuntos de Língua Portuguesa Superior × Médio (`vw_comparativo_nivel`):**
+   - Superior liderado por: *Substituição de palavras ou de trechos de texto* (11 questões sup vs 3 médio), *Concordância verbal e nominal* (7 sup vs 3 médio), *Relações de subordinação* (7 sup vs 3 médio), *Emprego de elementos de referenciação e conectores* (7 sup vs 3 médio).
+2. **Questões Filtradas por Cargo e Nível (`vw_questoes`):**
+   - Busca em `PF_25_ADM`, cargo 1 (`ADMINISTRADOR`, nível superior) em *Concordância verbal e nominal*: recupera questões 13 (C) e 14 (E) instantaneamente com caminho e metadados.
+3. **"No edital, nunca cobrado" do PF_25_ADM Cargo 1 (`vw_edital_vs_prova`):**
+   - Retorna 27 assuntos e 96 subassuntos previstos no edital que não tiveram nenhuma questão cobrada na prova (ex.: *Características das organizações formais modernas*, *Excelência nos serviços públicos*, *Ato administrativo*, *Responsabilidade civil do Estado*).
+4. **Consistência Canônica 5D × 5E:**
+   - 4.055 pares expandidos: **0 divergências**, mas a checagem não discrimina nada no piloto: os 3.029 apontamentos do `classificacao_questoes.json` têm `fora_do_edital = false`. Só 1 questão foi para a passada de reserva (`STM_25|072_STM_008_01|64`), saiu `sem_no` e foi mapeada pelo dono via `curar_classificacao.py --mapear`, que grava sempre `fora_do_edital = false` (`scripts/curar_classificacao.py:213`). Recalculado pela regra correta (nó ou ancestral apontado **diretamente** pelo edital do cargo), as 2.781 questões continuam cobertas.
+   - **Correção pós-revisão da `vw_edital_vs_prova`:** a primeira versão procurava o ancestral em `edital_nos`, que já inclui a subida do edital; um subassunto irmão nunca previsto parecia coberto e `cobrado_fora_do_edital` praticamente não ocorria. Agora a busca é em `edital_direto` (o que `vw_arvore_edital_por_cargo` aponta). Como o item de edital também aponta o nó da matéria (`materia_no`), na prática "fora do edital" = matéria ausente do edital do cargo ou item sem matéria mapeada. O teste de consistência passou a usar fixture com um caso `true` (irmão fora) em vez do banco real.
+   - **Pendência para a curadoria:** `--mapear` deveria herdar ou calcular o `fora_do_edital`, não fixar `false`. Enquanto isso, a fonte de "fora do edital" para o site é a `vw_edital_vs_prova`.
+5. **Custo Financeiro e Qualidade:**
+   - Custo: **$0.00 USD** (100% determinístico).
+   - Suíte de testes: 609 passed, 1 xfailed (18 testes dedicados de views em `tests/test_estatisticas_views.py`), `ruff check .` 100% verde.

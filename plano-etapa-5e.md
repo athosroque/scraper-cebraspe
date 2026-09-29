@@ -214,32 +214,32 @@ existente quebra a reaplicação).
 **Objetivo:** item (3) do produto e as views restantes; documentação e
 aceite final.
 
-- `[ ]` `vw_edital_vs_prova`: por (concurso × cargo × nó) com `no_edital`
+- `[x]` `vw_edital_vs_prova`: por (concurso × cargo × nó) com `no_edital`
   (cobertura descendente, decisão 5), `questoes` cobradas, `razao =
   questoes / previsao` (previsão = ocorrências do edital no nó) e
   `situacao` ∈ `cobrado_no_edital` | `no_edital_nunca_cobrado` |
   `cobrado_fora_do_edital`. Usar o nível em que o edital aponta para
   evitar "nunca cobrado" falso quando o edital está em assunto e a questão
   em subassunto (regra da descendência).
-- `[ ]` Teste de consistência 5D × 5E: para todo par (questão, nó) aprovado,
+- `[x]` Teste de consistência 5D × 5E: para todo par (questão, nó) aprovado,
   `fora_do_edital` da 5D **==** `situacao = 'cobrado_fora_do_edital'` da
   view. Divergências são listadas e analisadas uma a uma; **não** sobrescrever
   o dado da 5D sem o dono (é canônico, ADR-032).
-- `[ ]` `vw_peso_materia_cargo`: % de questões por matéria em cada cargo
+- `[x]` `vw_peso_materia_cargo`: % de questões por matéria em cada cargo
   (a prova do cargo = básico + específico), para o "peso de cada matéria".
   Matéria-cargo (`nome_de_cargo`) aparece como "Conhecimentos específicos —
   <cargo>", não como disciplina.
-- `[ ]` `vw_discursivas`: tema por matéria/cargo/nível a partir de
+- `[x]` `vw_discursivas`: tema por matéria/cargo/nível a partir de
   `discursivas` + `discursiva_no` (64 linhas), com `titulo`, `tema`, nós e
   `fora_do_edital`. Discursiva **não** entra nas contagens de questão.
-- `[ ]` Aplicar tudo no banco real (`python -m src.stats_writer`) e rodar as
+- `[x]` Aplicar tudo no banco real (`python -m src.stats_writer`) e rodar as
   **três consultas de aceite** do §1; registrar as saídas resumidas no ADR-032.
-- `[ ]` Documentação: ADR-032 (seção "Estatísticas 5E": decisões finais,
+- `[x]` Documentação: ADR-032 (seção "Estatísticas 5E": decisões finais,
   contas de reconciliação, custo das views); `CLAUDE.md` (§5 marcar 5E
   `[x]`, §3 arquitetura, §6 pattern "estatística sobe a árvore e conta
   questão distinta", §7 anti-patterns encontrados); `task.md` (5E `[x]`,
   próxima prioridade = 5F.0); `LESSONS.md` se houver gotcha.
-- `[ ]` Atualizar §5 do `CLAUDE.md`: "Prioridade atual" passa para 5F.
+- `[x]` Atualizar §5 do `CLAUDE.md`: "Prioridade atual" passa para 5F.
 - **Aceite final:** `pytest` e `ruff` 100% verdes no repositório; as 3
   consultas do §1 funcionam; nenhuma view nova ignora `status_revisao =
   'aprovado'`, `utilizavel` ou a resolução de nó fundido.
