@@ -36,7 +36,10 @@ from src.models_scraper import TaxonomiaEdital, Topico
 load_dotenv()
 
 OPENROUTER_BASE_URL = llm_openrouter.OPENROUTER_BASE_URL
-OPENROUTER_API_KEY = llm_openrouter.OPENROUTER_API_KEY
+OPENROUTER_API_KEY = llm_openrouter.chave_openrouter(
+    llm_openrouter.ETAPA_TAXONOMIA_EDITAL
+)
+NOME_TRACE = llm_openrouter.ETAPA_TAXONOMIA_EDITAL[1]
 LLM_MODEL = llm_openrouter.LLM_MODEL
 
 # Langfuse via SDK oficial (OTel). A API REST v3 de ingestão deixa de aceitar
@@ -134,7 +137,7 @@ def _registrar_langfuse(
     """Fecha a generation com o desfecho e grava `metadata` (ex: `tipo_erro`) no trace."""
     llm_openrouter.registrar_generation(
         gen,
-        nome_trace="taxonomia_extractor",
+        nome_trace=NOME_TRACE,
         resposta=resposta,
         usage=usage,
         sucesso=sucesso,

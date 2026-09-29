@@ -32,7 +32,7 @@ from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src import arvore, candidatos_questao, classificacao
+from src import arvore, candidatos_questao, classificacao, llm_openrouter
 from src.llm_openrouter import (
     REASONING_PADRAO,
     ResultadoPosValidacao,
@@ -422,7 +422,10 @@ def classificar_lote(
                 local_para_id, numeros_esperados, ultimo_erro
             ),
             nome_generation=f"classificar_{metadata_base.get('caderno', 'lote')}",
-            nome_trace="classificar_questoes",
+            nome_trace=llm_openrouter.ETAPA_CLASSIFICACAO_QUESTOES[1],
+            api_key=llm_openrouter.chave_openrouter(
+                llm_openrouter.ETAPA_CLASSIFICACAO_QUESTOES
+            ),
         )
         conta.registrar_usage(resultado.usage)
         if resultado.motivo is None:

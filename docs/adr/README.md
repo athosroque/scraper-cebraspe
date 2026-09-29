@@ -40,3 +40,4 @@ Este diretório armazena os Registros de Decisões de Arquitetura (**Architectur
 | [ADR-030](ADR-030-arvore-mestre-e-site-de-questoes.md) | 2026-09-28 | Árvore mestre de assuntos semeada com a 5B e site público de questões como objetivo do produto | Aceito (5B.1 implementada; 5B.2–5F a seguir) |
 | [ADR-031](ADR-031-extracao-questoes-cadernos.md) | 2026-09-25 | Extração determinística de questões, gabaritos e discursivas dos cadernos de prova | Aceito |
 | [ADR-032](ADR-032-classificacao-questoes-arvore.md) | 2026-09-29 | Classificação das questões na árvore mestre, confiança em 2 camadas e governança humana | Aceito |
+| [ADR-033](ADR-033-site-publico-stack-e-deploy.md) | 2026-09-29 | Site público: FastAPI + Jinja/HTMX (migração futura via /api/v1), Google OAuth, schema `app`, deploy e direitos | Aceito |

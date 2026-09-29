@@ -72,6 +72,8 @@ Datasette continua só como ferramenta de revisão do dono.
   `scraper-cebraspe-db` no `docker-compose.yml` deste projeto, porta
   `127.0.0.1:5435`, banco/usuário `cebraspe`, volume
   `scraper_cebraspe_pgdata` (ADR-026). Sem pgvector por ora
+- Site (5F, ADR-033): FastAPI + Jinja2 + HTMX + Alpine.js + Pico.css,
+  Authlib (Google OAuth), código em `site/`
 - sqlite-utils >=3.36 — só pra construir `revisao_piloto/revisao.db` (banco
   de apoio à revisão humana da Etapa 4); Datasette roda via Docker
   (`datasetteproject/datasette`), não é dependência do venv
@@ -183,7 +185,13 @@ Datasette continua só como ferramenta de revisão do dono.
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
       registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
-- **⚡ Prioridade atual: Etapa 5F do `task.md`** (Site público de questões: 5F.0 Design System e Arquitetura).
+- [x] Etapa 5F.0 — Decisões do site público (ADR-033): FastAPI + Jinja2/HTMX/Alpine
+      em 3 camadas (`repositorio` → `servicos` → `api/v1` JSON e `web` HTML) para
+      migrar o frontend depois (SvelteKit) sem tocar a regra; só Google OAuth;
+      schema `app` no `scraper-cebraspe-db` com roles `site_leitura`/`site_app`
+      e chave estável da 5D; deploy via Traefik + Tunnel sem Access. Plano em
+      `plano-etapa-5f.md`.
+- **⚡ Prioridade atual: Etapa 5F.1 do `plano-etapa-5f.md`** (API de leitura).
 
 
 ## 6. Patterns
@@ -245,8 +253,12 @@ Datasette continua só como ferramenta de revisão do dono.
   `MAX_TOKENS=12000`, `REQUEST_TIMEOUT=120`, reasoning 3000 — vieram do merge
   `b823c31` e substituíram os `24576`/`240` registrados na decisão de
   2026-09-20 (§12), que ficam só como histórico.
-- Chaves do OpenRouter são dedicadas por serviço (`TELEGRAM_OPENROUTER_API_KEY`
-  e `OPENROUTER_API_KEY`), mapeadas a projetos independentes no Langfuse.
+- Chaves do OpenRouter são dedicadas por etapa (`llm_openrouter.ETAPA_*` +
+  `chave_openrouter`): `OPENROUTER_KEY_TAXONOMIA_EDITAL`, `_SINONIMOS`,
+  `_CURADORIA_ARVORE`, `_CLASSIFICACAO_QUESTOES` e `_TELEGRAM`. O nome da chave
+  no OpenRouter é igual ao nome do trace no Langfuse
+  (`cebraspe-<etapa>-<função>`). Chave vazia cai na `OPENROUTER_API_KEY`
+  com aviso `[CHAVE_FALLBACK]` no log.
 - Todo passo derivado do checkpoint de revisão (validação de-para, relatório
   HTML, banco Datasette, restart do container) é acionado automaticamente
   ao final do pipeline de extração/reprocessamento
@@ -1396,6 +1408,20 @@ item sem nó.
 contexto); permitir que o LLM crie nós automaticamente (alucinação taxonômica);
 amarrar por IDs seriais de banco (incompatível com DELETE+INSERT de cadernos).
 Ver ADR-032.
+
+### 2026-09-29 — Stack e deploy do site público (Etapa 5F.0)
+
+**Decisão:** FastAPI + Jinja2/HTMX/Alpine renderizado no servidor, em 3
+camadas (`repositorio` → `servicos` → `api/v1` e `web`), com toda tela
+espelhada em JSON para migrar o frontend depois (SvelteKit) sem tocar a
+regra. Só Google OAuth. Dados de usuário no schema `app` do mesmo banco,
+com roles separadas e a chave estável da 5D (nunca `questoes.id`). Serviço
+público via Traefik + Tunnel, sem Access. Republicação com crédito à fonte
+e canal de remoção; termos do CEBRASPE conferidos pelo dono antes do deploy.
+**Motivo:** o dono preferiu começar em Python e migrar depois; a separação
+em camadas é o que torna essa migração barata.
+**Alternativas descartadas:** SvelteKit/Vue/Astro já agora; senha própria
+ou auth gerenciado; Postgres separado para usuários. Ver ADR-033.
 
 ## 13. LESSONS.md (do projeto)
 

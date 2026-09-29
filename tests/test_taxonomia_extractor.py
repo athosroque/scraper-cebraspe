@@ -538,7 +538,7 @@ class TestLangfuseSdk:
             status_message="erro teste",
         )
         mock_gen.update_trace.assert_called_once_with(
-            name="taxonomia_extractor",
+            name="cebraspe-4-taxonomia-edital",
             metadata={"tipo_erro": "falha_timeout"},
         )
         mock_gen.end.assert_called_once()
@@ -561,7 +561,7 @@ class TestLangfuseSdk:
             status_message=None,
         )
         mock_gen.update_trace.assert_called_once_with(
-            name="taxonomia_extractor",
+            name="cebraspe-4-taxonomia-edital",
             metadata={"reparo_nome_numerico": {"status": "reparado"}},
         )
         mock_gen.end.assert_called_once()

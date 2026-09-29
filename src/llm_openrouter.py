@@ -40,6 +40,39 @@ OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/ap
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 LLM_MODEL = os.getenv("OPENROUTER_MODEL", "z-ai/glm-5.3-flash")
 
+# Uma chave do OpenRouter por etapa, com o mesmo nome no painel do OpenRouter
+# e no trace do Langfuse, para separar custo e uso de cada etapa.
+# Etapa -> (variável no .env, nome da chave no OpenRouter = nome do trace).
+ETAPA_TAXONOMIA_EDITAL = (
+    "OPENROUTER_KEY_TAXONOMIA_EDITAL",
+    "cebraspe-4-taxonomia-edital",
+)
+ETAPA_SINONIMOS = ("OPENROUTER_KEY_SINONIMOS", "cebraspe-5b-sinonimos")
+ETAPA_CURADORIA_ARVORE = (
+    "OPENROUTER_KEY_CURADORIA_ARVORE",
+    "cebraspe-5b2-curadoria-arvore",
+)
+ETAPA_CLASSIFICACAO_QUESTOES = (
+    "OPENROUTER_KEY_CLASSIFICACAO_QUESTOES",
+    "cebraspe-5d-classificacao-questoes",
+)
+ETAPA_TELEGRAM = ("OPENROUTER_KEY_TELEGRAM", "cebraspe-telegram-bot")
+
+
+def chave_openrouter(etapa: tuple[str, str], *fallbacks: str) -> str:
+    """Chave da etapa; sem ela, usa os `fallbacks` e por fim `OPENROUTER_API_KEY`."""
+    nome_env, _ = etapa
+    chave = os.getenv(nome_env, "")
+    if chave:
+        return chave
+    for alternativa in (*fallbacks, "OPENROUTER_API_KEY"):
+        chave = os.getenv(alternativa, "")
+        if chave:
+            logger.warning(f"[CHAVE_FALLBACK] {nome_env} vazia; usando {alternativa}.")
+            return chave
+    return ""
+
+
 LANGFUSE_HOST = os.getenv("LANGFUSE_HOST") or os.getenv(
     "LANGFUSE_BASE_URL", "https://cloud.langfuse.com"
 )

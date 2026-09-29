@@ -1,0 +1,183 @@
+# Plano — Etapa 5F: Site público de questões
+
+> **Documento autocontido, uma sessão (conversa) por subetapa (5F.1 a 5F.6).**
+> Base normativa: ADR-030 (produto e árvore), ADR-032 (chave estável da
+> questão), ADR-033 (stack, auth, dados de usuário, deploy e direitos). Não é
+> preciso reler o `task.md`.
+
+---
+
+## 1. Contexto e objetivo
+
+A 5E deixou o banco pronto para leitura. O site mostra as **2.800 questões
+objetivas** do piloto 2025 (5 concursos), com filtros pela árvore mestre,
+resolução Certo/Errado, contas Google, desempenho pessoal, as três
+estatísticas e o simulado.
+
+**Pronto quando** (critério do `task.md`): o site está no ar com as 2.800
+questões filtráveis pela árvore, um usuário cadastrado resolve questões e vê
+o próprio desempenho, e as três estatísticas e o simulado `PF_25_ADM` cargo 1
+funcionam, com a pontuação conferida à mão.
+
+---
+
+## 2. O que já existe no banco (reutilizar, não recriar)
+
+- `vw_questoes`: 1 linha por (questão × nó aprovado). Colunas: `questao_id`,
+  `questao_canonica_id`, `numero`, `codigo_caderno`, `prova_tipo`,
+  `tipo_conhecimento`, `concurso`, `orgao`, `banca`, `ano`,
+  `cargo_edital_id`, `cargo_numero`, `cargo`, `nivel`, `gabarito`,
+  `anulada`, `utilizavel`, `status_revisao`, `enunciado`, `secao`,
+  `figuras`, `texto_base_id`, `texto_base_texto`, `tem_texto_base`,
+  `tem_figuras`, `no_id`, `no_caminho`, `no_nivel`, `no_nome`, `materia_id`,
+  `assunto_id`, `papel`, `confianca`, `fora_do_edital`, `nocoes`,
+  `nome_de_cargo`, `rotulo_materia`. **Vem expandida por nó e por cargo**:
+  a listagem precisa de `DISTINCT` por questão.
+- `vw_no_caminho` (árvore ativa, `no_efetivo`), `vw_questao_no`.
+- `fn_prova_cobra(p_nivel_alvo, p_banca, p_orgao, p_ano, p_concurso,
+  p_cargo_numero, p_nivel, p_tipo_conhecimento)`: leitura oficial do "o que
+  mais cai". **Nunca somar linhas de `vw_prova_cobra_*` entre cargos**.
+- `vw_edital_cobra_{materia,assunto,subassunto}`, `vw_edital_vs_prova`,
+  `vw_peso_materia_cargo`, `vw_certo_errado_por_no`, `vw_comparativo_nivel`,
+  `vw_discursivas` (discursiva nunca se mistura com objetiva).
+- Figuras em `data/2025/CEBRASPE/<orgao>/Provas/figuras/` (o caminho está no
+  JSONB `figuras`).
+
+---
+
+## 3. Estrutura proposta
+
+```
+scraper_cebraspe/site/
+  app/
+    main.py            # FastAPI, monta api + web + static
+    config.py          # pydantic-settings, lê .env (SITE_DB_*, GOOGLE_*, SESSION_SECRET)
+    db.py              # pool psycopg (dois DSNs: leitura e app)
+    modelos.py         # Pydantic: Questao, FiltroQuestoes, Pagina, NoArvore...
+    repositorio/       # SQL puro sobre as views e o schema app
+    servicos/          # regras: filtros, correção CEBRASPE, desempenho
+    api/v1/            # JSON
+    web/               # rotas HTML
+    templates/         # Jinja2 + HTMX + Alpine
+    static/            # pico.css, htmx.min.js, alpine.min.js (vendorizados)
+  sql/app_schema.sql   # schema app + roles (idempotente)
+  tests/
+  Dockerfile
+```
+
+Regra do ADR-033: **template e rota não têm SQL nem regra.** Toda rota HTML
+tem o endpoint JSON equivalente e teste.
+
+DDL do schema `app` (5F.3 aplica; aqui como referência):
+
+```sql
+CREATE SCHEMA IF NOT EXISTS app;
+CREATE TABLE app.usuario (
+  id bigserial PRIMARY KEY, google_sub text UNIQUE NOT NULL,
+  email text NOT NULL, nome text, criado_em timestamptz DEFAULT now());
+CREATE TABLE app.resposta (
+  id bigserial PRIMARY KEY,
+  usuario_id bigint REFERENCES app.usuario ON DELETE CASCADE,
+  questao_chave text NOT NULL,          -- <concurso>|<caderno>|<numero> (ADR-032)
+  resposta char(1) CHECK (resposta IN ('C','E')),
+  acertou boolean NOT NULL, simulado_id bigint NULL,
+  respondida_em timestamptz DEFAULT now());
+CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, fim, nota
+-- roles: site_leitura (SELECT nas views, EXECUTE fn_prova_cobra), site_app (CRUD em app)
+```
+
+---
+
+## 4. Sessões
+
+### 5F.1 — API de leitura
+- `vw_questoes` ganha a coluna `questao_chave` (`concurso|codigo_caderno|numero`,
+  a mesma de `canonico/classificacao_questoes.json`) — conferir que casa
+  1:1 com os 2.834 registros da 5D.
+- Roles `site_leitura`/`site_app` em `site/sql/app_schema.sql` (idempotente,
+  senhas do `.env`).
+- `GET /api/v1/questoes`: filtros combináveis `banca, orgao, ano, concurso,
+  cargo_numero, nivel, tipo_conhecimento, no_id` (inclui descendentes via
+  `materia_id/assunto_id`), `anuladas` (incluir/excluir/só),
+  `fora_do_edital`; paginação por cursor ou `limit/offset` (máx. 50);
+  1 item por questão (agregando os nós).
+- `GET /api/v1/questoes/{chave}`: texto-base, figuras (URL), gabarito,
+  caminhos na árvore, fonte (concurso, caderno, link ao PDF).
+- `GET /api/v1/arvore` (matéria → assunto → subassunto com contagem de
+  questões) e `GET /api/v1/facetas` (valores de cada filtro).
+- Testes com banco real (fixture que pula se o Postgres não estiver no ar,
+  no padrão de `tests/test_estatisticas_views.py`).
+- **Pronto quando:** a soma das questões distintas sem filtro = 2.800; o
+  filtro por subassunto de Língua Portuguesa + nível superior bate com
+  uma consulta SQL feita à mão.
+
+### 5F.2 — Frontend de resolução
+- Layout base (Pico.css), lista filtrável com HTMX (`hx-get` no formulário
+  de filtros, `hx-push-url` para URL compartilhável), árvore de filtros
+  expansível (Alpine).
+- Card de questão: enunciado, texto-base recolhível, figuras, botões C/E →
+  `POST` devolve o fragmento com a correção imediata (anônimo: sem gravar).
+- Página canônica por questão `/q/<concurso>/<caderno>/<numero>` com
+  `<title>`/meta description, crédito "Fonte: CEBRASPE" e link ao PDF.
+- Página "Sobre e fontes" + canal de remoção (ADR-033 §5).
+- **Pronto quando:** navegar da matéria ao subassunto, resolver 10 questões
+  e ver a correção, com HTML válido e testes das rotas.
+
+### 5F.3 — Contas e histórico (estatística 4: desempenho pessoal)
+- Google OAuth (Authlib), sessão em cookie assinado, CSRF nos POST.
+- Aplicar o schema `app`; resposta logada grava em `app.resposta`.
+- Filtros "já resolvidas" / "erradas" (JOIN por `questao_chave`).
+- Desempenho por nó (acertos/erros subindo a árvore, mesma regra da 5E:
+  questão distinta, nunca conta 2× no mesmo nó), com os mesmos filtros.
+- "Apagar minha conta" (cascata).
+- **Pronto quando:** login real com a conta do dono, 20 respostas gravadas,
+  o desempenho por matéria bate com a contagem manual.
+
+### 5F.4 — Páginas de estatística
+- (1) O que mais cai: `fn_prova_cobra` com filtros (concurso/cargo/nível),
+  ranking de subassuntos e barras (SVG no servidor ou Chart.js).
+- (2) O que o edital cobra: `vw_edital_cobra_*`.
+- (3) Edital × prova: `vw_edital_vs_prova` (cobrado, nunca cobrado, fora
+  do edital) + `vw_peso_materia_cargo`.
+- Cada ranking linka para a lista de questões já filtrada.
+- **Pronto quando:** os três exemplos do "pronto quando" da 5E aparecem nas
+  páginas com os mesmos números.
+
+### 5F.5 — Simulado
+- Montar a prova de um concurso/cargo: básico + específico na ordem
+  original (`codigo_caderno`, `numero`), cronômetro (Alpine), respostas em
+  branco permitidas.
+- Correção CEBRASPE em `servicos/` (certo +1, errado −1, branco 0, anulada
+  não conta), com teste unitário de casos-limite; desempenho por nó.
+- Discursiva: mostra tema e quesitos (`vw_discursivas`) e o padrão de
+  resposta depois de encerrar; sem nota automática.
+- **Pronto quando:** simulado `PF_25_ADM` cargo 1 respondido com um padrão
+  conhecido e a nota conferida à mão.
+
+### 5F.6 — Deploy público
+- `Dockerfile` (python:3.11-slim, uvicorn, usuário não root) e serviço
+  `scraper-cebraspe-site` no `docker-compose.yml` (labels Traefik,
+  `homelab_default`, figuras montadas `:ro`).
+- Cloudflare Tunnel para o subdomínio público, **sem** Access; middleware de
+  rate limit no Traefik; headers (CSP, HSTS, nosniff); `/saude`.
+- Backup `pg_dump -n app` diário (systemd timer do usuário) com retenção de 14 dias.
+- CI: ruff + pytest do `site/` no workflow do projeto.
+- **Checklist de direitos:** o dono leu os termos de `cebraspe.org.br`; sem
+  proibição expressa → público; com proibição → fica atrás do Access.
+- **Pronto quando:** o "pronto quando" da seção 1, acessando pelo domínio
+  público de fora da rede.
+
+---
+
+## 5. Ideias opcionais (fazer só se sobrar tempo na sessão)
+- "% de acerto da comunidade" por questão (agregado anônimo de `app.resposta`).
+- Filtro rápido "nunca cobrado no edital do meu cargo".
+- Sitemap XML das páginas de questão.
+- Modo escuro via `prefers-color-scheme` (Pico já suporta).
+
+## 6. Anti-patterns desta etapa
+- SQL ou regra de negócio em template/rota (quebra a migração da Fase 2).
+- Referenciar `questoes.id` fora do banco de conteúdo (muda a cada reextração).
+- Somar `vw_prova_cobra_*` entre cargos (usar `fn_prova_cobra`).
+- Misturar discursiva com objetiva nas contagens.
+- Usar o usuário `cebraspe` no site ou expor `data/` inteiro.

@@ -37,7 +37,7 @@ from pydantic import BaseModel, Field
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.gerar_relatorio_sinonimos import gerar_relatorio_sinonimos
-from src import canonico
+from src import canonico, llm_openrouter
 from src.llm_openrouter import (
     ResultadoPosValidacao,
     chamar_llm_json,
@@ -254,7 +254,8 @@ def propor_lote(
             },
             pos_validacao=_pos_validacao(ids_por_bloco),
             nome_generation=f"propor_sinonimos_{lote.nivel}",
-            nome_trace="propor_sinonimos",
+            nome_trace=llm_openrouter.ETAPA_SINONIMOS[1],
+            api_key=llm_openrouter.chave_openrouter(llm_openrouter.ETAPA_SINONIMOS),
         )
         conta.registrar_usage(resultado.usage)
         if resultado.motivo is None:

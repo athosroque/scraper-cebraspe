@@ -50,7 +50,7 @@ from pydantic import BaseModel, Field
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.gerar_relatorio_arvore import gerar_relatorio_arvore
-from src import arvore
+from src import arvore, llm_openrouter
 from src.llm_openrouter import (
     REASONING_PADRAO,
     ResultadoPosValidacao,
@@ -470,7 +470,10 @@ def propor_lote(
                 arv, ids_locais, materia_id, ultimo_erro
             ),
             nome_generation=f"propor_arvore_{materia_id}",
-            nome_trace="propor_arvore",
+            nome_trace=llm_openrouter.ETAPA_CURADORIA_ARVORE[1],
+            api_key=llm_openrouter.chave_openrouter(
+                llm_openrouter.ETAPA_CURADORIA_ARVORE
+            ),
         )
         conta.registrar_usage(resultado.usage)
         if resultado.motivo is None:

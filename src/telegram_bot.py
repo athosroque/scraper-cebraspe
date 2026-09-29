@@ -14,6 +14,7 @@ from telegram.ext import (
     filters,
 )
 
+from src import llm_openrouter
 from src.llm_openrouter import REASONING_PADRAO
 
 load_dotenv()
@@ -31,9 +32,10 @@ if ALLOWED_USER_ID:
 
 # OpenRouter (acesso direto REST via httpx, sem proxy)
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-OPENROUTER_API_KEY = os.getenv("TELEGRAM_OPENROUTER_API_KEY") or os.getenv(
-    "OPENROUTER_API_KEY", ""
+OPENROUTER_API_KEY = llm_openrouter.chave_openrouter(
+    llm_openrouter.ETAPA_TELEGRAM, "TELEGRAM_OPENROUTER_API_KEY"
 )
+NOME_TRACE = llm_openrouter.ETAPA_TELEGRAM[1]
 MODEL_NAME = os.getenv("TELEGRAM_OPENROUTER_MODEL", "z-ai/glm-5.3-flash")
 
 # Langfuse via SDK oficial (OTel, credenciais dedicadas do Telegram com fallback)
@@ -165,7 +167,7 @@ def _registrar_langfuse(
             status_message=erro,
         )
         gen.update_trace(
-            name="telegram_chat",
+            name=NOME_TRACE,
             user_id=str(user_id) if user_id else None,
         )
         gen.end()
@@ -184,7 +186,7 @@ async def chamar_openrouter(
     key = OPENROUTER_API_KEY if api_key is None else api_key
     if not key:
         raise ValueError(
-            "Chave da API do OpenRouter não configurada. Defina TELEGRAM_OPENROUTER_API_KEY no .env."
+            "Chave da API do OpenRouter não configurada. Defina OPENROUTER_KEY_TELEGRAM no .env."
         )
 
     endpoint = base_url or OPENROUTER_BASE_URL

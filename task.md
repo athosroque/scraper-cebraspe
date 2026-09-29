@@ -781,7 +781,11 @@ enviar o bloco de uma etapa específica para o agente construir.
 > da 5F.1, detalhar as subetapas num arquivo autocontido
 > (`plano-etapa-5f.md`), no padrão do `correcoes-etapa-5c.md`.
 
-- `[ ]` **5F.0 — Decisões (ADR-033):**
+- `[x]` **5F.0 — Decisões (ADR-033):** concluída em 2026-09-29. FastAPI +
+  Jinja/HTMX em 3 camadas (migração futura para SvelteKit via `/api/v1`),
+  só Google OAuth, schema `app` com roles no mesmo banco (chave estável da
+  5D), serviço público sem Zero Trust, postura de crédito à fonte.
+  Subetapas detalhadas em `plano-etapa-5f.md`. Itens decididos:
   - stack da API e do frontend;
   - autenticação (provedor próprio × OAuth);
   - hospedagem no Xeon via Traefik + Cloudflare Tunnel, **sem** o Zero
