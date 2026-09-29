@@ -314,7 +314,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ---
 
-# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-28): Etapas 5A–5F (5A, 5B, 5B.1, 5C e 5C.1 concluídas; próximas: 5B.2 curadoria → 5D → 5E → 5F site) — questões, árvore de assuntos, estatísticas e site público
+# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-29): Etapas 5A–5F (5A, 5B, 5B.1, 5B.2, 5C e 5C.1 concluídas; próximas: 5D classificação → 5E → 5F site) — questões, árvore de assuntos, estatísticas e site público
 
 > **Por que existe:** a Etapa 5 entregou o banco com a **taxonomia dos
 > editais**, ou seja, o que o edital lista. O objetivo real do projeto é
@@ -722,30 +722,18 @@ enviar o bloco de uma etapa específica para o agente construir.
   arquivo mantém os números da 5C.
 
 ## Etapa 5D: Classificação das questões na árvore mestre (LLM, lista fechada)
-- `[ ]` Pré-requisito: árvore aprovada (5B.1 + 5B.2) e questões extraídas
-  (5C, feito).
-- `[ ]` `scripts/classificar_questoes.py`: a questão é classificada no
-  **nó mais específico** da árvore, de preferência um subassunto; um
-  assunto, quando nenhum subassunto serve.
-  - **Candidatos preferenciais:** os nós para onde apontam os itens do
-    edital aplicáveis ao caderno (tipo básico/específico, nível, cargos via
-    `provas_cargos` e `cargos_restritos`).
-  - **Candidatos de reserva:** a subárvore global das matérias desses nós.
-    Uma questão cobrada fora do edital ainda cai na árvore.
-  - O LLM recebe um lote (um texto-base com seus itens, ou ~10 itens), o
-    rótulo de seção e a lista de candidatos com IDs. Devolve
-    `{numero: no_id, confianca, fora_do_edital: bool}`. ID fora da lista é
-    falha tipada (ADR-022), nunca aceito.
-- `[ ]` Estimativa: ~2.800 itens objetivos + 34 discursivas, ~300 chamadas.
-- `[ ]` Banco: `questao_no` (`questao_id`, `no_id`, `confianca`,
-  `fora_do_edital`, `origem`, `status`), N:N para a questão
-  interdisciplinar. As views oficiais só usam `aprovado`.
-- `[ ]` Revisão humana: relatório por caderno, ordenado pela menor
-  confiança. A aprovação pode ser em lote acima de um limiar de confiança
-  escolhido pelo dono, com a amostra de baixa confiança revisada item a
-  item.
-- **Checkpoint:** o dono aprova a classificação, começando pela amostra de
-  baixa confiança.
+> **Detalhes da implementação e plano de execução:** [`plano-etapa-5d.md`](file:///home/athos/homelab/scraper_cebraspe/plano-etapa-5d.md).
+> O arquivo é autocontido e dividido em 3 sessões independentes (uma por conversa).
+> Cada sessão roda seus testes e verificações antes de avançar.
+>
+> **Decisões fechadas (dono, 2026-09-29):** confiança categórica (`alta`, `media`, `baixa`);
+> até 2 nós por questão (`principal` e, se interdisciplinar, `secundario`);
+> `fora_do_edital` calculado localmente pelo conjunto do nó (preferencial × reserva);
+> fonte da verdade em `canonico/classificacao_questoes.json` (banco Postgres é derivado e recarregável).
+- `[x]` **Sessão A (sem LLM):** modelo (`src/classificacao.py`), candidatos preferenciais e de reserva + montagem de lotes (`src/candidatos_questao.py`), tabelas no banco (`questao_no`, `discursiva_no`, `vw_questao_no`), carga idempotente em `stats_writer.py` e testes.
+- `[ ]` **Sessão B (LLM + rodada real):** `scripts/classificar_questoes.py` (prompt contextualizado, IDs locais `C1..Cn`, validação estrita, reserva para `nenhum_serve`, idempotência), rodada real nos cadernos e testes mockados.
+- `[ ]` **Sessão C (revisão e checkpoint do dono):** relatório HTML (`scripts/gerar_relatorio_classificacao.py`), CLI de curadoria (`scripts/curar_classificacao.py`), decisão/aprovação pelo dono e documentação (ADR-032 parte 5D, `CLAUDE.md`, `task.md`).
+- **Pronto quando:** toda questão utilizável (2.800) e discursiva (34) tem registro canônico; 0 pendências após decisão do dono; `vw_questao_no` cobre os dados aprovados; reextração preserva classificações; pytest e ruff verdes.
 
 ## Etapa 5E: Estatísticas (views no banco)
 - `[ ]` Todas as views sobem pela árvore (matéria › assunto › subassunto) e

@@ -41,7 +41,7 @@ import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import Json, execute_batch
 
-from src import arvore, canonico, gabarito_parser
+from src import arvore, canonico, classificacao, gabarito_parser
 from src.comparacao_texto import extrair_cargos_do_texto, normalizar
 from src.downloader import (
     DATA_DIR,
@@ -860,6 +860,194 @@ def aplicar_arvore(conn, arvore_path: Path) -> dict[str, int]:
     return totais
 
 
+def nome_caderno(prova: dict) -> str:
+    """Nome estável do caderno: código impresso no gabarito
+    (`094_PF_CB1_01`), senão `<slug>_<identificador>` (`PF_25_ADM_DISC_001`),
+    senão o nome do arquivo higienizado."""
+    if prova.get("codigo_caderno"):
+        return prova["codigo_caderno"]
+    stem = Path(prova.get("arquivo", "")).stem
+    if re.fullmatch(r"\d{3}_[A-Z0-9]+_(?:\d{3}_DISC|DISC_\d{3})", stem, re.IGNORECASE):
+        return stem.upper()
+    if prova.get("identificador"):
+        return f"{prova['slug']}_{prova['identificador']}"
+    return re.sub(r"[^A-Za-z0-9]+", "_", f"{prova.get('slug', '')}_{stem}").strip("_")
+
+
+def aplicar_classificacao(
+    conn, classificacao_path: Path = classificacao.CLASSIFICACAO_PADRAO
+) -> dict[str, int]:
+    """Carrega `canonico/classificacao_questoes.json` em `questao_no` e `discursiva_no` (ADR-030).
+
+    Mapeia as chaves naturais para os IDs seriais de `questoes` e `discursivas`.
+    Numa transação atômica, limpa e recarrega as tabelas derivadas com todos os registros canônicos.
+
+    Registro cujo `hash_enunciado` não bate com o enunciado atual do banco é
+    **pulado** (a reextração mudou a questão, e a classificação antiga
+    descreveria outro texto): entra em `desatualizados` e no log, e volta a
+    ser classificado pelo `classificar_questoes.py`.
+    """
+    if not classificacao_path.exists():
+        logger.info(
+            f"[CLASSIFICACAO] {classificacao_path} não existe — nenhuma classificação carregada."
+        )
+        return {}
+
+    cq = classificacao.carregar(classificacao_path)
+    if not cq.registros:
+        logger.info(f"[CLASSIFICACAO] {classificacao_path} não possui registros.")
+        return {}
+
+    with conn, conn.cursor() as cur:
+        # Mapeia chaves de questões objetivas
+        # Objetivas e discursivas usam a mesma regra de nome de caderno
+        # (`nome_caderno`), a mesma da extração e do JSON canônico.
+        cur.execute(
+            """
+            SELECT c.slug, p.codigo_caderno, p.arquivo, p.identificador,
+                   q.numero, q.id, q.enunciado
+            FROM questoes q
+            JOIN provas p ON p.id = q.prova_id
+            JOIN concursos c ON c.id = p.concurso_id
+            """
+        )
+        map_questoes = {}
+        for slug, cod_caderno, arquivo, ident, num, q_id, enunciado in cur.fetchall():
+            cad_nome = nome_caderno(
+                {
+                    "slug": slug,
+                    "codigo_caderno": cod_caderno,
+                    "arquivo": arquivo,
+                    "identificador": ident,
+                }
+            )
+            map_questoes[f"{slug}|{cad_nome}|{num}"] = (q_id, enunciado)
+
+        # Mapeia chaves de discursivas
+        cur.execute(
+            """
+            SELECT c.slug, p.codigo_caderno, p.arquivo, p.identificador,
+                   d.numero, d.id, d.enunciado
+            FROM discursivas d
+            JOIN provas p ON p.id = d.prova_id
+            JOIN concursos c ON c.id = p.concurso_id
+            """
+        )
+        map_discursivas = {}
+        for slug, cod_caderno, arquivo, ident, num, d_id, enunciado in cur.fetchall():
+            cad_nome = nome_caderno(
+                {
+                    "slug": slug,
+                    "codigo_caderno": cod_caderno,
+                    "arquivo": arquivo,
+                    "identificador": ident,
+                }
+            )
+            map_discursivas[f"{slug}|{cad_nome}|D{num}"] = (d_id, enunciado)
+
+        linhas_questoes = []
+        linhas_discursivas = []
+        desatualizados: list[str] = []
+
+        for chave, reg in sorted(cq.registros.items()):
+            if reg.sem_no:
+                continue
+
+            alvo = map_discursivas.get(chave) or map_questoes.get(chave)
+            if alvo is not None and (
+                reg.hash_enunciado != classificacao.calcular_hash_enunciado(alvo[1])
+            ):
+                desatualizados.append(chave)
+                continue
+
+            if chave in map_discursivas:
+                d_id = map_discursivas[chave][0]
+                for a in reg.apontamentos:
+                    linhas_discursivas.append(
+                        (
+                            d_id,
+                            a.no_id,
+                            a.papel,
+                            a.confianca,
+                            a.fora_do_edital,
+                            a.origem,
+                            a.status,
+                        )
+                    )
+            elif chave in map_questoes:
+                q_id = map_questoes[chave][0]
+                for a in reg.apontamentos:
+                    linhas_questoes.append(
+                        (
+                            q_id,
+                            a.no_id,
+                            a.papel,
+                            a.confianca,
+                            a.fora_do_edital,
+                            a.origem,
+                            a.status,
+                        )
+                    )
+            else:
+                logger.warning(
+                    f"[CLASSIFICACAO] Chave canônica não encontrada no banco: {chave}"
+                )
+
+        cur.execute("DELETE FROM questao_no")
+        cur.execute("DELETE FROM discursiva_no")
+
+        execute_batch(
+            cur,
+            """
+            INSERT INTO questao_no (
+                questao_id, no_id, papel, confianca, fora_do_edital, origem, status
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (questao_id, no_id) DO UPDATE SET
+                papel = EXCLUDED.papel,
+                confianca = EXCLUDED.confianca,
+                fora_do_edital = EXCLUDED.fora_do_edital,
+                origem = EXCLUDED.origem,
+                status = EXCLUDED.status,
+                atualizado_em = now()
+            """,
+            linhas_questoes,
+        )
+
+        execute_batch(
+            cur,
+            """
+            INSERT INTO discursiva_no (
+                discursiva_id, no_id, papel, confianca, fora_do_edital, origem, status
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (discursiva_id, no_id) DO UPDATE SET
+                papel = EXCLUDED.papel,
+                confianca = EXCLUDED.confianca,
+                fora_do_edital = EXCLUDED.fora_do_edital,
+                origem = EXCLUDED.origem,
+                status = EXCLUDED.status,
+                atualizado_em = now()
+            """,
+            linhas_discursivas,
+        )
+
+    totais = {
+        "questao_no": len(linhas_questoes),
+        "discursiva_no": len(linhas_discursivas),
+        "desatualizados": len(desatualizados),
+    }
+    if desatualizados:
+        logger.warning(
+            f"[CLASSIFICACAO] {len(desatualizados)} registro(s) com enunciado "
+            f"diferente do banco (reextração mudou a questão); pulados, "
+            f"reclassificar: {desatualizados[:5]}"
+        )
+    logger.info(
+        f"[CLASSIFICACAO] banco: {totais['questao_no']} apontamentos de questões, "
+        f"{totais['discursiva_no']} de discursivas."
+    )
+    return totais
+
+
 def listar_jsons_edital(revisao_dir: Path) -> list[Path]:
     return sorted(
         p
@@ -874,6 +1062,7 @@ def gravar_estatisticas(
     data_dir: Path = DATA_DIR,
     conn=None,
     arvore_path: Path | None = None,
+    classificacao_path: Path | None = None,
 ) -> dict[str, int]:
     """Carga completa: schema, concursos extraídos, provas, fila e camada canônica."""
     proprio = conn is None
@@ -908,6 +1097,8 @@ def gravar_estatisticas(
         _limpar_dimensoes_orfas(conn)
         arvore_path = arvore_path or arvore.ARVORE_PADRAO
         aplicar_arvore(conn, arvore_path)
+        classificacao_path = classificacao_path or classificacao.CLASSIFICACAO_PADRAO
+        aplicar_classificacao(conn, classificacao_path)
         revisao = (
             ", ".join(f"{n} {status}" for status, n in sorted(por_status.items()))
             or "nenhum"

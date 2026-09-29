@@ -32,7 +32,6 @@ Uso:
 import argparse
 import hashlib
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -41,7 +40,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src import gabarito_parser, prova_parser, questoes_writer
 from src.downloader import DATA_DIR
 from src.logger import logger
-from src.stats_writer import conectar, criar_schema
+from src.stats_writer import (
+    aplicar_classificacao,
+    conectar,
+    criar_schema,
+    nome_caderno,
+)
 
 PROJETO_DIR = Path(__file__).resolve().parent.parent
 QUESTOES_DIR = PROJETO_DIR / "questoes"
@@ -52,20 +56,6 @@ LOCK_FILA_QUESTOES = 5_031_001
 # Linhas pendentes ou em processamento deixadas por execuções interrompidas.
 # Com o advisory lock (LOCK_FILA_QUESTOES), execuções concorrentes não ocorrem.
 STATUS_PENDENTES = ("pendente", "processando")
-
-
-def nome_caderno(prova: dict) -> str:
-    """Nome estável do caderno: código impresso no gabarito
-    (`094_PF_CB1_01`), senão `<slug>_<identificador>` (`PF_25_ADM_DISC_001`),
-    senão o nome do arquivo higienizado."""
-    if prova.get("codigo_caderno"):
-        return prova["codigo_caderno"]
-    stem = Path(prova["arquivo"]).stem
-    if re.fullmatch(r"\d{3}_[A-Z0-9]+_(?:\d{3}_DISC|DISC_\d{3})", stem, re.IGNORECASE):
-        return stem.upper()
-    if prova.get("identificador"):
-        return f"{prova['slug']}_{prova['identificador']}"
-    return re.sub(r"[^A-Za-z0-9]+", "_", f"{prova['slug']}_{stem}").strip("_")
 
 
 def carregar_fila(conn) -> list[dict]:
@@ -453,8 +443,22 @@ def processar_fila(
                 totais["justificativas"] += 1
             elif desfecho == "prova_sem_registro":
                 totais["provas_sem_registro"] += 1
-            else:
-                totais["gabaritos_sem_prova"] += 1
+        try:
+            res_class = aplicar_classificacao(conn)
+            if res_class:
+                logger.info(
+                    f"[QUESTOES] Classificação canônica reaplicada ao banco: {res_class}"
+                )
+        except Exception as e:  # noqa: BLE001
+            # O DELETE em cascata das questões já apagou a ponte: falhar aqui
+            # deixa `questao_no` vazia até a próxima carga, então o erro é
+            # visível nos totais e no código de saída.
+            logger.error(
+                f"[QUESTOES] Falha ao reaplicar a classificação canônica: "
+                f"{type(e).__name__}: {e}"
+            )
+            totais["classificacao_erro"] = f"{type(e).__name__}: {e}"
+
         logger.info(f"[QUESTOES] Fila processada: {totais}")
         return totais
     finally:
@@ -481,12 +485,9 @@ if __name__ == "__main__":
         help="refaz cadernos e órfãos com status 'erro'",
     )
     args = parser.parse_args()
-    print(
-        json.dumps(
-            processar_fila(
-                reprocessar=args.reprocessar, reprocessar_erros=args.reprocessar_erros
-            ),
-            ensure_ascii=False,
-            indent=2,
-        )
+    totais_fila = processar_fila(
+        reprocessar=args.reprocessar, reprocessar_erros=args.reprocessar_erros
     )
+    print(json.dumps(totais_fila, ensure_ascii=False, indent=2))
+    if "classificacao_erro" in totais_fila:
+        sys.exit(1)

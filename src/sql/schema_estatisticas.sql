@@ -327,12 +327,47 @@ CREATE TABLE IF NOT EXISTS discursivas (
     UNIQUE (prova_id, numero)
 );
 
+-- Classificação de questões na árvore mestre (Etapa 5D) -----------------------
+
+CREATE TABLE IF NOT EXISTS questao_no (
+    questao_id INTEGER NOT NULL REFERENCES questoes (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id),
+    papel TEXT NOT NULL CONSTRAINT questao_no_papel_check CHECK (papel IN ('principal', 'secundario')),
+    confianca TEXT NOT NULL CONSTRAINT questao_no_confianca_check CHECK (confianca IN ('alta', 'media', 'baixa')),
+    fora_do_edital BOOLEAN NOT NULL DEFAULT false,
+    origem TEXT NOT NULL CONSTRAINT questao_no_origem_check CHECK (origem IN ('llm', 'humano')),
+    status TEXT NOT NULL CONSTRAINT questao_no_status_check CHECK (status IN ('proposto', 'aprovado', 'rejeitado')),
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (questao_id, no_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_questao_no_no ON questao_no (no_id);
+CREATE INDEX IF NOT EXISTS idx_questao_no_status ON questao_no (status);
+
+CREATE TABLE IF NOT EXISTS discursiva_no (
+    discursiva_id INTEGER NOT NULL REFERENCES discursivas (id) ON DELETE CASCADE,
+    no_id TEXT NOT NULL REFERENCES no_arvore (id),
+    papel TEXT NOT NULL CONSTRAINT discursiva_no_papel_check CHECK (papel IN ('principal', 'secundario')),
+    confianca TEXT NOT NULL CONSTRAINT discursiva_no_confianca_check CHECK (confianca IN ('alta', 'media', 'baixa')),
+    fora_do_edital BOOLEAN NOT NULL DEFAULT false,
+    origem TEXT NOT NULL CONSTRAINT discursiva_no_origem_check CHECK (origem IN ('llm', 'humano')),
+    status TEXT NOT NULL CONSTRAINT discursiva_no_status_check CHECK (status IN ('proposto', 'aprovado', 'rejeitado')),
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (discursiva_id, no_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_discursiva_no_no ON discursiva_no (no_id);
+CREATE INDEX IF NOT EXISTS idx_discursiva_no_status ON discursiva_no (status);
+
 -- Views ----------------------------------------------------------------------
 
 DROP VIEW IF EXISTS vw_incidencia_topico CASCADE;
 DROP VIEW IF EXISTS vw_incidencia_topico_todas CASCADE;
 DROP VIEW IF EXISTS vw_taxonomia_detalhe CASCADE;
 DROP VIEW IF EXISTS vw_subtopico_detalhe CASCADE;
+DROP VIEW IF EXISTS vw_questao_no CASCADE;
 DROP VIEW IF EXISTS vw_no_caminho CASCADE;
 DROP VIEW IF EXISTS vw_arvore_edital_por_cargo CASCADE;
 DROP VIEW IF EXISTS vw_edital_cobra_subassunto CASCADE;
@@ -390,6 +425,33 @@ SELECT
     h.assunto_id
 FROM efetivo e
 INNER JOIN hierarquia h ON h.id = e.atual;
+
+-- View oficial para estatísticas e simulados (apenas registros aprovados, com nó efetivo resolvido)
+CREATE OR REPLACE VIEW vw_questao_no AS
+SELECT
+    qn.questao_id,
+    q.prova_id,
+    p.codigo_caderno,
+    q.numero,
+    q.enunciado,
+    q.gabarito,
+    q.anulada,
+    q.utilizavel,
+    nc.no_efetivo AS no_id,
+    nc.nivel AS no_nivel,
+    nc.nome AS no_nome,
+    nc.caminho AS no_caminho,
+    nc.materia_id,
+    nc.assunto_id,
+    qn.papel,
+    qn.confianca,
+    qn.fora_do_edital,
+    qn.origem
+FROM questao_no qn
+JOIN questoes q ON q.id = qn.questao_id
+JOIN provas p ON p.id = q.prova_id
+JOIN vw_no_caminho nc ON nc.id = qn.no_id
+WHERE qn.status = 'aprovado';
 
 CREATE OR REPLACE VIEW vw_taxonomia_detalhe AS
 SELECT
