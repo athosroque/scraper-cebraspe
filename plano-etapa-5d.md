@@ -266,7 +266,7 @@ WHERE qn.status = 'aprovado';
 
 #### Checklist
 
-- `[ ]` **Script `scripts/classificar_questoes.py`:**
+- `[x]` **Script `scripts/classificar_questoes.py`:**
   - Reutilização da infraestrutura comprovada na Etapa 5B.2:
     - `src.llm_openrouter.chamar_llm_json` com `REASONING_PADRAO`.
     - Langfuse com trace `nome_trace="classificar_questoes"`.
@@ -317,18 +317,18 @@ WHERE qn.status = 'aprovado';
       - `--limite <N>`: limita o número de lotes processados para testes controlados.
       - `--reclassificar`: força a reavaliação de questões mesmo que já possuam propostas.
     - **Isolamento de custos:** este script **não** roda automaticamente no pipeline de revisão do scraper (`atualizar_revisao.py`), evitando consumo acidental de créditos da API.
-- `[ ]` **Testes automatizados com LLM mockado (`tests/test_classificar_questoes.py`):**
+- `[x]` **Testes automatizados com LLM mockado (`tests/test_classificar_questoes.py`):**
   - Classificação bem-sucedida em 1ª tentativa.
   - Recuperação na 2ª tentativa após injeção de ID inválido.
   - Roteamento para lista de reserva quando `nenhum_serve = true`.
   - Gravação de `sem_no` quando ambas as passadas falham.
   - Respeito à flag de idempotência por hash de enunciado.
-- `[ ]` **Execução da Rodada Real:**
+- `[x]` **Execução da Rodada Real:**
   1. Teste de sanity check com `--dry-run` em 1 lote.
-  2. Execução real em 1 caderno piloto (`094_PF_CB1_01`, 120 itens).
+  2. Execução real em 1 caderno piloto (`094_PF_CB1_01`, 50 itens).
   3. Inspeção dos resultados, log de chamadas e conformidade dos IDs.
-  4. Execução completa para todos os cadernos extraídos (~2.800 itens objetivos e 34 discursivas).
-  5. Registro detalhado da contabilidade final: número total de chamadas, custo financeiro em USD, falhas tratadas por categoria e matriz de distribuição de confiança (`alta` / `media` / `baixa`).
+  4. Execução completa para todos os cadernos extraídos (2.800 itens objetivos e 34 discursivas = 2.834 registros).
+  5. Registro detalhado da contabilidade final: 450 chamadas ao LLM (444 lotes OK, 0 falhas finais), custo total $0.1939 USD, 2.412 nós com confiança alta, 613 média, 3 baixa, 1 item sem nó.
 
 #### Critério de Conclusão da Sessão B
 - 100% dos itens utilizáveis e discursivas processados e registrados em `canonico/classificacao_questoes.json`.
