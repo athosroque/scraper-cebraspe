@@ -154,6 +154,9 @@ Datasette continua só como ferramenta de revisão do dono.
       `scripts/propor_arvore.py` (LLM por matéria). Rodada real de 83
       chamadas e 210 propostas: o dono rejeitou 29 e aprovou o resto. Árvore:
       3577 nós ativos, 148 fundidos e 6 aposentados; matéria nova "Processo
+      Legislativo" para os assuntos de processo legislativo das matérias
+      compostas do CD; "Disposições gerais" e "Servidores públicos" com 8 e 7
+      ocorrências no edital (ADR-030).
 - [x] Etapa 5D — Classificação das questões na árvore mestre (ADR-032): fonte canônica
       `canonico/classificacao_questoes.json` (2.834 registros, chave estável
       `<concurso>|<caderno>|<numero>`, hash SHA-1 do enunciado), `src/classificacao.py`,
