@@ -1,0 +1,1025 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Questões CEBRASPE",
+    "description": "API de leitura do site público de questões CEBRASPE (piloto 2025). Fonte das questões: CEBRASPE (cebraspe.org.br). Ver ADR-033.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/questoes": {
+      "get": {
+        "tags": [
+          "Questões"
+        ],
+        "summary": "Lista questões objetivas com filtros",
+        "description": "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.800 questões objetivas do piloto 2025.",
+        "operationId": "listar_questoes_api_v1_questoes_get",
+        "parameters": [
+          {
+            "name": "banca",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Banca (ex.: `CEBRASPE`).",
+              "title": "Banca"
+            },
+            "description": "Banca (ex.: `CEBRASPE`)."
+          },
+          {
+            "name": "orgao",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Órgão (ex.: `PF`, `STM`). Valores em `/facetas`.",
+              "title": "Orgao"
+            },
+            "description": "Órgão (ex.: `PF`, `STM`). Valores em `/facetas`."
+          },
+          {
+            "name": "ano",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ano do concurso (ex.: `2025`).",
+              "title": "Ano"
+            },
+            "description": "Ano do concurso (ex.: `2025`)."
+          },
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
+              "title": "Concurso"
+            },
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Número do cargo no edital. Use junto com `concurso`.",
+              "title": "Cargo Numero"
+            },
+            "description": "Número do cargo no edital. Use junto com `concurso`."
+          },
+          {
+            "name": "nivel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`superior` ou `medio`.",
+              "title": "Nivel"
+            },
+            "description": "`superior` ou `medio`."
+          },
+          {
+            "name": "tipo_conhecimento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`basico` ou `especifico`.",
+              "title": "Tipo Conhecimento"
+            },
+            "description": "`basico` ou `especifico`."
+          },
+          {
+            "name": "no_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Nó da árvore (`/arvore`). Matéria ou assunto incluem as questões dos descendentes.",
+              "examples": [
+                "S-c33faee4a4"
+              ],
+              "title": "No Id"
+            },
+            "description": "Nó da árvore (`/arvore`). Matéria ou assunto incluem as questões dos descendentes."
+          },
+          {
+            "name": "anuladas",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "incluir",
+                "excluir",
+                "so"
+              ],
+              "type": "string",
+              "description": "Tratamento das questões anuladas.",
+              "default": "incluir",
+              "title": "Anuladas"
+            },
+            "description": "Tratamento das questões anuladas."
+          },
+          {
+            "name": "fora_do_edital",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "todos",
+                "sim",
+                "nao"
+              ],
+              "type": "string",
+              "description": "`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro.",
+              "default": "todos",
+              "title": "Fora Do Edital"
+            },
+            "description": "`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro."
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Página, a partir de 1.",
+              "default": 1,
+              "title": "Pagina"
+            },
+            "description": "Página, a partir de 1."
+          },
+          {
+            "name": "tamanho_pagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Itens por página (máx. 50).",
+              "default": 20,
+              "title": "Tamanho Pagina"
+            },
+            "description": "Itens por página (máx. 50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaQuestoes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questoes/{chave}": {
+      "get": {
+        "tags": [
+          "Questões"
+        ],
+        "summary": "Detalhe de uma questão",
+        "description": "Busca pela chave estável `concurso|caderno|numero`.",
+        "operationId": "obter_questao_api_v1_questoes__chave__get",
+        "parameters": [
+          {
+            "name": "chave",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chave"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestaoDetalhe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Questão não encontrada"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/arvore": {
+      "get": {
+        "tags": [
+          "Árvore"
+        ],
+        "summary": "Árvore mestre com contagem de questões",
+        "description": "Matéria → assunto → subassunto. A contagem é de questões distintas e sobe a árvore.",
+        "operationId": "obter_arvore_api_v1_arvore_get",
+        "parameters": [
+          {
+            "name": "apenas_com_questoes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Omite nós sem nenhuma questão.",
+              "default": true,
+              "title": "Apenas Com Questoes"
+            },
+            "description": "Omite nós sem nenhuma questão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoArvore"
+                  },
+                  "title": "Response Obter Arvore Api V1 Arvore Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/facetas": {
+      "get": {
+        "tags": [
+          "Facetas"
+        ],
+        "summary": "Valores possíveis dos filtros",
+        "description": "Cada valor vem com o total de questões distintas, para montar os filtros da interface.",
+        "operationId": "obter_facetas_api_v1_facetas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacetasResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/saude": {
+      "get": {
+        "tags": [
+          "Infra"
+        ],
+        "summary": "Checagem de saúde (banco de leitura)",
+        "operationId": "saude_saude_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CargoInfo": {
+        "properties": {
+          "cargo_edital_id": {
+            "type": "integer",
+            "title": "Cargo Edital Id"
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          },
+          "cargo": {
+            "type": "string",
+            "title": "Cargo"
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cargo_edital_id",
+          "cargo_numero",
+          "cargo",
+          "nivel"
+        ],
+        "title": "CargoInfo",
+        "description": "Cargo do edital para o qual o caderno da questão foi aplicado."
+      },
+      "FacetaCargo": {
+        "properties": {
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          },
+          "cargo": {
+            "type": "string",
+            "title": "Cargo"
+          },
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cargo_numero",
+          "cargo",
+          "concurso",
+          "nivel",
+          "total"
+        ],
+        "title": "FacetaCargo"
+      },
+      "FacetaValor": {
+        "properties": {
+          "valor": {
+            "title": "Valor"
+          },
+          "rotulo": {
+            "type": "string",
+            "title": "Rotulo"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valor",
+          "rotulo",
+          "total"
+        ],
+        "title": "FacetaValor"
+      },
+      "FacetasResponse": {
+        "properties": {
+          "bancas": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Bancas"
+          },
+          "orgaos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Orgaos"
+          },
+          "anos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Anos"
+          },
+          "concursos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Concursos"
+          },
+          "niveis": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Niveis"
+          },
+          "tipos_conhecimento": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Tipos Conhecimento"
+          },
+          "cargos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaCargo"
+            },
+            "type": "array",
+            "title": "Cargos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bancas",
+          "orgaos",
+          "anos",
+          "concursos",
+          "niveis",
+          "tipos_conhecimento",
+          "cargos"
+        ],
+        "title": "FacetasResponse",
+        "description": "Valores possíveis de cada filtro da listagem, com o total de questões distintas."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "NoArvore": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel"
+          },
+          "total_questoes": {
+            "type": "integer",
+            "title": "Total Questoes"
+          },
+          "filhos": {
+            "items": {
+              "$ref": "#/components/schemas/NoArvore"
+            },
+            "type": "array",
+            "title": "Filhos",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "nivel",
+          "total_questoes"
+        ],
+        "title": "NoArvore",
+        "description": "Nó da árvore mestre com a contagem de questões distintas (a contagem sobe a árvore)."
+      },
+      "NoInfo": {
+        "properties": {
+          "no_id": {
+            "type": "string",
+            "title": "No Id"
+          },
+          "no_nome": {
+            "type": "string",
+            "title": "No Nome"
+          },
+          "no_nivel": {
+            "type": "string",
+            "title": "No Nivel"
+          },
+          "no_caminho": {
+            "type": "string",
+            "title": "No Caminho"
+          },
+          "materia_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materia Id"
+          },
+          "assunto_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assunto Id"
+          },
+          "papel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Papel",
+            "description": "`principal` ou `secundario`."
+          },
+          "confianca": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confianca"
+          },
+          "fora_do_edital": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fora Do Edital",
+            "description": "`true` quando o nó não está previsto no edital do cargo."
+          },
+          "rotulo_materia": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotulo Materia"
+          }
+        },
+        "type": "object",
+        "required": [
+          "no_id",
+          "no_nome",
+          "no_nivel",
+          "no_caminho"
+        ],
+        "title": "NoInfo",
+        "description": "Nó da árvore mestre (matéria → assunto → subassunto) em que a questão foi classificada (Etapa 5D)."
+      },
+      "PaginaQuestoes": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "pagina": {
+            "type": "integer",
+            "title": "Pagina"
+          },
+          "tamanho_pagina": {
+            "type": "integer",
+            "title": "Tamanho Pagina"
+          },
+          "total_paginas": {
+            "type": "integer",
+            "title": "Total Paginas"
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/QuestaoResumo"
+            },
+            "type": "array",
+            "title": "Itens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "pagina",
+          "tamanho_pagina",
+          "total_paginas",
+          "itens"
+        ],
+        "title": "PaginaQuestoes",
+        "description": "Página de resultados de `GET /api/v1/questoes`."
+      },
+      "QuestaoDetalhe": {
+        "properties": {
+          "questao_id": {
+            "type": "integer",
+            "title": "Questao Id"
+          },
+          "questao_chave": {
+            "type": "string",
+            "title": "Questao Chave",
+            "description": "Chave estável `concurso|caderno|numero` (mesma da 5D). Use no detalhe e para guardar respostas.",
+            "examples": [
+              "PF_25_ADM|094_PF_CB1_01|13"
+            ]
+          },
+          "numero": {
+            "type": "integer",
+            "title": "Numero"
+          },
+          "codigo_caderno": {
+            "type": "string",
+            "title": "Codigo Caderno"
+          },
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "orgao": {
+            "type": "string",
+            "title": "Orgao"
+          },
+          "banca": {
+            "type": "string",
+            "title": "Banca"
+          },
+          "ano": {
+            "type": "integer",
+            "title": "Ano"
+          },
+          "gabarito": {
+            "type": "string",
+            "title": "Gabarito",
+            "description": "Gabarito definitivo: `C` (certo), `E` (errado) ou `X` (anulada)."
+          },
+          "anulada": {
+            "type": "boolean",
+            "title": "Anulada"
+          },
+          "utilizavel": {
+            "type": "boolean",
+            "title": "Utilizavel",
+            "description": "`false` quando a extração do PDF ficou ilegível ou com alerta bloqueante."
+          },
+          "enunciado": {
+            "type": "string",
+            "title": "Enunciado"
+          },
+          "secao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secao"
+          },
+          "tem_texto_base": {
+            "type": "boolean",
+            "title": "Tem Texto Base"
+          },
+          "tem_figuras": {
+            "type": "boolean",
+            "title": "Tem Figuras"
+          },
+          "cargos": {
+            "items": {
+              "$ref": "#/components/schemas/CargoInfo"
+            },
+            "type": "array",
+            "title": "Cargos"
+          },
+          "nos": {
+            "items": {
+              "$ref": "#/components/schemas/NoInfo"
+            },
+            "type": "array",
+            "title": "Nos"
+          },
+          "texto_base_texto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Texto Base Texto"
+          },
+          "figuras": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Figuras"
+          },
+          "link_pdf": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Pdf",
+            "description": "URL do caderno original no site do CEBRASPE (crédito da fonte)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "questao_id",
+          "questao_chave",
+          "numero",
+          "codigo_caderno",
+          "concurso",
+          "orgao",
+          "banca",
+          "ano",
+          "gabarito",
+          "anulada",
+          "utilizavel",
+          "enunciado",
+          "secao",
+          "tem_texto_base",
+          "tem_figuras",
+          "cargos",
+          "nos",
+          "texto_base_texto",
+          "figuras"
+        ],
+        "title": "QuestaoDetalhe",
+        "description": "Questão completa: texto-base, figuras e link para o PDF original do CEBRASPE."
+      },
+      "QuestaoResumo": {
+        "properties": {
+          "questao_id": {
+            "type": "integer",
+            "title": "Questao Id"
+          },
+          "questao_chave": {
+            "type": "string",
+            "title": "Questao Chave",
+            "description": "Chave estável `concurso|caderno|numero` (mesma da 5D). Use no detalhe e para guardar respostas.",
+            "examples": [
+              "PF_25_ADM|094_PF_CB1_01|13"
+            ]
+          },
+          "numero": {
+            "type": "integer",
+            "title": "Numero"
+          },
+          "codigo_caderno": {
+            "type": "string",
+            "title": "Codigo Caderno"
+          },
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "orgao": {
+            "type": "string",
+            "title": "Orgao"
+          },
+          "banca": {
+            "type": "string",
+            "title": "Banca"
+          },
+          "ano": {
+            "type": "integer",
+            "title": "Ano"
+          },
+          "gabarito": {
+            "type": "string",
+            "title": "Gabarito",
+            "description": "Gabarito definitivo: `C` (certo), `E` (errado) ou `X` (anulada)."
+          },
+          "anulada": {
+            "type": "boolean",
+            "title": "Anulada"
+          },
+          "utilizavel": {
+            "type": "boolean",
+            "title": "Utilizavel",
+            "description": "`false` quando a extração do PDF ficou ilegível ou com alerta bloqueante."
+          },
+          "enunciado": {
+            "type": "string",
+            "title": "Enunciado"
+          },
+          "secao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secao"
+          },
+          "tem_texto_base": {
+            "type": "boolean",
+            "title": "Tem Texto Base"
+          },
+          "tem_figuras": {
+            "type": "boolean",
+            "title": "Tem Figuras"
+          },
+          "cargos": {
+            "items": {
+              "$ref": "#/components/schemas/CargoInfo"
+            },
+            "type": "array",
+            "title": "Cargos"
+          },
+          "nos": {
+            "items": {
+              "$ref": "#/components/schemas/NoInfo"
+            },
+            "type": "array",
+            "title": "Nos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questao_id",
+          "questao_chave",
+          "numero",
+          "codigo_caderno",
+          "concurso",
+          "orgao",
+          "banca",
+          "ano",
+          "gabarito",
+          "anulada",
+          "utilizavel",
+          "enunciado",
+          "secao",
+          "tem_texto_base",
+          "tem_figuras",
+          "cargos",
+          "nos"
+        ],
+        "title": "QuestaoResumo",
+        "description": "Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

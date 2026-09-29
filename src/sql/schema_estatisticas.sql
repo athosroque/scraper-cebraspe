@@ -720,6 +720,7 @@ WITH canonica AS (
 SELECT
     q.id AS questao_id,
     can.questao_canonica_id,
+    (c.slug || '|' || p.codigo_caderno || '|' || q.numero) AS questao_chave,
     q.numero,
     p.codigo_caderno,
     p.tipo AS prova_tipo,
@@ -761,6 +762,7 @@ WITH materia_info AS (
 SELECT
     ctx.questao_id,
     ctx.questao_canonica_id,
+    ctx.questao_chave,
     ctx.numero,
     ctx.codigo_caderno,
     ctx.prova_tipo,

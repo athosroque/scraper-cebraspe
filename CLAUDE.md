@@ -192,7 +192,15 @@ Datasette continua só como ferramenta de revisão do dono.
       schema `app` no `scraper-cebraspe-db` com roles `site_leitura`/`site_app`
       e chave estável da 5D; deploy via Traefik + Tunnel sem Access. Plano em
       `plano-etapa-5f.md`.
-- **⚡ Prioridade atual: Etapa 5F.1 do `plano-etapa-5f.md`** (API de leitura).
+- [x] Etapa 5F.1 — API de leitura (ADR-033): `questao_chave` em `vw_questoes`
+      (2.800 chaves, 1:1 com a 5D; as 34 restantes da 5D são discursivas);
+      `site/app` em 3 camadas com `GET /api/v1/questoes` (filtros + paginação,
+      máx. 50), `/questoes/{chave}`, `/arvore`, `/facetas` e `/saude` (503 se o
+      banco cair). Roles `site_leitura`/`site_app` com senha só no `.env`,
+      aplicadas por `site/scripts/aplicar_schema_app.py`. Contrato em
+      `site/openapi.json` (versionado, teste de divergência) e Swagger em `/docs`.
+      619 testes (+1 xfail), ruff verde.
+- **⚡ Prioridade atual: Etapa 5F.2 do `plano-etapa-5f.md`** (frontend de resolução).
 
 
 ## 6. Patterns
@@ -567,6 +575,12 @@ Datasette continua só como ferramenta de revisão do dono.
 - Nunca extrair quesitos numerados antes do verbo de comando da prova discursiva (datas como "1 de janeiro..." no enunciado viram falso quesito 1).
 - Nunca commitar arquivos JSON de questões extraídas (`questoes/`) no git — mantidos localmente e no `.gitignore` por volumetria, sendo 100% regeneráveis sob demanda (ADR-031).
 - Nunca somar linhas de views agregadas por cargo (`vw_prova_cobra_*`): cadernos básicos cobrem múltiplos cargos; somar linhas de cargos diferentes duplica questões básicas no denominador e no numerador. Para consultas que cruzam ou agregam múltiplos cargos/concursos, usar sempre a função oficial `fn_prova_cobra(...)` ou filtrar estritamente por um cargo individual (ADR-032).
+- Nunca pôr senha de role no SQL versionado (`site/sql/app_schema.sql`) nem em
+  teste: a primeira versão da 5F.1 fez isso e as senhas foram trocadas. Senha
+  vem do `.env` via `site/scripts/aplicar_schema_app.py`.
+- Nunca rodar o site com `python -m site...`: o diretório `site` colide com o
+  módulo `site` da stdlib. Use o caminho do script ou `uvicorn app.main:app`
+  de dentro de `site/`.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança
@@ -701,6 +715,12 @@ resultado = download_concurso_pdfs(
   texto-base expansível, gabarito e comandos CLI copiáveis
 - `scripts/classificar_questoes.py` — inferência em 2 passadas (preferencial × reserva) via LLM
   com OpenRouter e Langfuse (não roda no pipeline padrão para isolar custos)
+- `site/` — API do site (5F). Rodar: `cd site && uvicorn app.main:app`;
+  documentação interativa em `/docs` (Swagger) e `/redoc`. `site/openapi.json`
+  é o contrato versionado (fonte para os MCPs): depois de mudar rota ou
+  modelo, rodar `python site/scripts/exportar_openapi.py`, senão o teste
+  `test_openapi_versionado_em_dia` falha. Roles do banco:
+  `python site/scripts/aplicar_schema_app.py` (senhas `SITE_DB_*` do `.env`)
 - `scripts/backfill_classificacao_chunks.py [<pdf> [json]]` — sem argumentos,
   roda em todos os editais de `revisao_piloto/` (`backfill_lote`); completa
   concurso/nível/tipo de conhecimento em extração já feita, sem LLM

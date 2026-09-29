@@ -90,7 +90,7 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 
 ## 4. Sessões
 
-### 5F.1 — API de leitura
+### 5F.1 — API de leitura ✅ (2026-09-29)
 - `vw_questoes` ganha a coluna `questao_chave` (`concurso|codigo_caderno|numero`,
   a mesma de `canonico/classificacao_questoes.json`) — conferir que casa
   1:1 com os 2.834 registros da 5D.
