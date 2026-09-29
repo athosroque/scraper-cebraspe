@@ -236,7 +236,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   de falhas estruturais de formatação e schema.
 - `[x]` **Migração da telemetria Langfuse para SDK oficial OTel (ADR-023):**
   substituição do endpoint REST manual legado (`/api/public/ingestion`, sunset em 2026-11-16)
-  pelo SDK oficial `langfuse>=3,<4` em `src/taxonomia_extractor.py` e `src/telegram_bot.py`.
+  pelo SDK oficial `langfuse>=4.7,<5` (era `>=3,<4`; ver nota no ADR-023) em `src/taxonomia_extractor.py` e `src/telegram_bot.py`.
   Observation do tipo generation aberta antes da requisição HTTP para medição real de latência,
   fechamento em `_registrar_langfuse` e flush automático em segundo plano via `atexit`.
 - `[x]` **Generalização do Parser e Resiliência a Variações de Editais de 2025:**

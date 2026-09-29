@@ -29,7 +29,7 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
-from langfuse import Langfuse
+from langfuse import Langfuse, propagate_attributes
 from pydantic import BaseModel, ValidationError
 
 from src.logger import logger
@@ -166,18 +166,26 @@ def abrir_generation(
     max_tokens: int,
     timeout: int,
     modelo: str = LLM_MODEL,
+    *,
+    nome_trace: str | None = None,
+    user_id: str | None = None,
 ):
-    """Abre a generation antes da chamada HTTP, pra latência ser a real."""
+    """Abre a generation antes da chamada HTTP, pra latência ser a real.
+
+    SDK v4: nome do trace e user_id só entram por `propagate_attributes`, ativo
+    quando a observation é criada (não existe mais `update_trace`).
+    """
     if client is None:
         return None
     try:
-        return client.start_observation(
-            as_type="generation",
-            name=nome,
-            model=modelo,
-            input=entrada,
-            model_parameters={"max_tokens": max_tokens, "timeout": timeout},
-        )
+        with propagate_attributes(trace_name=nome_trace, user_id=user_id):
+            return client.start_observation(
+                as_type="generation",
+                name=nome,
+                model=modelo,
+                input=entrada,
+                model_parameters={"max_tokens": max_tokens, "timeout": timeout},
+            )
     except Exception as e:  # noqa: BLE001 — telemetria nunca derruba a chamada
         logger.warning(f"Falha ao abrir generation no Langfuse: {e}")
         return None
@@ -186,14 +194,13 @@ def abrir_generation(
 def registrar_generation(
     gen,
     *,
-    nome_trace: str,
     resposta: str | None,
     usage: dict | None,
     sucesso: bool,
     erro: str | None = None,
     metadata: dict | None = None,
 ) -> None:
-    """Fecha a generation com o desfecho e grava `metadata` (ex: `tipo_erro`) no trace."""
+    """Fecha a generation com o desfecho e grava `metadata` (ex: `tipo_erro`) nela."""
     if gen is None:
         return
     try:
@@ -206,8 +213,8 @@ def registrar_generation(
             },
             level="DEFAULT" if sucesso else "ERROR",
             status_message=erro,
+            metadata=metadata or {},
         )
-        gen.update_trace(name=nome_trace, metadata=metadata or {})
         gen.end()
     except Exception as e:  # noqa: BLE001 — telemetria nunca derruba a chamada
         logger.warning(f"Falha ao registrar generation no Langfuse: {e}")
@@ -266,7 +273,7 @@ def chamar_llm_json(
     if registrar is None:
 
         def registrar(gen, **kw):
-            registrar_generation(gen, nome_trace=nome_trace, **kw)
+            registrar_generation(gen, **kw)
 
     payload_requisicao = {
         "model": modelo,
@@ -299,6 +306,7 @@ def chamar_llm_json(
             max_tokens,
             timeout,
             modelo,
+            nome_trace=nome_trace,
         )
     )
     try:

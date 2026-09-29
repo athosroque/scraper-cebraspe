@@ -4,7 +4,7 @@ from functools import lru_cache
 
 import httpx
 from dotenv import load_dotenv
-from langfuse import Langfuse
+from langfuse import Langfuse, propagate_attributes
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -117,18 +117,24 @@ def _langfuse_client() -> Langfuse | None:
     )
 
 
-def _abrir_generation(prompt: str, model: str):
-    """Abre a generation antes da chamada ao OpenRouter para latência real."""
+def _abrir_generation(prompt: str, model: str, user_id: int | str | None = None):
+    """Abre a generation antes da chamada ao OpenRouter para latência real.
+
+    Nome do trace e user_id entram na abertura (SDK v4, `propagate_attributes`).
+    """
     client = _langfuse_client()
     if client is None:
         return None
     try:
-        return client.start_observation(
-            as_type="generation",
-            name="telegram_response",
-            model=model,
-            input=prompt,
-        )
+        with propagate_attributes(
+            trace_name=NOME_TRACE, user_id=str(user_id) if user_id else None
+        ):
+            return client.start_observation(
+                as_type="generation",
+                name="telegram_response",
+                model=model,
+                input=prompt,
+            )
     except Exception as e:  # noqa: BLE001
         logger.warning(f"Falha ao abrir generation no Langfuse: {e}")
         return None
@@ -143,7 +149,7 @@ def _registrar_langfuse(
     erro: str | None = None,
     user_id: int | str | None = None,
 ) -> None:
-    """Fecha a generation com o desfecho e associa user_id e nome no trace."""
+    """Fecha a generation com o desfecho (user_id e nome do trace vêm da abertura)."""
     if gen is None:
         return
     try:
@@ -156,10 +162,6 @@ def _registrar_langfuse(
             },
             level="DEFAULT" if sucesso else "ERROR",
             status_message=erro,
-        )
-        gen.update_trace(
-            name=NOME_TRACE,
-            user_id=str(user_id) if user_id else None,
         )
         gen.end()
     except Exception as e:  # noqa: BLE001
@@ -198,7 +200,7 @@ async def chamar_openrouter(
     }
 
     user_prompt = messages[-1]["content"] if messages else ""
-    gen = _abrir_generation(user_prompt, model_name)
+    gen = _abrir_generation(user_prompt, model_name, user_id)
 
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:

@@ -57,3 +57,16 @@ Migrar a camada de telemetria de ambos os componentes (`taxonomia_extractor.py` 
 
 ### Cuidados
 - Processos que encerrem via terminação abrupta (`SIGKILL`, `os._exit`) podem não descarregar os últimos eventos bufferizados caso o hook de `atexit` não seja invocado.
+
+## Atualização 2026-09-29 — SDK v4
+
+O projeto migrou para uma org nova do Langfuse (v4, criada depois de
+2026-09-16). Nela, dados do SDK Python < 4.7.0 chegam com até 15 min de
+atraso, e o Langfuse v3 sai do ar no Cloud em 2026-11-16. Dependência
+passou para `langfuse>=4.7,<5`. O SDK v4 não tem `update_trace`: o nome do
+trace (`cebraspe-<etapa>-<função>`) e o `user_id` do bot entram por
+`propagate_attributes` na abertura da generation
+(`llm_openrouter.abrir_generation`), e o `metadata` (`tipo_erro`,
+`reparo_nome_numerico`) vai na própria generation. Leitura de dados pela API
+usa `GET /api/public/v2/observations` e `/v2/metrics`; `/api/public/traces` não
+existe para orgs novas.

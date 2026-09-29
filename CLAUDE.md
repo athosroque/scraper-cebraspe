@@ -67,7 +67,8 @@ Datasette continua só como ferramenta de revisão do dono.
 - python-dotenv
 - requests >=2.31 (download de PDFs na Etapa 3, fora do contexto Playwright)
 - pytest + ruff (CI universal do portfólio)
-- langfuse >=3,<4 — SDK oficial de observabilidade (OTel), ver ADR-023
+- langfuse >=4.7,<5 — SDK oficial de observabilidade (OTel), ver ADR-023
+  (v4 desde 2026-09-29: nome do trace via `propagate_attributes` na abertura)
 - PostgreSQL 16 (`postgres:16-alpine`) — serviço próprio
   `scraper-cebraspe-db` no `docker-compose.yml` deste projeto, porta
   `127.0.0.1:5435`, banco/usuário `cebraspe`, volume

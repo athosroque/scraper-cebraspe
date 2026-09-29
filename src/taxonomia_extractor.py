@@ -122,6 +122,7 @@ def _abrir_generation(chunk_text: str, max_tokens: int, timeout: int):
         max_tokens,
         timeout,
         LLM_MODEL,
+        nome_trace=NOME_TRACE,
     )
 
 
@@ -137,7 +138,6 @@ def _registrar_langfuse(
     """Fecha a generation com o desfecho e grava `metadata` (ex: `tipo_erro`) no trace."""
     llm_openrouter.registrar_generation(
         gen,
-        nome_trace=NOME_TRACE,
         resposta=resposta,
         usage=usage,
         sucesso=sucesso,

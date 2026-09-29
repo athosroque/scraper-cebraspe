@@ -536,11 +536,9 @@ class TestLangfuseSdk:
             usage_details={"input": 0, "output": 0, "total": 0},
             level="ERROR",
             status_message="erro teste",
-        )
-        mock_gen.update_trace.assert_called_once_with(
-            name="cebraspe-4-taxonomia-edital",
             metadata={"tipo_erro": "falha_timeout"},
         )
+        mock_gen.update_trace.assert_not_called()
         mock_gen.end.assert_called_once()
 
     def test_registra_sucesso_na_generation_e_trace(self):
@@ -559,11 +557,9 @@ class TestLangfuseSdk:
             usage_details={"input": 10, "output": 20, "total": 30},
             level="DEFAULT",
             status_message=None,
-        )
-        mock_gen.update_trace.assert_called_once_with(
-            name="cebraspe-4-taxonomia-edital",
             metadata={"reparo_nome_numerico": {"status": "reparado"}},
         )
+        mock_gen.update_trace.assert_not_called()
         mock_gen.end.assert_called_once()
 
     def test_excecao_no_sdk_nao_propaga_e_gera_warning(self):
