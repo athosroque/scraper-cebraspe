@@ -58,3 +58,44 @@ Os desafios técnicos resolvidos envolveram:
   - 100% dos nós mapeados validados contra a árvore mestre ativa.
   - Testes automatizados cobrindo I/O canônico, geração de candidatos, particionamento de lotes, CLI de curadoria e persistência idempotente no PostgreSQL.
   - Base de dados totalmente preparada para o cálculo das estatísticas de incidência da Etapa 5E.
+
+## Estatísticas e Views de Incidência (Etapa 5E — Sessões A e B)
+
+Na Etapa 5E, o modelo dimensional e as views analíticas foram desenvolvidos para responder às consultas centrais de produto do site de questões (*"o que mais cai"*, navegação e busca de questões, proporção Certo/Errado e comparativo de níveis), sem nenhuma dependência de LLM (custo financeiro $0).
+
+### 1. Decisões de Modelagem e Agregação
+
+1. **Grão Base e Expansão por Cargo (`vw_questoes_contexto`):**
+   - Grão: 1 linha por (questão × cargo). Cadernos de conhecimentos básicos cobrem múltiplos cargos (ex.: `CB1` atende 14 cargos na PF). A ponte `provas_cargos` expande as linhas para viabilizar filtros precisos por cargo e nível.
+2. **Subida na Árvore (`vw_prova_cobra_base`):**
+   - Analogamente à `vw_edital_cobra_base` (ADR-030), uma questão classificada em subassunto sobe na árvore e soma no subassunto, no assunto e na matéria. Questões classificadas diretamente em assunto somam no assunto e na matéria, **nunca descendo para subassuntos**.
+3. **Desduplicação Canônica Inter-Cadernos (`questao_canonica_id`):**
+   - Foram detectados **99 grupos de enunciados idênticos** repetidos entre cadernos específicos diferentes do mesmo concurso (81 no `STM_25`, 18 no `PF_25_ADM`; 0 nos demais concursos).
+   - Validação da chave completa `(concurso, hash_enunciado, texto_base, gabarito)`: **99 de 99 confirmados com 0 divergências**.
+   - Solução: criada a coluna derivadora `questao_canonica_id` via window function particionada por `(concurso_id, md5(enunciado), md5(texto_base), gabarito)`. As views agregadas `vw_prova_cobra_*` utilizam `count(DISTINCT questao_canonica_id)`, eliminando distorções estatísticas no consolidado sem prejudicar buscas locais por caderno/cargo (`vw_questoes`).
+4. **Reconciliação Estrita do Universo de Questões:**
+   - **2.800 questões físicas** extraídas no banco de dados.
+   - **2.781 questões utilizáveis oficiais** = 2.652 válidas + 129 anuladas.
+   - **19 questões não utilizáveis** (`simbolo_ilegivel`) descartadas de todas as agregações.
+   - **129 questões anuladas:** rigorosamente excluídas do total de `questoes` e do denominador de todos os percentuais, sendo computadas em coluna dedicada `anuladas`.
+   - **2.657 questões canônicas utilizáveis com nó:** consolidadas na `vw_prova_cobra_base` (2.532 válidas + 125 anuladas), absorvendo as 124 aplicações repetidas entre cadernos do mesmo concurso.
+5. **Média Ponderada por Concurso (`pct_medio_por_concurso`):**
+   - Evita distorções de concursos com cadernos básicos gigantescos (ex.: Câmara com 90 questões).
+   - Cada concurso possui peso idêntico. Concursos sem questões na matéria ficam fora da média; concursos com a matéria presente mas 0 questões no nó entram na média com 0.00%.
+6. **Interdisciplinaridade:**
+   - Todas as classificações aprovadas somam nas contagens gerais (questão multidisciplinar cobra ambos os tópicos); a coluna `so_principal` é exposta para alternância no frontend.
+7. **Matéria-Cargo (`nome_de_cargo`):**
+   - Identificada deterministicamente na Sessão A (`taxonomia_itens.materia_origem` = `cargo` e `dim_materia.nome_de_cargo = true`).
+   - Apresentada na `vw_questoes` com o rótulo formatado `"Conhecimentos específicos — <cargo>"`.
+
+### 2. Views Implementadas (`src/sql/schema_estatisticas.sql`)
+
+- `vw_questoes_contexto`: Grão (questão × cargo), expondo metadados de aplicação, concurso, nível e chave canônica.
+- `vw_questoes`: Base para a busca do site (5F.1), ligando o enunciado e textos-base à árvore e dimensões de filtro.
+- `vw_prova_cobra_base`: Base normalizada da subida hierárquica, filtrando concursos aprovados e questões utilizáveis.
+- `fn_prova_cobra(p_nivel_alvo, p_banca, p_orgao, p_ano, p_concurso, p_cargo_numero, p_nivel, p_tipo_conhecimento)`: **interface de leitura do site** para "o que mais cai". Filtra a base primeiro e conta depois, então a questão básica aplicada em N cargos conta 1× em qualquer combinação de filtros. Devolve `total_universo` (denominador do `pct_do_universo`) e o `pct_medio_por_concurso` calculado **sob os filtros**.
+- `vw_prova_cobra_no` (+ atalhos `vw_prova_cobra_{subassunto,assunto,materia}`): grão máximo (concurso × cargo × tipo × nó), para inspeção e consulta de um cargo só. **Não somar** `questoes` entre linhas nem reagregar os %: na revisão, somar a view deu 443 questões de Língua Portuguesa superior contra 101 distintas. O `pct_medio_por_concurso` dessas views é o global (sem filtro).
+- Denominadores: `pct_do_universo` = questões válidas distintas do universo filtrado (na view, do cargo × tipo); `pct_medio_por_concurso` = % do nó dentro da matéria no concurso (subassunto/assunto) ou dentro do concurso (matéria), média com peso igual por concurso.
+- Desempenho: `vw_prova_cobra_base` calcula o par (questão × cargo × nó) uma vez (CTE materializada) e a função materializa `vw_no_caminho`; consulta caiu de ~7,8 s para 0,1–0,3 s.
+- `vw_certo_errado_por_no`: Taxa de itens certos, errados e anulados por nó hierárquico.
+- `vw_comparativo_nivel`: Comparativo lado a lado de incidência Médio × Superior com diferença percentual.

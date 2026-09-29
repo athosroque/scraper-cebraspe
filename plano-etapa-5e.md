@@ -145,23 +145,23 @@ vão **depois** de `vw_questao_no`; o bloco de `DROP VIEW ... CASCADE` no topo
 da seção de views deve listar as novas, senão mudar coluna de uma view
 existente quebra a reaplicação).
 
-- `[ ]` **Decidir com o dono** os pontos da §3 (grão, principal×secundário,
+- `[x]` **Decidir com o dono** os pontos da §3 (grão, principal×secundário,
   denominador, tratamento de anuladas). Registrar a decisão final no ADR-032.
-- `[ ]` `vw_questoes_contexto`: 1 linha por (questão × cargo) com `questao_id`,
+- `[x]` `vw_questoes_contexto`: 1 linha por (questão × cargo) com `questao_id`,
   `numero`, `codigo_caderno`, `prova_tipo`, `tipo_conhecimento` (derivado de
   `provas.tipo`: `objetiva_basica` → `basico`, `objetiva_especifica` →
   `especifico`), `concurso`, `orgao`, `banca`, `ano`, `cargo_numero`, `cargo`,
   `nivel`, `gabarito`, `anulada`, `utilizavel`, `status_revisao`.
-- `[ ]` `vw_questoes` (base da busca do site, 5F.1): junta o contexto ao caminho
+- `[x]` `vw_questoes` (base da busca do site, 5F.1): junta o contexto ao caminho
   do nó (`vw_questao_no`): enunciado, `secao`, texto-base (`textos_base`),
   `figuras`, `no_id`, `no_caminho`, `papel`, `confianca`, `fora_do_edital`,
   flag de matéria-cargo (`nome_de_cargo`, rótulo "Conhecimentos específicos
   — <cargo>"). Uma linha por (questão × cargo × nó); o site agrupa por
   `questao_id`. Documentar no comentário SQL o grão e o `DISTINCT` esperado.
-- `[ ]` **Checagem de enunciado repetido (decisão 8):** consulta única sobre
+- `[x]` **Checagem de enunciado repetido (decisão 8):** consulta única sobre
   `canonico/classificacao_questoes.json` (ou `questoes`) agrupando por
   `hash_enunciado` dentro do concurso; registrar o resultado no ADR-032.
-- `[ ]` **Filtros suportados** (colunas obrigatórias em `vw_questoes`, para o
+- `[x]` **Filtros suportados** (colunas obrigatórias em `vw_questoes`, para o
   site filtrar sem nova view): banca, órgão, ano, concurso, cargo, nível,
   tipo_conhecimento, matéria/assunto/subassunto (via `no_caminho`, `materia_id`,
   `assunto_id`), `gabarito` (C/E), `anulada`, `confianca`, `fora_do_edital`,
@@ -171,11 +171,11 @@ existente quebra a reaplicação).
   "já resolvidas/erradas/nunca vi" são da 5F.3 (dependem de login) e ficam
   fora das views. Discursivas filtram em `vw_discursivas` por concurso,
   cargo, nível e matéria.
-- `[ ]` `vw_prova_cobra_base` (análoga a `vw_edital_cobra_base`): 
+- `[x]` `vw_prova_cobra_base` (análoga a `vw_edital_cobra_base`): 
   (`questao_id`, `cargo_edital_id`, `nivel_alvo`, `alvo_id`) subindo a
   árvore, só `papel` conforme decisão 3; filtros de universo (§3.4) aplicados
   aqui uma vez.
-- `[ ]` `vw_prova_cobra_{subassunto,assunto,materia}`: por nó **e** com as
+- `[x]` `vw_prova_cobra_{subassunto,assunto,materia}`: por nó **e** com as
   dimensões de filtro (`banca`, `orgao`, `ano`, `concurso`, `cargo`, `nivel`,
   `tipo_conhecimento`) como colunas — o site filtra com `WHERE`, então a
   view precisa ser agregada **no grão máximo** (concurso × cargo × nível ×
@@ -184,12 +184,12 @@ existente quebra a reaplicação).
   Conferir custo com `EXPLAIN ANALYZE`
   (universo é pequeno, 2.800 questões; se passar de ~100 ms, indexar
   `questao_no(no_id)` já existe, avaliar índice em `provas_cargos`).
-- `[ ]` `vw_certo_errado_por_no`: proporção C/E e anulações por nó
+- `[x]` `vw_certo_errado_por_no`: proporção C/E e anulações por nó
   (`gabarito` em `C`/`E`/`X`; `X` = anulada, ver `questoes.anulada`).
-- `[ ]` `vw_comparativo_nivel`: médio × superior por nó, lado a lado
+- `[x]` `vw_comparativo_nivel`: médio × superior por nó, lado a lado
   (`questoes_medio`, `questoes_superior`, e a diferença de % — só nós com
   ocorrência em ao menos um nível).
-- `[ ]` Testes em `tests/test_estatisticas_views.py` (padrão de
+- `[x]` Testes em `tests/test_estatisticas_views.py` (padrão de
   `tests/test_arvore_views.py`, Postgres real com fixtures mínimas): questão
   de caderno básico em 3 cargos conta 1× no nó ao filtrar 1 cargo e 1× (não
   3×) sem filtro de cargo; questão com 2 nós na mesma subárvore conta 1× no
@@ -199,6 +199,9 @@ existente quebra a reaplicação).
   tamanhos diferentes (peso igual por concurso, não por questão); matérias
   básicas de mesmo nome em cadernos de concursos distintos somam como
   questões distintas, mas o mesmo caderno em 14 cargos conta 1×.
+- `[x]` **Correção pós-revisão:** as views por cargo não se somam; a leitura com
+  filtros é `fn_prova_cobra(...)` (conta distinto depois de filtrar, média
+  por concurso sob os filtros). A Sessão C e a API da 5F leem por ela. Ver ADR-032.
 - **Aceite:** consultas 1 e 2 do "Pronto quando" rodam; conferir a mão o
   top 3 de LÍNGUA PORTUGUESA superior contra `classificacao.html`;
   reconciliar os totais e escrever a conta no ADR-032: 2.781 questões

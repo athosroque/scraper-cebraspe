@@ -200,6 +200,8 @@ CREATE TABLE IF NOT EXISTS provas_cargos (
     PRIMARY KEY (prova_id, cargo_edital_id)
 );
 
+CREATE INDEX IF NOT EXISTS idx_provas_cargos_cargo ON provas_cargos (cargo_edital_id);
+
 -- Fila da extração de questões (Etapa 5C, consumidor em
 -- `scripts/extrair_questoes.py`). O writer nunca altera `status`,
 -- `tipo_documento` nem `mensagem`: são estado do consumidor.
@@ -370,6 +372,16 @@ CREATE INDEX IF NOT EXISTS idx_discursiva_no_status ON discursiva_no (status);
 
 -- Views ----------------------------------------------------------------------
 
+DROP VIEW IF EXISTS vw_prova_cobra_no CASCADE;
+DROP FUNCTION IF EXISTS fn_prova_cobra CASCADE;
+DROP VIEW IF EXISTS vw_comparativo_nivel CASCADE;
+DROP VIEW IF EXISTS vw_certo_errado_por_no CASCADE;
+DROP VIEW IF EXISTS vw_prova_cobra_materia CASCADE;
+DROP VIEW IF EXISTS vw_prova_cobra_assunto CASCADE;
+DROP VIEW IF EXISTS vw_prova_cobra_subassunto CASCADE;
+DROP VIEW IF EXISTS vw_prova_cobra_base CASCADE;
+DROP VIEW IF EXISTS vw_questoes CASCADE;
+DROP VIEW IF EXISTS vw_questoes_contexto CASCADE;
 DROP VIEW IF EXISTS vw_incidencia_topico CASCADE;
 DROP VIEW IF EXISTS vw_incidencia_topico_todas CASCADE;
 DROP VIEW IF EXISTS vw_taxonomia_detalhe CASCADE;
@@ -683,3 +695,406 @@ SELECT
 FROM vw_taxonomia_detalhe
 WHERE status_revisao = 'aprovado'
 GROUP BY materia, topico, ano, nivel, tipo_conhecimento;
+
+-- Questões e Prova × Árvore (Etapa 5E, ADR-032) -----------------------------
+
+-- Contexto plano de cada aplicação de questão por cargo.
+-- Grão: 1 linha por (questão × cargo). Caderno básico expandido para os N cargos
+-- que cobre via provas_cargos.
+-- Chave canônica (decisão 8): `questao_canonica_id` identifica enunciados
+-- idênticos aplicados em cadernos diferentes do mesmo concurso.
+CREATE OR REPLACE VIEW vw_questoes_contexto AS
+WITH canonica AS (
+    SELECT
+        q.id AS questao_id,
+        min(q.id) OVER (
+            PARTITION BY p.concurso_id, md5(q.enunciado), COALESCE(md5(tb.texto), ''), q.gabarito
+        ) AS questao_canonica_id
+    FROM questoes q
+    JOIN provas p ON p.id = q.prova_id
+    LEFT JOIN textos_base tb ON tb.id = q.texto_base_id
+)
+SELECT
+    q.id AS questao_id,
+    can.questao_canonica_id,
+    q.numero,
+    p.codigo_caderno,
+    p.tipo AS prova_tipo,
+    CASE
+        WHEN p.tipo = 'objetiva_basica' THEN 'basico'
+        WHEN p.tipo = 'objetiva_especifica' THEN 'especifico'
+        ELSE p.tipo
+    END AS tipo_conhecimento,
+    c.slug AS concurso,
+    o.sigla AS orgao,
+    c.banca,
+    c.ano,
+    ce.id AS cargo_edital_id,
+    ce.numero AS cargo_numero,
+    ce.nome AS cargo,
+    ce.nivel,
+    q.gabarito,
+    q.anulada,
+    q.utilizavel,
+    c.status_revisao
+FROM questoes q
+JOIN canonica can ON can.questao_id = q.id
+JOIN provas p ON p.id = q.prova_id
+JOIN concursos c ON c.id = p.concurso_id
+JOIN dim_orgao o ON o.id = c.orgao_id
+JOIN provas_cargos pc ON pc.prova_id = p.id
+JOIN cargos_editais ce ON ce.id = pc.cargo_edital_id;
+
+-- Base plana de busca do site (Etapa 5F.1).
+-- Grão: 1 linha por (questão × cargo × nó aprovado). O site filtra por dimensões
+-- e agrupa por `questao_id`.
+CREATE OR REPLACE VIEW vw_questoes AS
+WITH materia_info AS (
+    SELECT mn.no_id, bool_or(m.nome_de_cargo) AS nome_de_cargo, bool_or(m.nocoes) AS nocoes
+    FROM materia_no mn
+    JOIN dim_materia m ON m.id = mn.materia_id
+    GROUP BY mn.no_id
+)
+SELECT
+    ctx.questao_id,
+    ctx.questao_canonica_id,
+    ctx.numero,
+    ctx.codigo_caderno,
+    ctx.prova_tipo,
+    ctx.tipo_conhecimento,
+    ctx.concurso,
+    ctx.orgao,
+    ctx.banca,
+    ctx.ano,
+    ctx.cargo_edital_id,
+    ctx.cargo_numero,
+    ctx.cargo,
+    ctx.nivel,
+    ctx.gabarito,
+    ctx.anulada,
+    ctx.utilizavel,
+    ctx.status_revisao,
+    q.enunciado,
+    q.secao,
+    q.figuras,
+    q.texto_base_id,
+    tb.texto AS texto_base_texto,
+    (q.texto_base_id IS NOT NULL) AS tem_texto_base,
+    (jsonb_array_length(q.figuras) > 0 OR (tb.id IS NOT NULL AND jsonb_array_length(tb.figuras) > 0)) AS tem_figuras,
+    qn.no_id,
+    qn.no_caminho,
+    qn.no_nivel,
+    qn.no_nome,
+    qn.materia_id,
+    qn.assunto_id,
+    qn.papel,
+    qn.confianca,
+    qn.fora_do_edital,
+    COALESCE(mi.nocoes, false) AS nocoes,
+    COALESCE(mi.nome_de_cargo, false) AS nome_de_cargo,
+    CASE
+        WHEN COALESCE(mi.nome_de_cargo, false) THEN 'Conhecimentos específicos — ' || ctx.cargo
+        ELSE na_mat.nome
+    END AS rotulo_materia
+FROM vw_questoes_contexto ctx
+JOIN questoes q ON q.id = ctx.questao_id
+LEFT JOIN textos_base tb ON tb.id = q.texto_base_id
+JOIN vw_questao_no qn ON qn.questao_id = ctx.questao_id
+LEFT JOIN materia_info mi ON mi.no_id = qn.materia_id
+LEFT JOIN no_arvore na_mat ON na_mat.id = qn.materia_id;
+
+-- Base de incidência de questões subindo a árvore (análoga a vw_edital_cobra_base).
+-- Grão: 1 linha por (questão × cargo × nível_alvo × nó_alvo).
+-- Regra de subida:
+-- - Questão em subassunto gera subassunto, assunto e matéria.
+-- - Questão em assunto gera assunto e matéria (nunca subassunto).
+-- - Questão em matéria gera matéria (nunca assunto nem subassunto).
+-- Só entram questões utilizáveis de concursos com revisão humana aprovada.
+CREATE OR REPLACE VIEW vw_prova_cobra_base AS
+WITH par AS MATERIALIZED (
+    -- (questão × cargo × nó) do universo oficial, calculado uma vez só.
+    SELECT
+        ctx.questao_id, ctx.questao_canonica_id, ctx.concurso, ctx.orgao,
+        ctx.banca, ctx.ano, ctx.cargo_edital_id, ctx.cargo_numero, ctx.cargo,
+        ctx.nivel, ctx.tipo_conhecimento, ctx.anulada, qn.papel,
+        qn.no_id, qn.no_nivel, qn.materia_id, qn.assunto_id
+    FROM vw_questoes_contexto ctx
+    JOIN vw_questao_no qn ON qn.questao_id = ctx.questao_id
+    WHERE ctx.utilizavel IS TRUE
+      AND ctx.status_revisao = 'aprovado'
+),
+subida AS (
+    SELECT par.*, 'subassunto'::text AS nivel_alvo, no_id AS alvo_id
+    FROM par WHERE no_nivel = 'subassunto'
+    UNION ALL
+    -- Questão em subassunto sobe para o assunto; questão em assunto fica nele.
+    SELECT par.*, 'assunto'::text,
+           CASE WHEN no_nivel = 'subassunto' THEN assunto_id ELSE no_id END
+    FROM par
+    WHERE no_nivel IN ('subassunto', 'assunto')
+      AND (CASE WHEN no_nivel = 'subassunto' THEN assunto_id ELSE no_id END) IS NOT NULL
+    UNION ALL
+    SELECT par.*, 'materia'::text, materia_id
+    FROM par WHERE materia_id IS NOT NULL
+)
+SELECT
+    questao_id,
+    questao_canonica_id,
+    concurso,
+    orgao,
+    banca,
+    ano,
+    cargo_edital_id,
+    cargo_numero,
+    cargo,
+    nivel,
+    tipo_conhecimento,
+    anulada,
+    CASE WHEN bool_or(papel = 'principal') THEN 'principal' ELSE 'secundario' END AS papel,
+    materia_id AS no_materia_id,
+    assunto_id AS no_assunto_id,
+    nivel_alvo,
+    alvo_id
+FROM subida
+GROUP BY
+    questao_id, questao_canonica_id, concurso, orgao, banca, ano,
+    cargo_edital_id, cargo_numero, cargo, nivel, tipo_conhecimento,
+    anulada, materia_id, assunto_id, nivel_alvo, alvo_id;
+
+-- "O que mais cai" com filtros (API do site, Etapa 5F).
+-- As contagens são `count(DISTINCT questao_canonica_id)` e NÃO se somam entre
+-- linhas: a mesma questão do caderno básico está em N cargos. Toda agregação
+-- com filtro (vários cargos, um nível, um órgão...) passa por esta função,
+-- que filtra a base primeiro e conta depois. Parâmetro NULL = sem filtro;
+-- `p_nivel_alvo` NULL devolve os três níveis.
+-- Denominadores:
+-- - `pct_do_universo` = questões válidas distintas do universo filtrado.
+-- - `pct_medio_por_concurso` = média, com peso igual por concurso, do % do nó
+--   dentro da matéria no concurso (subassunto/assunto) ou dentro do concurso
+--   (matéria). Entra na média todo concurso com questão na matéria (ou com
+--   questão, para matéria); quem não tem questão no nó entra com 0%.
+-- Anuladas ficam fora de `questoes` e de todo denominador (só em `anuladas`).
+-- A soma dos percentuais pode passar de 100%: a questão com 2 nós conta nos dois.
+CREATE OR REPLACE FUNCTION fn_prova_cobra(
+    p_nivel_alvo TEXT DEFAULT NULL,
+    p_banca TEXT DEFAULT NULL,
+    p_orgao TEXT DEFAULT NULL,
+    p_ano INTEGER DEFAULT NULL,
+    p_concurso TEXT DEFAULT NULL,
+    p_cargo_numero INTEGER DEFAULT NULL,
+    p_nivel TEXT DEFAULT NULL,
+    p_tipo_conhecimento TEXT DEFAULT NULL
+)
+RETURNS TABLE (
+    nivel_alvo TEXT,
+    no_id TEXT,
+    caminho TEXT,
+    no_nome TEXT,
+    materia_id TEXT,
+    assunto_id TEXT,
+    questoes BIGINT,
+    anuladas BIGINT,
+    so_principal BIGINT,
+    total_universo BIGINT,
+    pct_do_universo NUMERIC,
+    pct_medio_por_concurso NUMERIC
+)
+LANGUAGE sql STABLE AS $$
+WITH b AS MATERIALIZED (
+    SELECT *
+    FROM vw_prova_cobra_base v
+    WHERE (p_banca IS NULL OR v.banca = p_banca)
+      AND (p_orgao IS NULL OR v.orgao = p_orgao)
+      AND (p_ano IS NULL OR v.ano = p_ano)
+      AND (p_concurso IS NULL OR v.concurso = p_concurso)
+      AND (p_cargo_numero IS NULL OR v.cargo_numero = p_cargo_numero)
+      AND (p_nivel IS NULL OR v.nivel = p_nivel)
+      AND (p_tipo_conhecimento IS NULL OR v.tipo_conhecimento = p_tipo_conhecimento)
+),
+nc AS MATERIALIZED (
+    -- Sem materializar, o planner repete a CTE recursiva por linha.
+    SELECT * FROM vw_no_caminho
+),
+universo AS (
+    SELECT count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total
+    FROM b
+),
+alvo AS (
+    SELECT * FROM b WHERE p_nivel_alvo IS NULL OR b.nivel_alvo = p_nivel_alvo
+),
+-- Escopo do denominador por concurso: a matéria (subassunto/assunto) ou o
+-- concurso inteiro (matéria, escopo = '').
+den AS (
+    SELECT concurso, no_materia_id AS escopo,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total
+    FROM b
+    GROUP BY concurso, no_materia_id
+    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
+    UNION ALL
+    SELECT concurso, '' AS escopo,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada)
+    FROM b
+    GROUP BY concurso
+    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
+),
+elegiveis AS (
+    SELECT escopo, count(*) AS n_concursos FROM den GROUP BY escopo
+),
+por_concurso AS (
+    SELECT a.nivel_alvo, a.alvo_id,
+           CASE WHEN a.nivel_alvo = 'materia' THEN '' ELSE a.no_materia_id END AS escopo,
+           count(DISTINCT a.questao_canonica_id) FILTER (WHERE NOT a.anulada) * 100.0
+               / d.total AS pct
+    FROM alvo a
+    JOIN den d ON d.concurso = a.concurso
+              AND d.escopo = CASE WHEN a.nivel_alvo = 'materia' THEN '' ELSE a.no_materia_id END
+    GROUP BY a.nivel_alvo, a.alvo_id, a.no_materia_id, d.total
+),
+media AS (
+    SELECT p.nivel_alvo, p.alvo_id, round(sum(p.pct) / e.n_concursos, 2) AS pct_medio
+    FROM por_concurso p
+    JOIN elegiveis e ON e.escopo = p.escopo
+    GROUP BY p.nivel_alvo, p.alvo_id, e.n_concursos
+),
+contagem AS (
+    SELECT nivel_alvo, alvo_id,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS questoes,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE anulada) AS anuladas,
+           count(DISTINCT questao_canonica_id)
+               FILTER (WHERE NOT anulada AND papel = 'principal') AS so_principal
+    FROM alvo
+    GROUP BY nivel_alvo, alvo_id
+)
+SELECT
+    c.nivel_alvo,
+    c.alvo_id,
+    nc.caminho,
+    nc.nome,
+    nc.materia_id,
+    CASE WHEN c.nivel_alvo = 'materia' THEN NULL ELSE nc.assunto_id END,
+    c.questoes,
+    c.anuladas,
+    c.so_principal,
+    u.total,
+    round(c.questoes * 100.0 / NULLIF(u.total, 0), 2),
+    COALESCE(m.pct_medio, 0)
+FROM contagem c
+CROSS JOIN universo u
+JOIN nc ON nc.id = c.alvo_id
+LEFT JOIN media m ON m.nivel_alvo = c.nivel_alvo AND m.alvo_id = c.alvo_id
+$$;
+
+-- "O que mais cai" no grão máximo (concurso × cargo × tipo × nó), para
+-- inspeção e para a consulta de um cargo só. NÃO some `questoes` entre
+-- linhas (a mesma questão básica está em N cargos) nem reagregue os %:
+-- com filtro de vários cargos/níveis, use `fn_prova_cobra`.
+-- `pct_do_universo` divide pelo total do cargo naquele tipo de conhecimento
+-- (`total_universo`); `pct_medio_por_concurso` é o global de
+-- `fn_prova_cobra` sem filtro (igual em todas as linhas do nó).
+CREATE OR REPLACE VIEW vw_prova_cobra_no AS
+WITH b AS MATERIALIZED (
+    SELECT * FROM vw_prova_cobra_base
+),
+totais_cargo AS (
+    SELECT concurso, cargo_edital_id, tipo_conhecimento,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total_universo
+    FROM b
+    GROUP BY concurso, cargo_edital_id, tipo_conhecimento
+),
+contagem AS (
+    SELECT
+        nivel_alvo, alvo_id, banca, orgao, ano, concurso, cargo_edital_id,
+        cargo_numero, cargo, nivel, tipo_conhecimento,
+        count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS questoes,
+        count(DISTINCT questao_canonica_id) FILTER (WHERE anulada) AS anuladas,
+        count(DISTINCT questao_canonica_id)
+            FILTER (WHERE NOT anulada AND papel = 'principal') AS so_principal
+    FROM b
+    GROUP BY nivel_alvo, alvo_id, banca, orgao, ano, concurso, cargo_edital_id,
+             cargo_numero, cargo, nivel, tipo_conhecimento
+)
+SELECT
+    c.nivel_alvo,
+    c.alvo_id AS no_id,
+    g.caminho,
+    g.no_nome,
+    g.materia_id,
+    g.assunto_id,
+    c.banca,
+    c.orgao,
+    c.ano,
+    c.concurso,
+    c.cargo_numero,
+    c.cargo,
+    c.nivel,
+    c.tipo_conhecimento,
+    c.questoes,
+    c.anuladas,
+    c.so_principal,
+    t.total_universo,
+    round(c.questoes * 100.0 / NULLIF(t.total_universo, 0), 2) AS pct_do_universo,
+    g.pct_medio_por_concurso
+FROM contagem c
+JOIN totais_cargo t ON t.concurso = c.concurso
+                   AND t.cargo_edital_id = c.cargo_edital_id
+                   AND t.tipo_conhecimento = c.tipo_conhecimento
+JOIN fn_prova_cobra() g ON g.nivel_alvo = c.nivel_alvo AND g.no_id = c.alvo_id;
+
+-- Atalhos por nível (mesmas regras e ressalvas de `vw_prova_cobra_no`).
+CREATE OR REPLACE VIEW vw_prova_cobra_subassunto AS
+SELECT * FROM vw_prova_cobra_no WHERE nivel_alvo = 'subassunto';
+
+CREATE OR REPLACE VIEW vw_prova_cobra_assunto AS
+SELECT * FROM vw_prova_cobra_no WHERE nivel_alvo = 'assunto';
+
+CREATE OR REPLACE VIEW vw_prova_cobra_materia AS
+SELECT * FROM vw_prova_cobra_no WHERE nivel_alvo = 'materia';
+
+-- Proporção de itens Certo / Errado e taxa de anulação por nó.
+-- Percentual de C e E calculado sobre o total de itens válidos (não anulados).
+-- Percentual de anulação calculado sobre o total geral de itens.
+CREATE OR REPLACE VIEW vw_certo_errado_por_no AS
+SELECT
+    b.alvo_id AS no_id,
+    nc.caminho,
+    nc.nivel AS no_nivel,
+    count(DISTINCT b.questao_canonica_id) AS total_itens,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND q.gabarito = 'C') AS certos,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND q.gabarito = 'E') AS errados,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE b.anulada) AS anuladas,
+    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND q.gabarito = 'C') * 100.0 / NULLIF(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada), 0), 2) AS pct_certos,
+    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND q.gabarito = 'E') * 100.0 / NULLIF(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada), 0), 2) AS pct_errados,
+    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE b.anulada) * 100.0 / NULLIF(count(DISTINCT b.questao_canonica_id), 0), 2) AS pct_anuladas
+FROM vw_prova_cobra_base b
+JOIN questoes q ON q.id = b.questao_id
+JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+GROUP BY b.alvo_id, nc.caminho, nc.nivel;
+
+-- Comparativo Médio × Superior por nó.
+-- Permite ver a diferença de incidência de um nó entre provas de nível médio e superior.
+CREATE OR REPLACE VIEW vw_comparativo_nivel AS
+WITH totais_universo AS (
+    SELECT
+        count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada AND nivel = 'medio') AS total_medio,
+        count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada AND nivel = 'superior') AS total_superior
+    FROM vw_prova_cobra_base
+)
+SELECT
+    b.alvo_id AS no_id,
+    nc.caminho,
+    nc.nivel AS no_nivel,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') AS questoes_medio,
+    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') AS questoes_superior,
+    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') * 100.0 / NULLIF(t.total_medio, 0), 2) AS pct_medio,
+    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') * 100.0 / NULLIF(t.total_superior, 0), 2) AS pct_superior,
+    round(
+        COALESCE(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') * 100.0 / NULLIF(t.total_superior, 0), 0) -
+        COALESCE(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') * 100.0 / NULLIF(t.total_medio, 0), 0),
+        2
+    ) AS diferenca_pct
+FROM vw_prova_cobra_base b
+JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+CROSS JOIN totais_universo t
+GROUP BY b.alvo_id, nc.caminho, nc.nivel, t.total_medio, t.total_superior
+HAVING count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') > 0
+    OR count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') > 0;
