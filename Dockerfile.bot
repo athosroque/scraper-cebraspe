@@ -1,0 +1,8 @@
+# Imagem do bot do Telegram (serviço scraper-cebraspe-bot do docker-compose.yml).
+# Só as dependências que o bot importa; o código vem por bind mount de ./src.
+FROM python:3.12-slim
+WORKDIR /app
+RUN pip install --no-cache-dir "python-telegram-bot>=21.0.1" "httpx>=0.27.0" \
+    "requests>=2.31.0" "pydantic>=2.6.0" "python-dotenv>=1.0.1" "langfuse>=3,<4"
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "-m", "src.telegram_bot"]

@@ -37,7 +37,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   quebra se o script rodar fora da raiz do projeto. Ancorar em
   `Path(__file__).resolve().parent.parent / "logs"`.
 - `[x]` Criar `.env.example` com `POSTGRES_HOST/PORT/DB/USER/PASSWORD`
-  (hoje apontando para o banco próprio `scraper-cebraspe-db`, ADR-026) e `OPENROUTER_API_KEY`/`TELEGRAM_OPENROUTER_API_KEY`.
+  (hoje apontando para o banco próprio `scraper-cebraspe-db`, ADR-026) e `OPENROUTER_KEY_*` por etapa (fallback `OPENROUTER_API_KEY`).
   `.gitignore` já criado nesta revisão (cobre `.env`, `venv/`, `logs/`,
   `data/`).
 - `[x]` Revisar `src/models_scraper.py` (já existe, mas com 3 problemas a

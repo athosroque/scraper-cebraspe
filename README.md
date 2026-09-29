@@ -100,7 +100,7 @@ Copie o arquivo `.env.example` para `.env` e configure as variáveis conforme se
 | `POSTGRES_PASSWORD` | Senha do banco; obrigatória (sem ela o container não sobe) | *(gerar com `secrets.token_urlsafe`)* |
 | `TELEGRAM_BOT_TOKEN` | Token do bot de notificações do Telegram | *(opcional)* |
 | `TELEGRAM_ALLOWED_USER_ID` | ID do usuário autorizado no bot | *(opcional)* |
-| `TELEGRAM_OPENROUTER_API_KEY` | Chave dedicada do OpenRouter para o Telegram Bot | `sk-or-v1-...` |
+| `OPENROUTER_KEY_TELEGRAM` | Chave dedicada do OpenRouter para o Telegram Bot | `sk-or-v1-...` |
 | `OPENROUTER_API_KEY` | Chave do OpenRouter para extração de taxonomia | `sk-or-v1-...` |
 | `LANGFUSE_PUBLIC_KEY` | Chave pública do Langfuse para observabilidade (SDK oficial OTel, ver ADR-023) | *(opcional)* |
 | `LANGFUSE_SECRET_KEY` | Chave secreta do Langfuse (SDK oficial OTel, ver ADR-023) | *(opcional)* |

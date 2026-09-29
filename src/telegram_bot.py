@@ -32,24 +32,15 @@ if ALLOWED_USER_ID:
 
 # OpenRouter (acesso direto REST via httpx, sem proxy)
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-OPENROUTER_API_KEY = llm_openrouter.chave_openrouter(
-    llm_openrouter.ETAPA_TELEGRAM, "TELEGRAM_OPENROUTER_API_KEY"
-)
+OPENROUTER_API_KEY = llm_openrouter.chave_openrouter(llm_openrouter.ETAPA_TELEGRAM)
 NOME_TRACE = llm_openrouter.ETAPA_TELEGRAM[1]
 MODEL_NAME = os.getenv("TELEGRAM_OPENROUTER_MODEL", "z-ai/glm-5.3-flash")
 
-# Langfuse via SDK oficial (OTel, credenciais dedicadas do Telegram com fallback)
-LANGFUSE_HOST = (
-    os.getenv("TELEGRAM_LANGFUSE_HOST")
-    or os.getenv("LANGFUSE_HOST")
-    or os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com")
-)
-LANGFUSE_PUBLIC_KEY = os.getenv("TELEGRAM_LANGFUSE_PUBLIC_KEY") or os.getenv(
-    "LANGFUSE_PUBLIC_KEY", ""
-)
-LANGFUSE_SECRET_KEY = os.getenv("TELEGRAM_LANGFUSE_SECRET_KEY") or os.getenv(
-    "LANGFUSE_SECRET_KEY", ""
-)
+# Langfuse via SDK oficial (OTel): mesmo projeto das etapas do pipeline; o bot
+# se distingue pelo nome do trace (`cebraspe-telegram-bot`).
+LANGFUSE_HOST = llm_openrouter.LANGFUSE_HOST
+LANGFUSE_PUBLIC_KEY = llm_openrouter.LANGFUSE_PUBLIC_KEY
+LANGFUSE_SECRET_KEY = llm_openrouter.LANGFUSE_SECRET_KEY
 
 PROJECT_CONTEXT = ""
 

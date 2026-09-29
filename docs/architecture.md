@@ -146,7 +146,7 @@ flowchart TD
 
 ### 3.6. Bot de Notificações e Interações (Telegram — `src/telegram_bot.py`)
 - **Canal de Interação:** Bot assíncrono para notificações de status do pipeline e consultas contextuais.
-- **Integração com LLM e Observabilidade:** Conexão REST direta com OpenRouter utilizando chave dedicada (`TELEGRAM_OPENROUTER_API_KEY`) e observabilidade isolada no Langfuse via SDK oficial (OTel, ADR-023).
+- **Integração com LLM e Observabilidade:** Conexão REST direta com OpenRouter utilizando chave dedicada (`OPENROUTER_KEY_TELEGRAM`) e observabilidade no Langfuse via SDK oficial (OTel, ADR-023), no mesmo projeto do pipeline, com trace `cebraspe-telegram-bot`.
 - **Segurança de Acesso:** Verificação de ID do remetente via `TELEGRAM_ALLOWED_USER_ID`, descartando mensagens de usuários não autorizados.
 
 ---

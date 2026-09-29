@@ -572,7 +572,7 @@ Datasette continua só como ferramenta de revisão do dono.
 
 - Credenciais: `POSTGRES_HOST/PORT/DB/USER/PASSWORD` (apontando para o
   banco próprio `scraper-cebraspe-db`; a senha não tem default no compose —
-  vazia, o container não sobe) e `OPENROUTER_API_KEY`/`TELEGRAM_OPENROUTER_API_KEY` — todas
+  vazia, o container não sobe) e as chaves `OPENROUTER_KEY_*` por etapa (fallback `OPENROUTER_API_KEY`) — todas
   em `.env` local, nunca hardcoded.
 - `.env` está no `.gitignore` deste projeto.
 - Nunca commitar PDFs baixados (`data/`) nem logs (`logs/`) — ambos no

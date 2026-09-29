@@ -34,6 +34,11 @@
 # Mudou o `command` (ex.: nova flag --static)? `restart` não pega — precisa
 # recriar o container: docker compose up -d
 # Derrubar: docker compose down
+#
+# 3. scraper-cebraspe-bot — bot do Telegram (src/telegram_bot.py), sempre
+#    ligado (restart: unless-stopped). Código por bind mount de ./src: depois
+#    de mudar o bot, `docker compose restart scraper-cebraspe-bot`. Mudou
+#    Dockerfile.bot? `docker compose up -d --build scraper-cebraspe-bot`.
 
 services:
   scraper-cebraspe-db:
@@ -86,6 +91,19 @@ services:
       - "traefik.http.routers.scraper-datasette.rule=Host(`datasette.projetoathos.com.br`)"
       - "traefik.http.routers.scraper-datasette.entrypoints=web"
       - "traefik.http.services.scraper-datasette.loadbalancer.server.port=8001"
+
+  scraper-cebraspe-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: scraper-cebraspe-bot
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./src:/app/src:ro
+      - ./logs:/app/logs
+    networks:
+      - homelab_default
 
 volumes:
   scraper_cebraspe_pgdata:
