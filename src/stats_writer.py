@@ -247,6 +247,13 @@ def montar_carga_concurso(resultado: dict) -> dict:
         materia_nome = item.get("materia_normalizada") or item["materia_chunk"]
         materia_chave = normalizar(materia_nome)
         taxonomia = item["taxonomia_extraida"]
+        if not item.get("materia_origem"):
+            # Sem valor padrão: um `cabecalho` inventado esconderia o cargo de
+            # especialidade e zeraria `dim_materia.nome_de_cargo` sem aviso.
+            logger.warning(
+                f"[STATS] {concurso['slug']} chunk {item.get('chunk_index')}: "
+                "sem `materia_origem` — rode o backfill (Etapa 5E); gravado NULL."
+            )
         for ordem, topico in enumerate(taxonomia.get("topicos", [])):
             topico_chave = normalizar(topico["nome"])
             if not materia_chave or not topico_chave:
@@ -266,6 +273,7 @@ def montar_carga_concurso(resultado: dict) -> dict:
                     "cargos_restritos": list(item["cargos_restritos"])
                     if item.get("cargos_restritos")
                     else None,
+                    "materia_origem": item.get("materia_origem"),
                     "materia_nome": materia_nome,
                     "materia_chave": materia_chave,
                     "topico_nome": topico["nome"],
@@ -495,8 +503,8 @@ def gravar_concurso(conn, carga: dict) -> int:
                 INSERT INTO taxonomia_itens
                     (concurso_id, cargo_edital_id, materia_id, topico_id, tipo_conhecimento, nivel,
                      apenas_discursiva, chunk_index, topico_ordem, topico_nome, metadados,
-                     cargos_restritos)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                     cargos_restritos, materia_origem)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id
                 """,
                 (
@@ -512,6 +520,7 @@ def gravar_concurso(conn, carga: dict) -> int:
                     item["topico_nome"],
                     Json(item["metadados"]),
                     item.get("cargos_restritos"),
+                    item.get("materia_origem"),
                 ),
             )
             # Subtópico: 1 linha por subtópico (Etapa 5B), dimensão por
@@ -545,6 +554,28 @@ def gravar_concurso(conn, carga: dict) -> int:
         f"[STATS] {carga['slug']}: {total_subitens} subtópicos gravados (taxonomia_subitens)."
     )
     return concurso_id
+
+
+def atualizar_dim_materia_nome_de_cargo(conn) -> int:
+    """Atualiza o atributo derivado `dim_materia.nome_de_cargo` (Etapa 5E).
+
+    A verdade fica em `taxonomia_itens.materia_origem` (grão do chunk); aqui
+    só se deriva `bool_and(materia_origem = 'cargo')` sobre os itens da
+    matéria. Matéria sem itens fica `false`.
+    """
+    with conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE dim_materia m
+            SET nome_de_cargo = COALESCE(
+                (SELECT bool_and(ti.materia_origem = 'cargo')
+                 FROM taxonomia_itens ti
+                 WHERE ti.materia_id = m.id),
+                false
+            )
+            """
+        )
+        return cur.rowcount
 
 
 def gravar_provas_e_fila(
@@ -1095,6 +1126,7 @@ def gravar_estatisticas(
                 totais[chave] += contagem[chave]
 
         _limpar_dimensoes_orfas(conn)
+        atualizar_dim_materia_nome_de_cargo(conn)
         arvore_path = arvore_path or arvore.ARVORE_PADRAO
         aplicar_arvore(conn, arvore_path)
         classificacao_path = classificacao_path or classificacao.CLASSIFICACAO_PADRAO

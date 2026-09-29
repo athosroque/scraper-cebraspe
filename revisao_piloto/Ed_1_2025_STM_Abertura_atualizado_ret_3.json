@@ -123,7 +123,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 1,
@@ -171,7 +172,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 2,
@@ -217,7 +219,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 3,
@@ -244,7 +247,8 @@
       "cargos_restritos": [
         3,
         6
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 4,
@@ -351,7 +355,8 @@
       "cargos_restritos": [
         1,
         8
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 5,
@@ -400,7 +405,8 @@
       "cargos_restritos": [
         1,
         8
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 6,
@@ -431,7 +437,8 @@
       "cargos_restritos": [
         1,
         8
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 7,
@@ -505,7 +512,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 8,
@@ -561,7 +569,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 9,
@@ -645,7 +654,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 10,
@@ -769,7 +779,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 11,
@@ -861,7 +872,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 12,
@@ -898,7 +910,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 13,
@@ -1014,7 +1027,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 14,
@@ -1042,7 +1056,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 15,
@@ -1103,7 +1118,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 16,
@@ -1190,7 +1206,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 17,
@@ -1247,7 +1264,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 18,
@@ -1310,7 +1328,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 19,
@@ -1385,7 +1404,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 20,
@@ -1474,7 +1494,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 21,
@@ -1639,7 +1660,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 22,
@@ -1752,7 +1774,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 23,
@@ -1800,7 +1823,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 24,
@@ -1881,7 +1905,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 25,
@@ -1943,7 +1968,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 26,
@@ -2134,7 +2160,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 27,
@@ -2190,7 +2217,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 28,
@@ -2307,7 +2335,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 29,
@@ -2364,7 +2393,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 30,
@@ -2408,7 +2438,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 31,
@@ -2501,7 +2532,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 32,
@@ -2580,7 +2612,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 33,
@@ -2706,7 +2739,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 34,
@@ -2846,7 +2880,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 35,
@@ -2990,7 +3025,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 36,
@@ -3151,7 +3187,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 37,
@@ -3300,7 +3337,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 38,
@@ -3412,7 +3450,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 39,
@@ -3557,7 +3596,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 40,
@@ -3581,7 +3621,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 41,
@@ -3706,7 +3747,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 42,
@@ -3768,7 +3810,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 43,
@@ -3824,7 +3867,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 44,
@@ -3903,7 +3947,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 45,
@@ -3940,7 +3985,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 46,
@@ -3984,7 +4030,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 47,
@@ -4039,7 +4086,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 48,
@@ -4152,7 +4200,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 49,
@@ -4236,7 +4285,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 50,
@@ -4296,7 +4346,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 51,
@@ -4441,7 +4492,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 52,
@@ -4542,7 +4594,8 @@
           }
         ]
       },
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     }
   ],
   "status_revisao_humana": "APROVADO — revisão humana da Fase 4 concluída (registrada em 2026-09-22)"

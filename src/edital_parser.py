@@ -127,6 +127,7 @@ class ChunkTaxonomia:
     tipo_conhecimento: str | None = None  # "basico" | "especifico" | "complementar"
     nivel: str | None = None  # "medio" | "superior"
     cargo_numero: int | None = None
+    materia_origem: str = "cabecalho"  # "cabecalho" | "prefixo" | "cargo"
 
     @property
     def apenas_discursiva(self) -> bool:
@@ -167,6 +168,7 @@ CAMPOS_CLASSIFICACAO_CHUNK = (
     "materia_normalizada",
     "apenas_discursiva",
     "cargos_restritos",
+    "materia_origem",
 )
 
 
@@ -573,11 +575,13 @@ def dividir_por_cargo_e_materia(
                 ):
                     materia_nome = re.sub(r"\s+", " ", prefixo_materia)
                     texto_final = texto_bloco[m_primeiro_item.start() :].strip()
+                    materia_origem = "prefixo"
                 else:
                     materia_nome = re.sub(
                         r"\s+", " ", cargo_atual.split(": ", 1)[-1].strip()
                     )
                     texto_final = texto_bloco
+                    materia_origem = "cargo"
 
                 chunks.append(
                     ChunkTaxonomia(
@@ -587,6 +591,7 @@ def dividir_por_cargo_e_materia(
                         offset_inicio=fim_cabecalho,
                         offset_fim=proximo_inicio,
                         cargo_numero=cargo_numero_atual,
+                        materia_origem=materia_origem,
                         **classificacao,
                     )
                 )
@@ -600,6 +605,7 @@ def dividir_por_cargo_e_materia(
                 offset_inicio=fim_cabecalho,
                 offset_fim=proximo_inicio,
                 cargo_numero=cargo_numero_atual,
+                materia_origem="cabecalho",
                 **classificacao,
             )
         )

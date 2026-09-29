@@ -228,6 +228,14 @@ class TestMontarCargaConcurso:
         assert carga["itens"][0]["cargos_restritos"] == [1, 8]
         assert carga["itens"][1]["cargos_restritos"] is None
 
+    def test_materia_origem_propagada_quando_presente(self):
+        resultado = _resultado()
+        resultado["resultados"][0]["materia_origem"] = "cabecalho"
+        resultado["resultados"][1]["materia_origem"] = "cargo"
+        carga = montar_carga_concurso(resultado)
+        assert carga["itens"][0]["materia_origem"] == "cabecalho"
+        assert carga["itens"][1]["materia_origem"] == "cargo"
+
 
 def _montar_data_dir(data_dir):
     orgao_dir = data_dir / "2025" / "CEBRASPE" / "XX"
@@ -505,3 +513,35 @@ class TestGravacaoPostgres:
                 ("lingua portuguesa", False),
                 ("nocoes de direito", True),
             ]
+
+    def test_gravacao_materia_origem_e_nome_de_cargo(self, conn, tmp_path):
+        resultado = _resultado()
+        # chunk 0: básico, cabecalho
+        resultado["resultados"][0]["materia_origem"] = "cabecalho"
+        # chunk 1: específico, cargo (materia vira cargo)
+        resultado["resultados"][1]["materia_origem"] = "cargo"
+        resultado["resultados"][1]["materia_normalizada"] = "MÉDICO CLÍNICO"
+
+        revisao_dir = tmp_path / "revisao"
+        revisao_dir.mkdir(exist_ok=True)
+        (revisao_dir / "Ed_1_XX_25.json").write_text(
+            json.dumps(resultado, ensure_ascii=False), encoding="utf-8"
+        )
+        data_dir = tmp_path / "data"
+        _montar_data_dir(data_dir)
+
+        stats_writer.gravar_estatisticas(revisao_dir, data_dir, conn=conn)
+
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT topico_nome, materia_origem FROM taxonomia_itens ORDER BY id"
+            )
+            rows = cur.fetchall()
+            assert rows[0] == ("Ortografia oficial", "cabecalho")
+            assert rows[1] == ("Topico A", "cargo")
+            assert rows[2] == ("Topico B", "cargo")
+
+            cur.execute("SELECT chave, nome_de_cargo FROM dim_materia ORDER BY chave")
+            materias = dict(cur.fetchall())
+            assert materias["lingua portuguesa"] is False
+            assert materias["medico clinico"] is True

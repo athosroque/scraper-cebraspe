@@ -22,12 +22,16 @@ CREATE TABLE IF NOT EXISTS dim_ano (
 
 -- `nocoes`: o nome de origem é "NOÇÕES DE X" — mesma matéria canônica X
 -- (decisão do dono, Etapa 5B), com a marca de profundidade.
+-- `nome_de_cargo`: derivado na carga via bool_and(materia_origem = 'cargo') (Etapa 5E).
 CREATE TABLE IF NOT EXISTS dim_materia (
     id SERIAL PRIMARY KEY,
     chave TEXT NOT NULL UNIQUE,
     nome TEXT NOT NULL,
-    nocoes BOOLEAN NOT NULL DEFAULT false
+    nocoes BOOLEAN NOT NULL DEFAULT false,
+    nome_de_cargo BOOLEAN NOT NULL DEFAULT false
 );
+
+ALTER TABLE dim_materia ADD COLUMN IF NOT EXISTS nome_de_cargo BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS dim_topico (
     id SERIAL PRIMARY KEY,
@@ -143,11 +147,14 @@ CREATE TABLE IF NOT EXISTS taxonomia_itens (
     metadados JSONB NOT NULL DEFAULT '{}'::jsonb,
     -- Lista de IDs/números de cargo quando a matéria/chunk é restrita, ou NULL se comum a todos do nível/cargo
     cargos_restritos INTEGER[],
+    materia_origem TEXT CHECK (materia_origem IN ('cabecalho', 'prefixo', 'cargo')),
     UNIQUE (concurso_id, chunk_index, topico_ordem)
 );
 
 -- Migração idempotente para bancos existentes antes da introdução da coluna:
 ALTER TABLE taxonomia_itens ADD COLUMN IF NOT EXISTS cargos_restritos INTEGER[];
+ALTER TABLE taxonomia_itens ADD COLUMN IF NOT EXISTS materia_origem TEXT
+    CHECK (materia_origem IN ('cabecalho', 'prefixo', 'cargo'));
 -- Etapa 5B: o subtópico saiu do JSONB para `taxonomia_subitens` (a view que
 -- dependia da coluna é recriada abaixo).
 ALTER TABLE taxonomia_itens DROP COLUMN IF EXISTS subtopicos CASCADE;

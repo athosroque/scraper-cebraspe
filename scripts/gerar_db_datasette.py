@@ -37,7 +37,11 @@ def _classificacao(item: dict) -> dict:
 # sqlite-utils infere o tipo da coluna pela 1ª linha inserida — como os
 # chunks básicos vêm primeiro com `cargo_numero=None`, a coluna virava TEXT
 # ("15" em vez de 15) e quebrava ordenação/comparação numérica no Datasette.
-TIPOS_COLUNAS_CLASSIFICACAO = {"cargo_numero": int, "apenas_discursiva": int}
+TIPOS_COLUNAS_CLASSIFICACAO = {
+    "cargo_numero": int,
+    "apenas_discursiva": int,
+    "materia_origem": str,
+}
 
 
 def _concurso(resultado: dict) -> dict:

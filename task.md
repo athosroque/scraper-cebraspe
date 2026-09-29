@@ -736,6 +736,10 @@ enviar o bloco de uma etapa específica para o agente construir.
 - **Pronto quando:** toda questão utilizável (2.800) e discursiva (34) tem registro canônico; 0 pendências após decisão do dono; `vw_questao_no` cobre os dados aprovados; reextração preserva classificações; pytest e ruff verdes.
 
 ## Etapa 5E: Estatísticas (views no banco)
+> **Plano de execução em 3 sessões (A `materia_origem`, B base plana + "o que
+> mais cai", C edital × prova + fechamento):** `plano-etapa-5e.md`. Remover
+> ao concluir a etapa. Aqui fica só o resumo.
+
 - `[ ]` Todas as views sobem pela árvore (matéria › assunto › subassunto) e
   são filtráveis por `banca`, `orgao`, `ano`, `concurso`, `cargo`, `nivel` e
   `tipo_conhecimento`. O item básico é expandido por cargo, como na

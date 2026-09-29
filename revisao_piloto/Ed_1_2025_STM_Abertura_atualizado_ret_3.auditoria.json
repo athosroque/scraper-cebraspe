@@ -26,7 +26,8 @@
       "chars": 1109,
       "texto_enviado_llm": "1 Compreensão e interpretação de textos de gêneros variados. 2 Reconhecimento de \ntipos e gêneros textuais. 3 Domínio da ortografia oficial. 4 Domínio dos mecanismos de coesão textual. 4.1 \nEmprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de \nsequenciação textual. 4.2 Emprego de tempos e modos verbais. 5 Domínio da estrutura morfossintática do \nperíodo. 5.1 Emprego das classes de palavras. 5.2 Relações de coordenação entre orações e entre termos da \noração. 5.3 Relações de subordinação entre orações e entre termos da oração. 5.4 Emprego dos sinais de \npontuação. 5.5 Concordância verbal e nominal. 5.6 Regência verbal e nominal. 5.7 Emprego do sinal indicativo \nde crase. 5.8 Colocação dos pronomes átonos. 6 Reescrita de frases e parágrafos do texto. 6.1 Significação das \npalavras. 6.2 Substituição de palavras ou de trechos de texto. 6.3 Reorganização da estrutura de orações e de \nperíodos do texto. 6.4 Reescrita de textos de diferentes gêneros e níveis de formalidade. 7 Redação Oficial. \n7.1 Manual de Redação da Presidência da República.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 1,
@@ -42,7 +43,8 @@
       "chars": 611,
       "texto_enviado_llm": "1 Lei nº 8.457/1992 e suas alterações. 2 Regimento Interno do STM. 3 Lei nº 8.112/1990 \n(Regime Jurídico Único). 4 Lei nº 9.784/1999 (processo administrativo). 5 Lei nº 11.416/2006 (carreiras do \nPoder Judiciário). 6 Resolução do CNJ nº 351/2020 (Política de Prevenção e Enfrentamento do Assédio Moral, \ndo Assédio Sexual e da Discriminação no âmbito do Poder Judiciário). 7 Resolução do CNJ nº 400/2021 \n(Política Nacional de Sustentabilidade no Âmbito do Poder Judiciário). 8 Resolução do CNJ nº 401/2021 \n(diretrizes de acessibilidade e inclusão de pessoas com deficiência nos órgãos do Poder Judiciário).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 2,
@@ -58,7 +60,8 @@
       "chars": 470,
       "texto_enviado_llm": "1 Ética e moral. 2 Ética, princípios e valores. 3 Ética e democracia. 3.1 Exercício \nda cidadania. 4 Ética e função pública. 5 Ética no setor público. 5.1 Lei nº 8.429/1992 e suas alterações. 5.1.1 \nDisposições gerais. 5.1.2 Atos de improbidade administrativa. 6 Código de Ética dos Servidores da Justiça \nMilitar da União. \n(Incluído por meio do Edital nº 3 – STM, de 28 de março de 2025, divulgado no endereço eletrônico \nhttp://www.cebraspe.org.br/concursos/stm_25)",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 3,
@@ -77,7 +80,8 @@
       "cargos_restritos": [
         3,
         6
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 4,
@@ -96,7 +100,8 @@
       "cargos_restritos": [
         1,
         8
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 5,
@@ -115,7 +120,8 @@
       "cargos_restritos": [
         1,
         8
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 6,
@@ -134,7 +140,8 @@
       "cargos_restritos": [
         1,
         8
-      ]
+      ],
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 7,
@@ -150,7 +157,8 @@
       "chars": 1492,
       "texto_enviado_llm": "1 A evolução da administração pública e a reforma do Estado. 1.1 Do \nmodelo racional-legal ao paradigma pós-burocrático. 1.2 Convergências e diferenças entre a gestão pública \ne a gestão privada. 1.3 Excelência na gestão dos serviços públicos. 1.4 Empreendedorismo governamental e \nnovas lideranças no setor público. 2 Gestão de pessoas. 2.1 Conceitos e práticas relativas ao servidor público. \n2.2 Gestão de desempenho. 2.3 Comunicação. 2.4 Comportamento, clima e cultura organizacional. 2.5 \nGestão por competências. 2.6 Gestão do conhecimento. 2.7 Qualidade de vida no trabalho. 2.8 Liderança, \nmotivação e satisfação no trabalho. 2.9 Recrutamento e seleção de pessoas. 2.10 Análise e descrição de \ncargos. 2.11 Educação, treinamento e desenvolvimento. 2.11.1 Educação corporativa. 2.11.2 Educação a \ndistância. 2.11.3 Planejamento, desenvolvimento e objetivos do ensino. 2.11.4 Avaliação. 2.12 Gestão de \n\n \n \nconflitos. 3 Gestão de processos. 3.1 Conceitos da abordagem por processos. 3.2 Técnicas de mapeamento, \nanálise e melhoria de processos. 3.3 Construção e mensuração de indicadores de processos. 4 Gestão de \nriscos. 4.1 Conceitos básicos. 4.2 Processo de gestão de riscos. 4.3 Instâncias e responsabilidades. 5 Processo \nde mudança. 5.1 Mudança organizacional, forças internas e externas, papel do agente e métodos de \nmudança. 6 Características das organizações formais modernas. 6.1 Tipos de estrutura organizacional, \nnatureza, finalidades e critérios de departamentalização.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 8,
@@ -166,7 +174,8 @@
       "chars": 797,
       "texto_enviado_llm": "1 O papel do Estado e a atuação do governo \nnas finanças públicas. 1.1 Formas e dimensões da intervenção da administração na economia. 1.2 Funções \ndo orçamento público. 2 Orçamento público. 2.1 Conceito. 2.2 Técnicas orçamentárias. 2.3 Princípios \norçamentários. 2.4 Ciclo orçamentário. 2.5 Processo orçamentário. 3 Orçamento público no Brasil. 3.1 \nSistema de planejamento e de orçamento federal. 3.2 Plano plurianual. 3.3 Diretrizes orçamentárias. 3.4 \nOrçamento anual. 3.5 Outros planos e programas. 3.6 Sistema e processo de orçamentação. 3.7 Classificações \norçamentárias. 3.8 Estrutura programática. 3.9 Créditos ordinários e adicionais. 4 Lei de Responsabilidade \nFiscal. 4.1 Conceitos e objetivos. 4.2 Planejamento. 4.3 Dívida e endividamento. 4.4 Transparência, controle \ne fiscalização.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 9,
@@ -182,7 +191,8 @@
       "chars": 1865,
       "texto_enviado_llm": "1 Noções de organização administrativa. 1.1 Centralização, descentralização, \nconcentração e desconcentração. 1.2 Administração direta e indireta. 1.3 Autarquias, fundações, empresas \npúblicas e sociedades de economia mista. 2 Ato administrativo. 2.1 Conceito, requisitos, atributos, \nclassificação e espécies. 2.2 Invalidação, extinção, anulação e revogação. 2.3 Prescrição. 3 Poderes \nadministrativos. 3.1 Hierárquico, disciplinar, regulamentar e de polícia. 3.2 Uso e abuso do poder. 4 Licitações \ne contratos administrativos. 4.1 Legislação pertinente. 4.1.1 Lei nº 14.133/2021. 4.1.2 Decreto \nnº 11.531/2023 e Portaria Conjunta MGI/MF/CGU nº 33/2023 (convênios e instrumentos congêneres). 4.1.3 \nDecreto nº 11.462/2023. 4.1.4 IN/MPOG nº 5/2017 e IN/SEGES/ME nº 98/2022. 4.2 Disposições \nconstitucionais aplicáveis. 4.3 Disposições doutrinárias e jurisprudenciais. 4.4 Elaboração e fiscalização de \ncontratos. 4.4.1 Cláusulas e indicadores de nível de serviço. 4.4.2 Papel do fiscalizador do contrato. 4.4.3 Papel \ndo preposto da contratada. 4.4.4 Acompanhamento da execução contratual. 4.4.5 Registro e notificação de \nirregularidades. 4.4.6 Definição e aplicação de penalidades e sanções administrativas. 5 Controle da \nadministração pública. 5.1 Controle exercido pela administração pública. 5.2 Controle judicial. 5.3 Controle \nlegislativo. 6 Responsabilidade civil do Estado. 6.1 Responsabilidade civil do Estado no direito brasileiro. 6.1.1 \nResponsabilidade por ato comissivo do Estado. 6.1.2 Responsabilidade por omissão do Estado. 6.2 Requisitos \npara a demonstração da responsabilidade do Estado. 6.3 Causas excludentes e atenuantes da \nresponsabilidade do Estado. 7 Acesso à informação e proteção de dados. 7.1 Legislação pertinente. 7.1.1 Lei \nnº 12.527/2011 (Lei de Acesso à Informação). 7.1.2 Lei nº 13.709/2018 (Lei Geral de Proteção de Dados).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 10,
@@ -198,7 +208,8 @@
       "chars": 2532,
       "texto_enviado_llm": "1 A evolução da administração pública e a reforma do Estado. 1.1 Do \nmodelo racional-legal ao paradigma pós-burocrático. 1.2 Convergências e diferenças entre a gestão pública \ne a gestão privada. 1.3 Excelência na gestão dos serviços públicos. 1.4 Empreendedorismo governamental e \nnovas lideranças no setor público. 2 Gestão de pessoas. 2.1 Conceitos e práticas relativas ao servidor público. \n2.2 Gestão de desempenho. 2.3 Comunicação. 2.4 Comportamento, clima e cultura organizacional. 2.5 \nGestão por competências. 2.6 Gestão do conhecimento. 2.7 Qualidade de vida no trabalho. 2.8 Liderança, \nmotivação e satisfação no trabalho. 2.9 Recrutamento e seleção de pessoas. 2.10 Análise e descrição de \ncargos. 2.11 Educação, treinamento e desenvolvimento. 2.11.1 Educação corporativa. 2.11.2 Educação a \ndistância. 2.11.3 Planejamento, desenvolvimento e objetivos do ensino. 2.11.4 Avaliação. 2.12 Gestão de \nconflitos. 3 Gestão estratégica 3.1 Diagnóstico estratégico. 3.2 Planejamento estratégico. 3.3 Definições de \n\n \n \nestratégia. 3.4 Condições necessárias para se desenvolver a estratégia. 3.5 Questões-chave em estratégia. \n3.6 Metas estratégicas e resultados pretendidos. 3.7 Execução da estratégia 3.8 Monitoramento da estratégia \n3.9 Estratégia Nacional do Poder Judiciário. 4 Indicadores de desempenho. 5 Gestão de processos. 5.1 \nConceitos da abordagem por processos. 5.2 Tipos de processos 5.3 Ciclo de vida de gerenciamento de \nprocessos 5.4 Técnicas de mapeamento, análise e melhoria de processos. 5.5 Construção e mensuração de \nindicadores de processos. 5.6 Cadeia de valor. 5.7 Funções de gerenciamento de processos. 6 Ferramentas \nde análise de cenário interno e externo. 7 Balanced scorecard. 8 OKR (objective and key results). 9 Gestão de \nprojetos. 9.1 Elaboração, análise e avaliação de projetos. 9.2 Principais características dos modelos de gestão \nde projetos. 9.3 Projetos e suas etapas. 9.4 Escritório de projetos. 10 Gestão de riscos. 10.1 Conceitos básicos \n10.2 Processo de gestão de riscos. 10.3 Instâncias e responsabilidades. 11 Processo decisório. 11.1 Processo \nracional de solução de problemas. 11.2 Fatores que afetam a decisão. 11.3 Tipos de decisões. 12 \nCaracterísticas das organizações formais modernas. 12.1 Tipos de estrutura organizacional, natureza, \nfinalidades e critérios de departamentalização. 13 Governança organizacional. 13.1 Conceito de governança \npública organizacional. 13.2 Sistema de governança no setor público. 13.3 Princípios e diretrizes. 13.4 Práticas \nde governança.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 11,
@@ -214,7 +225,8 @@
       "chars": 1461,
       "texto_enviado_llm": "1 O papel do Estado e a atuação do governo nas finanças \npúblicas. 1.1 Formas e dimensões da intervenção da administração na economia. 1.2 Funções do orçamento \npúblico. 2 Orçamento público. 2.1 Conceito. 2.2 Técnicas orçamentárias. 2.3 Princípios orçamentários. 2.4 \nCiclo orçamentário. 2.5 Processo orçamentário. 3 Orçamento público no Brasil. 3.1 Sistema de planejamento \ne de orçamento federal. 3.2 Plano plurianual. 3.3 Diretrizes orçamentárias. 3.4 Orçamento anual. 3.5 Outros \nplanos e programas. 3.6 Sistema e processo de orçamentação. 3.7 Classificações orçamentárias. 3.8 Estrutura \nprogramática. 3.9 Créditos ordinários e adicionais. 4 Programação e execução orçamentária e financeira. 4.1 \nProgramação financeira 4.2 Descentralização orçamentária e financeira. 4.3 Acompanhamento da execução. \n4.4 Alterações orçamentárias 4.5 Limites e contingenciamentos. 5 Receita pública. 5.1 Conceito e \nclassificações. 5.2 Estágios. 5.3 Fontes. 5.4 Dívida ativa. 6 Despesa pública. 6.1 Conceito e classificações. 6.2 \nEstágios. 6.3 Restos a pagar. 6.4 Despesas de exercícios anteriores. 6.5 Dívida flutuante e fundada. 6.6 \nSuprimento de fundos. 7 Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal). 7.1 Conceitos e \nobjetivos. 7.2 Planejamento. 7.3 Dívida e endividamento. 7.4 Transparência, controle e fiscalização 7.5 Regra \nde ouro. 7.6 Geração da despesa e despesa obrigatória de caráter continuado. 8 Lei nº 4.320/1964 e suas \nalterações.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 12,
@@ -230,7 +242,8 @@
       "chars": 316,
       "texto_enviado_llm": "1 Processos de software, gestão de projetos e produtos de software. 2 \nMetodologias ágeis para o desenvolvimento de software. 2.1 Scrum.  2.2 Kanban. 2.3 XP. 2.4 Lean. 3 \nEngenharia de requisitos. 3.1 Produto mínimo viável (MVP). 3.2 Gestão de backlog. 3.3 Técnicas de \npriorização e de estimativas com story points.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 13,
@@ -246,7 +259,8 @@
       "chars": 1815,
       "texto_enviado_llm": "1 Linguagens de programação (PHP, JavaScript, Java, Python). 2 \nLinguagens de script: Ansible, Terraform, Shell Script (Bash), Windows PowerShell, Python. 3 Frameworks e \ntoolkits: Laravel, Symfony, React, Angular, jQuery, Spring, Spring Boot, Hibernate e JPA, Apache CXF, Scikit-\nlearn, TensorFlow, PyTorch, NLTK, Matplotlib e Jupyter Notebook. 4 Padrões XML, XSLT, UDDI, WSDL, SOAP \ne JSON. 5 Desenvolvimento web e mobile. 5.1 JavaScript, HTML5, CSS3, AJAX, WebSocket, Single Page \nApplication (SPA). 5.2 Usabilidade e acessibilidade na Internet, padrões W3C. 5.3 Noções de desenvolvimento \npara dispositivos móveis. 6 Desenvolvimento com contêineres: Docker, Kubernetes. 7 Integração de sistemas: \nApache Kafka, REST, SOAP, mensageria, RabbitMQ. 8 Arquitetura de software. 8.1 Padrões de arquitetura de \nsoftware: MVC, orientado a eventos, microsserviços, SOA/web services, cliente-servidor, pipes-and-filters e \n\n \n \nP2P. 8.2 Controles e testes de segurança para aplicações e webservices. 9 Testes de software. 9.1 Testes de \nunidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD. 9.2 Planejamento de testes, \nprincípios FIRST, testabilidade. 10 Bancos de dados. 10.1 Conceitos e fundamentos. 10.2 SGBD Oracle, MySQL \ne PostgreSQL. 10.3 Noções de bancos de dados NoSQL (orientados a documento, chave-valor, grafo e \ncolunar). 10.4 Características de bancos de dados massivos (big data). 10.5 Conceitos e propriedades das \ntransações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions \ne stored procedures, packages; tratamento de erros; cursores; arrays. 10.6 Tipos de modelagem dimensional: \nStar Schema, Snowflake Schema e Fact Constellation. 10.7 Metodologia CRISP-DM. 11 Plataforma Moodle de \naprendizagem virtual: configuração e recursos.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 14,
@@ -262,7 +276,8 @@
       "chars": 333,
       "texto_enviado_llm": "1 Princípios e fundamentos das práticas DevOps, técnicas e ferramentas de builds \ne deploys automatizados, ferramentas de deploy contínuo, modelo de versionamento, merge, branch e \npipeline. 2 CI/CD (continuous integration/continuous delivery). 3 Ambiente de clusters, Kubernetes, \nferramenta de orquestração de contêineres, Rancher.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 15,
@@ -278,7 +293,8 @@
       "chars": 1476,
       "texto_enviado_llm": "1 Resolução CNJ nº 522/2023 (institui o modelo de requisitos para sistemas \ninformatizados de gestão de processos e documentos do Poder Judiciário e disciplina a obrigatoriedade da \nsua utilização no desenvolvimento e manutenção de sistemas informatizados para as atividades judiciárias e \nadministrativas no âmbito do Poder Judiciário). 2 Resolução CNJ nº 335/2020 (institui política pública para \ngovernança e gestão de processo judicial eletrônico; integra os tribunais do país com a criação da Plataforma \nDigital do Poder Judiciário Brasileiro – PDPJ-Br; mantém o sistema PJe como sistema de processo eletrônico \nprioritário do Conselho Nacional de Justiça). 3 Portaria CNJ nº 252/2020 (dispõe sobre modelo de governança \ne gestão da Plataforma Digital do Poder Judiciário – PDPJ-Br). 4 Portaria CNJ nº 253/2020 (institui os critérios \ne as diretrizes técnicas para o processo de desenvolvimento de módulos e serviços na Plataforma Digital do \nPoder Judiciário Brasileiro – PDPJ-Br). 5 Portaria CNJ nº 131/2021 (institui o grupo revisor de código-fonte \ndas soluções da Plataforma Digital do Poder Judiciário – PDPJ-Br e do Processo Judicial Eletrônico – PJe). 6 \nResolução CNJ nº 396/2021 (institui a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – \nENSEC-PJ). 7 Portaria CNJ nº 162/2021 (aprova protocolos e manuais criados pela Resolução CNJ \nnº 396/2021, que instituiu a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – ENSEC-PJ).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 16,
@@ -294,7 +310,8 @@
       "chars": 740,
       "texto_enviado_llm": "1 Linguagem de programação Java. 2 Arquitetura distribuída de microsserviços; API RESTful; JSON; \nframework Spring; Spring Cloud; Spring Boot; Spring Eureka, Zuul; Map Struct; Swagger; Service Discovery; \nAPI Gateway. 3 Persistência; JPA 2.0; Hibernate 4.3 ou superior; Hibernate Envers; biblioteca Flyway. 4 Banco \nde dados; PostgreSQL; H2 Database. 5 Serviços de autenticação; single sign‐on (SSO); keycloak; protocolo \nOAuth2 (RFC 6749). 6 Mensageria e webhooks; message broker; RabbitMQ; evento negocial; webhook; APIs \nreversas. 7 Ferramenta de versionamento Git. 8 Ambiente de clusters e Kubernetes. 9 Ferramenta de \norquestração de contêineres, Rancher. 10 Deploy de aplicações; continuous delivery e continuous integration \n(CI/CD).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 17,
@@ -310,7 +327,8 @@
       "chars": 1196,
       "texto_enviado_llm": "1 Planejamento estratégico \nde TIC. 1.1 Fundamentos do planejamento estratégico em tecnologia da informação e comunicação. 1.2 \nElaboração e implementação do plano diretor de TIC (PDTIC). 1.3 Indicadores de desempenho de TIC e \nalinhamento com objetivos organizacionais. 2 Governança de TIC 2.1 COBIT 2019: conceitos básicos, \nestrutura, objetivos e aplicação para a governança de TIC. 2.2 ITIL v4: gerenciamento de serviços de TIC, com \nfoco em processos e melhores práticas. 2.3 Metodologias de indicadores OKR, PKI e BSC. 2.4 Análise SWOT \naplicados à TIC. 3 Gerenciamento de projetos de TIC. 3.1 PMBOK 7ª edição: conceitos, grupos de processos e \náreas de conhecimento. 3.2 Escritório de projetos – PMO e gestão de portfólio de projetos. 4 Governança e \n\n \n \nGestão de TIC. 4.1 Resolução CNJ nº 370/2021 (Estratégia Nacional de Tecnologia da Informação e \nComunicação do Poder Judiciário – ENTIC‐JUD). 4.2 Resolução CNJ nº 468/2022 e o Guia de Contratações de \nSTIC do Poder Judiciário e suas alterações. 4.3 Lei nº 14.133/2021. 4.4 Planejamento, fiscalização e gestão de \ncontratos de TIC. 5 Noções de gestão de riscos de TIC. 6 Lei Geral de Proteção de Dados Pessoais (Lei \nnº 13.709/2018).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 18,
@@ -326,7 +344,8 @@
       "chars": 1014,
       "texto_enviado_llm": "1 Conceitos e tecnologias de IA, redes neurais, aprendizado \nde máquina, processamento de linguagem natural (PLN), deep learning, chatbots. 2 Conceitos de big data e \nanalytics. 2.1 Ferramenta Qlik Sense. 3 Noções de business intelligence, data warehouse, data mart, data \nmining, data lake, ETL e OLAP. 4 Principais técnicas de pré‐processamento de dados estruturados e não \nestruturados. 5 Noções de modelos preditivos (supervisionados) e descritivos (não supervisionados). 6 \nAvaliação de modelos (sobreajuste, métricas de classificação e regressão, análise ROC). 7 Algoritmos para \nexploração de dados e machine learning. 8 Grandes modelos de linguagem (LLM), IA generativa. 9 Tecnologias \nemergentes e tendências. 9.1 Blockchain: conceitos e aplicações, sistemas de suporte à decisão analítica. 9.2 \nComputação em nuvem (SaaS, PaaS, IaaS), migração para a nuvem, estratégias de escalabilidade. 10 \nGovernança e ética na IA. 10.1 Transparência, responsabilidade, explicabilidade, privacidade, segurança, viés.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 19,
@@ -342,7 +361,8 @@
       "chars": 1362,
       "texto_enviado_llm": "1 Conceitos básicos. 1.1 Confidencialidade. 1.2 Integridade. 1.3 \nDisponibilidade. 1.4 Autenticidade. 2 Gestão de segurança da informação. 2.1 NBR ISO/IEC Família \n27001:2022 e NBR ISSO/IEC 27002:2022. 2.2 NIST – Cybersecurity Framework. 2.3 CIS Controls. 3 Segurança \nda informação e desenvolvimento de software seguro. 3.1 Privacidade e segurança por padrão e por design, \ncriptografia, autenticação e autorização. 3.2 Segurança em aplicações web e mobile, gestão de identidades e \nacess. 3.3 Análise de vulnerabilidades em aplicações web. 3.4 Metodologia Open Web Application Security \nProject (OWASP). 3.5 Técnicas de proteção de aplicações web, testes de invasão. 4 Métodos de autenticação. \n4.1 Autenticação multifator baseada em biometria, por token e certificados. 4.2 Protocolos de autenticação: \nOAuth 2.0, OpenID Connect, JWT (JSON Web Tokens) e SSO. 5 Ameaças e vulnerabilidades em aplicações. 5.1 \nInjection (SQL, LDAP), cross‐site scripting (XSS). 5.2 Quebra de autenticação e gerenciamento de sessão. 5.3 \nReferência insegura a objetos, cross‐site request forgery. 5.4 Armazenamento inseguro de dados \ncriptografados. 6 Segurança de aplicativos web. 7 Prevenção e combate a ataques a redes de computadores. \n7.1 DDoS, DoS, DNS spoofing. 7.2 Eavesdropping, ransomware, phishing. 7.3 Brute force, port scanning. 8 \nCriptografia e proteção de dados.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 20,
@@ -358,7 +378,8 @@
       "chars": 2067,
       "texto_enviado_llm": "1 Comunicação pública. 1.1 Conceito de comunicação pública. 1.2 Processos de \ncomunicação pública. 1.3 Instrumentos de comunicação pública. 1.4 Legislação. 2 Comunicação nas \norganizações. 2.1 Fundamentos e finalidades. 2.2 Assessoria de comunicação. 2.2.1 Atribuições, organização, \nestrutura e funcionamento. 2.3 Produtos e rotinas de uma assessoria de comunicação. 2.4 Papel do assessor. \n2.5 Sugestões de pauta, releases e artigos. 2.6 Notas oficiais. 2.7 Clipping. 2.8 Atendimento à imprensa. 2.9 \nOrganização de entrevistas. 2.10 Comunicação de crise. 3 Jornalismo institucional. 3.1 Comunicação interna \ne endomarketing. 4 Teorias do jornalismo e critérios de noticiabilidade. 4.1 Agenda setting, gatekeeping, \nnewsmaking, espiral do silêncio. 5 Produção jornalística. 5.1 Princípios e orientações gerais para redigir um \ntexto jornalístico. 5.2 Edição e revisão de informação. 5.3 Características, linguagens e técnicas de produção, \napuração, entrevista, redação em diferentes meios. 5.4 Telejornalismo e radiojornalismo. 5.4.1 Técnicas de \nredação e produção. 5.5 Fotojornalismo. 6 Novas tecnologias de comunicação. 6.1 Comunicação digital e \nmídias sociais. 6.2 Jornalismo digital. 6.2.1 Características e elementos. 6.2.2 Ferramentas, linguagens e \nplataformas. 6.2.3 Impactos da comunicação da Internet. 6.3 Fake news e jornalismo. 6.4 Inteligência artificial \ne produção de conteúdo. 7 Jornalismo jurídico e cobertura jornalística do Poder Judiciário. 7.1 Português \n\n \n \njurídico. 7.2 Normativos da comunicação social no Poder Judiciário. 7.2.1 Instrução Normativa da Presidência \ndo CNJ nº 96/2023 (institui a Política de Comunicação Social do Conselho Nacional de Justiça). 7.2.2 Portaria \nCNJ nº 198/2019 (constitui o Comitê de Comunicação Social do Poder Judiciário). 7.2.3 Resolução CNJ \nnº 407/2021 (institui o Plano Complementar de Comunicação Interna dos Tribunais). 7.3 Pacto Nacional do \nJudiciário pela Linguagem Simples. 7.3.1 Eixos temáticos. 7.4 Resolução CNJ nº 85/2009 (dispõe sobre a \ncomunicação social no âmbito do Poder Judiciário).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 21,
@@ -374,7 +395,8 @@
       "chars": 3546,
       "texto_enviado_llm": "1 Norma Brasileira de Contabilidade (NBC TG Estrutura Conceitual). 2 Plano de \ncontas e procedimentos de escrituração. 2.1 Conceito, classificação (patrimoniais e de resultado) e natureza \ndas contas (devedoras e credoras). 2.2 Elementos essenciais do lançamento contábil. 2.3 Formalidades \nessenciais da escrituração. 2.3.1 Livros utilizados na escrituração. 2.3.2 Arts. 39 e 40 da Lei nº 8.934/1994. \n2.3.3 Arts. 132, 1.065, e de 1.179 a 1.195 da Lei nº 10.406/2002 (Código Civil). 2.3.4 Arts. 133, 289, 294 e 295 \nda Lei nº 6.404/1976 (sociedades por ações). 2.3.5 Instrução Normativa DREI/SGD/ME nº 82/2021. 2.3.6 \nITG2000 (R1) do CFC (escrituração contábil). 2.3.7 Sistema Público de Escrituração Digital (SPED). 2.3.7.1 \nDecreto nº 6.022/2007. 2.3.7.2 Instrução Normativa RFB nº 2.003/2021. 2.3.7.3 CTG 2001 (R3): \nprocedimentos técnicos e demais formalidades a serem observados na escrituração contábil em forma digital \npara fins de atendimento ao Sistema Público de Escrituração Digital (SPED). 3 Elaboração de demonstrações \ncontábeis pela legislação societária, pelas normas brasileiras de contabilidade do Conselho Federal da \nContabilidade (CFC) e pelos pronunciamentos do Comitê de Pronunciamentos Contábeis (CPC). 3.1 \nDemonstração dos fluxos de caixa (métodos direto e indireto). 3.2 Balanço patrimonial. 3.3 Demonstração \ndo resultado do exercício. 3.4 Demonstração do valor adicionado. 3.5 Demonstração das mutações do \npatrimônio líquido. 3.6 Demonstração de lucros ou prejuízos acumulados. 3.7 Demonstração do resultado \nabrangente. 4 Disponibilidades: caixa e equivalentes de caixa. 4.1 Conteúdo, classificação e critérios de \navaliação. 5 Contas a receber. 5.1 Conceito, conteúdo e critérios contábeis. 6 Estoques. 6.1 Conceito e \nclassificação. 6.2 Critérios de avaliação de estoques. 7 Realizável a longo prazo (não circulante). 7.1 Conceito \ne classificação. 7.2 Ajuste a valor presente. 7.2.1 Conceito e metodologia. 7.2.2 Cálculo. 7.2.3 Contabilização. \n8 Passivo exigível. 8.1 Conceitos gerais, avaliação e conteúdo do passivo. 9 Fornecedores, obrigações fiscais \ne outras obrigações. 10 Empréstimos e financiamentos, debêntures e outros títulos de dívida. 11 Provisões, \npassivos contingentes e ativos contingentes. 12 Patrimônio líquido. 12.1 Reservas de capital. 12.2 Ajustes de \navaliação patrimonial. 12.3 Reservas de lucros. 12.4 Ações em tesouraria. 12.5 Prejuízos acumulados. 12.6 \nDividendos. 13 Receita de vendas. 14 Tributos sobre vendas na sistemática cumulativa e não cumulativa. 15 \nCusto das mercadorias e dos produtos vendidos e dos serviços prestados. 15.1 Custeio real ou custeio por \nabsorção. 15.2 Custeio direto (ou custeio variável). 15.3 Custo-padrão. 15.4 Custeio baseado em atividades. \n15.5 RKW. 15.6 Custos para tomada de decisões. 15.7 Sistemas de custos e informações gerenciais. 15.8 \nEstudo da relação custo versus volume versus lucro. 15.9 Custos e formação de preços em contratações \npúblicas. 16 Despesas de vendas, gerais e administrativas. 17 Receitas e despesas financeiras. 18 tributos \nsobre a renda. 19 Lucro líquido do exercício. 20 Consolidação das demonstrações contábeis e demonstrações \nseparadas. 21 Análise econômico-financeira. 21.1 Indicadores de liquidez. 21.2 Indicadores de rentabilidade. \n21.3 Indicadores de lucratividade. 21.4 Indicadores de endividamento. 21.5 Indicadores de estrutura de \ncapitais. 21.6 Análise vertical e horizontal. 22 Licitações e contratos. 22.1 § 1º do Art. 65 e Art. 69 da Lei \nnº 14.133/2021. 22.2 Instrução Normativa STJ/GDG nº 30/2022.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 22,
@@ -390,7 +412,8 @@
       "chars": 1645,
       "texto_enviado_llm": "1 Princípios de contabilidade sob a perspectiva do setor público. 2 Sistema de \ncontabilidade federal. 3 Conceituação, objeto e campo de aplicação da contabilidade pública. 4 Composição \ndo patrimônio público. 4.1 Patrimônio público. 4.2 Ativo. 4.3 Passivo. 4.4 Saldo patrimonial. 5 Variações \n\n \n \npatrimoniais. 5.1 Qualitativas. 5.2 Quantitativas. 5.2.1 Receita e despesa sob o enfoque patrimonial. 5.3 \nRealização da variação patrimonial. 5.4 Resultado patrimonial. 6 Mensuração de ativos. 6.1 Ativo imobilizado. \n6.2 Ativo intangível. 6.3 Reavaliação e redução ao valor recuperável. 6.4 Depreciação, amortização e \nexaustão. 7 Mensuração de passivos. 7.1 Provisões. 7.2 Passivos contingentes. 8 Tratamento contábil \naplicável aos impostos e contribuições. 9 Sistema de custos. 9.1 Aspectos legais do sistema de custos. 9.2 \nAmbiente da informação de custos. 9.3 Características da informação de custos. 9.4 Terminologia de custos. \n10 Plano de contas aplicado ao setor público. 11 Demonstrações contábeis aplicadas ao setor público. 11.1 \nBalanço orçamentário. 11.2 Balanço financeiro. 11.3 Demonstração das variações patrimoniais. 11.4 Balanço \npatrimonial. 11.5 Demonstração dos fluxos de caixa. 11.6 Demonstração das mutações do patrimônio líquido. \n11.7 Notas explicativas às demonstrações contábeis. 11.8 Consolidação das demonstrações contábeis. 12 \nTransações no setor público. 13 Manual de Contabilidade Aplicada ao Setor Público (MCASP) 11ª edição. 14 \nRegime contábil. 15 Sistema Integrado de Administração Financeira do Governo Federal (SIAFI). 16 Sistema \nde Informações Contábeis e Fiscais do Setor Público Brasileiro (SICONFI).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 23,
@@ -406,7 +429,8 @@
       "chars": 838,
       "texto_enviado_llm": "1 Tributos. 1.1 Impostos, taxas e \ncontribuições. 2 Operações fiscais e tributárias. 2.1 Noções de cálculo de tributos federais, estaduais e \nmunicipais, contribuições previdenciárias, FGTS e outras operações. 2.2 Noções sobre contribuições EFD, e‐\nSocial e EFD Reinf. 3 Retenções na fonte realizadas pela administração pública federal. 3.1 Imposto de renda \nda pessoa jurídica (IRPJ). 3.2 Contribuição social sobre o lucro líquido (CSLL). 3.3 Programa de Integração \nSocial (PIS). 3.4 Contribuição para o financiamento da seguridade social (COFINS). 3.5 Imposto sobre serviços \n(ISS). 3.6 Contribuição previdenciária (INSS). 4 Legislação básica e suas atualizações. 4.1 Instrução Normativa \nda Receita Federal do Brasil nº 2.110/2022. 4.2 Instrução Normativa da Receita Federal do Brasil \nnº 1.234/2012. 4.3 Lei Complementar nº 116/2003.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 24,
@@ -422,7 +446,8 @@
       "chars": 1318,
       "texto_enviado_llm": "1 Conceito e evolução da auditoria governamental. 1.1 Papéis das auditorias \ninterna e externa. 1.2 Auditoria de regularidade e auditoria operacional. 2 Instrumentos de fiscalização: \nauditoria, levantamento, monitoramento, acompanhamento e inspeção. 3 Planejamento de auditoria. 3.1 \nPlano de auditoria baseado no risco. 3.2 Atividades preliminares. 3.3 Determinação de escopo. 3.4 \nMaterialidade, risco e relevância. 3.5 Exame e avaliação do controle interno. 3.6 Risco inerente, de controle \ne de detecção. 3.7 Risco de auditoria 3.8 Matriz de planejamento. 3.9 Programa de auditoria. 3.10 Papéis de \ntrabalho. 3.11 Testes de auditoria. 3.12 Amostragem estatística em auditoria. 4 Execução da auditoria. 4.1 \nTécnicas e procedimentos: exame documental, inspeção física, conferência de cálculos, observação, \nentrevista, circularização, conciliações, análise de contas contábeis, revisão analítica. 5 Evidências. 5.1 \nCaracterização de achados de auditoria. 5.2 Matriz de achados e matriz de responsabilização. 6 Comunicação \ndos resultados: relatórios de auditoria. 7 Monitoramento. 8 Documentação da auditoria. 9 Supervisão e \ncontrole de qualidade. 10 Procedimentos em processos de prestação de contas da administração pública \nfederal. 11 Responsabilidade fiscal (Lei Complementar nº 101/2000 e suas alterações).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 25,
@@ -438,7 +463,8 @@
       "chars": 764,
       "texto_enviado_llm": "1 Orçamento público. 1.1 Conceito. 1.2 Princípios \norçamentários. 1.3 Ciclo orçamentário. 2 Orçamento público no Brasil. 2.1 Plano plurianual. 2.2 Diretrizes \norçamentárias. 2.3 Orçamento anual. 2.4 Classificações orçamentárias. 2.5 Estrutura programática. 2.6 \nCréditos adicionais. 3 Programação e execução orçamentária e financeira. 3.1 Descentralização orçamentária \ne financeira. 3.2 Alterações orçamentárias. 4 Receita pública. 4.1 Classificação das receitas públicas. 4.2 \nEstágios da receita pública. 4.3 Fontes de receitas públicas. 4.4 Dívida ativa. 5 Despesa pública. 5.1 Conceito \ne classificações. 5.2 Estágios da despesa pública. 5.3 Restos a pagar. 5.4 Despesas de exercícios anteriores. 5.5 \nDívida fundada e flutuante. 5.6 Suprimento de fundos.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 26,
@@ -454,7 +480,8 @@
       "chars": 3617,
       "texto_enviado_llm": "1 ISO/IEC 20000. 2 ITIL v4. 2.1 \nConceitos básicos, disciplinas, estrutura e objetivos. 3 Meios de transmissão e tipos de cabeamentos. 3.1 \nCabeamento estruturado categorias 5, 5e, 6 e 6a, de acordo com a ABNT NBR 14565:2019. 3.2 Fibras ópticas \n(monomodo e multimodo). 4 Técnicas de circuitos, pacotes e células. 5 Tecnologias, protocolos e elementos \nde redes locais e de longa distância (PAN, LAN, MAN, WAN, WPAN, WLAN, WMAN e WWAN). 6 Modelos de \nreferência OSI e TCP/IP. 6.1 Protocolos de comunicação TCP/IP, RDMA OVER converged ethernet (RoCE), \nMTU, Jumbo Frames. 7 Elementos de interconexão de redes de computadores (gateways, hubs, repetidores, \nbridges, switches e roteadores). 8 Protocolos de rede TCP/IP. 8.1 Protocolos IPv4 e IPv6. 8.2 Segmentação e \nendereçamento. 8.3 CIDR. 8.4 Protocolos TCP, UDP, ICMP, IPSec, ARP, SSH, SMTP, HTTP e HTTPS, SSL e TLS, \nFTP, NFS, SMB, LDAP, DNS, DHCP, IMAP. 8.5 Conceitos de multi protocol label switching (MPLS) e SD‐WAN. 9 \nMecanismos NAT e PAT. 10 Spanning tree protocol (IEEE 802.1D). 11 Protocolos de roteamento. 11.1 OSPF, \nBGP, RIP, VRRP e HSRP. 12 Noções de VLAN (IEEE 802.1Q). 13 Tecnologia VOIP. 13.1 Protocolos H.323 e SIP. \n13.2 Qualidade de serviço (QoS). 14 Padrão IEEE 802.3. 14.1 Fast ethernet. 14.2 Gigabit ethernet. 15 Redes \nsem fio (wireless). 15.1 Padrões IEEE 802.11, 802.1x, WPA e WPA2. 16 Ativos e perímetros de segurança de \nrede e aplicação. 16.1 Firewall, firewall proxy, WAF, SIEM, identity access management (IAM), privileged \naccess management (PAM), IPTables, IDS/IPS, VPN, antivírus e antispam, antiDDoS. 17 Gerenciamento de \nredes. 17.1 SNMP, MIBs, NMSs e agentes. 18 Ferramentas de monitoramento e logging. 18.1 Zabbix, Grafana, \nElasticsearch, Kibana, application performance monitoring (APM). 19 Serviços de nuvem (IaaS, PaaS e SaaS). \n19.1 Modelos de nuvem (público, privado, comunitário, híbrido). 19.2 Google Workspace. 19.3 Microsoft \nOffice 365. 20 Armazenamento de dados em rede. 20.1 Network attached storage (NAS), direct attached \nstorage (DAS), software defined storage (SDS), cloud storage, protocolo FCP, protocolos CIFS e NFS, noções \nde storage. 21 Backup. 21.1 Políticas. 21.2 Tipos de backup. 21.3 Tecnologias de backup. 21.3.1 Veritas \nNetbackup, Robocopy, RSync, deduplicação. 22 Sistemas operacionais. 22.1 Ambiente Linux (Red Hat e Oracle \nLinux). 22.1.1 Instalação, configuração e administração. 22.1.2 Utilitários e comandos‐padrão. 22.1.3 Shell \nScript. 22.2 Microsoft Windows (Windows 11 e Windows Server 2022). 22.2.1 Instalação, configuração e \nadministração. 22.2.2 Active Directory. 22.2.3 Powershell. 23 Virtualização. 23.1 VMWare. 23.1.1 \nFundamentos, configuração, administração e alta disponibilidade. 24 Virtualização de desktop. 24.1 Remote. \n24.2 Desktop services. 24.3 Noções de máquinas virtuais e contêineres. 24.4 Arquitetura de orquestração de \ncontêineres. 24.4.1 Docker, Kubernetes, Rancher, noções de ferramentas de orquestração de automação de \ninfraestrutura (Ansible e Puppet), noções de DevOps, ambiente de clusters. 24.4.2 Deploy de aplicações; \ncontinuous delivery e continuous integration (CI/CD). 24.4.3 Ferramenta de versionamento Git: configuração \ne utilização. 25 Noções de alta disponibilidade e tolerância a falhas. 25.1 Indicadores de disponibilidade. \n25.1.1 MTBF, MTTR e MTTF. 25.1.2 Clusterização. 25.1.3 Balanceamento de carga. 25.1.4 Failover. 26 \nServidores de aplicação (JBoss, Apache HTTP Server, IIS). 26.1 Administração e configuração. 26.1.1 Análise \nde desempenho da rede. 26.1.2 Gerenciamento de usuários. 26.1.3 Configuração, administração e logs de \nserviços.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 27,
@@ -470,7 +497,8 @@
       "chars": 673,
       "texto_enviado_llm": "1 Administração de SGBD. 1.1 MySQL, Oracle e PostgreSQL. 1.2 \nCaracterísticas de um SGBD. 2 Modelagens de dados. 2.1 Relacional, multidimensional, noSQL. 2.2 Noções de \nnormalização de dados. 3 Arquitetura de inteligência de negócio. 3.1 Business inteligence, data warehouse, \ndata mart, data mining, data lake, data mesh, ETL e OLAP. 4 Ciência de dados. 4.1 Aprendizado de máquina. \n4.2 Deep learning. 4.3 Processamento de linguagem natural. 4.4 Big data. 4.5 Qualidade de dados. 4.6 Tipos \nde aprendizado. 4.6.1 Supervisionado, não supervisionado, semissupervisionado, por reforço, por \ntransferência. 5 Grandes modelos de linguagem (LLM), IA generativa. 6 Redes neurais.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 28,
@@ -486,7 +514,8 @@
       "chars": 2441,
       "texto_enviado_llm": "1 Normas ABNT NBR ISO/IEC 27001:2013 e ABNT NBR ISO/IEC 27002:2022. \n2 Gestão de riscos de SI. 2.1 ABNT NBR ISO/IEC 27005:2022. 3 Políticas de segurança da informação. 4 \nGerenciamento de incidentes de segurança da informação. 5 Gestão de continuidade de negócio. 6 Princípios \nde segurança da informação. 6.1 Classificação de informações, confidencialidade, integridade, \ndisponibilidade, não repúdio, privacidade, autenticidade, segurança física e lógica. 7 Criptografia. 7.1 \nConceitos básicos e aplicações. 7.2 Protocolos criptográficos. 7.3 Criptografia simétrica e assimétrica. 7.4 \nAssinatura e certificação digital. 7.5 Hashes e algoritmos de hash. 7.6 Esteganografia e criptoanálise. 8 \nInfraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP‐ Brasil. 9 Controle de \nacesso. 9.1 Autenticação, autorização e auditoria. 9.2 Controle de acesso baseado em papéis. 9.3 \nAutenticação baseada em múltiplos fatores (MFA). 10 Gestão de identidades, acesso e serviços de \nautenticação. 10.1 Radius. 10.2 SSO Single. 10.3 Sign On. 10.4 Keycloak; protocolos SAML, OAuth2 (RFC 6749). \n10.5 OpenId Connect. 11 Monitoramento de tráfego; ferramentas e conceitos de sniffer de rede; wireshark; \nanálise de pacotes. 12 Ameaças e ataques em aplicações web. 12.1 SQL injection, broken authentication, \ncross-site scripting (XSS), insecure deserialization, directory traversal, watering hole attack, cross-site request \nforgery, cookie/session poisoning, buffer overflow, CAPTCHA attacks, OWASP Top 10:2021. 13 Ameaças e \nataques em redes de computadores e redes wireless. 13.1 Ataques de negação de serviço (denial of service – \nDoS), distributed denial of service (DDoS), permanent denial of service (PDoS), distributed reflection denial of \nservice (DRDoS). 13.2 Ataques de reconhecimento. 13.2.1 Ping sweeping, port scanning, social engineering, \nDNS footprinting. 13.3 Ataques de sniffing and spoofing. 13.4 Tipos de ataques em redes wireless. 14 Ameaças \ne ataques de e-mail. 14.1 Phishing (spear phishing, whaling, pharming, spimming), spamming, mail bombing, \nmail storms. 14.2 Protocolos de segurança de e-mail SPF e DKIM. 15 Ataques de malwares. 15.1 Vírus, worms, \ntrojans, ransomware, rootkits, adware, spyware, botnet, backdoor. 15.2 Advanced persistent threats (APT). \n16 Frameworks de segurança da informação e segurança cibernética. 16.1 MITRE ATT&CK, CIS Controls e NIST \nCyberSecurity Framework (NIST CSF).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 29,
@@ -502,7 +531,8 @@
       "chars": 1191,
       "texto_enviado_llm": "1 Planejamento estratégico \nde TIC. 1.1 Fundamentos do planejamento estratégico em tecnologia da informação e comunicação. 1.2 \nElaboração e implementação do plano diretor de TIC (PDTIC). 1.3 Indicadores de desempenho de TIC e \nalinhamento com objetivos organizacionais. 2 Governança de TIC 2.1 COBIT 2019: conceitos básicos, \nestrutura, objetivos e aplicação para a governança de TIC. 2.2 ITIL v4: gerenciamento de serviços de TIC, com \nfoco em processos e melhores práticas. 2.3 Metodologias de indicadores OKR, PKI e BSC. 2.4 Análise SWOT \naplicados à TIC. 3 Gerenciamento de projetos de TIC. 3.1 PMBOK 7ª edição: conceitos, grupos de processos e \náreas de conhecimento. 3.2 Escritório de projetos – PMO e gestão de portfólio de projetos. 4 Governança e \ngestão de TIC. 4.1 Resolução CNJ nº 370/2021 (Estratégia Nacional de Tecnologia da Informação e \nComunicação do Poder Judiciário – ENTIC‐JUD). 4.2 Resolução CNJ nº 468/2022 e o Guia de Contratações de \nSTIC do Poder Judiciário e suas alterações. 4.3 Lei nº 14.133/2021. 4.4 Planejamento, fiscalização e gestão de \ncontratos de TIC. 5 Noções de gestão de riscos de TIC. 6 Lei Geral de Proteção de Dados Pessoais (Lei \nnº 13.709/2018).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 30,
@@ -518,7 +548,8 @@
       "chars": 1480,
       "texto_enviado_llm": "1 Resolução CNJ nº 522/2023 (institui o modelo de requisitos para sistemas \ninformatizados de gestão de processos e documentos do Poder Judiciário e disciplina a obrigatoriedade da \nsua utilização no desenvolvimento e manutenção de sistemas informatizados para as atividades judiciárias e \nadministrativas no âmbito do Poder Judiciário). 2 Resolução CNJ nº 335/2020 (institui política pública para \ngovernança e gestão de processo judicial eletrônico; integra os tribunais do país com a criação da Plataforma \nDigital do Poder Judiciário Brasileiro –PDPJ-Br; mantém o sistema PJe como sistema de processo eletrônico \nprioritário do Conselho Nacional de Justiça). 3 Portaria CNJ nº 252/2020 (dispõe sobre modelo de governança \ne gestão da Plataforma Digital do Poder Judiciário – PDPJ-Br). 4 Portaria CNJ nº 253/2020 (institui os critérios \n\n \n \ne as diretrizes técnicas para o processo de desenvolvimento de módulos e serviços na Plataforma Digital do \nPoder Judiciário Brasileiro – PDPJ-Br). 5 Portaria CNJ nº 131/2021 (institui o grupo revisor de código-fonte \ndas soluções da Plataforma Digital do Poder Judiciário – PDPJ-Br e do Processo Judicial Eletrônico – PJe). 6 \nResolução CNJ nº 396/2021 (institui a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – \nENSEC-PJ). 7 Portaria CNJ nº 162/2021 (aprova protocolos e manuais criados pela Resolução CNJ \nnº 396/2021, que instituiu a Estratégia Nacional de Segurança Cibernética do Poder Judiciário – ENSEC-PJ).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 31,
@@ -534,7 +565,8 @@
       "chars": 741,
       "texto_enviado_llm": "1 Linguagem de programação Java. 2 Arquitetura distribuída de microsserviços; API RESTful; JSON; \nframework Spring; Spring Cloud; Spring Boot; Spring Eureka, Zuul; Map Struct; Swagger; Service Discovery; \nAPI Gateway. 3 Persistência; JPA 2.0; Hibernate 4.3 ou superior; Hibernate Envers; bBiblioteca Flyway. 4 \nBanco de dados; PostgreSQL; H2 Database. 5 Serviços de autenticação; single sign‐on (SSO); keycloak; \nprotocolo OAuth2 (RFC 6749). 6 Mensageria e webhooks; message broker; RabbitMQ; evento negocial; \nwebhook; APIs reversas. 7 Ferramenta de versionamento Git. 8 Ambiente de clusters e Kubernetes. 9 \nFerramenta de orquestração de contêineres, Rancher. 10 Deploy de aplicações; continuous delivery e \ncontinuous integration (CI/CD).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 32,
@@ -550,7 +582,8 @@
       "chars": 559,
       "texto_enviado_llm": "1 Aplicação da lei penal militar. 2 Crime. 3 Imputabilidade penal. 4 Concurso de \nagentes. 5 Penas. 5.1 Penas principais. 5.2 Aplicação da pena. 5.3 Suspensão condicional da pena. 5.4 \nLivramento condicional. 5.5 Penas acessórias. 5.6 Efeitos da condenação. 6 Medidas de segurança. 7 Ação \npenal. 8 Extinção da punibilidade. 9 Crimes militares em tempo de paz. 10 Crimes militares em tempo de \nguerra. 11 Crimes propriamente militares. 12 Crimes impropriamente militares. 13 Crimes militares por \nextensão. 14 Jurisprudência aplicada dos tribunais superiores.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 33,
@@ -566,7 +599,8 @@
       "chars": 1692,
       "texto_enviado_llm": "1 Lei processual penal militar e sua aplicação. 2 Polícia judiciária \nmilitar. 3 Inquérito policial militar. 4 Ação penal militar e seu exercício. 5 Processo penal militar em geral. 6 \nJuiz, auxiliares e partes do processo. 7 Denúncia. 8 Foro militar. 9 Competência em geral. 9.1 Espécies de \ncompetência 9.2 Desaforamento. 9.3 Conflitos de competência. 10 Questões prejudiciais. 11 Exceções em \ngeral. 12 Incidente de insanidade mental do acusado e incidente de falsidade de documento. 13 Medidas \npreventivas e assecuratórias. 13.1 Providências que recaem sobre coisas ou pessoas. 13.2 Providências que \nrecaem sobre coisas. 13.3 Providências que recaem sobre pessoas. 14 Menagem. 15 Liberdade provisória. 16 \nAplicação provisória de medidas de segurança. 17 Citação, intimação e notificação. 18 Atos probatórios. 18.1 \nDisposições gerais. 18.2 Qualificação e interrogatório do acusado. 18.3 Confissão. 18.4 Perguntas ao ofendido. \n18.5 Perícias e exames. 18.6 Testemunhas. 18.7 Acareação. 18.8 Reconhecimento de pessoa e de coisa. 18.9 \nDocumentos. 18.10 Indícios. 19 Processos em espécie. 19.1 Processo ordinário. 19.2 Processos especiais: \ndeserção em geral, processo de deserção de oficial, processo de deserção de praça com ou sem graduação e \nde praça especial, processo de crime de insubmissão, habeas corpus, processo para restauração de autos, \nprocesso de competência originária do Superior Tribunal Militar, correição parcial. 20 Nulidades e recursos \nem geral. 21 Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; \nexecução das medidas de segurança; incidentes da execução. 22 Jurisprudência aplicada dos tribunais \nsuperiores.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 34,
@@ -582,7 +616,8 @@
       "chars": 3015,
       "texto_enviado_llm": "1 Fontes do direito penal. 1.1 Princípios aplicáveis ao direito penal. 2 Aplicação da lei penal. \n2.1 Anterioridade da lei. 2.2 Lei penal no tempo e no espaço. 2.3 Tempo e lugar do crime. 2.4 Lei penal \nexcepcional, especial e temporária. 2.5 Territorialidade e extraterritorialidade da lei penal. 2.6 Pena cumprida \nno estrangeiro. 2.7 Eficácia da sentença estrangeira. 2.8 Contagem de prazo. 2.9 Frações não computáveis da \n\n \n \npena. 2.10 Interpretação da lei penal. 2.11 Analogia. 2.12 Irretroatividade da lei penal. 2.13 Conflito aparente \nde normas. 3 Crime. 3.1 Classificação dos crimes. 3.2 Teorias do crime. 3.3 Fato típico e seus elementos. 3.4 \nRelação de causalidade. 3.5 Superveniência de causa independente. 3.6 Relevância da omissão. 3.7 Crime \nconsumado e tentado. 3.8 Pena da tentativa. 3.9 Desistência voluntária e arrependimento eficaz. 3.10 \nArrependimento posterior. 3.11 Crime impossível. 3.12 Crime doloso, culposo e preterdoloso. 3.13 Agravação \npelo resultado. 3.14 Concurso de crimes. 3.15 Erro sobre elementos do tipo. 3.16 Descriminantes putativas. \n3.17 Erro determinado por terceiro. 3.18 Erro sobre a pessoa. 3.19 Erro sobre a ilicitude do fato (erro de \nproibição). 3.20 Coação irresistível e obediência hierárquica. 3.21 Ilicitude e causas de exclusão. 3.22 Excesso \npunível. 3.23 Culpabilidade. 3.23.1 Teorias, elementos e causas de exclusão. 4 Imputabilidade penal. 5 \nConcurso de pessoas. 6 Penas. 6.1 Espécies de penas. 6.2 Cominação das penas. 6.3 Aplicação da pena. 6.4 \nSuspensão condicional da pena. 6.5 Livramento condicional. 6.6 Efeitos da condenação. 6.7 Reabilitação. 6.8 \nExecução das penas em espécie e incidentes de execução. 7 Medidas de segurança. 7.1 Execução das medidas \nde segurança. 8 Ação penal. 9 Punibilidade e causas de extinção. 10 Crimes em espécie do Código Penal. 10.1 \nCrimes contra o patrimônio. 10.2 Crimes contra a incolumidade pública. 10.3 Crimes contra a paz pública. \n10.4 Crimes contra a fé pública. 10.5 Crimes contra a administração pública. 11 Crimes constantes de \nlegislação especial. 11.1 Crimes hediondos (Lei nº 8.072/1990 e suas alterações). 11.2 Crimes resultantes de \npreconceito de raça ou de cor (Lei nº 7.716/1989 e suas alterações). 11.3 Crime de tortura (Lei nº 9.455/1997 \ne suas alterações). 11.4 Crimes relacionados a entorpecentes (Lei nº 11.343/2006 e alterações – Lei \nAntidrogas). 11.5 Crime de abuso de autoridade (Lei nº 13.869/2019). 11.6 Crimes tipificados no Estatuto do \nDesarmamento (Lei nº 10.826/2003 e suas alterações). 11.7 Crimes e infrações administrativas tipificados no \nEstatuto da Criança e do Adolescente (Lei nº 8.069/1990 e suas alterações). 11.8 Crimes tipificados no \nEstatuto da Pessoa Idosa (Lei nº 10.741/2003). 11.9 Crimes contra a ordem tributária e econômica (Lei \nnº 8.137/1990 e suas alterações). 12 Convenção americana sobre direitos humanos (Pacto de São José e \nDecreto nº 678/1992). 13 Disposições constitucionais aplicáveis ao direito penal. 14 Súmulas e jurisprudência \ndo STF e STJ.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 35,
@@ -598,7 +633,8 @@
       "chars": 2578,
       "texto_enviado_llm": "1 Disposições preliminares do Código de Processo Penal. 2 Inquérito policial. \n3 Ação penal. 4 Competência. 5 Atos processuais. 5.1 Conceito, classificação, forma, tempo, lugar, prazos. 5.2 \nPreclusão. 5.3 Atos das partes, do juiz, dos auxiliares da justiça e de terceiros. 5.4 Atos simples, complexos e \ncompostos. 5.5 Atos de comunicação processual: espécies e formas. 5.6 Revelia no processo penal. 5.7 Atos \nde cooperação internacional. 5.8 Utilização de sistema de transmissão de dados para a prática de atos \nprocessuais. 6 Prova. 6.1 Conceito, objetivo, objeto, fontes e elementos. 6.2 Classificação e princípios. 6.3 \nMeios de prova em espécie previstos no Código de Processo Penal e em leis extravagantes. 6.4 Ônus da prova \nno processo penal. 6.5 Prova emprestada. 6.6 Provas admissíveis e provas proibidas. 6.7 Provas direta e \nindireta. 6.8 Sistemas de apreciação ou avaliação das provas. 6.9 Princípio do livre convencimento. 6.10 \nIniciativa instrutória do juiz de direito. 7 Sujeitos e partes do processo. 7.1 Juiz, Ministério Público, acusado, \ndefensor, assistentes, auxiliares da justiça e terceiros. 7.2 Relação jurídica processual penal: finalidade, \nnatureza jurídica, características, conteúdo, objeto, início, suspensão e fim. 7.3 Substituição processual. 8 \nNulidades. 8.1 Conceito, classificações e sistema legal. 8.2 Princípios. 8.3 Nulidades previstas no Código de \nProcesso Penal. 8.4 Nulidades absoluta e relativa. 8.5 Anulabilidade. 8.6 Irregularidades. 8.7 Inexistência \njurídica. 8.8 Atipicidade constitucional. 8.9 Arguição, saneamento e efeitos. 8.10 Prazos. 9 Jurisdição. 9.1 \nConceito, características, princípios, formas, objeto. 9.2 Órgãos. 10 Competência penal. 10.1 Conceito. 10.2 \nCritérios determinadores e causas modificadoras da competência de foro e do juízo. 10.3 Conexão e \ncontinência. 10.4 Competência funcional. 10.5 Conflitos de competência e de atribuição. 11 Questões e \nprocessos incidentes. 11.1 Questões prejudiciais. 11.2 Exceções. 11.3 Incompatibilidade, impedimento e \nsuspeição. 11.4 Incidente de insanidade mental do acusado. 12 Prisão, liberdade provisória e fiança. 13 \n\n \n \nProcesso e julgamento dos crimes de responsabilidade dos funcionários públicos. 14 Habeas corpus e seu \nprocesso. 15 Disposições constitucionais aplicáveis ao direito processual penal. 16 Lei nº 9.296/1996 \n(interceptação telefônica). 17 Noções de execução penal. 17.1 Execução das penas e das medidas de \nsegurança. 17.2 Natureza jurídica da execução penal. 18 Lei Anticrime (Lei nº 13.964/2019). 19 Súmulas e \njurisprudência do STF e STJ.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 36,
@@ -614,7 +650,8 @@
       "chars": 3061,
       "texto_enviado_llm": "1 Constituição. 1.1 Conceito, objeto, elementos e classificações. 1.2 Supremacia \nda Constituição. 1.3 Aplicabilidade das normas constitucionais. 1.4 Interpretação das normas constitucionais. \n1.4.1 Métodos, princípios e limites. 2 Poder constituinte. 2.1 Características. 2.2 Poder constituinte originário. \n2.3 Poder constituinte derivado. 3 Princípios fundamentais. 4 Direitos e garantias fundamentais. 4.1 Direitos \ne deveres individuais e coletivos. 4.2 Habeas corpus, mandado de segurança, mandado de injunção e habeas \ndata. 4.3 Direitos sociais. 4.4 Nacionalidade. 4.5 Direitos políticos. 4.6 Partidos políticos. 5 Organização do \nEstado. 5.1 Organização político-administrativa. 5.2 Estado federal brasileiro. 5.3 União. 5.4 Estados \nfederados. 5.5 Municípios. 5.6 Distrito Federal. 5.7 Territórios. 5.8 Intervenção federal. 5.9 Intervenção dos \nestados nos municípios. 6 Administração pública. 6.1 Disposições gerais. 6.2 Servidores públicos. 6.3 Militares \ndos estados, do Distrito Federal e dos territórios. 7 Organização dos poderes no Estado. 7.1 Mecanismos de \nfreios e contrapesos. 7.2 Poder Legislativo. 7.2.1 Estrutura, funcionamento e atribuições. 7.2.2 Comissões \nparlamentares de inquérito. 7.2.3 Fiscalização contábil, financeira e orçamentária. 7.2.4 Tribunal de Contas \nda União (TCU). 7.2.5 Processo legislativo. 7.2.6 Prerrogativas parlamentares. 7.3 Poder Executivo. 7.3.1 \nPresidente da República. 7.3.1.1 Atribuições, prerrogativas e responsabilidades. 7.3.2 Ministros de Estado. \n7.3.3 Conselho da República e de Defesa Nacional. 7.4 Poder Judiciário. 7.4.1 Disposições gerais. 7.4.2 Órgãos \ndo Poder Judiciário. 7.4.2.1 Organização e competências. 7.4.3 Conselho Nacional de Justiça (CNJ). 8 Funções \nessenciais à justiça. 8.1 Ministério Público. 8.1.1 Princípios, garantias, vedações, organização e competências. \n8.1.2. Conselho Nacional do Ministério Público. 8.2 Advocacia pública. 8.3 Defensoria Pública. 9 Controle de \nconstitucionalidade. 9.1 Sistemas gerais e sistema brasileiro. 9.2 Controle incidental ou concreto. 9.3 Controle \nabstrato de constitucionalidade. 9.4 Exame in abstractu da constitucionalidade de proposições legislativas. \n9.5 Ação declaratória de constitucionalidade. 9.6 Ação direta de inconstitucionalidade. 9.7 Arguição de \ndescumprimento de preceito fundamental. 9.8 Ação direta de inconstitucionalidade por omissão. 9.9 Ação \ndireta de inconstitucionalidade interventiva. 9.10 Controle concreto e abstrato de constitucionalidade do \ndireito municipal. 10 Defesa do Estado e das instituições democráticas. 11 Sistema Tributário Nacional. 11.1 \nPrincípios gerais. 11.2 Limitações do poder de tributar. 11.3 Impostos da União, dos estados e dos municípios. \n11.4 Repartição das receitas tributárias. 12 Finanças públicas. 12.1 Normas gerais. 12.2 Orçamentos. 13 \nOrdem econômica e financeira. 13.1 Princípios gerais da atividade econômica. 14 Sistema Financeiro \nNacional. 15 Ordem social. 16 Disciplina constitucional dos precatórios. 17 Lei de Responsabilidade Fiscal (Lei \nComplementar nº 101/2000).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 37,
@@ -630,7 +667,8 @@
       "chars": 3364,
       "texto_enviado_llm": "1 Introdução ao direito administrativo. 1.1 Origem, natureza jurídica e objeto do \ndireito administrativo. 1.2 Os diferentes critérios adotados para a conceituação do direito administrativo. 1.3 \nFontes do direito administrativo. 2 Regime jurídico‐administrativo. 2.1 Conceito. 2.2 Supremacia do interesse \npúblico sobre o privado e indisponibilidade, pela administração, dos interesses púbicos. 2.3 Princípios \nexpressos e implícitos da administração pública. 3 Organização administrativa. 3.1 Centralização, \ndescentralização, concentração e desconcentração. 3.2 Administração direta. 3.2.1 Conceito. 3.2.2 Órgão \npúblico. 3.2.2.1 Conceito. 3.2.2.2 Teorias sobre as relações do Estado com os agentes públicos. 3.2.2.3 \nCaracterísticas e classificação. 3.3 Administração indireta. 3.3.1 Conceito. 3.3.2 Autarquias. 3.3.3 Agências \nreguladoras. 3.3.4 Agências executivas. 3.3.5 Fundações públicas. 3.3.6 Empresas públicas. 3.3.7 Sociedades \nde economia mista. 3.3.8 Consórcios públicos. 3.4 Entidades paraestatais e terceiro setor. 3.4.1 Serviços \nsociais autônomos. 3.4.2 Entidades de apoio. 3.4.3 Organizações sociais. 3.4.4 Organizações da sociedade \n\n \n \ncivil de interesse público (OSCIP). 4 Atos administrativos. 4.1 Conceito. 4.2 Fatos da administração, atos da \nadministração e atos administrativos. 4.3 Requisitos ou elementos. 4.4 Atributos. 4.5 Classificação. 4.6 Atos \nadministrativos em espécie. 4.7 Extinção dos atos administrativos. 4.7.1 Revogação, anulação e cassação. 4.8 \nConvalidação. 4.9 Vinculação e discricionariedade. 4.10 Atos administrativos nulos, anuláveis e inexistentes. \n4.11 Decadência administrativa. 5 Poderes e deveres da administração pública. 5.1 Poder regulamentar. 5.2 \nPoder hierárquico. 5.3 Poder disciplinar. 5.4 Poder de polícia. 5.5 Dever de agir. 5.6 Dever de eficiência. 5.7 \nDever de probidade. 5.8 Dever de prestação de contas. 5.9 Abuso do poder. 6 Controle da administração \npública. 6.1 Conceito. 6.2 Classificação das formas de controle. 6.2.1 Conforme a origem. 6.2.2 Conforme o \nmomento a ser exercido. 6.2.3 Conforme a amplitude. 6.3 Controle exercido pela administração pública. 6.4 \nControle legislativo. 6.5 Controle judicial. 7 Agentes públicos. 8 Licitações. 8.1 Legislação pertinente. 8.1.1 Lei \nnº 14.133/2021 e suas alterações. 8.1.2 Decreto nº 11.462/2023. 8.1.3 Fundamentos constitucionais. 8.2 \nDisposições doutrinárias. 8.2.1 Conceito. 8.2.2 Objeto e finalidade. 8.2.3 Destinatários. 8.2.4 Princípios. 8.2.5 \nContratação direta. 8.2.5.1 Dispensa e inexigibilidade. 8.2.6 Modalidades. 8.2.7 Tipos. 8.2.8 Procedimento. \n8.2.9 Anulação e revogação. 8.2.10 Sanções administrativas. 9 Contratos administrativos. 9.1 Legislação \npertinente. 9.1.1 Lei nº 14.133/2021 e suas alterações. 9.1.2 Lei nº 11.107/2005 e Decreto nº 6.017/2007 \n(consórcios públicos). 9.2 Disposições doutrinárias. 9.2.1 Conceito. 9.2.2 Características. 9.2.3 Vigência. 9.2.4 \nAlterações contratuais. 9.2.5 Execução, inexecução e rescisão. 9.2.6 Convênios e instrumentos congêneres. \n10 Desapropriação. 10.1 Conceito, características, fundamentos, requisitos constitucionais, objeto, \nbeneficiários, indenização e seu pagamento, desapropriação indireta e por zona. 11 Jurisprudência pacificada \ndos tribunais superiores. 12 Lei nº 12.527/2011 (Lei de Acesso à Informação). 13 Lei nº 13.709/2018 (Lei Geral \nde Proteção de Dados).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 38,
@@ -646,7 +684,8 @@
       "chars": 1570,
       "texto_enviado_llm": "1 Introdução ao direito civil. 1.1 Decreto-lei nº 4.657/1942 (Lei de Introdução às Normas do \nDireito Brasileiro): arts. 1º a 19. 1.2 Vigência, aplicação, obrigatoriedade, interpretação e integração das leis. \n1.3 Conflito das leis no tempo. 1.4 Eficácia das leis no espaço. 2 Pessoas naturais. 2.1 Conceito. 2.2 Início da \npessoa natural. 2.3 Personalidade. 2.4 Capacidade. 2.5 Direitos da personalidade. 2.6 Nome civil. 2.7 Estado \ncivil. 2.8 Domicílio. 2.9 Ausência. 3 Pessoas jurídicas. 3.1 Disposições gerais. 3.2 Conceito e elementos \ncaracterizadores. 3.3 Constituição. 3.4 Extinção. 3.5 Capacidade e direitos da personalidade. 4 Fatos jurídicos. \n4.1 Negócio jurídico. 4.2 Atos jurídicos lícitos. 4.3 Atos jurídicos ilícitos. 4.4 Prescrição e decadência. 4.5 Prova. \n5 Direito das obrigações. 5.1 Modalidades. 5.2 Transmissão. 5.3 Adimplemento e extinção. 5.4 \nInadimplemento. 5.5 Atos unilaterais. 6 Contratos. 6.1 Princípios. 6.2 Classificações. 6.3 Interpretação. 6.4 \nDisposições gerais. 6.5 Extinção. 6.6 Espécies de contratos regulados no Código Civil. 7 Preferências e \nprivilégios creditórios. 8 Responsabilidade civil. 8.1 Obrigação de indenizar. 8.2 Indenização. 9 Direito das \nsucessões. 9.1 Sucessão em geral. 9.2 Sucessão legítima. 9.3 Sucessão testamentária. 9.4 Inventário e \npartilha. 10 Legislação especial. 10.1 Lei nº 10.741/2003 (Estatuto da Pessoa Idosa). 10.2 Lei nº 13.146/2015 \n(Estatuto da Pessoa com Deficiência). 10.3 Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais). 11 \nJurisprudência pacificada dos tribunais superiores.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 39,
@@ -662,7 +701,8 @@
       "chars": 2729,
       "texto_enviado_llm": "1 Lei nº 13.105/2015 e suas alterações (Código de Processo Civil). 2 Introdução \nao direito processual civil. 2.1 Princípios gerais. 2.2 Fontes. 2.3 Lei processual civil: eficácia, aplicação e \ninterpretação. 3 Jurisdição e competência. 3.1 Conceito, características e princípios da jurisdição. 3.2 \nJurisdição contenciosa e voluntária. 3.3 Meios alternativos de pacificação social. 3.4 Critérios de definição e \nde modificação de competência. 3.5 Competência absoluta e relativa. 3.6 Meios de declaração de \nincompetência. 3.7 Conflitos de competência e de atribuição. 3.8 Competência originária dos tribunais \nsuperiores. 4 Ação. 4.1 Conceito, natureza, elementos e características. 4.2 Condições. 4.3 Classificação. 4.4 \nConexão e continência. 4.5 Concurso e cumulação. 5 Processo. 5.1 Conceitos fundamentais. 5.2 Relação \njurídica processual. 5.3 Pressupostos processuais. 5.4 Processo e procedimento. 5.5 Espécies de processos e \n\n \n \nde procedimentos. 5.6 Objeto do processo. 5.7 Mérito. 5.8 Questão principal, questões preliminares e \nprejudiciais. 6 Sujeitos do processo. 6.1 Partes e procuradores. 6.2 Capacidade processual e postulatória. 6.3 \nDeveres das partes e dos procuradores. 6.4 Responsabilidade das partes por dano processual. 6.5 \nProcuradores. 6.6 Sucessão das partes e dos procuradores. 6.7 Litisconsórcio. 6.8 Intervenção de terceiros. \n6.9 Juiz e auxiliares da justiça. 6.10 Ministério Público, advocacia pública e Defensoria Pública. 7 Atos \nprocessuais. 7.1 Forma, tempo e lugar. 7.2 Prazos. 7.3 Comunicação dos atos processuais. 7.4 Nulidades. 7.5 \nDistribuição e registro. 8 Tutela de urgência e tutela da evidência. 8.1 Princípios. 8.2 Fungibilidade. 8.3 \nDisposições gerais. 8.4 Procedimentos. 9 Formação, suspensão e extinção do processo. 10 Processo de \nconhecimento e cumprimento de sentença: procedimento comum. 10.1 Disposições gerais. 10.2 Petição \ninicial. 10.3 Improcedência liminar do pedido. 10.4 Sentença e coisa julgada. 10.5 Liquidação da sentença. \n10.6 Cumprimento da sentença. 11 Procedimentos especiais. 11.1 Generalidades, características, espécies. \n12 Processos nos tribunais e meios de impugnação das decisões judiciais. 12.1 Ordem dos processos e \nprocessos de competência originária dos tribunais. 12.2 Recursos. 13 Ações diversas. 13.1 Mandado de \nsegurança. 13.2 Ação popular. 13.3 Ação civil pública. 13.4 Ação de improbidade administrativa. 13.5 \nMandado de injunção. 13.6 Habeas data. 13.7 Ação declaratória de constitucionalidade. 13.8 Ação direta de \ninconstitucionalidade. 13.9 Arguição de descumprimento de preceito fundamental. 13.10 Declaração \nincidental de inconstitucionalidade. 14 Jurisprudência pacificada dos tribunais superiores em matéria \nprocessual civil.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 40,
@@ -678,7 +718,8 @@
       "chars": 43,
       "texto_enviado_llm": "1 Lei nº 11.418/2006. 2 Lei nº 12.016/2009.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 41,
@@ -694,7 +735,8 @@
       "chars": 2550,
       "texto_enviado_llm": "1 Arquivos. 1.1 Histórico, função e classificação. 2 Noções de teoria arquivística. 3 \nTerminologia arquivística. 4 Documentos: gêneros, espécies, tipos. 5 Documentos de arquivos: características \ne especificidades. 6 Ciclo vital dos documentos. 7 Gerenciamento da informação: objetivos e vantagens. 8 \nGestão de documentos arquivísticos: produção, tramitação, uso e destinação. 9 Protocolo: recebimento, \nregistro, distribuição, tramitação e expedição de documentos. 10 Sistema de classificação: plano de \nclassificação e tabela de temporalidade. 11 Avaliação documental: seleção documental, eliminação e \nrecolhimento. 12 Armazenamento: ordenação e busca. 13 Arquivo permanente: arranjo e descrição. 14 \nNormalização da descrição arquivística: ISAD (G), Norma Brasileira de Descrição Arquivística (NOBRADE), \nISAAR (CPF) e instrumentos de pesquisa. 15 Políticas públicas dos arquivos permanentes: ações culturais, \neducativas e de preservação do patrimônio arquivístico. 16 Preservação de documentos arquivísticos \nanalógicos: preservação, conservação preventiva e restauração. 17 Tecnologias aplicadas aos arquivos: \npolíticas, planejamento, técnicas, microfilmagem e digitalização. 18 Arquivos no mundo digital: documentos \ndigitais, gestão de documentos digitais, gestão eletrônica de documentos. 19 Modelo de requisitos para \nsistemas informatizados de gestão de processos e documentos do Poder Judiciário (Moreq-Jus). 20 Modelo \nde requisitos para sistemas informatizados de gestão arquivística de documentos (e-ARQ Brasil). 21 \nCertificação digital: definição, infraestrutura de chaves públicas brasileira (ICP/Brasil), assinatura digital, \ncriptografia simétrica e assimétrica. 22 Preservação de documentos arquivísticos digitais. 22.1 Elaboração de \npolíticas de preservação de documentos arquivísticos digitais. 22.2 Modelo de referência OAIS (Open Archival \nInformation System). 22.3 Repositórios arquivísticos digitais confiáveis (RDC-Arq). 23 Legislação pertinente. \n23.1 Política Nacional de Arquivos Públicos e Privados (Lei nº 8.159/1991). 23.2 Decretos nº 4.073/2002 e \nnº 7.845/2012. 23.3 Lei nº 12.527/2011 e Decreto nº 7.724/2012. 23.4 Lei Geral de Proteção de Dados \nPessoais (Lei nº 13.709/2018). 23.5 Normas e manuais do Conselho Nacional de Justiça. 23.5.1 Resolução \nnº 215/2015. 23.5.2 Resolução nº 324/2020. 23.5.3 Resolução nº 469/2022. 23.5.4 Manual de Gestão \n\n \n \nDocumental do Poder Judiciário. 23.5.5 Manual de Gestão de Memória do Poder Judiciário. 23.5.6 Manual \nde Digitalização de Documentos do Poder Judiciário.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 42,
@@ -710,7 +752,8 @@
       "chars": 702,
       "texto_enviado_llm": "1 Modelos de gestão de pessoas. 1.1 Administração de pessoal. 1.2 Gestão estratégica \nde pessoas. 2 Processos de gestão de pessoas. 2.1 Modelagem do trabalho: descrição e análise de cargos, \nmodelos de desenho de cargos, coleta de dados sobre cargos. 2.2 Treinamento e desenvolvimento. 3 \nMotivação e satisfação no trabalho. 4 O indivíduo e o contexto organizacional: variáveis individuais, grupais \ne organizacionais. 4.1 Comportamento humano no trabalho: satisfação e comprometimento. 4.2 Equipes e \ngrupos de trabalho. 4.3 Competência interpessoal. 5 Comunicação. 6 Comportamento, clima e cultura \norganizacional. 7 Gestão por competências. 8 Gestão do conhecimento. 9 Qualidade de vida no trabalho.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 43,
@@ -726,7 +769,8 @@
       "chars": 797,
       "texto_enviado_llm": "1 O papel do Estado e a atuação do governo \nnas finanças públicas. 1.1 Formas e dimensões da intervenção da administração na economia. 1.2 Funções \ndo orçamento público. 2 Orçamento público. 2.1 Conceito. 2.2 Técnicas orçamentárias. 2.3 Princípios \norçamentários. 2.4 Ciclo orçamentário. 2.5 Processo orçamentário. 3 Orçamento público no Brasil. 3.1 \nSistema de planejamento e de orçamento federal. 3.2 Plano plurianual. 3.3 Diretrizes orçamentárias. 3.4 \nOrçamento anual. 3.5 Outros planos e programas. 3.6 Sistema e processo de orçamentação. 3.7 Classificações \norçamentárias. 3.8 Estrutura programática. 3.9 Créditos ordinários e adicionais. 4 Lei de Responsabilidade \nFiscal. 4.1 Conceitos e objetivos. 4.2 Planejamento. 4.3 Dívida e endividamento. 4.4 Transparência, controle \ne fiscalização.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 44,
@@ -742,7 +786,8 @@
       "chars": 1334,
       "texto_enviado_llm": "1 Ato administrativo. 1.1 Conceito, requisitos, atributos, \nclassificação e espécies. 1.2 Extinção do ato administrativo. 1.2.1 Cassação, anulação, revogação e \nconvalidação. 1.3 Decadência administrativa. 2 Agentes públicos. 2.1 Conceito. 2.2 Espécies. 2.3 Cargo, \nemprego e função pública. 2.3.1 Provimento. 2.3.2 Vacância. 2.3.3 Efetividade, estabilidade e vitaliciedade. \n2.4 Remuneração. 2.5 Direitos e deveres. 2.6 Responsabilidades. 2.7 Processo administrativo disciplinar. 2.8 \nDisposições constitucionais aplicáveis. 3 Poderes da administração pública. 3.1 Hierárquico, disciplinar, \nregulamentar e de polícia. 3.2 Uso e abuso de poder. 4 Regime jurídico-administrativo. 4.1 Conceito. 4.2 \nPrincípios expressos e implícitos da administração pública. 5 Responsabilidade civil do Estado. 5.1 \nResponsabilidade por ato comissivo do Estado. 5.2 Responsabilidade por omissão do Estado. 5.3 Reparação \ndo dano. 6 Organização administrativa. 6.1 Autarquias, fundações, empresas públicas e sociedades de \neconomia mista. 6.2 Entidades paraestatais e terceiro setor. 6.2.1 Serviços sociais autônomos, entidades de \napoio, organizações sociais, organizações da sociedade civil de interesse público. 7 Controle da administração \npública. 7.1 Controle exercido pela administração pública. 7.2 Controle judicial. 7.3 Controle legislativo.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 45,
@@ -758,7 +803,8 @@
       "chars": 510,
       "texto_enviado_llm": "1 Licitações e contratos administrativos. 1.1 Lei nº 14.133/2021: conceitos, \nprincípios, contratação direta, modalidades, tipos e aspectos procedimentais. 2 Decreto nº 11.462/2023. 3 \nElaboração e fiscalização de contratos. 3.1 Cláusulas e indicadores de nível de serviço. 3.2 Papel do \nfiscalizador do contrato. 3.3 Papel do preposto da contratada. 3.4 Acompanhamento da execução contratual. \n3.5 Registro e notificação de irregularidades. 3.6 Definição e aplicação de penalidades e sanções \nadministrativas.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 46,
@@ -774,7 +820,8 @@
       "chars": 448,
       "texto_enviado_llm": "1 Classificação de materiais. 1.1 Atributos para classificação de \nmateriais. 1.2 Tipos de classificação. 1.3 Metodologia de cálculo da curva ABC. 2 Recebimento e \narmazenagem. 2.1 Entrada. 2.2 Conferência. 2.3 Objetivos da armazenagem. 2.4 Critérios e técnicas de \narmazenagem. 2.5 Arranjo físico (leiaute). 3 Gestão patrimonial. 3.1 Tombamento de bens. 3.2 Controle de \nbens. 3.3 Inventário. 3.4 Alienação de bens. 3.5 Alterações e baixa de bens.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 47,
@@ -790,7 +837,8 @@
       "chars": 606,
       "texto_enviado_llm": "1 Código Penal. 1.1 Parte geral: aplicação da \nlei penal (arts. 1 a 10). 1.2 Anterioridade da lei. 1.3 Lei penal no tempo. 1.4 Lei excepcional ou temporária. \n1.5 Tempo do crime. 1.6 Territorialidade. 1.7 Lugar do crime. 1.8 Extraterritorialidade. 1.9 Eficácia da \nsentença. 1.10 Contagem de prazo. 2 Crimes contra a pessoa. 3 Crimes contra o patrimônio. 4 Crimes contra \na fé pública. 5 Crimes contra a administração pública. 6 Código de Processo Penal. 6.1 Prova. 6.1.1 Exame de \ncorpo de delito, cadeia de custódia e perícias em geral (artigos 158 a 184). 6.1.2 Prisão em flagrante (artigos \n301 a 310).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 48,
@@ -806,7 +854,8 @@
       "chars": 1423,
       "texto_enviado_llm": "1 Técnicas, táticas, operacionalização, planejamento e execução. 2 Objeto e \nmodus operandi. 3 Análise de riscos. 3.1 Riscos, ameaças, danos e perdas. 3.2 Diagnóstico. 3.3 Aplicação de \nmétodos. 4 Planejamento de contingências. 4.1 Necessidade. 4.2 Planejamento. 4.3 Componentes do \nplanejamento. 4.4 Manejo de emergência. 4.5 Gerenciamento de crises. 4.6 Procedimentos emergenciais. 5 \nSegurança de pessoas. 5.1 Noções sobre condutas preventivas, condutas protetivas, identificação de ameaças \ne vulnerabilidades, planejamento e execução da proteção de dignitários. 6 Defesa pessoal. 7 Armamento e \ntiro. 8 Direção defensiva. 9 Direção ofensiva. 10 Noções de primeiros socorros. 10.1 Conceitos e aspectos \nbásicos, identificação dos principais acidentes. 10.2 Avaliação e segurança da vítima e da cena até a chegada \ndo socorro especializado. 11 Noções de gestão de conflitos. 11.1 Negociação, postura, critérios de ação. 12 \nClassificação dos graus de risco. 12.1 Tipologia dos causadores. 12.2 Fases. 12.3 Pré‐confronto ou preparo. \n12.4 Resposta imediata. 12.5 Plano específico. 13 Perímetros táticos. 14 Organização do posto de comando. \n15 Táticas de negociação. 16 Trabalho em equipe. 17 Uso diferenciado da força. 17.1 Níveis do uso da força. \n17.2 Princípios da necessidade e da proporcionalidade. 17.3 Responsabilidade pelo uso da força. 17.4 Uso de \ninstrumentos de menor potencial ofensivo no controle da força.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 49,
@@ -822,7 +871,8 @@
       "chars": 1469,
       "texto_enviado_llm": "1 Fundamentos, princípios e definições. 2 Segurança corporativa estratégica. 3 \nAnálise de riscos. 4 Planejamento de contingências. 4.1 Necessidade, planejamento, componentes do \nplanejamento, manejo de emergência, gerenciamento de crises, procedimentos emergenciais. 5 Segurança \nda gestão das áreas e instalações. 6 Identificação de vulnerabilidades e ameaças. 6.1 Conceitos, modelos, \nequipamentos e funcionamento de barreiras físicas, sistemas de controle de acesso, sistemas de \nmonitoramento eletrônico e CFTV (circuito fechado de televisão). 7 Segurança patrimonial. 8 Segurança da \ninformação: noções de integridade, confidencialidade, disponibilidade, vulnerabilidades, ameaças, \nidentificação de códigos maliciosos e condutas preventivas. 9 Noções de prevenção e combate a incêndio. \n9.1 Aspectos básicos, identificação e utilização de equipamentos de prevenção e combate a incêndio em uma \nedificação. 9.2 Condutas preventivas. 9.3 Classes de incêndio. 9.4 Métodos de extinção do fogo. 9.5 Tipos e \naplicações de extintores de incêndio e hidrantes. 9.6 NR‐23 (proteção contra incêndios). 10 Plano de \nevacuação. 11 Noções de serviço de inteligência. 11.1 Inteligência estratégica. 11.2 Doutrina de inteligência. \n11.3 Metodologia de produção de conhecimento. 11.4 Fontes de coleta. 12 Qualidade no atendimento ao \npúblico. 12.1 Comunicabilidade, apresentação, atenção, cortesia, interesse, presteza, eficiência, tolerância, \ndiscrição, conduta, objetividade.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 50,
@@ -838,7 +888,8 @@
       "chars": 1326,
       "texto_enviado_llm": "1 Crimes de menor potencial ofensivo e juizados especiais cíveis e criminais (Lei \nnº 9.099/1995 e suas alterações). 2 Abuso de autoridade (Lei nº 13.869/2019 e suas alterações). 3 Crimes \nresultantes de preconceitos de raça ou de cor (Lei nº 7.716/1989 e suas alterações). 4 Estatuto da Pessoa \nIdosa (Lei nº 10.741/2003 e suas alterações). 5 Apresentação e uso de documentos de identificação pessoal \n(Lei nº 5.553/1968 e suas alterações). 6 Normas do cerimonial público e ordem geral de precedência (Decreto \nnº 70.274/1972 e suas alterações). 7 Registro, posse e comercialização de armas de fogo e munição, Sistema \nNacional de Armas – SINARM (Lei nº 10.826/2003 e suas alterações). 8 Resolução CNJ nº 344/2020 \n(regulamenta o exercício do poder de polícia administrativa no âmbito dos tribunais e dispõe sobre as \n\n \n \natribuições funcionais dos agentes e inspetores da polícia judicial). 9 Resolução CNJ nº 383/2021 (Sistema de \nInteligência de Segurança Institucional do Poder Judiciário). 10 Resolução CNJ nº 435/2021 (Política e Sistema \nNacional de Segurança do Poder Judiciário). 11 Resoluções CNJ nº 467/2022 e CNJ nº 566/2024 \n(regulamentam, no âmbito do Poder Judiciário, o disposto nos artigos 6º, inciso XI, e 7ºA da Lei \nnº 10.826/2003, com as alterações promovidas pela Lei nº 12.694/2012 e suas alterações).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 51,
@@ -854,7 +905,8 @@
       "chars": 2452,
       "texto_enviado_llm": "1 Contabilidade. 1.1 Objeto e objetivos da contabilidade. 1.2 Técnicas contábeis. 1.3 \nCampo de aplicação da contabilidade. 2 Patrimônio. 2.1 Aspectos qualitativos e quantitativos do patrimônio. \n2.2 Ativo, passivo e patrimônio líquido. 3 Disponibilidades – caixa e equivalentes de caixa: conteúdo, \nclassificação e critérios de avaliação. 4 Contas a receber: conceito, conteúdo e critérios contábeis. 5 Estoques. \n5.1 Conceito e classificação. 5.2 Critérios de avaliação de estoques. 6 Realizável a longo prazo (não circulante): \nconceito e classificação. 7 Ajuste a valor presente: cálculo e contabilização de contas ativas e passivas. 8 \nMensuração do valor justo. 8.1 Definição do valor justo. 8.2 Valor justo: aplicação para ativos, passivos e \ninstrumentos patrimoniais. 9 Ativo imobilizado. 9.1 Conceituação, classificação e conteúdo das contas. 9.2 \nCritérios de avaliação e mensuração do ativo imobilizado. 9.3 Redução ao valor recuperável. 9.3 Depreciação, \nexaustão e amortização. 10 Ativos intangíveis. 10.1 Definição, reconhecimento e mensuração. 10.2 \nImpairment test: intangíveis com vida útil definida e indefinida. 11 Passivo exigível. 11.1 Conceitos \nfundamentais, avaliação e conteúdo do passivo. 11.2 Fornecedores, obrigações fiscais e outras obrigações. \n11.3 Empréstimos, financiamentos, debêntures e outros títulos de dívida. 12 Provisões, passivos contingentes \ne ativos contingentes. 13 Patrimônio líquido. 13.1 Reservas de capital. 13.2 Ajustes de avaliação patrimonial. \n13.3 Reservas de lucros. 13.4 Ações em tesouraria. 13.5 Prejuízos acumulados. 13.6 Dividendos. 14 Receitas \nde vendas de produtos e serviços. 14.1 Conceitos e mensuração da receita e momento de seu \nreconhecimento. 14.2 Deduções das vendas. 15 Custos e despesas. 15.1 Custo das mercadorias, dos produtos \nvendidos e dos serviços prestados. 15.2 Despesas e outros resultados operacionais. 16 Elaboração de \ndemonstrações contábeis conforme a legislação societária, os princípios fundamentais da contabilidade e os \npronunciamentos contábeis do Comitê de Pronunciamentos Contábeis (CPC). 16.1 Balanço patrimonial. 16.2 \nDemonstração do resultado do exercício. 16.3 Demonstração de fluxos de caixa (métodos direto e indireto). \n16.4 Demonstração do valor adicionado. 16.5 Demonstração das mutações do patrimônio líquido. 16.6 \nDemonstração de lucros ou prejuízos acumulados. 17 Accountability e competência da contabilidade. 18 \nEscrituração digital e SPED.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 52,
@@ -870,7 +922,8 @@
       "chars": 1418,
       "texto_enviado_llm": "1 Conceituação, objeto e campo de aplicação da \ncontabilidade pública. 2 Princípios e normas de contabilidade sob a perspectiva do setor público. 3 Patrimônio \npúblico. 3.1 Ativo. 3.2 Passivo. 3.3 Saldo patrimonial. 4 Variações patrimoniais. 4.1 Variações qualitativas e \nquantitativas. 4.2 Realização da variação patrimonial. 4.3 Resultado patrimonial. 5 Receita e despesa sob o \nenfoque patrimonial. 6 Mensuração de ativos. 6.1 Ativo imobilizado. 6.2 Ativo intangível. 6.3 Reavaliação e \nredução ao valor recuperável. 7 Mensuração de passivos. 7.1 Provisões. 7.2 Passivos contingentes. 8 \nTratamento contábil aplicável aos impostos e contribuições. 9 Plano de Contas Aplicado ao Setor Público \n(PCASP). 10 Transações no setor público. 11 Receita e despesa pública. 11.1 Conceito, etapas, estágios e \ncategorias econômicas. 12 Execução orçamentária e financeira. 13 Demonstrações contábeis aplicadas ao \nsetor público. 13.1 Balanço orçamentário. 13.2 Balanço financeiro. 13.3 Demonstração das variações \npatrimoniais. 13.4 Balanço patrimonial. 13.5 Demonstração de fluxos de caixa. 13.6 Demonstração das \nmutações do patrimônio líquido. 13.7 Notas explicativas às demonstrações contábeis. 14 Sistema Integrado \nde Administração Financeira do Governo Federal (SIAFI). 15 Responsabilidade Fiscal (Lei Complementar \nnº 101/2000 e suas alterações). \n\n \n \n \nTen Brig Ar Francisco Joseli Parente Camelo \nMinistro-Presidente",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     }
   ]
 }

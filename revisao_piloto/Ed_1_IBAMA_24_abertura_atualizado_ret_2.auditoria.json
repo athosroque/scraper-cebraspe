@@ -26,7 +26,8 @@
       "chars": 1355,
       "texto_enviado_llm": "1  Compreensão  e  interpretação  de  textos  de  gêneros  variados.  2  Domínio  da \nortograﬁa oﬁcial. 3 Domínio dos mecanismos de coesão textual. 3.1 Emprego de elementos de referenciação, \nsubsƟtuição  e  repeƟção,  de  conectores  e  de  outros  elementos  de  sequenciação  textual.  4  Emprego  de \ntempos e modos verbais. 5 Domínio da estrutura morfossintáƟca do período. 5.1 Emprego das classes de \n\n \n \npalavras. 5.2 Emprego dos sinais de pontuação. 5.3 Concordância verbal e nominal. 5.4 Regência verbal e \nnominal.  5.5  Emprego  do  sinal  indicaƟvo  de  crase.  5.6  Colocação  pronominal.  6  Reescrita  de  frases  e \nparágrafos do texto. 6.1 Signiﬁcação das palavras. 6.2 SubsƟtuição de palavras ou de trechos de texto. 6.3 \nReorganização da estrutura de orações e de períodos do texto. 6.4 Reescrita de textos de diferentes gêneros \ne níveis de formalidade. 7 As estruturas linguísƟcas no processo de construção de mensagens adequadas. 7.1 \nA pragmáƟca na linguagem: o signiﬁcado contextual. 7.2 Os diversos níveis de linguagem. 7.3 As funções da \nlinguagem. 7.4 Intertextualidade. 8 Aspectos gerais da redação oﬁcial (conforme Manual de Redação da \nPresidência da República). 8.1 Finalidade dos expedientes oﬁciais. 8.2 Adequação da linguagem ao Ɵpo de \ndocumento. 8.3 Adequação do formato do texto ao gênero. 8.4 Pronomes de tratamento.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 1,
@@ -42,7 +43,8 @@
       "chars": 953,
       "texto_enviado_llm": "1 Noções de sistema operacional (Windows). 2 AplicaƟvos \nMicrosoŌ  Oﬃce  365.  2.1  Word,  Excel,  PowerPoint,  Outlook,  Teams,  Onedrive  e  SharePoint.  3  Redes  de \ncomputadores. 3.1 Programas de navegação (Google Chrome e Edge). 3.2 Programas de correio eletrônico \n(Outlook Express). 3.3 SíƟos de busca e pesquisa na Internet. 3.4 Redes sociais. 4 Segurança da informação. \n4.1 Procedimentos de segurança. 4.2 Noções de vírus, worms e pragas virtuais. 4.3 AplicaƟvos para segurança \n(anƟvírus, ﬁrewall, anƟ‐spyware etc.). 5 Sistema Eletrônico de Informações (SEI) – parte operacional. 6 Lei nº \n13.709/2018 (Lei Geral de Proteção de Dados Pessoais). 7 Acesso à informação (Lei nº 12.527/2011 e Decreto \nnº 7.724/2012). 8 Serviços públicos digitais. 9 Noções de Inteligência ArƟﬁcial. 9.1 Conceitos Básicos de \nInteligência ArƟﬁcial. 9.2 Aplicações de Inteligência ArƟﬁcial. 9.3 Técnicas e Algoritmos de IA. 9.4 Impactos \nda Inteligência ArƟﬁcial.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 2,
@@ -58,7 +60,8 @@
       "chars": 598,
       "texto_enviado_llm": "1 Lei nº 7.735/1989 (criação do IBAMA). 2 Lei nº 6.938/1981 e suas alterações \n(PolíƟca  Nacional  do  Meio  Ambiente).  3  Lei  nº  9.605/1998  e  Decreto  nº  6.514/2008  (Lei  dos  Crimes \nAmbientais). 4 Lei Complementar nº 140/2011 (Competências ambientais). 5 Lei nº 10.410/2002 (Criação da \ncarreira de especialista em meio ambiente). 6 Lei nº 13.019/2014 (Regime jurídico das parcerias entre a \nAdministração Pública). 7 Lei nº 12.651/2012 (proteção da vegetação naƟva). 8 Decreto nº 11.367/2023 \n(Comissão Interministerial Permanente para prevenir e controlar o desmatamento, entre outros).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 3,
@@ -74,7 +77,8 @@
       "chars": 523,
       "texto_enviado_llm": "1 Gestão documental: documento de arquivo, documento digital, processo \neletrônico, processo híbrido, espécie, ciclo de vida dos documentos, teoria das três idades, transferência, \ndescarte, recolhimento. 2 PolíƟcas de acesso aos documentos de arquivo, Sistemas informaƟzados de gestão \narquivísƟca  de  documentos  (documentos  digitais,  requisitos,  metadados).  2.1  Gerenciamento  de \ndocumentos  arquivísƟcos  digitais  (teorias,  princípios  e  soluções  tecnológicas).  2.2  Gerenciamento  da \nmemória insƟtucional.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 4,
@@ -90,7 +94,8 @@
       "chars": 325,
       "texto_enviado_llm": "1  Administração  de  Recursos  Materiais  e  Patrimoniais.  1.1  Conceituação  de \nMaterial e Patrimônio. 1.2 O Patrimônio das empresas e órgãos públicos. 1.3 O Patrimônio Imobiliário. 1.4 O \nPatrimônio  Mobiliário.  1.5  Organização  e  Controle  LogísƟco.  1.6  Gestão  de  cadeia  de  suprimentos.  1.7 \nLogísƟca reversa.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 5,
@@ -106,7 +111,8 @@
       "chars": 648,
       "texto_enviado_llm": "1 ÉƟca e moral. 2 ÉƟca, princípios e valores. 3 ÉƟca e democracia. 3.1 Exercício \nda cidadania. 4 ÉƟca e função pública. 5 ÉƟca no setor público. 6 Código de Conduta ÉƟca dos Agentes \nPúblicos do IBAMA (Portaria IBAMA nº 2.534/2019). 7 Código de ÉƟca Proﬁssional do Servidor Público Civil \ndo Poder ExecuƟvo Federal (Decreto nº 1.171/1994). 8 Assédio no Serviço Público. 8.1 Deﬁnição e Tipos de \nAssédio. 8.2 Impactos do Assédio no Ambiente de Trabalho. 8.3 Estratégias de Prevenção e Combate. 9 \nDiscriminação  no  Serviço  Público.  9.1  Tipos  de  Discriminação.  9.2  Consequências  da  Discriminação.  9.3 \nPromoção de Igualdade e Diversidade.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 6,
@@ -122,7 +128,8 @@
       "chars": 688,
       "texto_enviado_llm": "1 Processos parƟcipaƟvos de gestão pública: conselhos de gestão, orçamento \nparƟcipaƟvo, parceria entre governo e sociedade. 2 Governo eletrônico. 2.1 Transparência da administração \n\n \n \npública. 2.2 Controle social e cidadania. 2.3 Accountability. 3 Excelência nos serviços públicos. 3.1 Gestão por \nresultados  na  produção  de  serviços  públicos.  4  Comunicação  na  gestão  pública.  5  Ciclo  orçamentário. \nTransferências voluntárias e legislação sobre o tema. 6 Ciclo de planejamento governamental. 6.1 Plano \nPlurianual (PPA) 2024‐2027: modelo de planejamento, mega objeƟvos, dimensões, programa e ação. 7 Lei de \nDiretrizes Orçamentárias (LDO). 8 Lei Orçamentária Anual (LOA).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 7,
@@ -138,7 +145,8 @@
       "chars": 1364,
       "texto_enviado_llm": "1  Compreensão  e  interpretação  de  textos  de  gêneros  variados.  2  Domínio  da \nortograﬁa oﬁcial. 3 Domínio dos mecanismos de coesão textual. 3.1 Emprego de elementos de referenciação, \nsubsƟtuição e repeƟção, de conectores e de outros elementos de sequenciação textual. 4 Emprego de tempos \ne modos verbais. 5 Domínio da estrutura morfossintáƟca do período. 5.1 Emprego das classes de palavras. \n5.2 Emprego dos sinais de pontuação. 5.3 Concordância verbal e nominal. 5.4 Regência verbal e nominal. 5.5 \nEmprego do sinal indicaƟvo de crase. 5.6 Colocação pronominal. 6 Reescrita de frases e parágrafos do texto. \n6.1  Signiﬁcação  das palavras.  6.2  SubsƟtuição  de palavras  ou  de  trechos  de  texto.  6.3  Reorganização  da \nestrutura  de  orações  e  de  períodos  do  texto.  6.4  Reescrita  de  textos  de  diferentes  gêneros  e  níveis  de \nformalidade.  7  As  estruturas  linguísƟcas  no  processo  de  construção  de  mensagens  adequadas.  7.1  A \npragmáƟca na linguagem: o signiﬁcado contextual. 7.2 Os diversos níveis de linguagem. 7.3 As funções da \nlinguagem. 7.4 Intertextualidade. 8 Aspectos gerais da redação oﬁcial (conforme Manual de Redação da \nPresidência da República). 8.1 Finalidade dos expedientes oﬁciais. 8.2 Adequação da linguagem ao Ɵpo de \ndocumento. 8.3 Adequação do formato do texto ao gênero. 8.4 Pronomes de tratamento.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 8,
@@ -154,7 +162,8 @@
       "chars": 691,
       "texto_enviado_llm": "1 Noções de sistema operacional (Windows). 2 AplicaƟvos \nMicrosoŌ  Oﬃce  365.  2.1  Word,  Excel,  PowerPoint,  Outlook,  Teams,  Onedrive  e  SharePoint.  3  Redes  de \ncomputadores. 3.1 Programas de navegação (Google Chrome e Edge). 3.2 Programas de correio eletrônico \n(Outlook Express). 3.3 SíƟos de busca e pesquisa na Internet. 3.4 Redes sociais. 4 Segurança da informação. \n4.1 Procedimentos de segurança. 4.2 Noções de vírus, worms e pragas virtuais. 4.3 AplicaƟvos para segurança \n(anƟvírus, ﬁrewall, anƟ‐spyware etc.). 5 Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais). 6 \nAcesso à informação (Lei nº 12.527/2011 e Decreto nº 7.724/2012). 7 Serviços públicos digitais.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 9,
@@ -170,7 +179,8 @@
       "chars": 418,
       "texto_enviado_llm": "1 Conhecimento e uso das formas contemporâneas da linguagem inglesa. 2 Compreensão \ne  interpretação  de  textos variados:  domínio  do vocabulário  e da  estrutura  da  língua,  ideias principais  e \nsecundárias, explícitas e implícitas, relações intratextuais e intertextuais. 3 Itens gramaƟcais relevantes para \na compreensão dos conteúdos semânƟcos. 4 Palavras e expressões equivalentes. 5 Elementos de referência.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 10,
@@ -186,7 +196,8 @@
       "chars": 662,
       "texto_enviado_llm": "1 ÉƟca e moral. 2 ÉƟca, princípios e valores. 3 ÉƟca e democracia. 3.1 Exercício \nda cidadania. 4 ÉƟca e função pública. 5 ÉƟca no setor público. 6 Código de ÉƟca Proﬁssional do Servidor \nPúblico Civil do Poder ExecuƟvo Federal (Decreto nº 1.171/1994). 7 Código de Conduta ÉƟca dos Agentes \nPúblicos do IBAMA (Portaria IBAMA nº 2.534/2019). 8 Assédio no Serviço Público. 8.1 Deﬁnição e Ɵpos de \nassédio.  8.2  Impactos  do  assédio  no  ambiente  de  trabalho.  8.3  Estratégias  de  prevenção  e  combate.  9 \nDiscriminação  no  serviço  público.  9.1  Tipos  de  discriminação.  9.2  Consequências  da  discriminação.  9.3 \nPromoção de igualdade e diversidade.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 11,
@@ -202,7 +213,8 @@
       "chars": 682,
       "texto_enviado_llm": "1 Processos parƟcipaƟvos de gestão pública: conselhos de gestão, orçamento \nparƟcipaƟvo, parceria entre governo e sociedade. 2 Governo eletrônico. 2.1 Transparência da administração \npública. 2.2 Controle social e cidadania. 2.3 Accountability. 3 Excelência nos serviços públicos. 3.1 Gestão por \nresultados  na  produção  de  serviços  públicos.  4  Comunicação  na  gestão  pública.  5  Ciclo  orçamentário. \nTransferências voluntárias e legislação sobre o tema. 6 Ciclo de planejamento governamental. 6.1 Plano \nPlurianual (PPA) 2024‐2027: modelo de planejamento, megaobjeƟvos, dimensões, programa e ação. 7 Lei de \nDiretrizes Orçamentárias (LDO). 8 Lei Orçamentária Anual (LOA).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 12,
@@ -218,7 +230,8 @@
       "chars": 717,
       "texto_enviado_llm": "1 ConsƟtuição da República FederaƟva do Brasil de 1988 e emendas. \n1.1 Conceito,  classiﬁcações,  princípios  fundamentais.  2  Direitos  e garanƟas  fundamentais. 2.1  Direitos  e \ndeveres individuais e coleƟvos, direitos sociais, nacionalidade, cidadania, direitos políƟcos, parƟdos políƟcos. \n3  Organização  políƟco‐administraƟva.  3.1  União,  estados,  Distrito  Federal,  municípios  e  territórios.  4 \nAdministração pública. 4.1 Disposições gerais, servidores públicos. 5 Organização dos poderes no Estado. 5.1 \nPoder LegislaƟvo. 5.1.1 Estrutura, funcionamento e atribuições. 5.1.2 Tribunal de Contas da União (TCU). 6 \nFunções essenciais à JusƟça. 7 ArƟgos 23, 170, 225 e 231 da ConsƟtuição Federal de 1988.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 13,
@@ -234,7 +247,8 @@
       "chars": 1308,
       "texto_enviado_llm": "1  Noções  de  organização  administraƟva.  1.1  Centralização, \ndescentralização,  concentração  e  desconcentração.  1.2  Administração  direta  e  indireta.  1.3  Autarquias, \nfundações, empresas públicas e sociedades de economia mista. 2 Ato administraƟvo. 2.1 Conceito, requisitos, \natributos, classiﬁcação e espécies. 3 Agentes públicos. 3.1 Legislação perƟnente. 3.1.1 Lei n.º 8.112/1990. \n3.1.2 Disposições consƟtucionais aplicáveis. 3.2 Disposições doutrinárias. 3.2.1 Conceito. 3.2.2 Espécies. 3.2.3 \nCargo, emprego e função pública. 4 Poderes administraƟvos. 4.1 Hierárquico, disciplinar, regulamentar e de \npolícia.  4.2  Uso  e  abuso  do  poder.  5  Licitação.  5.1  Princípios.  5.2  Contratação  direta.  5.2.1  Dispensa  e \ninexigibilidade. 5.3 Modalidades. 5.4 Tipos. 5.5 Procedimento. 6 Contratos administraƟvos. 6.1 Conceitos e \ncaracterísƟcas. 7 Controle da administração pública. 8 Responsabilidade civil do Estado. 9 Regime jurídico \nadministraƟvo.  9.1  Conceito.  9.2  Princípios  expressos  e  implícitos da  administração  pública.  10  Processo \nadministraƟvo federal (Lei n.º 9.784/1999). 11 Improbidade administraƟva (Lei n.º 8.429/1992). 12 Acesso à \nInformação. 12.1 Lei n.º 12.527/2011 (Lei de Acesso à Informação). 12.2 Lei n.º 13.709/2018 (Lei Geral de \nProteção de Dados).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 14,
@@ -250,7 +264,8 @@
       "chars": 1240,
       "texto_enviado_llm": "1 Constituição. 1.1 Conceito, objeto, elementos e classificações. 2 Princípios \nfundamentais. 3 Direitos e garantias fundamentais. 3.1 Direitos e deveres individuais e coletivos. 3.2 Habeas \ncorpus, mandado de segurança, mandado de injunção e habeas data. 3.3 Direitos sociais. 3.4 Nacionalidade. \n3.5 Direitos políticos. 3.6 Partidos políticos. 4 Organização do Estado. 4.1 Organização político‐administrativa. \n4.2  Estado  federal  brasileiro.  4.3  União.  4.4  Estados  federados.  4.5  Municípios.  4.6  Distrito  Federal.  4.7 \nTerritórios.  5  Administração  pública.  5.1  Disposições  gerais.  5.2  Servidores  públicos.  6  Organização  dos \npoderes no Estado. 6.1 Poder Legislativo. 6.1.1 Estrutura, funcionamento e atribuições. 6.1.2 Fiscalização \ncontábil, financeira e orçamentária. 6.1.3 Tribunal de Contas da União (TCU). 7 Funções essenciais à Justiça. \n7.1 Ministério Público. 7.2 Advocacia pública. 8 Defesa do Estado e das instituições democráticas. 9 Sistema \nTributário Nacional. 10 Finanças públicas. 10.1 Normas gerais. 10.2 Orçamentos. 11 Ordem econômica e \nfinanceira. 11.1 Princípios gerais da atividade econômica. 11.2 Sistema Financeiro Nacional. 12 Artigos 23, \n170, 225 e 231 da Constituição Federal de 1988.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 15,
@@ -266,7 +281,8 @@
       "chars": 2856,
       "texto_enviado_llm": "1  Estado,  governo  e  administração  pública.  1.1  Conceitos.  1.2  Elementos.  2 \nDireito administrativo. 2.1 Conceito. 2.2 Objeto. 2.3 Fontes. 3 Ato administrativo. 3.1 Conceito, requisitos, \natributos, classificação e espécies. 3.2 Extinção do ato administraƟvo. 3.2.1 Cassação, anulação, revogação e \nconvalidação. 3.3 Decadência administraƟva. 4 Agentes públicos.  4.1 Legislação perƟnente. 4.1.1 Lei n.º \n8.112/1990. 4.1.2 Disposições consƟtucionais aplicáveis. 4.2 Disposições doutrinárias. 4.2.1 Conceito. 4.2.2 \nEspécies.  4.2.3  Cargo,  emprego  e  função  pública.  4.2.4  Provimento.  4.2.5  Vacância.  4.2.6  EfeƟvidade, \nestabilidade e vitaliciedade. 4.2.7 Remuneração. 4.2.8 Direitos e deveres. 4.2.9 Responsabilidade. 4.2.10 \nProcesso  administraƟvo  disciplinar.  5  Poderes  da  administração  pública.  5.1  Hierárquico,  disciplinar, \nregulamentar e de polícia. 5.2 Uso e abuso do poder. 6 Regime jurídico‐administraƟvo. 6.1 Conceito. 6.2 \n\n \n \nPrincípios expressos e implícitos da administração pública. 6.3 Princípio da Legalidade.7 Responsabilidade \ncivil do Estado. 7.1 Evolução histórica. 7.2 Responsabilidade civil do Estado no direito brasileiro. 8 Serviços \npúblicos.  8.1  Conceito.  8.2  Elementos  consƟtuƟvos.  8.3  Formas  de  prestação  e  meios  de  execução.  8.4 \nDelegação.  8.4.1  Concessão,  permissão  e  autorização.  8.5  Classiﬁcação.  8.6  Princípios.  9  Organização \nadministraƟva.  9.1  Centralização,  descentralização,  concentração  e  desconcentração.  9.2  Administração \ndireta  e  indireta.  9.3  Autarquias,  fundações,  empresas  públicas  e  sociedades  de  economia  mista.  9.4 \nEnƟdades paraestatais e terceiro setor. 9.4.1 Serviços sociais autônomos, enƟdades de apoio, organizações \nsociais, organizações da sociedade civil de interesse público. 10 Controle da administração pública. 10.1 \nControle  exercido  pela  administração  pública.  10.2  Controle  judicial.  10.3  Controle  legislaƟvo.  10.4 \nImprobidade administraƟva: Lei n.º 8.429/1992 e suas alterações. 11 Processo administraƟvo. 11.1 Lei n.º \n9.784/1999. 12 Licitações e contratos administraƟvos. 12.1 Conceito, natureza jurídica, objeto e ﬁnalidade. \n12.2 Princípios básicos e correlatos. 12.3 Modalidades. 12.4 Obrigatoriedade, dispensa e inexigibilidade. 12.5 \nProcedimento licitatório. 12.6 Anulação, revogação e recursos administraƟvos. 12.7 Sanções e procedimento \nsancionatório.  12.8  Crimes  em  licitações  e  contratos  administraƟvos.  13  Contrato  administraƟvo  para \ncompras na administração pública. 13.1 Conceito, principais caracterísƟcas e espécies. 13.2 Formalização, \nexecução e inexecução. 13.3 Duração, prorrogação, renovação e exƟnção. 13.4 Revisão e rescisão. 14 Acesso \nà Informação. 14.1 Lei n.º 12.527/2011 (Lei de Acesso à Informação). 14.2 Lei nº 13.709/2018 (Lei Geral de \nProteção de Dados).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 16,
@@ -282,7 +298,8 @@
       "chars": 2096,
       "texto_enviado_llm": "1 A evolução da administração pública e a reforma do Estado. 1.1 Do \nmodelo racional‐legal ao paradigma pós‐burocráƟco. 1.2 Convergências e diferenças entre a gestão pública e \na gestão privada. 1.3 Excelência na gestão dos serviços públicos. 1.4 Empreendedorismo governamental e \nnovas lideranças no setor público. 2 Gestão de pessoas. 2.1 Conceitos e práƟcas relaƟvas ao servidor público. \n2.2 Gestão de desempenho. 2.3 Comunicação. 2.4 Comportamento, clima e cultura organizacional. 2.5 Gestão \npor competências. 2.6 Gestão do conhecimento. 2.7 Qualidade de vida no trabalho. 2.8 Liderança, moƟvação \ne saƟsfação no trabalho. 2.9 Recrutamento e seleção de pessoas. 2.10 Análise e descrição de cargos. 2.11 \nEducação, treinamento e desenvolvimento. 2.11.1 Educação corporaƟva. 2.11.2 Educação a distância. 2.11.3 \nPlanejamento, desenvolvimento e objeƟvos do ensino. 2.11.4 Avaliação. 2.12 Gestão de conﬂito. 3 Gestão \norganizacional. 3.1 Planejamento estratégico. 3.1.1 Deﬁnições de estratégia. 3.1.2 Condições necessárias para \nse  desenvolver  a  estratégia.  3.1.3  Questões‐chave  em  estratégia.  3.1.4  Metas  estratégicas  e  resultados \npretendidos.  4  Indicadores  de  desempenho.  5  Gestão  de  processos.  5.1  Conceitos  da  abordagem  por \nprocessos. 5.2 Técnicas de mapeamento, análise e melhoria de processos. 5.3 Construção e mensuração de \nindicadores de processos. 6 Ferramentas de análise de cenário interno e externo. 7 Balanced scorecard. 8 \nGestão de projetos. 8.1 Elaboração, análise e avaliação de projetos. 8.2 Principais caracterísƟcas dos modelos \nde gestão de projetos. 8.3 Projetos e suas etapas. 8.4 Escritório de projetos. 9 Gestão de risco. 10 Processo \ndecisório. 10.1 O processo racional de solução de problemas. 10.2 Fatores que afetam a decisão. 10.3 Tipos \nde decisões. 11 Processo de mudança. 11.1 Mudança organizacional, forças internas e externas, o papel do \nagente  e  métodos  de  mudança.  12  CaracterísƟcas  das  organizações  formais  modernas.  12.1  Tipos  de \nestrutura organizacional, natureza, ﬁnalidades e critérios de departamentalização.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 17,
@@ -298,7 +315,8 @@
       "chars": 1481,
       "texto_enviado_llm": "1  Orçamento  público.  1.1 \nConceito  1.2  Técnicas orçamentárias.  1.3  Princípios  orçamentários.  1.4  Ciclo  orçamentário.  1.5  Processo \norçamentário. 2 O orçamento público no Brasil. 2.1 Sistema de planejamento e de orçamento federal. 2.2 \nPlano plurianual. 2.3 Diretrizes orçamentárias. 2.4 Orçamento anual. 2.5 Outros planos e programas. 2.6 \nSistema  e  processo  de  orçamentação.  2.7  Classiﬁcações  orçamentárias.  2.8  Estrutura  programáƟca.  2.9 \nCréditos ordinários e adicionais. 3 Programação e execução orçamentária e ﬁnanceira. 3.1 Descentralização \norçamentária e ﬁnanceira. 3.2 Acompanhamento da execução. 3.3 Sistemas de informações. 3.4 Alterações \norçamentárias. 4 Receita pública. 4.1 Conceito e classiﬁcações. 4.2 Estágios. 4.3 Fontes. 4.4 Dívida aƟva. 5 \n\n \n \nDespesa pública. 5.1 Conceito e classiﬁcações. 5.2 Estágios. 5.3 Restos a pagar. 5.4 Despesas de exercícios \nanteriores. 5.5 Dívida ﬂutuante e fundada. 5.6 Suprimento de fundos. 6 Lei de Responsabilidade Fiscal. 6.1 \nConceitos e objeƟvos. 6.2 Transparência, controle e ﬁscalização. 7 Noções de Direito Financeiro e Tributário. \n7.1  Lei  nº  5.172/1966  (Sistema  Tributário  Nacional).  7.2  Lei  nº  4.320/1964  (Normas  Gerais  de  Direito \nFinanceiro) 7.3 Decreto nº 70.235/1972 e suas alterações (Processo AdministraƟvo Fiscal). 7.4 Instrução \nNormaƟva IBAMA nº 17/2011 (Regulamentação da TCFA – Taxa de Controle e Fiscalização Ambiental). 8 Lei \nnº 10.522/2002 e Decreto nº 9.194/2017.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 18,
@@ -314,7 +332,8 @@
       "chars": 2609,
       "texto_enviado_llm": "1  Sistema  de  Contabilidade  Federal.  1.1  Organização  e  competências  (Lei  nº \n10.180/2021  e  Decreto  nº  6.976/2009).  1.2  Sistema  Integrado  de  Administração  Financeira  do  Governo \nFederal  (SIAFI):  conceito,  objeƟvos,  usuários  e  segurança  do  sistema  (princípios  e  instrumentos).  2 \nConceituação, objeto e campo de aplicação. 3 Composição do Patrimônio Público. 3.1 Patrimônio Público. 3.2 \nAƟvo. 3.3 Passivo. 3.4 Saldo Patrimonial. 4 Variações Patrimoniais. 4.1 QualitaƟvas. 4.2 QuanƟtaƟvas: receita \ne despesa sob o enfoque patrimonial. 4.3 Realização da variação patrimonial. 4.4 Resultado patrimonial. 5 \nRegime Orçamentário e Regime Contábil. 6 Mensuração de aƟvos. 6.1 AƟvo Imobilizado. 6.2 AƟvo Intangível. \n6.3 Reavaliação e redução ao valor recuperável. 6.4 Depreciação, amorƟzação e exaustão. 7 Mensuração de \npassivos.  7.1  Provisões.  7.2  Passivos  ConƟngentes.  8  Tratamento  contábil  aplicável  aos  impostos  e \ncontribuições. 9 Sistema de custos. 9.1 Aspectos legais do sistema de custos. 9.2 Ambiente da informação de \ncustos. 9.3 CaracterísƟcas da informação de custos. 9.4 Terminologia de custos. 9.5 NBC TSP 34 ‐ Custos no \nSetor Público. 9.6 Manual de Informações de Custos do Governo Federal, aprovado pela Portaria STN nº \n518/2018. 10 Estrutura do Plano de contas aplicado ao setor público (PCASP). 10.1 Naturezas da Informação \nContábil. 10.2 Código da Conta Contábil. 10.3 Atributos da informação contábil. 10.4 Regras de integridade \ndo PCASP. 11 Demonstrações contábeis aplicadas ao setor público. 11.1 Balanço orçamentário. 11.2 Balanço \nFinanceiro. 11.3 Demonstração das variações patrimoniais. 11.4 Balanço patrimonial. 11.5 Demonstração de \nﬂuxos  de  caixa.  11.6  Demonstração  das  Mutações  do  Patrimônio  Líquido.  11.7  Notas  explicaƟvas  às \ndemonstrações contábeis. 11.8 Consolidação das demonstrações contábeis. 12 Transações no setor público. \n13  Despesa  pública.  13.1  Conceito,  etapas,  estágios  e  categorias  econômicas.  14  Receita  pública.  14.1 \nConceito, etapas, estágios e categorias econômicas. 15 Créditos Adicionais. 16 Execução orçamentária e \nﬁnanceira. 17 Fonte ou DesƟnação de Recursos. 18 Suprimento de Fundos. 19 Restos a pagar. 20 Despesas \ncom  Pessoal.  20.1  Deﬁnições  e  Limites.  20.2  Controle  da  Despesa  Total  com  Pessoal.  21  Despesas  de \nExercícios anteriores. 22 Conta única do Tesouro Nacional. 23 Norma Brasileira de Contabilidade – NBC TSP \nEstrutura Conceitual, de 23 de setembro de 2016. 24 MCASP 10ª edição. 25 Lei de Responsabilidade Fiscal \n(Lei nº 101/2000). 26 Lei nº 4.320/1964.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 19,
@@ -330,7 +349,8 @@
       "chars": 399,
       "texto_enviado_llm": "1 Gestão de pessoas. 1.1 Liderança, gerenciamento de conﬂitos, moƟvação, sistemas \nde  incenƟvo  e  responsabilização,  gestão  do  desempenho.  1.2  Programa  de  Gestão  do  Desempenho, \nteletrabalho. 1.3 Indicadores de gestão de pessoas. 1.4 Trabalho em equipe. 2 Qualidade de vida no trabalho. \n3 Capacitação e desenvolvimento de pessoas. 4 Gestão por competência. 5 Análise de dados de pessoas.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 20,
@@ -346,7 +366,8 @@
       "chars": 2421,
       "texto_enviado_llm": "1  Leis,  decretos,  resoluções  e  portarias.  1.1  Lei  de  Proteção  à  Fauna  (Lei  nº \n5.197/1967).  1.2  Lei  nº  6.938/1981  e  suas  alterações  (PolíƟca  Nacional  do  Meio  Ambiente).  1.3  Lei  nº \n7.173/1983. 1.4 Lei nº 7.735/1989 (criação do IBAMA). 1.5 Lei nº 9.605/1998 (Lei dos Crimes Ambientais) e \nDecreto nº 6.514/2008. 1.6 Lei nº 9.966/2000 (Lei do Óleo). 1.7 Lei nº 10.410/2002 (Criação da carreira de \nespecialista em meio ambiente). 1.8 Lei nº 11.284/2006 (ơtulos I, II e III e V). 1.9 Lei nº 11.428/2006 (Mata \n\n \n \nAtlânƟca). 1.10 Lei nº 12.187/2009 (PolíƟca Nacional sobre Mudança do Clima) e Decreto nº 9.578/2018. 1.11 \nLei nº 12.305/2010 (PolíƟca Nacional de Resíduos Sólidos) e Decreto nº 10.936/2022. 1.12 Lei Complementar \nnº 140/2011 (Competências ambientais). 1.13 Lei nº 12.651/2012 (proteção da vegetação naƟva). 1.14 Lei nº \n13.123/2015 e Decreto nº 8.772/2016 (Convenção sobre Diversidade Biológica). 1.15 Lei nº 11.959/2009. 1.16 \nLei nº 14.785/2023 (agrotóxicos). 1.17 Lei nº 9.433/1997 (PolíƟca Nacional de Recursos Hídricos) e alterações. \n1.18 Lei nº 9.985/2000 (Sistema Nacional de Unidades de Conservação da Natureza) e Decreto nº 4.340/2002. \n1.19  Lei  nº  12.334/2010  (PolíƟca  Nacional  de  Segurança  de  Barragens)  e  alterações.  1.20  Decreto  nº \n8.437/2015.  1.21  Decreto  nº  70.235/1972  (Processo  AdministraƟvo  Fiscal).  1.22  Decreto  nº  3.607/2000 \n(CITES). 1.23 Decreto nº 7.830/2012. 1.24 Decreto nº 11.367/2023 (Comissão Interministerial Permanente \npara prevenir e controlar o desmatamento, entre outros). 1.25 Decreto nº 12.044/2024 (Sociobioeconomia). \n1.26 Decreto nº 2.519/1998 (Convenção sobre Diversidade Biológica). 1.27 Decreto nº 875/1993 (Convenção \nde Basileia), Decreto nº 9.470/2018 (Convenção de Minamata) e Decreto nº 99.280/1990 (Protocolo de \nMontreal).    1.28  Decreto  nº  6.640/2008  (Proteção  de  cavidades).  1.29  Decreto  nº  10.935/2022.  1.30 \nResoluções do Conselho Nacional do Meio Ambiente (CONAMA): nº 1/1986, nº 5/1989, nº 237/1997, nº \n350/2004, nº 357/2005, nº 302/2002, nº 303/2002, nº 369/2006, nº 371/2006, nº 393/2007, nº 394/2007, \nnº  396/2008,  nº  457/2013,  nº  487/2018,  nº  489/2018,  nº  496/2020  e  nº  507/2024.  1.32  Portaria \nInterministerial nº 60/2015 (disciplina a atuação dos órgãos e enƟdades da administração pública federal em \nprocessos de licenciamento ambiental de competência do IBAMA).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 21,
@@ -362,7 +383,8 @@
       "chars": 508,
       "texto_enviado_llm": "1  Proteção  dos  Recursos  GenéƟcos.  1.1  Ilícitos  relacionados  ao \npatrimônio  genéƟco  e  conhecimento  tradicional  associado.  1.2  Protocolo  de  Cartagena,  Decreto  nº \n5.705/2006. 1.3 Normas de segurança e ﬁscalização de Organismos GeneƟcamente Modiﬁcados (OGM). 1.4 \nLei nº 11.460/2007. 1.5 Ilícitos envolvendo OGMs. 1.6 Resoluções NormaƟvas da Comissão Técnica Nacional \nde Biossegurança (CTNBio) nº 26/2020 e nº 37/2022. 1.7 Resolução do Conselho de Gestão do Patrimônio \nGenéƟco (CGEN) nº 27.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 22,
@@ -378,7 +400,8 @@
       "chars": 223,
       "texto_enviado_llm": "1 Proteção da Fauna. 1.1 Conceitos biológicos e taxonomia de fauna. 1.2 Evolução da \nproteção, defesa e direitos dos animais. 1.3 Lei nº 5.197/1967. 1.4 Ilícitos contra a fauna: tráﬁco, maus‐tratos, \ncaça, espécies exóƟcas.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 23,
@@ -394,7 +417,8 @@
       "chars": 440,
       "texto_enviado_llm": "1  Proteção  de  Recursos  Pesqueiros.  1.1  Recursos  pesqueiros  e \necossistemas aquáƟcos relevantes. 1.2 Métodos da pesca industrial. 1.3 Evolução do ordenamento pesqueiro \nno Brasil: Sistema InformaƟzado do Registro Geral da AƟvidade Pesqueira (SisRGP) e Programa Nacional de \nRastreamento de Embarcações Pesqueiras por Satélite (Preps). 1.4 Pesca ilegal e ilícitos relacionados. 1.5 \nDanos ambientais decorrentes da aƟvidade pesqueira.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 24,
@@ -410,7 +434,8 @@
       "chars": 416,
       "texto_enviado_llm": "1 Comércio Exterior. 1.1 Território aduaneiro e controle de operações. 1.2 Convenção \nsobre o Comércio Internacional das Espécies da Flora e Fauna Selvagens em Perigo de ExƟnção (CITES). 1.3 \nRegime aduaneiro especial. 1.4 Portaria nº 38 da Secex/MDIC, de 18 de maio de 2015, Portaria Secex nº \n346, de 28 de agosto de 2024, Portaria Secex nº 19, de 2 de julho de 2019, Portaria Secex nº 249, de 4 de \njulho de 2023.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 25,
@@ -426,7 +451,8 @@
       "chars": 223,
       "texto_enviado_llm": "1 Lei nº 14.944/2024. 2 Ecologia do Fogo. 3 Fundamentos da Ecologia do Fogo. 4 \nFisiologia Vegetal e Adaptações ao Fogo. 5 Regimes de Fogo. 6 Impactos do Fogo nos Ecossistemas. 7 Manejo \ne Prevenção de Incêndios Florestais.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 26,
@@ -442,7 +468,8 @@
       "chars": 627,
       "texto_enviado_llm": "1 Mudanças ClimáƟcas Globais: Causas, consequências e cenários \nfuturos. Evidências cienơﬁcas do Painel Intergovernamental sobre Mudanças ClimáƟcas (IPCC). 2 Resiliência \nClimáƟca e Redução de Riscos de Desastres Ambientais: Conceitos de adaptação e miƟgação em face de \n\n \n \neventos climáƟcos extremos, como secas, inundações e tempestades. 3 Emergências Ambientais no Brasil: \nGestão  e  resposta  a  emergências  ambientais.  4  Principais  desastres  ambientais  recentes  no  país,  como \nderramamento  de  óleo,  rompimento  de  barragens  e  incêndios  ﬂorestais.  5  Responsabilidades  legais  e \nprotocolos de atuação.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 27,
@@ -458,7 +485,8 @@
       "chars": 250,
       "texto_enviado_llm": "1 Lei nº 7.735/1989. 2 Lei Complementar nº 140/2011. 3 Lei nº \n9.784/1999 e Lei nº 9.873/1999. 4 Lei nº 9.605/1998. 5 Decreto nº 6.514/2008. 6 Instrução NormaƟva Ibama \nnº 19/2023. 7 Instrução NormaƟva Ibama nº 8/2024. 8 Portaria Ibama nº 1.369/2020.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 28,
@@ -474,7 +502,8 @@
       "chars": 2503,
       "texto_enviado_llm": "1  Licenciamento  ambiental  federal.  1.1  Socioantropologia  no \nLicenciamento Ambiental. 1.1.1 Conceitos fundadores: cultura, indivíduo, comunidade e sociedade. 1.1.2 \nConﬂito e movimentos sociais. 1.1.3 Dinâmica e mudança social. 1.1.4 Estrutura social e etnologia brasileira. \n1.1.5 Relação entre meio ambiente e organização social. 1.1.6 Papel do território: planejamento ambiental e \nterritorial, urbanismo, vocação e uso do solo. 1.1.7 Noções de pesquisa social: teoria, método, análise de \ndados  qualitaƟvos  e  quanƟtaƟvos,  deﬁnição  de  indicadores.  1.1.8  Estado  e  sociedade.  1.2  Demograﬁa, \nEconomia e Sociologia. 1.2.1 Direitos Humanos e PolíƟcas Públicas. 1.2.1.1 PolíƟcas sociais, Estado de bem‐\nestar  social,  desenvolvimento  agrário,  economia  do  setor  público.  1.2.2  IdenƟdade  cultural  e \nmulƟculturalismo  no  Brasil.  1.2.3  Equilíbrio  entre  equidade  social  e  compeƟƟvidade  econômica.  1.3 \nCaracterização  da  Sociedade  Brasileira.  1.3.1  Dinâmica  populacional:  transição  demográﬁca,  migrações, \nfecundidade, mortalidade. 1.3.2 Organização geoeconômica no Brasil. 1.3.3 Distribuição de renda e PIB. 1.3.4 \nDesenvolvimento nacional. 1.3.5 Questão agrária: estrutura fundiária e sociedade rural. 1.4 Impactos Sociais \ne Econômicos de Grandes Empreendimentos. 1.4.1 Análise social e econômica de projetos. 1.4.2 Economia \nambiental. 1.5 Licenciamento Ambiental e Avaliação de Impacto. 1.5.1 Licenciamento Ambiental Federal: \nConceitos,  ﬁnalidades,  procedimentos,  etapas  e  competência.  1.5.2  Avaliação  de  Impactos  Ambientais: \nMetodologias  principais  e  aplicação.  1.5.3  EIA/RIMA:  Critérios,  métodos  de  elaboração.  1.5.4  Gestão  e \nMiƟgação Ambiental: Plano de gestão, análise de risco, compensação, miƟgação e recuperação de áreas \ndegradadas. 1.5.5 Monitoramento Ambiental. 1.6 Cartograﬁa e Sensoriamento. 1.6.1 Levantamentos, SIG, \nanálise  de  paisagens.  1.6.2  Ecossistemas  e  Fitogeograﬁa:  Ecossistemas  brasileiros,  ﬁtossociologia,  ﬂora  e \nfauna.  1.6.3  Geologia  e  Geotecnia:  Geologia  ambiental,  riscos  geológicos,  processos  erosivos.  1.6.4 \nClimatologia  e  Mudanças  ClimáƟcas:  MiƟgação  e  adaptação.  1.6.5  Hidrologia  e  Hidrogeologia:  Ciclo \nhidrológico, águas subterrâneas, poluição hídrica. 1.6.6 Química e Poluição Ambiental: Poluição do solo, água \ne ar, resíduos e emissões. 1.6.7 Energia e Infraestrutura: Matriz energéƟca, energias renováveis, infraestrutura \nviária e projetos de construção civil.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 29,
@@ -490,7 +519,8 @@
       "chars": 2344,
       "texto_enviado_llm": "1 Desenvolvimento sustentável. 2 Financiamento da políƟca ambiental. 3 \nValoração  da  natureza  e  serviços  ambientais.  4  DeserƟﬁcação.  5  Responsabilidade  por  dano  ao  meio \nambiente. 6 Tutela processual do meio ambiente. 7 Maus tratos e bem‐estar animal de silvestres. 8 Questões \nambientais globais e acordos internacionais. 8.1 Convenção sobre Diversidade Biológica. 8.2 Convenção sobre \no Comércio Internacional das Espécies Silvestres Ameaçadas de ExƟnção (CITES). 8.3 Convenção Internacional \nde  Combate  à  DeserƟﬁcação.  8.4  Agenda  2030  para  o  Desenvolvimento  Sustentável,  ObjeƟvos  de \nDesenvolvimento Sustentável (ODS) da ONU e ODS Brasil. 9 Classiﬁcação e taxonomia animal e vegetal. 10 \nFatores  biológicos  determinantes  de  riscos  de  exƟnção.  11  Radiação  evoluƟva  (evolução  ﬁlogenéƟca  e \nﬁlogeograﬁa).  12  Degradação  de  habitat.  13  Monitoramento  ambiental:  conceitos,  objeƟvos  e  suas \naplicações  no solo,  ar,  água,  fauna,  ﬂora  e  ecossistemas.  14 Fragmentação,  efeito  de  borda  e  perda  de \nbiodiversidade. 15 Corredores ecológicos, dispersão de fauna e ﬂora e trocas genéƟcas. 16 Conservação e \nmanejo de populações e de metapopulações in situ e ex situ. 17 Introdução indesejada de espécies exóƟcas \ne seus impactos sobre populações e comunidades naturais. 18 Estratégias de conservação de hábitats e de \nespécies. 19 Biomas e ﬁtoﬁsionomias brasileiros: caracterísƟcas e evolução da fauna e ﬂora. 20 Conceitos, \npráƟcas e técnicas de manejo ﬂorestal madeireiro e não‐madeireiro. 21 PolíƟca ﬂorestal. 22 Dendrometria e \n\n \n \ninventário ﬂorestal. 23 Sementes e viveiros ﬂorestais. 24 Ciclagem de nutrientes. 25 Ecologia e manejo de \nfragmentos ﬂorestais. 26 Ecologia de paisagem. 27 Recuperação de áreas degradadas. 28 Economia ﬂorestal. \n29  Geoprocessamento.  30  Acesso  e  uso  de  produtos  ﬂorestais  e  conﬂitos  sociais.  31  Controle  e \nmonitoramento das aƟvidades ﬂorestais. 32 Biodiversidade e conservação de espécies ﬂorestais. 33 Florestas \ne  mudanças  climáƟcas:  serviços  ambientais.  34  Aquecimento  global  e  sequestro  de  carbono.  35 \nDescentralização da gestão ﬂorestal. 36 PolíƟcas públicas de controle e prevenção do desmatamento. 37 \nDesenvolvimento  econômico  e  conservação  da  biodiversidade.  38  Fiscalização  e  poder  de  polícia \nadministraƟva.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 30,
@@ -506,7 +536,8 @@
       "chars": 2879,
       "texto_enviado_llm": "1 Qualidade Ambiental. 1.1 Impacto ambiental, degradação e poluição. 1.2 Controle \ne ﬁscalização do uso de mercúrio. 1.3 Instrução NormaƟva IBAMA nº 17/2011 (Taxa de Controle e Fiscalização \nAmbiental – TCFA). 1.4 Relatório Anual de AƟvidades Potencialmente Poluidoras e UƟlizadoras de Recursos \nAmbientais (RAPP) e Cadastro Técnico Federal (CTF). 1.5 Programa de Controle de Poluição do Ar por Veículos \nAutomotores  (Proconve).  2  Resolução  CONAMA  nº  452/2012.  2.1  PneumáƟcos:  Resolução  CONAMA  nº \n416/2009.  2.2  Resolução  CONAMA  nº  401/2008  (pilhas  e  baterias).  2.3  Óleos  lubriﬁcantes  usados  ou \ncontaminados. 2.4 Resoluções CONAMA nº 362/2005 e nº 450/2012. 2.5 Convenção de Minamata sobre \nMercúrio.  2.6  Decreto  nº  97.634/1989  (mercúrio  metálico).  3  Acordo  de  Paris  Resoluções  CONAMA  nº \n267/2000 e nº 340/2003. 3.1 Lei nº 8.723/1993 (redução de emissão de poluentes por veículos automotores). \n3.2  Resolução  CONAMA  nº  18/1986.  3.3  Resolução  CONAMA  nº  490/2018.  3.4  Resolução  CONAMA  nº \n492/2018. 3.5 Resolução CONAMA nº 493/2019. 4 Programa Nacional de Educação e Controle da Poluição \nSonora ‐ Silêncio: Resoluções CONAMA nº 2/1990 e nº 20/1994. 5 Resolução CONAMA nº 1/1998 (CTF/AIDA). \n5.1 Instrução NormaƟva Ibama nº 12/2021. 5.2 Lei nº 7.804/1989 (CTF/APP). 5.3 Instrução NormaƟva Ibama \nnº 13/2021. 5.4 Instrução NormaƟva Ibama nº 06/2022. 5.5 Lei nº 10.165/2001. 5.6 Instrução NormaƟva \nIbama nº 22/2021 e alterações (Relatório anual de aƟvidades potencialmente poluidoras e uƟlizadoras de \nrecursos  ambientais  ‐  RAPP).  6  Biorremediação.  6.1  Resolução  CONAMA  nº  463/2014.  6.2  Resolução \nCONAMA  nº  472/2015.  6.3  Áreas  contaminadas:  Resolução  CONAMA  nº  420/2009.  7  ComparƟmentos \nambientais. 7.1 Ciclos biogeoquímicos. 7.2 Transporte, distribuição e transformação de agentes químicos no \nmeio  ambiente.  7.3  Bioacumulação  e  biomagniﬁcação.  7.4  Testes  ecotoxicológicos.  8  Convenções \ninternacionais. 8.1 Decreto nº 5.472/2005 (Convenção de Estocolmo). 8.2 Decreto nº 5.360/2005 (Convenção \nde Roterdã). 9 Agrotóxicos, seus componentes e aﬁns. 9.1 Lei nº 14.785/2023 (agrotóxicos). 9.2 Decreto \nnº 4.074/2002. 9.3 Decreto nº 10.833/2021. 9.4 Portaria IBAMA nº 84/1996 (potencial de periculosidade \nambiental de agrotóxicos e aﬁns). 9.5 Instrução NormaƟva Ibama nº 27/2018 e alterações. 9.6 Instrução \nNormaƟva Ibama nº 02/2017. 9.7 Manual de Avaliação de Risco Ambiental de Agrotóxicos para Abelhas. 9.8 \nProdutos  de  baixa  periculosidade:  bioquímicos,  semioquímicos,  microbiológicos  e  agentes  biológicos  de \ncontrole. 9.9 Avaliação de risco ecológico de agrotóxicos. 9.10 Produtos preservaƟvos de madeira. 9.11 Lei \nnº 4.797/1965.  9.12 Portaria Interministerial nº 292/1989 (Ministério da Fazenda,  Ministério da Saúde e \nMinistério do Interior). 9.13 Fundamentos de Agroecologia.",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 31,
@@ -522,7 +553,8 @@
       "chars": 754,
       "texto_enviado_llm": "1  Conceitos,  objeƟvos  e  aplicações  do  monitoramento  ambiental.  2 \nSensoriamento remoto. 2.1 Sensores aƟvos e passivos. 2.2 Sistemas de imageamento: conceitos de pixel, \nresolução espacial, temporal e radiométrica. 2.3 Aplicação do sensoriamento remoto no monitoramento e \ncontrole de desmatamentos, incêndios ﬂorestais e recuperação da vegetação. 3 Sistemas de Informação \nGeográﬁca (SIG). 3.1 Sistemas de coordenadas e georreferenciamento. 3.2 Projeções e transformações. 3.3 \nDescrição e uso das funcionalidades de um SIG. 4 Geoprocessamento e Análise de dados. 5 Estrutura de dados \nespaciais. 5.1 Modelagem de dados em geoprocessamento. 5.2 Sistema Gerenciador de Banco de Dados \n(SGBD). 5.3 Infraestrutura Nacional de Dados Espaciais (INDE).",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     },
     {
       "chunk_index": 32,
@@ -538,7 +570,8 @@
       "chars": 1650,
       "texto_enviado_llm": "1  IN  Ibama  05/2021.  2  Ecossistemas \nbrasileiros. 3 Biologia da conservação: estratégias para conservação de espécies, habitats e paisagens. 4 \nCorredores ecológicos. 5 Noções de geografia. 6 Biologia animal e evolução. 7 Taxonomia, sistemática e \nclassificação animal. 7.1 Dispersão e fluxo gênico em populações naturais. 7.2 Adaptação e especiação. 8 \nConservação  da  fauna  silvestre.  9  Ecologia  e  distribuição  dos  animais.  9.1  Estrutura  de  populações  e \nmetapopulações. 9.2 Fragmentação de ecossistemas e efeito de borda. 9.3 Proteção de áreas de reprodução \ne  de  alimentação  da  fauna.  10  Manejo  de  fauna.  10.1  Introduções,  reintroduções,  translocações  e \nadensamento  populacional  de  fauna  silvestre.  10.2  Manejo  de  fauna  silvestre,  suas  populações  e  de \nmetapopulações in situ e ex situ. 10.3 Contenção química e física de animais silvestres. 10.4 Nutrição de \nanimais silvestres. 10.5 Doenças nutricionais. 10.6 Biossegurança aplicada ao manejo de fauna silvestre. 10.7 \nMedidas mitigadoras para a captura incidental de aves, mamíferos e répteis marinhos em artes de pesca. \n10.8  Fauna  Ameaçada  de  Extinção  –  Manejo  de  Fauna  Invasora.  10.9  Taxonomia  e  Sistemática  de \nvertebrados. 10.10 Biologia reprodutiva e cuidados parentais em animais selvagens. 11 Epidemiologia. 12 \nAnatomia e fisiologia de animais silvestres. 13 Proteção da Fauna. 13.1 Conceitos biológicos e taxonomia de \nfauna. 13.2 Evolução da proteção, defesa e direitos dos animais. 13.3 Lei nº 5.197/1967. 13.4 Ilícitos contra \na fauna: tráﬁco, maus‐tratos, caça, espécies exóƟcas. \n \nRODRIGO AGOSTINHO \nPresidente do Ibama",
       "status": "sucesso",
-      "cargos_restritos": null
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho"
     }
   ]
 }

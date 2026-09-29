@@ -138,6 +138,34 @@ class TestDividirPorCargoEMateria:
             dividir_por_cargo_e_materia("texto sem nenhum cabeçalho reconhecível") == []
         )
 
+    def test_materia_origem_nos_tres_ramos_e_metadados(self):
+        assert "materia_origem" in CAMPOS_CLASSIFICACAO_CHUNK
+        chunks = dividir_por_cargo_e_materia(SECAO_TESTE)
+        lp = next(c for c in chunks if c.materia == "LÍNGUA PORTUGUESA")
+        assert lp.materia_origem == "cabecalho"
+        assert metadados_chunk(lp)["materia_origem"] == "cabecalho"
+
+        medico = next(c for c in chunks if c.cargo == "CARGO 7: MÉDICO CLÍNICO")
+        assert medico.materia_origem == "cargo"
+        assert metadados_chunk(medico)["materia_origem"] == "cargo"
+
+    def test_materia_origem_prefixo_antes_do_item_1(self):
+        texto = (
+            "OBJETOS DE AVALIAÇÃO\n"
+            "CONHECIMENTOS ESPECÍFICOS\n"
+            "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE\n"
+            "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO 1 Constituição Federal. 2 Poder Legislativo.\n"
+        )
+        chunks = dividir_por_cargo_e_materia(texto)
+        assert len(chunks) == 1
+        assert (
+            chunks[0].materia
+            == "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO"
+        )
+        assert chunks[0].materia_origem == "prefixo"
+        assert chunks[0].texto.startswith("1 Constituição Federal.")
+        assert metadados_chunk(chunks[0])["materia_origem"] == "prefixo"
+
     def test_chunks_carregam_offsets_dentro_da_secao(self):
         # Offsets necessários pra trilha de auditoria (revisar_taxonomia_piloto.py):
         # devem apontar de volta pro texto exato que gerou cada chunk.
@@ -395,6 +423,7 @@ class TestBlocosDeConhecimento:
             "materia_normalizada": "ATUALIDADES",
             "apenas_discursiva": True,
             "cargos_restritos": None,
+            "materia_origem": "cabecalho",
         }
 
     def test_chunk_com_restricao_de_cargo_extrai_cargos_restritos_e_limpa_materia(self):

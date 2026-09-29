@@ -166,6 +166,17 @@ def backfill_lote(
         backfill(pdf_path, json_path, atualizar_artefatos=False)
         for pdf_path, json_path in pares
     ]
+    totais_origem: dict[str, int] = {}
+    for res in resultados:
+        if not isinstance(res, dict):
+            continue
+        for chunk in res.get("resultados", []) + res.get("chunks_com_falha", []):
+            origem = chunk.get("materia_origem", "desconhecido")
+            totais_origem[origem] = totais_origem.get(origem, 0) + 1
+    logger.info(
+        f"[BACKFILL] Lote concluído ({len(resultados)} editais, {sum(totais_origem.values())} chunks): "
+        + ", ".join(f"{k}={v}" for k, v in sorted(totais_origem.items()))
+    )
     if atualizar_artefatos:
         atualizar_artefatos_revisao(revisao_dir)
     return resultados
