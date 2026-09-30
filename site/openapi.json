@@ -12,7 +12,7 @@
           "Questões"
         ],
         "summary": "Lista questões objetivas com filtros",
-        "description": "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.800 questões objetivas do piloto 2025.",
+        "description": "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.781 questões objetivas utilizáveis do piloto 2025 (2.800 com `utilizaveis=todas`).",
         "operationId": "listar_questoes_api_v1_questoes_get",
         "parameters": [
           {
@@ -195,6 +195,22 @@
               "title": "Fora Do Edital"
             },
             "description": "`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro."
+          },
+          {
+            "name": "utilizaveis",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "so",
+                "todas"
+              ],
+              "type": "string",
+              "description": "`so` (padrão): esconde as questões com extração ilegível (`utilizavel=false`, ex.: fórmulas do caderno de Estatística da PF). `todas`: inclui, para revisão.",
+              "default": "so",
+              "title": "Utilizaveis"
+            },
+            "description": "`so` (padrão): esconde as questões com extração ilegível (`utilizavel=false`, ex.: fórmulas do caderno de Estatística da PF). `todas`: inclui, para revisão."
           },
           {
             "name": "pagina",

@@ -7,11 +7,11 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-def test_listar_questoes_sem_filtro_total_2800(cliente):
+def test_listar_questoes_sem_filtro_total_2781_utilizaveis(cliente):
     response = cliente.get("/api/v1/questoes")
     assert response.status_code == 200
     dados = response.json()
-    assert dados["total"] == 2800
+    assert dados["total"] == 2781
     assert len(dados["itens"]) == 20
     assert dados["pagina"] == 1
     assert dados["tamanho_pagina"] == 20
@@ -87,7 +87,7 @@ def test_facetas(cliente):
 
     # Órgãos (PF, STM, IBAMA, CD, TCU)
     orgaos = {o["valor"]: o["total"] for o in dados["orgaos"]}
-    assert orgaos["PF"] == 1150
+    assert orgaos["PF"] == 1131
     assert orgaos["STM"] == 950
     assert orgaos["IBAMA"] == 310
     assert orgaos["CD"] == 270
@@ -116,6 +116,19 @@ def test_permissoes_role_site_leitura():
             cur.execute("DELETE FROM questoes")
 
     conn.close()
+
+
+def test_utilizaveis_todas_inclui_as_19_ilegiveis(cliente):
+    todas = cliente.get("/api/v1/questoes?utilizaveis=todas").json()
+    assert todas["total"] == 2800
+    ilegiveis = cliente.get(
+        "/api/v1/questoes?utilizaveis=todas&concurso=PF_25_ADM&tamanho_pagina=50"
+    ).json()
+    chave = "PF_25_ADM|094_PF_005_01|52"
+    padrao = cliente.get("/api/v1/questoes?concurso=PF_25_ADM&tamanho_pagina=50").json()
+    assert ilegiveis["total"] - padrao["total"] == 19
+    # O detalhe por chave continua acessível (link direto), marcado como não utilizável.
+    assert cliente.get(f"/api/v1/questoes/{chave}").json()["utilizavel"] is False
 
 
 def test_filtro_invalido_devolve_422(cliente):

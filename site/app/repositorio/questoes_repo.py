@@ -53,6 +53,9 @@ def buscar_questoes(
         elif filtros_dict.get("anuladas") == "so":
             condicoes.append("anulada = true")
 
+        if filtros_dict.get("utilizaveis", "so") == "so":
+            condicoes.append("utilizavel")
+
         if filtros_dict.get("fora_do_edital") == "nao":
             condicoes.append("fora_do_edital = false")
         elif filtros_dict.get("fora_do_edital") == "sim":
@@ -191,13 +194,13 @@ def obter_arvore_com_contagens() -> list[dict]:
         query = """
         WITH contagens AS (
             SELECT materia_id AS alvo_id, count(DISTINCT questao_id) AS total_questoes
-            FROM vw_questoes WHERE materia_id IS NOT NULL GROUP BY materia_id
+            FROM vw_questoes WHERE utilizavel AND materia_id IS NOT NULL GROUP BY materia_id
             UNION ALL
             SELECT coalesce(assunto_id, no_id) AS alvo_id, count(DISTINCT questao_id) AS total_questoes
-            FROM vw_questoes WHERE assunto_id IS NOT NULL OR no_nivel = 'assunto' GROUP BY coalesce(assunto_id, no_id)
+            FROM vw_questoes WHERE utilizavel AND (assunto_id IS NOT NULL OR no_nivel = 'assunto') GROUP BY coalesce(assunto_id, no_id)
             UNION ALL
             SELECT no_id AS alvo_id, count(DISTINCT questao_id) AS total_questoes
-            FROM vw_questoes WHERE no_nivel = 'subassunto' GROUP BY no_id
+            FROM vw_questoes WHERE utilizavel AND no_nivel = 'subassunto' GROUP BY no_id
         )
         SELECT 
             c.id, c.nome, c.nivel, c.pai_id,
@@ -224,13 +227,14 @@ def obter_facetas() -> dict:
             "tipo_conhecimento",
         ]:
             cur.execute(
-                f"SELECT {col} AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes GROUP BY {col} ORDER BY total DESC"
+                f"SELECT {col} AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY {col} ORDER BY total DESC"
             )
             facetas[col] = cur.fetchall()
 
         cur.execute("""
             SELECT cargo_numero, cargo, concurso, nivel, count(DISTINCT questao_id) AS total
             FROM vw_questoes
+            WHERE utilizavel
             GROUP BY cargo_numero, cargo, concurso, nivel
             ORDER BY total DESC
         """)

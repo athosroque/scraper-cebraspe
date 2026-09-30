@@ -20,8 +20,8 @@ router = APIRouter(prefix="/questoes", tags=["Questões"])
     summary="Lista questões objetivas com filtros",
     description=(
         "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, "
-        "caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.800 "
-        "questões objetivas do piloto 2025."
+        "caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.781 "
+        "questões objetivas utilizáveis do piloto 2025 (2.800 com `utilizaveis=todas`)."
     ),
 )
 def listar_questoes(
@@ -52,6 +52,13 @@ def listar_questoes(
         "todos",
         description="`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro.",
     ),
+    utilizaveis: Literal["so", "todas"] = Query(
+        "so",
+        description=(
+            "`so` (padrão): esconde as questões com extração ilegível (`utilizavel=false`, "
+            "ex.: fórmulas do caderno de Estatística da PF). `todas`: inclui, para revisão."
+        ),
+    ),
     pagina: int = Query(1, ge=1, description="Página, a partir de 1."),
     tamanho_pagina: int = Query(
         20, ge=1, le=50, description="Itens por página (máx. 50)."
@@ -68,6 +75,7 @@ def listar_questoes(
         no_id=no_id,
         anuladas=anuladas,
         fora_do_edital=fora_do_edital,
+        utilizaveis=utilizaveis,
     )
     return questoes_servico.listar_questoes(filtros, pagina, tamanho_pagina)
 

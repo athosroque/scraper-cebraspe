@@ -15,6 +15,7 @@ class FiltroQuestoes(BaseModel):
     no_id: str | None = None
     anuladas: Literal["incluir", "excluir", "so"] = "incluir"
     fora_do_edital: Literal["todos", "sim", "nao"] = "todos"
+    utilizaveis: Literal["so", "todas"] = "so"
 
 
 # -- Respostas da API --

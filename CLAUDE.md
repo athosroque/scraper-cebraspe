@@ -199,6 +199,10 @@ Datasette continua só como ferramenta de revisão do dono.
       banco cair). Roles `site_leitura`/`site_app` com senha só no `.env`,
       aplicadas por `site/scripts/aplicar_schema_app.py`. Contrato em
       `site/openapi.json` (versionado, teste de divergência) e Swagger em `/docs`.
+      Listagem, árvore e facetas escondem por padrão as 19 questões com
+      `utilizavel=false` (fórmulas ilegíveis do caderno `094_PF_005_01`):
+      2.781 no padrão, 2.800 com `utilizaveis=todas`; o detalhe por chave segue
+      acessível.
       619 testes (+1 xfail), ruff verde.
 - **⚡ Prioridade atual: Etapa 5F.2 do `plano-etapa-5f.md`** (frontend de resolução).
 

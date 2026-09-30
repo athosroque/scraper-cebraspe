@@ -170,6 +170,11 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 ---
 
 ## 5. Ideias opcionais (fazer só se sobrar tempo na sessão)
+
+- **Recuperar as 19 questões ilegíveis** (`simbolo_ilegivel`, caderno
+  `094_PF_005_01`, Estatística da PF): recortar a região do item no PDF como
+  imagem na extração e exibi-la no lugar do texto. Hoje a API as esconde por
+  padrão (`utilizaveis=so`, decisão do dono em 2026-09-30).
 - "% de acerto da comunidade" por questão (agregado anônimo de `app.resposta`).
 - Filtro rápido "nunca cobrado no edital do meu cargo".
 - Sitemap XML das páginas de questão.
