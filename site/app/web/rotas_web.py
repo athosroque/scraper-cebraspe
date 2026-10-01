@@ -55,6 +55,16 @@ def _url_lista(no_id: str, filtros: FiltroEstatistica) -> str:
 templates.env.globals["url_lista"] = _url_lista
 
 
+def _nome_do_no(arvore, no_id: str | None) -> str | None:
+    pilha = list(arvore)
+    while no_id and pilha:
+        no = pilha.pop()
+        if no.id == no_id:
+            return no.nome
+        pilha.extend(no.filhos)
+    return None
+
+
 def _nao_encontrada(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request=request, name="nao_encontrada.html", status_code=404
@@ -115,6 +125,7 @@ def index(
     else:
         nome = "lista_questoes.html"
         contexto["arvore"] = questoes_servico.obter_arvore()
+        contexto["no_nome"] = _nome_do_no(contexto["arvore"], filtros.no_id)
         contexto["facetas"] = questoes_servico.obter_facetas()
 
     resposta = templates.TemplateResponse(request=request, name=nome, context=contexto)

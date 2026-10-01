@@ -138,3 +138,9 @@ def test_sobre(cliente):
 def test_rotas_web_fora_do_openapi(cliente):
     caminhos = cliente.get("/openapi.json").json()["paths"]
     assert not any(p == "/" or p.startswith("/q/") for p in caminhos)
+
+
+def test_filtro_de_assunto_mostra_o_nome(cliente):
+    materia = cliente.get("/api/v1/arvore").json()[0]
+    r = cliente.get("/", params={"no_id": materia["id"]})
+    assert f'data-no-nome="{materia["nome"]}"' in r.text

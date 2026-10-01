@@ -46,10 +46,12 @@
                 <legend><strong>Árvore de Assuntos</strong></legend>
                 {# no_id vem da query string: passa por data-attr (escape de HTML
                    comum), nunca interpolado dentro da expressão JS do Alpine. #}
-                <div data-no-id="{{ filtros.no_id or '' }}" x-data="{
+                <div data-no-id="{{ filtros.no_id or '' }}" data-no-nome="{{ no_nome or '' }}" x-data="{
                     selecionado: $el.dataset.noId,
-                    selecionar(id) {
+                    nome: $el.dataset.noNome,
+                    selecionar(id, nome) {
                         this.selecionado = id;
+                        this.nome = nome || '';
                         this.$nextTick(() => { document.getElementById('form-filtros').requestSubmit(); });
                     }
                 }">
@@ -57,8 +59,8 @@
                     
                     {# Controlado pelo Alpine: o HTMX troca só a lista, não a barra lateral. #}
                     <div x-show="selecionado" x-cloak style="margin-bottom: 1rem;">
-                        <small>Filtrando por assunto</small>
-                        <a href="#" @click.prevent="selecionar('')" role="button" class="outline secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7em;">Limpar</a>
+                        <small>Filtrando por: <strong x-text="nome || 'assunto'"></strong></small>
+                        <a href="#" @click.prevent="selecionar('', '')" role="button" class="outline secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7em;">Limpar</a>
                     </div>
 
                     <ul style="list-style: none; padding-left: 0; font-size: 0.85em;">
@@ -71,7 +73,7 @@
                                     <span x-show="aberto">▼</span>
                                 </button>
                                 {% endif %}
-                                <a href="#" @click.prevent="selecionar('{{ materia.id }}')" :class="selecionado == '{{ materia.id }}' ? 'pico-color-primary' : 'secondary'">
+                                <a href="#" data-nome="{{ materia.nome }}" @click.prevent="selecionar('{{ materia.id }}', $el.dataset.nome)" :class="selecionado == '{{ materia.id }}' ? 'pico-color-primary' : 'secondary'">
                                     <strong>{{ materia.nome }}</strong> <small>({{ materia.total_questoes }})</small>
                                 </a>
                             </div>
@@ -87,7 +89,7 @@
                                             <span x-show="aberto_assunto">▼</span>
                                         </button>
                                         {% endif %}
-                                        <a href="#" @click.prevent="selecionar('{{ assunto.id }}')" :class="selecionado == '{{ assunto.id }}' ? 'pico-color-primary' : 'secondary'">
+                                        <a href="#" data-nome="{{ assunto.nome }}" @click.prevent="selecionar('{{ assunto.id }}', $el.dataset.nome)" :class="selecionado == '{{ assunto.id }}' ? 'pico-color-primary' : 'secondary'">
                                             {{ assunto.nome }} <small>({{ assunto.total_questoes }})</small>
                                         </a>
                                     </div>
@@ -96,7 +98,7 @@
                                     <ul x-show="aberto_assunto" style="list-style: none; padding-left: 1.5rem; margin-top: 0.2rem;">
                                         {% for sub in assunto.filhos %}
                                         <li>
-                                            <a href="#" @click.prevent="selecionar('{{ sub.id }}')" :class="selecionado == '{{ sub.id }}' ? 'pico-color-primary' : 'secondary'">
+                                            <a href="#" data-nome="{{ sub.nome }}" @click.prevent="selecionar('{{ sub.id }}', $el.dataset.nome)" :class="selecionado == '{{ sub.id }}' ? 'pico-color-primary' : 'secondary'">
                                                 {{ sub.nome }} <small>({{ sub.total_questoes }})</small>
                                             </a>
                                         </li>
