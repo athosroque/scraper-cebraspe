@@ -662,6 +662,383 @@
         }
       }
     },
+    "/api/v1/estatisticas/prova-cobra": {
+      "get": {
+        "tags": [
+          "Estatísticas"
+        ],
+        "summary": "O que mais cai na prova",
+        "description": "Ranking de nós por questões distintas (`fn_prova_cobra`). A questão sobe a árvore e a básica aplicada a vários cargos conta uma vez.",
+        "operationId": "prova_cobra_api_v1_estatisticas_prova_cobra_get",
+        "parameters": [
+          {
+            "name": "nivel_alvo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "materia",
+                "assunto",
+                "subassunto"
+              ],
+              "type": "string",
+              "description": "Nível da árvore do ranking.",
+              "default": "subassunto",
+              "title": "Nivel Alvo"
+            },
+            "description": "Nível da árvore do ranking."
+          },
+          {
+            "name": "materia_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Restringe o ranking a uma matéria (id do nó).",
+              "title": "Materia Id"
+            },
+            "description": "Restringe o ranking a uma matéria (id do nó)."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Tamanho do ranking (máx. 200).",
+              "default": 20,
+              "title": "Limite"
+            },
+            "description": "Tamanho do ranking (máx. 200)."
+          },
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
+              "title": "Concurso"
+            },
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Número do cargo no edital. Use junto com `concurso`.",
+              "title": "Cargo Numero"
+            },
+            "description": "Número do cargo no edital. Use junto com `concurso`."
+          },
+          {
+            "name": "nivel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`superior` ou `medio`.",
+              "title": "Nivel"
+            },
+            "description": "`superior` ou `medio`."
+          },
+          {
+            "name": "tipo_conhecimento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`basico` ou `especifico`.",
+              "title": "Tipo Conhecimento"
+            },
+            "description": "`basico` ou `especifico`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LinhaProvaCobra"
+                  },
+                  "title": "Response Prova Cobra Api V1 Estatisticas Prova Cobra Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estatisticas/edital-cobra": {
+      "get": {
+        "tags": [
+          "Estatísticas"
+        ],
+        "summary": "O que o edital cobra",
+        "description": "Ranking de nós por itens de edital distintos (concursos aprovados), subindo a árvore; o item básico vale para cada cargo do nível.",
+        "operationId": "edital_cobra_api_v1_estatisticas_edital_cobra_get",
+        "parameters": [
+          {
+            "name": "nivel_alvo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "materia",
+                "assunto",
+                "subassunto"
+              ],
+              "type": "string",
+              "description": "Nível da árvore do ranking.",
+              "default": "subassunto",
+              "title": "Nivel Alvo"
+            },
+            "description": "Nível da árvore do ranking."
+          },
+          {
+            "name": "materia_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Restringe o ranking a uma matéria (id do nó).",
+              "title": "Materia Id"
+            },
+            "description": "Restringe o ranking a uma matéria (id do nó)."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Tamanho do ranking (máx. 200).",
+              "default": 20,
+              "title": "Limite"
+            },
+            "description": "Tamanho do ranking (máx. 200)."
+          },
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
+              "title": "Concurso"
+            },
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Número do cargo no edital. Use junto com `concurso`.",
+              "title": "Cargo Numero"
+            },
+            "description": "Número do cargo no edital. Use junto com `concurso`."
+          },
+          {
+            "name": "nivel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`superior` ou `medio`.",
+              "title": "Nivel"
+            },
+            "description": "`superior` ou `medio`."
+          },
+          {
+            "name": "tipo_conhecimento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`basico` ou `especifico`.",
+              "title": "Tipo Conhecimento"
+            },
+            "description": "`basico` ou `especifico`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LinhaEditalCobra"
+                  },
+                  "title": "Response Edital Cobra Api V1 Estatisticas Edital Cobra Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estatisticas/edital-vs-prova": {
+      "get": {
+        "tags": [
+          "Estatísticas"
+        ],
+        "summary": "Edital × prova de um cargo",
+        "description": "Cada nó do edital ou da prova do cargo, com a situação: cobrado no edital, no edital e nunca cobrado, ou cobrado fora do edital. Inclui o peso de cada matéria na prova.",
+        "operationId": "edital_vs_prova_api_v1_estatisticas_edital_vs_prova_get",
+        "parameters": [
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Slug do concurso.",
+              "title": "Concurso"
+            },
+            "description": "Slug do concurso."
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "Número do cargo no edital.",
+              "title": "Cargo Numero"
+            },
+            "description": "Número do cargo no edital."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditalVsProva"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cargo sem edital nem prova"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/saude": {
       "get": {
         "tags": [
@@ -712,6 +1089,50 @@
         ],
         "title": "CargoInfo",
         "description": "Cargo do edital para o qual o caderno da questão foi aplicado."
+      },
+      "EditalVsProva": {
+        "properties": {
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          },
+          "resumo": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Resumo",
+            "description": "Total de nós por situação."
+          },
+          "nos": {
+            "items": {
+              "$ref": "#/components/schemas/LinhaEditalVsProva"
+            },
+            "type": "array",
+            "title": "Nos"
+          },
+          "peso_materias": {
+            "items": {
+              "$ref": "#/components/schemas/PesoMateria"
+            },
+            "type": "array",
+            "title": "Peso Materias"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero",
+          "resumo",
+          "nos",
+          "peso_materias"
+        ],
+        "title": "EditalVsProva",
+        "description": "Edital × prova de um cargo (`vw_edital_vs_prova` + `vw_peso_materia_cargo`)."
       },
       "FacetaCargo": {
         "properties": {
@@ -845,6 +1266,172 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LinhaEditalCobra": {
+        "properties": {
+          "no_id": {
+            "type": "string",
+            "title": "No Id"
+          },
+          "no_nome": {
+            "type": "string",
+            "title": "No Nome"
+          },
+          "caminho": {
+            "type": "string",
+            "title": "Caminho"
+          },
+          "materia_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materia Id"
+          },
+          "ocorrencias": {
+            "type": "integer",
+            "title": "Ocorrencias"
+          }
+        },
+        "type": "object",
+        "required": [
+          "no_id",
+          "no_nome",
+          "caminho",
+          "materia_id",
+          "ocorrencias"
+        ],
+        "title": "LinhaEditalCobra",
+        "description": "Nó no ranking \"o que o edital cobra\": itens de edital distintos, subindo a árvore."
+      },
+      "LinhaEditalVsProva": {
+        "properties": {
+          "no_id": {
+            "type": "string",
+            "title": "No Id"
+          },
+          "no_nome": {
+            "type": "string",
+            "title": "No Nome"
+          },
+          "no_nivel": {
+            "type": "string",
+            "title": "No Nivel"
+          },
+          "caminho": {
+            "type": "string",
+            "title": "Caminho"
+          },
+          "materia_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materia Id"
+          },
+          "previsao": {
+            "type": "integer",
+            "title": "Previsao",
+            "description": "Itens do edital do cargo no nó."
+          },
+          "questoes": {
+            "type": "integer",
+            "title": "Questoes"
+          },
+          "situacao": {
+            "type": "string",
+            "enum": [
+              "cobrado_no_edital",
+              "no_edital_nunca_cobrado",
+              "cobrado_fora_do_edital"
+            ],
+            "title": "Situacao"
+          }
+        },
+        "type": "object",
+        "required": [
+          "no_id",
+          "no_nome",
+          "no_nivel",
+          "caminho",
+          "materia_id",
+          "previsao",
+          "questoes",
+          "situacao"
+        ],
+        "title": "LinhaEditalVsProva"
+      },
+      "LinhaProvaCobra": {
+        "properties": {
+          "no_id": {
+            "type": "string",
+            "title": "No Id"
+          },
+          "no_nome": {
+            "type": "string",
+            "title": "No Nome"
+          },
+          "caminho": {
+            "type": "string",
+            "title": "Caminho"
+          },
+          "materia_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materia Id"
+          },
+          "questoes": {
+            "type": "integer",
+            "title": "Questoes",
+            "description": "Questões válidas distintas no nó (anuladas fora)."
+          },
+          "anuladas": {
+            "type": "integer",
+            "title": "Anuladas"
+          },
+          "total_universo": {
+            "type": "integer",
+            "title": "Total Universo",
+            "description": "Questões válidas distintas sob os filtros."
+          },
+          "pct_do_universo": {
+            "type": "number",
+            "title": "Pct Do Universo"
+          },
+          "pct_medio_por_concurso": {
+            "type": "number",
+            "title": "Pct Medio Por Concurso",
+            "description": "Média entre concursos do % do nó dentro da matéria (subassunto/assunto) ou da prova (matéria), com peso igual por concurso."
+          }
+        },
+        "type": "object",
+        "required": [
+          "no_id",
+          "no_nome",
+          "caminho",
+          "materia_id",
+          "questoes",
+          "anuladas",
+          "total_universo",
+          "pct_do_universo",
+          "pct_medio_por_concurso"
+        ],
+        "title": "LinhaProvaCobra",
+        "description": "Nó no ranking \"o que mais cai\" (`fn_prova_cobra`): questão distinta, subindo a árvore."
       },
       "NoArvore": {
         "properties": {
@@ -1064,6 +1651,44 @@
         ],
         "title": "PaginaQuestoes",
         "description": "Página de resultados de `GET /api/v1/questoes`."
+      },
+      "PesoMateria": {
+        "properties": {
+          "materia_id": {
+            "type": "string",
+            "title": "Materia Id"
+          },
+          "rotulo_materia": {
+            "type": "string",
+            "title": "Rotulo Materia"
+          },
+          "questoes": {
+            "type": "integer",
+            "title": "Questoes"
+          },
+          "anuladas": {
+            "type": "integer",
+            "title": "Anuladas"
+          },
+          "total_cargo": {
+            "type": "integer",
+            "title": "Total Cargo"
+          },
+          "pct_da_prova": {
+            "type": "number",
+            "title": "Pct Da Prova"
+          }
+        },
+        "type": "object",
+        "required": [
+          "materia_id",
+          "rotulo_materia",
+          "questoes",
+          "anuladas",
+          "total_cargo",
+          "pct_da_prova"
+        ],
+        "title": "PesoMateria"
       },
       "QuestaoDetalhe": {
         "properties": {

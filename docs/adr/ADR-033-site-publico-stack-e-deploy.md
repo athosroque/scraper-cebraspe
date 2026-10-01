@@ -181,6 +181,20 @@ UX fique limitada pelo HTMX. Até lá, migrar é custo sem ganho.
   `GET/DELETE /api/v1/eu`, `GET /api/v1/eu/desempenho`, `historico=` na
   listagem (401 sem login). Em produção (5F.6): `SESSION_HTTPS_ONLY=true` e
   uvicorn com `--proxy-headers`, senão o `redirect_uri` sai `http://`.
+- **5F.4 (2026-10-01):** páginas `/estatisticas` (o que mais cai),
+  `/estatisticas/edital` e `/estatisticas/edital-vs-prova`, espelhadas em
+  `GET /api/v1/estatisticas/{prova-cobra,edital-cobra,edital-vs-prova}`.
+  "O que mais cai" vem só de `fn_prova_cobra` (nunca soma de
+  `vw_prova_cobra_*`). As `vw_edital_cobra_*` não têm filtro de concurso ou
+  cargo, então o "edital cobra" repete a regra da `vw_edital_cobra_base`
+  sobre `vw_arvore_edital_por_cargo` (item distinto, sobe a árvore, só
+  `aprovado`), com `SELECT` novo para a `site_leitura`; sem filtro, bate com
+  as views. Barras em CSS no servidor (sem Chart.js). Cada linha linka para
+  a lista com `no_id`, os mesmos filtros e `anuladas=excluir`. A lista pode
+  ter mais questões que o ranking, porque mostra o enunciado repetido em
+  cadernos diferentes e a estatística conta a questão canônica uma vez.
+  `cargo_numero` chega como texto nas rotas HTML: trocar o concurso manda
+  o campo vazio, que como `int` dava 422.
 
 ## Referências
 - ADR-026 (banco próprio), ADR-030 (árvore mestre e objetivo do site),

@@ -56,6 +56,8 @@ GRANT SELECT ON vw_prova_cobra_subassunto TO site_leitura;
 GRANT SELECT ON vw_certo_errado_por_no TO site_leitura;
 GRANT SELECT ON vw_comparativo_nivel TO site_leitura;
 GRANT SELECT ON vw_peso_materia_cargo TO site_leitura;
+-- 5F.4: "o que o edital cobra" com filtro de concurso/cargo/nível.
+GRANT SELECT ON vw_arvore_edital_por_cargo TO site_leitura;
 GRANT EXECUTE ON FUNCTION fn_prova_cobra TO site_leitura;
 REVOKE CREATE ON SCHEMA public FROM site_leitura;
 

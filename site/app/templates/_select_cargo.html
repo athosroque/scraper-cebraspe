@@ -1,0 +1,19 @@
+{# Concurso e cargo: trocar o concurso limpa o cargo (o número se repete entre concursos). #}
+<label>Concurso
+    <select name="concurso" @change="$refs.cargo.value = ''">
+        <option value="">{{ rotulo_todos or "Todos" }}</option>
+        {% for c in cargos|map(attribute="concurso")|unique %}
+        <option value="{{ c }}" {% if filtros.concurso == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+    </select>
+</label>
+<label>Cargo
+    <select name="cargo_numero" x-ref="cargo" {% if not filtros.concurso %}disabled{% endif %}>
+        <option value="">{{ rotulo_todos or "Todos" }}</option>
+        {% for c in cargos if c.concurso == filtros.concurso %}
+        <option value="{{ c.cargo_numero }}" {% if filtros.cargo_numero == c.cargo_numero %}selected{% endif %}>
+            {{ c.cargo_numero }} — {{ c.cargo }} ({{ c.nivel }})
+        </option>
+        {% endfor %}
+    </select>
+</label>

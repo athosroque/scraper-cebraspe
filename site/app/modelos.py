@@ -170,3 +170,79 @@ class NoDesempenho(BaseModel):
     acertos: int
     percentual: float = Field(description="Acertos / total × 100, com 1 casa.")
     filhos: list["NoDesempenho"] = []
+
+
+# -- Estatísticas (5F.4) --
+NivelAlvo = Literal["materia", "assunto", "subassunto"]
+
+
+class FiltroEstatistica(BaseModel):
+    concurso: str | None = None
+    cargo_numero: int | None = None
+    nivel: str | None = None
+    tipo_conhecimento: str | None = None
+
+
+class LinhaProvaCobra(BaseModel):
+    """Nó no ranking "o que mais cai" (`fn_prova_cobra`): questão distinta, subindo a árvore."""
+
+    no_id: str
+    no_nome: str
+    caminho: str
+    materia_id: str | None
+    questoes: int = Field(
+        description="Questões válidas distintas no nó (anuladas fora)."
+    )
+    anuladas: int
+    total_universo: int = Field(
+        description="Questões válidas distintas sob os filtros."
+    )
+    pct_do_universo: float
+    pct_medio_por_concurso: float = Field(
+        description=(
+            "Média entre concursos do % do nó dentro da matéria (subassunto/assunto) "
+            "ou da prova (matéria), com peso igual por concurso."
+        )
+    )
+
+
+class LinhaEditalCobra(BaseModel):
+    """Nó no ranking "o que o edital cobra": itens de edital distintos, subindo a árvore."""
+
+    no_id: str
+    no_nome: str
+    caminho: str
+    materia_id: str | None
+    ocorrencias: int
+
+
+class LinhaEditalVsProva(BaseModel):
+    no_id: str
+    no_nome: str
+    no_nivel: str
+    caminho: str
+    materia_id: str | None
+    previsao: int = Field(description="Itens do edital do cargo no nó.")
+    questoes: int
+    situacao: Literal[
+        "cobrado_no_edital", "no_edital_nunca_cobrado", "cobrado_fora_do_edital"
+    ]
+
+
+class PesoMateria(BaseModel):
+    materia_id: str
+    rotulo_materia: str
+    questoes: int
+    anuladas: int
+    total_cargo: int
+    pct_da_prova: float
+
+
+class EditalVsProva(BaseModel):
+    """Edital × prova de um cargo (`vw_edital_vs_prova` + `vw_peso_materia_cargo`)."""
+
+    concurso: str
+    cargo_numero: int
+    resumo: dict[str, int] = Field(description="Total de nós por situação.")
+    nos: list[LinhaEditalVsProva]
+    peso_materias: list[PesoMateria]

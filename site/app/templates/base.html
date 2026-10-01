@@ -17,6 +17,7 @@
                 <li><strong><a href="/" class="contrast">Questões CEBRASPE</a></strong></li>
             </ul>
             <ul>
+                <li><a href="/estatisticas">Estatísticas</a></li>
                 <li><a href="/sobre">Sobre</a></li>
                 {% if request.session.get("usuario_id") %}
                 <li><a href="/conta">{{ request.session.get("usuario_nome") }}</a></li>

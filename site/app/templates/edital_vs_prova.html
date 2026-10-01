@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Edital × prova - Questões CEBRASPE{% endblock %}
+{% block description %}O que o edital de cada cargo do CEBRASPE previu e a prova cobrou: assuntos cobrados, nunca cobrados e cobrados fora do edital.{% endblock %}
+
+{% block content %}
+{% include "_abas_estatistica.html" %}
+
+<form method="get" x-data @change="$el.requestSubmit()">
+    <div class="grid">
+        {% with rotulo_todos = "Escolha" %}{% include "_select_cargo.html" %}{% endwith %}
+    </div>
+    <noscript><button type="submit">Aplicar</button></noscript>
+</form>
+
+{% if not resultado %}
+<p>Escolha um concurso e um cargo para comparar o edital com a prova.</p>
+{% else %}
+{% set rotulos = {
+    "cobrado_no_edital": "Previsto no edital e cobrado",
+    "no_edital_nunca_cobrado": "No edital, nunca cobrado",
+    "cobrado_fora_do_edital": "Cobrado fora do edital",
+} %}
+<div class="grid">
+    {% for chave, rotulo in rotulos.items() %}
+    <article class="resumo-situacao">
+        <header><small>{{ rotulo }}</small></header>
+        <strong>{{ resultado.resumo.get(chave, 0) }}</strong> <small>nós</small>
+    </article>
+    {% endfor %}
+</div>
+
+<h3>Peso de cada matéria na prova</h3>
+<table class="ranking">
+    <thead><tr><th>Matéria</th><th>Questões</th><th>% da prova</th></tr></thead>
+    <tbody>
+        {% for p in resultado.peso_materias %}
+        <tr>
+            <td>
+                <a href="{{ url_lista(p.materia_id, filtros) }}">{{ p.rotulo_materia }}</a>
+                <div class="barra"><span style="width: {{ [p.pct_da_prova, 100]|min }}%"></span></div>
+            </td>
+            <td>{{ p.questoes }}</td>
+            <td>{{ "%.2f"|format(p.pct_da_prova) }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p><small>Total da prova: {{ resultado.peso_materias[0].total_cargo if resultado.peso_materias else 0 }} questões válidas. A questão com nós em duas matérias conta nas duas, então a soma pode passar de 100%.</small></p>
+
+{% for chave, rotulo in rotulos.items() %}
+{% set nos = resultado.nos|selectattr("situacao", "equalto", chave)|list %}
+<details {% if chave == "no_edital_nunca_cobrado" %}open{% endif %}>
+    <summary><strong>{{ rotulo }}</strong> ({{ nos|length }})</summary>
+    {% if nos %}
+    <table>
+        <thead><tr><th>Nó</th><th>Nível</th><th>Itens no edital</th><th>Questões</th></tr></thead>
+        <tbody>
+            {% for n in nos %}
+            <tr>
+                <td>
+                    {% if n.questoes %}<a href="{{ url_lista(n.no_id, filtros) }}">{{ n.no_nome }}</a>{% else %}{{ n.no_nome }}{% endif %}
+                    {% if n.no_nivel != "materia" %}<br><small class="secondary">{{ n.caminho.rsplit(" > ", 1)[0] }}</small>{% endif %}
+                </td>
+                <td>{{ n.no_nivel }}</td>
+                <td>{{ n.previsao }}</td>
+                <td>{{ n.questoes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p><small>Nenhum.</small></p>
+    {% endif %}
+</details>
+{% endfor %}
+<p><small>O item do edital num nó cobre também os nós abaixo dele. A questão classificada direto num assunto não desce para o subassunto previsto abaixo, que pode aparecer como nunca cobrado.</small></p>
+{% endif %}
+{% endblock %}

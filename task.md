@@ -802,11 +802,11 @@ enviar o bloco de uma etapa específica para o agente construir.
 - `[x]` **5F.2 — Frontend de resolução:** concluída em 2026-10-01. lista filtrável, resolver
   Certo/Errado com a correção imediata, texto-base e figuras, e a árvore de
   filtros navegável.
-- `[ ]` **5F.3 — Contas e histórico:** cadastro/login, tabela de respostas
+- `[x]` **5F.3 — Contas e histórico:** concluída em 2026-10-01. cadastro/login, tabela de respostas
   (`usuario`, `questao`, `resposta`, `acertou`, `respondida_em`) e
   **(4) desempenho pessoal** por nó da árvore (onde mais erra), com os
   mesmos filtros.
-- `[ ]` **5F.4 — Páginas de estatística:** (1) o que mais cai, (2) o que o
+- `[x]` **5F.4 — Páginas de estatística:** concluída em 2026-10-01. (1) o que mais cai, (2) o que o
   edital cobra e (3) edital × prova, por concurso/cargo/nível, a partir das
   views da 5E.
 - `[ ]` **5F.5 — Simulado:** refazer a prova de um concurso/cargo (básico +

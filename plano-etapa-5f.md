@@ -142,7 +142,7 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 - **Pronto quando:** login real com a conta do dono, 20 respostas gravadas,
   o desempenho por matéria bate com a contagem manual.
 
-### 5F.4 — Páginas de estatística
+### 5F.4 — Páginas de estatística ✅ (2026-10-01)
 - (1) O que mais cai: `fn_prova_cobra` com filtros (concurso/cargo/nível),
   ranking de subassuntos e barras (SVG no servidor ou Chart.js).
 - (2) O que o edital cobra: `vw_edital_cobra_*`.

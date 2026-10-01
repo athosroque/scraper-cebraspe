@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{% if aba == "prova" %}O que mais cai{% else %}O que o edital cobra{% endif %} - Questões CEBRASPE{% endblock %}
+{% block description %}{% if aba == "prova" %}Ranking dos assuntos que mais caem nas provas do CEBRASPE, por concurso, cargo e nível.{% else %}Ranking dos assuntos mais previstos nos editais do CEBRASPE, por concurso, cargo e nível.{% endif %}{% endblock %}
+
+{% block content %}
+{% include "_abas_estatistica.html" %}
+
+<form method="get" x-data @change="$el.requestSubmit()" class="filtros-estatistica">
+    <div class="grid">
+        <label>Nível da árvore
+            <select name="nivel_alvo">
+                {% for valor, rotulo in [("materia", "Matéria"), ("assunto", "Assunto"), ("subassunto", "Subassunto")] %}
+                <option value="{{ valor }}" {% if nivel_alvo == valor %}selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Matéria
+            <select name="materia_id" {% if nivel_alvo == "materia" %}disabled{% endif %}>
+                <option value="">Todas</option>
+                {% for m in materias %}
+                <option value="{{ m.id }}" {% if materia_id == m.id %}selected{% endif %}>{{ m.nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Nível do cargo
+            <select name="nivel">
+                {% for valor, rotulo in [("", "Todos"), ("superior", "Superior"), ("medio", "Médio")] %}
+                <option value="{{ valor }}" {% if (filtros.nivel or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Conhecimento
+            <select name="tipo_conhecimento">
+                {% for valor, rotulo in [("", "Todos"), ("basico", "Básico"), ("especifico", "Específico")] %}
+                <option value="{{ valor }}" {% if (filtros.tipo_conhecimento or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+    <div class="grid">
+        {% include "_select_cargo.html" %}
+    </div>
+    <noscript><button type="submit">Aplicar</button></noscript>
+</form>
+
+{% if aba == "prova" %}
+<p><small>Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da matéria (ou da prova, no nível matéria), com o mesmo peso para cada concurso.</small></p>
+{% else %}
+<p><small>Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a matéria acima dele; o item básico vale para cada cargo do nível.</small></p>
+{% endif %}
+
+{% if linhas %}
+<table class="ranking">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>{{ {"materia": "Matéria", "assunto": "Assunto", "subassunto": "Subassunto"}[nivel_alvo] }}</th>
+            <th>{% if aba == "prova" %}Questões{% else %}Itens no edital{% endif %}</th>
+            {% if aba == "prova" %}<th>% médio</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in linhas %}
+        {% set valor = r.questoes if aba == "prova" else r.ocorrencias %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+                <a href="{{ url_lista(r.no_id, filtros) }}">{{ r.no_nome }}</a>
+                {% if nivel_alvo != "materia" %}<br><small class="secondary">{{ r.caminho.rsplit(" > ", 1)[0] }}</small>{% endif %}
+                <div class="barra"><span style="width: {{ (valor * 100 / maximo) if maximo else 0 }}%"></span></div>
+            </td>
+            <td>{{ valor }}</td>
+            {% if aba == "prova" %}<td>{{ "%.2f"|format(r.pct_medio_por_concurso) }}%</td>{% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if aba == "prova" %}<p><small>Universo sob os filtros: {{ linhas[0].total_universo }} questões válidas.</small></p>{% endif %}
+{% else %}
+<p>Nenhum resultado para esses filtros.</p>
+{% endif %}
+{% endblock %}

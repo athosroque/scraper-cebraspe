@@ -1,0 +1,7 @@
+<nav aria-label="Estatísticas">
+    <ul>
+        <li><a href="/estatisticas" {% if aba == "prova" %}aria-current="page"{% else %}class="secondary"{% endif %}>O que mais cai</a></li>
+        <li><a href="/estatisticas/edital" {% if aba == "edital" %}aria-current="page"{% else %}class="secondary"{% endif %}>O que o edital cobra</a></li>
+        <li><a href="/estatisticas/edital-vs-prova" {% if aba == "edital_vs_prova" %}aria-current="page"{% else %}class="secondary"{% endif %}>Edital × prova</a></li>
+    </ul>
+</nav>

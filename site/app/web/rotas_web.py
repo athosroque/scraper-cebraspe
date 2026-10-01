@@ -4,10 +4,11 @@ import hashlib
 import logging
 import pathlib
 from typing import Literal
+from urllib.parse import urlencode
 
 from app import auth
-from app.modelos import FiltroQuestoes
-from app.servicos import contas_servico, questoes_servico
+from app.modelos import FiltroEstatistica, FiltroQuestoes, NivelAlvo
+from app.servicos import contas_servico, estatisticas_servico, questoes_servico
 from authlib.integrations.base_client import OAuthError
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -38,6 +39,20 @@ def _url_questao(chave: str) -> str:
 
 
 templates.env.globals["url_questao"] = _url_questao
+
+
+def _url_lista(no_id: str, filtros: FiltroEstatistica) -> str:
+    """Lista de questões já filtrada pelo nó e pelos filtros da estatística."""
+    # Anuladas fora, como na contagem da estatística.
+    params = {
+        "no_id": no_id,
+        "anuladas": "excluir",
+        **filtros.model_dump(exclude_none=True),
+    }
+    return "/?" + urlencode(params)
+
+
+templates.env.globals["url_lista"] = _url_lista
 
 
 def _nao_encontrada(request: Request) -> HTMLResponse:
@@ -154,6 +169,108 @@ def detalhe_questao(request: Request, concurso: str, caderno: str, numero: int):
 @router.get("/sobre", response_class=HTMLResponse)
 def sobre(request: Request):
     return templates.TemplateResponse(request=request, name="sobre.html")
+
+
+# -- Estatísticas (5F.4) --
+def _filtro_estatistica(
+    concurso: str | None,
+    cargo_numero: str | None,
+    nivel: str | None,
+    tipo_conhecimento: str | None,
+) -> FiltroEstatistica:
+    # Select vazio chega como "": vale como "sem filtro" (o cargo é str porque
+    # trocar o concurso manda `cargo_numero=`, que como int daria 422). Cargo
+    # sem concurso não identifica nada (o número se repete entre concursos).
+    concurso = concurso or None
+    numero = int(cargo_numero) if cargo_numero and cargo_numero.isdigit() else None
+    return FiltroEstatistica(
+        concurso=concurso,
+        cargo_numero=numero if concurso else None,
+        nivel=nivel or None,
+        tipo_conhecimento=tipo_conhecimento or None,
+    )
+
+
+def _ranking(
+    request: Request,
+    aba: Literal["prova", "edital"],
+    nivel_alvo: NivelAlvo,
+    materia_id: str | None,
+    filtros: FiltroEstatistica,
+):
+    materia_id = materia_id or None
+    if aba == "prova":
+        linhas = estatisticas_servico.prova_cobra(nivel_alvo, filtros, materia_id, 30)
+        maximo = max((r.questoes for r in linhas), default=0)
+    else:
+        linhas = estatisticas_servico.edital_cobra(nivel_alvo, filtros, materia_id, 30)
+        maximo = max((r.ocorrencias for r in linhas), default=0)
+    return templates.TemplateResponse(
+        request=request,
+        name="estatisticas.html",
+        context={
+            "aba": aba,
+            "linhas": linhas,
+            "maximo": maximo,
+            "nivel_alvo": nivel_alvo,
+            "materia_id": materia_id,
+            "filtros": filtros,
+            "materias": estatisticas_servico.materias(),
+            "cargos": estatisticas_servico.cargos(),
+        },
+    )
+
+
+@router.get("/estatisticas", response_class=HTMLResponse)
+def estatisticas_prova(
+    request: Request,
+    nivel_alvo: NivelAlvo = "subassunto",
+    materia_id: str | None = None,
+    concurso: str | None = None,
+    cargo_numero: str | None = None,
+    nivel: str | None = None,
+    tipo_conhecimento: str | None = None,
+):
+    filtros = _filtro_estatistica(concurso, cargo_numero, nivel, tipo_conhecimento)
+    return _ranking(request, "prova", nivel_alvo, materia_id, filtros)
+
+
+@router.get("/estatisticas/edital", response_class=HTMLResponse)
+def estatisticas_edital(
+    request: Request,
+    nivel_alvo: NivelAlvo = "subassunto",
+    materia_id: str | None = None,
+    concurso: str | None = None,
+    cargo_numero: str | None = None,
+    nivel: str | None = None,
+    tipo_conhecimento: str | None = None,
+):
+    filtros = _filtro_estatistica(concurso, cargo_numero, nivel, tipo_conhecimento)
+    return _ranking(request, "edital", nivel_alvo, materia_id, filtros)
+
+
+@router.get("/estatisticas/edital-vs-prova", response_class=HTMLResponse)
+def estatisticas_edital_vs_prova(
+    request: Request,
+    concurso: str | None = None,
+    cargo_numero: str | None = None,
+):
+    filtros = _filtro_estatistica(concurso, cargo_numero, None, None)
+    resultado = None
+    if filtros.concurso and filtros.cargo_numero:
+        resultado = estatisticas_servico.edital_vs_prova(
+            filtros.concurso, filtros.cargo_numero
+        )
+    return templates.TemplateResponse(
+        request=request,
+        name="edital_vs_prova.html",
+        context={
+            "aba": "edital_vs_prova",
+            "filtros": filtros,
+            "resultado": resultado,
+            "cargos": estatisticas_servico.cargos(),
+        },
+    )
 
 
 # -- Contas (5F.3) --

@@ -17,3 +17,22 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* Estatísticas (5F.4): barra proporcional ao maior valor do ranking */
+.barra {
+    height: 0.4rem;
+    background: var(--pico-muted-border-color);
+    border-radius: 0.2rem;
+    margin-top: 0.3rem;
+}
+
+.barra span {
+    display: block;
+    height: 100%;
+    background: var(--pico-primary-background);
+    border-radius: 0.2rem;
+}
+
+.resumo-situacao strong {
+    font-size: 1.8rem;
+}

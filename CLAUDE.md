@@ -226,7 +226,16 @@ Datasette continua só como ferramenta de revisão do dono.
       2026-10-01 (via túnel SSH para `localhost:8000`): 30 respostas, e o
       desempenho das 13 matérias bateu com a contagem manual no banco.
       641 testes (+1 xfail), ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.4 do `plano-etapa-5f.md`** (páginas de estatística).
+- [x] Etapa 5F.4 — Páginas de estatística (ADR-033): `/estatisticas` (o que
+      mais cai, `fn_prova_cobra`), `/estatisticas/edital` (itens de edital
+      distintos sobre `vw_arvore_edital_por_cargo`, com filtro de
+      concurso/cargo/nível) e `/estatisticas/edital-vs-prova` (situações +
+      `vw_peso_materia_cargo`), espelhadas em `/api/v1/estatisticas/*`. Os 3
+      exemplos da 5E batem: top 10 de LP superior × médio, link para a lista
+      filtrada por subassunto/cargo/nível e PF_25_ADM cargo 1 (139 nós
+      cobrados, 125 nunca cobrados, 0 fora). Validado no Chromium headless.
+      653 testes (+1 xfail), ruff verde.
+- **⚡ Prioridade atual: Etapa 5F.5 do `plano-etapa-5f.md`** (simulado).
 
 
 ## 6. Patterns
@@ -629,6 +638,9 @@ Datasette continua só como ferramenta de revisão do dono.
 - Nunca pôr campo pesado (texto-base, figuras) em `QuestaoResumo` para
   servir o HTML: muda o contrato da API e multiplica o payload da listagem.
   O card busca em `/q/.../anexos` quando o usuário abre.
+- Nunca declarar `cargo_numero: int` em rota HTML com select de cargo: trocar
+  o concurso limpa o select e manda `cargo_numero=`, e o FastAPI responde 422
+  (só aparece no navegador, não no teste com parâmetro válido).
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança
