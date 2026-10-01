@@ -3,6 +3,69 @@ from psycopg2.extras import RealDictCursor
 from app.db import get_conexao_leitura
 
 
+def montar_where(filtros_dict: dict, params: dict) -> str:
+    """WHERE sobre `vw_questoes` a partir dos filtros; preenche `params`."""
+    condicoes = ["1 = 1"]
+
+    if filtros_dict.get("banca"):
+        condicoes.append("banca = %(banca)s")
+        params["banca"] = filtros_dict["banca"]
+
+    if filtros_dict.get("orgao"):
+        condicoes.append("orgao = %(orgao)s")
+        params["orgao"] = filtros_dict["orgao"]
+
+    if filtros_dict.get("ano"):
+        condicoes.append("ano = %(ano)s")
+        params["ano"] = filtros_dict["ano"]
+
+    if filtros_dict.get("concurso"):
+        condicoes.append("concurso = %(concurso)s")
+        params["concurso"] = filtros_dict["concurso"]
+
+    if filtros_dict.get("cargo_numero"):
+        condicoes.append("cargo_numero = %(cargo_numero)s")
+        params["cargo_numero"] = filtros_dict["cargo_numero"]
+
+    if filtros_dict.get("nivel"):
+        condicoes.append("nivel = %(nivel)s")
+        params["nivel"] = filtros_dict["nivel"]
+
+    if filtros_dict.get("tipo_conhecimento"):
+        condicoes.append("tipo_conhecimento = %(tipo_conhecimento)s")
+        params["tipo_conhecimento"] = filtros_dict["tipo_conhecimento"]
+
+    if filtros_dict.get("no_id"):
+        condicoes.append(
+            "(no_id = %(no_id)s OR assunto_id = %(no_id)s OR materia_id = %(no_id)s)"
+        )
+        params["no_id"] = filtros_dict["no_id"]
+
+    if filtros_dict.get("anuladas") == "excluir":
+        condicoes.append("anulada = false")
+    elif filtros_dict.get("anuladas") == "so":
+        condicoes.append("anulada = true")
+
+    if filtros_dict.get("utilizaveis", "so") == "so":
+        condicoes.append("utilizavel")
+
+    if filtros_dict.get("fora_do_edital") == "nao":
+        condicoes.append("fora_do_edital = false")
+    elif filtros_dict.get("fora_do_edital") == "sim":
+        condicoes.append("fora_do_edital = true")
+
+    # Histórico do usuário (5F.3): as respostas ficam no schema `app`, que a
+    # role de leitura não enxerga; o serviço resolve as chaves antes.
+    if filtros_dict.get("chaves_incluir") is not None:
+        condicoes.append("questao_chave = ANY(%(chaves_incluir)s)")
+        params["chaves_incluir"] = list(filtros_dict["chaves_incluir"])
+    if filtros_dict.get("chaves_excluir"):
+        condicoes.append("NOT (questao_chave = ANY(%(chaves_excluir)s))")
+        params["chaves_excluir"] = list(filtros_dict["chaves_excluir"])
+
+    return " AND ".join(condicoes)
+
+
 def buscar_questoes(
     filtros_dict: dict, limit: int, offset: int
 ) -> tuple[list[dict], int]:
@@ -10,58 +73,8 @@ def buscar_questoes(
         get_conexao_leitura() as conn,
         conn.cursor(cursor_factory=RealDictCursor) as cur,
     ):
-        # Construir cláusulas WHERE iterativamente
-        condicoes = ["1 = 1"]
         params = {}
-
-        if filtros_dict.get("banca"):
-            condicoes.append("banca = %(banca)s")
-            params["banca"] = filtros_dict["banca"]
-
-        if filtros_dict.get("orgao"):
-            condicoes.append("orgao = %(orgao)s")
-            params["orgao"] = filtros_dict["orgao"]
-
-        if filtros_dict.get("ano"):
-            condicoes.append("ano = %(ano)s")
-            params["ano"] = filtros_dict["ano"]
-
-        if filtros_dict.get("concurso"):
-            condicoes.append("concurso = %(concurso)s")
-            params["concurso"] = filtros_dict["concurso"]
-
-        if filtros_dict.get("cargo_numero"):
-            condicoes.append("cargo_numero = %(cargo_numero)s")
-            params["cargo_numero"] = filtros_dict["cargo_numero"]
-
-        if filtros_dict.get("nivel"):
-            condicoes.append("nivel = %(nivel)s")
-            params["nivel"] = filtros_dict["nivel"]
-
-        if filtros_dict.get("tipo_conhecimento"):
-            condicoes.append("tipo_conhecimento = %(tipo_conhecimento)s")
-            params["tipo_conhecimento"] = filtros_dict["tipo_conhecimento"]
-
-        if filtros_dict.get("no_id"):
-            condicoes.append(
-                "(no_id = %(no_id)s OR assunto_id = %(no_id)s OR materia_id = %(no_id)s)"
-            )
-            params["no_id"] = filtros_dict["no_id"]
-
-        if filtros_dict.get("anuladas") == "excluir":
-            condicoes.append("anulada = false")
-        elif filtros_dict.get("anuladas") == "so":
-            condicoes.append("anulada = true")
-
-        if filtros_dict.get("utilizaveis", "so") == "so":
-            condicoes.append("utilizavel")
-
-        if filtros_dict.get("fora_do_edital") == "nao":
-            condicoes.append("fora_do_edital = false")
-        elif filtros_dict.get("fora_do_edital") == "sim":
-            condicoes.append("fora_do_edital = true")
-
-        where_clause = " AND ".join(condicoes)
+        where_clause = montar_where(filtros_dict, params)
 
         # Contagem total
         query_total = f"SELECT count(DISTINCT questao_id) AS total FROM vw_questoes WHERE {where_clause}"
@@ -240,3 +253,51 @@ def obter_facetas() -> dict:
         """)
         facetas["cargos"] = cur.fetchall()
         return facetas
+
+
+def desempenho_por_no(
+    filtros_dict: dict, chaves: list[str], acertos: list[bool]
+) -> list[dict]:
+    """Acertos/total por nó para as questões respondidas (uma resposta por chave).
+
+    Mesma regra da 5E: a questão sobe a árvore (subassunto → assunto →
+    matéria, nunca desce) e conta uma vez por nó, mesmo com 2 nós na mesma
+    matéria. Anuladas ficam de fora.
+    """
+    if not chaves:
+        return []
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        params = {"chaves": chaves, "acertos": acertos}
+        where_clause = montar_where(
+            {**filtros_dict, "anuladas": "excluir", "chaves_incluir": chaves}, params
+        )
+        query = f"""
+        WITH r AS (
+            SELECT * FROM unnest(%(chaves)s::text[], %(acertos)s::boolean[])
+                AS r(chave, acertou)
+        ),
+        q AS (
+            SELECT DISTINCT questao_chave, materia_id, assunto_id, no_id, no_nivel
+            FROM vw_questoes
+            WHERE {where_clause}
+        ),
+        alvos AS (
+            SELECT questao_chave, materia_id AS alvo FROM q WHERE materia_id IS NOT NULL
+            UNION
+            SELECT questao_chave, assunto_id FROM q WHERE assunto_id IS NOT NULL
+            UNION
+            SELECT questao_chave, no_id FROM q WHERE no_nivel = 'subassunto'
+        )
+        SELECT c.id, c.nome, c.nivel, c.pai_id,
+               count(*) AS total,
+               count(*) FILTER (WHERE r.acertou) AS acertos
+        FROM alvos a
+        JOIN r ON r.chave = a.questao_chave
+        JOIN vw_no_caminho c ON c.id = a.alvo
+        GROUP BY c.id, c.nome, c.nivel, c.pai_id
+        """
+        cur.execute(query, params)
+        return cur.fetchall()

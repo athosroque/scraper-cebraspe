@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Minha conta — Questões CEBRASPE{% endblock %}
+
+{% macro linha(no, nivel) %}
+<tr>
+    <td style="padding-left: {{ 0.5 + nivel * 1.5 }}rem;">
+        <a href="/?no_id={{ no.id|urlencode }}&historico=resolvidas" class="{{ 'contrast' if nivel == 0 else 'secondary' }}">
+            {% if nivel == 0 %}<strong>{{ no.nome }}</strong>{% else %}{{ no.nome }}{% endif %}
+        </a>
+    </td>
+    <td style="text-align: right;">{{ no.acertos }} / {{ no.total }}</td>
+    <td style="text-align: right;">{{ no.percentual }}%</td>
+    <td style="width: 30%;"><progress value="{{ no.acertos }}" max="{{ no.total }}" style="margin: 0;"></progress></td>
+</tr>
+{% for filho in no.filhos %}{{ linha(filho, nivel + 1) }}{% endfor %}
+{% endmacro %}
+
+{% block content %}
+<hgroup>
+    <h2>Minha conta</h2>
+    <p>{{ usuario.nome or usuario.email }} · {{ usuario.email }}</p>
+</hgroup>
+
+<section>
+    <h3>Desempenho por assunto</h3>
+    <form method="get" action="/conta" class="grid">
+        <select name="concurso" onchange="this.form.submit()">
+            <option value="">Todos os concursos</option>
+            {% for c in facetas.concursos %}
+            <option value="{{ c.valor }}" {% if filtros.concurso == c.valor %}selected{% endif %}>{{ c.rotulo }}</option>
+            {% endfor %}
+        </select>
+        <select name="nivel" onchange="this.form.submit()">
+            <option value="">Todos os níveis</option>
+            {% for n in facetas.niveis %}
+            <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo|title }}</option>
+            {% endfor %}
+        </select>
+        <select name="tipo_conhecimento" onchange="this.form.submit()">
+            <option value="">Básico e específico</option>
+            {% for t in facetas.tipos_conhecimento %}
+            <option value="{{ t.valor }}" {% if filtros.tipo_conhecimento == t.valor %}selected{% endif %}>{{ t.rotulo|title }}</option>
+            {% endfor %}
+        </select>
+        <noscript><button type="submit">Filtrar</button></noscript>
+    </form>
+    <p><small class="secondary">Conta a resposta mais recente de cada questão. A questão soma no subassunto, no assunto e na matéria, uma vez em cada; anuladas ficam de fora.</small></p>
+
+    {% if desempenho %}
+    <div class="overflow-auto">
+    <table>
+        <thead><tr><th>Assunto</th><th style="text-align: right;">Acertos</th><th style="text-align: right;">%</th><th></th></tr></thead>
+        <tbody>
+            {% for materia in desempenho %}{{ linha(materia, 0) }}{% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p>Nenhuma questão respondida com esses filtros. <a href="/">Resolver questões</a></p>
+    {% endif %}
+</section>
+
+<section>
+    <h3>Apagar minha conta</h3>
+    <p>Apaga sua conta e todo o histórico de respostas. Não dá para desfazer.</p>
+    <form method="post" action="/conta/apagar" x-data="{ confirma: false }">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+        <label><input type="checkbox" x-model="confirma"> Entendo que isso apaga tudo</label>
+        <button type="submit" class="secondary" :disabled="!confirma">Apagar minha conta</button>
+    </form>
+</section>
+{% endblock %}

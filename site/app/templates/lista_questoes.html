@@ -31,6 +31,17 @@
                 </select>
             </fieldset>
 
+            {% if request.session.get("usuario_id") %}
+            <fieldset>
+                <legend><strong>Meu histórico</strong></legend>
+                <select name="historico">
+                    {% for valor, rotulo in [("todas", "Todas"), ("nao_resolvidas", "Não resolvidas"), ("resolvidas", "Já resolvidas"), ("erradas", "Errei (última resposta)"), ("certas", "Acertei (última resposta)")] %}
+                    <option value="{{ valor }}" {% if filtros.historico == valor %}selected{% endif %}>{{ rotulo }}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            {% endif %}
+
             <fieldset>
                 <legend><strong>Árvore de Assuntos</strong></legend>
                 {# no_id vem da query string: passa por data-attr (escape de HTML

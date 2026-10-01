@@ -36,7 +36,7 @@ def test_home_htmx_devolve_so_fragmento(cliente):
     assert "<html" not in r.text
     assert "Árvore de Assuntos" not in r.text
     assert "questões encontradas" in r.text
-    assert r.headers["vary"] == "HX-Request"
+    assert "HX-Request" in r.headers["vary"]
 
 
 def test_restauracao_de_historico_devolve_pagina_inteira(cliente):

@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS app.simulado (
     nota numeric(6, 2) NULL
 );
 
+CREATE INDEX IF NOT EXISTS resposta_usuario_chave_idx
+    ON app.resposta (usuario_id, questao_chave, respondida_em DESC);
+
 -- 2. Roles site_leitura/site_app: criadas (com senha do .env) por
 --    site/scripts/aplicar_schema_app.py antes deste arquivo. Nunca pôr senha aqui.
 

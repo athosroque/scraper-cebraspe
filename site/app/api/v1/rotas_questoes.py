@@ -1,7 +1,8 @@
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
+from app.auth import usuario_id_atual
 from app.modelos import (
     FacetasResponse,
     FiltroQuestoes,
@@ -10,6 +11,7 @@ from app.modelos import (
     QuestaoDetalhe,
 )
 from app.servicos import questoes_servico
+from app.servicos.contas_servico import LoginNecessario
 
 router = APIRouter(prefix="/questoes", tags=["Questões"])
 
@@ -18,6 +20,7 @@ router = APIRouter(prefix="/questoes", tags=["Questões"])
     "",
     response_model=PaginaQuestoes,
     summary="Lista questões objetivas com filtros",
+    responses={401: {"description": "Filtro de histórico sem login"}},
     description=(
         "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, "
         "caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.781 "
@@ -25,6 +28,7 @@ router = APIRouter(prefix="/questoes", tags=["Questões"])
     ),
 )
 def listar_questoes(
+    request: Request,
     banca: str | None = Query(None, description="Banca (ex.: `CEBRASPE`)."),
     orgao: str | None = Query(
         None, description="Órgão (ex.: `PF`, `STM`). Valores em `/facetas`."
@@ -59,6 +63,15 @@ def listar_questoes(
             "ex.: fórmulas do caderno de Estatística da PF). `todas`: inclui, para revisão."
         ),
     ),
+    historico: Literal[
+        "todas", "resolvidas", "nao_resolvidas", "certas", "erradas"
+    ] = Query(
+        "todas",
+        description=(
+            "Filtra pelo histórico do usuário logado (resposta mais recente de cada "
+            "questão). Diferente de `todas` sem login: 401."
+        ),
+    ),
     pagina: int = Query(1, ge=1, description="Página, a partir de 1."),
     tamanho_pagina: int = Query(
         20, ge=1, le=50, description="Itens por página (máx. 50)."
@@ -76,8 +89,14 @@ def listar_questoes(
         anuladas=anuladas,
         fora_do_edital=fora_do_edital,
         utilizaveis=utilizaveis,
+        historico=historico,
     )
-    return questoes_servico.listar_questoes(filtros, pagina, tamanho_pagina)
+    try:
+        return questoes_servico.listar_questoes(
+            filtros, pagina, tamanho_pagina, usuario_id_atual(request)
+        )
+    except LoginNecessario:
+        raise HTTPException(status_code=401, detail="Login necessário") from None
 
 
 @router.get(

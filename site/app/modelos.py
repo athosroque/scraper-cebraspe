@@ -16,6 +16,10 @@ class FiltroQuestoes(BaseModel):
     anuladas: Literal["incluir", "excluir", "so"] = "incluir"
     fora_do_edital: Literal["todos", "sim", "nao"] = "todos"
     utilizaveis: Literal["so", "todas"] = "so"
+    # 5F.3: só vale com login (pela resposta mais recente de cada questão)
+    historico: Literal["todas", "resolvidas", "nao_resolvidas", "certas", "erradas"] = (
+        "todas"
+    )
 
 
 # -- Respostas da API --
@@ -129,3 +133,40 @@ class FacetasResponse(BaseModel):
     niveis: list[FacetaValor]
     tipos_conhecimento: list[FacetaValor]
     cargos: list[FacetaCargo]
+
+
+# -- Contas e histórico (5F.3) --
+class Usuario(BaseModel):
+    """Usuário logado (Google OAuth)."""
+
+    id: int
+    email: str
+    nome: str | None = None
+
+
+class RespostaEntrada(BaseModel):
+    questao_chave: str = Field(examples=["PF_25_ADM|094_PF_CB1_01|13"])
+    resposta: Literal["C", "E"]
+
+
+class RespostaResultado(BaseModel):
+    """Correção de uma resposta. `gravada` é `false` sem login ou em questão anulada."""
+
+    questao_chave: str
+    resposta: Literal["C", "E"]
+    gabarito: str
+    anulada: bool
+    acertou: bool
+    gravada: bool
+
+
+class NoDesempenho(BaseModel):
+    """Acertos do usuário num nó da árvore: questão distinta, subindo a árvore (regra da 5E)."""
+
+    id: str
+    nome: str
+    nivel: str
+    total: int
+    acertos: int
+    percentual: float = Field(description="Acertos / total × 100, com 1 casa.")
+    filhos: list["NoDesempenho"] = []

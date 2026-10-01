@@ -213,6 +213,25 @@
             "description": "`so` (padrão): esconde as questões com extração ilegível (`utilizavel=false`, ex.: fórmulas do caderno de Estatística da PF). `todas`: inclui, para revisão."
           },
           {
+            "name": "historico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "todas",
+                "resolvidas",
+                "nao_resolvidas",
+                "certas",
+                "erradas"
+              ],
+              "type": "string",
+              "description": "Filtra pelo histórico do usuário logado (resposta mais recente de cada questão). Diferente de `todas` sem login: 401.",
+              "default": "todas",
+              "title": "Historico"
+            },
+            "description": "Filtra pelo histórico do usuário logado (resposta mais recente de cada questão). Diferente de `todas` sem login: 401."
+          },
+          {
             "name": "pagina",
             "in": "query",
             "required": false,
@@ -250,6 +269,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Filtro de histórico sem login"
           },
           "422": {
             "description": "Validation Error",
@@ -375,6 +397,264 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FacetasResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/respostas": {
+      "post": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Corrige uma resposta (e grava no histórico, com login)",
+        "description": "Sem login, só corrige. Questão anulada nunca é gravada.",
+        "operationId": "responder_api_v1_respostas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RespostaEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaResultado"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Questão não encontrada"
+          },
+          "403": {
+            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/eu": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Usuário logado",
+        "operationId": "eu_api_v1_eu_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Apaga a conta e todo o histórico",
+        "operationId": "apagar_conta_api_v1_eu_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Login necessário"
+          },
+          "403": {
+            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+          }
+        }
+      }
+    },
+    "/api/v1/eu/desempenho": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Desempenho por nó da árvore",
+        "description": "Acertos sobre a resposta mais recente de cada questão. A questão sobe a árvore e conta uma vez por nó (regra da 5E); anuladas ficam de fora. Aceita os mesmos filtros da listagem.",
+        "operationId": "desempenho_api_v1_eu_desempenho_get",
+        "parameters": [
+          {
+            "name": "orgao",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Orgao"
+            }
+          },
+          {
+            "name": "ano",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ano"
+            }
+          },
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Concurso"
+            }
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cargo Numero"
+            }
+          },
+          {
+            "name": "nivel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Nivel"
+            }
+          },
+          {
+            "name": "tipo_conhecimento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tipo Conhecimento"
+            }
+          },
+          {
+            "name": "no_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "No Id"
+            }
+          },
+          {
+            "name": "fora_do_edital",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "todos",
+                "sim",
+                "nao"
+              ],
+              "type": "string",
+              "default": "todos",
+              "title": "Fora Do Edital"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoDesempenho"
+                  },
+                  "title": "Response Desempenho Api V1 Eu Desempenho Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -602,6 +882,54 @@
         ],
         "title": "NoArvore",
         "description": "Nó da árvore mestre com a contagem de questões distintas (a contagem sobe a árvore)."
+      },
+      "NoDesempenho": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "acertos": {
+            "type": "integer",
+            "title": "Acertos"
+          },
+          "percentual": {
+            "type": "number",
+            "title": "Percentual",
+            "description": "Acertos / total × 100, com 1 casa."
+          },
+          "filhos": {
+            "items": {
+              "$ref": "#/components/schemas/NoDesempenho"
+            },
+            "type": "array",
+            "title": "Filhos",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "nivel",
+          "total",
+          "acertos",
+          "percentual"
+        ],
+        "title": "NoDesempenho",
+        "description": "Acertos do usuário num nó da árvore: questão distinta, subindo a árvore (regra da 5E)."
       },
       "NoInfo": {
         "properties": {
@@ -995,6 +1323,104 @@
         ],
         "title": "QuestaoResumo",
         "description": "Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados."
+      },
+      "RespostaEntrada": {
+        "properties": {
+          "questao_chave": {
+            "type": "string",
+            "title": "Questao Chave",
+            "examples": [
+              "PF_25_ADM|094_PF_CB1_01|13"
+            ]
+          },
+          "resposta": {
+            "type": "string",
+            "enum": [
+              "C",
+              "E"
+            ],
+            "title": "Resposta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questao_chave",
+          "resposta"
+        ],
+        "title": "RespostaEntrada"
+      },
+      "RespostaResultado": {
+        "properties": {
+          "questao_chave": {
+            "type": "string",
+            "title": "Questao Chave"
+          },
+          "resposta": {
+            "type": "string",
+            "enum": [
+              "C",
+              "E"
+            ],
+            "title": "Resposta"
+          },
+          "gabarito": {
+            "type": "string",
+            "title": "Gabarito"
+          },
+          "anulada": {
+            "type": "boolean",
+            "title": "Anulada"
+          },
+          "acertou": {
+            "type": "boolean",
+            "title": "Acertou"
+          },
+          "gravada": {
+            "type": "boolean",
+            "title": "Gravada"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questao_chave",
+          "resposta",
+          "gabarito",
+          "anulada",
+          "acertou",
+          "gravada"
+        ],
+        "title": "RespostaResultado",
+        "description": "Correção de uma resposta. `gravada` é `false` sem login ou em questão anulada."
+      },
+      "Usuario": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "nome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nome"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email"
+        ],
+        "title": "Usuario",
+        "description": "Usuário logado (Google OAuth)."
       },
       "ValidationError": {
         "properties": {

@@ -1,0 +1,78 @@
+"""Schema `app` (5F.3): usuários e respostas, sempre pela role `site_app`."""
+
+from psycopg2.extras import RealDictCursor
+
+from app.db import get_conexao_app
+
+
+def upsert_usuario(google_sub: str, email: str, nome: str | None) -> dict:
+    with (
+        get_conexao_app() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute(
+            """
+            INSERT INTO app.usuario (google_sub, email, nome)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (google_sub)
+                DO UPDATE SET email = EXCLUDED.email, nome = EXCLUDED.nome
+            RETURNING id, email, nome
+            """,
+            (google_sub, email, nome),
+        )
+        usuario = cur.fetchone()
+        conn.commit()
+        return usuario
+
+
+def obter_usuario(usuario_id: int) -> dict | None:
+    with (
+        get_conexao_app() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute(
+            "SELECT id, email, nome FROM app.usuario WHERE id = %s", (usuario_id,)
+        )
+        usuario = cur.fetchone()
+        conn.rollback()
+        return usuario
+
+
+def gravar_resposta(
+    usuario_id: int, questao_chave: str, resposta: str, acertou: bool
+) -> None:
+    with get_conexao_app() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO app.resposta (usuario_id, questao_chave, resposta, acertou)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (usuario_id, questao_chave, resposta, acertou),
+        )
+        conn.commit()
+
+
+def ultimas_respostas(usuario_id: int) -> dict[str, bool]:
+    """Chave → acertou, pela resposta mais recente de cada questão."""
+    with get_conexao_app() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT DISTINCT ON (questao_chave) questao_chave, acertou
+            FROM app.resposta
+            WHERE usuario_id = %s AND simulado_id IS NULL
+            ORDER BY questao_chave, respondida_em DESC, id DESC
+            """,
+            (usuario_id,),
+        )
+        linhas = cur.fetchall()
+        conn.rollback()
+        return dict(linhas)
+
+
+def apagar_usuario(usuario_id: int) -> bool:
+    """Apaga a conta; respostas e simulados saem em cascata."""
+    with get_conexao_app() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM app.usuario WHERE id = %s", (usuario_id,))
+        apagou = cur.rowcount > 0
+        conn.commit()
+        return apagou

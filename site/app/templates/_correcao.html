@@ -1,12 +1,18 @@
-<div id="{{ dom_id(questao.questao_chave) }}" style="padding: 1rem; border-radius: var(--pico-border-radius); border: 1px solid var(--pico-muted-border-color); background-color: var(--pico-form-element-background-color);">
+{% set questao = resultado %}
+<div id="{{ dom_id(resultado.questao_chave) }}" style="padding: 1rem; border-radius: var(--pico-border-radius); border: 1px solid var(--pico-muted-border-color); background-color: var(--pico-form-element-background-color);">
     <p style="margin-bottom: 0.5rem;">
-        Sua resposta: <strong>{{ resposta }}</strong>
+        Sua resposta: <strong>{{ resultado.resposta }}</strong>
     </p>
-    {% if questao.anulada %}
+    {% if resultado.anulada %}
     <p class="text-error" style="margin-bottom: 0;"><strong>Atenção:</strong> Esta questão foi anulada pela banca.</p>
-    {% elif acertou %}
-    <p class="text-success" style="margin-bottom: 0;"><strong>✅ Você acertou!</strong> O gabarito é {{ questao.gabarito }}.</p>
+    {% elif resultado.acertou %}
+    <p class="text-success" style="margin-bottom: 0;"><strong>✅ Você acertou!</strong> O gabarito é {{ resultado.gabarito }}.</p>
     {% else %}
-    <p class="text-error" style="margin-bottom: 0;"><strong>❌ Você errou.</strong> O gabarito é {{ questao.gabarito }}.</p>
+    <p class="text-error" style="margin-bottom: 0;"><strong>❌ Você errou.</strong> O gabarito é {{ resultado.gabarito }}.</p>
+    {% endif %}
+    {% if resultado.gravada %}
+    <p style="margin: 0.5rem 0 0;"><small class="secondary">Resposta salva no seu histórico.</small></p>
+    {% elif not logado and login_habilitado() %}
+    <p style="margin: 0.5rem 0 0;"><small class="secondary"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}">Entre com Google</a> para guardar seu histórico.</small></p>
     {% endif %}
 </div>

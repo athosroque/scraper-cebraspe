@@ -12,13 +12,19 @@ from app.repositorio import questoes_repo
 
 
 def listar_questoes(
-    filtros: FiltroQuestoes, pagina: int, tamanho_pagina: int
+    filtros: FiltroQuestoes,
+    pagina: int,
+    tamanho_pagina: int,
+    usuario_id: int | None = None,
 ) -> PaginaQuestoes:
     tamanho_pagina = max(1, min(50, tamanho_pagina))
     pagina = max(1, pagina)
     offset = (pagina - 1) * tamanho_pagina
 
-    filtros_dict = filtros.model_dump(exclude_none=True)
+    # Import tardio: contas_servico importa este módulo.
+    from app.servicos.contas_servico import filtros_com_historico
+
+    filtros_dict = filtros_com_historico(filtros, usuario_id)
 
     linhas, total = questoes_repo.buscar_questoes(filtros_dict, tamanho_pagina, offset)
 

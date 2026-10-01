@@ -6,7 +6,9 @@ import psycopg2
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
+from app.api.v1.rotas_conta import router as router_conta
 from app.api.v1.rotas_questoes import router as router_questoes
 from app.api.v1.rotas_questoes import router_arvore, router_facetas
 from app.config import settings
@@ -33,6 +35,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Sessão em cookie assinado (5F.3): só id do usuário, nome e token CSRF.
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.session_secret,
+    session_cookie="sessao",
+    max_age=60 * 60 * 24 * 30,
+    same_site="lax",
+    https_only=settings.session_https_only,
+)
+
 # Arquivos estáticos do frontend (Pico, HTMX, Alpine)
 static_path = pathlib.Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
@@ -47,6 +59,7 @@ if settings.figuras_dir.exists():
 app.include_router(router_questoes, prefix="/api/v1")
 app.include_router(router_arvore, prefix="/api/v1")
 app.include_router(router_facetas, prefix="/api/v1")
+app.include_router(router_conta, prefix="/api/v1")
 app.include_router(router_web)
 
 

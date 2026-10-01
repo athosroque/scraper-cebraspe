@@ -217,7 +217,16 @@ Datasette continua só como ferramenta de revisão do dono.
       ficou inalterado. Validado no Chromium headless (10 questões
       corrigidas, filtros combinados, árvore, voltar do navegador, sem erro
       de JS). 25 testes no `site/`, ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.3 do `plano-etapa-5f.md`** (contas e histórico).
+- [x] Etapa 5F.3 — Contas e histórico (ADR-033): Google OAuth (Authlib),
+      sessão em cookie assinado, CSRF em todo POST/DELETE; `app.resposta`
+      gravada com login (anulada não grava); filtro `historico`
+      (resolvidas/não resolvidas/certas/erradas, pela resposta mais recente);
+      desempenho por nó em `/conta` e `/api/v1/eu/desempenho` (regra da 5E);
+      "apagar minha conta" em cascata. Login real com a conta do dono em
+      2026-10-01 (via túnel SSH para `localhost:8000`): 30 respostas, e o
+      desempenho das 13 matérias bateu com a contagem manual no banco.
+      641 testes (+1 xfail), ruff verde.
+- **⚡ Prioridade atual: Etapa 5F.4 do `plano-etapa-5f.md`** (páginas de estatística).
 
 
 ## 6. Patterns
@@ -598,6 +607,11 @@ Datasette continua só como ferramenta de revisão do dono.
 - Nunca rodar o site com `python -m site...`: o diretório `site` colide com o
   módulo `site` da stdlib. Use o caminho do script ou `uvicorn app.main:app`
   de dentro de `site/`.
+- Nunca dar à role `site_leitura` acesso ao schema `app` (nem fazer JOIN
+  entre `app.resposta` e as views numa query só): as respostas são lidas pela
+  `site_app` e a lista de chaves entra no SQL das views por parâmetro.
+- Nunca aceitar o `voltar` do login sem `auth.destino_seguro` (open redirect
+  com `//host` ou `/\host`).
 - Nunca usar a `questao_chave` crua como id de elemento HTML: o `|` é
   separador de namespace em seletor CSS, e o `hx-target="#..."` quebra no
   `querySelector` do HTMX sem aparecer em teste de rota. Use `dom_id(chave)`

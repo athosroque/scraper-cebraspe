@@ -10,7 +10,7 @@
     <script src="/static/htmx.min.js"></script>
     <script defer src="/static/alpine.min.js"></script>
 </head>
-<body hx-headers='{"X-CSRFToken": "TBD-em-5F.3"}'>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token(request) }}"}'>
     <header class="container">
         <nav>
             <ul>
@@ -18,7 +18,17 @@
             </ul>
             <ul>
                 <li><a href="/sobre">Sobre</a></li>
-                <!-- Login será implementado na 5F.3 -->
+                {% if request.session.get("usuario_id") %}
+                <li><a href="/conta">{{ request.session.get("usuario_nome") }}</a></li>
+                <li>
+                    <form method="post" action="/sair" style="margin: 0;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+                        <button type="submit" class="outline secondary" style="padding: 0.2rem 0.6rem; margin: 0;">Sair</button>
+                    </form>
+                </li>
+                {% elif login_habilitado() %}
+                <li><a href="/entrar?voltar={{ request.url.path|urlencode }}" role="button" class="outline" style="padding: 0.2rem 0.6rem;">Entrar com Google</a></li>
+                {% endif %}
             </ul>
         </nav>
     </header>

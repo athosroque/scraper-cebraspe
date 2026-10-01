@@ -132,7 +132,7 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
   os outros filtros (um subassunto pode mostrar N e devolver 0 combinado com
   órgão/nível). Exige contagem por faceta.
 
-### 5F.3 — Contas e histórico (estatística 4: desempenho pessoal)
+### 5F.3 — Contas e histórico (estatística 4: desempenho pessoal) ✅ (2026-10-01)
 - Google OAuth (Authlib), sessão em cookie assinado, CSRF nos POST.
 - Aplicar o schema `app`; resposta logada grava em `app.resposta`.
 - Filtros "já resolvidas" / "erradas" (JOIN por `questao_chave`).

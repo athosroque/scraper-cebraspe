@@ -166,6 +166,21 @@ UX fique limitada pelo HTMX. Até lá, migrar é custo sem ganho.
   aumentar `QuestaoResumo` (o contrato da 5F.1 é o mesmo). Id de elemento
   derivado da chave por hash (`q-<sha1>`), porque o `|` não vale em
   seletor CSS. Canal de remoção: `athosroque@hotmail.com`.
+- **5F.3 (2026-10-01):** sessão em cookie assinado (`SessionMiddleware`,
+  cookie `sessao`, `SameSite=Lax`, 30 dias) com só o id do usuário, o nome e
+  o token CSRF; a sessão é recriada no login. CSRF em todo POST/DELETE, pelo
+  header `X-CSRFToken` (HTMX via `hx-headers` do `<body>`, API) ou pelo campo
+  `csrf_token` (forms comuns). Google OAuth via Authlib (`/entrar`,
+  `/auth/google`), só e-mail verificado; `voltar` aceita só caminho local.
+  Login fica desligado sem `GOOGLE_CLIENT_ID`. Histórico e desempenho usam a
+  **resposta mais recente** de cada questão; anulada não é gravada; resposta
+  de simulado (`simulado_id`) fica fora. A role de leitura não lê `app`:
+  o serviço busca as chaves respondidas pela `site_app` e passa a lista ao
+  SQL das views (`questao_chave = ANY(...)`). Desempenho por nó segue a 5E
+  (sobe a árvore, uma vez por nó). API: `POST /api/v1/respostas`,
+  `GET/DELETE /api/v1/eu`, `GET /api/v1/eu/desempenho`, `historico=` na
+  listagem (401 sem login). Em produção (5F.6): `SESSION_HTTPS_ONLY=true` e
+  uvicorn com `--proxy-headers`, senão o `redirect_uri` sai `http://`.
 
 ## Referências
 - ADR-026 (banco próprio), ADR-030 (árvore mestre e objetivo do site),
