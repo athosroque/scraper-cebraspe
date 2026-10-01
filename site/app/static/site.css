@@ -1,0 +1,19 @@
+/* Custom CSS */
+.sidebar {
+    position: sticky;
+    top: 1rem;
+    height: calc(100vh - 2rem);
+    overflow-y: auto;
+}
+
+.text-success {
+    color: var(--pico-ins-color);
+}
+
+.text-error {
+    color: var(--pico-del-color);
+}
+
+[x-cloak] {
+    display: none !important;
+}

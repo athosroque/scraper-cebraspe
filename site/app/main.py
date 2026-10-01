@@ -1,4 +1,5 @@
 import logging
+import pathlib
 from contextlib import asynccontextmanager
 
 import psycopg2
@@ -10,6 +11,7 @@ from app.api.v1.rotas_questoes import router as router_questoes
 from app.api.v1.rotas_questoes import router_arvore, router_facetas
 from app.config import settings
 from app.db import fechar_pools, get_conexao_leitura, inicializar_pools
+from app.web.rotas_web import router as router_web
 
 logger = logging.getLogger(__name__)
 
@@ -31,16 +33,21 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Arquivos estáticos do frontend (Pico, HTMX, Alpine)
+static_path = pathlib.Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+
 # Servir figuras locais (fallback se não houver URL estática)
 if settings.figuras_dir.exists():
     app.mount(
-        "/static", StaticFiles(directory=str(settings.figuras_dir)), name="static"
+        "/figuras", StaticFiles(directory=str(settings.figuras_dir)), name="figuras"
     )
 
 # Incluir rotas
 app.include_router(router_questoes, prefix="/api/v1")
 app.include_router(router_arvore, prefix="/api/v1")
 app.include_router(router_facetas, prefix="/api/v1")
+app.include_router(router_web)
 
 
 @app.get("/saude", tags=["Infra"], summary="Checagem de saúde (banco de leitura)")

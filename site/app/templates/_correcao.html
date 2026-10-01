@@ -1,0 +1,12 @@
+<div id="{{ dom_id(questao.questao_chave) }}" style="padding: 1rem; border-radius: var(--pico-border-radius); border: 1px solid var(--pico-muted-border-color); background-color: var(--pico-form-element-background-color);">
+    <p style="margin-bottom: 0.5rem;">
+        Sua resposta: <strong>{{ resposta }}</strong>
+    </p>
+    {% if questao.anulada %}
+    <p class="text-error" style="margin-bottom: 0;"><strong>Atenção:</strong> Esta questão foi anulada pela banca.</p>
+    {% elif acertou %}
+    <p class="text-success" style="margin-bottom: 0;"><strong>✅ Você acertou!</strong> O gabarito é {{ questao.gabarito }}.</p>
+    {% else %}
+    <p class="text-error" style="margin-bottom: 0;"><strong>❌ Você errou.</strong> O gabarito é {{ questao.gabarito }}.</p>
+    {% endif %}
+</div>

@@ -1,0 +1,37 @@
+<div>
+    <header style="margin-bottom: 2rem;">
+        <hgroup>
+            <h2>Questões</h2>
+            <p>{{ pagina_questoes.total }} questões encontradas</p>
+        </hgroup>
+    </header>
+
+    {% if pagina_questoes.total == 0 %}
+    <article>
+        <p>Nenhuma questão encontrada com estes filtros.</p>
+    </article>
+    {% else %}
+        {% for questao in pagina_questoes.itens %}
+            {% include "_card_questao.html" %}
+        {% endfor %}
+
+        <!-- Paginação -->
+        <nav style="margin-top: 2rem; display: flex; justify-content: space-between;">
+            {% if pagina_questoes.pagina > 1 %}
+            <button hx-get="/" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Anterior</button>
+            {% else %}
+            <div></div>
+            {% endif %}
+
+            <div style="align-self: center;">
+                Página {{ pagina_questoes.pagina }} de {{ pagina_questoes.total_paginas }}
+            </div>
+
+            {% if pagina_questoes.pagina < pagina_questoes.total_paginas %}
+            <button hx-get="/" hx-vals='{"pagina": {{ pagina_questoes.pagina + 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Próxima</button>
+            {% else %}
+            <div></div>
+            {% endif %}
+        </nav>
+    {% endif %}
+</div>

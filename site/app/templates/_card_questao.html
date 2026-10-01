@@ -1,0 +1,51 @@
+<article style="margin-bottom: 2rem;">
+    <header>
+        <strong>Questão {{ questao.numero }}</strong> — 
+        <small class="secondary">
+            <a href="{{ url_questao(questao.questao_chave) }}" class="secondary">
+                {{ questao.orgao }} {{ questao.ano }} ({{ questao.banca }})
+            </a>
+        </small>
+        {% if questao.anulada %}
+        <span class="pico-background-danger" style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8em; color: white;">Anulada</span>
+        {% endif %}
+    </header>
+
+    {% if questao.tem_texto_base or questao.tem_figuras %}
+    <details style="margin-bottom: 1rem; background-color: var(--pico-form-element-background-color); padding: 1rem; border-radius: var(--pico-border-radius);"{% if anexos_inline %} open{% endif %}>
+        <summary><strong>{% if questao.tem_texto_base %}Texto associado{% else %}Figuras{% endif %}{% if questao.tem_texto_base and questao.tem_figuras %} e figuras{% endif %}</strong></summary>
+        {% if anexos_inline %}
+        <div style="margin-top: 1rem;">{% include "_anexos.html" %}</div>
+        {% else %}
+        <div style="margin-top: 1rem;" hx-get="{{ url_questao(questao.questao_chave) }}/anexos" hx-trigger="toggle from:closest details once" hx-swap="innerHTML"><small aria-busy="true">Carregando…</small></div>
+        {% endif %}
+    </details>
+    {% endif %}
+
+    <div style="margin-bottom: 1.5rem; font-size: 1.05em; line-height: 1.6;">
+        {{ questao.enunciado }}
+    </div>
+
+    <!-- Container do Form e Resposta -->
+    <div id="{{ dom_id(questao.questao_chave) }}">
+        <form hx-post="/q/correcao" hx-target="#{{ dom_id(questao.questao_chave) }}" hx-swap="outerHTML">
+            <input type="hidden" name="chave" value="{{ questao.questao_chave }}">
+            <div class="grid" style="gap: 1rem;">
+                <button type="submit" name="resposta" value="C" class="outline">Certo</button>
+                <button type="submit" name="resposta" value="E" class="outline">Errado</button>
+            </div>
+        </form>
+    </div>
+
+    <footer style="font-size: 0.85em;">
+        <p style="margin-bottom: 0.3rem;"><small>Fonte: CEBRASPE — {{ questao.concurso }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</small></p>
+        <strong>Assuntos:</strong>
+        <ul style="display: inline; padding: 0; margin: 0; list-style: none;">
+            {% for no in questao.nos %}
+            <li style="display: inline; margin-right: 0.5rem;">
+                <span class="secondary">{{ no.no_caminho }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </footer>
+</article>

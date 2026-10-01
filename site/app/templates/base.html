@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Questões CEBRASPE{% endblock %}</title>
+    <meta name="description" content="{% block description %}Questões de concursos do CEBRASPE para resolver, filtradas por matéria, assunto e subassunto.{% endblock %}">
+    <link rel="stylesheet" href="/static/pico.min.css">
+    <link rel="stylesheet" href="/static/site.css">
+    <script src="/static/htmx.min.js"></script>
+    <script defer src="/static/alpine.min.js"></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "TBD-em-5F.3"}'>
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong><a href="/" class="contrast">Questões CEBRASPE</a></strong></li>
+            </ul>
+            <ul>
+                <li><a href="/sobre">Sobre</a></li>
+                <!-- Login será implementado na 5F.3 -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

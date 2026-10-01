@@ -204,7 +204,20 @@ Datasette continua só como ferramenta de revisão do dono.
       2.781 no padrão, 2.800 com `utilizaveis=todas`; o detalhe por chave segue
       acessível.
       619 testes (+1 xfail), ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.2 do `plano-etapa-5f.md`** (frontend de resolução).
+- [x] Etapa 5F.2 — Frontend de resolução (ADR-033): rotas HTML em
+      `site/app/web/rotas_web.py` (fora do OpenAPI) e templates Jinja2 com
+      Pico.css/HTMX/Alpine servidos de `site/app/static/` (figuras em
+      `/figuras`). Lista filtrável (form inteiro a cada `change`, URL
+      compartilhável, página volta a 1), árvore matéria → assunto →
+      subassunto, correção C/E por fragmento (anônimo, sem gravar), página
+      canônica `/q/<concurso>/<caderno>/<numero>` com meta description e
+      crédito "Fonte: CEBRASPE", `/sobre` com canal de remoção
+      (`athosroque@hotmail.com`) e 404 com layout. Texto-base e figuras
+      carregam sob demanda (`/q/.../anexos`), e o contrato da API da 5F.1
+      ficou inalterado. Validado no Chromium headless (10 questões
+      corrigidas, filtros combinados, árvore, voltar do navegador, sem erro
+      de JS). 25 testes no `site/`, ruff verde.
+- **⚡ Prioridade atual: Etapa 5F.3 do `plano-etapa-5f.md`** (contas e histórico).
 
 
 ## 6. Patterns
@@ -585,6 +598,23 @@ Datasette continua só como ferramenta de revisão do dono.
 - Nunca rodar o site com `python -m site...`: o diretório `site` colide com o
   módulo `site` da stdlib. Use o caminho do script ou `uvicorn app.main:app`
   de dentro de `site/`.
+- Nunca usar a `questao_chave` crua como id de elemento HTML: o `|` é
+  separador de namespace em seletor CSS, e o `hx-target="#..."` quebra no
+  `querySelector` do HTMX sem aparecer em teste de rota. Use `dom_id(chave)`
+  (`q-<sha1>`) de `rotas_web.py`.
+- Nunca interpolar valor da query string dentro de expressão do Alpine
+  (`x-data="{ x: '{{ valor }}' }"`): o navegador decodifica `&#39;` de volta
+  para `'` antes de o Alpine avaliar, e vira XSS. Passe por atributo
+  `data-*` e leia com `$el.dataset`.
+- Nunca pôr `hx-get` num `<select>` dentro do form de filtros: em GET o HTMX
+  envia só o valor do próprio elemento e perde os outros filtros. O gatilho
+  fica no `<form>` (`hx-trigger="change, submit"`).
+- Nunca devolver o fragmento só por `HX-Request`: a restauração de histórico
+  do HTMX também manda esse header e espera a página inteira (checar
+  `HX-History-Restore-Request`).
+- Nunca pôr campo pesado (texto-base, figuras) em `QuestaoResumo` para
+  servir o HTML: muda o contrato da API e multiplica o payload da listagem.
+  O card busca em `/q/.../anexos` quando o usuário abre.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança
@@ -719,7 +749,8 @@ resultado = download_concurso_pdfs(
   texto-base expansível, gabarito e comandos CLI copiáveis
 - `scripts/classificar_questoes.py` — inferência em 2 passadas (preferencial × reserva) via LLM
   com OpenRouter e Langfuse (não roda no pipeline padrão para isolar custos)
-- `site/` — API do site (5F). Rodar: `cd site && uvicorn app.main:app`;
+- `site/` — API e páginas do site (5F). Rodar: `cd site && uvicorn app.main:app`
+  (páginas em `/`, `/sobre`, `/q/<concurso>/<caderno>/<numero>`);
   documentação interativa em `/docs` (Swagger) e `/redoc`. `site/openapi.json`
   é o contrato versionado (fonte para os MCPs): depois de mudar rota ou
   modelo, rodar `python site/scripts/exportar_openapi.py`, senão o teste
@@ -1447,6 +1478,22 @@ e canal de remoção; termos do CEBRASPE conferidos pelo dono antes do deploy.
 em camadas é o que torna essa migração barata.
 **Alternativas descartadas:** SvelteKit/Vue/Astro já agora; senha própria
 ou auth gerenciado; Postgres separado para usuários. Ver ADR-033.
+
+### 2026-10-01 — Frontend de resolução (Etapa 5F.2) e texto-base sob demanda
+
+**Decisão:** As páginas usam a mesma camada `servicos` da API, em rotas
+HTML fora do OpenAPI. A primeira entrega pôs `texto_base_texto` e `figuras`
+em `QuestaoResumo` para o card da lista. O dono decidiu carregar esses
+campos sob demanda (`GET /q/.../anexos`, disparado ao abrir o `<details>`),
+o que mantém o contrato da 5F.1. A validação da entrega achou e corrigiu
+bugs que os testes de rota não pegavam: id com `|` quebrando o `hx-target`,
+XSS do `no_id` dentro do `x-data`, `$nextTick` sem `this`, select que
+perdia os outros filtros e fragmento devolvido na restauração de histórico.
+**Motivo:** a listagem com 50 itens passava de ~14 KB para ~68 KB, e a
+maior parte dos cards não tem o texto-base aberto.
+**Alternativas descartadas:** manter os campos na listagem (contrato maior,
+payload 5×); carregar anexos de todo card no `load` (uma requisição por
+card). Ver ADR-033.
 
 ## 13. LESSONS.md (do projeto)
 

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Questão {{ questao.numero }} - {{ questao.concurso }} - CEBRASPE{% endblock %}
+
+{% block description %}Questão {{ questao.numero }} ({{ questao.orgao }} {{ questao.ano }}, CEBRASPE): {{ questao.enunciado|truncate(150) }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ul>
+        <li><a href="/">Início</a></li>
+        <li>Questão {{ questao.questao_chave }}</li>
+    </ul>
+</nav>
+
+{% include "_card_questao.html" %}
+
+<article style="margin-top: 2rem;">
+    <header><strong>Fonte Original</strong></header>
+    <p>
+        Esta questão foi extraída do concurso <strong>{{ questao.concurso }}</strong> ({{ questao.ano }}), 
+        caderno <code>{{ questao.codigo_caderno }}</code>.
+    </p>
+    {% if questao.link_pdf %}
+    <p>
+        <a href="{{ questao.link_pdf }}" target="_blank" rel="noopener noreferrer" role="button" class="outline">
+            Ver PDF Original no site do CEBRASPE
+        </a>
+    </p>
+    {% else %}
+    <p class="secondary"><em>O link para o PDF original não está disponível.</em></p>
+    {% endif %}
+</article>
+{% endblock %}

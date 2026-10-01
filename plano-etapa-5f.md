@@ -111,7 +111,7 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
   filtro por subassunto de Língua Portuguesa + nível superior bate com
   uma consulta SQL feita à mão.
 
-### 5F.2 — Frontend de resolução
+### 5F.2 — Frontend de resolução ✅ (2026-09-30)
 - Layout base (Pico.css), lista filtrável com HTMX (`hx-get` no formulário
   de filtros, `hx-push-url` para URL compartilhável), árvore de filtros
   expansível (Alpine).
@@ -122,6 +122,15 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 - Página "Sobre e fontes" + canal de remoção (ADR-033 §5).
 - **Pronto quando:** navegar da matéria ao subassunto, resolver 10 questões
   e ver a correção, com HTML válido e testes das rotas.
+- **Entregue (2026-10-01):** `site/app/web/rotas_web.py` (fora do OpenAPI),
+  templates em `site/app/templates/`, Pico/HTMX/Alpine locais em
+  `site/app/static/` e figuras em `/figuras`. Texto-base e figuras do card
+  da lista vêm de `GET /q/<concurso>/<caderno>/<numero>/anexos`, aberto sob
+  demanda: o contrato da API da 5F.1 não mudou. Canal de remoção:
+  `athosroque@hotmail.com`. Validado no Chromium headless.
+- **Fica para depois:** as contagens da árvore são globais e não mudam com
+  os outros filtros (um subassunto pode mostrar N e devolver 0 combinado com
+  órgão/nível). Exige contagem por faceta.
 
 ### 5F.3 — Contas e histórico (estatística 4: desempenho pessoal)
 - Google OAuth (Authlib), sessão em cookie assinado, CSRF nos POST.
@@ -186,3 +195,6 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 - Somar `vw_prova_cobra_*` entre cargos (usar `fn_prova_cobra`).
 - Misturar discursiva com objetiva nas contagens.
 - Usar o usuário `cebraspe` no site ou expor `data/` inteiro.
+- `questao_chave` crua como id HTML (o `|` quebra o seletor do `hx-target`).
+- Valor da query string dentro de expressão do Alpine (XSS); usar `data-*`.
+- `hx-get` em campo dentro do form de filtros (GET envia só o próprio campo).

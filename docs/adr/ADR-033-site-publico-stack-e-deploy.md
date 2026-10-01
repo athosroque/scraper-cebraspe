@@ -157,6 +157,16 @@ UX fique limitada pelo HTMX. Até lá, migrar é custo sem ganho.
 - **Operacionais:** novo serviço público no Xeon exige rate limit, headers,
   backup do schema `app` e CI da API (5F.6).
 
+## Notas de implementação
+
+- **5F.2 (2026-10-01):** as rotas HTML ficam em `site/app/web/` com
+  `include_in_schema=False` e chamam a mesma camada `servicos` da API. O
+  card da lista não recebe texto-base nem figuras: abre
+  `GET /q/<concurso>/<caderno>/<numero>/anexos` sob demanda, para não
+  aumentar `QuestaoResumo` (o contrato da 5F.1 é o mesmo). Id de elemento
+  derivado da chave por hash (`q-<sha1>`), porque o `|` não vale em
+  seletor CSS. Canal de remoção: `athosroque@hotmail.com`.
+
 ## Referências
 - ADR-026 (banco próprio), ADR-030 (árvore mestre e objetivo do site),
   ADR-031 (extração, DELETE + INSERT por caderno), ADR-032 (chave estável

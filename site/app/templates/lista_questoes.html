@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Questões CEBRASPE - Filtrar{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <!-- Barra Lateral: Filtros -->
+    <aside class="sidebar">
+        <form id="form-filtros" hx-get="/" hx-trigger="change, submit" hx-target="#lista-conteudo" hx-push-url="true">
+            <fieldset>
+                <legend><strong>Órgão</strong></legend>
+                <select name="orgao">
+                    <option value="">Todos</option>
+                    {% for o in facetas.orgaos %}
+                    <option value="{{ o.valor }}" {% if filtros.orgao == o.valor %}selected{% endif %}>
+                        {{ o.rotulo }} ({{ o.total }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+
+            <fieldset>
+                <legend><strong>Nível</strong></legend>
+                <select name="nivel">
+                    <option value="">Todos</option>
+                    {% for n in facetas.niveis %}
+                    <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>
+                        {{ n.rotulo|title }} ({{ n.total }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+
+            <fieldset>
+                <legend><strong>Árvore de Assuntos</strong></legend>
+                {# no_id vem da query string: passa por data-attr (escape de HTML
+                   comum), nunca interpolado dentro da expressão JS do Alpine. #}
+                <div data-no-id="{{ filtros.no_id or '' }}" x-data="{
+                    selecionado: $el.dataset.noId,
+                    selecionar(id) {
+                        this.selecionado = id;
+                        this.$nextTick(() => { document.getElementById('form-filtros').requestSubmit(); });
+                    }
+                }">
+                    <input type="hidden" name="no_id" :value="selecionado">
+                    
+                    {# Controlado pelo Alpine: o HTMX troca só a lista, não a barra lateral. #}
+                    <div x-show="selecionado" x-cloak style="margin-bottom: 1rem;">
+                        <small>Filtrando por assunto</small>
+                        <a href="#" @click.prevent="selecionar('')" role="button" class="outline secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7em;">Limpar</a>
+                    </div>
+
+                    <ul style="list-style: none; padding-left: 0; font-size: 0.85em;">
+                        {% for materia in arvore %}
+                        <li x-data="{ aberto: false }" style="margin-bottom: 0.5rem;">
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                {% if materia.filhos %}
+                                <button type="button" @click="aberto = !aberto" class="outline" style="padding: 0 0.4rem; border: none; font-size: 1em;">
+                                    <span x-show="!aberto">▶</span>
+                                    <span x-show="aberto">▼</span>
+                                </button>
+                                {% endif %}
+                                <a href="#" @click.prevent="selecionar('{{ materia.id }}')" :class="selecionado == '{{ materia.id }}' ? 'pico-color-primary' : 'secondary'">
+                                    <strong>{{ materia.nome }}</strong> <small>({{ materia.total_questoes }})</small>
+                                </a>
+                            </div>
+                            
+                            {% if materia.filhos %}
+                            <ul x-show="aberto" style="list-style: none; padding-left: 1.5rem; margin-top: 0.5rem;">
+                                {% for assunto in materia.filhos %}
+                                <li x-data="{ aberto_assunto: false }" style="margin-bottom: 0.2rem;">
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        {% if assunto.filhos %}
+                                        <button type="button" @click="aberto_assunto = !aberto_assunto" class="outline" style="padding: 0 0.4rem; border: none; font-size: 1em;">
+                                            <span x-show="!aberto_assunto">▶</span>
+                                            <span x-show="aberto_assunto">▼</span>
+                                        </button>
+                                        {% endif %}
+                                        <a href="#" @click.prevent="selecionar('{{ assunto.id }}')" :class="selecionado == '{{ assunto.id }}' ? 'pico-color-primary' : 'secondary'">
+                                            {{ assunto.nome }} <small>({{ assunto.total_questoes }})</small>
+                                        </a>
+                                    </div>
+                                    
+                                    {% if assunto.filhos %}
+                                    <ul x-show="aberto_assunto" style="list-style: none; padding-left: 1.5rem; margin-top: 0.2rem;">
+                                        {% for sub in assunto.filhos %}
+                                        <li>
+                                            <a href="#" @click.prevent="selecionar('{{ sub.id }}')" :class="selecionado == '{{ sub.id }}' ? 'pico-color-primary' : 'secondary'">
+                                                {{ sub.nome }} <small>({{ sub.total_questoes }})</small>
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </fieldset>
+
+            <button type="submit" style="display: none;">Aplicar (JS ou Enter)</button>
+        </form>
+    </aside>
+
+    <!-- Área Principal: Lista -->
+    <section id="lista-conteudo">
+        {% include "_lista_parcial.html" %}
+    </section>
+</div>
+{% endblock %}

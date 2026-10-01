@@ -794,12 +794,12 @@ enviar o bloco de uma etapa específica para o agente construir.
     leitura para o site) e os dados de usuário;
   - checagem de direitos de republicação das provas do CEBRASPE (documento
     público; citar a fonte).
-- `[ ]` **5F.1 — API de leitura:** busca de questões com filtros
+- `[x]` **5F.1 — API de leitura:** concluída em 2026-09-29. busca de questões com filtros
   combináveis (banca, órgão, ano, concurso, cargo, nível, tipo, matéria ›
   assunto › subassunto, anuladas, "já resolvidas/erradas" com login),
   paginação e detalhe da questão (texto-base, figuras, gabarito). Lê
   `vw_questoes`.
-- `[ ]` **5F.2 — Frontend de resolução:** lista filtrável, resolver
+- `[x]` **5F.2 — Frontend de resolução:** concluída em 2026-10-01. lista filtrável, resolver
   Certo/Errado com a correção imediata, texto-base e figuras, e a árvore de
   filtros navegável.
 - `[ ]` **5F.3 — Contas e histórico:** cadastro/login, tabela de respostas

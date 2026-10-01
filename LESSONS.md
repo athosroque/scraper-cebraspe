@@ -523,3 +523,23 @@ definitivos e os 107 quesitos não mudaram):
    `elabore`, `aborde`, `discorra`, etc.).
 **Custo do aprendizado:** ~25 min em auditoria e testes sintéticos (o risco
 não gerou retrabalho em dados).
+
+### [tags: htmx, alpine, frontend, xss, falha-silenciosa]
+**Sintoma:** a 5F.2 foi entregue com os testes de rota verdes, mas no
+navegador o clique em Certo/Errado não fazia nada, clicar num nó da árvore
+não filtrava, trocar o órgão perdia o nível escolhido e
+`/?no_id=x');alert(1);//` executava JS.
+**Causa:**
+1. O id do card era `correcao-<questao_chave>`, e a chave tem `|`, que em
+   seletor CSS separa namespace: o `querySelector` do `hx-target` lança erro.
+2. `'{{ no_id }}'` dentro de `x-data`: o autoescape gera `&#39;`, mas o
+   navegador decodifica a entidade antes de o Alpine avaliar a expressão.
+3. `$nextTick` dentro de método do `x-data` precisa de `this.`.
+4. `hx-get` num `<select>` em GET envia só o valor dele, não o form.
+O `TestClient` não executa JS, então nenhum desses aparece em teste de rota.
+**Solução:** `dom_id(chave)` por hash; valor da URL por `data-*` e
+`$el.dataset`; `this.$nextTick`; gatilho `change, submit` no `<form>`.
+Testes novos conferem que todo `hx-target` é seletor válido e que o
+`no_id` não entra no `x-data`. Validação no Chromium headless (Playwright,
+já no venv) antes de marcar etapa de frontend como concluída.
+**Custo do aprendizado:** ~45 min de validação e correção.

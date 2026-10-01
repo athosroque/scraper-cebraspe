@@ -40,11 +40,11 @@ def obter_questao_por_chave(chave: str) -> QuestaoDetalhe | None:
     if not row:
         return None
 
-    # Formatar as figuras para adicionar um fallback se precisarmos servir do `/static`
+    # Formatar as figuras para adicionar um fallback se precisarmos servir do `/figuras`
     figuras = row.get("figuras") or []
     for f in figuras:
         if "url" not in f and "path_relativo" in f:
-            f["url"] = f"/static/{f['path_relativo']}"
+            f["url"] = f"/figuras/{f['path_relativo']}"
 
     row["figuras"] = figuras
     return QuestaoDetalhe(**row)
