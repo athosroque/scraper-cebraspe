@@ -94,3 +94,16 @@ def desempenho(usuario_id: int, filtros: FiltroQuestoes) -> list[NoDesempenho]:
 
     ordenar(raizes)
     return raizes
+
+
+def resumo(usuario_id: int) -> dict:
+    """KPIs da conta pela resposta mais recente de cada questão (regra do `historico`)."""
+    ultimas = usuarios_repo.ultimas_respostas(usuario_id)
+    total = len(ultimas)
+    certas = sum(1 for acertou in ultimas.values() if acertou)
+    return {
+        "resolvidas": total,
+        "certas": certas,
+        "erradas": total - certas,
+        "percentual": round(100 * certas / total, 1) if total else None,
+    }

@@ -1,73 +1,93 @@
 {% extends "base.html" %}
+{% import "_componentes.html" as c %}
 
-{% block title %}Minha conta — Questões CEBRASPE{% endblock %}
-
-{% macro linha(no, nivel) %}
-<tr>
-    <td style="padding-left: {{ 0.5 + nivel * 1.5 }}rem;">
-        <a href="/?no_id={{ no.id|urlencode }}&historico=resolvidas" class="{{ 'contrast' if nivel == 0 else 'secondary' }}">
-            {% if nivel == 0 %}<strong>{{ no.nome }}</strong>{% else %}{{ no.nome }}{% endif %}
-        </a>
-    </td>
-    <td style="text-align: right;">{{ no.acertos }} / {{ no.total }}</td>
-    <td style="text-align: right;">{{ no.percentual }}%</td>
-    <td style="width: 30%;"><progress value="{{ no.acertos }}" max="{{ no.total }}" style="margin: 0;"></progress></td>
-</tr>
-{% for filho in no.filhos %}{{ linha(filho, nivel + 1) }}{% endfor %}
-{% endmacro %}
+{% block title %}Meu desempenho — Questões CEBRASPE{% endblock %}
+{% block estilos_legados %}{% endblock %}
 
 {% block content %}
-<hgroup>
-    <h2>Minha conta</h2>
-    <p>{{ usuario.nome or usuario.email }} · {{ usuario.email }}</p>
-</hgroup>
+{{ c.cabecalho("Meu desempenho", (usuario.nome ~ " · " if usuario.nome else "") ~ usuario.email) }}
 
-<section>
-    <h3>Desempenho por assunto</h3>
-    <form method="get" action="/conta" class="grid">
-        <select name="concurso" onchange="this.form.submit()">
-            <option value="">Todos os concursos</option>
-            {% for c in facetas.concursos %}
-            <option value="{{ c.valor }}" {% if filtros.concurso == c.valor %}selected{% endif %}>{{ c.rotulo }}</option>
-            {% endfor %}
-        </select>
-        <select name="nivel" onchange="this.form.submit()">
-            <option value="">Todos os níveis</option>
-            {% for n in facetas.niveis %}
-            <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo|title }}</option>
-            {% endfor %}
-        </select>
-        <select name="tipo_conhecimento" onchange="this.form.submit()">
-            <option value="">Básico e específico</option>
-            {% for t in facetas.tipos_conhecimento %}
-            <option value="{{ t.valor }}" {% if filtros.tipo_conhecimento == t.valor %}selected{% endif %}>{{ t.rotulo|title }}</option>
-            {% endfor %}
-        </select>
-        <noscript><button type="submit">Filtrar</button></noscript>
-    </form>
-    <p><small class="secondary">Conta a resposta mais recente de cada questão. A questão soma no subassunto, no assunto e na matéria, uma vez em cada; anuladas ficam de fora.</small></p>
+{% if resumo.resolvidas %}
+<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    {{ c.kpi("Resolvidas", resumo.resolvidas) }}
+    {{ c.kpi("Acerto", "%.1f%%"|format(resumo.percentual)) }}
+    {{ c.kpi("Certas", resumo.certas) }}
+    {{ c.kpi("Erradas", resumo.erradas) }}
+</div>
 
-    {% if desempenho %}
-    <div class="overflow-auto">
-    <table>
-        <thead><tr><th>Assunto</th><th style="text-align: right;">Acertos</th><th style="text-align: right;">%</th><th></th></tr></thead>
-        <tbody>
-            {% for materia in desempenho %}{{ linha(materia, 0) }}{% endfor %}
-        </tbody>
-    </table>
+{# TODO 5F.8: "o que estudar agora", "dias seguidos" e "nota líquida" #}
+<p class="mt-3 text-xs text-slate-500">Em breve: o que estudar agora, dias seguidos e nota líquida.</p>
+
+{% call c.card("mt-6") %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+        <h2 class="text-base font-semibold text-slate-900">Caderno de erros</h2>
+        <p class="text-sm text-slate-600">{{ resumo.erradas }} {{ 'questão' if resumo.erradas == 1 else 'questões' }} em que sua última resposta foi errada.</p>
     </div>
-    {% else %}
-    <p>Nenhuma questão respondida com esses filtros. <a href="/">Resolver questões</a></p>
-    {% endif %}
-</section>
+    <a href="/questoes?historico=erradas" class="btn-primario">Refazer erradas</a>
+</div>
+{% endcall %}
+{% endif %}
 
-<section>
-    <h3>Apagar minha conta</h3>
-    <p>Apaga sua conta e todo o histórico de respostas. Não dá para desfazer.</p>
-    <form method="post" action="/conta/apagar" x-data="{ confirma: false }">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
-        <label><input type="checkbox" x-model="confirma"> Entendo que isso apaga tudo</label>
-        <button type="submit" class="secondary" :disabled="!confirma">Apagar minha conta</button>
-    </form>
-</section>
+{% call c.card("mt-6") %}
+<h2 class="text-base font-semibold text-slate-900">Desempenho por assunto</h2>
+<form method="get" action="/conta" class="mt-3 grid gap-3 sm:grid-cols-3">
+    <select name="concurso" class="campo" aria-label="Concurso" onchange="this.form.submit()">
+        <option value="">Todos os concursos</option>
+        {% for f in facetas.concursos %}
+        <option value="{{ f.valor }}" {% if filtros.concurso == f.valor %}selected{% endif %}>{{ f.rotulo }}</option>
+        {% endfor %}
+    </select>
+    <select name="nivel" class="campo" aria-label="Nível" onchange="this.form.submit()">
+        <option value="">Todos os níveis</option>
+        {% for n in facetas.niveis %}
+        <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo|title }}</option>
+        {% endfor %}
+    </select>
+    <select name="tipo_conhecimento" class="campo" aria-label="Tipo de conhecimento" onchange="this.form.submit()">
+        <option value="">Básico e específico</option>
+        {% for t in facetas.tipos_conhecimento %}
+        <option value="{{ t.valor }}" {% if filtros.tipo_conhecimento == t.valor %}selected{% endif %}>{{ t.rotulo|title }}</option>
+        {% endfor %}
+    </select>
+    <noscript><button type="submit" class="btn-secundario">Filtrar</button></noscript>
+</form>
+<p class="mt-2 text-xs text-slate-500">Conta a resposta mais recente de cada questão. A questão soma no subassunto, no assunto e na matéria, uma vez em cada; anuladas ficam de fora.</p>
+
+{% if desempenho %}
+<div class="mt-4 divide-y divide-slate-100">
+    {% for materia in desempenho %}
+    <details class="group py-2" {% if loop.first %}open{% endif %}>
+        <summary class="cursor-pointer list-none">
+            {{ c.barra_ranking(materia.nome, materia.percentual, materia.acertos ~ "/" ~ materia.total ~ " · " ~ "%.1f%%"|format(materia.percentual), destaque=True) }}
+        </summary>
+        {% if materia.filhos %}
+        <div class="ml-4 border-l border-slate-100 pl-4">
+            {% for assunto in materia.filhos %}
+            {{ c.barra_ranking(assunto.nome, assunto.percentual, assunto.acertos ~ "/" ~ assunto.total ~ " · " ~ "%.1f%%"|format(assunto.percentual), url="/questoes?" ~ {"no_id": assunto.id, "historico": "resolvidas"}|urlencode) }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </details>
+    {% endfor %}
+</div>
+{% elif resumo.resolvidas %}
+<p class="mt-4 text-sm text-slate-600">Nenhuma questão respondida com esses filtros.</p>
+{% else %}
+<div class="mt-4 rounded-lg bg-slate-50 p-6 text-center">
+    <p class="text-sm text-slate-700">Você ainda não respondeu nenhuma questão. Resolva algumas e seu desempenho aparece aqui.</p>
+    <a href="/questoes" class="btn-primario mt-3">Resolver questões</a>
+</div>
+{% endif %}
+{% endcall %}
+
+{% call c.card("mt-6 border-red-200") %}
+<h2 class="text-base font-semibold text-slate-900">Apagar minha conta</h2>
+<p class="mt-1 text-sm text-slate-600">Apaga sua conta e todo o histórico de respostas. Não dá para desfazer.</p>
+<form method="post" action="/conta/apagar" x-data="{ confirma: false }" class="mt-3 flex flex-wrap items-center gap-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" x-model="confirma"> Entendo que isso apaga tudo</label>
+    <button type="submit" class="btn border border-red-300 bg-white text-red-700 hover:bg-red-50 disabled:opacity-50" :disabled="!confirma">Apagar minha conta</button>
+</form>
+{% endcall %}
 {% endblock %}
