@@ -182,3 +182,16 @@ def test_lista_aponta_para_questoes(cliente):
     r = cliente.get("/questoes", params={"concurso": "PF_25_ADM"})
     assert 'hx-get="/"' not in r.text
     assert 'hx-get="/questoes"' in r.text
+
+
+def test_parecidas_html_sob_demanda(cliente):
+    r = cliente.get("/q/PF_25_ADM/094_PF_CB1_01/13/parecidas")
+    assert r.status_code == 200
+    assert "/q/" in r.text
+    assert cliente.get("/q/NAO/EXISTE/1/parecidas").status_code == 404
+
+
+def test_detalhe_mostra_parecidas(cliente):
+    r = cliente.get("/q/PF_25_ADM/094_PF_CB1_01/13")
+    assert "Questões parecidas" in r.text
+    assert "em breve" not in r.text
