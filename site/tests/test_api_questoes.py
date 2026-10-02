@@ -141,3 +141,47 @@ def test_saude_ok(cliente):
     resposta = cliente.get("/saude")
     assert resposta.status_code == 200
     assert resposta.json() == {"status": "ok"}
+
+
+CHAVE_PF = "PF_25_ADM|094_PF_CB1_01|13"
+
+
+def test_parecidas_mesmo_no_sem_a_propria(cliente):
+    detalhe = cliente.get(f"/api/v1/questoes/{CHAVE_PF}").json()
+    principal = next(n for n in detalhe["nos"] if n["papel"] == "principal")
+
+    response = cliente.get(f"/api/v1/questoes/{CHAVE_PF}/parecidas?limite=20")
+    assert response.status_code == 200
+    itens = response.json()
+    assert 0 < len(itens) <= 20
+    chaves = [i["questao_chave"] for i in itens]
+    assert CHAVE_PF not in chaves
+    assert len(set(chaves)) == len(chaves)
+    for item in itens:
+        ids = set()
+        for n in item["nos"]:
+            ids |= {n["no_id"], n["assunto_id"], n["materia_id"]}
+        assert principal["no_id"] in ids
+    # Sem enunciado repetido entre si nem com a própria questão.
+    enunciados = [i["enunciado"] for i in itens]
+    assert len(set(enunciados)) == len(enunciados)
+    assert detalhe["enunciado"] not in enunciados
+
+
+def test_parecidas_404(cliente):
+    response = cliente.get("/api/v1/questoes/NAO|EXISTE|1/parecidas")
+    assert response.status_code == 404
+
+
+def test_incidencia_na_listagem_e_no_detalhe(cliente):
+    itens = cliente.get("/api/v1/questoes?tamanho_pagina=50").json()["itens"]
+    com = [i for i in itens if i["incidencia"]]
+    assert com
+    for i in com:
+        inc = i["incidencia"]
+        assert 1 <= inc["posicao"] <= inc["total_subassuntos"]
+        principal = next(n for n in i["nos"] if n["papel"] == "principal")
+        assert inc["no_id"] == principal["no_id"]
+    chave = com[0]["questao_chave"]
+    detalhe = cliente.get(f"/api/v1/questoes/{chave}").json()
+    assert detalhe["incidencia"] == com[0]["incidencia"]

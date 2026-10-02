@@ -1,6 +1,6 @@
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Path, Query, Request
 
 from app.auth import usuario_id_atual
 from app.modelos import (
@@ -9,6 +9,7 @@ from app.modelos import (
     NoArvore,
     PaginaQuestoes,
     QuestaoDetalhe,
+    QuestaoResumo,
 )
 from app.servicos import questoes_servico
 from app.servicos.contas_servico import LoginNecessario
@@ -111,6 +112,39 @@ def obter_questao(chave: str):
     if not questao:
         raise HTTPException(status_code=404, detail="Questão não encontrada")
     return questao
+
+
+@router.get(
+    "/{chave}/parecidas",
+    response_model=list[QuestaoResumo],
+    summary="Questões parecidas",
+    description=(
+        "Questões do mesmo nó principal da árvore, sem a própria e sem repetir "
+        "enunciado canônico (o mesmo item aplicado em outro caderno aparece uma "
+        "vez só, e o da própria questão não aparece). Só utilizáveis, na ordem "
+        "da listagem. Lista vazia se a questão não foi classificada."
+    ),
+    responses={
+        404: {
+            "description": "Questão não encontrada",
+            "content": {
+                "application/json": {"example": {"detail": "Questão não encontrada"}}
+            },
+        }
+    },
+)
+def obter_parecidas(
+    chave: str = Path(
+        description="Chave estável `concurso|caderno|numero`.",
+        examples=["PF_25_ADM|094_PF_CB1_01|13"],
+    ),
+    limite: int = Query(5, ge=1, le=20, description="Máximo de questões (até 20)."),
+):
+    """Questões do mesmo nó principal, para continuar estudando o assunto."""
+    parecidas = questoes_servico.parecidas(chave, limite)
+    if parecidas is None:
+        raise HTTPException(status_code=404, detail="Questão não encontrada")
+    return parecidas
 
 
 router_arvore = APIRouter(prefix="/arvore", tags=["Árvore"])

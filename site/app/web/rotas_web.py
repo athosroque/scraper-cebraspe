@@ -186,15 +186,31 @@ def anexos_questao(request: Request, concurso: str, caderno: str, numero: int):
     )
 
 
+@router.get("/q/{concurso}/{caderno}/{numero}/parecidas", response_class=HTMLResponse)
+def parecidas_questao(request: Request, concurso: str, caderno: str, numero: int):
+    """Questões parecidas, carregadas sob demanda pelo card da lista."""
+    parecidas = questoes_servico.parecidas(f"{concurso}|{caderno}|{numero}")
+    if parecidas is None:
+        return _nao_encontrada(request)
+    return templates.TemplateResponse(
+        request=request, name="_parecidas.html", context={"parecidas": parecidas}
+    )
+
+
 @router.get("/q/{concurso}/{caderno}/{numero}", response_class=HTMLResponse)
 def detalhe_questao(request: Request, concurso: str, caderno: str, numero: int):
-    questao = questoes_servico.obter_questao_por_chave(f"{concurso}|{caderno}|{numero}")
+    chave = f"{concurso}|{caderno}|{numero}"
+    questao = questoes_servico.obter_questao_por_chave(chave)
     if not questao:
         return _nao_encontrada(request)
     return templates.TemplateResponse(
         request=request,
         name="questao_detalhe.html",
-        context={"questao": questao, "anexos_inline": True},
+        context={
+            "questao": questao,
+            "anexos_inline": True,
+            "parecidas": questoes_servico.parecidas(chave) or [],
+        },
     )
 
 

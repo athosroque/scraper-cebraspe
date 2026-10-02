@@ -63,6 +63,11 @@ def montar_where(filtros_dict: dict, params: dict) -> str:
         condicoes.append("NOT (questao_chave = ANY(%(chaves_excluir)s))")
         params["chaves_excluir"] = list(filtros_dict["chaves_excluir"])
 
+    # Uma questão por enunciado canônico (o mesmo item em cadernos diferentes
+    # do concurso fica só uma vez).
+    if filtros_dict.get("apenas_canonicas"):
+        condicoes.append("questao_id = questao_canonica_id")
+
     return " AND ".join(condicoes)
 
 
@@ -300,4 +305,41 @@ def desempenho_por_no(
         GROUP BY c.id, c.nome, c.nivel, c.pai_id
         """
         cur.execute(query, params)
+        return cur.fetchall()
+
+
+def chaves_mesmo_enunciado(chave: str) -> list[str] | None:
+    """Chaves com o mesmo enunciado canônico da questão (inclui a própria).
+
+    `None` quando a chave não existe.
+    """
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute(
+            """
+            SELECT DISTINCT o.questao_chave
+            FROM vw_questoes q
+            JOIN vw_questoes o ON o.questao_canonica_id = q.questao_canonica_id
+            WHERE q.questao_chave = %(chave)s
+            """,
+            {"chave": chave},
+        )
+        return [r["questao_chave"] for r in cur.fetchall()] or None
+
+
+def ranking_subassuntos() -> list[dict]:
+    """Ranking completo de subassuntos (`fn_prova_cobra`, sem filtros)."""
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute(
+            """
+            SELECT no_id, materia_id, questoes
+            FROM fn_prova_cobra('subassunto')
+            ORDER BY materia_id, questoes DESC, pct_medio_por_concurso DESC, no_nome
+            """
+        )
         return cur.fetchall()

@@ -49,6 +49,20 @@ class NoInfo(BaseModel):
     rotulo_materia: str | None = None
 
 
+class Incidencia(BaseModel):
+    """Posição do subassunto principal no ranking "o que mais cai" da matéria."""
+
+    no_id: str = Field(description="Subassunto principal da questão.")
+    materia_id: str | None = Field(None, description="Matéria do subassunto.")
+    posicao: int = Field(
+        description="Posição no ranking da matéria (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
+    )
+    total_subassuntos: int = Field(
+        description="Quantos subassuntos da matéria têm questão no ranking."
+    )
+    questoes: int = Field(description="Questões válidas distintas no subassunto.")
+
+
 class QuestaoResumo(BaseModel):
     """Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados."""
 
@@ -76,6 +90,13 @@ class QuestaoResumo(BaseModel):
     tem_figuras: bool
     cargos: list[CargoInfo]
     nos: list[NoInfo]
+    incidencia: Incidencia | None = Field(
+        None,
+        description=(
+            "Posição do subassunto principal no ranking da matéria. `null` quando o "
+            "nó principal não é subassunto ou a questão não foi classificada."
+        ),
+    )
 
 
 class QuestaoDetalhe(QuestaoResumo):

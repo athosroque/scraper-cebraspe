@@ -1,0 +1,12 @@
+{% if parecidas %}
+<ul class="space-y-2">
+    {% for p in parecidas %}
+    <li>
+        <a href="{{ url_questao(p.questao_chave) }}" class="link">{{ p.orgao }} {{ p.ano }} · caderno {{ p.codigo_caderno }}, item {{ p.numero }}</a>
+        <p class="mt-0.5 line-clamp-2 text-slate-600">{{ p.enunciado|truncate(160) }}</p>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="text-slate-500">Nenhuma outra questão no mesmo assunto.</p>
+{% endif %}
