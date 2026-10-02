@@ -6,7 +6,7 @@
 {% set rotulo = {"errado": "que você errou", "branco": "que ficaram em branco"}[situacao] %}
 
 {% block content %}
-{{ c.cabecalho("Revisar simulado", simulado.concurso ~ " · cargo " ~ simulado.cargo_numero ~ ": questões " ~ rotulo) }}
+{{ c.cabecalho("Revisar simulado", rotulo_concurso(simulado.concurso) ~ " · cargo " ~ simulado.cargo_numero ~ ": questões " ~ rotulo) }}
 
 <p class="mb-4 flex flex-wrap items-center gap-3 text-sm">
     <a href="/simulado/{{ simulado.id }}" class="link">← Voltar ao resultado</a>
@@ -15,7 +15,7 @@
     {% else %}
     <a href="/simulado/{{ simulado.id }}/revisar?situacao=errado" class="link">Ver as erradas</a>
     {% endif %}
-    <span class="text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total }}</strong> questões</span>
+    <span class="text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total|num }}</strong> questões</span>
 </p>
 
 {% if pagina_questoes.total == 0 %}

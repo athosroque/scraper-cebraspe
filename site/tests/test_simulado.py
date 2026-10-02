@@ -328,3 +328,22 @@ def test_duracao_nota_anterior_e_revisar_erradas(cliente_logado):
 
     c.cookies.clear()
     assert c.get(f"/api/v1/simulados/{s2}/questoes").status_code == 401
+
+
+@banco
+def test_revisar_pagina_fora_do_intervalo(cliente_logado):
+    c, _ = cliente_logado
+    s = c.post("/api/v1/simulados", json=PROVA).json()["id"]
+    c.post(f"/api/v1/simulados/{s}/correcao", json={"respostas": {}})
+    r = c.get(
+        f"/simulado/{s}/revisar",
+        params={"situacao": "branco", "pagina": 999},
+        follow_redirects=False,
+    )
+    assert r.status_code == 307
+    assert "pagina=999" not in r.headers["location"]
+    assert "pagina=0" not in r.headers["location"]
+    r0 = c.get(f"/simulado/{s}/revisar", params={"pagina": 0}, follow_redirects=False)
+    assert r0.status_code == 200
+    r = c.get(f"/simulado/{s}/revisar", params={"situacao": "branco", "pagina": 999})
+    assert r.status_code == 200

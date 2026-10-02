@@ -118,13 +118,13 @@ Testes não rodaram (role de leitura sem permissão em `vw_questoes`; falha igua
 com e sem as mudanças).
 
 ### Pendentes de código
-- [ ] Facetas `nivel`/`concurso`/`tipo_conhecimento` em `questoes_servico.py`
+- [x] Facetas `nivel`/`concurso`/`tipo_conhecimento` em `questoes_servico.py`
   (~l.175-195) sem rótulo; `conta.html:60` ainda usa `|title`.
-- [ ] `|num` faltando em `estatisticas.html:59`, `conta.html:72,77`, totais dos selects.
-- [ ] Rótulo "Conhecimentos específicos — <cargo>" faltando em `materia.html`, chips da lista, `edital_vs_prova.html`.
-- [ ] `estatisticas.html`/`conta.html` mostram slug cru de concurso.
+- [x] `|num` faltando em `estatisticas.html:59`, `conta.html:72,77`, totais dos selects.
+- [x] Rótulo "Conhecimentos específicos — <cargo>" faltando em `materia.html`, chips da lista, `edital_vs_prova.html`.
+- [x] `estatisticas.html`/`conta.html` mostram slug cru de concurso.
 - [x] 404 genérico em ~9 rotas (simulado, cargo sem prova); 405 usa o template de 404 e perde `Allow`.
-- [ ] Paginação do `simulado_revisar` sem a mesma proteção.
+- [x] Paginação do `simulado_revisar` sem a mesma proteção.
 - [~] Sessão 3: `outros < 0`, tooltip "Questões da matéria", rodapé "Anuladas ficam fora", KPI "Itens de edital" removido, `/api/v1/arvore` ainda 178. (feito: `outros < 0` e rodapé; faltam tooltip, KPI e `/api/v1/arvore`)
 - [ ] Sessão 5: `og:image`, `twitter:title/description`; `localStorage` sem try/catch.
 
