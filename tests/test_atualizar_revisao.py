@@ -16,6 +16,11 @@ def _sem_banco_real(monkeypatch):
     monkeypatch.setattr(
         atualizar_revisao, "processar_fila", lambda: chamadas.append("fila")
     )
+    monkeypatch.setattr(
+        atualizar_revisao,
+        "_reaplicar_permissoes_site",
+        lambda: chamadas.append("grants"),
+    )
     return chamadas
 
 
@@ -116,8 +121,8 @@ class TestGravacaoBancoEstatisticas:
         atualizar_revisao.atualizar_artefatos_revisao(
             tmp_path, reiniciar_datasette=False
         )
-        # Carga do banco e, depois dela, a fila de cadernos (Etapa 5C).
-        assert _sem_banco_real == [tmp_path, "fila"]
+        # Carga, fila de cadernos (5C) e reaplicação dos grants do site.
+        assert _sem_banco_real == [tmp_path, "fila", "grants"]
 
     def test_gravar_banco_false_nao_grava(self, monkeypatch, tmp_path, _sem_banco_real):
         self._sem_etapas(monkeypatch)
@@ -209,3 +214,21 @@ class TestSinonimosNoPipeline:
 
         monkeypatch.setattr(src.canonico, "mapear_novos_itens_por_regra", _falha)
         atualizar_revisao.atualizar_arvore(tmp_path)
+
+
+class TestReaplicarPermissoesSite:
+    def test_roda_o_script_do_site(self, monkeypatch):
+        monkeypatch.undo()
+        subprocess_mock = MagicMock(return_value=MagicMock(returncode=0, stderr=""))
+        monkeypatch.setattr(atualizar_revisao.subprocess, "run", subprocess_mock)
+        atualizar_revisao._reaplicar_permissoes_site()
+        assert subprocess_mock.call_args.args[0][-1].endswith("aplicar_schema_app.py")
+
+    def test_falha_so_loga_aviso(self, monkeypatch):
+        monkeypatch.undo()
+
+        def _levanta(*a, **k):
+            raise OSError("sem python")
+
+        monkeypatch.setattr(atualizar_revisao.subprocess, "run", _levanta)
+        atualizar_revisao._reaplicar_permissoes_site()

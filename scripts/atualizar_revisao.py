@@ -95,6 +95,25 @@ def atualizar_classificacao(revisao_dir: Path) -> None:
         )
 
 
+def _reaplicar_permissoes_site() -> None:
+    # A recarga do star schema recria as views e perde os GRANTs de
+    # `site_leitura`: sem reaplicar, o site responde "permission denied".
+    # Subprocesso porque o diretório `site/` colide com o módulo `site` da
+    # stdlib (não dá para importar). Best-effort, como o restart do Datasette.
+    script = Path(__file__).resolve().parents[1] / "site" / "scripts" / "aplicar_schema_app.py"
+    try:
+        resultado = subprocess.run(
+            [sys.executable, str(script)], capture_output=True, text=True, timeout=60, check=False
+        )
+    except (OSError, subprocess.SubprocessError) as e:
+        logger.warning(f"[SITE] Não foi possível reaplicar as permissões do site: {e}")
+        return
+    if resultado.returncode != 0:
+        logger.warning(
+            f"[SITE] Permissões do site não reaplicadas: {resultado.stderr.strip()}"
+        )
+
+
 def _gravar_banco_estatisticas(revisao_dir: Path) -> None:
     # Exception genérica de propósito: conexão recusada, senha ausente no
     # .env ou erro de SQL não podem derrubar a extração que já pagou o LLM —
@@ -110,6 +129,7 @@ def _gravar_banco_estatisticas(revisao_dir: Path) -> None:
         processar_fila()
     except Exception as e:  # noqa: BLE001
         logger.warning(f"[QUESTOES] Não foi possível processar a fila de cadernos: {e}")
+    _reaplicar_permissoes_site()
 
 
 def atualizar_artefatos_revisao(
