@@ -6,18 +6,35 @@
 {% else %}
     {% set tom = "border-red-200 bg-red-50 text-red-900" %}
 {% endif %}
-<div id="{{ dom_id(resultado.questao_chave) }}" class="rounded-lg border p-4 text-sm {{ tom }}" role="status">
-    {% if resultado.anulada %}
-    <p class="font-semibold">Atenção: esta questão foi anulada pela banca.</p>
-    {% elif resultado.acertou %}
-    <p class="font-semibold">✓ Você acertou! O gabarito é {{ resultado.gabarito }}.</p>
-    {% else %}
-    <p class="font-semibold">✗ Você errou. O gabarito é {{ resultado.gabarito }}.</p>
-    {% endif %}
-    <p class="mt-1">Sua resposta: <strong>{{ resultado.resposta }}</strong></p>
-    {% if resultado.gravada %}
-    <p class="mt-2 text-xs opacity-80">Resposta salva no seu histórico.</p>
-    {% elif not logado and login_habilitado() %}
-    <p class="mt-2 text-xs"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}" class="link">Entre com Google</a> para guardar seu histórico.</p>
-    {% endif %}
+{% set gab_texto = "Certo" if resultado.gabarito == "C" else "Errado" if resultado.gabarito == "E" else resultado.gabarito %}
+{% set resp_texto = "Certo" if resultado.resposta == "C" else "Errado" if resultado.resposta == "E" else resultado.resposta %}
+<div id="{{ dom_id(resultado.questao_chave) }}" class="rounded-lg border p-4 text-sm {{ tom }}" role="status" x-data="{ tentando: false }">
+    <div x-show="!tentando">
+        {% if resultado.anulada %}
+        <p class="font-semibold">Atenção: esta questão foi anulada pela banca.</p>
+        {% elif resultado.acertou %}
+        <p class="font-semibold">✓ Você acertou! O gabarito é {{ gab_texto }}.</p>
+        {% else %}
+        <p class="font-semibold">✗ Você errou. O gabarito é {{ gab_texto }}.</p>
+        {% endif %}
+        <p class="mt-1">Sua resposta: <strong>{{ resp_texto }}</strong></p>
+        
+        {% if resultado.gravada %}
+        <p class="mt-2 text-xs opacity-80">Resposta salva no seu histórico.</p>
+        {% elif not logado and login_habilitado() %}
+        <div class="mt-2 flex items-center gap-3"
+             {% if resultado.acertou %}x-init="localStorage.setItem('sessao_acertos', parseInt(localStorage.getItem('sessao_acertos') || 0) + 1); $dispatch('acerto-registrado')"{% endif %}>
+            <p class="text-xs"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}" class="link">Entre com Google</a> para guardar seu histórico.</p>
+            <button type="button" @click="tentando = true" class="btn-secundario text-xs bg-white px-2 py-1">Tentar de novo</button>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div x-show="tentando" x-cloak>
+        <form hx-post="/q/correcao" hx-target="#{{ dom_id(resultado.questao_chave) }}" hx-swap="outerHTML" class="flex gap-3" aria-label="Responder questão novamente">
+            <input type="hidden" name="chave" value="{{ resultado.questao_chave }}">
+            <button type="submit" name="resposta" value="C" class="btn-secundario flex-1 justify-center hover:border-emerald-400 hover:text-emerald-700 sm:flex-none sm:px-8">Certo</button>
+            <button type="submit" name="resposta" value="E" class="btn-secundario flex-1 justify-center hover:border-red-400 hover:text-red-700 sm:flex-none sm:px-8">Errado</button>
+        </form>
+    </div>
 </div>

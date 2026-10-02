@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Questões CEBRASPE{% endblock %}</title>
     <meta name="description" content="{% block description %}Questões de concursos do CEBRASPE para resolver, filtradas por matéria, assunto e subassunto.{% endblock %}">
+    <link rel="canonical" href="{{ request.url.replace(query='') }}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
+    <meta property="og:url" content="{{ request.url.replace(query='') }}">
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
@@ -13,6 +19,7 @@
     <script defer src="/static/alpine.min.js"></script>
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token(request) }}"}'>
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-blue-700">Pular para o conteúdo</a>
     {% set caminho = request.url.path %}
     {% set itens_menu = [
         ("/questoes", "Questões"),
@@ -36,6 +43,12 @@
                     <button type="submit" class="btn-secundario">Sair</button>
                 </form>
                 {% elif login_habilitado() %}
+                <span x-data="{ acertos: parseInt(localStorage.getItem('sessao_acertos') || 0) }" 
+                      @acerto-registrado.window="acertos = parseInt(localStorage.getItem('sessao_acertos') || 0)"
+                      x-show="acertos > 0" x-cloak
+                      class="ml-2 text-sm font-medium text-emerald-600" aria-live="polite">
+                    Acertos: <span x-text="acertos"></span>
+                </span>
                 <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="btn-primario ml-2">Entrar com Google</a>
                 {% endif %}
             </div>
@@ -50,12 +63,18 @@
                 <button type="submit" class="block px-3 py-2 text-sm text-slate-700">Sair</button>
             </form>
             {% elif login_habilitado() %}
+            <span x-data="{ acertos: parseInt(localStorage.getItem('sessao_acertos') || 0) }" 
+                  @acerto-registrado.window="acertos = parseInt(localStorage.getItem('sessao_acertos') || 0)"
+                  x-show="acertos > 0" x-cloak
+                  class="block px-3 py-2 text-sm font-medium text-emerald-600" aria-live="polite">
+                Acertos: <span x-text="acertos"></span>
+            </span>
             <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="block px-3 py-2 text-sm font-semibold text-blue-700">Entrar com Google</a>
             {% endif %}
         </div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-4 py-8">
+    <main id="conteudo" class="mx-auto max-w-6xl px-4 py-8">
         {% block content %}{% endblock %}
     </main>
 

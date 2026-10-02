@@ -858,3 +858,8 @@ enviar o bloco de uma etapa específica para o agente construir.
   `mart`/dbt) que lê os dois. Decisão a registrar em ADR próprio.
 - `[ ]` Caso de uso-alvo: "tópicos mais cobrados por matéria/ano que ainda não
   têm item de estudo" → plano de estudo priorizado.
+
+- [x] Etapa 5F.11b — Correções da interface web (antes do deploy 5F.12)
+  Plano autocontido em `correcoes-interface-5f.md` (6 sessões: bugs de rota,
+  rótulos/formatação, coerência dos números, curadoria da árvore, SEO/UX,
+  revalidação ao vivo). Executar uma sessão por conversa.

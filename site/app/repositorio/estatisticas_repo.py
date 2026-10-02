@@ -174,8 +174,8 @@ def materia_ativa(no_id: str) -> dict | None:
 def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
     """Matérias ativas com questões utilizáveis distintas (mesma conta da árvore).
 
-    `vw_questoes.materia_id` já é a matéria do nó classificado, então a
-    contagem sobe a árvore. O denominador é o total de questões utilizáveis.
+    Usa `fn_prova_cobra` para manter a coerência de % (válidas desduplicadas)
+    entre a home e o painel.
     """
     with (
         get_conexao_leitura() as conn,
@@ -183,21 +183,14 @@ def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
     ):
         cur.execute(
             """
-            WITH total AS (
-                SELECT count(DISTINCT questao_id) AS n FROM vw_questoes WHERE utilizavel
-            )
-            SELECT nc.id, nc.nome,
-                   count(DISTINCT q.questao_id) AS total_questoes,
-                   round(100.0 * count(DISTINCT q.questao_id)
-                         / nullif((SELECT n FROM total), 0), 2)::float AS pct_incidencia,
-                   coalesce(bool_or(q.nome_de_cargo), false) AS nome_de_cargo
-            FROM vw_no_caminho nc
-            LEFT JOIN vw_questoes q ON q.materia_id = nc.id AND q.utilizavel
-            WHERE nc.nivel = 'materia'
-              AND (%(materia_id)s::text IS NULL OR nc.id = %(materia_id)s)
-            GROUP BY nc.id, nc.nome
-            HAVING %(materia_id)s::text IS NOT NULL OR count(q.questao_id) > 0
-            ORDER BY total_questoes DESC, nc.nome
+            SELECT no_id AS id, no_nome AS nome,
+                   questoes AS total_questoes,
+                   pct_do_universo AS pct_incidencia,
+                   (SELECT coalesce(bool_or(nome_de_cargo), false)
+                    FROM vw_questoes q WHERE q.materia_id = no_id AND q.utilizavel) AS nome_de_cargo
+            FROM fn_prova_cobra('materia')
+            WHERE (%(materia_id)s::text IS NULL OR no_id = %(materia_id)s)
+            ORDER BY total_questoes DESC, no_nome
             """,
             {"materia_id": materia_id},
         )

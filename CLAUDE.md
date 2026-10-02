@@ -1554,6 +1554,12 @@ maior parte dos cards não tem o texto-base aberto.
 payload 5×); carregar anexos de todo card no `load` (uma requisição por
 card). Ver ADR-033.
 
+### 2026-10-02 — Coerência dos números do painel de matéria (Etapa 5F.12 - Sessão 3)
+
+**Decisão:** A base única para a porcentagem de incidência na home e no painel de matéria passa a ser "válidas desduplicadas" (computadas via `fn_prova_cobra`). Na tela do painel, os 4 KPIs receberam rótulos mais diretos e tooltips de explicação ("Questões da matéria", "Distintas no recorte", "Anuladas", "Universo de comparação"). O ranking "O que mais cai" também foi complementado com uma linha agregadora "Outros / direto no assunto", para que a soma visível feche exatamente com o total do recorte e a explicação de escopo fique clara (adicionado teste de reconciliação para a LP).
+**Motivo:** Usuários reportaram inconsistências ou confusão entre o número do ranking, o total sem filtro e o número do recorte, visto que cada query contava itens de maneira ligeiramente diferente.
+**Alternativas descartadas:** Mostrar a porcentagem usando a tabela bruta de questões sem desduplicar (causava peso maior do que a matéria realmente tem nos cadernos).
+
 ## 13. LESSONS.md (do projeto)
 
 Ver `LESSONS.md` neste diretório — protocolo padrão descrito no `CLAUDE.md`

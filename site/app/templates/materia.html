@@ -13,11 +13,23 @@
     <div class="min-w-0 lg:col-span-2">
         {% call c.card() %}
         <h2 class="mb-2 text-lg font-semibold text-slate-900">O que mais cai</h2>
-        {% if linhas %}
+        {% if linhas or materia.questoes_recorte > 0 %}
+        {% set soma_ranking = linhas|map(attribute='questoes')|sum if linhas else 0 %}
+        {% set outros = materia.questoes_recorte - soma_ranking %}
+        {% set max_real = maximo if maximo > outros else outros %}
+        
         {% for r in linhas %}
-        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / maximo) if maximo else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
+        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / max_real) if max_real else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
         {% endfor %}
-        <p class="mt-3 text-xs text-slate-500">Universo sob os filtros: {{ linhas[0].total_universo|num }} questões válidas. Anuladas ficam fora.</p>
+        
+        {% if outros > 0 %}
+        {{ c.barra_ranking("Outros / direto no assunto", (outros * 100 / max_real) if max_real else 0, outros ~ (" questão" if outros == 1 else " questões")) }}
+        {% endif %}
+        
+        <p class="mt-3 text-xs text-slate-500">
+            Mostrando {{ soma_ranking + outros }} de {{ materia.questoes_recorte }} questões (fechando a soma).
+            Universo sob os filtros: {{ (linhas[0].total_universo if linhas else materia.questoes_recorte)|num }} questões válidas. Anuladas ficam fora.
+        </p>
         {% else %}
         <p class="text-sm text-slate-600">Nenhuma questão desta matéria para esses filtros.</p>
         {% endif %}
@@ -57,14 +69,25 @@
 
         {% call c.card() %}
         <h2 class="mb-2 text-lg font-semibold text-slate-900">Desempenho e edital</h2>
-        {# KPIs do mesmo serviço de /api/v1/materias/{id} (5F.7). #}
         <dl class="grid grid-cols-2 gap-3 text-sm">
-            <div><dt class="text-slate-500">Questões (total)</dt><dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.total_questoes|num }}</dd></div>
-            <div><dt class="text-slate-500">Incidência</dt><dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.pct_incidencia|pct }}</dd></div>
-            <div><dt class="text-slate-500">No recorte</dt><dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.questoes_recorte|num }}{% if materia.anuladas_recorte %} <span class="text-xs font-normal text-slate-500">+ {{ materia.anuladas_recorte }} anul.</span>{% endif %}</dd></div>
-            <div><dt class="text-slate-500">Itens de edital</dt><dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.itens_edital }}</dd></div>
+            <div>
+                <dt class="text-slate-500" title="Todas as questões ativas da matéria no banco (sem filtro).">Questões da matéria</dt>
+                <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.total_questoes|num }}</dd>
+            </div>
+            <div>
+                <dt class="text-slate-500" title="Questões válidas, não anuladas e sem repetição, para estes filtros.">Distintas no recorte</dt>
+                <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.questoes_recorte|num }}</dd>
+            </div>
+            <div>
+                <dt class="text-slate-500" title="Questões anuladas pela banca neste recorte.">Anuladas</dt>
+                <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.anuladas_recorte|num }}</dd>
+            </div>
+            <div>
+                <dt class="text-slate-500" title="Peso da matéria no total de questões válidas encontradas pelos filtros.">Universo de comparação</dt>
+                <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.pct_do_universo|pct }}</dd>
+            </div>
         </dl>
-        <p class="mt-3 text-xs text-slate-500">"No recorte" e "itens de edital" seguem os filtros. Seu desempenho fica em <a href="/conta" class="underline">Minha conta</a>.</p>
+        <p class="mt-3 text-xs text-slate-500">Seu desempenho fica em <a href="/conta" class="underline">Minha conta</a>.</p>
         {% endcall %}
     </div>
 </div>

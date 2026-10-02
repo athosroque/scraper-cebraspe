@@ -156,7 +156,7 @@ def test_edital_cobra_filtro_de_cargo(cliente):
 def test_cargo_sem_concurso_e_ignorado(cliente):
     com = cliente.get("/estatisticas", params={"cargo_numero": 1}).text
     sem = cliente.get("/estatisticas").text
-    assert com == sem
+    assert com.replace("?cargo_numero=1", "") == sem
 
 
 def test_rotas_html_de_estatistica_fora_do_openapi(cliente):

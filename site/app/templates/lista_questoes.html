@@ -70,7 +70,7 @@ document.addEventListener("alpine:init", () => {
    cache de histórico; o voltar busca a página inteira no servidor. #}
 <form id="form-filtros" action="/questoes" method="get" hx-history="false"
       hx-get="/questoes" hx-trigger="change, submit" hx-target="#lista-conteudo" hx-push-url="true"
-      class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Filtros de questões">
     {# Página volta a 1 a cada mudança de filtro: o form não manda `pagina`. #}
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {% with cargos = facetas.cargos %}{% include "_select_cargo.html" %}{% endwith %}

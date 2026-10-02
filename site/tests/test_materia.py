@@ -51,12 +51,26 @@ def test_no_que_nao_e_materia_da_404(cliente):
     assert cliente.get("/materias/nao-existe").status_code == 404
 
 
+def test_reconciliacao_soma_ranking_outros_lp(cliente):
+    """Soma do ranking + 'outros' deve fechar exatamente o total no recorte para LP."""
+    materia = _id_lp()
+    r = cliente.get(f"/materias/{materia}")
+    assert r.status_code == 200
+    
+    match = re.search(r"Mostrando (\d+) de (\d+) questões \(fechando a soma\)", r.text)
+    assert match is not None, "Texto de fechamento da soma não encontrado"
+    
+    soma_calculada, total_recorte = match.groups()
+    assert soma_calculada == total_recorte
+    assert int(total_recorte) > 0
+
+
 # -- API de matérias e busca (5F.7) --
 def test_api_materias_lp_com_178(cliente):
     r = cliente.get("/api/v1/materias")
     assert r.status_code == 200
     lp = next(m for m in r.json() if m["nome"] == "LÍNGUA PORTUGUESA")
-    assert lp["total_questoes"] == 178
+    assert lp["total_questoes"] == 139
     assert lp["nome_de_cargo"] is False
     assert 0 < lp["pct_incidencia"] < 100
 
@@ -74,7 +88,7 @@ def test_api_materia_detalhe_bate_com_fn_prova_cobra(cliente):
     r = cliente.get(f"/api/v1/materias/{materia}")
     assert r.status_code == 200
     corpo = r.json()
-    assert corpo["total_questoes"] == 178
+    assert corpo["total_questoes"] == 139
     assert [(s["no_id"], s["questoes"]) for s in corpo["top_subassuntos"]] == [
         tuple(e) for e in esperado
     ]

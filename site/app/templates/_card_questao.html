@@ -11,6 +11,7 @@
     <details class="group mb-4 rounded-lg border border-slate-200 bg-slate-50"{% if anexos_inline %} open{% endif %}>
         <summary class="cursor-pointer select-none px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900">
             {% if questao.tem_texto_base %}Texto associado{% else %}Figuras{% endif %}{% if questao.tem_texto_base and questao.tem_figuras %} e figuras{% endif %}
+            {% if mesmo_texto %}<span class="ml-2 font-normal text-slate-500">(mesmo texto da questão anterior)</span>{% endif %}
         </summary>
         {% if anexos_inline %}
         <div class="border-t border-slate-200 px-4 py-3">{% include "_anexos.html" %}</div>
@@ -23,7 +24,7 @@
     <p class="mb-4 whitespace-pre-line leading-relaxed text-slate-900">{{ questao.enunciado }}</p>
 
     <div id="{{ dom_id(questao.questao_chave) }}">
-        <form hx-post="/q/correcao" hx-target="#{{ dom_id(questao.questao_chave) }}" hx-swap="outerHTML" class="flex gap-3">
+        <form hx-post="/q/correcao" hx-target="#{{ dom_id(questao.questao_chave) }}" hx-swap="outerHTML" class="flex gap-3" aria-label="Responder questão">
             <input type="hidden" name="chave" value="{{ questao.questao_chave }}">
             <button type="submit" name="resposta" value="C" class="btn-secundario flex-1 justify-center hover:border-emerald-400 hover:text-emerald-700 sm:flex-none sm:px-8">Certo</button>
             <button type="submit" name="resposta" value="E" class="btn-secundario flex-1 justify-center hover:border-red-400 hover:text-red-700 sm:flex-none sm:px-8">Errado</button>
@@ -38,9 +39,9 @@
         {% endif %}
         <p>Fonte: CEBRASPE — {{ rotulo_concurso(questao.concurso) }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</p>
         {% if questao.nos and not anexos_inline %}
-        <details class="mt-2">
+        <details class="mt-2" hx-get="{{ url_questao(questao.questao_chave) }}/parecidas" hx-trigger="toggle[target.open] once" hx-target="find .parecidas-container" hx-swap="innerHTML">
             <summary class="cursor-pointer select-none font-medium text-slate-600 hover:text-blue-700">Questões parecidas</summary>
-            <div class="mt-2" hx-get="{{ url_questao(questao.questao_chave) }}/parecidas" hx-trigger="toggle from:closest details once" hx-swap="innerHTML"><span aria-busy="true">Carregando…</span></div>
+            <div class="mt-2 parecidas-container"><span aria-busy="true">Carregando…</span></div>
         </details>
         {% endif %}
     </footer>

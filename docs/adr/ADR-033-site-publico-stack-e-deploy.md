@@ -210,6 +210,10 @@ UX fique limitada pelo HTMX. Até lá, migrar é custo sem ganho.
   resultado: um envio que falhe (CSRF, rede) não perde as marcações. Login
   caído com simulado gravado volta pelo `/entrar`, nunca corrige como
   avulso (o simulado ficaria aberto para sempre).
+- **5F.12 (2026-10-02):** Unificação da base de cálculo de porcentagem no
+  painel e na home para "válidas desduplicadas" usando `fn_prova_cobra`.
+  No painel de matéria, o ranking de subassuntos ganhou a linha "Outros / 
+  direto no assunto" para fechar a soma com o recorte visível.
 
 ## Referências
 - ADR-026 (banco próprio), ADR-030 (árvore mestre e objetivo do site),
