@@ -211,14 +211,13 @@ def obter_arvore_com_contagens() -> list[dict]:
     ):
         query = """
         WITH contagens AS (
-            SELECT materia_id AS alvo_id, count(DISTINCT questao_id) AS total_questoes
-            FROM vw_questoes WHERE utilizavel AND materia_id IS NOT NULL GROUP BY materia_id
+            -- Base única: questões válidas distintas (fn_prova_cobra), a mesma
+            -- da home e do painel de matéria; sobe a árvore e exclui anuladas.
+            SELECT no_id AS alvo_id, questoes AS total_questoes FROM fn_prova_cobra('materia')
             UNION ALL
-            SELECT coalesce(assunto_id, no_id) AS alvo_id, count(DISTINCT questao_id) AS total_questoes
-            FROM vw_questoes WHERE utilizavel AND (assunto_id IS NOT NULL OR no_nivel = 'assunto') GROUP BY coalesce(assunto_id, no_id)
+            SELECT no_id, questoes FROM fn_prova_cobra('assunto')
             UNION ALL
-            SELECT no_id AS alvo_id, count(DISTINCT questao_id) AS total_questoes
-            FROM vw_questoes WHERE utilizavel AND no_nivel = 'subassunto' GROUP BY no_id
+            SELECT no_id, questoes FROM fn_prova_cobra('subassunto')
         )
         SELECT 
             c.id, c.nome, c.nivel, c.pai_id,

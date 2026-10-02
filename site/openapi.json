@@ -3316,7 +3316,7 @@
           "total_questoes": {
             "type": "integer",
             "title": "Total Questoes",
-            "description": "Questões distintas no nó e nos descendentes."
+            "description": "Questões válidas distintas no nó e nos descendentes (`fn_prova_cobra`: sem anuladas e sem repetição entre cadernos)."
           },
           "nome_de_cargo": {
             "type": "boolean",

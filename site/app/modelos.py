@@ -252,7 +252,7 @@ class NoArvore(BaseModel):
     nome: str = Field(description=_D_NO_NOME)
     nivel: str = Field(description=_D_NO_NIVEL)
     total_questoes: int = Field(
-        description="Questões distintas no nó e nos descendentes."
+        description="Questões válidas distintas no nó e nos descendentes (`fn_prova_cobra`: sem anuladas e sem repetição entre cadernos)."
     )
     nome_de_cargo: bool = Field(
         False,
