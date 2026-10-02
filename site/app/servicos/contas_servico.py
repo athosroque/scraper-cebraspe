@@ -1,7 +1,15 @@
 """Regras de conta e histórico (5F.3): correção, gravação e desempenho por nó."""
 
-from app.modelos import FiltroQuestoes, NoDesempenho, RespostaResultado, Usuario
-from app.repositorio import questoes_repo, usuarios_repo
+from app.modelos import (
+    ConcursoAlvo,
+    FiltroQuestoes,
+    ItemPlano,
+    NoDesempenho,
+    PlanoEstudo,
+    RespostaResultado,
+    Usuario,
+)
+from app.repositorio import estatisticas_repo, questoes_repo, usuarios_repo
 from app.servicos import questoes_servico
 
 
@@ -107,3 +115,68 @@ def resumo(usuario_id: int) -> dict:
         "erradas": total - certas,
         "percentual": round(100 * certas / total, 1) if total else None,
     }
+
+
+# -- Plano de estudo e concurso-alvo (5F.8) --
+class ConcursoInexistente(Exception):
+    """Concurso ou cargo sem prova na base."""
+
+
+def _validar_concurso_cargo(concurso: str, cargo_numero: int) -> None:
+    pares = {(c["concurso"], c["cargo_numero"]) for c in estatisticas_repo.cargos()}
+    if (concurso, cargo_numero) not in pares:
+        raise ConcursoInexistente
+
+
+def obter_concurso_alvo(usuario_id: int) -> ConcursoAlvo | None:
+    usuario = usuarios_repo.obter_usuario(usuario_id)
+    if not usuario or not usuario["concurso_alvo"] or not usuario["cargo_alvo"]:
+        return None
+    return ConcursoAlvo(
+        concurso=usuario["concurso_alvo"], cargo_numero=usuario["cargo_alvo"]
+    )
+
+
+def salvar_concurso_alvo(usuario_id: int, alvo: ConcursoAlvo) -> bool:
+    """Valida o par na base e grava. Levanta `ConcursoInexistente`."""
+    _validar_concurso_cargo(alvo.concurso, alvo.cargo_numero)
+    return usuarios_repo.salvar_concurso_alvo(
+        usuario_id, alvo.concurso, alvo.cargo_numero
+    )
+
+
+def plano_estudo(usuario_id: int, concurso: str, cargo_numero: int) -> PlanoEstudo:
+    """Peso da matéria no cargo × (1 − acerto do usuário na matéria).
+
+    O acerto vem da regra do desempenho (resposta mais recente de cada questão,
+    em qualquer prova). As respostas são lidas pela `site_app` e entram nas
+    views por parâmetro, nunca num JOIN entre `app.*` e as views.
+    """
+    _validar_concurso_cargo(concurso, cargo_numero)
+    ultimas = usuarios_repo.ultimas_respostas(usuario_id)
+    por_materia = {
+        r["id"]: r
+        for r in questoes_repo.desempenho_por_no(
+            {}, list(ultimas), list(ultimas.values())
+        )
+        if r["nivel"] == "materia"
+    }
+    itens = []
+    for p in estatisticas_repo.peso_materia_cargo(concurso, cargo_numero):
+        d = por_materia.get(p["materia_id"])
+        total, acertos = (d["total"], d["acertos"]) if d else (0, 0)
+        acerto = acertos / total if total else 0.0
+        pct = float(p["pct_da_prova"])
+        itens.append(
+            ItemPlano(
+                materia_id=p["materia_id"],
+                rotulo_materia=p["rotulo_materia"],
+                pct_da_prova=pct,
+                respondidas=total,
+                acertos=acertos,
+                acerto=round(acerto, 4),
+                prioridade=round(pct * (1 - acerto), 4),
+            )
+        )
+    itens.sort(key=lambda i: (-i.prioridade, -i.pct_da_prova, i.rotulo_materia))
+    return PlanoEstudo(concurso=concurso, cargo_numero=cargo_numero, itens=itens)

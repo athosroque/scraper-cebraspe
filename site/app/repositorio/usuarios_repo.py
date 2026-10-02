@@ -31,7 +31,9 @@ def obter_usuario(usuario_id: int) -> dict | None:
         conn.cursor(cursor_factory=RealDictCursor) as cur,
     ):
         cur.execute(
-            "SELECT id, email, nome FROM app.usuario WHERE id = %s", (usuario_id,)
+            "SELECT id, email, nome, concurso_alvo, cargo_alvo"
+            " FROM app.usuario WHERE id = %s",
+            (usuario_id,),
         )
         usuario = cur.fetchone()
         conn.rollback()
@@ -76,3 +78,15 @@ def apagar_usuario(usuario_id: int) -> bool:
         apagou = cur.rowcount > 0
         conn.commit()
         return apagou
+
+
+def salvar_concurso_alvo(usuario_id: int, concurso: str, cargo_numero: int) -> bool:
+    """Grava o concurso-alvo (5F.8). Falso se o usuário não existe mais."""
+    with get_conexao_app() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE app.usuario SET concurso_alvo = %s, cargo_alvo = %s WHERE id = %s",
+            (concurso, cargo_numero, usuario_id),
+        )
+        atualizou = cur.rowcount > 0
+        conn.commit()
+        return atualizou

@@ -7,7 +7,7 @@ from typing import Literal
 from urllib.parse import urlencode
 
 from app import auth
-from app.modelos import FiltroEstatistica, FiltroQuestoes, NivelAlvo
+from app.modelos import ConcursoAlvo, FiltroEstatistica, FiltroQuestoes, NivelAlvo
 from app.servicos import (
     contas_servico,
     estatisticas_servico,
@@ -286,13 +286,22 @@ def estatisticas_edital_vs_prova(
     request: Request,
     concurso: str | None = None,
     cargo_numero: str | None = None,
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
 ):
+    alvo = contas_servico.obter_concurso_alvo(usuario_id) if usuario_id else None
+    if alvo and concurso is None and cargo_numero is None:
+        # Logado e sem escolha na URL: abre no concurso-alvo salvo (5F.8).
+        concurso, cargo_numero = alvo.concurso, str(alvo.cargo_numero)
     filtros = _filtro_estatistica(concurso, cargo_numero, None, None)
-    resultado = None
+    resultado = plano = None
     if filtros.concurso and filtros.cargo_numero:
         resultado = estatisticas_servico.edital_vs_prova(
             filtros.concurso, filtros.cargo_numero
         )
+        if usuario_id and resultado.peso_materias:
+            plano = contas_servico.plano_estudo(
+                usuario_id, filtros.concurso, filtros.cargo_numero
+            )
     return templates.TemplateResponse(
         request=request,
         name="edital_vs_prova.html",
@@ -301,8 +310,32 @@ def estatisticas_edital_vs_prova(
             "filtros": filtros,
             "resultado": resultado,
             "cargos": estatisticas_servico.cargos(),
+            "alvo": alvo,
+            "plano": plano,
+            "logado": usuario_id is not None,
         },
     )
+
+
+@router.post("/estatisticas/concurso-alvo", dependencies=[Depends(auth.verificar_csrf)])
+def salvar_concurso_alvo(
+    request: Request,
+    concurso: str = Form(...),
+    cargo_numero: str = Form(""),
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+):
+    # Cargo como str: select vazio chega como "" (int daria 422, ver §7).
+    if usuario_id is None:
+        return RedirectResponse("/entrar?voltar=/estatisticas/edital-vs-prova", 303)
+    if not cargo_numero.isdigit():
+        return _nao_encontrada(request)
+    alvo = ConcursoAlvo(concurso=concurso, cargo_numero=int(cargo_numero))
+    try:
+        contas_servico.salvar_concurso_alvo(usuario_id, alvo)
+    except contas_servico.ConcursoInexistente:
+        return _nao_encontrada(request)
+    query = urlencode({"concurso": alvo.concurso, "cargo_numero": alvo.cargo_numero})
+    return RedirectResponse(f"/estatisticas/edital-vs-prova?{query}", status_code=303)
 
 
 # -- Simulado (5F.5) --
