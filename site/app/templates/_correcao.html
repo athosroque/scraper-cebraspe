@@ -22,8 +22,8 @@
         {% if resultado.gravada %}
         <p class="mt-2 text-xs opacity-80">Resposta salva no seu histórico.</p>
         {% elif not logado and login_habilitado() %}
-        <div class="mt-2 flex items-center gap-3"
-             {% if resultado.acertou %}x-init="localStorage.setItem('sessao_acertos', parseInt(localStorage.getItem('sessao_acertos') || 0) + 1); $dispatch('acerto-registrado')"{% endif %}>
+        <div class="mt-2 flex items-center gap-3" data-chave="{{ resultado.questao_chave }}"
+             {% if resultado.acertou %}x-init="let k = JSON.parse(localStorage.getItem('sessao_acertos_chaves') || '[]'); if (!k.includes($el.dataset.chave)) { k.push($el.dataset.chave); localStorage.setItem('sessao_acertos_chaves', JSON.stringify(k)); localStorage.setItem('sessao_acertos', k.length); $dispatch('acerto-registrado') }"{% endif %}>
             <p class="text-xs"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}" class="link">Entre com Google</a> para guardar seu histórico.</p>
             <button type="button" @click="tentando = true" class="btn-secundario text-xs bg-white px-2 py-1">Tentar de novo</button>
         </div>

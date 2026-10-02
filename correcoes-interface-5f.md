@@ -107,3 +107,44 @@ Só via `scripts/curar_arvore.py`; propostas do agente, decisão do dono.
   abas "Edital × prova" e "O que o edital cobra", layout mobile (Chromium
   headless com viewport real). Repetir os itens do relatório e conferir o
   console sem erro. Só então liberar a 5F.12.
+
+## Reabertos após validação por subagentes (2026-10-02)
+
+Os `[x]` acima foram marcados pela sessão que implementou o plano. A validação
+contra o código achou o que segue. Corrigido nesta rodada: select de concurso
+(`value` = slug), precedência de `|pct` em `edital_vs_prova.html`, redirect com
+`max(total_paginas, 1)`, `favicon.svg`, contador de acertos sem dupla contagem.
+Testes não rodaram (role de leitura sem permissão em `vw_questoes`; falha igual
+com e sem as mudanças).
+
+### Pendentes de código
+- [ ] Facetas `nivel`/`concurso`/`tipo_conhecimento` em `questoes_servico.py`
+  (~l.175-195) sem rótulo; `conta.html:60` ainda usa `|title`.
+- [ ] `|num` faltando em `estatisticas.html:59`, `conta.html:72,77`, totais dos selects.
+- [ ] Rótulo "Conhecimentos específicos — <cargo>" faltando em `materia.html`, chips da lista, `edital_vs_prova.html`.
+- [ ] `estatisticas.html`/`conta.html` mostram slug cru de concurso.
+- [ ] 404 genérico em ~9 rotas (simulado, cargo sem prova); 405 usa o template de 404 e perde `Allow`.
+- [ ] Paginação do `simulado_revisar` sem a mesma proteção.
+- [ ] Sessão 3: `outros < 0`, tooltip "Questões da matéria", rodapé "Anuladas ficam fora", KPI "Itens de edital" removido, `/api/v1/arvore` ainda 178.
+- [ ] Sessão 5: `og:image`, `twitter:title/description`; `localStorage` sem try/catch.
+
+### Testes que faltam
+- [ ] `pagina=999`, `/nao-existe` (HTML) e `/api/v1/nao-existe` (JSON), texto do 404 de matéria.
+- [ ] Teste de reconciliação não tautológico (`test_materia.py:54`).
+- [ ] `value` dos selects, ordem dos filtros, favicon 200, canonical/OG.
+- [ ] Sessão 6 sem validação em navegador real: reabrir.
+
+### Decisões do dono (Sessão 4)
+- [ ] Fusões de matéria composta em uma só parte (Direito Penal, TI+Estatística,
+  Administração) conflitam com o ADR-030: reverter ou aceitar?
+- [ ] "Despesa(s) de exercícios anteriores": 3 nós ativos; 117 nós em minúscula;
+  padrão de caixa por função de exibição.
+
+### Decisões do dono (2026-10-02)
+- Fusão "Direito Penal e de Direito Processual Penal" → Direito Penal: **aceita**.
+- E-mail do "Sobre" (`athosroque@hotmail.com`): **correto**, manter.
+- Permissões do banco nos testes: resolvido reaplicando `site/scripts/aplicar_schema_app.py`
+  (a recarga das views pelo `stats_writer` tira os GRANTs). 105 testes passam.
+  Se voltar a falhar com `permission denied for view`, rodar o script de novo.
+- Pendentes de decisão: "TI + Estatística" (qual matéria recebe a parte de
+  Estatística), "Despesa(s) de exercícios anteriores", base dos percentuais.

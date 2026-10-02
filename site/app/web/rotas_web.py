@@ -150,9 +150,9 @@ def index(
         filtros, pagina, tamanho_pagina, usuario_id
     )
     
-    if pagina > 1 and pagina > pagina_questoes.total_paginas:
+    if pagina > 1 and pagina > max(pagina_questoes.total_paginas, 1):
         params = dict(request.query_params)
-        params["pagina"] = str(pagina_questoes.total_paginas)
+        params["pagina"] = str(max(pagina_questoes.total_paginas, 1))
         return RedirectResponse(f"/questoes?{urlencode(params)}", status_code=307)
 
     # A restauração de histórico do HTMX também manda HX-Request, mas espera a

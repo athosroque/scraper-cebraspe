@@ -14,7 +14,7 @@
         <select name="concurso" class="campo mt-1 w-full" @change="$refs.cargo.value = ''">
             <option value="">Escolha</option>
             {% for cc in cargos|map(attribute="concurso")|unique %}
-            <option value="{{ rotulo_concurso(cc) }}" {% if filtros.concurso == cc %}selected{% endif %}>{{ rotulo_concurso(cc) }}</option>
+            <option value="{{ cc }}" {% if filtros.concurso == cc %}selected{% endif %}>{{ rotulo_concurso(cc) }}</option>
             {% endfor %}
         </select>
     </label>

@@ -3,7 +3,7 @@
     <select name="concurso" class="campo" @change="$refs.cargo.value = ''">
         <option value="">{{ rotulo_todos or "Todos" }}</option>
         {% for co in cargos|map(attribute="concurso")|unique %}
-        <option value="{{ rotulo_concurso(co) }}" {% if filtros.concurso == co %}selected{% endif %}>{{ rotulo_concurso(co) }}</option>
+        <option value="{{ co }}" {% if filtros.concurso == co %}selected{% endif %}>{{ rotulo_concurso(co) }}</option>
         {% endfor %}
     </select>
 </label>

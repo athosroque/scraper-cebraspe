@@ -66,7 +66,7 @@ def test_reconciliacao_soma_ranking_outros_lp(cliente):
 
 
 # -- API de matérias e busca (5F.7) --
-def test_api_materias_lp_com_178(cliente):
+def test_api_materias_lp_com_139_distintas(cliente):
     r = cliente.get("/api/v1/materias")
     assert r.status_code == 200
     lp = next(m for m in r.json() if m["nome"] == "LÍNGUA PORTUGUESA")

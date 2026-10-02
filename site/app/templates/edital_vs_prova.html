@@ -59,7 +59,7 @@
 <p class="mb-2 text-xs text-slate-500">Prioridade = peso da matéria na prova × (1 − seu acerto na matéria). Sem respostas, o acerto conta como 0.</p>
 <ol class="space-y-1 text-sm">
 {% for i in plano.itens[:10] %}
-<li class="flex justify-between gap-3"><a class="text-slate-900 hover:text-blue-700" href="{{ url_lista(i.materia_id, filtros) }}">{{ loop.index }}. {{ i.rotulo_materia }}</a><span class="whitespace-nowrap text-slate-500">{{ i.pct_da_prova|pct }} · {% if i.respondidas %}{{ 100 * i.acerto|pct }} de acerto{% else %}sem respostas{% endif %}</span></li>
+<li class="flex justify-between gap-3"><a class="text-slate-900 hover:text-blue-700" href="{{ url_lista(i.materia_id, filtros) }}">{{ loop.index }}. {{ i.rotulo_materia }}</a><span class="whitespace-nowrap text-slate-500">{{ i.pct_da_prova|pct }} · {% if i.respondidas %}{{ (100 * i.acerto)|pct }} de acerto{% else %}sem respostas{% endif %}</span></li>
 {% endfor %}
 </ol>
 {% endif %}
