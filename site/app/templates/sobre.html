@@ -1,36 +1,28 @@
 {% extends "base.html" %}
+{% import "_componentes.html" as c %}
 
 {% block title %}Sobre e Fontes - Questões CEBRASPE{% endblock %}
+{% block estilos_legados %}{% endblock %}
 
 {% block content %}
-<article>
-    <header>
-        <h2>Sobre e Fontes</h2>
-    </header>
-    <p>
-        Este site é um projeto de portfólio (não comercial) para indexação e resolução de provas de concurso público.
-    </p>
-    
-    <h3>Origem dos Dados</h3>
-    <p>
-        Todas as questões apresentadas neste site foram extraídas de documentos públicos (cadernos de prova) disponibilizados abertamente pela banca organizadora <strong>CEBRASPE</strong>.
-    </p>
-    <p>
-        Para cada questão, mantemos a citação da origem ("Fonte: CEBRASPE", informando o concurso e o caderno) e fornecemos, na página de detalhe da questão, o link direto para o PDF original hospedado em <code>cebraspe.org.br</code> (quando disponível). 
-        Se um texto-base da prova contiver uma citação de terceiros (ex: reportagem, trecho de livro), a citação original feita pela banca é preservada no conteúdo.
-    </p>
+<div class="mx-auto max-w-3xl">
+{{ c.cabecalho("Sobre e fontes", "Projeto de portfólio, não comercial, para indexar e resolver provas de concurso público.") }}
 
-    <h3>Isenção de Responsabilidade</h3>
-    <p>
-        Este site <strong>não possui qualquer vínculo, afiliação ou patrocínio</strong> com o CEBRASPE ou qualquer órgão da administração pública. As questões são reproduzidas para fins de estudo e pesquisa. O site não garante a ausência de falhas na extração automatizada do texto das provas.
-    </p>
-
-    <h3>Canal de Contato e Remoção</h3>
-    <p>
-        Caso identifique algum conteúdo cuja exibição viole direitos autorais ou termos de uso específicos, comprometo-me a remover o conteúdo questionado imediatamente.
-    </p>
-    <p>
-        Por favor, entre em contato através do e-mail: <code>athosroque@hotmail.com</code>.
-    </p>
-</article>
+{% call c.card("space-y-6 text-sm leading-relaxed text-slate-700") %}
+<section>
+    <h2 class="text-base font-semibold text-slate-900">Origem dos dados</h2>
+    <p class="mt-2">Todas as questões foram extraídas de documentos públicos (cadernos de prova) disponibilizados abertamente pela banca organizadora <strong>CEBRASPE</strong>.</p>
+    <p class="mt-2">Cada questão cita a origem ("Fonte: CEBRASPE", com o concurso e o caderno), e a página da questão traz o link direto para o PDF original em <code class="rounded bg-slate-100 px-1">cebraspe.org.br</code>, quando disponível. Citações de terceiros feitas pela banca nos textos-base são preservadas.</p>
+</section>
+<section>
+    <h2 class="text-base font-semibold text-slate-900">Isenção de responsabilidade</h2>
+    <p class="mt-2">Este site <strong>não tem vínculo, afiliação ou patrocínio</strong> do CEBRASPE ou de qualquer órgão público. As questões são reproduzidas para estudo e pesquisa, e a extração automática do texto das provas pode conter falhas.</p>
+</section>
+<section class="rounded-lg bg-blue-50 p-4 ring-1 ring-blue-200">
+    <h2 class="text-base font-semibold text-slate-900">Canal de contato e remoção</h2>
+    <p class="mt-2">Se algum conteúdo violar direitos autorais ou termos de uso, ele será removido imediatamente.</p>
+    <p class="mt-2">Escreva para <a href="mailto:athosroque@hotmail.com" class="link font-medium">athosroque@hotmail.com</a>.</p>
+</section>
+{% endcall %}
+</div>
 {% endblock %}

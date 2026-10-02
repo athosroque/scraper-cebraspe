@@ -119,7 +119,8 @@ def test_pagina_canonica(cliente):
     r = cliente.get(_url(q["questao_chave"]))
     assert r.status_code == 200
     assert "Fonte: CEBRASPE" in r.text
-    assert "Fonte Original" in r.text
+    assert "Fonte: CEBRASPE" in r.text
+    assert "/questoes?no_id=" in r.text
     assert f"Questão {q['numero']} (" in r.text  # meta description
 
 
