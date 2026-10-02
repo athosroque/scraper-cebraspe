@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "_componentes.html" as c %}
+
+{% block title %}Revisar simulado - Questões CEBRASPE{% endblock %}
+
+{% set rotulo = {"errado": "que você errou", "branco": "que ficaram em branco"}[situacao] %}
+
+{% block content %}
+{{ c.cabecalho("Revisar simulado", simulado.concurso ~ " · cargo " ~ simulado.cargo_numero ~ ": questões " ~ rotulo) }}
+
+<p class="mb-4 flex flex-wrap items-center gap-3 text-sm">
+    <a href="/simulado/{{ simulado.id }}" class="link">← Voltar ao resultado</a>
+    {% if situacao == "errado" %}
+    <a href="/simulado/{{ simulado.id }}/revisar?situacao=branco" class="link">Ver as em branco</a>
+    {% else %}
+    <a href="/simulado/{{ simulado.id }}/revisar?situacao=errado" class="link">Ver as erradas</a>
+    {% endif %}
+    <span class="text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total }}</strong> questões</span>
+</p>
+
+{% if pagina_questoes.total == 0 %}
+{% call c.card() %}<p class="text-sm text-slate-600">Nenhuma questão {{ rotulo }} neste simulado.</p>{% endcall %}
+{% else %}
+<div class="space-y-4">
+    {% for questao in pagina_questoes.itens %}
+        {% include "_card_questao.html" %}
+    {% endfor %}
+</div>
+{% if pagina_questoes.total_paginas > 1 %}
+<nav class="mt-6 flex items-center justify-center gap-3" aria-label="Paginação">
+    {% if pagina_questoes.pagina > 1 %}
+    <a class="btn-secundario" href="?situacao={{ situacao }}&pagina={{ pagina_questoes.pagina - 1 }}">← Anterior</a>
+    {% endif %}
+    <span class="text-sm tabular-nums text-slate-600">Página {{ pagina_questoes.pagina }} de {{ pagina_questoes.total_paginas }}</span>
+    {% if pagina_questoes.pagina < pagina_questoes.total_paginas %}
+    <a class="btn-secundario" href="?situacao={{ situacao }}&pagina={{ pagina_questoes.pagina + 1 }}">Próxima →</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endif %}
+{% endblock %}

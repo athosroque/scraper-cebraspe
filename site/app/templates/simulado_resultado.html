@@ -23,12 +23,24 @@ try { localStorage.removeItem(document.getElementById("rascunho-corrigido").data
 {% set p = resultado.placar %}
 <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
     <div class="col-span-2 sm:col-span-1">{{ c.kpi("Nota CEBRASPE", p.nota, "de " ~ p.nota_maxima ~ " · " ~ p.certas ~ " − " ~ p.erradas) }}</div>
-    {# TODO 5F.8: nota_anterior e duracao_segundos ainda não existem no resultado. #}
     {{ c.kpi("Certas", p.certas) }}
     {{ c.kpi("Erradas", p.erradas) }}
     {{ c.kpi("Em branco", p.brancos) }}
     {{ c.kpi("Anuladas", p.anuladas) }}
 </div>
+{% if resultado.duracao_segundos is not none or resultado.nota_anterior is not none %}
+<p class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-700">
+    {% if resultado.duracao_segundos is not none %}
+    {% set d = resultado.duracao_segundos %}
+    <span>Duração: <strong class="tabular-nums">{% if d >= 3600 %}{{ d // 3600 }}h {% endif %}{{ "%02d"|format((d % 3600) // 60) }}min {{ "%02d"|format(d % 60) }}s</strong></span>
+    {% endif %}
+    {% if resultado.nota_anterior is not none %}
+    {% set dif = p.nota - resultado.nota_anterior %}
+    <span>Simulado anterior: <strong class="tabular-nums">{{ "%g"|format(resultado.nota_anterior) }}</strong>
+        <span class="tabular-nums {{ 'text-emerald-700' if dif > 0 else ('text-rose-700' if dif < 0 else 'text-slate-500') }}">({{ "%+g"|format(dif) }})</span></span>
+    {% endif %}
+</p>
+{% endif %}
 <p class="mt-2 text-xs text-slate-600">Certo +1, errado −1, em branco 0. Item anulado fica fora da nota e do máximo.{% if not resultado.simulado_id %} Sem login, este resultado não fica guardado.{% endif %}</p>
 
 <div class="mt-8 grid gap-6 lg:grid-cols-2">
@@ -45,8 +57,11 @@ try { localStorage.removeItem(document.getElementById("rascunho-corrigido").data
     <section>
         <div class="mb-3 flex items-center justify-between gap-3">
             <h2 class="text-lg font-semibold text-slate-900">Itens</h2>
-            {# TODO 5F.8: "Revisar as que errei" depende de /api/v1/simulados/{id}/questoes. #}
-            <span class="btn-secundario cursor-not-allowed opacity-50" aria-disabled="true" title="Em breve">Revisar as que errei</span>
+            {% if resultado.simulado_id and p.erradas %}
+            <a href="/simulado/{{ resultado.simulado_id }}/revisar?situacao=errado" class="btn-secundario">Revisar as que errei</a>
+            {% elif not resultado.simulado_id %}
+            <span class="btn-secundario cursor-not-allowed opacity-50" aria-disabled="true" title="Entre com o Google para guardar o simulado e revisar depois">Revisar as que errei</span>
+            {% endif %}
         </div>
         <div class="max-h-[32rem] overflow-auto rounded-xl border border-slate-200 bg-white">
         <table class="w-full text-sm">

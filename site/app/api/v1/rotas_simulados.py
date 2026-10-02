@@ -1,9 +1,12 @@
 """Simulado (5F.5): a prova sem gabarito e a correção no padrão CEBRASPE."""
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.auth import exigir_usuario_id, verificar_csrf
 from app.modelos import (
+    PaginaQuestoes,
     ProvaSimulado,
     RespostasSimulado,
     ResultadoSimulado,
@@ -103,6 +106,45 @@ def encerrar(
     if not resultado:
         raise HTTPException(status_code=404, detail="Simulado não encontrado")
     return resultado
+
+
+@router.get(
+    "/{simulado_id}/questoes",
+    response_model=PaginaQuestoes,
+    summary="Questões do simulado por situação (para revisar)",
+    description=(
+        "Lista paginada (mesmo formato de `GET /api/v1/questoes`) das questões "
+        "de um simulado encerrado que ficaram com a situação pedida: `errado` "
+        "(resposta diferente do gabarito) ou `branco` (sem resposta). A "
+        "situação usa o gabarito atual, como o resultado. Anuladas nunca entram."
+    ),
+    responses={
+        401: {"description": "Login necessário"},
+        404: {"description": "Simulado não existe ou não é do usuário"},
+        409: {"description": "Simulado ainda não encerrado"},
+    },
+)
+def questoes(
+    simulado_id: int,
+    situacao: Literal["errado", "branco"] = Query(
+        "errado", description="Situação do item no simulado: `errado` ou `branco`."
+    ),
+    pagina: int = Query(1, ge=1, description="Página (começa em 1)."),
+    tamanho_pagina: int = Query(
+        20, ge=1, le=50, description="Itens por página (máximo 50)."
+    ),
+    usuario_id: int = Depends(exigir_usuario_id),
+):
+    """Questões erradas ou em branco de um simulado encerrado do usuário."""
+    try:
+        pagina_questoes = simulados_servico.questoes_por_situacao(
+            simulado_id, usuario_id, situacao, pagina, tamanho_pagina
+        )
+    except simulados_servico.SimuladoAberto:
+        raise HTTPException(status_code=409, detail="Simulado ainda não encerrado")
+    if pagina_questoes is None:
+        raise HTTPException(status_code=404, detail="Simulado não encontrado")
+    return pagina_questoes
 
 
 @router.get(

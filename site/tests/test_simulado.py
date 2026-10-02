@@ -286,3 +286,44 @@ def test_login_caido_nao_corrige_simulado_gravado_como_avulso(cliente_logado):
     )
     assert r.status_code == 303
     assert r.headers["location"] == f"/entrar?voltar=/simulado/{simulado_id}"
+
+
+@banco
+def test_duracao_nota_anterior_e_revisar_erradas(cliente_logado):
+    c, _ = cliente_logado
+    gabs = _gabaritos(c)
+    validas = [k for k, (_, a) in gabs.items() if not a]
+    errada = validas[0]
+    contra = "E" if gabs[errada][0] == "C" else "C"
+
+    # 1º simulado: uma certa (nota 1). Aberto, o endpoint dá 409.
+    s1 = c.post("/api/v1/simulados", json=PROVA).json()["id"]
+    assert c.get(f"/api/v1/simulados/{s1}/questoes").status_code == 409
+    r1 = c.post(
+        f"/api/v1/simulados/{s1}/correcao",
+        json={"respostas": {validas[1]: gabs[validas[1]][0]}},
+    ).json()
+    assert r1["nota_anterior"] is None
+    assert r1["duracao_segundos"] is not None and r1["duracao_segundos"] >= 0
+
+    # 2º simulado: uma errada (nota −1); a anterior é a do 1º.
+    s2 = c.post("/api/v1/simulados", json=PROVA).json()["id"]
+    r2 = c.post(
+        f"/api/v1/simulados/{s2}/correcao", json={"respostas": {errada: contra}}
+    ).json()
+    assert r2["nota_anterior"] == 1 and r2["placar"]["nota"] == -1
+    assert c.get(f"/api/v1/simulados/{s2}").json()["nota_anterior"] == 1
+
+    erradas = c.get(f"/api/v1/simulados/{s2}/questoes?situacao=errado").json()
+    assert [q["questao_chave"] for q in erradas["itens"]] == [errada]
+    brancos = c.get(f"/api/v1/simulados/{s2}/questoes?situacao=branco").json()
+    assert brancos["total"] == r2["placar"]["brancos"]
+    assert c.get("/api/v1/simulados/999999999/questoes").status_code == 404
+
+    html = c.get(f"/simulado/{s2}").text
+    assert "Duração" in html and "Simulado anterior" in html
+    assert f"/simulado/{s2}/revisar?situacao=errado" in html
+    assert "Questão" in c.get(f"/simulado/{s2}/revisar").text
+
+    c.cookies.clear()
+    assert c.get(f"/api/v1/simulados/{s2}/questoes").status_code == 401

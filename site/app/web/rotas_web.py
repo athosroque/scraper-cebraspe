@@ -365,6 +365,39 @@ def simulado_prova_avulsa(request: Request, concurso: str, cargo_numero: int):
     )
 
 
+@router.get("/simulado/{simulado_id}/revisar", response_class=HTMLResponse)
+def simulado_revisar(
+    request: Request,
+    simulado_id: int,
+    situacao: Literal["errado", "branco"] = "errado",
+    pagina: int = 1,
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+):
+    """Questões erradas (ou em branco) de um simulado encerrado, para refazer."""
+    if usuario_id is None:
+        voltar = f"/simulado/{simulado_id}/revisar?situacao={situacao}&pagina={pagina}"
+        return RedirectResponse(
+            "/entrar?" + urlencode({"voltar": voltar}), status_code=303
+        )
+    try:
+        pagina_questoes = simulados_servico.questoes_por_situacao(
+            simulado_id, usuario_id, situacao, max(pagina, 1), 20
+        )
+    except simulados_servico.SimuladoAberto:
+        return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
+    if pagina_questoes is None:
+        return _nao_encontrada(request)
+    return templates.TemplateResponse(
+        request=request,
+        name="simulado_revisar.html",
+        context={
+            "pagina_questoes": pagina_questoes,
+            "simulado": simulados_servico.obter_simulado(simulado_id, usuario_id),
+            "situacao": situacao,
+        },
+    )
+
+
 @router.get("/simulado/{simulado_id}", response_class=HTMLResponse)
 def simulado_gravado(
     request: Request,
