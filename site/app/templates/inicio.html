@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% import "_componentes.html" as c %}
+
+{% block title %}Escolha sua matéria - Questões CEBRASPE{% endblock %}
+{% block estilos_legados %}{% endblock %}
+
+{% block content %}
+{{ c.cabecalho("Escolha sua matéria", "Questões do CEBRASPE organizadas por matéria, assunto e subassunto.") }}
+
+{# Busca ignora acento e caixa: "lingua" acha "LÍNGUA PORTUGUESA". #}
+<div x-data="{ busca: '', norm(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim() } }">
+    <label for="busca-materia" class="sr-only">Buscar matéria</label>
+    <input id="busca-materia" type="search" x-model="busca" placeholder="Buscar matéria..." autocomplete="off" class="campo mb-6 w-full sm:max-w-md">
+
+    {# TODO 5F.7: % de incidência e desempenho por matéria virão de /api/v1/materias. #}
+    <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {% for materia in materias %}
+        <li data-nome="{{ materia.nome }}"
+            x-show="!busca || norm($el.dataset.nome).includes(norm(busca))">
+            {% call c.card("flex h-full flex-col justify-between gap-4") %}
+            <div>
+                <a href="/materias/{{ materia.id|urlencode }}" class="text-base font-semibold text-slate-900 hover:text-blue-700">{{ materia.nome }}</a>
+                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }}</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="/materias/{{ materia.id|urlencode }}" class="btn-secundario">Ver painel</a>
+                <a href="/questoes?no_id={{ materia.id|urlencode }}" class="btn-primario">Resolver questões</a>
+            </div>
+            {% endcall %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

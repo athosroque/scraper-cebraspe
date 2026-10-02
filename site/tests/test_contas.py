@@ -121,7 +121,7 @@ def test_historico_e_desempenho(cliente_logado):
     assert pagina.status_code == 200
     assert "Desempenho por assunto" in pagina.text
     assert "Caderno de erros" in pagina.text
-    assert "Meu histórico" in c.get("/").text
+    assert "Meu histórico" in c.get("/questoes").text
 
 
 def test_anulada_nao_grava(cliente_logado):
