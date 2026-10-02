@@ -27,7 +27,7 @@ def test_home_pagina_inteira(cliente):
     r = cliente.get("/questoes")
     assert r.status_code == 200
     assert "Árvore de Assuntos" in r.text
-    assert "2781 questões encontradas" in r.text
+    assert ">2781</strong> questões encontradas" in r.text
     assert '<meta name="description"' in r.text
 
 
@@ -54,7 +54,7 @@ def test_filtros_combinados_e_select_vazio(cliente):
     api = cliente.get(
         "/api/v1/questoes", params={"nivel": "superior", "no_id": "S-c33faee4a4"}
     ).json()
-    assert f"{api['total']} questões encontradas" in r.text
+    assert f">{api['total']}</strong> questões encontradas" in r.text
 
 
 def test_no_id_nao_entra_na_expressao_do_alpine(cliente):
@@ -154,3 +154,30 @@ def test_inicio_grade_de_materias(cliente):
     materia = cliente.get("/api/v1/arvore").json()[0]
     assert f'href="/materias/{materia["id"]}"' in r.text
     assert f'href="/questoes?no_id={materia["id"]}"' in r.text
+    # O chip do assunto também sai no fragmento, com o nome.
+    parcial = cliente.get("/questoes", params={"no_id": materia["id"]}, headers=HX)
+    assert f"Assunto: {materia['nome']}" in parcial.text
+
+
+def test_cargo_vazio_ao_trocar_concurso_nao_da_422(cliente):
+    r = cliente.get(
+        "/questoes", params={"concurso": "PF_25_ADM", "cargo_numero": ""}, headers=HX
+    )
+    assert r.status_code == 200
+
+
+def test_chip_remove_so_aquele_filtro(cliente):
+    r = cliente.get(
+        "/questoes",
+        params={"concurso": "PF_25_ADM", "cargo_numero": "1", "nivel": "superior"},
+        headers=HX,
+    )
+    assert 'href="/questoes?concurso=PF_25_ADM&amp;cargo_numero=1"' in r.text
+    # Tirar o concurso tira o cargo junto.
+    assert 'href="/questoes?nivel=superior"' in r.text
+
+
+def test_lista_aponta_para_questoes(cliente):
+    r = cliente.get("/questoes", params={"concurso": "PF_25_ADM"})
+    assert 'hx-get="/"' not in r.text
+    assert 'hx-get="/questoes"' in r.text

@@ -95,7 +95,8 @@ def index(
     orgao: str | None = None,
     ano: int | None = None,
     concurso: str | None = None,
-    cargo_numero: int | None = None,
+    # str: trocar o concurso manda `cargo_numero=`, que como int daria 422.
+    cargo_numero: str | None = None,
     nivel: str | None = None,
     tipo_conhecimento: str | None = None,
     no_id: str | None = None,
@@ -114,7 +115,9 @@ def index(
         orgao=orgao or None,
         ano=ano,
         concurso=concurso or None,
-        cargo_numero=cargo_numero,
+        cargo_numero=int(cargo_numero)
+        if cargo_numero and cargo_numero.isdigit()
+        else None,
         nivel=nivel or None,
         tipo_conhecimento=tipo_conhecimento or None,
         no_id=no_id or None,
@@ -136,12 +139,14 @@ def index(
         "HX-History-Restore-Request"
     )
     contexto = {"pagina_questoes": pagina_questoes, "filtros": filtros}
+    # O chip do assunto precisa do nome também no fragmento.
+    arvore = questoes_servico.obter_arvore() if filtros.no_id or not parcial else []
+    contexto["no_nome"] = _nome_do_no(arvore, filtros.no_id)
     if parcial:
         nome = "_lista_parcial.html"
     else:
         nome = "lista_questoes.html"
-        contexto["arvore"] = questoes_servico.obter_arvore()
-        contexto["no_nome"] = _nome_do_no(contexto["arvore"], filtros.no_id)
+        contexto["arvore"] = arvore
         contexto["facetas"] = questoes_servico.obter_facetas()
 
     resposta = templates.TemplateResponse(request=request, name=nome, context=contexto)

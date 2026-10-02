@@ -1,19 +1,28 @@
-{# Concurso e cargo: trocar o concurso limpa o cargo (o número se repete entre concursos). #}
-<label>Concurso
-    <select name="concurso" @change="$refs.cargo.value = ''">
-        <option value="">{{ rotulo_todos or "Todos" }}</option>
-        {% for c in cargos|map(attribute="concurso")|unique %}
-        <option value="{{ c }}" {% if filtros.concurso == c %}selected{% endif %}>{{ c }}</option>
-        {% endfor %}
-    </select>
-</label>
-<label>Cargo
-    <select name="cargo_numero" x-ref="cargo" {% if not filtros.concurso %}disabled{% endif %}>
-        <option value="">{{ rotulo_todos or "Todos" }}</option>
-        {% for c in cargos if c.concurso == filtros.concurso %}
-        <option value="{{ c.cargo_numero }}" {% if filtros.cargo_numero == c.cargo_numero %}selected{% endif %}>
-            {{ c.cargo_numero }} — {{ c.cargo }} ({{ c.nivel }})
-        </option>
-        {% endfor %}
-    </select>
-</label>
+{# Concurso e cargo. As opções de cargo vêm de JSON e são filtradas no
+   cliente pelo concurso escolhido: a troca funciona mesmo quando só a lista é
+   recarregada (HTMX). Trocar o concurso limpa o cargo (o número se repete
+   entre concursos). Valor da query string entra por data-*, nunca na
+   expressão do Alpine. #}
+{% set opcoes_cargo = [] %}
+{% for c in cargos %}{% set _ = opcoes_cargo.append({"concurso": c.concurso, "numero": c.cargo_numero|string, "rotulo": c.cargo_numero|string ~ " — " ~ c.cargo ~ " (" ~ c.nivel ~ ")"}) %}{% endfor %}
+<div class="contents" data-concurso="{{ filtros.concurso or '' }}" data-cargo="{{ filtros.cargo_numero or '' }}"
+     x-data="{ concurso: '', cargo: '', opcoes: [] }"
+     x-init="opcoes = JSON.parse($refs.opcoesCargo.textContent); concurso = $el.dataset.concurso; cargo = $el.dataset.cargo">
+    <script type="application/json" x-ref="opcoesCargo">{{ opcoes_cargo|tojson }}</script>
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Concurso
+        <select name="concurso" class="campo" @change="concurso = $el.value; cargo = ''; $refs.selCargo.value = ''">
+            <option value="">{{ rotulo_todos or "Todos" }}</option>
+            {% for c in cargos|map(attribute="concurso")|unique %}
+            <option value="{{ c }}" {% if filtros.concurso == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Cargo
+        <select name="cargo_numero" class="campo disabled:bg-slate-100 disabled:text-slate-400" x-ref="selCargo" @change="cargo = $el.value" :disabled="!concurso" {% if not filtros.concurso %}disabled{% endif %}>
+            <option value="">{{ rotulo_todos or "Todos" }}</option>
+            <template x-for="c in opcoes.filter(o => o.concurso === concurso)" :key="c.numero">
+                <option :value="c.numero" x-text="c.rotulo" :selected="c.numero === cargo"></option>
+            </template>
+        </select>
+    </label>
+</div>
