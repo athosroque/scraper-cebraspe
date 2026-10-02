@@ -70,3 +70,7 @@ def materias() -> list[dict]:
 
 def cargos() -> list[dict]:
     return estatisticas_repo.cargos()
+
+
+def materia_ativa(no_id: str) -> dict | None:
+    return estatisticas_repo.materia_ativa(no_id)

@@ -156,3 +156,16 @@ def cargos() -> list[dict]:
             """
         )
         return cur.fetchall()
+
+
+def materia_ativa(no_id: str) -> dict | None:
+    """Nó de nível matéria da cadeia ativa (`vw_no_caminho` só expõe a ativa)."""
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute(
+            "SELECT id, nome FROM vw_no_caminho WHERE id = %s AND nivel = 'materia'",
+            (no_id,),
+        )
+        return cur.fetchone()

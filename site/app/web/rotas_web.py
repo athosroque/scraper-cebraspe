@@ -506,3 +506,42 @@ def apagar_conta(
         contas_servico.apagar_conta(usuario_id)
     request.session.clear()
     return RedirectResponse("/", status_code=303)
+
+
+# -- Painel da matéria (5F.10) --
+@router.get("/materias/{no_id}", response_class=HTMLResponse)
+def painel_materia(
+    request: Request,
+    no_id: str,
+    concurso: str | None = None,
+    cargo_numero: str | None = None,
+    nivel: str | None = None,
+):
+    materia = estatisticas_servico.materia_ativa(no_id)
+    if materia is None:
+        return _nao_encontrada(request)
+    filtros = _filtro_estatistica(concurso, cargo_numero, nivel, None)
+    # Subassunto só com anuladas sob o filtro volta com 0 válidas: fica de fora.
+    linhas = [
+        r
+        for r in estatisticas_servico.prova_cobra("subassunto", filtros, no_id, 15)
+        if r.questoes
+    ]
+    filtros_lista = filtros.model_dump(exclude_none=True)
+    return templates.TemplateResponse(
+        request=request,
+        name="materia.html",
+        context={
+            "materia": materia,
+            "linhas": linhas,
+            "maximo": max((r.questoes for r in linhas), default=0),
+            "filtros": filtros,
+            "cargos": estatisticas_servico.cargos(),
+            "url_resolver": "/questoes?" + urlencode({"no_id": no_id, **filtros_lista}),
+            "urls_subassunto": {
+                r.no_id: "/questoes?"
+                + urlencode({"no_id": r.no_id, "anuladas": "excluir", **filtros_lista})
+                for r in linhas
+            },
+        },
+    )
