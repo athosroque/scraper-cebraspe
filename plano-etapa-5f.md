@@ -225,7 +225,7 @@ obrigue toda rota nova a nascer documentada.
   (17,80%); prioridades e resumo batem com um usuário de teste de respostas
   conhecidas; 401/403/404 cobertos.
 
-### 5F.9 — Tailwind: base, Início e Painel da matéria
+### 5F.9 — Tailwind: base, Início e Painel da matéria ✅ (2026-10-02, visual; blocos de 5F.7/5F.8 com `TODO`)
 - Tailwind pelo binário standalone (sem Node); `site/scripts/gerar_css.sh`
   gera `static/tailwind.css` (versionado, teste de divergência); Pico sai.
 - Tokens do protótipo: `slate-50`/`slate-900`/`slate-600`, destaque `blue-700`,
@@ -236,14 +236,14 @@ obrigue toda rota nova a nascer documentada.
 - **Pronto quando:** Início e Painel iguais ao protótipo em 1280 e 390 px, sem
   erro de JS no Chromium headless.
 
-### 5F.10 — Tailwind: Resolver questões e Meu concurso
+### 5F.10 — Tailwind: Resolver questões e Meu concurso ✅ (2026-10-02, visual; blocos de 5F.7/5F.8 com `TODO`)
 - Barra de filtros em chips (modal da árvore com busca), card limpo com selo de
   incidência, "questões parecidas", painel Meu concurso (peso, edital × prova,
   plano).
 - **Pronto quando:** fluxo matéria → painel → questões → correção funcionando,
   com os anti-patterns de HTMX/Alpine do CLAUDE.md respeitados.
 
-### 5F.11 — Tailwind: Meu desempenho, Simulado e páginas restantes
+### 5F.11 — Tailwind: Meu desempenho, Simulado e páginas restantes ✅ (2026-10-02, visual; blocos de 5F.7/5F.8 com `TODO`)
 - Desempenho (KPIs, "o que estudar agora", caderno de erros), simulado (início,
   prova, resultado com "revisar as que errei"), página da questão, sobre, 404.
 - **Pronto quando:** todas as telas no novo visual; nenhum template usa Pico.

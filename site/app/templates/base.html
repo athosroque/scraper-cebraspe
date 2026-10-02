@@ -8,9 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
-    {# Transição 5F.9–5F.11: template ainda não migrado herda o Pico; o
-       migrado sobrescreve este bloco vazio. Sai de vez no fim da 5F.11. #}
-    {% block estilos_legados %}<link rel="stylesheet" href="/static/pico.min.css"><link rel="stylesheet" href="/static/site.css">{% endblock %}
     <link rel="stylesheet" href="/static/tailwind.css">
     <script src="/static/htmx.min.js"></script>
     <script defer src="/static/alpine.min.js"></script>
@@ -22,8 +19,8 @@
         ("/", "Matérias"),
         ("/estatisticas", "Meu concurso"),
         ("/simulado", "Simulados"),
-        ("/conta", "Meu desempenho"),
     ] %}
+    {% if request.session.get("usuario_id") %}{% set itens_menu = itens_menu + [("/conta", "Meu desempenho")] %}{% endif %}
     <header class="border-b border-slate-200 bg-white" x-data="{ aberto: false }">
         <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
             <a href="/" class="text-base font-bold text-slate-900">Questões CEBRASPE</a>
@@ -33,9 +30,10 @@
                 <a href="{{ url }}" class="rounded-md px-3 py-2 text-sm font-medium {{ 'bg-slate-100 text-slate-900' if caminho == url else 'text-slate-600 hover:text-slate-900' }}">{{ rotulo }}</a>
                 {% endfor %}
                 {% if request.session.get("usuario_id") %}
+                <a href="/conta" class="ml-2 max-w-[10rem] truncate text-sm text-slate-600 hover:text-slate-900">{{ request.session.get("usuario_nome") }}</a>
                 <form method="post" action="/sair" class="ml-2">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
-                    <button type="submit" class="btn-secundario" title="{{ request.session.get('usuario_nome') }}">Sair</button>
+                    <button type="submit" class="btn-secundario">Sair</button>
                 </form>
                 {% elif login_habilitado() %}
                 <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="btn-primario ml-2">Entrar com Google</a>

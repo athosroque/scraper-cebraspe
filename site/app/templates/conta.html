@@ -2,7 +2,6 @@
 {% import "_componentes.html" as c %}
 
 {% block title %}Meu desempenho — Questões CEBRASPE{% endblock %}
-{% block estilos_legados %}{% endblock %}
 
 {% block content %}
 {{ c.cabecalho("Meu desempenho", (usuario.nome ~ " · " if usuario.nome else "") ~ usuario.email) }}
