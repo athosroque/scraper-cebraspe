@@ -5,7 +5,7 @@
 {% macro linha(no, nivel) %}
 <tr>
     <td style="padding-left: {{ 0.5 + nivel * 1.5 }}rem;">
-        <a href="/?no_id={{ no.id|urlencode }}&historico=resolvidas" class="{{ 'contrast' if nivel == 0 else 'secondary' }}">
+        <a href="/questoes?no_id={{ no.id|urlencode }}&historico=resolvidas" class="{{ 'contrast' if nivel == 0 else 'secondary' }}">
             {% if nivel == 0 %}<strong>{{ no.nome }}</strong>{% else %}{{ no.nome }}{% endif %}
         </a>
     </td>
@@ -57,7 +57,7 @@
     </table>
     </div>
     {% else %}
-    <p>Nenhuma questão respondida com esses filtros. <a href="/">Resolver questões</a></p>
+    <p>Nenhuma questão respondida com esses filtros. <a href="/questoes">Resolver questões</a></p>
     {% endif %}
 </section>
 

@@ -54,7 +54,7 @@ def _url_lista(no_id: str, filtros: FiltroEstatistica) -> str:
         "anuladas": "excluir",
         **filtros.model_dump(exclude_none=True),
     }
-    return "/?" + urlencode(params)
+    return "/questoes?" + urlencode(params)
 
 
 templates.env.globals["url_lista"] = _url_lista
@@ -76,8 +76,18 @@ def _nao_encontrada(request: Request) -> HTMLResponse:
     )
 
 
-@router.get("/questoes", response_class=HTMLResponse)
 @router.get("/", response_class=HTMLResponse)
+def inicio(request: Request):
+    # Grade de matérias (5F.9): só o 1º nível da árvore, maior volume primeiro.
+    materias = sorted(
+        questoes_servico.obter_arvore(), key=lambda no: (-no.total_questoes, no.nome)
+    )
+    return templates.TemplateResponse(
+        request=request, name="inicio.html", context={"materias": materias}
+    )
+
+
+@router.get("/questoes", response_class=HTMLResponse)
 def index(
     request: Request,
     usuario_id: int | None = Depends(auth.usuario_id_atual),

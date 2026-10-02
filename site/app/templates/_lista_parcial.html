@@ -18,7 +18,7 @@
         <!-- Paginação -->
         <nav style="margin-top: 2rem; display: flex; justify-content: space-between;">
             {% if pagina_questoes.pagina > 1 %}
-            <button hx-get="/" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Anterior</button>
+            <button hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Anterior</button>
             {% else %}
             <div></div>
             {% endif %}
@@ -28,7 +28,7 @@
             </div>
 
             {% if pagina_questoes.pagina < pagina_questoes.total_paginas %}
-            <button hx-get="/" hx-vals='{"pagina": {{ pagina_questoes.pagina + 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Próxima</button>
+            <button hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina + 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Próxima</button>
             {% else %}
             <div></div>
             {% endif %}

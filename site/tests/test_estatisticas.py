@@ -59,7 +59,11 @@ def test_link_do_ranking_abre_a_lista_filtrada(cliente):
         "/api/v1/estatisticas/prova-cobra", params={**filtros, "limite": 1}
     ).json()[0]
     html = cliente.get("/estatisticas", params=filtros).text
-    href = re.search(r'href="(/\?no_id=[^"]+)"', html).group(1).replace("&amp;", "&")
+    href = (
+        re.search(r'href="(/questoes\?no_id=[^"]+)"', html)
+        .group(1)
+        .replace("&amp;", "&")
+    )
     params = {k: v[0] for k, v in parse_qs(urlparse(href).query).items()}
     assert params == {
         "no_id": linha["no_id"],
