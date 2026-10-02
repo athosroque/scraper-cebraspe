@@ -162,3 +162,28 @@ def respostas_do_simulado(simulado_id: int, usuario_id: int) -> dict[str, str]:
         linhas = cur.fetchall()
         conn.rollback()
         return dict(linhas)
+
+
+def nota_anterior(simulado_id: int, usuario_id: int) -> int | None:
+    """Nota do simulado encerrado imediatamente antes deste (mesmo usuário,
+    concurso e cargo). Usa a nota gravada no encerramento."""
+    with get_conexao_app() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT ant.nota FROM app.simulado atual
+            JOIN app.simulado ant
+              ON ant.usuario_id = atual.usuario_id
+             AND ant.concurso = atual.concurso
+             AND ant.cargo_numero IS NOT DISTINCT FROM atual.cargo_numero
+             AND ant.fim IS NOT NULL
+             AND ant.id <> atual.id
+             AND (ant.fim, ant.id) < (atual.fim, atual.id)
+            WHERE atual.id = %s AND atual.usuario_id = %s AND atual.fim IS NOT NULL
+            ORDER BY ant.fim DESC, ant.id DESC
+            LIMIT 1
+            """,
+            (simulado_id, usuario_id),
+        )
+        linha = cur.fetchone()
+        conn.rollback()
+        return linha[0] if linha else None

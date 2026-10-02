@@ -463,6 +463,20 @@ class ResultadoSimulado(BaseModel):
     por_materia: list[MateriaSimulado]
     itens: list[ItemCorrigido]
     discursivas: list[DiscursivaSimulado]
+    duracao_segundos: int | None = Field(
+        None,
+        description=(
+            "Tempo entre o início e o encerramento do simulado gravado, em "
+            "segundos. Null sem login."
+        ),
+    )
+    nota_anterior: float | None = Field(
+        None,
+        description=(
+            "Nota do simulado encerrado anterior do mesmo usuário, no mesmo "
+            "concurso e cargo. Null se não houver ou sem login."
+        ),
+    )
 
 
 class SimuladoResumo(BaseModel):

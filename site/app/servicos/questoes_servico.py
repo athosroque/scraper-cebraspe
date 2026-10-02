@@ -18,7 +18,10 @@ def listar_questoes(
     pagina: int,
     tamanho_pagina: int,
     usuario_id: int | None = None,
+    chaves_incluir: list[str] | None = None,
 ) -> PaginaQuestoes:
+    """Lista paginada. `chaves_incluir` restringe a um conjunto de chaves
+    (ex.: as erradas de um simulado), somado aos filtros."""
     tamanho_pagina = max(1, min(50, tamanho_pagina))
     pagina = max(1, pagina)
     offset = (pagina - 1) * tamanho_pagina
@@ -27,6 +30,13 @@ def listar_questoes(
     from app.servicos.contas_servico import filtros_com_historico
 
     filtros_dict = filtros_com_historico(filtros, usuario_id)
+    if chaves_incluir is not None:
+        anteriores = filtros_dict.get("chaves_incluir")
+        filtros_dict["chaves_incluir"] = (
+            list(chaves_incluir)
+            if anteriores is None
+            else [c for c in chaves_incluir if c in set(anteriores)]
+        )
 
     linhas, total = questoes_repo.buscar_questoes(filtros_dict, tamanho_pagina, offset)
 

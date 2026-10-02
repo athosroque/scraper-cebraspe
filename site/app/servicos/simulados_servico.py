@@ -2,9 +2,11 @@
 
 from app.modelos import (
     DiscursivaSimulado,
+    FiltroQuestoes,
     ItemCorrigido,
     ItemSimulado,
     MateriaSimulado,
+    PaginaQuestoes,
     PlacarSimulado,
     ProvaSimulado,
     ResultadoSimulado,
@@ -15,6 +17,10 @@ from app.repositorio import simulados_repo
 
 class SimuladoJaEncerrado(Exception):
     """O simulado gravado já tem nota: corrigir de novo duplicaria respostas."""
+
+
+class SimuladoAberto(Exception):
+    """O simulado ainda não foi encerrado: não há situação por item."""
 
 
 def _figuras(figuras: list[dict] | None) -> list[dict]:
@@ -143,6 +149,19 @@ def encerrar(
         simulado_id, usuario_id, resultado.placar.nota, gravar
     ):
         raise SimuladoJaEncerrado
+    return _com_historico(resultado, simulado_id, usuario_id)
+
+
+def _com_historico(
+    resultado: ResultadoSimulado, simulado_id: int, usuario_id: int
+) -> ResultadoSimulado:
+    """Duração (início → encerramento) e nota do simulado anterior."""
+    registro = simulados_repo.obter_simulado(simulado_id, usuario_id)
+    if registro and registro["fim"] is not None and registro["inicio"] is not None:
+        resultado.duracao_segundos = max(
+            0, int((registro["fim"] - registro["inicio"]).total_seconds())
+        )
+    resultado.nota_anterior = simulados_repo.nota_anterior(simulado_id, usuario_id)
     return resultado
 
 
@@ -160,8 +179,39 @@ def obter_resultado(simulado_id: int, usuario_id: int) -> ResultadoSimulado | No
         registro["concurso"], registro["cargo_numero"]
     )
     respostas = simulados_repo.respostas_do_simulado(simulado_id, usuario_id)
-    return _resultado(
+    resultado = _resultado(
         registro["concurso"], registro["cargo_numero"], itens, respostas, simulado_id
+    )
+    return _com_historico(resultado, simulado_id, usuario_id)
+
+
+def questoes_por_situacao(
+    simulado_id: int,
+    usuario_id: int,
+    situacao: str,
+    pagina: int = 1,
+    tamanho_pagina: int = 20,
+) -> PaginaQuestoes | None:
+    """Questões do simulado encerrado com a situação pedida (errado/branco).
+
+    None se o simulado não existe ou não é do usuário; `SimuladoAberto` se
+    ainda não foi encerrado. A situação vem da mesma correção do resultado.
+    """
+    registro = simulados_repo.obter_simulado(simulado_id, usuario_id)
+    if not registro:
+        return None
+    if registro["fim"] is None:
+        raise SimuladoAberto
+    resultado = obter_resultado(simulado_id, usuario_id)
+    chaves = [i.questao_chave for i in resultado.itens if i.situacao == situacao]
+    # Import tardio, como em questoes_servico (evita ciclo com contas_servico).
+    from app.servicos import questoes_servico
+
+    return questoes_servico.listar_questoes(
+        FiltroQuestoes(utilizaveis="todas"),
+        pagina,
+        tamanho_pagina,
+        chaves_incluir=chaves,
     )
 
 
