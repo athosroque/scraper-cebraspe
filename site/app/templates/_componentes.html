@@ -1,0 +1,51 @@
+{# Macros visuais do redesenho (5F.9). Toda tela nova usa estas peças em vez
+   de repetir classes Tailwind; regra de negócio nunca entra aqui. #}
+
+{% macro cabecalho(titulo, subtitulo=None) %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ titulo }}</h1>
+    {% if subtitulo %}<p class="mt-1 text-sm text-slate-600">{{ subtitulo }}</p>{% endif %}
+    {% if caller is defined %}<div class="mt-3">{{ caller() }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{# Uso: {% call card() %}conteúdo{% endcall %} #}
+{% macro card(classe="") %}
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm {{ classe }}">{{ caller() }}</div>
+{% endmacro %}
+
+{# Chip de filtro ativo. `remover_url` limpa só este filtro. #}
+{% macro chip(rotulo, remover_url=None, ativo=True) %}
+<span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium
+    {{ 'bg-blue-50 text-blue-800 ring-1 ring-blue-200' if ativo else 'bg-slate-100 text-slate-700' }}">
+    {{ rotulo }}
+    {% if remover_url %}<a href="{{ remover_url }}" class="ml-1 text-blue-700 hover:text-blue-900" aria-label="Remover filtro {{ rotulo }}">×</a>{% endif %}
+</span>
+{% endmacro %}
+
+{# Barra de ranking: `percentual` de 0 a 100. "Mais cai" fica discreto. #}
+{% macro barra_ranking(rotulo, percentual, valor=None, url=None, destaque=False) %}
+<div class="py-2">
+    <div class="flex items-baseline justify-between gap-3 text-sm">
+        {% if url %}<a href="{{ url }}" class="truncate text-slate-900 hover:text-blue-700">{{ rotulo }}</a>
+        {% else %}<span class="truncate text-slate-900">{{ rotulo }}</span>{% endif %}
+        <span class="shrink-0 tabular-nums text-slate-600">{{ valor if valor is not none else '%.1f%%'|format(percentual) }}</span>
+    </div>
+    <div class="mt-1 h-2 rounded-full bg-slate-100">
+        <div class="h-2 rounded-full {{ 'bg-blue-700' if destaque else 'bg-blue-300' }}" style="width: {{ [percentual, 100]|min }}%"></div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro kpi(rotulo, valor, detalhe=None) %}
+<div class="rounded-xl border border-slate-200 bg-white p-4">
+    <div class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ rotulo }}</div>
+    <div class="mt-1 text-2xl font-bold tabular-nums text-slate-900">{{ valor }}</div>
+    {% if detalhe %}<div class="mt-1 text-xs text-slate-600">{{ detalhe }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{# Selo discreto de incidência ("mais cai"). #}
+{% macro selo(texto) %}
+<span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{{ texto }}</span>
+{% endmacro %}

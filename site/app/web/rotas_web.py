@@ -76,6 +76,7 @@ def _nao_encontrada(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/questoes", response_class=HTMLResponse)
 @router.get("/", response_class=HTMLResponse)
 def index(
     request: Request,

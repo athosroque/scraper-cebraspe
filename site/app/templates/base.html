@@ -5,38 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Questões CEBRASPE{% endblock %}</title>
     <meta name="description" content="{% block description %}Questões de concursos do CEBRASPE para resolver, filtradas por matéria, assunto e subassunto.{% endblock %}">
-    <link rel="stylesheet" href="/static/pico.min.css">
-    <link rel="stylesheet" href="/static/site.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+    {# Transição 5F.9–5F.11: template ainda não migrado herda o Pico; o
+       migrado sobrescreve este bloco vazio. Sai de vez no fim da 5F.11. #}
+    {% block estilos_legados %}<link rel="stylesheet" href="/static/pico.min.css"><link rel="stylesheet" href="/static/site.css">{% endblock %}
+    <link rel="stylesheet" href="/static/tailwind.css">
     <script src="/static/htmx.min.js"></script>
     <script defer src="/static/alpine.min.js"></script>
 </head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token(request) }}"}'>
-    <header class="container">
-        <nav>
-            <ul>
-                <li><strong><a href="/" class="contrast">Questões CEBRASPE</a></strong></li>
-            </ul>
-            <ul>
-                <li><a href="/simulado">Simulado</a></li>
-                <li><a href="/estatisticas">Estatísticas</a></li>
-                <li><a href="/sobre">Sobre</a></li>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token(request) }}"}'>
+    {% set caminho = request.url.path %}
+    {% set itens_menu = [
+        ("/questoes", "Questões"),
+        ("/", "Matérias"),
+        ("/estatisticas", "Meu concurso"),
+        ("/simulado", "Simulados"),
+        ("/conta", "Meu desempenho"),
+    ] %}
+    <header class="border-b border-slate-200 bg-white" x-data="{ aberto: false }">
+        <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+            <a href="/" class="text-base font-bold text-slate-900">Questões CEBRASPE</a>
+            <button type="button" class="rounded-md p-2 text-slate-600 md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">☰</button>
+            <div class="hidden items-center gap-1 md:flex">
+                {% for url, rotulo in itens_menu %}
+                <a href="{{ url }}" class="rounded-md px-3 py-2 text-sm font-medium {{ 'bg-slate-100 text-slate-900' if caminho == url else 'text-slate-600 hover:text-slate-900' }}">{{ rotulo }}</a>
+                {% endfor %}
                 {% if request.session.get("usuario_id") %}
-                <li><a href="/conta">{{ request.session.get("usuario_nome") }}</a></li>
-                <li>
-                    <form method="post" action="/sair" style="margin: 0;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
-                        <button type="submit" class="outline secondary" style="padding: 0.2rem 0.6rem; margin: 0;">Sair</button>
-                    </form>
-                </li>
+                <form method="post" action="/sair" class="ml-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+                    <button type="submit" class="btn-secundario" title="{{ request.session.get('usuario_nome') }}">Sair</button>
+                </form>
                 {% elif login_habilitado() %}
-                <li><a href="/entrar?voltar={{ request.url.path|urlencode }}" role="button" class="outline" style="padding: 0.2rem 0.6rem;">Entrar com Google</a></li>
+                <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="btn-primario ml-2">Entrar com Google</a>
                 {% endif %}
-            </ul>
+            </div>
         </nav>
+        <div class="border-t border-slate-200 px-4 py-2 md:hidden" x-show="aberto" x-cloak>
+            {% for url, rotulo in itens_menu %}
+            <a href="{{ url }}" class="block rounded-md px-3 py-2 text-sm text-slate-700">{{ rotulo }}</a>
+            {% endfor %}
+            {% if request.session.get("usuario_id") %}
+            <form method="post" action="/sair">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+                <button type="submit" class="block px-3 py-2 text-sm text-slate-700">Sair</button>
+            </form>
+            {% elif login_habilitado() %}
+            <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="block px-3 py-2 text-sm font-semibold text-blue-700">Entrar com Google</a>
+            {% endif %}
+        </div>
     </header>
 
-    <main class="container">
+    <main class="mx-auto max-w-6xl px-4 py-8">
         {% block content %}{% endblock %}
     </main>
+
+    <footer class="border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+        Fonte das questões: CEBRASPE · <a href="/sobre" class="link">Sobre e remoção de conteúdo</a>
+    </footer>
 </body>
 </html>
