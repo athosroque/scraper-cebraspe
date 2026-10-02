@@ -71,7 +71,7 @@
 {% for chave, rotulo in rotulos.items() %}
 {% set nos = resultado.nos|selectattr("situacao", "equalto", chave)|list %}
 <details class="rounded-xl border border-slate-200 bg-white shadow-sm" {% if chave == "no_edital_nunca_cobrado" %}open{% endif %}>
-    <summary class="cursor-pointer px-5 py-3 text-sm text-slate-900"><strong>{{ rotulo }}</strong> ({{ nos|length }})</summary>
+    <summary class="cursor-pointer px-5 py-3 text-sm text-slate-900"><strong>{{ rotulo }}</strong> ({{ nos|length|num }})</summary>
     {% if nos %}
     <div class="overflow-x-auto border-t border-slate-100">
     <table class="w-full text-left text-sm">

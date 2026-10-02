@@ -56,7 +56,7 @@
 <ol class="divide-y divide-slate-100">
     {% for r in linhas %}
     {% set valor = r.questoes if aba == "prova" else r.ocorrencias %}
-    {% set rotulo_valor = (valor ~ " questões · " ~ (r.pct_medio_por_concurso|pct) ~ " médio") if aba == "prova" else (valor ~ " itens") %}
+    {% set rotulo_valor = (valor|num ~ " questões · " ~ (r.pct_medio_por_concurso|pct) ~ " médio") if aba == "prova" else (valor|num ~ " itens") %}
     <li class="flex gap-3">
         <span class="w-6 shrink-0 pt-2 text-right text-xs tabular-nums text-slate-400">{{ loop.index }}</span>
         <div class="min-w-0 flex-1">

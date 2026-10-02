@@ -57,7 +57,7 @@
     <select name="tipo_conhecimento" class="campo" aria-label="Tipo de conhecimento" onchange="this.form.submit()">
         <option value="">Básico e específico</option>
         {% for t in facetas.tipos_conhecimento %}
-        <option value="{{ t.valor }}" {% if filtros.tipo_conhecimento == t.valor %}selected{% endif %}>{{ t.rotulo|title }}</option>
+        <option value="{{ t.valor }}" {% if filtros.tipo_conhecimento == t.valor %}selected{% endif %}>{{ t.rotulo }}</option>
         {% endfor %}
     </select>
     <noscript><button type="submit" class="btn-secundario">Filtrar</button></noscript>
@@ -69,12 +69,12 @@
     {% for materia in desempenho %}
     <details class="group py-2" {% if loop.first %}open{% endif %}>
         <summary class="cursor-pointer list-none">
-            {{ c.barra_ranking(materia.nome, materia.percentual, materia.acertos ~ "/" ~ materia.total ~ " · " ~ (materia.percentual|pct), destaque=True) }}
+            {{ c.barra_ranking(materia.nome, materia.percentual, materia.acertos|num ~ "/" ~ materia.total|num ~ " · " ~ (materia.percentual|pct), destaque=True) }}
         </summary>
         {% if materia.filhos %}
         <div class="ml-4 border-l border-slate-100 pl-4">
             {% for assunto in materia.filhos %}
-            {{ c.barra_ranking(assunto.nome, assunto.percentual, assunto.acertos ~ "/" ~ assunto.total ~ " · " ~ (assunto.percentual|pct), url="/questoes?" ~ {"no_id": assunto.id, "historico": "resolvidas"}|urlencode) }}
+            {{ c.barra_ranking(assunto.nome, assunto.percentual, assunto.acertos|num ~ "/" ~ assunto.total|num ~ " · " ~ (assunto.percentual|pct), url="/questoes?" ~ {"no_id": assunto.id, "historico": "resolvidas"}|urlencode) }}
             {% endfor %}
         </div>
         {% endif %}
