@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% import "_componentes.html" as c %}
+
+{% block title %}{{ materia.nome }} - Questões CEBRASPE{% endblock %}
+{% block description %}O que mais cai de {{ materia.nome }} nas provas do CEBRASPE, por subassunto.{% endblock %}
+{% block estilos_legados %}{% endblock %}
+
+{% block content %}
+{% call c.cabecalho(materia.nome, "Subassuntos que mais caem nas provas, em questões objetivas distintas.") %}
+<a href="{{ url_resolver }}" class="btn-primario">Resolver questões desta matéria</a>
+{% endcall %}
+
+<div class="grid gap-6 lg:grid-cols-3">
+    <div class="min-w-0 lg:col-span-2">
+        {% call c.card() %}
+        <h2 class="mb-2 text-lg font-semibold text-slate-900">O que mais cai</h2>
+        {% if linhas %}
+        {% for r in linhas %}
+        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / maximo) if maximo else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões"), urls_subassunto[r.no_id]) }}
+        {% endfor %}
+        <p class="mt-3 text-xs text-slate-500">Universo sob os filtros: {{ linhas[0].total_universo }} questões válidas. Anuladas ficam fora.</p>
+        {% else %}
+        <p class="text-sm text-slate-600">Nenhuma questão desta matéria para esses filtros.</p>
+        {% endif %}
+        {% endcall %}
+    </div>
+
+    <div class="min-w-0 space-y-6">
+        {% call c.card() %}
+        <h2 class="mb-3 text-lg font-semibold text-slate-900">Filtros</h2>
+        <form method="get" x-data @change="$el.requestSubmit()" class="space-y-3 text-sm">
+            <label class="block">Nível do cargo
+                <select name="nivel" class="campo mt-1 w-full">
+                    {% for valor, rotulo in [("", "Todos"), ("superior", "Superior"), ("medio", "Médio")] %}
+                    <option value="{{ valor }}" {% if (filtros.nivel or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="block">Concurso
+                <select name="concurso" class="campo mt-1 w-full" @change="$refs.cargo.value = ''">
+                    <option value="">Todos</option>
+                    {% for k in cargos|map(attribute="concurso")|unique %}
+                    <option value="{{ k }}" {% if filtros.concurso == k %}selected{% endif %}>{{ k }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="block">Cargo
+                <select name="cargo_numero" x-ref="cargo" class="campo mt-1 w-full" {% if not filtros.concurso %}disabled{% endif %}>
+                    <option value="">Todos</option>
+                    {% for k in cargos if k.concurso == filtros.concurso %}
+                    <option value="{{ k.cargo_numero }}" {% if filtros.cargo_numero == k.cargo_numero %}selected{% endif %}>{{ k.cargo_numero }} — {{ k.cargo }} ({{ k.nivel }})</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <noscript><button type="submit" class="btn-secundario">Aplicar</button></noscript>
+        </form>
+        {% endcall %}
+
+        {% call c.card() %}
+        <h2 class="mb-2 text-lg font-semibold text-slate-900">Desempenho e edital</h2>
+        {# TODO 5F.7: KPIs da matéria (questões, edital × prova, desempenho) via /api/v1/materias/{id}. #}
+        <p class="text-sm text-slate-600">Em breve: seu desempenho e a cobertura do edital nesta matéria.</p>
+        {% endcall %}
+    </div>
+</div>
+{% endblock %}
