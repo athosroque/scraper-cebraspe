@@ -11,6 +11,11 @@ from app.modelos import (
     QuestaoResumo,
 )
 from app.repositorio import questoes_repo
+from app.servicos.formatacao import (
+    rotulo_concurso,
+    rotulo_nivel,
+    rotulo_tipo_conhecimento,
+)
 
 
 def listar_questoes(
@@ -148,6 +153,7 @@ def obter_arvore(apenas_com_questoes: bool = True) -> list[NoArvore]:
             nome=r["nome"],
             nivel=r["nivel"],
             total_questoes=r["total_questoes"],
+            nome_de_cargo=bool(r.get("nome_de_cargo")),
             filhos=[],
         )
         for r in linhas
@@ -184,15 +190,27 @@ def obter_facetas() -> FacetasResponse:
             for r in dados["ano"]
         ],
         concursos=[
-            {"valor": r["valor"], "rotulo": str(r["valor"]), "total": r["total"]}
+            {
+                "valor": r["valor"],
+                "rotulo": rotulo_concurso(str(r["valor"])),
+                "total": r["total"],
+            }
             for r in dados["concurso"]
         ],
         niveis=[
-            {"valor": r["valor"], "rotulo": str(r["valor"]), "total": r["total"]}
+            {
+                "valor": r["valor"],
+                "rotulo": rotulo_nivel(str(r["valor"])),
+                "total": r["total"],
+            }
             for r in dados["nivel"]
         ],
         tipos_conhecimento=[
-            {"valor": r["valor"], "rotulo": str(r["valor"]), "total": r["total"]}
+            {
+                "valor": r["valor"],
+                "rotulo": rotulo_tipo_conhecimento(str(r["valor"])),
+                "total": r["total"],
+            }
             for r in dados["tipo_conhecimento"]
         ],
         cargos=dados["cargos"],

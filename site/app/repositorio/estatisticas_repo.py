@@ -183,14 +183,15 @@ def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
     ):
         cur.execute(
             """
-            SELECT no_id AS id, no_nome AS nome,
-                   questoes AS total_questoes,
-                   pct_do_universo AS pct_incidencia,
-                   (SELECT coalesce(bool_or(nome_de_cargo), false)
-                    FROM vw_questoes q WHERE q.materia_id = no_id AND q.utilizavel) AS nome_de_cargo
-            FROM fn_prova_cobra('materia')
-            WHERE (%(materia_id)s::text IS NULL OR no_id = %(materia_id)s)
-            ORDER BY total_questoes DESC, no_nome
+            SELECT f.no_id AS id, f.no_nome AS nome,
+                   f.questoes AS total_questoes,
+                   f.pct_do_universo AS pct_incidencia,
+                   (SELECT coalesce(bool_or(q.nome_de_cargo), false)
+                    FROM vw_questoes q
+                    WHERE q.materia_id = f.no_id AND q.utilizavel) AS nome_de_cargo
+            FROM fn_prova_cobra('materia') f
+            WHERE (%(materia_id)s::text IS NULL OR f.no_id = %(materia_id)s)
+            ORDER BY f.questoes DESC, f.no_nome
             """,
             {"materia_id": materia_id},
         )

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% import "_componentes.html" as c %}
 
-{% block title %}{{ materia.nome }} - Questões CEBRASPE{% endblock %}
-{% block description %}O que mais cai de {{ materia.nome }} nas provas do CEBRASPE, por subassunto.{% endblock %}
+{% block title %}{{ rotulo_materia(materia.nome, materia.nome_de_cargo) }} - Questões CEBRASPE{% endblock %}
+{% block description %}O que mais cai de {{ rotulo_materia(materia.nome, materia.nome_de_cargo) }} nas provas do CEBRASPE, por subassunto.{% endblock %}
 
 {% block content %}
-{% call c.cabecalho(materia.nome, "Subassuntos que mais caem nas provas, em questões objetivas distintas.") %}
+{% call c.cabecalho(rotulo_materia(materia.nome, materia.nome_de_cargo), "Subassuntos que mais caem nas provas, em questões objetivas distintas.") %}
 <a href="{{ url_resolver }}" class="btn-primario">Resolver questões desta matéria</a>
 {% endcall %}
 

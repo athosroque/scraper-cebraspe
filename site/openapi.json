@@ -3318,6 +3318,12 @@
             "title": "Total Questoes",
             "description": "Questões distintas no nó e nos descendentes."
           },
+          "nome_de_cargo": {
+            "type": "boolean",
+            "title": "Nome De Cargo",
+            "description": "A matéria é o próprio nome de um cargo (exibir como conhecimentos específicos).",
+            "default": false
+          },
           "filhos": {
             "items": {
               "$ref": "#/components/schemas/NoArvore"

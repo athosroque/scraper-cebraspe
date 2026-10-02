@@ -48,7 +48,13 @@ def filtro_pct(valor: float | None) -> str:
     return f"{valor:.2f}%".replace(".", ",")
 
 
-from app.servicos.formatacao import ROTULO_NIVEL, rotulo_concurso
+from app.servicos.formatacao import (
+    ROTULO_NIVEL,
+    rotulo_concurso,
+    rotulo_materia,
+    rotulo_nivel,
+    rotulo_tipo_conhecimento,
+)
 
 templates.env.filters["num"] = filtro_num
 templates.env.filters["pct"] = filtro_pct
@@ -57,6 +63,9 @@ templates.env.globals["csrf_token"] = auth.token_csrf
 templates.env.globals["login_habilitado"] = auth.login_habilitado
 templates.env.globals["ROTULO_NIVEL"] = ROTULO_NIVEL
 templates.env.globals["rotulo_concurso"] = rotulo_concurso
+templates.env.globals["rotulo_materia"] = rotulo_materia
+templates.env.globals["rotulo_nivel"] = rotulo_nivel
+templates.env.globals["rotulo_tipo_conhecimento"] = rotulo_tipo_conhecimento
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +97,7 @@ def _nome_do_no(arvore, no_id: str | None) -> str | None:
     while no_id and pilha:
         no = pilha.pop()
         if no.id == no_id:
-            return no.nome
+            return rotulo_materia(no.nome, no.nome_de_cargo)
         pilha.extend(no.filhos)
     return None
 
@@ -488,6 +497,7 @@ def simulado_revisar(
     usuario_id: int | None = Depends(auth.usuario_id_atual),
 ):
     """Questões erradas (ou em branco) de um simulado encerrado, para refazer."""
+    pagina = max(pagina, 1)
     if usuario_id is None:
         voltar = f"/simulado/{simulado_id}/revisar?situacao={situacao}&pagina={pagina}"
         return RedirectResponse(
@@ -495,7 +505,7 @@ def simulado_revisar(
         )
     try:
         pagina_questoes = simulados_servico.questoes_por_situacao(
-            simulado_id, usuario_id, situacao, max(pagina, 1), 20
+            simulado_id, usuario_id, situacao, pagina, 20
         )
     except simulados_servico.SimuladoAberto:
         return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
@@ -504,6 +514,13 @@ def simulado_revisar(
             request,
             titulo="Simulado não encontrado",
             mensagem="O simulado não existe ou não pertence à sua conta.",
+        )
+    if pagina > 1 and pagina > max(pagina_questoes.total_paginas, 1):
+        destino = urlencode(
+            {"situacao": situacao, "pagina": max(pagina_questoes.total_paginas, 1)}
+        )
+        return RedirectResponse(
+            f"/simulado/{simulado_id}/revisar?{destino}", status_code=307
         )
     return templates.TemplateResponse(
         request=request,

@@ -35,7 +35,7 @@
     {% call c.card() %}
     <h2 class="text-base font-semibold text-slate-900">Fonte: CEBRASPE</h2>
     <p class="mt-2 text-sm text-slate-700">
-        Concurso <strong>{{ questao.concurso }}</strong> ({{ questao.ano }}), caderno
+        Concurso <strong>{{ rotulo_concurso(questao.concurso) }}</strong> ({{ questao.ano }}), caderno
         <code class="rounded bg-slate-100 px-1">{{ questao.codigo_caderno }}</code>, item {{ questao.numero }}.
     </p>
     <div class="mt-3">

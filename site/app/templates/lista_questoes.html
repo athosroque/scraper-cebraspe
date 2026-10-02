@@ -16,7 +16,7 @@
         {% for s in a.filhos %}{% set _ = subs.append({"id": s.id, "nome": s.nome, "total": s.total_questoes}) %}{% endfor %}
         {% set _ = assuntos.append({"id": a.id, "nome": a.nome, "total": a.total_questoes, "filhos": subs}) %}
     {% endfor %}
-    {% set _ = dados_arvore.append({"id": m.id, "nome": m.nome, "total": m.total_questoes, "filhos": assuntos}) %}
+    {% set _ = dados_arvore.append({"id": m.id, "nome": rotulo_materia(m.nome, m.nome_de_cargo), "total": m.total_questoes, "filhos": assuntos}) %}
 {% endfor %}
 <script type="application/json" id="dados-arvore">{{ dados_arvore|tojson }}</script>
 <script>
@@ -78,7 +78,7 @@ document.addEventListener("alpine:init", () => {
             <select name="orgao" class="campo">
                 <option value="">Todos</option>
                 {% for o in facetas.orgaos %}
-                <option value="{{ o.valor }}" {% if filtros.orgao == o.valor %}selected{% endif %}>{{ o.rotulo }} ({{ o.total }})</option>
+                <option value="{{ o.valor }}" {% if filtros.orgao == o.valor %}selected{% endif %}>{{ o.rotulo }} ({{ o.total|num }})</option>
                 {% endfor %}
             </select>
         </label>
@@ -86,7 +86,7 @@ document.addEventListener("alpine:init", () => {
             <select name="nivel" class="campo">
                 <option value="">Todos</option>
                 {% for n in facetas.niveis %}
-                <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo }} ({{ n.total }})</option>
+                <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo }} ({{ n.total|num }})</option>
                 {% endfor %}
             </select>
         </label>

@@ -26,7 +26,7 @@ def test_home_pagina_inteira(cliente):
     r = cliente.get("/questoes")
     assert r.status_code == 200
     assert "Árvore de Assuntos" in r.text
-    assert ">2781</strong> questões encontradas" in r.text
+    assert ">2.781</strong> questões encontradas" in r.text
     assert '<meta name="description"' in r.text
 
 
@@ -235,3 +235,31 @@ def test_simulado_inexistente_tem_texto_proprio(cliente_logado):
     r = cliente_logado.get("/simulado/999999999", headers={"accept": "text/html"})
     assert r.status_code == 404
     assert "Simulado não encontrado" in r.text
+
+
+def test_facetas_tem_rotulos_legiveis(cliente):
+    f = cliente.get("/api/v1/facetas").json()
+    assert all("_" not in x["rotulo"] for x in f["concursos"])
+    assert {x["rotulo"] for x in f["niveis"]} <= {"Superior", "Médio"}
+    assert {x["rotulo"] for x in f["tipos_conhecimento"]} <= {"Básico", "Específico"}
+
+
+def test_chips_de_nivel_e_tipo_com_rotulo(cliente):
+    html = cliente.get(
+        "/questoes", params={"nivel": "superior", "tipo_conhecimento": "basico"}
+    ).text
+    assert "Superior" in html and "Básico" in html
+    assert "Nível: superior" not in html and "Tipo: basico" not in html
+
+
+def test_milhar_com_ponto_nos_totais(cliente):
+    html = cliente.get("/questoes").text
+    assert ">2.781</strong>" in html and ">2781<" not in html
+
+
+def test_materia_de_cargo_com_rotulo(cliente):
+    arvore = cliente.get("/api/v1/arvore").json()
+    mat = next((m for m in arvore if m.get("nome_de_cargo")), None)
+    assert mat is not None
+    html = cliente.get(f"/materias/{mat['id']}").text
+    assert f"Conhecimentos específicos — {mat['nome']}" in html

@@ -222,7 +222,11 @@ def obter_arvore_com_contagens() -> list[dict]:
         )
         SELECT 
             c.id, c.nome, c.nivel, c.pai_id,
-            COALESCE(cnt.total_questoes, 0) AS total_questoes
+            COALESCE(cnt.total_questoes, 0) AS total_questoes,
+            (c.nivel = 'materia' AND EXISTS (
+                SELECT 1 FROM vw_questoes q
+                WHERE q.materia_id = c.id AND q.utilizavel AND q.nome_de_cargo
+            )) AS nome_de_cargo
         FROM vw_no_caminho c
         LEFT JOIN contagens cnt ON cnt.alvo_id = c.id
         ORDER BY COALESCE(cnt.total_questoes, 0) DESC, c.nome ASC

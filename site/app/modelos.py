@@ -254,6 +254,10 @@ class NoArvore(BaseModel):
     total_questoes: int = Field(
         description="Questões distintas no nó e nos descendentes."
     )
+    nome_de_cargo: bool = Field(
+        False,
+        description="A matéria é o próprio nome de um cargo (exibir como conhecimentos específicos).",
+    )
     filhos: list["NoArvore"] = Field([], description="Nós filhos.")
 
 

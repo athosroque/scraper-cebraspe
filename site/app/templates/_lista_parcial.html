@@ -20,7 +20,7 @@
 {% set rotulos_historico = {"resolvidas": "Já resolvidas", "nao_resolvidas": "Não resolvidas", "certas": "Acertei", "erradas": "Errei"} %}
 
 <div class="mb-4 flex flex-wrap items-center gap-2">
-    <p class="mr-2 text-sm text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total }}</strong> questões encontradas</p>
+    <p class="mr-2 text-sm text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total|num }}</strong> questões encontradas</p>
     {% for campo, valor in ativos.items() %}
         {% if campo == "no_id" %}
             {{ c.chip("Assunto: " ~ (no_nome or valor), url_sem("no_id")) }}
@@ -29,7 +29,8 @@
         {% elif campo == "concurso" %}
             {{ c.chip(rotulo_concurso(valor), url_sem("concurso", "cargo_numero")) }}
         {% else %}
-            {{ c.chip(rotulos.get(campo, campo) ~ ": " ~ valor, url_sem(campo)) }}
+            {% if campo == "nivel" %}{% set texto_valor = rotulo_nivel(valor) %}{% elif campo == "tipo_conhecimento" %}{% set texto_valor = rotulo_tipo_conhecimento(valor) %}{% else %}{% set texto_valor = valor %}{% endif %}
+            {{ c.chip(rotulos.get(campo, campo) ~ ": " ~ texto_valor, url_sem(campo)) }}
         {% endif %}
     {% endfor %}
     {% if ativos %}<a href="/questoes" class="link text-xs">Limpar filtros</a>{% endif %}
