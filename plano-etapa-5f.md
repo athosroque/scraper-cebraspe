@@ -193,6 +193,12 @@ obrigue toda rota nova a nascer documentada.
 - **Pronto quando:** teste guarda verde, `openapi.json` regenerado e `/docs`
   mostra tags descritas e o "Authorize" com cookie e CSRF.
 
+- **Junto com esta sessão (decisão do dono, 2026-10-02):** ligar no frontend
+  os blocos que ficaram com `{# TODO 5F.7 #}`/`{# TODO 5F.8 #}` nas 5F.9–5F.11
+  (questões parecidas, selo de incidência, plano de estudo, concurso-alvo,
+  dias seguidos, "revisar as que errei", duração e nota anterior do simulado)
+  à medida que os endpoints da 5F.7/5F.8 nascem documentados.
+
 ### 5F.7 — Endpoints públicos novos
 - `GET /api/v1/materias`: matérias da árvore ativa com total de questões
   (distinta, sobe a árvore, utilizável) e `nome_de_cargo`.
