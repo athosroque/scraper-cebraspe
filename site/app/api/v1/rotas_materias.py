@@ -1,6 +1,6 @@
 """Matérias e busca na árvore (5F.7)."""
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Path, Query
 
 from app.modelos import FiltroEstatistica, MateriaDetalhe, MateriaResumo, ResultadoBusca
 from app.servicos import estatisticas_servico
@@ -36,7 +36,9 @@ def listar_materias():
     responses={**_RESPOSTA_404, **_RESPOSTA_422},
 )
 def detalhe_materia(
-    materia_id: str,
+    materia_id: str = Path(
+        description="ID do nó da matéria na árvore mestre (ex.: `M-0f9a364d06`)."
+    ),
     concurso: str | None = Query(
         None, description="Slug do concurso (ex.: `PF_25_ADM`)."
     ),

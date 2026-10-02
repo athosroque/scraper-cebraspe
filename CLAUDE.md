@@ -250,10 +250,18 @@ Datasette continua só como ferramenta de revisão do dono.
       `/entrar`, aviso de itens ilegíveis (`itens_omitidos`, PF cargo 5) e
       início pela API via body. Validado no Chromium headless. 670 testes
       (+1 xfail), ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.6 do `plano-etapa-5f.md`** (documentação da
-  API no Swagger). Redesenho aprovado em 2026-10-02: 5F.6 a 5F.11 (docs,
-  endpoints novos, frontend Tailwind); o deploy passou para a 5F.12.
-
+- [x] Etapas 5F.6 a 5F.8 — Documentação e endpoints novos (ADR-033): Swagger
+      com tags descritas, `securitySchemes` (cookie `sessao` + `X-CSRFToken`),
+      `respostas_comuns.py` e teste guarda `test_openapi_documentado.py` (toda
+      operação, schema, campo e parâmetro descritos; 401/403/404 conforme a
+      dependência). 5F.7: `/materias`, `/materias/{id}`, `/busca`,
+      `/questoes/{chave}/parecidas` e `incidencia` na questão. 5F.8:
+      `/eu/resumo`, `/eu/prioridades`, `/eu/plano`, `/eu/concurso-alvo`
+      (colunas em `app.usuario`), duração e nota anterior do simulado e
+      `/simulados/{id}/questoes`. Os TODOs do frontend Tailwind foram ligados.
+      LP com 178 questões; plano de PF_25_ADM cargo 1 começa por AOF (17,80%).
+      97 testes no `site/`, ruff verde.
+- **⚡ Prioridade atual: Etapa 5F.12 do `plano-etapa-5f.md`** (deploy).
 
 ## 6. Patterns
 

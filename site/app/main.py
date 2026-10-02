@@ -1,11 +1,13 @@
 import logging
 import pathlib
 from contextlib import asynccontextmanager
+from typing import Literal
 
 import psycopg2
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.api.v1.rotas_conta import router as router_conta
@@ -17,6 +19,7 @@ from app.api.v1.rotas_simulados import router as router_simulados
 from app.config import settings
 from app.db import fechar_pools, get_conexao_leitura, inicializar_pools
 from app.web.rotas_web import router as router_web
+from app.web.rotas_web import router_auth
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +31,70 @@ async def lifespan(app: FastAPI):
     fechar_pools()
 
 
+DESCRICAO = """
+API do site público de questões CEBRASPE (piloto 2025: PF, STM, IBAMA, CD e TCU).
+
+**Autenticação.** Login só com Google (`GET /entrar`). A sessão é o cookie
+assinado `sessao`. Todo `POST`/`DELETE` exige o header `X-CSRFToken` com o
+token da sessão (exposto no `hx-headers` do `<body>` das páginas). No botão
+**Authorize**, `sessao` e `csrf` descrevem esses dois valores. Rotas de leitura
+pública não pedem login.
+
+**Chave da questão.** Toda questão é identificada pela chave estável
+`concurso|caderno|numero` (ex.: `PF_25_ADM|094_PF_CB1_01|1`); no caminho da URL,
+codifique `|` como `%7C`. Use a chave, nunca `questao_id`, para guardar
+referências.
+
+**Erros.** Sempre `{"detail": "..."}` (modelo `Erro`).
+
+**Fonte.** Questões, gabaritos e cadernos são do CEBRASPE (cebraspe.org.br);
+cite a fonte ao republicar. Pedidos de remoção: athosroque@hotmail.com.
+
+**Fora do contrato.** As rotas HTML do site (`/`, `/q/...`, `/conta`,
+`/simulado`, `/estatisticas`...) não fazem parte desta API; só login e logout
+aparecem aqui, na tag Autenticação.
+"""
+
+TAGS = [
+    {
+        "name": "Questões",
+        "description": "Listagem filtrável e detalhe das questões objetivas (certo/errado).",
+    },
+    {
+        "name": "Árvore",
+        "description": "Árvore mestre matéria → assunto → subassunto com contagem de questões.",
+    },
+    {
+        "name": "Facetas",
+        "description": "Valores possíveis dos filtros, com o total de questões de cada um.",
+    },
+    {
+        "name": "Matérias",
+        "description": "Matérias da árvore com resumo e os subassuntos que mais caem.",
+    },
+    {
+        "name": "Conta",
+        "description": "Resposta a questões, dados da conta e desempenho pessoal (com login).",
+    },
+    {
+        "name": "Estatísticas",
+        "description": "O que mais cai na prova, o que o edital cobra e edital × prova.",
+    },
+    {
+        "name": "Simulado",
+        "description": "Prova de um cargo sem gabarito e correção no padrão CEBRASPE (certo +1, errado −1).",
+    },
+    {
+        "name": "Autenticação",
+        "description": "Login com Google e logout. Respondem com redirecionamento (303).",
+    },
+    {"name": "Infra", "description": "Checagem de saúde do serviço."},
+]
+
 app = FastAPI(
     title="Questões CEBRASPE",
-    description=(
-        "API de leitura do site público de questões CEBRASPE (piloto 2025). "
-        "Fonte das questões: CEBRASPE (cebraspe.org.br). Ver ADR-033."
-    ),
+    description=DESCRICAO,
+    openapi_tags=TAGS,
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -66,10 +127,26 @@ app.include_router(router_conta, prefix="/api/v1")
 app.include_router(router_estatisticas, prefix="/api/v1")
 app.include_router(router_materias, prefix="/api/v1")
 app.include_router(router_simulados, prefix="/api/v1")
+app.include_router(router_auth)
 app.include_router(router_web)
 
 
-@app.get("/saude", tags=["Infra"], summary="Checagem de saúde (banco de leitura)")
+class Saude(BaseModel):
+    """Estado do serviço."""
+
+    status: Literal["ok", "erro"] = Field(
+        description="`ok` quando o banco de leitura responde; `erro` caso contrário."
+    )
+
+
+@app.get(
+    "/saude",
+    tags=["Infra"],
+    summary="Checagem de saúde (banco de leitura)",
+    description="Executa `SELECT 1` no banco de leitura. Banco fora do ar: 503.",
+    response_model=Saude,
+    responses={503: {"model": Saude, "description": "Banco de leitura indisponível."}},
+)
 def saude():
     try:
         with get_conexao_leitura() as conn, conn.cursor() as cur:

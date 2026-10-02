@@ -7,6 +7,7 @@ from typing import Literal
 from urllib.parse import urlencode
 
 from app import auth
+from app.api.v1.respostas_comuns import R403
 from app.modelos import ConcursoAlvo, FiltroEstatistica, FiltroQuestoes, NivelAlvo
 from app.servicos import (
     contas_servico,
@@ -15,11 +16,14 @@ from app.servicos import (
     simulados_servico,
 )
 from authlib.integrations.base_client import OAuthError
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter(tags=["Web"], include_in_schema=False)
+# Login/logout ficam no contrato (5F.6); as demais rotas HTML, não.
+router_auth = APIRouter(tags=["Autenticação"])
+_303 = {303: {"description": "Redireciona (header `Location`)."}}
 templates = Jinja2Templates(
     directory=str(pathlib.Path(__file__).parent.parent / "templates")
 )
@@ -516,8 +520,27 @@ async def simulado_corrigir(
 
 
 # -- Contas (5F.3) --
-@router.get("/entrar")
-async def entrar(request: Request, voltar: str | None = None):
+@router_auth.get(
+    "/entrar",
+    summary="Inicia o login com Google",
+    description=(
+        "Redireciona para o consentimento do Google OAuth. `voltar` é o caminho "
+        "local para onde o usuário volta depois do login. Sem login configurado, "
+        "redireciona para `/`."
+    ),
+    status_code=303,
+    response_class=RedirectResponse,
+    responses={
+        **_303,
+        302: {"description": "Redireciona para o consentimento do Google."},
+    },
+)
+async def entrar(
+    request: Request,
+    voltar: str | None = Query(
+        None, description="Caminho local de retorno (ex.: `/conta`)."
+    ),
+):
     if not auth.login_habilitado():
         return RedirectResponse("/", status_code=303)
     request.session["voltar"] = auth.destino_seguro(voltar)
@@ -526,7 +549,19 @@ async def entrar(request: Request, voltar: str | None = None):
     )
 
 
-@router.get("/auth/google", name="auth_google")
+@router_auth.get(
+    "/auth/google",
+    name="auth_google",
+    summary="Retorno do Google OAuth",
+    description=(
+        "Callback chamado pelo Google: cria ou acha o usuário, abre a sessão "
+        "(cookie `sessao`) e redireciona para o `voltar` do `/entrar`. Falha no "
+        "OAuth ou e-mail não verificado redireciona para `/` sem login."
+    ),
+    status_code=303,
+    response_class=RedirectResponse,
+    responses=_303,
+)
 async def auth_google(request: Request):
     voltar = auth.destino_seguro(request.session.pop("voltar", None))
     try:
@@ -544,7 +579,15 @@ async def auth_google(request: Request):
     return RedirectResponse(voltar, status_code=303)
 
 
-@router.post("/sair", dependencies=[Depends(auth.verificar_csrf)])
+@router_auth.post(
+    "/sair",
+    summary="Encerra a sessão",
+    description="Limpa o cookie de sessão e redireciona para `/`. Exige CSRF.",
+    dependencies=[Depends(auth.verificar_csrf)],
+    status_code=303,
+    response_class=RedirectResponse,
+    responses={**_303, **R403},
+)
 def sair(request: Request):
     request.session.clear()
     return RedirectResponse("/", status_code=303)

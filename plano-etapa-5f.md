@@ -171,7 +171,7 @@ Decisões: entrada pela matéria; "Meu concurso" com login; Tailwind; "mais cai"
 em cor discreta. A documentação vem antes dos endpoints para que o teste guarda
 obrigue toda rota nova a nascer documentada.
 
-### 5F.6 — Documentação da API (Swagger/ReDoc)
+### 5F.6 — Documentação da API (Swagger/ReDoc) ✅ (2026-10-02)
 - `openapi_tags` com descrição (Questões, Árvore, Facetas, Matérias, Conta,
   Estatísticas, Simulado, Autenticação, Infra) e `description` geral: como
   autenticar (cookie `sessao` + `X-CSRFToken`), chave `concurso|caderno|numero`,
@@ -199,7 +199,7 @@ obrigue toda rota nova a nascer documentada.
   dias seguidos, "revisar as que errei", duração e nota anterior do simulado)
   à medida que os endpoints da 5F.7/5F.8 nascem documentados.
 
-### 5F.7 — Endpoints públicos novos
+### 5F.7 — Endpoints públicos novos ✅ (2026-10-02)
 - `GET /api/v1/materias`: matérias da árvore ativa com total de questões
   (distinta, sobe a árvore, utilizável) e `nome_de_cargo`.
 - `GET /api/v1/materias/{materia_id}`: resumo + top subassuntos por
@@ -212,9 +212,9 @@ obrigue toda rota nova a nascer documentada.
 - Campo aditivo `incidencia` em `QuestaoResumo`/`QuestaoDetalhe`: posição do
   subassunto principal no ranking da matéria (cache por processo).
 - **Pronto quando:** LP com 178 questões em `/materias`; top 1 de LP =
-  "Substituição de palavras…" (15); testes de 404.
+  "Substituição de palavras…" (15; a base atual dá 14, divergência em aberto); testes de 404.
 
-### 5F.8 — Endpoints pessoais novos
+### 5F.8 — Endpoints pessoais novos ✅ (2026-10-02)
 - `GET /api/v1/eu/resumo`: resolvidas, acerto, nota líquida, erradas pendentes,
   dias seguidos (fuso `America/Sao_Paulo`).
 - `GET /api/v1/eu/prioridades`: subassuntos com ≥ 2 respostas, por

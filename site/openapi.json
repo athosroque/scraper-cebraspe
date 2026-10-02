@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Questões CEBRASPE",
-    "description": "API de leitura do site público de questões CEBRASPE (piloto 2025). Fonte das questões: CEBRASPE (cebraspe.org.br). Ver ADR-033.",
+    "description": "\nAPI do site público de questões CEBRASPE (piloto 2025: PF, STM, IBAMA, CD e TCU).\n\n**Autenticação.** Login só com Google (`GET /entrar`). A sessão é o cookie\nassinado `sessao`. Todo `POST`/`DELETE` exige o header `X-CSRFToken` com o\ntoken da sessão (exposto no `hx-headers` do `<body>` das páginas). No botão\n**Authorize**, `sessao` e `csrf` descrevem esses dois valores. Rotas de leitura\npública não pedem login.\n\n**Chave da questão.** Toda questão é identificada pela chave estável\n`concurso|caderno|numero` (ex.: `PF_25_ADM|094_PF_CB1_01|1`); no caminho da URL,\ncodifique `|` como `%7C`. Use a chave, nunca `questao_id`, para guardar\nreferências.\n\n**Erros.** Sempre `{\"detail\": \"...\"}` (modelo `Erro`).\n\n**Fonte.** Questões, gabaritos e cadernos são do CEBRASPE (cebraspe.org.br);\ncite a fonte ao republicar. Pedidos de remoção: athosroque@hotmail.com.\n\n**Fora do contrato.** As rotas HTML do site (`/`, `/q/...`, `/conta`,\n`/simulado`, `/estatisticas`...) não fazem parte desta API; só login e logout\naparecem aqui, na tag Autenticação.\n",
     "version": "1.0.0"
   },
   "paths": {
@@ -271,7 +271,14 @@
             }
           },
           "401": {
-            "description": "Filtro de histórico sem login"
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -301,8 +308,13 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "Chave estável `concurso|caderno|numero` (codifique `|` como `%7C`).",
+              "examples": [
+                "PF_25_ADM|094_PF_CB1_01|1"
+              ],
               "title": "Chave"
-            }
+            },
+            "description": "Chave estável `concurso|caderno|numero` (codifique `|` como `%7C`)."
           }
         ],
         "responses": {
@@ -317,7 +329,90 @@
             }
           },
           "404": {
-            "description": "Questão não encontrada"
+            "description": "Questão não encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questoes/{chave}/parecidas": {
+      "get": {
+        "tags": [
+          "Questões"
+        ],
+        "summary": "Questões parecidas",
+        "description": "Questões do mesmo nó principal da árvore, sem a própria e sem repetir enunciado canônico (o mesmo item aplicado em outro caderno aparece uma vez só, e o da própria questão não aparece). Só utilizáveis, na ordem da listagem. Lista vazia se a questão não foi classificada.",
+        "operationId": "obter_parecidas_api_v1_questoes__chave__parecidas_get",
+        "parameters": [
+          {
+            "name": "chave",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Chave estável `concurso|caderno|numero`.",
+              "examples": [
+                "PF_25_ADM|094_PF_CB1_01|13"
+              ],
+              "title": "Chave"
+            },
+            "description": "Chave estável `concurso|caderno|numero`."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "minimum": 1,
+              "description": "Máximo de questões (até 20).",
+              "default": 5,
+              "title": "Limite"
+            },
+            "description": "Máximo de questões (até 20)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestaoResumo"
+                  },
+                  "title": "Response Obter Parecidas Api V1 Questoes  Chave  Parecidas Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Questão não encontrada",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Questão não encontrada"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -434,10 +529,197 @@
             }
           },
           "404": {
-            "description": "Questão não encontrada"
+            "description": "Questão não encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "csrf": []
+          }
+        ]
+      }
+    },
+    "/api/v1/eu": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Usuário logado",
+        "description": "Dados da conta da sessão atual (cookie `sessao`), com o concurso-alvo salvo (nulo se não houver). Sem login: 401.",
+        "operationId": "eu_api_v1_eu_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sessao": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Apaga a conta e todo o histórico",
+        "description": "Remove o usuário, as respostas e os simulados (cascata) e encerra a sessão. Irreversível.",
+        "operationId": "apagar_conta_api_v1_eu_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "csrf": []
+          },
+          {
+            "sessao": []
+          }
+        ]
+      }
+    },
+    "/api/v1/eu/resumo": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Resumo da conta (KPIs)",
+        "description": "Resolvidas, certas, erradas e acerto pela resposta mais recente de cada questão (fora de simulado); nota líquida na regra CEBRASPE (certas − erradas); erradas pendentes (caderno de erros) e dias seguidos com resposta no fuso America/Sao_Paulo.",
+        "operationId": "resumo_conta_api_v1_eu_resumo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumoConta"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          }
+        },
+        "security": [
+          {
+            "sessao": []
+          }
+        ]
+      }
+    },
+    "/api/v1/eu/prioridades": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "O que estudar agora",
+        "description": "Subassuntos com pelo menos 2 questões respondidas, ordenados por incidência na prova (`fn_prova_cobra`, % médio por concurso) × taxa de erro do usuário. Respostas e incidência são lidas em separado e cruzadas no serviço.",
+        "operationId": "prioridades_api_v1_eu_prioridades_get",
+        "security": [
+          {
+            "sessao": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Máximo de subassuntos.",
+              "default": 10,
+              "title": "Limite"
+            },
+            "description": "Máximo de subassuntos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Prioridade"
+                  },
+                  "title": "Response Prioridades Api V1 Eu Prioridades Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
           },
           "422": {
             "description": "Validation Error",
@@ -452,48 +734,6 @@
         }
       }
     },
-    "/api/v1/eu": {
-      "get": {
-        "tags": [
-          "Conta"
-        ],
-        "summary": "Usuário logado",
-        "operationId": "eu_api_v1_eu_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Usuario"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Login necessário"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Conta"
-        ],
-        "summary": "Apaga a conta e todo o histórico",
-        "operationId": "apagar_conta_api_v1_eu_delete",
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "401": {
-            "description": "Login necessário"
-          },
-          "403": {
-            "description": "Token CSRF inválido (header `X-CSRFToken`)"
-          }
-        }
-      }
-    },
     "/api/v1/eu/desempenho": {
       "get": {
         "tags": [
@@ -502,6 +742,11 @@
         "summary": "Desempenho por nó da árvore",
         "description": "Acertos sobre a resposta mais recente de cada questão. A questão sobe a árvore e conta uma vez por nó (regra da 5E); anuladas ficam de fora. Aceita os mesmos filtros da listagem.",
         "operationId": "desempenho_api_v1_eu_desempenho_get",
+        "security": [
+          {
+            "sessao": []
+          }
+        ],
         "parameters": [
           {
             "name": "orgao",
@@ -516,8 +761,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Órgão (ex.: `PF`).",
               "title": "Orgao"
-            }
+            },
+            "description": "Órgão (ex.: `PF`)."
           },
           {
             "name": "ano",
@@ -532,8 +779,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Ano do concurso.",
               "title": "Ano"
-            }
+            },
+            "description": "Ano do concurso."
           },
           {
             "name": "concurso",
@@ -548,8 +797,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
               "title": "Concurso"
-            }
+            },
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           {
             "name": "cargo_numero",
@@ -564,8 +815,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Número do cargo no edital. Use junto com `concurso`.",
               "title": "Cargo Numero"
-            }
+            },
+            "description": "Número do cargo no edital. Use junto com `concurso`."
           },
           {
             "name": "nivel",
@@ -580,8 +833,10 @@
                   "type": "null"
                 }
               ],
+              "description": "`superior` ou `medio`.",
               "title": "Nivel"
-            }
+            },
+            "description": "`superior` ou `medio`."
           },
           {
             "name": "tipo_conhecimento",
@@ -596,8 +851,10 @@
                   "type": "null"
                 }
               ],
+              "description": "`basico` ou `especifico`.",
               "title": "Tipo Conhecimento"
-            }
+            },
+            "description": "`basico` ou `especifico`."
           },
           {
             "name": "no_id",
@@ -612,8 +869,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Nó da árvore; inclui os descendentes.",
               "title": "No Id"
-            }
+            },
+            "description": "Nó da árvore; inclui os descendentes."
           },
           {
             "name": "fora_do_edital",
@@ -626,9 +885,11 @@
                 "nao"
               ],
               "type": "string",
+              "description": "Recorte por questão fora do edital do cargo.",
               "default": "todos",
               "title": "Fora Do Edital"
-            }
+            },
+            "description": "Recorte por questão fora do edital do cargo."
           }
         ],
         "responses": {
@@ -647,7 +908,211 @@
             }
           },
           "401": {
-            "description": "Login necessário"
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/eu/concurso-alvo": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Concurso-alvo salvo",
+        "description": "Concurso e cargo que o usuário estuda; `null` se nada foi salvo.",
+        "operationId": "obter_concurso_alvo_api_v1_eu_concurso_alvo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ConcursoAlvo"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Obter Concurso Alvo Api V1 Eu Concurso Alvo Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sessao": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Salva o concurso-alvo",
+        "description": "Grava concurso e cargo na conta. O par precisa existir na base (cargo com prova); senão, 404. Exige o header `X-CSRFToken`.",
+        "operationId": "salvar_concurso_alvo_api_v1_eu_concurso_alvo_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConcursoAlvo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConcursoAlvo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Concurso ou cargo sem prova na base"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "csrf": []
+          },
+          {
+            "sessao": []
+          }
+        ]
+      }
+    },
+    "/api/v1/eu/plano": {
+      "get": {
+        "tags": [
+          "Conta"
+        ],
+        "summary": "Plano de estudo do cargo",
+        "description": "Matérias do cargo ordenadas por `prioridade` = peso da matéria na prova (`vw_peso_materia_cargo`) × (1 − acerto do usuário na matéria). O acerto usa a resposta mais recente de cada questão, de qualquer prova; sem respostas na matéria, o acerto é 0 e a prioridade é o próprio peso.",
+        "operationId": "plano_api_v1_eu_plano_get",
+        "security": [
+          {
+            "sessao": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Slug do concurso.",
+              "examples": [
+                "PF_25_ADM"
+              ],
+              "title": "Concurso"
+            },
+            "description": "Slug do concurso."
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Número do cargo.",
+              "examples": [
+                1
+              ],
+              "title": "Cargo Numero"
+            },
+            "description": "Número do cargo."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanoEstudo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Concurso ou cargo sem prova na base"
           },
           "422": {
             "description": "Validation Error",
@@ -1024,7 +1489,14 @@
             }
           },
           "404": {
-            "description": "Cargo sem edital nem prova"
+            "description": "Cargo sem edital nem prova.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1035,6 +1507,185 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/materias": {
+      "get": {
+        "tags": [
+          "Matérias"
+        ],
+        "summary": "Lista as matérias com o volume de questões",
+        "description": "Matérias da árvore mestre ativa que têm questão objetiva utilizável, com o total de questões distintas (a contagem sobe a árvore, anuladas incluídas) e o % de incidência sobre o total. Maior volume primeiro.",
+        "operationId": "listar_materias_api_v1_materias_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MateriaResumo"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Materias Api V1 Materias Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/materias/{materia_id}": {
+      "get": {
+        "tags": [
+          "Matérias"
+        ],
+        "summary": "Resumo de uma matéria",
+        "description": "Resumo da matéria e os subassuntos que mais caem (`fn_prova_cobra`) no recorte de concurso, cargo e nível. O cargo só vale junto com o concurso.",
+        "operationId": "detalhe_materia_api_v1_materias__materia_id__get",
+        "parameters": [
+          {
+            "name": "materia_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ID do nó da matéria na árvore mestre (ex.: `M-0f9a364d06`).",
+              "title": "Materia Id"
+            },
+            "description": "ID do nó da matéria na árvore mestre (ex.: `M-0f9a364d06`)."
+          },
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
+              "title": "Concurso"
+            },
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Número do cargo no edital. Use junto com `concurso`.",
+              "title": "Cargo Numero"
+            },
+            "description": "Número do cargo no edital. Use junto com `concurso`."
+          },
+          {
+            "name": "nivel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`superior` ou `medio`.",
+              "title": "Nivel"
+            },
+            "description": "`superior` ou `medio`."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Tamanho do top de subassuntos.",
+              "default": 15,
+              "title": "Limite"
+            },
+            "description": "Tamanho do top de subassuntos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MateriaDetalhe"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "O id não é uma matéria ativa da árvore mestre."
+          },
+          "422": {
+            "description": "Parâmetro de consulta inválido."
+          }
+        }
+      }
+    },
+    "/api/v1/busca": {
+      "get": {
+        "tags": [
+          "Matérias"
+        ],
+        "summary": "Busca nós da árvore por nome",
+        "description": "Nós ativos (matéria, assunto, subassunto) cujo nome contém o termo, sem acento e sem caixa (`lingua` acha `LÍNGUA PORTUGUESA`). Começo do nome primeiro, depois matéria → assunto → subassunto. Máximo de 20.",
+        "operationId": "buscar_api_v1_busca_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100,
+              "description": "Termo de busca.",
+              "title": "Q"
+            },
+            "description": "Termo de busca."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResultadoBusca"
+                  },
+                  "title": "Response Buscar Api V1 Busca Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parâmetro de consulta inválido."
           }
         }
       }
@@ -1054,8 +1705,10 @@
             "required": true,
             "schema": {
               "type": "string",
+              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
               "title": "Concurso"
-            }
+            },
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           {
             "name": "cargo_numero",
@@ -1063,8 +1716,10 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "description": "Número do cargo no edital.",
               "title": "Cargo Numero"
-            }
+            },
+            "description": "Número do cargo no edital."
           }
         ],
         "responses": {
@@ -1079,7 +1734,14 @@
             }
           },
           "404": {
-            "description": "Cargo sem prova ou simulado não encontrado"
+            "description": "Cargo sem prova ou simulado não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1124,10 +1786,24 @@
             }
           },
           "404": {
-            "description": "Cargo sem prova ou simulado não encontrado"
+            "description": "Cargo sem prova ou simulado não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1139,7 +1815,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "csrf": []
+          }
+        ]
       }
     },
     "/api/v1/simulados": {
@@ -1148,6 +1829,7 @@
           "Simulado"
         ],
         "summary": "Meus simulados",
+        "description": "Simulados gravados do usuário logado, do mais recente ao mais antigo.",
         "operationId": "listar_api_v1_simulados_get",
         "responses": {
           "200": {
@@ -1165,15 +1847,28 @@
             }
           },
           "401": {
-            "description": "Login necessário"
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "sessao": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "Simulado"
         ],
         "summary": "Inicia um simulado gravado (o início vale para o cronômetro)",
+        "description": "Cria o simulado do usuário logado para o cargo e devolve o resumo com o `id`. A prova vem de `GET /simulados/prova`; o encerramento é `POST /simulados/{simulado_id}/correcao`.",
         "operationId": "iniciar_api_v1_simulados_post",
         "requestBody": {
           "content": {
@@ -1197,13 +1892,34 @@
             }
           },
           "401": {
-            "description": "Login necessário"
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Cargo sem prova ou simulado não encontrado"
+            "description": "Cargo sem prova ou simulado não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1215,7 +1931,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "csrf": []
+          },
+          {
+            "sessao": []
+          }
+        ]
       }
     },
     "/api/v1/simulados/{simulado_id}/correcao": {
@@ -1226,6 +1950,14 @@
         "summary": "Encerra e corrige um simulado gravado",
         "description": "Grava nota, fim e respostas. Só encerra uma vez (409 depois).",
         "operationId": "encerrar_api_v1_simulados__simulado_id__correcao_post",
+        "security": [
+          {
+            "csrf": []
+          },
+          {
+            "sessao": []
+          }
+        ],
         "parameters": [
           {
             "name": "simulado_id",
@@ -1233,8 +1965,10 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "description": "Id do simulado (devolvido no início).",
               "title": "Simulado Id"
-            }
+            },
+            "description": "Id do simulado (devolvido no início)."
           }
         ],
         "requestBody": {
@@ -1259,16 +1993,146 @@
             }
           },
           "401": {
-            "description": "Login necessário"
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Cargo sem prova ou simulado não encontrado"
+            "description": "Cargo sem prova ou simulado não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Simulado já encerrado"
+            "description": "Simulado já encerrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulados/{simulado_id}/questoes": {
+      "get": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Questões do simulado por situação (para revisar)",
+        "description": "Lista paginada (mesmo formato de `GET /api/v1/questoes`) das questões de um simulado encerrado que ficaram com a situação pedida: `errado` (resposta diferente do gabarito) ou `branco` (sem resposta). A situação usa o gabarito atual, como o resultado. Anuladas nunca entram.",
+        "operationId": "questoes_api_v1_simulados__simulado_id__questoes_get",
+        "security": [
+          {
+            "sessao": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "simulado_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "Id do simulado (devolvido no início).",
+              "title": "Simulado Id"
+            },
+            "description": "Id do simulado (devolvido no início)."
+          },
+          {
+            "name": "situacao",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "errado",
+                "branco"
+              ],
+              "type": "string",
+              "description": "Situação do item no simulado: `errado` ou `branco`.",
+              "default": "errado",
+              "title": "Situacao"
+            },
+            "description": "Situação do item no simulado: `errado` ou `branco`."
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Página (começa em 1).",
+              "default": 1,
+              "title": "Pagina"
+            },
+            "description": "Página (começa em 1)."
+          },
+          {
+            "name": "tamanho_pagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Itens por página (máximo 50).",
+              "default": 20,
+              "title": "Tamanho Pagina"
+            },
+            "description": "Itens por página (máximo 50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaQuestoes"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          },
+          "404": {
+            "description": "Simulado não existe ou não é do usuário"
+          },
+          "409": {
+            "description": "Simulado ainda não encerrado"
           },
           "422": {
             "description": "Validation Error",
@@ -1289,7 +2153,13 @@
           "Simulado"
         ],
         "summary": "Resultado de um simulado encerrado",
+        "description": "Placar, correção por item e padrões de resposta das discursivas. Só o dono vê; simulado aberto ou de outro usuário dá 404.",
         "operationId": "resultado_api_v1_simulados__simulado_id__get",
+        "security": [
+          {
+            "sessao": []
+          }
+        ],
         "parameters": [
           {
             "name": "simulado_id",
@@ -1297,8 +2167,10 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "description": "Id do simulado (devolvido no início).",
               "title": "Simulado Id"
-            }
+            },
+            "description": "Id do simulado (devolvido no início)."
           }
         ],
         "responses": {
@@ -1313,10 +2185,24 @@
             }
           },
           "401": {
-            "description": "Login necessário"
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Cargo sem prova ou simulado não encontrado"
+            "description": "Cargo sem prova ou simulado não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1331,19 +2217,125 @@
         }
       }
     },
+    "/entrar": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Inicia o login com Google",
+        "description": "Redireciona para o consentimento do Google OAuth. `voltar` é o caminho local para onde o usuário volta depois do login. Sem login configurado, redireciona para `/`.",
+        "operationId": "entrar_entrar_get",
+        "parameters": [
+          {
+            "name": "voltar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Caminho local de retorno (ex.: `/conta`).",
+              "title": "Voltar"
+            },
+            "description": "Caminho local de retorno (ex.: `/conta`)."
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Redireciona (header `Location`)."
+          },
+          "302": {
+            "description": "Redireciona para o consentimento do Google."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Retorno do Google OAuth",
+        "description": "Callback chamado pelo Google: cria ou acha o usuário, abre a sessão (cookie `sessao`) e redireciona para o `voltar` do `/entrar`. Falha no OAuth ou e-mail não verificado redireciona para `/` sem login.",
+        "operationId": "auth_google_auth_google_get",
+        "responses": {
+          "303": {
+            "description": "Redireciona (header `Location`)."
+          }
+        }
+      }
+    },
+    "/sair": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Encerra a sessão",
+        "description": "Limpa o cookie de sessão e redireciona para `/`. Exige CSRF.",
+        "operationId": "sair_sair_post",
+        "responses": {
+          "303": {
+            "description": "Redireciona (header `Location`)."
+          },
+          "403": {
+            "description": "Token CSRF inválido: envie o header `X-CSRFToken` com o token da sessão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "csrf": []
+          }
+        ]
+      }
+    },
     "/saude": {
       "get": {
         "tags": [
           "Infra"
         ],
         "summary": "Checagem de saúde (banco de leitura)",
+        "description": "Executa `SELECT 1` no banco de leitura. Banco fora do ar: 503.",
         "operationId": "saude_saude_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Saude"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco de leitura indisponível.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Saude"
+                }
               }
             }
           }
@@ -1357,19 +2349,23 @@
         "properties": {
           "cargo_edital_id": {
             "type": "integer",
-            "title": "Cargo Edital Id"
+            "title": "Cargo Edital Id",
+            "description": "Id interno do cargo no banco."
           },
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           },
           "cargo": {
             "type": "string",
-            "title": "Cargo"
+            "title": "Cargo",
+            "description": "Nome do cargo como no edital."
           },
           "nivel": {
             "type": "string",
-            "title": "Nivel"
+            "title": "Nivel",
+            "description": "Nível do cargo: `superior` ou `medio`."
           }
         },
         "type": "object",
@@ -1380,7 +2376,43 @@
           "nivel"
         ],
         "title": "CargoInfo",
-        "description": "Cargo do edital para o qual o caderno da questão foi aplicado."
+        "description": "Cargo do edital para o qual o caderno da questão foi aplicado.",
+        "examples": [
+          {
+            "cargo": "ADMINISTRADOR",
+            "cargo_edital_id": 1,
+            "cargo_numero": 1,
+            "nivel": "superior"
+          }
+        ]
+      },
+      "ConcursoAlvo": {
+        "properties": {
+          "concurso": {
+            "type": "string",
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`).",
+            "examples": [
+              "PF_25_ADM"
+            ]
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Cargo Numero",
+            "description": "Número do cargo no concurso.",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero"
+        ],
+        "title": "ConcursoAlvo",
+        "description": "Concurso e cargo que o usuário está estudando."
       },
       "DiscursivaSimulado": {
         "properties": {
@@ -1393,7 +2425,8 @@
                 "type": "null"
               }
             ],
-            "title": "Numero"
+            "title": "Numero",
+            "description": "Número da questão discursiva."
           },
           "titulo": {
             "anyOf": [
@@ -1404,7 +2437,8 @@
                 "type": "null"
               }
             ],
-            "title": "Titulo"
+            "title": "Titulo",
+            "description": "Título impresso no caderno."
           },
           "tema": {
             "anyOf": [
@@ -1415,7 +2449,8 @@
                 "type": "null"
               }
             ],
-            "title": "Tema"
+            "title": "Tema",
+            "description": "Tema proposto (vazio se anafórico)."
           },
           "enunciado": {
             "anyOf": [
@@ -1426,7 +2461,8 @@
                 "type": "null"
               }
             ],
-            "title": "Enunciado"
+            "title": "Enunciado",
+            "description": "Texto completo da proposta."
           },
           "quesitos": {
             "items": {
@@ -1435,6 +2471,7 @@
             },
             "type": "array",
             "title": "Quesitos",
+            "description": "Quesitos da discursiva (número, texto e valor em pontos).",
             "default": []
           },
           "padrao_resposta": {
@@ -1457,17 +2494,20 @@
           "tema",
           "enunciado"
         ],
-        "title": "DiscursivaSimulado"
+        "title": "DiscursivaSimulado",
+        "description": "Questão discursiva da prova do cargo (sem nota: não entra no placar)."
       },
       "EditalVsProva": {
         "properties": {
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           },
           "resumo": {
             "additionalProperties": {
@@ -1482,14 +2522,16 @@
               "$ref": "#/components/schemas/LinhaEditalVsProva"
             },
             "type": "array",
-            "title": "Nos"
+            "title": "Nos",
+            "description": "Nós com a situação de cada um."
           },
           "peso_materias": {
             "items": {
               "$ref": "#/components/schemas/PesoMateria"
             },
             "type": "array",
-            "title": "Peso Materias"
+            "title": "Peso Materias",
+            "description": "Peso de cada matéria na prova."
           }
         },
         "type": "object",
@@ -1503,27 +2545,50 @@
         "title": "EditalVsProva",
         "description": "Edital × prova de um cargo (`vw_edital_vs_prova` + `vw_peso_materia_cargo`)."
       },
+      "Erro": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "description": "Mensagem do erro, em português.",
+            "examples": [
+              "Login necessário"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "Erro",
+        "description": "Corpo de erro padrão da API."
+      },
       "FacetaCargo": {
         "properties": {
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           },
           "cargo": {
             "type": "string",
-            "title": "Cargo"
+            "title": "Cargo",
+            "description": "Nome do cargo."
           },
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "nivel": {
             "type": "string",
-            "title": "Nivel"
+            "title": "Nivel",
+            "description": "Nível do cargo: `superior` ou `medio`."
           },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Questões distintas do cargo."
           }
         },
         "type": "object",
@@ -1534,20 +2599,24 @@
           "nivel",
           "total"
         ],
-        "title": "FacetaCargo"
+        "title": "FacetaCargo",
+        "description": "Cargo possível no filtro, com o total de questões."
       },
       "FacetaValor": {
         "properties": {
           "valor": {
-            "title": "Valor"
+            "title": "Valor",
+            "description": "Valor a enviar no parâmetro do filtro."
           },
           "rotulo": {
             "type": "string",
-            "title": "Rotulo"
+            "title": "Rotulo",
+            "description": "Texto para exibir."
           },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Questões distintas com esse valor."
           }
         },
         "type": "object",
@@ -1556,7 +2625,8 @@
           "rotulo",
           "total"
         ],
-        "title": "FacetaValor"
+        "title": "FacetaValor",
+        "description": "Um valor possível de filtro, com o total de questões."
       },
       "FacetasResponse": {
         "properties": {
@@ -1565,49 +2635,56 @@
               "$ref": "#/components/schemas/FacetaValor"
             },
             "type": "array",
-            "title": "Bancas"
+            "title": "Bancas",
+            "description": "Bancas."
           },
           "orgaos": {
             "items": {
               "$ref": "#/components/schemas/FacetaValor"
             },
             "type": "array",
-            "title": "Orgaos"
+            "title": "Orgaos",
+            "description": "Órgãos."
           },
           "anos": {
             "items": {
               "$ref": "#/components/schemas/FacetaValor"
             },
             "type": "array",
-            "title": "Anos"
+            "title": "Anos",
+            "description": "Anos."
           },
           "concursos": {
             "items": {
               "$ref": "#/components/schemas/FacetaValor"
             },
             "type": "array",
-            "title": "Concursos"
+            "title": "Concursos",
+            "description": "Concursos (slug)."
           },
           "niveis": {
             "items": {
               "$ref": "#/components/schemas/FacetaValor"
             },
             "type": "array",
-            "title": "Niveis"
+            "title": "Niveis",
+            "description": "Níveis de cargo."
           },
           "tipos_conhecimento": {
             "items": {
               "$ref": "#/components/schemas/FacetaValor"
             },
             "type": "array",
-            "title": "Tipos Conhecimento"
+            "title": "Tipos Conhecimento",
+            "description": "Tipos de conhecimento (básico/específico)."
           },
           "cargos": {
             "items": {
               "$ref": "#/components/schemas/FacetaCargo"
             },
             "type": "array",
-            "title": "Cargos"
+            "title": "Cargos",
+            "description": "Cargos por concurso."
           }
         },
         "type": "object",
@@ -1636,19 +2713,67 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "Incidencia": {
+        "properties": {
+          "no_id": {
+            "type": "string",
+            "title": "No Id",
+            "description": "Subassunto principal da questão."
+          },
+          "materia_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materia Id",
+            "description": "Matéria do subassunto."
+          },
+          "posicao": {
+            "type": "integer",
+            "title": "Posicao",
+            "description": "Posição no ranking da matéria (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
+          },
+          "total_subassuntos": {
+            "type": "integer",
+            "title": "Total Subassuntos",
+            "description": "Quantos subassuntos da matéria têm questão no ranking."
+          },
+          "questoes": {
+            "type": "integer",
+            "title": "Questoes",
+            "description": "Questões válidas distintas no subassunto."
+          }
+        },
+        "type": "object",
+        "required": [
+          "no_id",
+          "posicao",
+          "total_subassuntos",
+          "questoes"
+        ],
+        "title": "Incidencia",
+        "description": "Posição do subassunto principal no ranking \"o que mais cai\" da matéria."
+      },
       "ItemCorrigido": {
         "properties": {
           "questao_chave": {
             "type": "string",
-            "title": "Questao Chave"
+            "title": "Questao Chave",
+            "description": "Chave estável `concurso|caderno|numero` da questão (mesma da 5D)."
           },
           "numero": {
             "type": "integer",
-            "title": "Numero"
+            "title": "Numero",
+            "description": "Número do item no caderno."
           },
           "codigo_caderno": {
             "type": "string",
-            "title": "Codigo Caderno"
+            "title": "Codigo Caderno",
+            "description": "Código do caderno de prova (ex.: `094_PF_CB1_01`)."
           },
           "resposta": {
             "anyOf": [
@@ -1663,11 +2788,13 @@
                 "type": "null"
               }
             ],
-            "title": "Resposta"
+            "title": "Resposta",
+            "description": "Resposta marcada (vazio = em branco)."
           },
           "gabarito": {
             "type": "string",
-            "title": "Gabarito"
+            "title": "Gabarito",
+            "description": "Gabarito definitivo (`C`, `E` ou `X`)."
           },
           "situacao": {
             "type": "string",
@@ -1677,7 +2804,8 @@
               "branco",
               "anulada"
             ],
-            "title": "Situacao"
+            "title": "Situacao",
+            "description": "Resultado do item."
           }
         },
         "type": "object",
@@ -1689,29 +2817,86 @@
           "gabarito",
           "situacao"
         ],
-        "title": "ItemCorrigido"
+        "title": "ItemCorrigido",
+        "description": "Item do simulado com a resposta, o gabarito e a situação."
+      },
+      "ItemPlano": {
+        "properties": {
+          "materia_id": {
+            "type": "string",
+            "title": "Materia Id",
+            "description": "ID do nó da matéria na árvore mestre."
+          },
+          "rotulo_materia": {
+            "type": "string",
+            "title": "Rotulo Materia",
+            "description": "Nome da matéria (ou \"Conhecimentos específicos — <cargo>\")."
+          },
+          "pct_da_prova": {
+            "type": "number",
+            "title": "Pct Da Prova",
+            "description": "Peso da matéria na prova do cargo (%)."
+          },
+          "respondidas": {
+            "type": "integer",
+            "title": "Respondidas",
+            "description": "Questões da matéria respondidas pelo usuário (todas as provas)."
+          },
+          "acertos": {
+            "type": "integer",
+            "title": "Acertos",
+            "description": "Questões da matéria com a última resposta certa."
+          },
+          "acerto": {
+            "type": "number",
+            "title": "Acerto",
+            "description": "Acerto do usuário na matéria (0 a 1). Sem respostas, 0."
+          },
+          "prioridade": {
+            "type": "number",
+            "title": "Prioridade",
+            "description": "`pct_da_prova` × (1 − `acerto`). Maior primeiro."
+          }
+        },
+        "type": "object",
+        "required": [
+          "materia_id",
+          "rotulo_materia",
+          "pct_da_prova",
+          "respondidas",
+          "acertos",
+          "acerto",
+          "prioridade"
+        ],
+        "title": "ItemPlano",
+        "description": "Matéria do plano, com a prioridade de estudo."
       },
       "ItemSimulado": {
         "properties": {
           "questao_chave": {
             "type": "string",
-            "title": "Questao Chave"
+            "title": "Questao Chave",
+            "description": "Chave estável `concurso|caderno|numero` da questão (mesma da 5D)."
           },
           "numero": {
             "type": "integer",
-            "title": "Numero"
+            "title": "Numero",
+            "description": "Número do item no caderno."
           },
           "codigo_caderno": {
             "type": "string",
-            "title": "Codigo Caderno"
+            "title": "Codigo Caderno",
+            "description": "Código do caderno de prova (ex.: `094_PF_CB1_01`)."
           },
           "tipo_conhecimento": {
             "type": "string",
-            "title": "Tipo Conhecimento"
+            "title": "Tipo Conhecimento",
+            "description": "Tipo de conhecimento: `basico` ou `especifico`."
           },
           "enunciado": {
             "type": "string",
-            "title": "Enunciado"
+            "title": "Enunciado",
+            "description": "Texto do item a julgar."
           },
           "texto_base_texto": {
             "anyOf": [
@@ -1722,7 +2907,8 @@
                 "type": "null"
               }
             ],
-            "title": "Texto Base Texto"
+            "title": "Texto Base Texto",
+            "description": "Texto-base compartilhado, quando houver."
           },
           "figuras": {
             "items": {
@@ -1731,6 +2917,7 @@
             },
             "type": "array",
             "title": "Figuras",
+            "description": "Figuras recortadas do PDF, com caminho e URL para exibir.",
             "default": []
           }
         },
@@ -1743,21 +2930,35 @@
           "enunciado"
         ],
         "title": "ItemSimulado",
-        "description": "Item da prova no simulado, sem gabarito (só aparece na correção)."
+        "description": "Item da prova no simulado, sem gabarito (só aparece na correção).",
+        "examples": [
+          {
+            "codigo_caderno": "094_PF_CB1_01",
+            "enunciado": "Dada a relação de contraste estabelecida entre as duas primeiras orações do último período do texto, seria coerente e gramaticalmente correto inserir, entre vírgulas, a expressão não obstante logo após “pobres”.",
+            "figuras": [],
+            "numero": 1,
+            "questao_chave": "PF_25_ADM|094_PF_CB1_01|1",
+            "texto_base_texto": "“A liberdade medieval”, disse o historiador…",
+            "tipo_conhecimento": "basico"
+          }
+        ]
       },
       "LinhaEditalCobra": {
         "properties": {
           "no_id": {
             "type": "string",
-            "title": "No Id"
+            "title": "No Id",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
           },
           "no_nome": {
             "type": "string",
-            "title": "No Nome"
+            "title": "No Nome",
+            "description": "Nome do nó na árvore mestre."
           },
           "caminho": {
             "type": "string",
-            "title": "Caminho"
+            "title": "Caminho",
+            "description": "Caminho do nó na árvore, separado por ` > `."
           },
           "materia_id": {
             "anyOf": [
@@ -1768,11 +2969,13 @@
                 "type": "null"
               }
             ],
-            "title": "Materia Id"
+            "title": "Materia Id",
+            "description": "Id do nó de matéria ao qual o nó pertence."
           },
           "ocorrencias": {
             "type": "integer",
-            "title": "Ocorrencias"
+            "title": "Ocorrencias",
+            "description": "Itens de edital distintos no nó (básico conta por cargo)."
           }
         },
         "type": "object",
@@ -1790,19 +2993,23 @@
         "properties": {
           "no_id": {
             "type": "string",
-            "title": "No Id"
+            "title": "No Id",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
           },
           "no_nome": {
             "type": "string",
-            "title": "No Nome"
+            "title": "No Nome",
+            "description": "Nome do nó na árvore mestre."
           },
           "no_nivel": {
             "type": "string",
-            "title": "No Nivel"
+            "title": "No Nivel",
+            "description": "Nível do nó: `materia`, `assunto` ou `subassunto`."
           },
           "caminho": {
             "type": "string",
-            "title": "Caminho"
+            "title": "Caminho",
+            "description": "Caminho do nó na árvore, separado por ` > `."
           },
           "materia_id": {
             "anyOf": [
@@ -1813,7 +3020,8 @@
                 "type": "null"
               }
             ],
-            "title": "Materia Id"
+            "title": "Materia Id",
+            "description": "Id do nó de matéria ao qual o nó pertence."
           },
           "previsao": {
             "type": "integer",
@@ -1822,7 +3030,8 @@
           },
           "questoes": {
             "type": "integer",
-            "title": "Questoes"
+            "title": "Questoes",
+            "description": "Questões distintas da prova do cargo no nó."
           },
           "situacao": {
             "type": "string",
@@ -1831,7 +3040,8 @@
               "no_edital_nunca_cobrado",
               "cobrado_fora_do_edital"
             ],
-            "title": "Situacao"
+            "title": "Situacao",
+            "description": "Situação do nó no edital × prova."
           }
         },
         "type": "object",
@@ -1845,21 +3055,25 @@
           "questoes",
           "situacao"
         ],
-        "title": "LinhaEditalVsProva"
+        "title": "LinhaEditalVsProva",
+        "description": "Nó do edital ou da prova de um cargo, com a situação da cobrança."
       },
       "LinhaProvaCobra": {
         "properties": {
           "no_id": {
             "type": "string",
-            "title": "No Id"
+            "title": "No Id",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
           },
           "no_nome": {
             "type": "string",
-            "title": "No Nome"
+            "title": "No Nome",
+            "description": "Nome do nó na árvore mestre."
           },
           "caminho": {
             "type": "string",
-            "title": "Caminho"
+            "title": "Caminho",
+            "description": "Caminho do nó na árvore, separado por ` > `."
           },
           "materia_id": {
             "anyOf": [
@@ -1870,7 +3084,8 @@
                 "type": "null"
               }
             ],
-            "title": "Materia Id"
+            "title": "Materia Id",
+            "description": "Id do nó de matéria ao qual o nó pertence."
           },
           "questoes": {
             "type": "integer",
@@ -1879,7 +3094,8 @@
           },
           "anuladas": {
             "type": "integer",
-            "title": "Anuladas"
+            "title": "Anuladas",
+            "description": "Questões anuladas no nó."
           },
           "total_universo": {
             "type": "integer",
@@ -1888,7 +3104,8 @@
           },
           "pct_do_universo": {
             "type": "number",
-            "title": "Pct Do Universo"
+            "title": "Pct Do Universo",
+            "description": "`questoes` / `total_universo` × 100."
           },
           "pct_medio_por_concurso": {
             "type": "number",
@@ -1911,26 +3128,141 @@
         "title": "LinhaProvaCobra",
         "description": "Nó no ranking \"o que mais cai\" (`fn_prova_cobra`): questão distinta, subindo a árvore."
       },
+      "MateriaDetalhe": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "ID estável do nó de nível matéria."
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome",
+            "description": "Nome do nó na árvore mestre."
+          },
+          "total_questoes": {
+            "type": "integer",
+            "title": "Total Questoes",
+            "description": "Questões objetivas utilizáveis distintas (anuladas incluídas) classificadas na matéria ou abaixo dela (a contagem sobe a árvore)."
+          },
+          "pct_incidencia": {
+            "type": "number",
+            "title": "Pct Incidencia",
+            "description": "`total_questoes` sobre o total de questões utilizáveis distintas, em %. A soma entre matérias pode passar de 100 (questão em 2 nós)."
+          },
+          "nome_de_cargo": {
+            "type": "boolean",
+            "title": "Nome De Cargo",
+            "description": "A matéria é o próprio nome de um cargo (conhecimentos específicos sem matéria nomeada no edital)."
+          },
+          "questoes_recorte": {
+            "type": "integer",
+            "title": "Questoes Recorte",
+            "description": "Questões válidas distintas da matéria sob os filtros (`fn_prova_cobra`)."
+          },
+          "anuladas_recorte": {
+            "type": "integer",
+            "title": "Anuladas Recorte",
+            "description": "Anuladas da matéria sob os filtros."
+          },
+          "pct_do_universo": {
+            "type": "number",
+            "title": "Pct Do Universo",
+            "description": "Participação da matéria no universo de questões válidas sob os filtros, em %."
+          },
+          "itens_edital": {
+            "type": "integer",
+            "title": "Itens Edital",
+            "description": "Itens de edital distintos na matéria sob os filtros (concursos aprovados)."
+          },
+          "top_subassuntos": {
+            "items": {
+              "$ref": "#/components/schemas/LinhaProvaCobra"
+            },
+            "type": "array",
+            "title": "Top Subassuntos",
+            "description": "Subassuntos que mais caem na matéria sob os filtros, maior primeiro."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "total_questoes",
+          "pct_incidencia",
+          "nome_de_cargo",
+          "questoes_recorte",
+          "anuladas_recorte",
+          "pct_do_universo",
+          "itens_edital",
+          "top_subassuntos"
+        ],
+        "title": "MateriaDetalhe",
+        "description": "Resumo da matéria com o recorte dos filtros e os subassuntos que mais caem."
+      },
+      "MateriaResumo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "ID estável do nó de nível matéria."
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome",
+            "description": "Nome do nó na árvore mestre."
+          },
+          "total_questoes": {
+            "type": "integer",
+            "title": "Total Questoes",
+            "description": "Questões objetivas utilizáveis distintas (anuladas incluídas) classificadas na matéria ou abaixo dela (a contagem sobe a árvore)."
+          },
+          "pct_incidencia": {
+            "type": "number",
+            "title": "Pct Incidencia",
+            "description": "`total_questoes` sobre o total de questões utilizáveis distintas, em %. A soma entre matérias pode passar de 100 (questão em 2 nós)."
+          },
+          "nome_de_cargo": {
+            "type": "boolean",
+            "title": "Nome De Cargo",
+            "description": "A matéria é o próprio nome de um cargo (conhecimentos específicos sem matéria nomeada no edital)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "total_questoes",
+          "pct_incidencia",
+          "nome_de_cargo"
+        ],
+        "title": "MateriaResumo",
+        "description": "Matéria da árvore ativa com o volume de questões objetivas utilizáveis."
+      },
       "MateriaSimulado": {
         "properties": {
           "certas": {
             "type": "integer",
             "title": "Certas",
+            "description": "Itens certos.",
             "default": 0
           },
           "erradas": {
             "type": "integer",
             "title": "Erradas",
+            "description": "Itens errados.",
             "default": 0
           },
           "brancos": {
             "type": "integer",
             "title": "Brancos",
+            "description": "Itens em branco.",
             "default": 0
           },
           "anuladas": {
             "type": "integer",
             "title": "Anuladas",
+            "description": "Itens anulados (fora da nota).",
             "default": 0
           },
           "nota": {
@@ -1947,11 +3279,13 @@
           },
           "materia_id": {
             "type": "string",
-            "title": "Materia Id"
+            "title": "Materia Id",
+            "description": "Id do nó de matéria."
           },
           "nome": {
             "type": "string",
-            "title": "Nome"
+            "title": "Nome",
+            "description": "Nome da matéria para exibição."
           }
         },
         "type": "object",
@@ -1959,25 +3293,30 @@
           "materia_id",
           "nome"
         ],
-        "title": "MateriaSimulado"
+        "title": "MateriaSimulado",
+        "description": "Placar do simulado numa matéria (pelo nó principal de cada item)."
       },
       "NoArvore": {
         "properties": {
           "id": {
             "type": "string",
-            "title": "Id"
+            "title": "Id",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
           },
           "nome": {
             "type": "string",
-            "title": "Nome"
+            "title": "Nome",
+            "description": "Nome do nó na árvore mestre."
           },
           "nivel": {
             "type": "string",
-            "title": "Nivel"
+            "title": "Nivel",
+            "description": "Nível do nó: `materia`, `assunto` ou `subassunto`."
           },
           "total_questoes": {
             "type": "integer",
-            "title": "Total Questoes"
+            "title": "Total Questoes",
+            "description": "Questões distintas no nó e nos descendentes."
           },
           "filhos": {
             "items": {
@@ -1985,6 +3324,7 @@
             },
             "type": "array",
             "title": "Filhos",
+            "description": "Nós filhos.",
             "default": []
           }
         },
@@ -2002,23 +3342,28 @@
         "properties": {
           "id": {
             "type": "string",
-            "title": "Id"
+            "title": "Id",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
           },
           "nome": {
             "type": "string",
-            "title": "Nome"
+            "title": "Nome",
+            "description": "Nome do nó na árvore mestre."
           },
           "nivel": {
             "type": "string",
-            "title": "Nivel"
+            "title": "Nivel",
+            "description": "Nível do nó: `materia`, `assunto` ou `subassunto`."
           },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Questões respondidas no nó (resposta mais recente)."
           },
           "acertos": {
             "type": "integer",
-            "title": "Acertos"
+            "title": "Acertos",
+            "description": "Questões acertadas no nó."
           },
           "percentual": {
             "type": "number",
@@ -2031,6 +3376,7 @@
             },
             "type": "array",
             "title": "Filhos",
+            "description": "Nós filhos.",
             "default": []
           }
         },
@@ -2050,19 +3396,23 @@
         "properties": {
           "no_id": {
             "type": "string",
-            "title": "No Id"
+            "title": "No Id",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
           },
           "no_nome": {
             "type": "string",
-            "title": "No Nome"
+            "title": "No Nome",
+            "description": "Nome do nó na árvore mestre."
           },
           "no_nivel": {
             "type": "string",
-            "title": "No Nivel"
+            "title": "No Nivel",
+            "description": "Nível do nó: `materia`, `assunto` ou `subassunto`."
           },
           "no_caminho": {
             "type": "string",
-            "title": "No Caminho"
+            "title": "No Caminho",
+            "description": "Caminho do nó na árvore, separado por ` > `."
           },
           "materia_id": {
             "anyOf": [
@@ -2073,7 +3423,8 @@
                 "type": "null"
               }
             ],
-            "title": "Materia Id"
+            "title": "Materia Id",
+            "description": "Id do nó de matéria ao qual o nó pertence."
           },
           "assunto_id": {
             "anyOf": [
@@ -2084,7 +3435,8 @@
                 "type": "null"
               }
             ],
-            "title": "Assunto Id"
+            "title": "Assunto Id",
+            "description": "Id do nó de assunto (vazio quando o nó é matéria)."
           },
           "papel": {
             "anyOf": [
@@ -2107,7 +3459,8 @@
                 "type": "null"
               }
             ],
-            "title": "Confianca"
+            "title": "Confianca",
+            "description": "Confiança da classificação: `alta`, `media` ou `baixa`."
           },
           "fora_do_edital": {
             "anyOf": [
@@ -2130,7 +3483,8 @@
                 "type": "null"
               }
             ],
-            "title": "Rotulo Materia"
+            "title": "Rotulo Materia",
+            "description": "Nome da matéria para exibição (matéria com nome de cargo vira “Conhecimentos específicos — <cargo>”)."
           }
         },
         "type": "object",
@@ -2141,32 +3495,51 @@
           "no_caminho"
         ],
         "title": "NoInfo",
-        "description": "Nó da árvore mestre (matéria → assunto → subassunto) em que a questão foi classificada (Etapa 5D)."
+        "description": "Nó da árvore mestre (matéria → assunto → subassunto) em que a questão foi classificada (Etapa 5D).",
+        "examples": [
+          {
+            "assunto_id": "A-56b9b718fa",
+            "confianca": "alta",
+            "fora_do_edital": false,
+            "materia_id": "M-0f9a364d06",
+            "no_caminho": "LÍNGUA PORTUGUESA > Domínio dos mecanismos de coesão textual > Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+            "no_id": "SL-f514698ce9",
+            "no_nivel": "subassunto",
+            "no_nome": "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+            "papel": "principal",
+            "rotulo_materia": "LÍNGUA PORTUGUESA"
+          }
+        ]
       },
       "PaginaQuestoes": {
         "properties": {
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Total de questões que atendem aos filtros."
           },
           "pagina": {
             "type": "integer",
-            "title": "Pagina"
+            "title": "Pagina",
+            "description": "Página atual, a partir de 1."
           },
           "tamanho_pagina": {
             "type": "integer",
-            "title": "Tamanho Pagina"
+            "title": "Tamanho Pagina",
+            "description": "Itens por página."
           },
           "total_paginas": {
             "type": "integer",
-            "title": "Total Paginas"
+            "title": "Total Paginas",
+            "description": "Número de páginas."
           },
           "itens": {
             "items": {
               "$ref": "#/components/schemas/QuestaoResumo"
             },
             "type": "array",
-            "title": "Itens"
+            "title": "Itens",
+            "description": "Questões da página."
           }
         },
         "type": "object",
@@ -2184,27 +3557,33 @@
         "properties": {
           "materia_id": {
             "type": "string",
-            "title": "Materia Id"
+            "title": "Materia Id",
+            "description": "Id do nó de matéria."
           },
           "rotulo_materia": {
             "type": "string",
-            "title": "Rotulo Materia"
+            "title": "Rotulo Materia",
+            "description": "Nome da matéria para exibição."
           },
           "questoes": {
             "type": "integer",
-            "title": "Questoes"
+            "title": "Questoes",
+            "description": "Questões válidas da matéria na prova."
           },
           "anuladas": {
             "type": "integer",
-            "title": "Anuladas"
+            "title": "Anuladas",
+            "description": "Questões anuladas da matéria."
           },
           "total_cargo": {
             "type": "integer",
-            "title": "Total Cargo"
+            "title": "Total Cargo",
+            "description": "Questões válidas da prova do cargo."
           },
           "pct_da_prova": {
             "type": "number",
-            "title": "Pct Da Prova"
+            "title": "Pct Da Prova",
+            "description": "`questoes` / `total_cargo` × 100."
           }
         },
         "type": "object",
@@ -2216,28 +3595,33 @@
           "total_cargo",
           "pct_da_prova"
         ],
-        "title": "PesoMateria"
+        "title": "PesoMateria",
+        "description": "Peso de uma matéria na prova do cargo (`vw_peso_materia_cargo`)."
       },
       "PlacarSimulado": {
         "properties": {
           "certas": {
             "type": "integer",
             "title": "Certas",
+            "description": "Itens certos.",
             "default": 0
           },
           "erradas": {
             "type": "integer",
             "title": "Erradas",
+            "description": "Itens errados.",
             "default": 0
           },
           "brancos": {
             "type": "integer",
             "title": "Brancos",
+            "description": "Itens em branco.",
             "default": 0
           },
           "anuladas": {
             "type": "integer",
             "title": "Anuladas",
+            "description": "Itens anulados (fora da nota).",
             "default": 0
           },
           "nota": {
@@ -2257,23 +3641,114 @@
         "title": "PlacarSimulado",
         "description": "Correção CEBRASPE: certo +1, errado −1, branco 0; anulada não conta."
       },
+      "PlanoEstudo": {
+        "properties": {
+          "concurso": {
+            "type": "string",
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ItemPlano"
+            },
+            "type": "array",
+            "title": "Itens",
+            "description": "Matérias, da maior prioridade para a menor."
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero",
+          "itens"
+        ],
+        "title": "PlanoEstudo",
+        "description": "Matérias do cargo ordenadas pela prioridade de estudo."
+      },
+      "Prioridade": {
+        "properties": {
+          "no_id": {
+            "type": "string",
+            "title": "No Id",
+            "description": "ID do subassunto na árvore mestre."
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome",
+            "description": "Nome do subassunto."
+          },
+          "caminho": {
+            "type": "string",
+            "title": "Caminho",
+            "description": "Matéria › assunto › subassunto."
+          },
+          "respondidas": {
+            "type": "integer",
+            "title": "Respondidas",
+            "description": "Questões distintas respondidas no nó."
+          },
+          "acertos": {
+            "type": "integer",
+            "title": "Acertos",
+            "description": "Questões do subassunto com a última resposta certa."
+          },
+          "taxa_erro": {
+            "type": "number",
+            "title": "Taxa Erro",
+            "description": "(respondidas − acertos) / respondidas × 100, com 1 casa."
+          },
+          "incidencia": {
+            "type": "number",
+            "title": "Incidencia",
+            "description": "% médio por concurso das questões no subassunto (`fn_prova_cobra`, sem filtros); 0 se o nó não aparece no ranking."
+          },
+          "prioridade": {
+            "type": "number",
+            "title": "Prioridade",
+            "description": "incidência × taxa de erro / 100 (ordem decrescente)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "no_id",
+          "nome",
+          "caminho",
+          "respondidas",
+          "acertos",
+          "taxa_erro",
+          "incidencia",
+          "prioridade"
+        ],
+        "title": "Prioridade",
+        "description": "Subassunto sugerido para estudo: cai muito na prova e o usuário erra."
+      },
       "ProvaSimulado": {
         "properties": {
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           },
           "cargo": {
             "type": "string",
-            "title": "Cargo"
+            "title": "Cargo",
+            "description": "Nome do cargo."
           },
           "nivel": {
             "type": "string",
-            "title": "Nivel"
+            "title": "Nivel",
+            "description": "Nível do cargo: `superior` ou `medio`."
           },
           "itens_omitidos": {
             "type": "integer",
@@ -2286,14 +3761,16 @@
               "$ref": "#/components/schemas/ItemSimulado"
             },
             "type": "array",
-            "title": "Itens"
+            "title": "Itens",
+            "description": "Itens objetivos, sem gabarito."
           },
           "discursivas": {
             "items": {
               "$ref": "#/components/schemas/DiscursivaSimulado"
             },
             "type": "array",
-            "title": "Discursivas"
+            "title": "Discursivas",
+            "description": "Discursivas do cargo, sem padrão de resposta."
           }
         },
         "type": "object",
@@ -2312,39 +3789,46 @@
         "properties": {
           "questao_id": {
             "type": "integer",
-            "title": "Questao Id"
+            "title": "Questao Id",
+            "description": "Id interno (muda a cada recarga). Para referência, use `questao_chave`."
           },
           "questao_chave": {
             "type": "string",
             "title": "Questao Chave",
             "description": "Chave estável `concurso|caderno|numero` (mesma da 5D). Use no detalhe e para guardar respostas.",
             "examples": [
-              "PF_25_ADM|094_PF_CB1_01|13"
+              "PF_25_ADM|094_PF_CB1_01|1"
             ]
           },
           "numero": {
             "type": "integer",
-            "title": "Numero"
+            "title": "Numero",
+            "description": "Número do item no caderno."
           },
           "codigo_caderno": {
             "type": "string",
-            "title": "Codigo Caderno"
+            "title": "Codigo Caderno",
+            "description": "Código do caderno de prova (ex.: `094_PF_CB1_01`)."
           },
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "orgao": {
             "type": "string",
-            "title": "Orgao"
+            "title": "Orgao",
+            "description": "Órgão do concurso (ex.: `PF`)."
           },
           "banca": {
             "type": "string",
-            "title": "Banca"
+            "title": "Banca",
+            "description": "Banca organizadora (`CEBRASPE`)."
           },
           "ano": {
             "type": "integer",
-            "title": "Ano"
+            "title": "Ano",
+            "description": "Ano do concurso."
           },
           "gabarito": {
             "type": "string",
@@ -2353,7 +3837,8 @@
           },
           "anulada": {
             "type": "boolean",
-            "title": "Anulada"
+            "title": "Anulada",
+            "description": "`true` quando a banca anulou o item."
           },
           "utilizavel": {
             "type": "boolean",
@@ -2362,7 +3847,8 @@
           },
           "enunciado": {
             "type": "string",
-            "title": "Enunciado"
+            "title": "Enunciado",
+            "description": "Texto do item a julgar."
           },
           "secao": {
             "anyOf": [
@@ -2373,29 +3859,45 @@
                 "type": "null"
               }
             ],
-            "title": "Secao"
+            "title": "Secao",
+            "description": "Comando da seção do caderno que agrupa o item (“julgue os itens…”)."
           },
           "tem_texto_base": {
             "type": "boolean",
-            "title": "Tem Texto Base"
+            "title": "Tem Texto Base",
+            "description": "`true` quando há texto-base (buscar no detalhe ou em `/q/.../anexos`)."
           },
           "tem_figuras": {
             "type": "boolean",
-            "title": "Tem Figuras"
+            "title": "Tem Figuras",
+            "description": "`true` quando o item tem figuras."
           },
           "cargos": {
             "items": {
               "$ref": "#/components/schemas/CargoInfo"
             },
             "type": "array",
-            "title": "Cargos"
+            "title": "Cargos",
+            "description": "Cargos para os quais o caderno foi aplicado."
           },
           "nos": {
             "items": {
               "$ref": "#/components/schemas/NoInfo"
             },
             "type": "array",
-            "title": "Nos"
+            "title": "Nos",
+            "description": "Nós da árvore em que a questão foi classificada (principal e secundário)."
+          },
+          "incidencia": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Incidencia"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Posição do subassunto principal no ranking da matéria. `null` quando o nó principal não é subassunto ou a questão não foi classificada."
           },
           "texto_base_texto": {
             "anyOf": [
@@ -2406,7 +3908,8 @@
                 "type": "null"
               }
             ],
-            "title": "Texto Base Texto"
+            "title": "Texto Base Texto",
+            "description": "Texto-base compartilhado pelos itens, quando houver."
           },
           "figuras": {
             "items": {
@@ -2414,7 +3917,8 @@
               "type": "object"
             },
             "type": "array",
-            "title": "Figuras"
+            "title": "Figuras",
+            "description": "Figuras recortadas do PDF, com caminho e URL para exibir."
           },
           "link_pdf": {
             "anyOf": [
@@ -2452,45 +3956,95 @@
           "figuras"
         ],
         "title": "QuestaoDetalhe",
-        "description": "Questão completa: texto-base, figuras e link para o PDF original do CEBRASPE."
+        "description": "Questão completa: texto-base, figuras e link para o PDF original do CEBRASPE.",
+        "examples": [
+          {
+            "ano": 2025,
+            "anulada": false,
+            "banca": "CEBRASPE",
+            "cargos": [
+              {
+                "cargo": "ADMINISTRADOR",
+                "cargo_edital_id": 1,
+                "cargo_numero": 1,
+                "nivel": "superior"
+              }
+            ],
+            "codigo_caderno": "094_PF_CB1_01",
+            "concurso": "PF_25_ADM",
+            "enunciado": "Dada a relação de contraste estabelecida entre as duas primeiras orações do último período do texto, seria coerente e gramaticalmente correto inserir, entre vírgulas, a expressão não obstante logo após “pobres”.",
+            "figuras": [],
+            "gabarito": "C",
+            "nos": [
+              {
+                "assunto_id": "A-56b9b718fa",
+                "confianca": "alta",
+                "fora_do_edital": false,
+                "materia_id": "M-0f9a364d06",
+                "no_caminho": "LÍNGUA PORTUGUESA > Domínio dos mecanismos de coesão textual > Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+                "no_id": "SL-f514698ce9",
+                "no_nivel": "subassunto",
+                "no_nome": "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+                "papel": "principal",
+                "rotulo_materia": "LÍNGUA PORTUGUESA"
+              }
+            ],
+            "numero": 1,
+            "orgao": "PF",
+            "questao_chave": "PF_25_ADM|094_PF_CB1_01|1",
+            "questao_id": 63231,
+            "secao": "Acerca das ideias e de aspectos linguísticos do texto precedente, julgue os itens a seguir.",
+            "tem_figuras": false,
+            "tem_texto_base": true,
+            "texto_base_texto": "“A liberdade medieval”, disse o historiador…",
+            "utilizavel": true
+          }
+        ]
       },
       "QuestaoResumo": {
         "properties": {
           "questao_id": {
             "type": "integer",
-            "title": "Questao Id"
+            "title": "Questao Id",
+            "description": "Id interno (muda a cada recarga). Para referência, use `questao_chave`."
           },
           "questao_chave": {
             "type": "string",
             "title": "Questao Chave",
             "description": "Chave estável `concurso|caderno|numero` (mesma da 5D). Use no detalhe e para guardar respostas.",
             "examples": [
-              "PF_25_ADM|094_PF_CB1_01|13"
+              "PF_25_ADM|094_PF_CB1_01|1"
             ]
           },
           "numero": {
             "type": "integer",
-            "title": "Numero"
+            "title": "Numero",
+            "description": "Número do item no caderno."
           },
           "codigo_caderno": {
             "type": "string",
-            "title": "Codigo Caderno"
+            "title": "Codigo Caderno",
+            "description": "Código do caderno de prova (ex.: `094_PF_CB1_01`)."
           },
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "orgao": {
             "type": "string",
-            "title": "Orgao"
+            "title": "Orgao",
+            "description": "Órgão do concurso (ex.: `PF`)."
           },
           "banca": {
             "type": "string",
-            "title": "Banca"
+            "title": "Banca",
+            "description": "Banca organizadora (`CEBRASPE`)."
           },
           "ano": {
             "type": "integer",
-            "title": "Ano"
+            "title": "Ano",
+            "description": "Ano do concurso."
           },
           "gabarito": {
             "type": "string",
@@ -2499,7 +4053,8 @@
           },
           "anulada": {
             "type": "boolean",
-            "title": "Anulada"
+            "title": "Anulada",
+            "description": "`true` quando a banca anulou o item."
           },
           "utilizavel": {
             "type": "boolean",
@@ -2508,7 +4063,8 @@
           },
           "enunciado": {
             "type": "string",
-            "title": "Enunciado"
+            "title": "Enunciado",
+            "description": "Texto do item a julgar."
           },
           "secao": {
             "anyOf": [
@@ -2519,29 +4075,45 @@
                 "type": "null"
               }
             ],
-            "title": "Secao"
+            "title": "Secao",
+            "description": "Comando da seção do caderno que agrupa o item (“julgue os itens…”)."
           },
           "tem_texto_base": {
             "type": "boolean",
-            "title": "Tem Texto Base"
+            "title": "Tem Texto Base",
+            "description": "`true` quando há texto-base (buscar no detalhe ou em `/q/.../anexos`)."
           },
           "tem_figuras": {
             "type": "boolean",
-            "title": "Tem Figuras"
+            "title": "Tem Figuras",
+            "description": "`true` quando o item tem figuras."
           },
           "cargos": {
             "items": {
               "$ref": "#/components/schemas/CargoInfo"
             },
             "type": "array",
-            "title": "Cargos"
+            "title": "Cargos",
+            "description": "Cargos para os quais o caderno foi aplicado."
           },
           "nos": {
             "items": {
               "$ref": "#/components/schemas/NoInfo"
             },
             "type": "array",
-            "title": "Nos"
+            "title": "Nos",
+            "description": "Nós da árvore em que a questão foi classificada (principal e secundário)."
+          },
+          "incidencia": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Incidencia"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Posição do subassunto principal no ranking da matéria. `null` quando o nó principal não é subassunto ou a questão não foi classificada."
           }
         },
         "type": "object",
@@ -2565,15 +4137,57 @@
           "nos"
         ],
         "title": "QuestaoResumo",
-        "description": "Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados."
+        "description": "Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados.",
+        "examples": [
+          {
+            "ano": 2025,
+            "anulada": false,
+            "banca": "CEBRASPE",
+            "cargos": [
+              {
+                "cargo": "ADMINISTRADOR",
+                "cargo_edital_id": 1,
+                "cargo_numero": 1,
+                "nivel": "superior"
+              }
+            ],
+            "codigo_caderno": "094_PF_CB1_01",
+            "concurso": "PF_25_ADM",
+            "enunciado": "Dada a relação de contraste estabelecida entre as duas primeiras orações do último período do texto, seria coerente e gramaticalmente correto inserir, entre vírgulas, a expressão não obstante logo após “pobres”.",
+            "gabarito": "C",
+            "nos": [
+              {
+                "assunto_id": "A-56b9b718fa",
+                "confianca": "alta",
+                "fora_do_edital": false,
+                "materia_id": "M-0f9a364d06",
+                "no_caminho": "LÍNGUA PORTUGUESA > Domínio dos mecanismos de coesão textual > Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+                "no_id": "SL-f514698ce9",
+                "no_nivel": "subassunto",
+                "no_nome": "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+                "papel": "principal",
+                "rotulo_materia": "LÍNGUA PORTUGUESA"
+              }
+            ],
+            "numero": 1,
+            "orgao": "PF",
+            "questao_chave": "PF_25_ADM|094_PF_CB1_01|1",
+            "questao_id": 63231,
+            "secao": "Acerca das ideias e de aspectos linguísticos do texto precedente, julgue os itens a seguir.",
+            "tem_figuras": false,
+            "tem_texto_base": true,
+            "utilizavel": true
+          }
+        ]
       },
       "RespostaEntrada": {
         "properties": {
           "questao_chave": {
             "type": "string",
             "title": "Questao Chave",
+            "description": "Chave estável `concurso|caderno|numero` da questão (mesma da 5D).",
             "examples": [
-              "PF_25_ADM|094_PF_CB1_01|13"
+              "PF_25_ADM|094_PF_CB1_01|1"
             ]
           },
           "resposta": {
@@ -2582,7 +4196,8 @@
               "C",
               "E"
             ],
-            "title": "Resposta"
+            "title": "Resposta",
+            "description": "`C` (certo) ou `E` (errado)."
           }
         },
         "type": "object",
@@ -2590,13 +4205,21 @@
           "questao_chave",
           "resposta"
         ],
-        "title": "RespostaEntrada"
+        "title": "RespostaEntrada",
+        "description": "Resposta a uma questão para corrigir (e gravar, com login).",
+        "examples": [
+          {
+            "questao_chave": "PF_25_ADM|094_PF_CB1_01|1",
+            "resposta": "C"
+          }
+        ]
       },
       "RespostaResultado": {
         "properties": {
           "questao_chave": {
             "type": "string",
-            "title": "Questao Chave"
+            "title": "Questao Chave",
+            "description": "Chave estável `concurso|caderno|numero` da questão (mesma da 5D)."
           },
           "resposta": {
             "type": "string",
@@ -2604,23 +4227,28 @@
               "C",
               "E"
             ],
-            "title": "Resposta"
+            "title": "Resposta",
+            "description": "Resposta enviada."
           },
           "gabarito": {
             "type": "string",
-            "title": "Gabarito"
+            "title": "Gabarito",
+            "description": "Gabarito definitivo (`C`, `E` ou `X`)."
           },
           "anulada": {
             "type": "boolean",
-            "title": "Anulada"
+            "title": "Anulada",
+            "description": "`true` quando a questão foi anulada."
           },
           "acertou": {
             "type": "boolean",
-            "title": "Acertou"
+            "title": "Acertou",
+            "description": "`true` quando a resposta bate com o gabarito."
           },
           "gravada": {
             "type": "boolean",
-            "title": "Gravada"
+            "title": "Gravada",
+            "description": "`true` quando entrou no histórico do usuário."
           }
         },
         "type": "object",
@@ -2633,7 +4261,17 @@
           "gravada"
         ],
         "title": "RespostaResultado",
-        "description": "Correção de uma resposta. `gravada` é `false` sem login ou em questão anulada."
+        "description": "Correção de uma resposta. `gravada` é `false` sem login ou em questão anulada.",
+        "examples": [
+          {
+            "acertou": true,
+            "anulada": false,
+            "gabarito": "C",
+            "gravada": true,
+            "questao_chave": "PF_25_ADM|094_PF_CB1_01|1",
+            "resposta": "C"
+          }
+        ]
       },
       "RespostasSimulado": {
         "properties": {
@@ -2651,7 +4289,61 @@
           }
         },
         "type": "object",
-        "title": "RespostasSimulado"
+        "title": "RespostasSimulado",
+        "description": "Marcações do simulado.",
+        "examples": [
+          {
+            "respostas": {
+              "PF_25_ADM|094_PF_CB1_01|1": "C"
+            }
+          }
+        ]
+      },
+      "ResultadoBusca": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "ID estável do nó."
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome",
+            "description": "Nome do nó."
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel",
+            "description": "`materia`, `assunto` ou `subassunto`."
+          },
+          "caminho": {
+            "type": "string",
+            "title": "Caminho",
+            "description": "Caminho matéria → assunto → subassunto."
+          },
+          "materia_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materia Id",
+            "description": "ID da matéria do nó."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "nivel",
+          "caminho",
+          "materia_id"
+        ],
+        "title": "ResultadoBusca",
+        "description": "Nó da árvore ativa cujo nome casa com a busca (sem acento e sem caixa)."
       },
       "ResultadoSimulado": {
         "properties": {
@@ -2669,15 +4361,18 @@
           },
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           },
           "cargo": {
             "type": "string",
-            "title": "Cargo"
+            "title": "Cargo",
+            "description": "Nome do cargo."
           },
           "itens_omitidos": {
             "type": "integer",
@@ -2686,28 +4381,56 @@
             "default": 0
           },
           "placar": {
-            "$ref": "#/components/schemas/PlacarSimulado"
+            "$ref": "#/components/schemas/PlacarSimulado",
+            "description": "Placar geral."
           },
           "por_materia": {
             "items": {
               "$ref": "#/components/schemas/MateriaSimulado"
             },
             "type": "array",
-            "title": "Por Materia"
+            "title": "Por Materia",
+            "description": "Placar por matéria."
           },
           "itens": {
             "items": {
               "$ref": "#/components/schemas/ItemCorrigido"
             },
             "type": "array",
-            "title": "Itens"
+            "title": "Itens",
+            "description": "Correção item a item."
           },
           "discursivas": {
             "items": {
               "$ref": "#/components/schemas/DiscursivaSimulado"
             },
             "type": "array",
-            "title": "Discursivas"
+            "title": "Discursivas",
+            "description": "Discursivas com o padrão de resposta."
+          },
+          "duracao_segundos": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duracao Segundos",
+            "description": "Tempo entre o início e o encerramento do simulado gravado, em segundos. Null sem login."
+          },
+          "nota_anterior": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nota Anterior",
+            "description": "Nota do simulado encerrado anterior do mesmo usuário, no mesmo concurso e cargo. Null se não houver ou sem login."
           }
         },
         "type": "object",
@@ -2720,7 +4443,85 @@
           "itens",
           "discursivas"
         ],
-        "title": "ResultadoSimulado"
+        "title": "ResultadoSimulado",
+        "description": "Resultado de um simulado: placar geral, por matéria e por item."
+      },
+      "ResumoConta": {
+        "properties": {
+          "resolvidas": {
+            "type": "integer",
+            "title": "Resolvidas",
+            "description": "Questões distintas respondidas."
+          },
+          "certas": {
+            "type": "integer",
+            "title": "Certas",
+            "description": "Questões cuja última resposta acertou."
+          },
+          "erradas": {
+            "type": "integer",
+            "title": "Erradas",
+            "description": "Questões cuja última resposta errou."
+          },
+          "percentual": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentual",
+            "description": "Certas / resolvidas × 100, com 1 casa; `null` sem respostas."
+          },
+          "nota_liquida": {
+            "type": "integer",
+            "title": "Nota Liquida",
+            "description": "Regra CEBRASPE: certas − erradas (cada errada anula uma certa)."
+          },
+          "erradas_pendentes": {
+            "type": "integer",
+            "title": "Erradas Pendentes",
+            "description": "Erradas ainda não refeitas com acerto (caderno de erros)."
+          },
+          "dias_seguidos": {
+            "type": "integer",
+            "title": "Dias Seguidos",
+            "description": "Dias consecutivos com ao menos uma resposta (avulsa ou de simulado), no fuso America/Sao_Paulo, terminando hoje ou ontem."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolvidas",
+          "certas",
+          "erradas",
+          "percentual",
+          "nota_liquida",
+          "erradas_pendentes",
+          "dias_seguidos"
+        ],
+        "title": "ResumoConta",
+        "description": "KPIs da conta pela resposta mais recente de cada questão (fora de simulado)."
+      },
+      "Saude": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "erro"
+            ],
+            "title": "Status",
+            "description": "`ok` quando o banco de leitura responde; `erro` caso contrário."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "Saude",
+        "description": "Estado do serviço."
       },
       "SimuladoEntrada": {
         "properties": {
@@ -2738,11 +4539,13 @@
           },
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           }
         },
         "type": "object",
@@ -2750,17 +4553,29 @@
           "concurso",
           "cargo_numero"
         ],
-        "title": "SimuladoEntrada"
+        "title": "SimuladoEntrada",
+        "description": "Cargo e marcações para corrigir um simulado sem gravar.",
+        "examples": [
+          {
+            "cargo_numero": 1,
+            "concurso": "PF_25_ADM",
+            "respostas": {
+              "PF_25_ADM|094_PF_CB1_01|1": "C"
+            }
+          }
+        ]
       },
       "SimuladoInicio": {
         "properties": {
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "cargo_numero": {
             "type": "integer",
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           }
         },
         "type": "object",
@@ -2768,17 +4583,26 @@
           "concurso",
           "cargo_numero"
         ],
-        "title": "SimuladoInicio"
+        "title": "SimuladoInicio",
+        "description": "Cargo do simulado a iniciar.",
+        "examples": [
+          {
+            "cargo_numero": 1,
+            "concurso": "PF_25_ADM"
+          }
+        ]
       },
       "SimuladoResumo": {
         "properties": {
           "id": {
             "type": "integer",
-            "title": "Id"
+            "title": "Id",
+            "description": "Id do simulado."
           },
           "concurso": {
             "type": "string",
-            "title": "Concurso"
+            "title": "Concurso",
+            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
           },
           "cargo_numero": {
             "anyOf": [
@@ -2789,13 +4613,16 @@
                 "type": "null"
               }
             ],
-            "title": "Cargo Numero"
+            "title": "Cargo Numero",
+            "description": "Número do cargo no edital do concurso."
           },
           "inicio": {
-            "title": "Inicio"
+            "title": "Inicio",
+            "description": "Data e hora do início (ISO 8601)."
           },
           "fim": {
-            "title": "Fim"
+            "title": "Fim",
+            "description": "Data e hora do encerramento (vazio se aberto)."
           },
           "nota": {
             "anyOf": [
@@ -2806,7 +4633,8 @@
                 "type": "null"
               }
             ],
-            "title": "Nota"
+            "title": "Nota",
+            "description": "Nota líquida (vazio se aberto)."
           }
         },
         "type": "object",
@@ -2818,17 +4646,20 @@
           "fim",
           "nota"
         ],
-        "title": "SimuladoResumo"
+        "title": "SimuladoResumo",
+        "description": "Simulado gravado do usuário."
       },
       "Usuario": {
         "properties": {
           "id": {
             "type": "integer",
-            "title": "Id"
+            "title": "Id",
+            "description": "Id interno do usuário."
           },
           "email": {
             "type": "string",
-            "title": "Email"
+            "title": "Email",
+            "description": "E-mail da conta Google."
           },
           "nome": {
             "anyOf": [
@@ -2839,7 +4670,32 @@
                 "type": "null"
               }
             ],
-            "title": "Nome"
+            "title": "Nome",
+            "description": "Nome da conta Google."
+          },
+          "concurso_alvo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concurso Alvo",
+            "description": "Slug do concurso-alvo salvo (5F.8), ou nulo."
+          },
+          "cargo_alvo": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargo Alvo",
+            "description": "Número do cargo-alvo no concurso salvo, ou nulo."
           }
         },
         "type": "object",
@@ -2890,6 +4746,58 @@
         ],
         "title": "ValidationError"
       }
+    },
+    "securitySchemes": {
+      "csrf": {
+        "type": "apiKey",
+        "description": "Token CSRF da sessão, exigido em todo POST/DELETE. Está no atributo `hx-headers` do `<body>` de qualquer página do site.",
+        "in": "header",
+        "name": "X-CSRFToken"
+      },
+      "sessao": {
+        "type": "apiKey",
+        "description": "Cookie de sessão assinado, criado no login com Google (`GET /entrar`). No Swagger, entre pelo site no mesmo navegador: o cookie vai sozinho.",
+        "in": "cookie",
+        "name": "sessao"
+      }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Questões",
+      "description": "Listagem filtrável e detalhe das questões objetivas (certo/errado)."
+    },
+    {
+      "name": "Árvore",
+      "description": "Árvore mestre matéria → assunto → subassunto com contagem de questões."
+    },
+    {
+      "name": "Facetas",
+      "description": "Valores possíveis dos filtros, com o total de questões de cada um."
+    },
+    {
+      "name": "Matérias",
+      "description": "Matérias da árvore com resumo e os subassuntos que mais caem."
+    },
+    {
+      "name": "Conta",
+      "description": "Resposta a questões, dados da conta e desempenho pessoal (com login)."
+    },
+    {
+      "name": "Estatísticas",
+      "description": "O que mais cai na prova, o que o edital cobra e edital × prova."
+    },
+    {
+      "name": "Simulado",
+      "description": "Prova de um cargo sem gabarito e correção no padrão CEBRASPE (certo +1, errado −1)."
+    },
+    {
+      "name": "Autenticação",
+      "description": "Login com Google e logout. Respondem com redirecionamento (303)."
+    },
+    {
+      "name": "Infra",
+      "description": "Checagem de saúde do serviço."
+    }
+  ]
 }
