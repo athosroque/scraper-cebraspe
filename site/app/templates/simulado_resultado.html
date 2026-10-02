@@ -1,22 +1,14 @@
 {% extends "base.html" %}
+{% import "_componentes.html" as c %}
 
 {% block title %}Resultado do simulado - Questões CEBRASPE{% endblock %}
+{% block estilos_legados %}{% endblock %}
 
-{% set rotulos = {"certo": "✅ Certo", "errado": "❌ Errado", "branco": "Em branco", "anulada": "Anulada"} %}
-
-{% macro linha_placar(p) %}
-<td style="text-align: right;">{{ p.certas }}</td>
-<td style="text-align: right;">{{ p.erradas }}</td>
-<td style="text-align: right;">{{ p.brancos }}</td>
-<td style="text-align: right;">{{ p.anuladas }}</td>
-<td style="text-align: right;"><strong>{{ p.nota }}</strong> / {{ p.nota_maxima }}</td>
-{% endmacro %}
+{% set rotulos = {"certo": "Certo", "errado": "Errado", "branco": "Em branco", "anulada": "Anulada"} %}
+{% set cores = {"certo": "bg-emerald-50 text-emerald-800", "errado": "bg-rose-50 text-rose-800", "branco": "bg-slate-100 text-slate-600", "anulada": "bg-amber-50 text-amber-800"} %}
 
 {% block content %}
-<hgroup>
-    <h2>Resultado do simulado</h2>
-    <p>{{ resultado.concurso }} · cargo {{ resultado.cargo_numero }}: {{ resultado.cargo }}</p>
-</hgroup>
+{{ c.cabecalho("Resultado do simulado", resultado.concurso ~ " · cargo " ~ resultado.cargo_numero ~ ": " ~ resultado.cargo) }}
 
 {# Corrigido: o rascunho da prova no navegador não serve mais. #}
 <div hidden data-rascunho="simulado:{{ resultado.simulado_id if resultado.simulado_id else resultado.concurso ~ '|' ~ resultado.cargo_numero }}"
@@ -26,71 +18,77 @@ try { localStorage.removeItem(document.getElementById("rascunho-corrigido").data
 </script>
 
 {% if resultado.itens_omitidos %}
-<p><mark>{{ resultado.itens_omitidos }} itens desta prova ficaram de fora (fórmulas ilegíveis no PDF) e não entram na nota nem no máximo.</mark></p>
+<p class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{{ resultado.itens_omitidos }} itens desta prova ficaram de fora (fórmulas ilegíveis no PDF) e não entram na nota nem no máximo.</p>
 {% endif %}
 
-<article class="resumo-situacao">
-    <div class="grid">
-        <div>Nota<br><strong>{{ resultado.placar.nota }}</strong> <small class="secondary">de {{ resultado.placar.nota_maxima }}</small></div>
-        <div>Certas<br><strong class="text-success">{{ resultado.placar.certas }}</strong></div>
-        <div>Erradas<br><strong class="text-error">{{ resultado.placar.erradas }}</strong></div>
-        <div>Em branco<br><strong>{{ resultado.placar.brancos }}</strong></div>
-        <div>Anuladas<br><strong>{{ resultado.placar.anuladas }}</strong></div>
-    </div>
-    <footer><small>Certo +1, errado −1, em branco 0. Item anulado fica fora da nota e do máximo.{% if not resultado.simulado_id %} Sem login, este resultado não fica guardado.{% endif %}</small></footer>
-</article>
+{% set p = resultado.placar %}
+<div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+    <div class="col-span-2 sm:col-span-1">{{ c.kpi("Nota CEBRASPE", p.nota, "de " ~ p.nota_maxima ~ " · " ~ p.certas ~ " − " ~ p.erradas) }}</div>
+    {# TODO 5F.8: nota_anterior e duracao_segundos ainda não existem no resultado. #}
+    {{ c.kpi("Certas", p.certas) }}
+    {{ c.kpi("Erradas", p.erradas) }}
+    {{ c.kpi("Em branco", p.brancos) }}
+    {{ c.kpi("Anuladas", p.anuladas) }}
+</div>
+<p class="mt-2 text-xs text-slate-600">Certo +1, errado −1, em branco 0. Item anulado fica fora da nota e do máximo.{% if not resultado.simulado_id %} Sem login, este resultado não fica guardado.{% endif %}</p>
 
-<section>
-    <h3>Por matéria</h3>
-    <div class="overflow-auto">
-    <table>
-        <thead><tr><th>Matéria</th><th style="text-align: right;">Certas</th><th style="text-align: right;">Erradas</th><th style="text-align: right;">Branco</th><th style="text-align: right;">Anuladas</th><th style="text-align: right;">Nota</th></tr></thead>
-        <tbody>
+<div class="mt-8 grid gap-6 lg:grid-cols-2">
+    <section>
+        <h2 class="mb-3 text-lg font-semibold text-slate-900">Por matéria</h2>
+        {% call c.card() %}
         {% for m in resultado.por_materia %}
-        <tr><td>{{ m.nome }}</td>{{ linha_placar(m) }}</tr>
+        {{ c.barra_ranking(m.nome, (100 * m.certas / m.nota_maxima) if m.nota_maxima else 0, m.nota ~ " / " ~ m.nota_maxima ~ " (" ~ m.certas ~ "C " ~ m.erradas ~ "E " ~ m.brancos ~ "B)") }}
         {% endfor %}
-        </tbody>
-    </table>
-    </div>
-</section>
+        <p class="mt-2 text-xs text-slate-500">Barra: acertos sobre o máximo da matéria. Valor: nota (certas − erradas) / máximo.</p>
+        {% endcall %}
+    </section>
 
-<section>
-    <h3>Itens</h3>
-    <div class="overflow-auto">
-    <table>
-        <thead><tr><th>Caderno</th><th>Item</th><th>Sua resposta</th><th>Gabarito</th><th>Situação</th></tr></thead>
-        <tbody>
-        {% for i in resultado.itens %}
-        <tr>
-            <td>{{ i.codigo_caderno }}</td>
-            <td><a href="{{ url_questao(i.questao_chave) }}">{{ i.numero }}</a></td>
-            <td>{{ i.resposta or "—" }}</td>
-            <td>{{ i.gabarito }}</td>
-            <td class="{{ 'text-success' if i.situacao == 'certo' else 'text-error' if i.situacao == 'errado' else '' }}">{{ rotulos[i.situacao] }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    </div>
-</section>
+    <section>
+        <div class="mb-3 flex items-center justify-between gap-3">
+            <h2 class="text-lg font-semibold text-slate-900">Itens</h2>
+            {# TODO 5F.8: "Revisar as que errei" depende de /api/v1/simulados/{id}/questoes. #}
+            <span class="btn-secundario cursor-not-allowed opacity-50" aria-disabled="true" title="Em breve">Revisar as que errei</span>
+        </div>
+        <div class="max-h-[32rem] overflow-auto rounded-xl border border-slate-200 bg-white">
+        <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr><th class="px-3 py-2">Caderno</th><th class="px-3 py-2">Item</th><th class="px-3 py-2">Sua</th><th class="px-3 py-2">Gabarito</th><th class="px-3 py-2">Situação</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            {% for i in resultado.itens %}
+            <tr>
+                <td class="px-3 py-1.5 text-slate-600">{{ i.codigo_caderno }}</td>
+                <td class="px-3 py-1.5 tabular-nums"><a href="{{ url_questao(i.questao_chave) }}" class="link">{{ i.numero }}</a></td>
+                <td class="px-3 py-1.5">{{ i.resposta or "—" }}</td>
+                <td class="px-3 py-1.5">{{ i.gabarito }}</td>
+                <td class="px-3 py-1.5"><span class="rounded px-2 py-0.5 text-xs font-medium {{ cores.get(i.situacao, '') }}">{{ rotulos[i.situacao] }}</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </section>
+</div>
 
 {% for d in resultado.discursivas %}
-<section>
-    <h3>Discursiva{% if d.numero %} {{ d.numero }}{% endif %}{% if d.titulo %}: {{ d.titulo }}{% endif %}</h3>
-    <p><small class="secondary">Sem nota automática: compare seu texto com o padrão de resposta da banca.</small></p>
+<section class="mt-8">
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">Discursiva{% if d.numero %} {{ d.numero }}{% endif %}{% if d.titulo %}: {{ d.titulo }}{% endif %}</h2>
+    {% call c.card() %}
+    <p class="text-xs text-slate-500">Sem nota automática: compare seu texto com o padrão de resposta da banca.</p>
     {% if d.quesitos %}
-    <ol>
+    <ol class="mt-3 list-decimal space-y-1 pl-6 text-sm">
         {% for q in d.quesitos %}
-        <li value="{{ q.numero }}">{{ q.texto }}{% if q.valor_pontos %} <small class="secondary">({{ "%g"|format(q.valor_pontos) }} pontos)</small>{% endif %}</li>
+        <li value="{{ q.numero }}">{{ q.texto }}{% if q.valor_pontos %} <span class="text-slate-500">({{ "%g"|format(q.valor_pontos) }} pontos)</span>{% endif %}</li>
         {% endfor %}
     </ol>
     {% endif %}
-    <details open>
-        <summary><strong>Padrão de resposta</strong></summary>
-        <div class="texto-base">{{ d.padrao_resposta or "Padrão de resposta não disponível." }}</div>
+    <details open class="mt-4">
+        <summary class="cursor-pointer text-sm font-semibold text-slate-900">Padrão de resposta</summary>
+        <div class="mt-2 whitespace-pre-line rounded-lg bg-slate-100 px-4 py-3 text-sm">{{ d.padrao_resposta or "Padrão de resposta não disponível." }}</div>
     </details>
+    {% endcall %}
 </section>
 {% endfor %}
 
-<p><a href="/simulado" role="button" class="outline">Novo simulado</a></p>
+<p class="mt-8"><a href="/simulado" class="btn-secundario">Novo simulado</a></p>
 {% endblock %}
