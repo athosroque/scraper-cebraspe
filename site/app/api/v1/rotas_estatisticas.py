@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 
+from app.api.v1.respostas_comuns import r404
 from app.modelos import (
     EditalVsProva,
     FiltroEstatistica,
@@ -85,7 +86,7 @@ def edital_cobra(
         "no edital e nunca cobrado, ou cobrado fora do edital. Inclui o peso de "
         "cada matéria na prova."
     ),
-    responses={404: {"description": "Cargo sem edital nem prova"}},
+    responses=r404("Cargo sem edital nem prova."),
 )
 def edital_vs_prova(
     concurso: str = Query(..., description="Slug do concurso."),

@@ -1,7 +1,8 @@
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Path, Query, Request
 
+from app.api.v1.respostas_comuns import R401, r404
 from app.auth import usuario_id_atual
 from app.modelos import (
     FacetasResponse,
@@ -20,7 +21,7 @@ router = APIRouter(prefix="/questoes", tags=["Questões"])
     "",
     response_model=PaginaQuestoes,
     summary="Lista questões objetivas com filtros",
-    responses={401: {"description": "Filtro de histórico sem login"}},
+    responses=R401,
     description=(
         "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, "
         "caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.781 "
@@ -104,9 +105,14 @@ def listar_questoes(
     response_model=QuestaoDetalhe,
     summary="Detalhe de uma questão",
     description="Busca pela chave estável `concurso|caderno|numero`.",
-    responses={404: {"description": "Questão não encontrada"}},
+    responses=r404("Questão não encontrada."),
 )
-def obter_questao(chave: str):
+def obter_questao(
+    chave: str = Path(
+        description="Chave estável `concurso|caderno|numero` (codifique `|` como `%7C`).",
+        examples=["PF_25_ADM|094_PF_CB1_01|1"],
+    ),
+):
     questao = questoes_servico.obter_questao_por_chave(chave)
     if not questao:
         raise HTTPException(status_code=404, detail="Questão não encontrada")

@@ -4,6 +4,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
+from app.api.v1.respostas_comuns import R401, R403, r404
 from app.auth import exigir_usuario_id, usuario_id_atual, verificar_csrf
 from app.modelos import (
     FiltroQuestoes,
@@ -16,8 +17,8 @@ from app.servicos import contas_servico
 
 router = APIRouter(tags=["Conta"])
 
-_401 = {401: {"description": "Login necessário"}}
-_403 = {403: {"description": "Token CSRF inválido (header `X-CSRFToken`)"}}
+_401 = R401
+_403 = R403
 
 
 @router.post(
@@ -26,7 +27,7 @@ _403 = {403: {"description": "Token CSRF inválido (header `X-CSRFToken`)"}}
     summary="Corrige uma resposta (e grava no histórico, com login)",
     description="Sem login, só corrige. Questão anulada nunca é gravada.",
     dependencies=[Depends(verificar_csrf)],
-    responses={404: {"description": "Questão não encontrada"}, **_403},
+    responses={**r404("Questão não encontrada."), **_403},
 )
 def responder(entrada: RespostaEntrada, request: Request):
     resultado = contas_servico.responder(
@@ -37,7 +38,13 @@ def responder(entrada: RespostaEntrada, request: Request):
     return resultado
 
 
-@router.get("/eu", response_model=Usuario, summary="Usuário logado", responses=_401)
+@router.get(
+    "/eu",
+    response_model=Usuario,
+    summary="Usuário logado",
+    description="Dados da conta da sessão atual (cookie `sessao`). Sem login: 401.",
+    responses=_401,
+)
 def eu(usuario_id: int = Depends(exigir_usuario_id)):
     usuario = contas_servico.obter_usuario(usuario_id)
     if not usuario:
@@ -49,6 +56,10 @@ def eu(usuario_id: int = Depends(exigir_usuario_id)):
     "/eu",
     status_code=204,
     summary="Apaga a conta e todo o histórico",
+    description=(
+        "Remove o usuário, as respostas e os simulados (cascata) e encerra a "
+        "sessão. Irreversível."
+    ),
     dependencies=[Depends(verificar_csrf)],
     responses={**_401, **_403},
 )
@@ -71,14 +82,24 @@ def apagar_conta(request: Request, usuario_id: int = Depends(exigir_usuario_id))
 )
 def desempenho(
     usuario_id: int = Depends(exigir_usuario_id),
-    orgao: str | None = Query(None),
-    ano: int | None = Query(None),
-    concurso: str | None = Query(None),
-    cargo_numero: int | None = Query(None),
-    nivel: str | None = Query(None),
-    tipo_conhecimento: str | None = Query(None),
-    no_id: str | None = Query(None),
-    fora_do_edital: Literal["todos", "sim", "nao"] = Query("todos"),
+    orgao: str | None = Query(None, description="Órgão (ex.: `PF`)."),
+    ano: int | None = Query(None, description="Ano do concurso."),
+    concurso: str | None = Query(
+        None, description="Slug do concurso (ex.: `PF_25_ADM`)."
+    ),
+    cargo_numero: int | None = Query(
+        None, description="Número do cargo no edital. Use junto com `concurso`."
+    ),
+    nivel: str | None = Query(None, description="`superior` ou `medio`."),
+    tipo_conhecimento: str | None = Query(
+        None, description="`basico` ou `especifico`."
+    ),
+    no_id: str | None = Query(
+        None, description="Nó da árvore; inclui os descendentes."
+    ),
+    fora_do_edital: Literal["todos", "sim", "nao"] = Query(
+        "todos", description="Recorte por questão fora do edital do cargo."
+    ),
 ):
     filtros = FiltroQuestoes(
         orgao=orgao,
