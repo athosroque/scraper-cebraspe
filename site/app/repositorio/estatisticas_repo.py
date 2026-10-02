@@ -8,6 +8,7 @@ subindo a árvore, só concurso `aprovado`.
 
 from psycopg2.extras import RealDictCursor
 
+from app.cache import cache_ttl
 from app.db import get_conexao_leitura
 
 
@@ -171,6 +172,7 @@ def materia_ativa(no_id: str) -> dict | None:
         return cur.fetchone()
 
 
+@cache_ttl(300)
 def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
     """Matérias ativas com questões utilizáveis distintas (mesma conta da árvore).
 
@@ -186,10 +188,12 @@ def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
             SELECT f.no_id AS id, f.no_nome AS nome,
                    f.questoes AS total_questoes,
                    f.pct_do_universo AS pct_incidencia,
-                   (SELECT coalesce(bool_or(q.nome_de_cargo), false)
-                    FROM vw_questoes q
-                    WHERE q.materia_id = f.no_id AND q.utilizavel) AS nome_de_cargo
+                   coalesce(nc.nome_de_cargo, false) AS nome_de_cargo
             FROM fn_prova_cobra('materia') f
+            LEFT JOIN (
+                SELECT materia_id, bool_or(nome_de_cargo) AS nome_de_cargo
+                FROM vw_questoes WHERE utilizavel GROUP BY materia_id
+            ) nc ON nc.materia_id = f.no_id
             WHERE (%(materia_id)s::text IS NULL OR f.no_id = %(materia_id)s)
             ORDER BY f.questoes DESC, f.no_nome
             """,

@@ -1,5 +1,6 @@
 from psycopg2.extras import RealDictCursor
 
+from app.cache import cache_ttl
 from app.db import get_conexao_leitura
 
 
@@ -204,13 +205,14 @@ def obter_questao_por_chave(chave: str) -> dict | None:
         return row
 
 
+@cache_ttl(300)
 def obter_arvore_com_contagens() -> list[dict]:
     with (
         get_conexao_leitura() as conn,
         conn.cursor(cursor_factory=RealDictCursor) as cur,
     ):
         query = """
-        WITH contagens AS (
+        WITH contagens AS MATERIALIZED (
             -- Base única: questões válidas distintas (fn_prova_cobra), a mesma
             -- da home e do painel de matéria; sobe a árvore e exclui anuladas.
             SELECT no_id AS alvo_id, questoes AS total_questoes FROM fn_prova_cobra('materia')
@@ -222,12 +224,13 @@ def obter_arvore_com_contagens() -> list[dict]:
         SELECT 
             c.id, c.nome, c.nivel, c.pai_id,
             COALESCE(cnt.total_questoes, 0) AS total_questoes,
-            (c.nivel = 'materia' AND EXISTS (
-                SELECT 1 FROM vw_questoes q
-                WHERE q.materia_id = c.id AND q.utilizavel AND q.nome_de_cargo
-            )) AS nome_de_cargo
+            COALESCE(nc.nome_de_cargo, false) AS nome_de_cargo
         FROM vw_no_caminho c
         LEFT JOIN contagens cnt ON cnt.alvo_id = c.id
+        LEFT JOIN (
+            SELECT materia_id, bool_or(nome_de_cargo) AS nome_de_cargo
+            FROM vw_questoes WHERE utilizavel GROUP BY materia_id
+        ) nc ON nc.materia_id = c.id AND c.nivel = 'materia'
         ORDER BY COALESCE(cnt.total_questoes, 0) DESC, c.nome ASC
         """
         cur.execute(query)
