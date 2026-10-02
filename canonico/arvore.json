@@ -759,7 +759,7 @@
   "A-aa69ec5e26": {"id": "A-aa69ec5e26", "nivel": "assunto", "nome": "Controle e monitoramento das atividades florestais", "pai": "M-101f78b6a6", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-aad3fabb9b": {"id": "A-aad3fabb9b", "nivel": "assunto", "nome": "Economia florestal", "pai": "M-101f78b6a6", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-ab3684aaea": {"id": "A-ab3684aaea", "nivel": "assunto", "nome": "Classificação e taxonomia animal e vegetal", "pai": "M-101f78b6a6", "origem": "semente", "status": "ativo", "fundido_em": null},
-  "A-ab49ad05b2": {"id": "A-ab49ad05b2", "nivel": "assunto", "nome": "Despesas de Exercícios anteriores", "pai": "ML-d3c974c363", "origem": "semente", "status": "ativo", "fundido_em": null},
+  "A-ab49ad05b2": {"id": "A-ab49ad05b2", "nivel": "assunto", "nome": "Despesas de Exercícios anteriores", "pai": "ML-d3c974c363", "origem": "semente", "status": "fundido", "fundido_em": "A-25cda6b4f4"},
   "A-ab59789e84": {"id": "A-ab59789e84", "nivel": "assunto", "nome": "Acesso e uso de produtos florestais e conflitos sociais", "pai": "M-101f78b6a6", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-ab65ec9e5e": {"id": "A-ab65ec9e5e", "nivel": "assunto", "nome": "Doenças gastrointestinais e hepáticas", "pai": "M-e779c36584", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-abb1e7cea2": {"id": "A-abb1e7cea2", "nivel": "assunto", "nome": "Segurança da informação", "pai": "M-7f77004bff", "origem": "semente", "status": "ativo", "fundido_em": null},
