@@ -16,7 +16,7 @@
         {% if linhas or materia.questoes_recorte > 0 %}
         {% set soma_ranking = linhas|map(attribute='questoes')|sum if linhas else 0 %}
         {% set outros = materia.questoes_recorte - soma_ranking %}
-        {% set max_real = maximo if maximo > outros else outros %}
+        {% set max_real = maximo if maximo > outros else (outros if outros > 0 else maximo) %}
         
         {% for r in linhas %}
         {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / max_real) if max_real else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
@@ -27,8 +27,12 @@
         {% endif %}
         
         <p class="mt-3 text-xs text-slate-500">
-            Mostrando {{ soma_ranking + outros }} de {{ materia.questoes_recorte }} questões (fechando a soma).
-            Universo sob os filtros: {{ (linhas[0].total_universo if linhas else materia.questoes_recorte)|num }} questões válidas. Anuladas ficam fora.
+            {% if outros >= 0 %}
+            Os subassuntos acima{% if outros > 0 %} e o grupo "Outros"{% endif %} somam {{ (soma_ranking + outros)|num }} de {{ materia.questoes_recorte|num }} questões da matéria no recorte.
+            {% else %}
+            Os subassuntos acima somam {{ soma_ranking|num }} para {{ materia.questoes_recorte|num }} questões da matéria no recorte: uma questão pode estar em até 2 subassuntos.
+            {% endif %}
+            Universo sob os filtros: {{ (linhas[0].total_universo if linhas else materia.questoes_recorte)|num }} questões válidas. Anuladas aparecem ao lado do subassunto e não entram na contagem.
         </p>
         {% else %}
         <p class="text-sm text-slate-600">Nenhuma questão desta matéria para esses filtros.</p>

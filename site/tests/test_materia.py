@@ -3,7 +3,6 @@
 import re
 
 import pytest
-
 from src import stats_writer
 from tests.test_stats_writer import _postgres_disponivel
 
@@ -51,18 +50,21 @@ def test_no_que_nao_e_materia_da_404(cliente):
     assert cliente.get("/materias/nao-existe").status_code == 404
 
 
-def test_reconciliacao_soma_ranking_outros_lp(cliente):
-    """Soma do ranking + 'outros' deve fechar exatamente o total no recorte para LP."""
+def test_reconciliacao_ranking_com_total_independente_lp(cliente):
+    """O total mostrado vem da fn_prova_cobra no nível matéria, não do próprio ranking."""
     materia = _id_lp()
+    total = _consulta(
+        "SELECT questoes FROM fn_prova_cobra('materia') WHERE no_id = %s", (materia,)
+    )[0][0]
     r = cliente.get(f"/materias/{materia}")
     assert r.status_code == 200
-    
-    match = re.search(r"Mostrando (\d+) de (\d+) questões \(fechando a soma\)", r.text)
-    assert match is not None, "Texto de fechamento da soma não encontrado"
-    
-    soma_calculada, total_recorte = match.groups()
-    assert soma_calculada == total_recorte
-    assert int(total_recorte) > 0
+    texto = re.sub(r"\s+", " ", r.text)
+    m = re.search(r"somam ([\d.]+) (?:para|de) ([\d.]+) questões", texto)
+    assert m is not None, "Texto de reconciliação não encontrado"
+    soma, total_pagina = (int(x.replace(".", "")) for x in m.groups())
+    assert total_pagina == total
+    assert soma > 0
+    assert "Anuladas ficam fora" not in texto
 
 
 # -- API de matérias e busca (5F.7) --

@@ -1,7 +1,6 @@
 import re
 
 import pytest
-
 from tests.test_stats_writer import _postgres_disponivel
 
 pytestmark = pytest.mark.skipif(
@@ -195,3 +194,44 @@ def test_detalhe_mostra_parecidas(cliente):
     r = cliente.get("/q/PF_25_ADM/094_PF_CB1_01/13")
     assert "Questões parecidas" in r.text
     assert "em breve" not in r.text
+
+
+# -- Sessão 1 do plano de correções: paginação e 404/405 --
+def test_pagina_fora_do_intervalo_redireciona_para_a_ultima(cliente):
+    r = cliente.get("/questoes?pagina=999", follow_redirects=False)
+    assert r.status_code in (302, 303, 307)
+    assert "pagina=0" not in r.headers["location"]
+
+
+def test_404_html_com_layout(cliente):
+    r = cliente.get("/nao-existe", headers={"accept": "text/html"})
+    assert r.status_code == 404
+    assert "Página não encontrada" in r.text
+    assert "Erro 404" in r.text
+
+
+def test_404_api_responde_json(cliente):
+    r = cliente.get("/api/v1/nao-existe", headers={"accept": "text/html"})
+    assert r.status_code == 404
+    assert r.headers["content-type"].startswith("application/json")
+    assert "detail" in r.json()
+
+
+def test_404_de_materia_tem_texto_proprio(cliente):
+    r = cliente.get("/materias/nao-existe", headers={"accept": "text/html"})
+    assert r.status_code == 404
+    assert "Matéria não encontrada" in r.text
+
+
+def test_405_preserva_allow_e_mostra_405(cliente):
+    r = cliente.post("/sobre", headers={"accept": "text/html"})
+    assert r.status_code == 405
+    assert "Erro 405" in r.text
+    assert "allow" in r.headers
+
+
+def test_simulado_inexistente_tem_texto_proprio(cliente_logado):
+    cliente_logado, _ = cliente_logado
+    r = cliente_logado.get("/simulado/999999999", headers={"accept": "text/html"})
+    assert r.status_code == 404
+    assert "Simulado não encontrado" in r.text

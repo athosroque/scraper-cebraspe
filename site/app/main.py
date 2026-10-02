@@ -111,10 +111,25 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     if request.url.path.startswith("/api/") or "text/html" not in accept:
         return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
     if exc.status_code in (404, 405):
-        return templates.TemplateResponse(
-            request=request, name="nao_encontrada.html", status_code=exc.status_code, context={"titulo": "Página não encontrada", "mensagem": "O endereço pode estar errado ou a página foi removida."}
+        e405 = exc.status_code == 405
+        resp = templates.TemplateResponse(
+            request=request,
+            name="nao_encontrada.html",
+            status_code=exc.status_code,
+            context={
+                "codigo": exc.status_code,
+                "titulo": "Método não permitido" if e405 else "Página não encontrada",
+                "mensagem": "Esta página não aceita esse tipo de requisição."
+                if e405
+                else "O endereço pode estar errado ou a página foi removida.",
+            },
         )
+        # Preserva o Allow do 405 (RFC 9110).
+        if exc.headers:
+            resp.headers.update(exc.headers)
+        return resp
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
 
 # Sessão em cookie assinado (5F.3): só id do usuário, nome e token CSRF.
 app.add_middleware(

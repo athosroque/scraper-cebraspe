@@ -123,14 +123,14 @@ com e sem as mudanças).
 - [ ] `|num` faltando em `estatisticas.html:59`, `conta.html:72,77`, totais dos selects.
 - [ ] Rótulo "Conhecimentos específicos — <cargo>" faltando em `materia.html`, chips da lista, `edital_vs_prova.html`.
 - [ ] `estatisticas.html`/`conta.html` mostram slug cru de concurso.
-- [ ] 404 genérico em ~9 rotas (simulado, cargo sem prova); 405 usa o template de 404 e perde `Allow`.
+- [x] 404 genérico em ~9 rotas (simulado, cargo sem prova); 405 usa o template de 404 e perde `Allow`.
 - [ ] Paginação do `simulado_revisar` sem a mesma proteção.
-- [ ] Sessão 3: `outros < 0`, tooltip "Questões da matéria", rodapé "Anuladas ficam fora", KPI "Itens de edital" removido, `/api/v1/arvore` ainda 178.
+- [~] Sessão 3: `outros < 0`, tooltip "Questões da matéria", rodapé "Anuladas ficam fora", KPI "Itens de edital" removido, `/api/v1/arvore` ainda 178. (feito: `outros < 0` e rodapé; faltam tooltip, KPI e `/api/v1/arvore`)
 - [ ] Sessão 5: `og:image`, `twitter:title/description`; `localStorage` sem try/catch.
 
 ### Testes que faltam
-- [ ] `pagina=999`, `/nao-existe` (HTML) e `/api/v1/nao-existe` (JSON), texto do 404 de matéria.
-- [ ] Teste de reconciliação não tautológico (`test_materia.py:54`).
+- [x] `pagina=999`, `/nao-existe` (HTML) e `/api/v1/nao-existe` (JSON), texto do 404 de matéria.
+- [x] Teste de reconciliação não tautológico (`test_materia.py:54`).
 - [ ] `value` dos selects, ordem dos filtros, favicon 200, canonical/OG.
 - [ ] Sessão 6 sem validação em navegador real: reabrir.
 
