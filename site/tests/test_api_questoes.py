@@ -185,3 +185,24 @@ def test_incidencia_na_listagem_e_no_detalhe(cliente):
     chave = com[0]["questao_chave"]
     detalhe = cliente.get(f"/api/v1/questoes/{chave}").json()
     assert detalhe["incidencia"] == com[0]["incidencia"]
+
+def test_facetas_ordenacao(cliente):
+    response = cliente.get("/api/v1/facetas")
+    assert response.status_code == 200
+    dados = response.json()
+    
+    # concurso por orgao e ano
+    concursos = [c["valor"] for c in dados["concursos"]]
+    assert concursos == sorted(concursos) # Wait, it sorts by orgao then ano. Since slug is ORGAO_ANO, sorting alphabetically works, let's just assert that it's ordered by orgao, ano.
+    
+    # nivel Superior antes de Medio
+    niveis = [n["valor"] for n in dados["niveis"]]
+    assert niveis == ["superior", "medio"]
+    
+    # cargos por numero
+    cargos = [(c["concurso"], c["cargo_numero"]) for c in dados["cargos"]]
+    # check that for each concurso, cargo_numero is ascending
+    from itertools import groupby
+    for _, grupo in groupby(cargos, key=lambda x: x[0]):
+        numeros = [x[1] for x in grupo]
+        assert numeros == sorted(numeros)

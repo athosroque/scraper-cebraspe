@@ -34,10 +34,25 @@ def dom_id(chave: str) -> str:
     # `hx-target="#..."` quebraria no querySelector do HTMX.
     return "q-" + hashlib.sha1(chave.encode()).hexdigest()[:12]
 
+def filtro_num(valor: float | None) -> str:
+    if valor is None:
+        return ""
+    return f"{valor:,.0f}".replace(",", ".")
 
+def filtro_pct(valor: float | None) -> str:
+    if valor is None:
+        return ""
+    return f"{valor:.2f}%".replace(".", ",")
+
+from app.servicos.formatacao import ROTULO_NIVEL, rotulo_concurso
+
+templates.env.filters["num"] = filtro_num
+templates.env.filters["pct"] = filtro_pct
 templates.env.globals["dom_id"] = dom_id
 templates.env.globals["csrf_token"] = auth.token_csrf
 templates.env.globals["login_habilitado"] = auth.login_habilitado
+templates.env.globals["ROTULO_NIVEL"] = ROTULO_NIVEL
+templates.env.globals["rotulo_concurso"] = rotulo_concurso
 
 logger = logging.getLogger(__name__)
 

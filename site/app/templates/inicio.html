@@ -26,9 +26,8 @@
             x-show="!busca || norm($el.dataset.nome).includes(norm(busca))">
             {% call c.card("flex h-full flex-col justify-between gap-4") %}
             <div>
-                <a href="/materias/{{ materia.id|urlencode }}" class="text-base font-semibold text-slate-900 hover:text-blue-700">{{ materia.nome }}</a>
-                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }} · {{ "%.1f"|format(materia.pct_incidencia)|replace(".", ",") }}% das questões</p>
-                {% if materia.nome_de_cargo %}<p class="mt-1 text-xs text-slate-500">Conhecimentos específicos do cargo</p>{% endif %}
+                <a href="/materias/{{ materia.id|urlencode }}" class="text-base font-semibold text-slate-900 hover:text-blue-700">{{ "Conhecimentos específicos — " ~ materia.nome if materia.nome_de_cargo else materia.nome }}</a>
+                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes|num }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }} · {{ materia.pct_incidencia|pct }} das questões</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="/materias/{{ materia.id|urlencode }}" class="btn-secundario">Ver painel</a>

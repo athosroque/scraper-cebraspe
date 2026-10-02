@@ -27,7 +27,7 @@
         {% elif campo == "historico" %}
             {{ c.chip(rotulos_historico.get(valor, valor), url_sem("historico")) }}
         {% elif campo == "concurso" %}
-            {{ c.chip(valor, url_sem("concurso", "cargo_numero")) }}
+            {{ c.chip(rotulo_concurso(valor), url_sem("concurso", "cargo_numero")) }}
         {% else %}
             {{ c.chip(rotulos.get(campo, campo) ~ ": " ~ valor, url_sem(campo)) }}
         {% endif %}

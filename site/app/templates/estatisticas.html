@@ -28,7 +28,7 @@
         <select name="materia_id" class="campo" {% if nivel_alvo == "materia" %}disabled{% endif %}>
             <option value="">Todas</option>
             {% for m in materias %}
-            <option value="{{ m.id }}" {% if materia_id == m.id %}selected{% endif %}>{{ m.nome }}</option>
+            <option value="{{ m.id }}" {% if materia_id == m.id %}selected{% endif %}>{{ "Conhecimentos específicos — " ~ m.nome if m.nome_de_cargo else m.nome }}</option>
             {% endfor %}
         </select>
     </label>
@@ -46,7 +46,7 @@
 {% call c.card() %}
 <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
     <h2 class="text-lg font-semibold text-slate-900">{% if aba == "prova" %}O que mais cai na prova{% else %}O que o edital cobra{% endif %}</h2>
-    {% if aba == "prova" and linhas %}{{ c.selo(linhas[0].total_universo ~ " questões válidas no universo") }}{% endif %}
+    {% if aba == "prova" and linhas %}{{ c.selo(linhas[0].total_universo|num ~ " questões válidas no universo") }}{% endif %}
 </div>
 <p class="mb-4 text-xs text-slate-500">
 {% if aba == "prova" %}Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da matéria (ou da prova, no nível matéria), com o mesmo peso para cada concurso.
@@ -56,7 +56,7 @@
 <ol class="divide-y divide-slate-100">
     {% for r in linhas %}
     {% set valor = r.questoes if aba == "prova" else r.ocorrencias %}
-    {% set rotulo_valor = (valor ~ " questões · " ~ "%.2f"|format(r.pct_medio_por_concurso) ~ "% médio") if aba == "prova" else (valor ~ " itens") %}
+    {% set rotulo_valor = (valor ~ " questões · " ~ (r.pct_medio_por_concurso|pct) ~ " médio") if aba == "prova" else (valor ~ " itens") %}
     <li class="flex gap-3">
         <span class="w-6 shrink-0 pt-2 text-right text-xs tabular-nums text-slate-400">{{ loop.index }}</span>
         <div class="min-w-0 flex-1">

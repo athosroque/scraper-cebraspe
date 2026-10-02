@@ -36,7 +36,7 @@
             {% for no in questao.nos %}{{ c.selo(no.no_caminho) }}{% endfor %}
         </div>
         {% endif %}
-        <p>Fonte: CEBRASPE — {{ questao.concurso }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</p>
+        <p>Fonte: CEBRASPE — {{ rotulo_concurso(questao.concurso) }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</p>
         {% if questao.nos and not anexos_inline %}
         <details class="mt-2">
             <summary class="cursor-pointer select-none font-medium text-slate-600 hover:text-blue-700">Questões parecidas</summary>

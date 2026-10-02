@@ -86,7 +86,7 @@ document.addEventListener("alpine:init", () => {
             <select name="nivel" class="campo">
                 <option value="">Todos</option>
                 {% for n in facetas.niveis %}
-                <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo|title }} ({{ n.total }})</option>
+                <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo }} ({{ n.total }})</option>
                 {% endfor %}
             </select>
         </label>

@@ -14,7 +14,7 @@
         <select name="concurso" class="campo mt-1 w-full" @change="$refs.cargo.value = ''">
             <option value="">Escolha</option>
             {% for cc in cargos|map(attribute="concurso")|unique %}
-            <option value="{{ cc }}" {% if filtros.concurso == cc %}selected{% endif %}>{{ cc }}</option>
+            <option value="{{ rotulo_concurso(cc) }}" {% if filtros.concurso == cc %}selected{% endif %}>{{ rotulo_concurso(cc) }}</option>
             {% endfor %}
         </select>
     </label>
@@ -22,7 +22,7 @@
         <select name="cargo_numero" x-ref="cargo" class="campo mt-1 w-full disabled:bg-slate-100" {% if not filtros.concurso %}disabled{% endif %}>
             <option value="">Escolha</option>
             {% for cg in cargos if cg.concurso == filtros.concurso %}
-            <option value="{{ cg.cargo_numero }}" {% if filtros.cargo_numero == cg.cargo_numero %}selected{% endif %}>{{ cg.cargo_numero }} — {{ cg.cargo }} ({{ cg.nivel }})</option>
+            <option value="{{ cg.cargo_numero }}" {% if filtros.cargo_numero == cg.cargo_numero %}selected{% endif %}>{{ cg.cargo_numero }} — {{ cg.cargo }} ({{ ROTULO_NIVEL.get(cg.nivel, cg.nivel) }})</option>
             {% endfor %}
         </select>
     </label>
@@ -54,7 +54,7 @@
         {% for s in simulados %}
         <tr>
             <td class="px-4 py-2 tabular-nums">{{ s.inicio.strftime("%d/%m/%Y %H:%M") }}</td>
-            <td class="px-4 py-2">{{ s.concurso }}</td>
+            <td class="px-4 py-2">{{ rotulo_concurso(s.concurso) }}</td>
             <td class="px-4 py-2">{{ s.cargo_numero }}</td>
             <td class="px-4 py-2 text-right tabular-nums">{{ "%g"|format(s.nota) if s.nota is not none else "em andamento" }}</td>
             <td class="px-4 py-2 text-right"><a href="/simulado/{{ s.id }}" class="link">{{ "Ver resultado" if s.fim else "Retomar" }}</a></td>

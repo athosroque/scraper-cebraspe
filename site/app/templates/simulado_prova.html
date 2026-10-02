@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_componentes.html" as c %}
 
-{% block title %}Simulado {{ prova.concurso }} cargo {{ prova.cargo_numero }} - Questões CEBRASPE{% endblock %}
+{% block title %}Simulado {{ rotulo_concurso(prova.concurso) }} cargo {{ prova.cargo_numero }} - Questões CEBRASPE{% endblock %}
 
 {% set rotulos_tipo = {"basico": "Conhecimentos básicos", "especifico": "Conhecimentos específicos"} %}
 
@@ -17,7 +17,7 @@
       data-rascunho="simulado:{{ simulado.id if simulado else prova.concurso ~ '|' ~ prova.cargo_numero }}"
       data-inicio="{{ simulado.inicio.isoformat() if simulado else '' }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
-    <input type="hidden" name="concurso" value="{{ prova.concurso }}">
+    <input type="hidden" name="concurso" value="{{ rotulo_concurso(prova.concurso) }}">
     <input type="hidden" name="cargo_numero" value="{{ prova.cargo_numero }}">
     {% if simulado %}<input type="hidden" name="simulado_id" value="{{ simulado.id }}">{% endif %}
 

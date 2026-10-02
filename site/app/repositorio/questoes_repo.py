@@ -225,6 +225,7 @@ def obter_arvore_com_contagens() -> list[dict]:
             COALESCE(cnt.total_questoes, 0) AS total_questoes
         FROM vw_no_caminho c
         LEFT JOIN contagens cnt ON cnt.alvo_id = c.id
+        ORDER BY COALESCE(cnt.total_questoes, 0) DESC, c.nome ASC
         """
         cur.execute(query)
         return cur.fetchall()
@@ -240,8 +241,6 @@ def obter_facetas() -> dict:
             "banca",
             "orgao",
             "ano",
-            "concurso",
-            "nivel",
             "tipo_conhecimento",
         ]:
             cur.execute(
@@ -249,12 +248,18 @@ def obter_facetas() -> dict:
             )
             facetas[col] = cur.fetchall()
 
+        cur.execute("SELECT concurso AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY concurso ORDER BY max(orgao), max(ano)")
+        facetas["concurso"] = cur.fetchall()
+
+        cur.execute("SELECT nivel AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY nivel ORDER BY nivel DESC")
+        facetas["nivel"] = cur.fetchall()
+
         cur.execute("""
             SELECT cargo_numero, cargo, concurso, nivel, count(DISTINCT questao_id) AS total
             FROM vw_questoes
             WHERE utilizavel
             GROUP BY cargo_numero, cargo, concurso, nivel
-            ORDER BY total DESC
+            ORDER BY cargo_numero ASC
         """)
         facetas["cargos"] = cur.fetchall()
         return facetas
