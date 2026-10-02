@@ -152,7 +152,7 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 - **Pronto quando:** os três exemplos do "pronto quando" da 5E aparecem nas
   páginas com os mesmos números.
 
-### 5F.5 — Simulado
+### 5F.5 — Simulado ✅ (2026-10-01)
 - Montar a prova de um concurso/cargo: básico + específico na ordem
   original (`codigo_caderno`, `numero`), cronômetro (Alpine), respostas em
   branco permitidas.
@@ -163,7 +163,92 @@ CREATE TABLE app.simulado (...);          -- usuario, concurso, cargo, início, 
 - **Pronto quando:** simulado `PF_25_ADM` cargo 1 respondido com um padrão
   conhecido e a nota conferida à mão.
 
-### 5F.6 — Deploy público
+### Redesenho (2026-10-02)
+Protótipo aprovado pelo dono: https://claude.ai/artifact/323qGK9cuTRHdJjRSS9DUE
+(6 telas: Início "escolha sua matéria", Painel da matéria, Resolver questões,
+Meu concurso, Meu desempenho com caderno de erros, Resultado do simulado).
+Decisões: entrada pela matéria; "Meu concurso" com login; Tailwind; "mais cai"
+em cor discreta. A documentação vem antes dos endpoints para que o teste guarda
+obrigue toda rota nova a nascer documentada.
+
+### 5F.6 — Documentação da API (Swagger/ReDoc)
+- `openapi_tags` com descrição (Questões, Árvore, Facetas, Matérias, Conta,
+  Estatísticas, Simulado, Autenticação, Infra) e `description` geral: como
+  autenticar (cookie `sessao` + `X-CSRFToken`), chave `concurso|caderno|numero`,
+  crédito à fonte, rotas HTML fora do contrato.
+- `securitySchemes`: `APIKeyCookie("sessao")` e `APIKeyHeader("X-CSRFToken")`
+  com `auto_error=False` em `auth.py` (comportamento igual, mantém o fallback do
+  campo `csrf_token`).
+- Modelo `Erro {detail}` e respostas 401/403/404/409 compartilhadas em
+  `app/api/v1/respostas_comuns.py`.
+- `description` nas rotas que faltam (`GET`/`DELETE /eu`, `GET`/`POST /simulados`,
+  `GET /simulados/{id}`, `/saude` com 503).
+- `Field(description=...)` em todos os campos (hoje 169 de 194 sem), docstring
+  em todo schema, exemplos reais (PF_25_ADM item 1) nos modelos principais.
+- `/entrar`, `/auth/google` e `/sair` no contrato (tag "Autenticação",
+  redirecionamentos 303); as demais rotas HTML continuam fora.
+- Teste guarda `site/tests/test_openapi_documentado.py`: toda operação com
+  `summary` e `description`; 401/403/404 declarados conforme dependência e
+  parâmetro de caminho; todo schema e campo próprio com descrição.
+- **Pronto quando:** teste guarda verde, `openapi.json` regenerado e `/docs`
+  mostra tags descritas e o "Authorize" com cookie e CSRF.
+
+### 5F.7 — Endpoints públicos novos
+- `GET /api/v1/materias`: matérias da árvore ativa com total de questões
+  (distinta, sobe a árvore, utilizável) e `nome_de_cargo`.
+- `GET /api/v1/materias/{materia_id}`: resumo + top subassuntos por
+  `fn_prova_cobra` (via `estatisticas_servico.prova_cobra`), com recorte de
+  concurso/cargo/nível; 404 se não for matéria ativa.
+- `GET /api/v1/busca?q=`: nós da árvore por nome, sem acento e sem caixa,
+  máx. 20 (não busca enunciado).
+- `GET /api/v1/questoes/{chave}/parecidas`: mesmo nó principal, sem a própria
+  e sem enunciado canônico repetido (`listar_questoes` + `chaves_excluir`).
+- Campo aditivo `incidencia` em `QuestaoResumo`/`QuestaoDetalhe`: posição do
+  subassunto principal no ranking da matéria (cache por processo).
+- **Pronto quando:** LP com 178 questões em `/materias`; top 1 de LP =
+  "Substituição de palavras…" (15); testes de 404.
+
+### 5F.8 — Endpoints pessoais novos
+- `GET /api/v1/eu/resumo`: resolvidas, acerto, nota líquida, erradas pendentes,
+  dias seguidos (fuso `America/Sao_Paulo`).
+- `GET /api/v1/eu/prioridades`: subassuntos com ≥ 2 respostas, por
+  incidência × taxa de erro (cruzamento no serviço, sem JOIN `app` × views).
+- `GET /api/v1/eu/plano?concurso&cargo_numero`: peso da matéria
+  (`vw_peso_materia_cargo`) × (1 − acerto).
+- `GET`/`PUT /api/v1/eu/concurso-alvo` + colunas `concurso_alvo`/`cargo_alvo`
+  em `app.usuario` (`ALTER ... ADD COLUMN IF NOT EXISTS` em `app_schema.sql`);
+  `GET /eu` passa a devolver o alvo.
+- `ResultadoSimulado` ganha `duracao_segundos` e `nota_anterior`;
+  `GET /api/v1/simulados/{id}/questoes?situacao=errado|branco` reusa
+  `listar_questoes(chaves_incluir=...)`.
+- **Pronto quando:** plano de PF_25_ADM cargo 1 sem respostas começa por AOF
+  (17,80%); prioridades e resumo batem com um usuário de teste de respostas
+  conhecidas; 401/403/404 cobertos.
+
+### 5F.9 — Tailwind: base, Início e Painel da matéria
+- Tailwind pelo binário standalone (sem Node); `site/scripts/gerar_css.sh`
+  gera `static/tailwind.css` (versionado, teste de divergência); Pico sai.
+- Tokens do protótipo: `slate-50`/`slate-900`/`slate-600`, destaque `blue-700`,
+  "mais cai" discreto (`slate-100`/`blue-300`), fonte Public Sans.
+- Macros Jinja em `templates/_componentes.html` (cabeçalho, card, chip de
+  filtro, barra de ranking, KPI). Menu: Questões · Matérias · Meu concurso ·
+  Simulados · Meu desempenho.
+- **Pronto quando:** Início e Painel iguais ao protótipo em 1280 e 390 px, sem
+  erro de JS no Chromium headless.
+
+### 5F.10 — Tailwind: Resolver questões e Meu concurso
+- Barra de filtros em chips (modal da árvore com busca), card limpo com selo de
+  incidência, "questões parecidas", painel Meu concurso (peso, edital × prova,
+  plano).
+- **Pronto quando:** fluxo matéria → painel → questões → correção funcionando,
+  com os anti-patterns de HTMX/Alpine do CLAUDE.md respeitados.
+
+### 5F.11 — Tailwind: Meu desempenho, Simulado e páginas restantes
+- Desempenho (KPIs, "o que estudar agora", caderno de erros), simulado (início,
+  prova, resultado com "revisar as que errei"), página da questão, sobre, 404.
+- **Pronto quando:** todas as telas no novo visual; nenhum template usa Pico.
+
+### 5F.12 — Deploy público
 - `Dockerfile` (python:3.11-slim, uvicorn, usuário não root) e serviço
   `scraper-cebraspe-site` no `docker-compose.yml` (labels Traefik,
   `homelab_default`, figuras montadas `:ro`).

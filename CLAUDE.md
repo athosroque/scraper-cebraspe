@@ -250,7 +250,9 @@ Datasette continua só como ferramenta de revisão do dono.
       `/entrar`, aviso de itens ilegíveis (`itens_omitidos`, PF cargo 5) e
       início pela API via body. Validado no Chromium headless. 670 testes
       (+1 xfail), ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.6 do `plano-etapa-5f.md`** (deploy público).
+- **⚡ Prioridade atual: Etapa 5F.6 do `plano-etapa-5f.md`** (documentação da
+  API no Swagger). Redesenho aprovado em 2026-10-02: 5F.6 a 5F.11 (docs,
+  endpoints novos, frontend Tailwind); o deploy passou para a 5F.12.
 
 
 ## 6. Patterns
