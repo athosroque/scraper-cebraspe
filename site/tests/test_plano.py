@@ -1,7 +1,6 @@
 """Plano de estudo e concurso-alvo (5F.8)."""
 
 import pytest
-
 from tests.test_stats_writer import _postgres_disponivel
 
 pytestmark = pytest.mark.skipif(

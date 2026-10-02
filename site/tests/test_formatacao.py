@@ -8,10 +8,12 @@ def test_filtro_num():
     assert filtro_num(42) == "42"
     assert filtro_num(None) == ""
 
+
 def test_filtro_pct():
     assert filtro_pct(10.46) == "10,46%"
     assert filtro_pct(0.5) == "0,50%"
     assert filtro_pct(None) == ""
+
 
 def test_rotulo_concurso():
     assert rotulo_concurso("CD_25_NS") == "CD 2025 — Nível Superior"

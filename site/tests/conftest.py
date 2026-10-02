@@ -6,7 +6,6 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 from itsdangerous import TimestampSigner
-
 from tests.test_stats_writer import _postgres_disponivel
 
 # Credenciais das roles vêm do .env (app.config); nada de senha no teste.

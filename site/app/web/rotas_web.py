@@ -6,6 +6,11 @@ import pathlib
 from typing import Literal
 from urllib.parse import urlencode
 
+from authlib.integrations.base_client import OAuthError
+from fastapi import APIRouter, Depends, Form, Query, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+
 from app import auth
 from app.api.v1.respostas_comuns import R403
 from app.modelos import ConcursoAlvo, FiltroEstatistica, FiltroQuestoes, NivelAlvo
@@ -15,10 +20,6 @@ from app.servicos import (
     questoes_servico,
     simulados_servico,
 )
-from authlib.integrations.base_client import OAuthError
-from fastapi import APIRouter, Depends, Form, Query, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 
 router = APIRouter(tags=["Web"], include_in_schema=False)
 # Login/logout ficam no contrato (5F.6); as demais rotas HTML, não.
@@ -34,15 +35,18 @@ def dom_id(chave: str) -> str:
     # `hx-target="#..."` quebraria no querySelector do HTMX.
     return "q-" + hashlib.sha1(chave.encode()).hexdigest()[:12]
 
+
 def filtro_num(valor: float | None) -> str:
     if valor is None:
         return ""
     return f"{valor:,.0f}".replace(",", ".")
 
+
 def filtro_pct(valor: float | None) -> str:
     if valor is None:
         return ""
     return f"{valor:.2f}%".replace(".", ",")
+
 
 from app.servicos.formatacao import ROTULO_NIVEL, rotulo_concurso
 
@@ -89,9 +93,16 @@ def _nome_do_no(arvore, no_id: str | None) -> str | None:
     return None
 
 
-def _nao_encontrada(request: Request, titulo: str = "Página não encontrada", mensagem: str = "O endereço pode estar errado ou a página foi removida.") -> HTMLResponse:
+def _nao_encontrada(
+    request: Request,
+    titulo: str = "Página não encontrada",
+    mensagem: str = "O endereço pode estar errado ou a página foi removida.",
+) -> HTMLResponse:
     return templates.TemplateResponse(
-        request=request, name="nao_encontrada.html", status_code=404, context={"titulo": titulo, "mensagem": mensagem}
+        request=request,
+        name="nao_encontrada.html",
+        status_code=404,
+        context={"titulo": titulo, "mensagem": mensagem},
     )
 
 
@@ -149,7 +160,7 @@ def index(
     pagina_questoes = questoes_servico.listar_questoes(
         filtros, pagina, tamanho_pagina, usuario_id
     )
-    
+
     if pagina > 1 and pagina > max(pagina_questoes.total_paginas, 1):
         params = dict(request.query_params)
         params["pagina"] = str(max(pagina_questoes.total_paginas, 1))
@@ -189,7 +200,11 @@ def corrigir_questao(
 ):
     resultado = contas_servico.responder(chave, resposta, usuario_id)
     if not resultado:
-        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
+        return _nao_encontrada(
+            request,
+            titulo="Questão não encontrada",
+            mensagem="O endereço pode estar errado ou a questão foi removida.",
+        )
     return templates.TemplateResponse(
         request=request,
         name="_correcao.html",
@@ -202,7 +217,11 @@ def anexos_questao(request: Request, concurso: str, caderno: str, numero: int):
     """Texto-base e figuras, carregados sob demanda pelo card da lista."""
     questao = questoes_servico.obter_questao_por_chave(f"{concurso}|{caderno}|{numero}")
     if not questao:
-        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
+        return _nao_encontrada(
+            request,
+            titulo="Questão não encontrada",
+            mensagem="O endereço pode estar errado ou a questão foi removida.",
+        )
     return templates.TemplateResponse(
         request=request, name="_anexos.html", context={"questao": questao}
     )
@@ -213,7 +232,11 @@ def parecidas_questao(request: Request, concurso: str, caderno: str, numero: int
     """Questões parecidas, carregadas sob demanda pelo card da lista."""
     parecidas = questoes_servico.parecidas(f"{concurso}|{caderno}|{numero}")
     if parecidas is None:
-        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
+        return _nao_encontrada(
+            request,
+            titulo="Questão não encontrada",
+            mensagem="O endereço pode estar errado ou a questão foi removida.",
+        )
     return templates.TemplateResponse(
         request=request, name="_parecidas.html", context={"parecidas": parecidas}
     )
@@ -224,7 +247,11 @@ def detalhe_questao(request: Request, concurso: str, caderno: str, numero: int):
     chave = f"{concurso}|{caderno}|{numero}"
     questao = questoes_servico.obter_questao_por_chave(chave)
     if not questao:
-        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
+        return _nao_encontrada(
+            request,
+            titulo="Questão não encontrada",
+            mensagem="O endereço pode estar errado ou a questão foi removida.",
+        )
     return templates.TemplateResponse(
         request=request,
         name="questao_detalhe.html",
@@ -366,12 +393,20 @@ def salvar_concurso_alvo(
     if usuario_id is None:
         return RedirectResponse("/entrar?voltar=/estatisticas/edital-vs-prova", 303)
     if not cargo_numero.isdigit():
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Cargo não encontrado",
+            mensagem="O cargo informado não existe ou não tem edital nem prova na base.",
+        )
     alvo = ConcursoAlvo(concurso=concurso, cargo_numero=int(cargo_numero))
     try:
         contas_servico.salvar_concurso_alvo(usuario_id, alvo)
     except contas_servico.ConcursoInexistente:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Cargo não encontrado",
+            mensagem="O cargo informado não existe ou não tem edital nem prova na base.",
+        )
     query = urlencode({"concurso": alvo.concurso, "cargo_numero": alvo.cargo_numero})
     return RedirectResponse(f"/estatisticas/edital-vs-prova?{query}", status_code=303)
 
@@ -422,7 +457,11 @@ def simulado_iniciar(
         return RedirectResponse(f"/simulado/prova?{query}", status_code=303)
     simulado_id = simulados_servico.iniciar(usuario_id, concurso, cargo_numero)
     if simulado_id is None:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Simulado não encontrado",
+            mensagem="O simulado não existe ou não pertence à sua conta.",
+        )
     return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
 
 
@@ -430,7 +469,11 @@ def simulado_iniciar(
 def simulado_prova_avulsa(request: Request, concurso: str, cargo_numero: int):
     prova = simulados_servico.montar_prova(concurso, cargo_numero)
     if not prova:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Prova não encontrada",
+            mensagem="Não há prova na base para esse concurso e cargo.",
+        )
     return templates.TemplateResponse(
         request=request, name="simulado_prova.html", context={"prova": prova}
     )
@@ -457,7 +500,11 @@ def simulado_revisar(
     except simulados_servico.SimuladoAberto:
         return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
     if pagina_questoes is None:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Simulado não encontrado",
+            mensagem="O simulado não existe ou não pertence à sua conta.",
+        )
     return templates.TemplateResponse(
         request=request,
         name="simulado_revisar.html",
@@ -481,7 +528,11 @@ def simulado_gravado(
         )
     simulado = simulados_servico.obter_simulado(simulado_id, usuario_id)
     if not simulado:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Simulado não encontrado",
+            mensagem="O simulado não existe ou não pertence à sua conta.",
+        )
     if simulado["fim"] is not None:
         return templates.TemplateResponse(
             request=request,
@@ -494,7 +545,11 @@ def simulado_gravado(
         simulado["concurso"], simulado["cargo_numero"]
     )
     if not prova:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Prova não encontrada",
+            mensagem="Não há prova na base para esse concurso e cargo.",
+        )
     return templates.TemplateResponse(
         request=request,
         name="simulado_prova.html",
@@ -522,7 +577,11 @@ async def simulado_corrigir(
     if simulado_id.isdigit():
         try:
             if not simulados_servico.encerrar(int(simulado_id), usuario_id, respostas):
-                return _nao_encontrada(request)
+                return _nao_encontrada(
+                    request,
+                    titulo="Simulado não encontrado",
+                    mensagem="O simulado não existe, já foi encerrado ou não pertence à sua conta.",
+                )
         except simulados_servico.SimuladoJaEncerrado:
             pass  # reenvio do form: mostra o resultado já gravado
         return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
@@ -531,7 +590,11 @@ async def simulado_corrigir(
         form.get("concurso", ""), int(cargo), respostas
     )
     if not resultado:
-        return _nao_encontrada(request)
+        return _nao_encontrada(
+            request,
+            titulo="Simulado não encontrado",
+            mensagem="O simulado não existe ou não pertence à sua conta.",
+        )
     return templates.TemplateResponse(
         request=request,
         name="simulado_resultado.html",
@@ -671,7 +734,11 @@ def painel_materia(
     # aviso no card): subassunto só com anuladas fica no ranking, com 0 válidas.
     materia = estatisticas_servico.detalhe_materia(no_id, filtros, 15)
     if materia is None:
-        return _nao_encontrada(request, titulo="Matéria não encontrada", mensagem="O endereço pode estar errado ou a matéria foi removida.")
+        return _nao_encontrada(
+            request,
+            titulo="Matéria não encontrada",
+            mensagem="O endereço pode estar errado ou a matéria foi removida.",
+        )
     linhas = materia.top_subassuntos
     filtros_lista = filtros.model_dump(exclude_none=True)
     return templates.TemplateResponse(

@@ -1,11 +1,7 @@
-ROTULO_NIVEL = {
-    "superior": "Superior",
-    "medio": "Médio"
-}
+ROTULO_NIVEL = {"superior": "Superior", "medio": "Médio"}
 
-_MAPA_CONCURSOS = {
-    "CD_25_NS": "CD 2025 — Nível Superior"
-}
+_MAPA_CONCURSOS = {"CD_25_NS": "CD 2025 — Nível Superior"}
+
 
 def rotulo_concurso(slug: str) -> str:
     if not slug:

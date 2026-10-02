@@ -248,10 +248,14 @@ def obter_facetas() -> dict:
             )
             facetas[col] = cur.fetchall()
 
-        cur.execute("SELECT concurso AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY concurso ORDER BY max(orgao), max(ano)")
+        cur.execute(
+            "SELECT concurso AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY concurso ORDER BY max(orgao), max(ano)"
+        )
         facetas["concurso"] = cur.fetchall()
 
-        cur.execute("SELECT nivel AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY nivel ORDER BY nivel DESC")
+        cur.execute(
+            "SELECT nivel AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY nivel ORDER BY nivel DESC"
+        )
         facetas["nivel"] = cur.fetchall()
 
         cur.execute("""

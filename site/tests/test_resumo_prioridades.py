@@ -3,9 +3,9 @@
 from datetime import date
 
 import pytest
-from app.servicos.contas_servico import contar_dias_seguidos
-
 from tests.test_stats_writer import _postgres_disponivel
+
+from app.servicos.contas_servico import contar_dias_seguidos
 
 banco = pytest.mark.skipif(
     not _postgres_disponivel(), reason="scraper-cebraspe-db indisponivel"
