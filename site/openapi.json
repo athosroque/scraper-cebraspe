@@ -1039,6 +1039,298 @@
         }
       }
     },
+    "/api/v1/simulados/prova": {
+      "get": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Prova de um cargo para o simulado (sem gabarito)",
+        "description": "Itens na ordem da prova (básico, depois específico; caderno e número) e as discursivas sem o padrão de resposta.",
+        "operationId": "prova_api_v1_simulados_prova_get",
+        "parameters": [
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concurso"
+            }
+          },
+          {
+            "name": "cargo_numero",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Cargo Numero"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProvaSimulado"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cargo sem prova ou simulado não encontrado"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulados/correcao": {
+      "post": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Corrige um simulado sem gravar",
+        "description": "Certo +1, errado −1, branco 0; anulada fica fora da nota e do máximo.",
+        "operationId": "corrigir_api_v1_simulados_correcao_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimuladoEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoSimulado"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cargo sem prova ou simulado não encontrado"
+          },
+          "403": {
+            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulados": {
+      "get": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Meus simulados",
+        "operationId": "listar_api_v1_simulados_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SimuladoResumo"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Api V1 Simulados Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Inicia um simulado gravado (o início vale para o cronômetro)",
+        "operationId": "iniciar_api_v1_simulados_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimuladoInicio"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimuladoResumo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          },
+          "403": {
+            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+          },
+          "404": {
+            "description": "Cargo sem prova ou simulado não encontrado"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulados/{simulado_id}/correcao": {
+      "post": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Encerra e corrige um simulado gravado",
+        "description": "Grava nota, fim e respostas. Só encerra uma vez (409 depois).",
+        "operationId": "encerrar_api_v1_simulados__simulado_id__correcao_post",
+        "parameters": [
+          {
+            "name": "simulado_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Simulado Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RespostasSimulado"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoSimulado"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          },
+          "403": {
+            "description": "Token CSRF inválido (header `X-CSRFToken`)"
+          },
+          "404": {
+            "description": "Cargo sem prova ou simulado não encontrado"
+          },
+          "409": {
+            "description": "Simulado já encerrado"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulados/{simulado_id}": {
+      "get": {
+        "tags": [
+          "Simulado"
+        ],
+        "summary": "Resultado de um simulado encerrado",
+        "operationId": "resultado_api_v1_simulados__simulado_id__get",
+        "parameters": [
+          {
+            "name": "simulado_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Simulado Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoSimulado"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário"
+          },
+          "404": {
+            "description": "Cargo sem prova ou simulado não encontrado"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/saude": {
       "get": {
         "tags": [
@@ -1089,6 +1381,83 @@
         ],
         "title": "CargoInfo",
         "description": "Cargo do edital para o qual o caderno da questão foi aplicado."
+      },
+      "DiscursivaSimulado": {
+        "properties": {
+          "numero": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "titulo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titulo"
+          },
+          "tema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tema"
+          },
+          "enunciado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enunciado"
+          },
+          "quesitos": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Quesitos",
+            "default": []
+          },
+          "padrao_resposta": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Padrao Resposta",
+            "description": "Só vem na correção, depois de encerrar o simulado."
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "titulo",
+          "tema",
+          "enunciado"
+        ],
+        "title": "DiscursivaSimulado"
       },
       "EditalVsProva": {
         "properties": {
@@ -1267,6 +1636,115 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "ItemCorrigido": {
+        "properties": {
+          "questao_chave": {
+            "type": "string",
+            "title": "Questao Chave"
+          },
+          "numero": {
+            "type": "integer",
+            "title": "Numero"
+          },
+          "codigo_caderno": {
+            "type": "string",
+            "title": "Codigo Caderno"
+          },
+          "resposta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "C",
+                  "E"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resposta"
+          },
+          "gabarito": {
+            "type": "string",
+            "title": "Gabarito"
+          },
+          "situacao": {
+            "type": "string",
+            "enum": [
+              "certo",
+              "errado",
+              "branco",
+              "anulada"
+            ],
+            "title": "Situacao"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questao_chave",
+          "numero",
+          "codigo_caderno",
+          "resposta",
+          "gabarito",
+          "situacao"
+        ],
+        "title": "ItemCorrigido"
+      },
+      "ItemSimulado": {
+        "properties": {
+          "questao_chave": {
+            "type": "string",
+            "title": "Questao Chave"
+          },
+          "numero": {
+            "type": "integer",
+            "title": "Numero"
+          },
+          "codigo_caderno": {
+            "type": "string",
+            "title": "Codigo Caderno"
+          },
+          "tipo_conhecimento": {
+            "type": "string",
+            "title": "Tipo Conhecimento"
+          },
+          "enunciado": {
+            "type": "string",
+            "title": "Enunciado"
+          },
+          "texto_base_texto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Texto Base Texto"
+          },
+          "figuras": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Figuras",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "questao_chave",
+          "numero",
+          "codigo_caderno",
+          "tipo_conhecimento",
+          "enunciado"
+        ],
+        "title": "ItemSimulado",
+        "description": "Item da prova no simulado, sem gabarito (só aparece na correção)."
+      },
       "LinhaEditalCobra": {
         "properties": {
           "no_id": {
@@ -1432,6 +1910,56 @@
         ],
         "title": "LinhaProvaCobra",
         "description": "Nó no ranking \"o que mais cai\" (`fn_prova_cobra`): questão distinta, subindo a árvore."
+      },
+      "MateriaSimulado": {
+        "properties": {
+          "certas": {
+            "type": "integer",
+            "title": "Certas",
+            "default": 0
+          },
+          "erradas": {
+            "type": "integer",
+            "title": "Erradas",
+            "default": 0
+          },
+          "brancos": {
+            "type": "integer",
+            "title": "Brancos",
+            "default": 0
+          },
+          "anuladas": {
+            "type": "integer",
+            "title": "Anuladas",
+            "default": 0
+          },
+          "nota": {
+            "type": "integer",
+            "title": "Nota",
+            "description": "Certas − erradas.",
+            "default": 0
+          },
+          "nota_maxima": {
+            "type": "integer",
+            "title": "Nota Maxima",
+            "description": "Itens não anulados.",
+            "default": 0
+          },
+          "materia_id": {
+            "type": "string",
+            "title": "Materia Id"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          }
+        },
+        "type": "object",
+        "required": [
+          "materia_id",
+          "nome"
+        ],
+        "title": "MateriaSimulado"
       },
       "NoArvore": {
         "properties": {
@@ -1689,6 +2217,96 @@
           "pct_da_prova"
         ],
         "title": "PesoMateria"
+      },
+      "PlacarSimulado": {
+        "properties": {
+          "certas": {
+            "type": "integer",
+            "title": "Certas",
+            "default": 0
+          },
+          "erradas": {
+            "type": "integer",
+            "title": "Erradas",
+            "default": 0
+          },
+          "brancos": {
+            "type": "integer",
+            "title": "Brancos",
+            "default": 0
+          },
+          "anuladas": {
+            "type": "integer",
+            "title": "Anuladas",
+            "default": 0
+          },
+          "nota": {
+            "type": "integer",
+            "title": "Nota",
+            "description": "Certas − erradas.",
+            "default": 0
+          },
+          "nota_maxima": {
+            "type": "integer",
+            "title": "Nota Maxima",
+            "description": "Itens não anulados.",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "PlacarSimulado",
+        "description": "Correção CEBRASPE: certo +1, errado −1, branco 0; anulada não conta."
+      },
+      "ProvaSimulado": {
+        "properties": {
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          },
+          "cargo": {
+            "type": "string",
+            "title": "Cargo"
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel"
+          },
+          "itens_omitidos": {
+            "type": "integer",
+            "title": "Itens Omitidos",
+            "description": "Itens do cargo fora da prova por `utilizavel=false` (ilegíveis).",
+            "default": 0
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ItemSimulado"
+            },
+            "type": "array",
+            "title": "Itens"
+          },
+          "discursivas": {
+            "items": {
+              "$ref": "#/components/schemas/DiscursivaSimulado"
+            },
+            "type": "array",
+            "title": "Discursivas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero",
+          "cargo",
+          "nivel",
+          "itens",
+          "discursivas"
+        ],
+        "title": "ProvaSimulado",
+        "description": "Prova de um cargo na ordem original: básico, depois específico (caderno, número)."
       },
       "QuestaoDetalhe": {
         "properties": {
@@ -2016,6 +2634,191 @@
         ],
         "title": "RespostaResultado",
         "description": "Correção de uma resposta. `gravada` é `false` sem login ou em questão anulada."
+      },
+      "RespostasSimulado": {
+        "properties": {
+          "respostas": {
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "C",
+                "E"
+              ]
+            },
+            "type": "object",
+            "title": "Respostas",
+            "description": "Chave da questão → `C`/`E`. Item ausente conta como em branco."
+          }
+        },
+        "type": "object",
+        "title": "RespostasSimulado"
+      },
+      "ResultadoSimulado": {
+        "properties": {
+          "simulado_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Simulado Id",
+            "description": "Preenchido quando o simulado foi gravado (com login)."
+          },
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          },
+          "cargo": {
+            "type": "string",
+            "title": "Cargo"
+          },
+          "itens_omitidos": {
+            "type": "integer",
+            "title": "Itens Omitidos",
+            "description": "Itens ilegíveis fora da prova, da nota e do máximo.",
+            "default": 0
+          },
+          "placar": {
+            "$ref": "#/components/schemas/PlacarSimulado"
+          },
+          "por_materia": {
+            "items": {
+              "$ref": "#/components/schemas/MateriaSimulado"
+            },
+            "type": "array",
+            "title": "Por Materia"
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ItemCorrigido"
+            },
+            "type": "array",
+            "title": "Itens"
+          },
+          "discursivas": {
+            "items": {
+              "$ref": "#/components/schemas/DiscursivaSimulado"
+            },
+            "type": "array",
+            "title": "Discursivas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero",
+          "cargo",
+          "placar",
+          "por_materia",
+          "itens",
+          "discursivas"
+        ],
+        "title": "ResultadoSimulado"
+      },
+      "SimuladoEntrada": {
+        "properties": {
+          "respostas": {
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "C",
+                "E"
+              ]
+            },
+            "type": "object",
+            "title": "Respostas",
+            "description": "Chave da questão → `C`/`E`. Item ausente conta como em branco."
+          },
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero"
+        ],
+        "title": "SimuladoEntrada"
+      },
+      "SimuladoInicio": {
+        "properties": {
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "cargo_numero": {
+            "type": "integer",
+            "title": "Cargo Numero"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concurso",
+          "cargo_numero"
+        ],
+        "title": "SimuladoInicio"
+      },
+      "SimuladoResumo": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "concurso": {
+            "type": "string",
+            "title": "Concurso"
+          },
+          "cargo_numero": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargo Numero"
+          },
+          "inicio": {
+            "title": "Inicio"
+          },
+          "fim": {
+            "title": "Fim"
+          },
+          "nota": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nota"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "concurso",
+          "cargo_numero",
+          "inicio",
+          "fim",
+          "nota"
+        ],
+        "title": "SimuladoResumo"
       },
       "Usuario": {
         "properties": {

@@ -195,6 +195,21 @@ UX fique limitada pelo HTMX. Até lá, migrar é custo sem ganho.
   cadernos diferentes e a estatística conta a questão canônica uma vez.
   `cargo_numero` chega como texto nas rotas HTML: trocar o concurso manda
   o campo vazio, que como `int` dava 422.
+- **5F.5 (2026-10-01):** `/simulado` monta a prova do cargo na ordem
+  original (básico, depois específico; caderno e número) e corrige no
+  servidor no padrão CEBRASPE (certo +1, errado −1, branco 0, anulada fora da
+  nota e do máximo). A prova enviada não tem gabarito nem padrão de resposta.
+  Com login, `app.simulado` nasce no início e encerra uma vez só
+  (`UPDATE ... WHERE fim IS NULL`; reenvio cai no resultado, API dá 409). As
+  respostas ficam com `simulado_id` e fora do desempenho da `/conta` (o
+  chute de prova distorceria a métrica). O resultado gravado é **recalculado**
+  com o gabarito atual a cada leitura (não lê `app.simulado.nota`), e
+  resposta em item anulado não é gravada. Itens com `utilizavel=false` ficam
+  fora da prova, com aviso (`itens_omitidos`; hoje só `PF_25_ADM` cargo 5,
+  19 itens). O rascunho no `localStorage` só é apagado na página de
+  resultado: um envio que falhe (CSRF, rede) não perde as marcações. Login
+  caído com simulado gravado volta pelo `/entrar`, nunca corrige como
+  avulso (o simulado ficaria aberto para sempre).
 
 ## Referências
 - ADR-026 (banco próprio), ADR-030 (árvore mestre e objetivo do site),

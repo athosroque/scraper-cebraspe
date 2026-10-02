@@ -8,7 +8,12 @@ from urllib.parse import urlencode
 
 from app import auth
 from app.modelos import FiltroEstatistica, FiltroQuestoes, NivelAlvo
-from app.servicos import contas_servico, estatisticas_servico, questoes_servico
+from app.servicos import (
+    contas_servico,
+    estatisticas_servico,
+    questoes_servico,
+    simulados_servico,
+)
 from authlib.integrations.base_client import OAuthError
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -281,6 +286,136 @@ def estatisticas_edital_vs_prova(
             "resultado": resultado,
             "cargos": estatisticas_servico.cargos(),
         },
+    )
+
+
+# -- Simulado (5F.5) --
+_PREFIXO_RESPOSTA = "r:"
+
+
+def _respostas_do_form(form) -> dict[str, str]:
+    """Campos `r:<chave>` com C/E; em branco ou valor inválido fica de fora."""
+    return {
+        campo[len(_PREFIXO_RESPOSTA) :]: valor
+        for campo, valor in form.items()
+        if campo.startswith(_PREFIXO_RESPOSTA) and valor in ("C", "E")
+    }
+
+
+@router.get("/simulado", response_class=HTMLResponse)
+def simulado_inicio(
+    request: Request,
+    concurso: str | None = None,
+    cargo_numero: str | None = None,
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+):
+    filtros = _filtro_estatistica(concurso, cargo_numero, None, None)
+    return templates.TemplateResponse(
+        request=request,
+        name="simulado_inicio.html",
+        context={
+            "filtros": filtros,
+            "cargos": estatisticas_servico.cargos(),
+            "simulados": simulados_servico.listar(usuario_id) if usuario_id else [],
+        },
+    )
+
+
+@router.post("/simulado/iniciar", dependencies=[Depends(auth.verificar_csrf)])
+def simulado_iniciar(
+    request: Request,
+    concurso: str = Form(...),
+    cargo_numero: int = Form(...),
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+):
+    # Sem login, a prova roda sem registro; com login, o simulado nasce aqui
+    # (o início vale para o cronômetro e para o histórico).
+    if usuario_id is None:
+        query = urlencode({"concurso": concurso, "cargo_numero": cargo_numero})
+        return RedirectResponse(f"/simulado/prova?{query}", status_code=303)
+    simulado_id = simulados_servico.iniciar(usuario_id, concurso, cargo_numero)
+    if simulado_id is None:
+        return _nao_encontrada(request)
+    return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
+
+
+@router.get("/simulado/prova", response_class=HTMLResponse)
+def simulado_prova_avulsa(request: Request, concurso: str, cargo_numero: int):
+    prova = simulados_servico.montar_prova(concurso, cargo_numero)
+    if not prova:
+        return _nao_encontrada(request)
+    return templates.TemplateResponse(
+        request=request, name="simulado_prova.html", context={"prova": prova}
+    )
+
+
+@router.get("/simulado/{simulado_id}", response_class=HTMLResponse)
+def simulado_gravado(
+    request: Request,
+    simulado_id: int,
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+):
+    if usuario_id is None:
+        return RedirectResponse(
+            f"/entrar?voltar=/simulado/{simulado_id}", status_code=303
+        )
+    simulado = simulados_servico.obter_simulado(simulado_id, usuario_id)
+    if not simulado:
+        return _nao_encontrada(request)
+    if simulado["fim"] is not None:
+        return templates.TemplateResponse(
+            request=request,
+            name="simulado_resultado.html",
+            context={
+                "resultado": simulados_servico.obter_resultado(simulado_id, usuario_id)
+            },
+        )
+    prova = simulados_servico.montar_prova(
+        simulado["concurso"], simulado["cargo_numero"]
+    )
+    if not prova:
+        return _nao_encontrada(request)
+    return templates.TemplateResponse(
+        request=request,
+        name="simulado_prova.html",
+        context={"prova": prova, "simulado": simulado},
+    )
+
+
+@router.post(
+    "/simulado/corrigir",
+    response_class=HTMLResponse,
+    dependencies=[Depends(auth.verificar_csrf)],
+)
+async def simulado_corrigir(
+    request: Request, usuario_id: int | None = Depends(auth.usuario_id_atual)
+):
+    form = await request.form()
+    respostas = _respostas_do_form(form)
+    simulado_id = form.get("simulado_id", "")
+    if simulado_id.isdigit() and usuario_id is None:
+        # Login caiu no meio da prova: corrigir como avulso deixaria o simulado
+        # aberto para sempre. Volta pela prova gravada (o rascunho continua lá).
+        return RedirectResponse(
+            f"/entrar?voltar=/simulado/{simulado_id}", status_code=303
+        )
+    if simulado_id.isdigit():
+        try:
+            if not simulados_servico.encerrar(int(simulado_id), usuario_id, respostas):
+                return _nao_encontrada(request)
+        except simulados_servico.SimuladoJaEncerrado:
+            pass  # reenvio do form: mostra o resultado já gravado
+        return RedirectResponse(f"/simulado/{simulado_id}", status_code=303)
+    cargo = form.get("cargo_numero", "")
+    resultado = cargo.isdigit() and simulados_servico.corrigir_avulso(
+        form.get("concurso", ""), int(cargo), respostas
+    )
+    if not resultado:
+        return _nao_encontrada(request)
+    return templates.TemplateResponse(
+        request=request,
+        name="simulado_resultado.html",
+        context={"resultado": resultado},
     )
 
 

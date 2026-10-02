@@ -246,3 +246,108 @@ class EditalVsProva(BaseModel):
     resumo: dict[str, int] = Field(description="Total de nós por situação.")
     nos: list[LinhaEditalVsProva]
     peso_materias: list[PesoMateria]
+
+
+# -- Simulado (5F.5) --
+class ItemSimulado(BaseModel):
+    """Item da prova no simulado, sem gabarito (só aparece na correção)."""
+
+    questao_chave: str
+    numero: int
+    codigo_caderno: str
+    tipo_conhecimento: str
+    enunciado: str
+    texto_base_texto: str | None = None
+    figuras: list[dict[str, Any]] = []
+
+
+class DiscursivaSimulado(BaseModel):
+    numero: int | None
+    titulo: str | None
+    tema: str | None
+    enunciado: str | None
+    quesitos: list[dict[str, Any]] = []
+    padrao_resposta: str | None = Field(
+        None, description="Só vem na correção, depois de encerrar o simulado."
+    )
+
+
+class ProvaSimulado(BaseModel):
+    """Prova de um cargo na ordem original: básico, depois específico (caderno, número)."""
+
+    concurso: str
+    cargo_numero: int
+    cargo: str
+    nivel: str
+    itens_omitidos: int = Field(
+        0,
+        description="Itens do cargo fora da prova por `utilizavel=false` (ilegíveis).",
+    )
+    itens: list[ItemSimulado]
+    discursivas: list[DiscursivaSimulado]
+
+
+class RespostasSimulado(BaseModel):
+    respostas: dict[str, Literal["C", "E"]] = Field(
+        default_factory=dict,
+        description="Chave da questão → `C`/`E`. Item ausente conta como em branco.",
+    )
+
+
+class SimuladoInicio(BaseModel):
+    concurso: str
+    cargo_numero: int
+
+
+class SimuladoEntrada(SimuladoInicio, RespostasSimulado):
+    pass
+
+
+class ItemCorrigido(BaseModel):
+    questao_chave: str
+    numero: int
+    codigo_caderno: str
+    resposta: Literal["C", "E"] | None
+    gabarito: str
+    situacao: Literal["certo", "errado", "branco", "anulada"]
+
+
+class PlacarSimulado(BaseModel):
+    """Correção CEBRASPE: certo +1, errado −1, branco 0; anulada não conta."""
+
+    certas: int = 0
+    erradas: int = 0
+    brancos: int = 0
+    anuladas: int = 0
+    nota: int = Field(0, description="Certas − erradas.")
+    nota_maxima: int = Field(0, description="Itens não anulados.")
+
+
+class MateriaSimulado(PlacarSimulado):
+    materia_id: str
+    nome: str
+
+
+class ResultadoSimulado(BaseModel):
+    simulado_id: int | None = Field(
+        None, description="Preenchido quando o simulado foi gravado (com login)."
+    )
+    concurso: str
+    cargo_numero: int
+    cargo: str
+    itens_omitidos: int = Field(
+        0, description="Itens ilegíveis fora da prova, da nota e do máximo."
+    )
+    placar: PlacarSimulado
+    por_materia: list[MateriaSimulado]
+    itens: list[ItemCorrigido]
+    discursivas: list[DiscursivaSimulado]
+
+
+class SimuladoResumo(BaseModel):
+    id: int
+    concurso: str
+    cargo_numero: int | None
+    inicio: Any
+    fim: Any
+    nota: float | None

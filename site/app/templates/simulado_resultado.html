@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Resultado do simulado - Questões CEBRASPE{% endblock %}
+
+{% set rotulos = {"certo": "✅ Certo", "errado": "❌ Errado", "branco": "Em branco", "anulada": "Anulada"} %}
+
+{% macro linha_placar(p) %}
+<td style="text-align: right;">{{ p.certas }}</td>
+<td style="text-align: right;">{{ p.erradas }}</td>
+<td style="text-align: right;">{{ p.brancos }}</td>
+<td style="text-align: right;">{{ p.anuladas }}</td>
+<td style="text-align: right;"><strong>{{ p.nota }}</strong> / {{ p.nota_maxima }}</td>
+{% endmacro %}
+
+{% block content %}
+<hgroup>
+    <h2>Resultado do simulado</h2>
+    <p>{{ resultado.concurso }} · cargo {{ resultado.cargo_numero }}: {{ resultado.cargo }}</p>
+</hgroup>
+
+{# Corrigido: o rascunho da prova no navegador não serve mais. #}
+<div hidden data-rascunho="simulado:{{ resultado.simulado_id if resultado.simulado_id else resultado.concurso ~ '|' ~ resultado.cargo_numero }}"
+     id="rascunho-corrigido"></div>
+<script>
+try { localStorage.removeItem(document.getElementById("rascunho-corrigido").dataset.rascunho); } catch (e) {}
+</script>
+
+{% if resultado.itens_omitidos %}
+<p><mark>{{ resultado.itens_omitidos }} itens desta prova ficaram de fora (fórmulas ilegíveis no PDF) e não entram na nota nem no máximo.</mark></p>
+{% endif %}
+
+<article class="resumo-situacao">
+    <div class="grid">
+        <div>Nota<br><strong>{{ resultado.placar.nota }}</strong> <small class="secondary">de {{ resultado.placar.nota_maxima }}</small></div>
+        <div>Certas<br><strong class="text-success">{{ resultado.placar.certas }}</strong></div>
+        <div>Erradas<br><strong class="text-error">{{ resultado.placar.erradas }}</strong></div>
+        <div>Em branco<br><strong>{{ resultado.placar.brancos }}</strong></div>
+        <div>Anuladas<br><strong>{{ resultado.placar.anuladas }}</strong></div>
+    </div>
+    <footer><small>Certo +1, errado −1, em branco 0. Item anulado fica fora da nota e do máximo.{% if not resultado.simulado_id %} Sem login, este resultado não fica guardado.{% endif %}</small></footer>
+</article>
+
+<section>
+    <h3>Por matéria</h3>
+    <div class="overflow-auto">
+    <table>
+        <thead><tr><th>Matéria</th><th style="text-align: right;">Certas</th><th style="text-align: right;">Erradas</th><th style="text-align: right;">Branco</th><th style="text-align: right;">Anuladas</th><th style="text-align: right;">Nota</th></tr></thead>
+        <tbody>
+        {% for m in resultado.por_materia %}
+        <tr><td>{{ m.nome }}</td>{{ linha_placar(m) }}</tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+
+<section>
+    <h3>Itens</h3>
+    <div class="overflow-auto">
+    <table>
+        <thead><tr><th>Caderno</th><th>Item</th><th>Sua resposta</th><th>Gabarito</th><th>Situação</th></tr></thead>
+        <tbody>
+        {% for i in resultado.itens %}
+        <tr>
+            <td>{{ i.codigo_caderno }}</td>
+            <td><a href="{{ url_questao(i.questao_chave) }}">{{ i.numero }}</a></td>
+            <td>{{ i.resposta or "—" }}</td>
+            <td>{{ i.gabarito }}</td>
+            <td class="{{ 'text-success' if i.situacao == 'certo' else 'text-error' if i.situacao == 'errado' else '' }}">{{ rotulos[i.situacao] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+
+{% for d in resultado.discursivas %}
+<section>
+    <h3>Discursiva{% if d.numero %} {{ d.numero }}{% endif %}{% if d.titulo %}: {{ d.titulo }}{% endif %}</h3>
+    <p><small class="secondary">Sem nota automática: compare seu texto com o padrão de resposta da banca.</small></p>
+    {% if d.quesitos %}
+    <ol>
+        {% for q in d.quesitos %}
+        <li value="{{ q.numero }}">{{ q.texto }}{% if q.valor_pontos %} <small class="secondary">({{ "%g"|format(q.valor_pontos) }} pontos)</small>{% endif %}</li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+    <details open>
+        <summary><strong>Padrão de resposta</strong></summary>
+        <div class="texto-base">{{ d.padrao_resposta or "Padrão de resposta não disponível." }}</div>
+    </details>
+</section>
+{% endfor %}
+
+<p><a href="/simulado" role="button" class="outline">Novo simulado</a></p>
+{% endblock %}

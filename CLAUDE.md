@@ -235,7 +235,22 @@ Datasette continua só como ferramenta de revisão do dono.
       filtrada por subassunto/cargo/nível e PF_25_ADM cargo 1 (139 nós
       cobrados, 125 nunca cobrados, 0 fora). Validado no Chromium headless.
       653 testes (+1 xfail), ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.5 do `plano-etapa-5f.md`** (simulado).
+- [x] Etapa 5F.5 — Simulado (ADR-033): `/simulado` escolhe concurso/cargo e
+      monta a prova na ordem original (básico, depois específico; caderno e
+      número), com cronômetro e rascunho no `localStorage` (Alpine). Correção
+      CEBRASPE em `servicos/simulados_servico.py` (certo +1, errado −1,
+      branco 0, anulada fora da nota e do máximo), com placar por matéria do
+      nó principal. Sem login corrige sem gravar; com login, `app.simulado`
+      nasce no início e encerra uma vez só (reenvio cai no resultado, API dá
+      409), e as respostas ficam com `simulado_id` (fora do histórico
+      avulso). Discursiva mostra tema e quesitos e o padrão de resposta só no
+      resultado. API em `/api/v1/simulados/*`. Conferido: PF_25_ADM cargo 1,
+      padrão "tudo C" dá 58 − 60 = −2 de 118 (2 anuladas), igual à contagem
+      no banco. Revisão: rascunho só some no resultado, login caído volta pelo
+      `/entrar`, aviso de itens ilegíveis (`itens_omitidos`, PF cargo 5) e
+      início pela API via body. Validado no Chromium headless. 670 testes
+      (+1 xfail), ruff verde.
+- **⚡ Prioridade atual: Etapa 5F.6 do `plano-etapa-5f.md`** (deploy público).
 
 
 ## 6. Patterns
@@ -641,6 +656,14 @@ Datasette continua só como ferramenta de revisão do dono.
 - Nunca declarar `cargo_numero: int` em rota HTML com select de cargo: trocar
   o concurso limpa o select e manda `cargo_numero=`, e o FastAPI responde 422
   (só aparece no navegador, não no teste com parâmetro válido).
+- Nunca mandar o gabarito na prova do simulado (`ItemSimulado` não tem o
+  campo) nem o padrão de resposta antes de encerrar: a correção é sempre no
+  servidor.
+- Nunca apagar o rascunho do simulado no clique de enviar: se o POST falhar
+  (CSRF, rede), as marcações de horas de prova somem. Só a página de
+  resultado apaga. E nada de `try` em `x-init`: Alpine só avalia expressão.
+- Nunca usar dois `TestClient(app)` ao mesmo tempo nos testes: os pools do
+  banco são globais e o lifespan do primeiro a sair fecha os do outro.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança

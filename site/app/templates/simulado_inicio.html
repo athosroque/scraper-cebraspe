@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Simulado - Questões CEBRASPE{% endblock %}
+{% block description %}Refaça a prova de um cargo do CEBRASPE com cronômetro e correção no padrão da banca: certo +1, errado −1, branco 0.{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h2>Simulado</h2>
+    <p>Refaça a prova de um cargo na ordem original, com cronômetro. A correção segue o padrão CEBRASPE: certo vale +1, errado −1 e em branco 0; item anulado não conta.</p>
+</hgroup>
+
+<form method="get" action="/simulado" x-data @change="$el.requestSubmit()">
+    <div class="grid">
+        {% with rotulo_todos = "Escolha" %}{% include "_select_cargo.html" %}{% endwith %}
+    </div>
+    <noscript><button type="submit">Escolher</button></noscript>
+</form>
+
+{% if filtros.concurso and filtros.cargo_numero %}
+<form method="post" action="/simulado/iniciar">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <input type="hidden" name="concurso" value="{{ filtros.concurso }}">
+    <input type="hidden" name="cargo_numero" value="{{ filtros.cargo_numero }}">
+    <button type="submit">Começar o simulado</button>
+    {% if not request.session.get("usuario_id") %}
+    <small class="secondary">Sem login, o resultado não fica guardado.{% if login_habilitado() %} <a href="/entrar?voltar={{ request.url.path|urlencode }}">Entre com Google</a> para guardar.{% endif %}</small>
+    {% endif %}
+</form>
+{% endif %}
+
+{% if simulados %}
+<section>
+    <h3>Meus simulados</h3>
+    <div class="overflow-auto">
+    <table>
+        <thead><tr><th>Início</th><th>Concurso</th><th>Cargo</th><th style="text-align: right;">Nota</th><th></th></tr></thead>
+        <tbody>
+        {% for s in simulados %}
+        <tr>
+            <td>{{ s.inicio.strftime("%d/%m/%Y %H:%M") }}</td>
+            <td>{{ s.concurso }}</td>
+            <td>{{ s.cargo_numero }}</td>
+            <td style="text-align: right;">{{ "%g"|format(s.nota) if s.nota is not none else "em andamento" }}</td>
+            <td><a href="/simulado/{{ s.id }}">{{ "Ver resultado" if s.fim else "Retomar" }}</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Simulado {{ prova.concurso }} cargo {{ prova.cargo_numero }} - Questões CEBRASPE{% endblock %}
+
+{% set rotulos_tipo = {"basico": "Conhecimentos básicos", "especifico": "Conhecimentos específicos"} %}
+
+{% block content %}
+<hgroup>
+    <h2>Simulado — {{ prova.concurso }}</h2>
+    <p>Cargo {{ prova.cargo_numero }}: {{ prova.cargo }} ({{ prova.nivel }}) · {{ prova.itens|length }} itens{% if prova.discursivas %} + {{ prova.discursivas|length }} discursiva(s){% endif %}</p>
+</hgroup>
+{% if prova.itens_omitidos %}
+<p><mark>{{ prova.itens_omitidos }} itens desta prova ficaram de fora porque o texto não pôde ser extraído do PDF (fórmulas ilegíveis). A nota máxima é menor que a da prova real.</mark></p>
+{% endif %}
+
+{# Rascunho no navegador: recarregar a página não perde as marcações. Só a
+   página de resultado o apaga, então um envio que falhe não perde nada. #}
+<form method="post" action="/simulado/corrigir" x-data="simulado" @change="salvar()"
+      data-rascunho="simulado:{{ simulado.id if simulado else prova.concurso ~ '|' ~ prova.cargo_numero }}"
+      data-inicio="{{ simulado.inicio.isoformat() if simulado else '' }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <input type="hidden" name="concurso" value="{{ prova.concurso }}">
+    <input type="hidden" name="cargo_numero" value="{{ prova.cargo_numero }}">
+    {% if simulado %}<input type="hidden" name="simulado_id" value="{{ simulado.id }}">{% endif %}
+
+    <article class="cronometro" x-cloak>
+        <span>⏱ <strong x-text="tempo">00:00:00</strong></span>
+        <span><span x-text="respondidas">0</span> / {{ prova.itens|length }} marcados</span>
+    </article>
+
+    {% set ns = namespace(tipo=None, texto=None, figuras=None) %}
+    {% for item in prova.itens %}
+    {% if item.tipo_conhecimento != ns.tipo %}
+    {% set ns.tipo = item.tipo_conhecimento %}
+    <h3>{{ rotulos_tipo.get(item.tipo_conhecimento, item.tipo_conhecimento) }} <small class="secondary">· caderno {{ item.codigo_caderno }}</small></h3>
+    {% endif %}
+    {% if item.texto_base_texto and item.texto_base_texto != ns.texto %}
+    <blockquote class="texto-base">{{ item.texto_base_texto }}</blockquote>
+    {% endif %}
+    {% set ns.texto = item.texto_base_texto %}
+    {% if item.figuras and item.figuras != ns.figuras %}
+    {% for fig in item.figuras if fig.url %}
+    <img src="{{ fig.url }}" alt="Figura do item {{ item.numero }}" loading="lazy" class="figura">
+    {% endfor %}
+    {% endif %}
+    {% set ns.figuras = item.figuras %}
+    <fieldset class="item-simulado">
+        <legend><strong>{{ item.numero }}</strong></legend>
+        <p>{{ item.enunciado }}</p>
+        <div class="opcoes">
+            <label><input type="radio" name="r:{{ item.questao_chave }}" value="C"> Certo</label>
+            <label><input type="radio" name="r:{{ item.questao_chave }}" value="E"> Errado</label>
+            <label><input type="radio" name="r:{{ item.questao_chave }}" value="" checked> Em branco</label>
+        </div>
+    </fieldset>
+    {% endfor %}
+
+    {% for d in prova.discursivas %}
+    <h3>Discursiva{% if d.numero %} {{ d.numero }}{% endif %}</h3>
+    <article>
+        {% if d.titulo %}<p><strong>{{ d.titulo }}</strong></p>{% endif %}
+        {% if d.enunciado %}<p class="texto-base">{{ d.enunciado }}</p>{% endif %}
+        {% if d.quesitos %}
+        <ol>
+            {% for q in d.quesitos %}
+            <li value="{{ q.numero }}">{{ q.texto }}{% if q.valor_pontos %} <small class="secondary">({{ "%g"|format(q.valor_pontos) }} pontos)</small>{% endif %}</li>
+            {% endfor %}
+        </ol>
+        {% endif %}
+        <textarea name="rascunho_discursiva_{{ loop.index }}" rows="8" placeholder="Rascunho (não é corrigido; o padrão de resposta aparece no resultado)"></textarea>
+    </article>
+    {% endfor %}
+
+    <div x-data="{ confirma: false }">
+        <button type="button" x-show="!confirma" @click="confirma = true">Encerrar e corrigir</button>
+        <div x-show="confirma" x-cloak>
+            <p>Encerrar agora? <span x-text="{{ prova.itens|length }} - respondidas"></span> itens ficam em branco.</p>
+            <div class="grid">
+                <button type="submit">Sim, corrigir</button>
+                <button type="button" class="secondary" @click="confirma = false">Voltar à prova</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+document.addEventListener("alpine:init", () => {
+    Alpine.data("simulado", () => ({
+        tempo: "00:00:00",
+        respondidas: 0,
+        init() {
+            const chave = this.$el.dataset.rascunho;
+            this.chave = chave;
+            let rascunho = {};
+            try { rascunho = JSON.parse(localStorage.getItem(chave) || "{}"); } catch (e) {}
+            // Sem login não há início no servidor: o rascunho guarda o próprio.
+            this.inicio = Date.parse(this.$el.dataset.inicio) || rascunho.inicio || Date.now();
+            for (const [nome, valor] of Object.entries(rascunho.campos || {})) {
+                const campo = this.$el.querySelector(`[name="${CSS.escape(nome)}"]` + (valor && nome.startsWith("r:") ? `[value="${valor}"]` : ""));
+                if (!campo) continue;
+                if (campo.type === "radio") campo.checked = true; else campo.value = valor;
+            }
+            this.contar();
+            this.tique();
+            setInterval(() => this.tique(), 1000);
+        },
+        tique() {
+            const s = Math.max(0, Math.floor((Date.now() - this.inicio) / 1000));
+            const dois = (n) => String(n).padStart(2, "0");
+            this.tempo = `${dois(Math.floor(s / 3600))}:${dois(Math.floor(s / 60) % 60)}:${dois(s % 60)}`;
+        },
+        contar() {
+            this.respondidas = this.$el.querySelectorAll('input[type=radio][name^="r:"]:checked:not([value=""])').length;
+        },
+        salvar() {
+            this.contar();
+            const campos = {};
+            for (const el of this.$el.querySelectorAll('input[type=radio][name^="r:"]:checked, textarea')) {
+                if (el.value) campos[el.name] = el.value;
+            }
+            try { localStorage.setItem(this.chave, JSON.stringify({ inicio: this.inicio, campos })); } catch (e) {}
+        },
+    }));
+});
+</script>
+{% endblock %}
