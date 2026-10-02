@@ -526,11 +526,12 @@ def painel_materia(
     if materia is None:
         return _nao_encontrada(request)
     filtros = _filtro_estatistica(concurso, cargo_numero, nivel, None)
-    # Subassunto só com anuladas sob o filtro volta com 0 válidas: fica de fora.
+    # Anulada também se resolve (com aviso no card): subassunto só com
+    # anuladas fica no ranking, com 0 válidas.
     linhas = [
         r
         for r in estatisticas_servico.prova_cobra("subassunto", filtros, no_id, 15)
-        if r.questoes
+        if r.questoes or r.anuladas
     ]
     filtros_lista = filtros.model_dump(exclude_none=True)
     return templates.TemplateResponse(
@@ -544,8 +545,7 @@ def painel_materia(
             "cargos": estatisticas_servico.cargos(),
             "url_resolver": "/questoes?" + urlencode({"no_id": no_id, **filtros_lista}),
             "urls_subassunto": {
-                r.no_id: "/questoes?"
-                + urlencode({"no_id": r.no_id, "anuladas": "excluir", **filtros_lista})
+                r.no_id: "/questoes?" + urlencode({"no_id": r.no_id, **filtros_lista})
                 for r in linhas
             },
         },

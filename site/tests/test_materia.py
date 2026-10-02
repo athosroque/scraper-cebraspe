@@ -30,7 +30,7 @@ def test_painel_lista_top_igual_fn_prova_cobra(cliente):
     esperado = _consulta(
         """
         SELECT no_id FROM fn_prova_cobra('subassunto', p_nivel => 'medio')
-        WHERE materia_id = %s AND questoes > 0
+        WHERE materia_id = %s AND (questoes > 0 OR anuladas > 0)
         ORDER BY questoes DESC, pct_medio_por_concurso DESC, no_nome LIMIT 15
         """,
         (materia,),
@@ -38,8 +38,9 @@ def test_painel_lista_top_igual_fn_prova_cobra(cliente):
     r = cliente.get(f"/materias/{materia}?nivel=medio&cargo_numero=")
     assert r.status_code == 200
     assert "LÍNGUA PORTUGUESA" in r.text
-    ids = re.findall(r'href="/questoes\?no_id=([^&"]+)&amp;anuladas', r.text)
+    ids = re.findall(r'href="/questoes\?no_id=((?!M-)[^&"]+)&amp;', r.text)
     assert ids == [e[0] for e in esperado]
+    assert "anuladas=excluir" not in r.text
     assert "nivel=medio" in r.text
     assert "Resolver questões desta matéria" in r.text
 

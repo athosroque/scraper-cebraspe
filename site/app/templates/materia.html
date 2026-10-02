@@ -15,7 +15,7 @@
         <h2 class="mb-2 text-lg font-semibold text-slate-900">O que mais cai</h2>
         {% if linhas %}
         {% for r in linhas %}
-        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / maximo) if maximo else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões"), urls_subassunto[r.no_id]) }}
+        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / maximo) if maximo else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
         {% endfor %}
         <p class="mt-3 text-xs text-slate-500">Universo sob os filtros: {{ linhas[0].total_universo }} questões válidas. Anuladas ficam fora.</p>
         {% else %}
