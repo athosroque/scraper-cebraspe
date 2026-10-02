@@ -11,7 +11,7 @@
     <label for="busca-materia" class="sr-only">Buscar matéria</label>
     <input id="busca-materia" type="search" x-model="busca" placeholder="Buscar matéria..." autocomplete="off" class="campo mb-6 w-full sm:max-w-md">
 
-    {# TODO 5F.7: % de incidência e desempenho por matéria virão de /api/v1/materias. #}
+    {# % de incidência vem do mesmo serviço de /api/v1/materias (5F.7). #}
     <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {% for materia in materias %}
         <li data-nome="{{ materia.nome }}"
@@ -19,7 +19,8 @@
             {% call c.card("flex h-full flex-col justify-between gap-4") %}
             <div>
                 <a href="/materias/{{ materia.id|urlencode }}" class="text-base font-semibold text-slate-900 hover:text-blue-700">{{ materia.nome }}</a>
-                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }}</p>
+                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }} · {{ "%.1f"|format(materia.pct_incidencia)|replace(".", ",") }}% das questões</p>
+                {% if materia.nome_de_cargo %}<p class="mt-1 text-xs text-slate-500">Conhecimentos específicos do cargo</p>{% endif %}
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="/materias/{{ materia.id|urlencode }}" class="btn-secundario">Ver painel</a>

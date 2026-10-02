@@ -273,6 +273,60 @@ class LinhaProvaCobra(BaseModel):
     )
 
 
+# -- Matérias e busca (5F.7) --
+class MateriaResumo(BaseModel):
+    """Matéria da árvore ativa com o volume de questões objetivas utilizáveis."""
+
+    id: str = Field(description="ID estável do nó de nível matéria.")
+    nome: str = Field(description="Nome do nó na árvore mestre.")
+    total_questoes: int = Field(
+        description=(
+            "Questões objetivas utilizáveis distintas (anuladas incluídas) "
+            "classificadas na matéria ou abaixo dela (a contagem sobe a árvore)."
+        )
+    )
+    pct_incidencia: float = Field(
+        description=(
+            "`total_questoes` sobre o total de questões utilizáveis distintas, em %. "
+            "A soma entre matérias pode passar de 100 (questão em 2 nós)."
+        )
+    )
+    nome_de_cargo: bool = Field(
+        description=(
+            "A matéria é o próprio nome de um cargo (conhecimentos específicos "
+            "sem matéria nomeada no edital)."
+        )
+    )
+
+
+class MateriaDetalhe(MateriaResumo):
+    """Resumo da matéria com o recorte dos filtros e os subassuntos que mais caem."""
+
+    questoes_recorte: int = Field(
+        description="Questões válidas distintas da matéria sob os filtros (`fn_prova_cobra`)."
+    )
+    anuladas_recorte: int = Field(description="Anuladas da matéria sob os filtros.")
+    pct_do_universo: float = Field(
+        description="Participação da matéria no universo de questões válidas sob os filtros, em %."
+    )
+    itens_edital: int = Field(
+        description="Itens de edital distintos na matéria sob os filtros (concursos aprovados)."
+    )
+    top_subassuntos: list[LinhaProvaCobra] = Field(
+        description="Subassuntos que mais caem na matéria sob os filtros, maior primeiro."
+    )
+
+
+class ResultadoBusca(BaseModel):
+    """Nó da árvore ativa cujo nome casa com a busca (sem acento e sem caixa)."""
+
+    id: str = Field(description="ID estável do nó.")
+    nome: str = Field(description="Nome do nó.")
+    nivel: str = Field(description="`materia`, `assunto` ou `subassunto`.")
+    caminho: str = Field(description="Caminho matéria → assunto → subassunto.")
+    materia_id: str | None = Field(description="ID da matéria do nó.")
+
+
 class LinhaEditalCobra(BaseModel):
     """Nó no ranking "o que o edital cobra": itens de edital distintos, subindo a árvore."""
 

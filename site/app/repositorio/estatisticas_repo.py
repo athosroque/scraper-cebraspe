@@ -169,3 +169,46 @@ def materia_ativa(no_id: str) -> dict | None:
             (no_id,),
         )
         return cur.fetchone()
+
+
+def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
+    """Matérias ativas com questões utilizáveis distintas (mesma conta da árvore).
+
+    `vw_questoes.materia_id` já é a matéria do nó classificado, então a
+    contagem sobe a árvore. O denominador é o total de questões utilizáveis.
+    """
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute(
+            """
+            WITH total AS (
+                SELECT count(DISTINCT questao_id) AS n FROM vw_questoes WHERE utilizavel
+            )
+            SELECT nc.id, nc.nome,
+                   count(DISTINCT q.questao_id) AS total_questoes,
+                   round(100.0 * count(DISTINCT q.questao_id)
+                         / nullif((SELECT n FROM total), 0), 2)::float AS pct_incidencia,
+                   coalesce(bool_or(q.nome_de_cargo), false) AS nome_de_cargo
+            FROM vw_no_caminho nc
+            LEFT JOIN vw_questoes q ON q.materia_id = nc.id AND q.utilizavel
+            WHERE nc.nivel = 'materia'
+              AND (%(materia_id)s::text IS NULL OR nc.id = %(materia_id)s)
+            GROUP BY nc.id, nc.nome
+            HAVING %(materia_id)s::text IS NOT NULL OR count(q.questao_id) > 0
+            ORDER BY total_questoes DESC, nc.nome
+            """,
+            {"materia_id": materia_id},
+        )
+        return cur.fetchall()
+
+
+def nos_ativos() -> list[dict]:
+    """Todos os nós da cadeia ativa (para a busca por nome em Python)."""
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute("SELECT id, nome, nivel, caminho, materia_id FROM vw_no_caminho")
+        return cur.fetchall()

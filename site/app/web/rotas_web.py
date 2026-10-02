@@ -78,10 +78,8 @@ def _nao_encontrada(request: Request) -> HTMLResponse:
 
 @router.get("/", response_class=HTMLResponse)
 def inicio(request: Request):
-    # Grade de matérias (5F.9): só o 1º nível da árvore, maior volume primeiro.
-    materias = sorted(
-        questoes_servico.obter_arvore(), key=lambda no: (-no.total_questoes, no.nome)
-    )
+    # Grade de matérias (5F.9/5F.7): mesma lista de /api/v1/materias.
+    materias = estatisticas_servico.listar_materias()
     return templates.TemplateResponse(
         request=request, name="inicio.html", context={"materias": materias}
     )
@@ -539,17 +537,13 @@ def painel_materia(
     cargo_numero: str | None = None,
     nivel: str | None = None,
 ):
-    materia = estatisticas_servico.materia_ativa(no_id)
+    filtros = _filtro_estatistica(concurso, cargo_numero, nivel, None)
+    # Mesmo serviço de /api/v1/materias/{id}. Anulada também se resolve (com
+    # aviso no card): subassunto só com anuladas fica no ranking, com 0 válidas.
+    materia = estatisticas_servico.detalhe_materia(no_id, filtros, 15)
     if materia is None:
         return _nao_encontrada(request)
-    filtros = _filtro_estatistica(concurso, cargo_numero, nivel, None)
-    # Anulada também se resolve (com aviso no card): subassunto só com
-    # anuladas fica no ranking, com 0 válidas.
-    linhas = [
-        r
-        for r in estatisticas_servico.prova_cobra("subassunto", filtros, no_id, 15)
-        if r.questoes or r.anuladas
-    ]
+    linhas = materia.top_subassuntos
     filtros_lista = filtros.model_dump(exclude_none=True)
     return templates.TemplateResponse(
         request=request,

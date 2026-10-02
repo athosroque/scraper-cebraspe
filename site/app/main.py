@@ -10,6 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.api.v1.rotas_conta import router as router_conta
 from app.api.v1.rotas_estatisticas import router as router_estatisticas
+from app.api.v1.rotas_materias import router as router_materias
 from app.api.v1.rotas_questoes import router as router_questoes
 from app.api.v1.rotas_questoes import router_arvore, router_facetas
 from app.api.v1.rotas_simulados import router as router_simulados
@@ -63,6 +64,7 @@ app.include_router(router_arvore, prefix="/api/v1")
 app.include_router(router_facetas, prefix="/api/v1")
 app.include_router(router_conta, prefix="/api/v1")
 app.include_router(router_estatisticas, prefix="/api/v1")
+app.include_router(router_materias, prefix="/api/v1")
 app.include_router(router_simulados, prefix="/api/v1")
 app.include_router(router_web)
 
