@@ -39,6 +39,14 @@
 #    ligado (restart: unless-stopped). Código por bind mount de ./src: depois
 #    de mudar o bot, `docker compose restart scraper-cebraspe-bot`. Mudou
 #    Dockerfile.bot? `docker compose up -d --build scraper-cebraspe-bot`.
+#
+# 4. scraper-cebraspe-site — site (5F), ambiente DEV. Código por bind mount
+#    de ./site com uvicorn --reload. Exposto em questoes-dev.projetoathos.com.br
+#    via Traefik + Cloudflare Tunnel, protegido por Cloudflare Access (só o
+#    dono). O deploy público é a 5F.12. O Traefik reescreve
+#    X-Forwarded-Proto para http (não confia no cloudflared); o middleware
+#    abaixo força https para o redirect_uri do Google OAuth sair certo.
+#    Mudou Dockerfile.site? `docker compose up -d --build scraper-cebraspe-site`.
 
 services:
   scraper-cebraspe-db:
@@ -104,6 +112,37 @@ services:
       - ./logs:/app/logs
     networks:
       - homelab_default
+
+  scraper-cebraspe-site:
+    build:
+      context: .
+      dockerfile: Dockerfile.site
+    container_name: scraper-cebraspe-site
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_HOST: scraper-cebraspe-db
+      POSTGRES_PORT: "5432"
+      FIGURAS_DIR: /figuras
+      SESSION_HTTPS_ONLY: "true"
+    volumes:
+      - ./site:/app/site:ro
+      - ./.env:/app/.env:ro
+      - ./data:/figuras:ro
+    ports:
+      - "127.0.0.1:8012:8000"
+    depends_on:
+      scraper-cebraspe-db:
+        condition: service_healthy
+    networks:
+      - homelab_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scraper-site-dev.rule=Host(`questoes-dev.projetoathos.com.br`)"
+      - "traefik.http.routers.scraper-site-dev.entrypoints=web"
+      - "traefik.http.routers.scraper-site-dev.middlewares=scraper-site-dev-https"
+      - "traefik.http.middlewares.scraper-site-dev-https.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.services.scraper-site-dev.loadbalancer.server.port=8000"
 
 volumes:
   scraper_cebraspe_pgdata:
