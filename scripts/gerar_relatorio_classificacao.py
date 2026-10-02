@@ -425,9 +425,7 @@ def renderizar_relatorio(
                     )
                     conf_badge = f"<span class='badge-conf {escape(ap.confianca)}'>Confiança: {escape(ap.confianca)}</span>"
                     status_badge = f"<span class='badge-status {escape(ap.status)}'>{escape(ap.status)}</span>"
-                    papel_badge = (
-                        f"<span class='papel-tag'>[{escape(ap.papel)}]</span>"
-                    )
+                    papel_badge = f"<span class='papel-tag'>[{escape(ap.papel)}]</span>"
 
                     cmd_aprovar = f"python -m scripts.curar_classificacao --aprovar '{escape(reg.chave)}:{escape(ap.no_id)}'"
                     cmd_rejeitar = f"python -m scripts.curar_classificacao --rejeitar '{escape(reg.chave)}:{escape(ap.no_id)}'"
@@ -490,24 +488,24 @@ def renderizar_relatorio(
 
 <div class="totais-grid">
   <div class="total-card"><strong>{total_registros}</strong>Total Itens</div>
-  <div class="total-card {'destaque-aviso' if total_propostos else ''}"><strong>{total_propostos}</strong>Propostos</div>
-  <div class="total-card {'destaque-sucesso' if total_aprovados else ''}"><strong>{total_aprovados}</strong>Aprovados</div>
+  <div class="total-card {"destaque-aviso" if total_propostos else ""}"><strong>{total_propostos}</strong>Propostos</div>
+  <div class="total-card {"destaque-sucesso" if total_aprovados else ""}"><strong>{total_aprovados}</strong>Aprovados</div>
   <div class="total-card"><strong>{total_rejeitados}</strong>Rejeitados</div>
-  <div class="total-card {'destaque-alerta' if total_sem_no else ''}"><strong>{total_sem_no}</strong>Sem Nó</div>
+  <div class="total-card {"destaque-alerta" if total_sem_no else ""}"><strong>{total_sem_no}</strong>Sem Nó</div>
   <div class="total-card"><strong>{total_fora_edital}</strong>Fora do Edital</div>
-  <div class="total-card destaque-sucesso"><strong>{cont_conf.get('alta', 0)}</strong>Confiança Alta</div>
-  <div class="total-card"><strong>{cont_conf.get('media', 0)}</strong>Confiança Média</div>
-  <div class="total-card {'destaque-aviso' if cont_conf.get('baixa', 0) else ''}"><strong>{cont_conf.get('baixa', 0)}</strong>Confiança Baixa</div>
+  <div class="total-card destaque-sucesso"><strong>{cont_conf.get("alta", 0)}</strong>Confiança Alta</div>
+  <div class="total-card"><strong>{cont_conf.get("media", 0)}</strong>Confiança Média</div>
+  <div class="total-card {"destaque-aviso" if cont_conf.get("baixa", 0) else ""}"><strong>{cont_conf.get("baixa", 0)}</strong>Confiança Baixa</div>
 </div>
 
 <details class="indice-cadernos" open>
   <summary>Índice de Cadernos ({len(cadernos_ordenados)} cadernos extraídos)</summary>
   <ul class="lista-indice-cadernos">
-    {''.join(itens_indice)}
+    {"".join(itens_indice)}
   </ul>
 </details>
 
-{''.join(blocos_cadernos)}
+{"".join(blocos_cadernos)}
 
 <hr>
 <p><small>Relatório gerado automaticamente por <code>scripts/gerar_relatorio_classificacao.py</code>.</small></p>

@@ -33,9 +33,7 @@ from src import classificacao as classif_mod
 from src import stats_writer
 
 
-def _dividir_chave_valor(
-    arg: str, formato: str = "CHAVE:VALOR"
-) -> tuple[str, str]:
+def _dividir_chave_valor(arg: str, formato: str = "CHAVE:VALOR") -> tuple[str, str]:
     """Divide pelo último ':' separando a chave natural dos nós."""
     chave, sep, valor = arg.rpartition(":")
     if not sep or not chave.strip() or not valor.strip():
@@ -82,7 +80,9 @@ def listar_pendentes(
         print(f"\n🚨 ITENS SEM NÓ NA ÁRVORE ({len(sem_no_itens)}):")
         for r in sem_no_itens:
             print(f"  • Chave: {r.chave}")
-            print(f"    Comando sugerido: python -m scripts.curar_classificacao --mapear '{r.chave}:NO_ID'")
+            print(
+                f"    Comando sugerido: python -m scripts.curar_classificacao --mapear '{r.chave}:NO_ID'"
+            )
     else:
         print("\n✅ Nenhum item pendente marcado como 'sem_no'.")
 

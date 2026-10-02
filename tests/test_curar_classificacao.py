@@ -14,10 +14,18 @@ def ambiente_classificacao(tmp_path: Path):
     """Monta um ambiente isolado com árvore, arquivo canônico de classificação e pasta de revisão."""
     # 1. Árvore mestre
     arv = arv_mod.ArvoreMestre()
-    arv_mod.criar_no(arv, "materia", "DIREITO CONSTITUCIONAL", None, id_override="M-CONST")
-    arv_mod.criar_no(arv, "assunto", "Poder Legislativo", "M-CONST", id_override="A-LEG")
-    arv_mod.criar_no(arv, "subassunto", "Processo Legislativo", "A-LEG", id_override="S-PROC")
-    arv_mod.criar_no(arv, "subassunto", "Comissões Parlamentares", "A-LEG", id_override="S-CPI")
+    arv_mod.criar_no(
+        arv, "materia", "DIREITO CONSTITUCIONAL", None, id_override="M-CONST"
+    )
+    arv_mod.criar_no(
+        arv, "assunto", "Poder Legislativo", "M-CONST", id_override="A-LEG"
+    )
+    arv_mod.criar_no(
+        arv, "subassunto", "Processo Legislativo", "A-LEG", id_override="S-PROC"
+    )
+    arv_mod.criar_no(
+        arv, "subassunto", "Comissões Parlamentares", "A-LEG", id_override="S-CPI"
+    )
 
     arv_path = tmp_path / "arvore.json"
     arv_mod.salvar(arv, arv_path)
@@ -140,7 +148,9 @@ def test_aprovar_lote_com_filtro_caderno(ambiente_classificacao):
     _, classif_path, _, rodar = ambiente_classificacao
 
     # Aprovar lote apenas no caderno 002
-    assert rodar("--aprovar-lote", "--confianca", "baixa", "--caderno", "002_PF_02") == 0
+    assert (
+        rodar("--aprovar-lote", "--confianca", "baixa", "--caderno", "002_PF_02") == 0
+    )
 
     cq = classif_mod.carregar(classif_path)
     assert cq.registros["PF_25_ADM|002_PF_02|3"].apontamentos[0].status == "aprovado"
@@ -200,7 +210,9 @@ def test_geracao_relatorio_html(ambiente_classificacao):
 def test_renderizar_relatorio_com_contexto_mock(tmp_path: Path):
     arv = arv_mod.ArvoreMestre()
     arv_mod.criar_no(arv, "materia", "DIREITO PENAL", None, id_override="M-PEN")
-    arv_mod.criar_no(arv, "assunto", "Crimes contra a pessoa", "M-PEN", id_override="A-PES")
+    arv_mod.criar_no(
+        arv, "assunto", "Crimes contra a pessoa", "M-PEN", id_override="A-PES"
+    )
 
     cq = classif_mod.ClassificacaoQuestoes()
     classif_mod.mapear_questao(
@@ -231,7 +243,9 @@ def test_renderizar_relatorio_com_contexto_mock(tmp_path: Path):
         }
     }
 
-    html = gerar_relatorio_classificacao.renderizar_relatorio(cq, arv, contexto=contexto)
+    html = gerar_relatorio_classificacao.renderizar_relatorio(
+        cq, arv, contexto=contexto
+    )
     assert "O homicídio doloso admite tentativa." in html
     assert "Gabarito: C" in html
     assert "FORA DO EDITAL" in html
