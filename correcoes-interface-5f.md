@@ -125,13 +125,13 @@ com e sem as mudanças).
 - [x] `estatisticas.html`/`conta.html` mostram slug cru de concurso.
 - [x] 404 genérico em ~9 rotas (simulado, cargo sem prova); 405 usa o template de 404 e perde `Allow`.
 - [x] Paginação do `simulado_revisar` sem a mesma proteção.
-- [~] Sessão 3: `outros < 0`, tooltip "Questões da matéria", rodapé "Anuladas ficam fora", KPI "Itens de edital" removido, `/api/v1/arvore` ainda 178. (feito: `outros < 0` e rodapé; faltam tooltip, KPI e `/api/v1/arvore`)
-- [ ] Sessão 5: `og:image`, `twitter:title/description`; `localStorage` sem try/catch.
+- [x] Sessão 3: `outros < 0`, tooltip "Questões da matéria", rodapé, KPI "Itens de edital" (já não aparece no template) e `/api/v1/arvore` (178 vinha de `count(DISTINCT questao_id)` em `vw_questoes`; agora `fn_prova_cobra`, LP = 139).
+- [x] Sessão 5: `og:image` (`static/og.png`), `twitter:*`, canonical, `localStorage` via helper com try/catch, `aria-expanded` no ☰.
 
 ### Testes que faltam
 - [x] `pagina=999`, `/nao-existe` (HTML) e `/api/v1/nao-existe` (JSON), texto do 404 de matéria.
 - [x] Teste de reconciliação não tautológico (`test_materia.py:54`).
-- [ ] `value` dos selects, ordem dos filtros, favicon 200, canonical/OG.
+- [x] `value` dos selects, ordem dos filtros, favicon 200, canonical/OG (`tests/test_sessao5.py`).
 - [ ] Sessão 6 sem validação em navegador real: reabrir.
 
 ### Decisões do dono (Sessão 4)

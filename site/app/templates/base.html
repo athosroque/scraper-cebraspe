@@ -9,13 +9,34 @@
     <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
     <meta property="og:url" content="{{ request.url.replace(query='') }}">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ request.base_url }}static/og.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ self.og_title() }}">
+    <meta name="twitter:description" content="{{ self.og_description() }}">
+    <meta name="twitter:image" content="{{ request.base_url }}static/og.png">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="/static/tailwind.css">
     <script src="/static/htmx.min.js"></script>
+    <script>
+    // localStorage pode lançar (modo privado, dados bloqueados): sempre via helper.
+    window.sessaoAcertos = function () {
+        try { return parseInt(localStorage.getItem("sessao_acertos") || 0) || 0; } catch (e) { return 0; }
+    };
+    window.registrarAcerto = function (chave) {
+        try {
+            const k = JSON.parse(localStorage.getItem("sessao_acertos_chaves") || "[]");
+            if (!k.includes(chave)) {
+                k.push(chave);
+                localStorage.setItem("sessao_acertos_chaves", JSON.stringify(k));
+                localStorage.setItem("sessao_acertos", k.length);
+            }
+        } catch (e) {}
+    };
+    </script>
     <script defer src="/static/alpine.min.js"></script>
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token(request) }}"}'>
@@ -31,7 +52,7 @@
     <header class="border-b border-slate-200 bg-white" x-data="{ aberto: false }">
         <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
             <a href="/" class="text-base font-bold text-slate-900">Questões CEBRASPE</a>
-            <button type="button" class="rounded-md p-2 text-slate-600 md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">☰</button>
+            <button type="button" class="rounded-md p-2 text-slate-600 md:hidden" @click="aberto = !aberto" :aria-expanded="aberto.toString()" aria-expanded="false" aria-controls="menu-movel" aria-label="Abrir menu">☰</button>
             <div class="hidden items-center gap-1 md:flex">
                 {% for url, rotulo in itens_menu %}
                 <a href="{{ url }}" class="rounded-md px-3 py-2 text-sm font-medium {{ 'bg-slate-100 text-slate-900' if caminho == url else 'text-slate-600 hover:text-slate-900' }}">{{ rotulo }}</a>
@@ -43,8 +64,8 @@
                     <button type="submit" class="btn-secundario">Sair</button>
                 </form>
                 {% elif login_habilitado() %}
-                <span x-data="{ acertos: parseInt(localStorage.getItem('sessao_acertos') || 0) }" 
-                      @acerto-registrado.window="acertos = parseInt(localStorage.getItem('sessao_acertos') || 0)"
+                <span x-data="{ acertos: sessaoAcertos() }" 
+                      @acerto-registrado.window="acertos = sessaoAcertos()"
                       x-show="acertos > 0" x-cloak
                       class="ml-2 text-sm font-medium text-emerald-600" aria-live="polite">
                     Acertos: <span x-text="acertos"></span>
@@ -53,7 +74,7 @@
                 {% endif %}
             </div>
         </nav>
-        <div class="border-t border-slate-200 px-4 py-2 md:hidden" x-show="aberto" x-cloak>
+        <div id="menu-movel" class="border-t border-slate-200 px-4 py-2 md:hidden" x-show="aberto" x-cloak>
             {% for url, rotulo in itens_menu %}
             <a href="{{ url }}" class="block rounded-md px-3 py-2 text-sm text-slate-700">{{ rotulo }}</a>
             {% endfor %}
@@ -63,8 +84,8 @@
                 <button type="submit" class="block px-3 py-2 text-sm text-slate-700">Sair</button>
             </form>
             {% elif login_habilitado() %}
-            <span x-data="{ acertos: parseInt(localStorage.getItem('sessao_acertos') || 0) }" 
-                  @acerto-registrado.window="acertos = parseInt(localStorage.getItem('sessao_acertos') || 0)"
+            <span x-data="{ acertos: sessaoAcertos() }" 
+                  @acerto-registrado.window="acertos = sessaoAcertos()"
                   x-show="acertos > 0" x-cloak
                   class="block px-3 py-2 text-sm font-medium text-emerald-600" aria-live="polite">
                 Acertos: <span x-text="acertos"></span>
