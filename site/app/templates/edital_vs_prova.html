@@ -1,79 +1,84 @@
 {% extends "base.html" %}
+{% import "_componentes.html" as c %}
 
 {% block title %}Edital × prova - Questões CEBRASPE{% endblock %}
 {% block description %}O que o edital de cada cargo do CEBRASPE previu e a prova cobrou: assuntos cobrados, nunca cobrados e cobrados fora do edital.{% endblock %}
+{% block estilos_legados %}{% endblock %}
 
 {% block content %}
 {% include "_abas_estatistica.html" %}
 
-<form method="get" x-data @change="$el.requestSubmit()">
-    <div class="grid">
-        {% with rotulo_todos = "Escolha" %}{% include "_select_cargo.html" %}{% endwith %}
-    </div>
-    <noscript><button type="submit">Aplicar</button></noscript>
+{% call c.card("mb-6") %}
+<form method="get" x-data @change="$el.requestSubmit()" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    {% with rotulo_todos = "Escolha" %}{% include "_filtro_concurso_cargo.html" %}{% endwith %}
+    <noscript><button type="submit" class="btn-primario">Aplicar</button></noscript>
 </form>
+{% endcall %}
 
 {% if not resultado %}
-<p>Escolha um concurso e um cargo para comparar o edital com a prova.</p>
+{% call c.card() %}
+<p class="text-sm text-slate-600">Escolha um concurso e um cargo para comparar o edital com a prova.</p>
+{% endcall %}
 {% else %}
 {% set rotulos = {
     "cobrado_no_edital": "Previsto no edital e cobrado",
     "no_edital_nunca_cobrado": "No edital, nunca cobrado",
     "cobrado_fora_do_edital": "Cobrado fora do edital",
 } %}
-<div class="grid">
+<div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
     {% for chave, rotulo in rotulos.items() %}
-    <article class="resumo-situacao">
-        <header><small>{{ rotulo }}</small></header>
-        <strong>{{ resultado.resumo.get(chave, 0) }}</strong> <small>nós</small>
-    </article>
+    {{ c.kpi(rotulo, resultado.resumo.get(chave, 0), "nós da árvore") }}
     {% endfor %}
 </div>
 
-<h3>Peso de cada matéria na prova</h3>
-<table class="ranking">
-    <thead><tr><th>Matéria</th><th>Questões</th><th>% da prova</th></tr></thead>
-    <tbody>
-        {% for p in resultado.peso_materias %}
-        <tr>
-            <td>
-                <a href="{{ url_lista(p.materia_id, filtros) }}">{{ p.rotulo_materia }}</a>
-                <div class="barra"><span style="width: {{ [p.pct_da_prova, 100]|min }}%"></span></div>
-            </td>
-            <td>{{ p.questoes }}</td>
-            <td>{{ "%.2f"|format(p.pct_da_prova) }}%</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<p><small>Total da prova: {{ resultado.peso_materias[0].total_cargo if resultado.peso_materias else 0 }} questões válidas. A questão com nós em duas matérias conta nas duas, então a soma pode passar de 100%.</small></p>
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+{% call c.card() %}
+<h2 class="mb-2 text-lg font-semibold text-slate-900">Peso de cada matéria na prova</h2>
+{% for p in resultado.peso_materias %}
+{{ c.barra_ranking(p.rotulo_materia, p.pct_da_prova, p.questoes ~ " q · " ~ "%.2f"|format(p.pct_da_prova) ~ "%", url_lista(p.materia_id, filtros), destaque=loop.first) }}
+{% endfor %}
+<p class="mt-3 text-xs text-slate-500">Total da prova: {{ resultado.peso_materias[0].total_cargo if resultado.peso_materias else 0 }} questões válidas. A questão com nós em duas matérias conta nas duas, então a soma pode passar de 100%.</p>
+{% endcall %}
 
+{% call c.card("self-start") %}
+<h2 class="mb-2 text-lg font-semibold text-slate-900">Plano de estudo</h2>
+{# TODO 5F.8: plano de estudo e concurso-alvo salvo dependem dos endpoints da 5F.8. #}
+<p class="text-sm text-slate-600">Em breve: salve este concurso como alvo e receba um plano de estudo a partir dos assuntos do edital.</p>
+{% endcall %}
+</div>
+
+<div class="mt-6 space-y-3">
 {% for chave, rotulo in rotulos.items() %}
 {% set nos = resultado.nos|selectattr("situacao", "equalto", chave)|list %}
-<details {% if chave == "no_edital_nunca_cobrado" %}open{% endif %}>
-    <summary><strong>{{ rotulo }}</strong> ({{ nos|length }})</summary>
+<details class="rounded-xl border border-slate-200 bg-white shadow-sm" {% if chave == "no_edital_nunca_cobrado" %}open{% endif %}>
+    <summary class="cursor-pointer px-5 py-3 text-sm text-slate-900"><strong>{{ rotulo }}</strong> ({{ nos|length }})</summary>
     {% if nos %}
-    <table>
-        <thead><tr><th>Nó</th><th>Nível</th><th>Itens no edital</th><th>Questões</th></tr></thead>
-        <tbody>
+    <div class="overflow-x-auto border-t border-slate-100">
+    <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <tr><th class="px-5 py-2">Nó</th><th class="px-3 py-2">Nível</th><th class="px-3 py-2 text-right">Itens no edital</th><th class="px-5 py-2 text-right">Questões</th></tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
             {% for n in nos %}
             <tr>
-                <td>
-                    {% if n.questoes %}<a href="{{ url_lista(n.no_id, filtros) }}">{{ n.no_nome }}</a>{% else %}{{ n.no_nome }}{% endif %}
-                    {% if n.no_nivel != "materia" %}<br><small class="secondary">{{ n.caminho.rsplit(" > ", 1)[0] }}</small>{% endif %}
+                <td class="px-5 py-2">
+                    {% if n.questoes %}<a href="{{ url_lista(n.no_id, filtros) }}" class="link">{{ n.no_nome }}</a>{% else %}<span class="text-slate-900">{{ n.no_nome }}</span>{% endif %}
+                    {% if n.no_nivel != "materia" %}<div class="text-xs text-slate-500">{{ n.caminho.rsplit(" > ", 1)[0] }}</div>{% endif %}
                 </td>
-                <td>{{ n.no_nivel }}</td>
-                <td>{{ n.previsao }}</td>
-                <td>{{ n.questoes }}</td>
+                <td class="px-3 py-2 text-slate-600">{{ n.no_nivel }}</td>
+                <td class="px-3 py-2 text-right tabular-nums text-slate-600">{{ n.previsao }}</td>
+                <td class="px-5 py-2 text-right tabular-nums text-slate-600">{{ n.questoes }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
-    <p><small>Nenhum.</small></p>
+    <p class="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">Nenhum.</p>
     {% endif %}
 </details>
 {% endfor %}
-<p><small>O item do edital num nó cobre também os nós abaixo dele. A questão classificada direto num assunto não desce para o subassunto previsto abaixo, que pode aparecer como nunca cobrado.</small></p>
+</div>
+<p class="mt-3 text-xs text-slate-500">O item do edital num nó cobre também os nós abaixo dele. A questão classificada direto num assunto não desce para o subassunto previsto abaixo, que pode aparecer como nunca cobrado.</p>
 {% endif %}
 {% endblock %}

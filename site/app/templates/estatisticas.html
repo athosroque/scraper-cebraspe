@@ -1,83 +1,74 @@
 {% extends "base.html" %}
+{% import "_componentes.html" as c %}
 
 {% block title %}{% if aba == "prova" %}O que mais cai{% else %}O que o edital cobra{% endif %} - Questões CEBRASPE{% endblock %}
 {% block description %}{% if aba == "prova" %}Ranking dos assuntos que mais caem nas provas do CEBRASPE, por concurso, cargo e nível.{% else %}Ranking dos assuntos mais previstos nos editais do CEBRASPE, por concurso, cargo e nível.{% endif %}{% endblock %}
+{% block estilos_legados %}{% endblock %}
 
 {% block content %}
 {% include "_abas_estatistica.html" %}
 
-<form method="get" x-data @change="$el.requestSubmit()" class="filtros-estatistica">
-    <div class="grid">
-        <label>Nível da árvore
-            <select name="nivel_alvo">
-                {% for valor, rotulo in [("materia", "Matéria"), ("assunto", "Assunto"), ("subassunto", "Subassunto")] %}
-                <option value="{{ valor }}" {% if nivel_alvo == valor %}selected{% endif %}>{{ rotulo }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label>Matéria
-            <select name="materia_id" {% if nivel_alvo == "materia" %}disabled{% endif %}>
-                <option value="">Todas</option>
-                {% for m in materias %}
-                <option value="{{ m.id }}" {% if materia_id == m.id %}selected{% endif %}>{{ m.nome }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label>Nível do cargo
-            <select name="nivel">
-                {% for valor, rotulo in [("", "Todos"), ("superior", "Superior"), ("medio", "Médio")] %}
-                <option value="{{ valor }}" {% if (filtros.nivel or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label>Conhecimento
-            <select name="tipo_conhecimento">
-                {% for valor, rotulo in [("", "Todos"), ("basico", "Básico"), ("especifico", "Específico")] %}
-                <option value="{{ valor }}" {% if (filtros.tipo_conhecimento or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
-                {% endfor %}
-            </select>
-        </label>
-    </div>
-    <div class="grid">
-        {% include "_select_cargo.html" %}
-    </div>
-    <noscript><button type="submit">Aplicar</button></noscript>
+{% call c.card("mb-6") %}
+<form method="get" x-data @change="$el.requestSubmit()" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {% include "_filtro_concurso_cargo.html" %}
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Nível do cargo
+        <select name="nivel" class="campo">
+            {% for valor, rotulo in [("", "Todos"), ("superior", "Superior"), ("medio", "Médio")] %}
+            <option value="{{ valor }}" {% if (filtros.nivel or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Nível da árvore
+        <select name="nivel_alvo" class="campo">
+            {% for valor, rotulo in [("materia", "Matéria"), ("assunto", "Assunto"), ("subassunto", "Subassunto")] %}
+            <option value="{{ valor }}" {% if nivel_alvo == valor %}selected{% endif %}>{{ rotulo }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Matéria
+        <select name="materia_id" class="campo" {% if nivel_alvo == "materia" %}disabled{% endif %}>
+            <option value="">Todas</option>
+            {% for m in materias %}
+            <option value="{{ m.id }}" {% if materia_id == m.id %}selected{% endif %}>{{ m.nome }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Conhecimento
+        <select name="tipo_conhecimento" class="campo">
+            {% for valor, rotulo in [("", "Todos"), ("basico", "Básico"), ("especifico", "Específico")] %}
+            <option value="{{ valor }}" {% if (filtros.tipo_conhecimento or "") == valor %}selected{% endif %}>{{ rotulo }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <noscript><button type="submit" class="btn-primario">Aplicar</button></noscript>
 </form>
+{% endcall %}
 
-{% if aba == "prova" %}
-<p><small>Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da matéria (ou da prova, no nível matéria), com o mesmo peso para cada concurso.</small></p>
-{% else %}
-<p><small>Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a matéria acima dele; o item básico vale para cada cargo do nível.</small></p>
-{% endif %}
-
+{% call c.card() %}
+<div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+    <h2 class="text-lg font-semibold text-slate-900">{% if aba == "prova" %}O que mais cai na prova{% else %}O que o edital cobra{% endif %}</h2>
+    {% if aba == "prova" and linhas %}{{ c.selo(linhas[0].total_universo ~ " questões válidas no universo") }}{% endif %}
+</div>
+<p class="mb-4 text-xs text-slate-500">
+{% if aba == "prova" %}Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da matéria (ou da prova, no nível matéria), com o mesmo peso para cada concurso.
+{% else %}Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a matéria acima dele; o item básico vale para cada cargo do nível.{% endif %}
+</p>
 {% if linhas %}
-<table class="ranking">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>{{ {"materia": "Matéria", "assunto": "Assunto", "subassunto": "Subassunto"}[nivel_alvo] }}</th>
-            <th>{% if aba == "prova" %}Questões{% else %}Itens no edital{% endif %}</th>
-            {% if aba == "prova" %}<th>% médio</th>{% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for r in linhas %}
-        {% set valor = r.questoes if aba == "prova" else r.ocorrencias %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>
-                <a href="{{ url_lista(r.no_id, filtros) }}">{{ r.no_nome }}</a>
-                {% if nivel_alvo != "materia" %}<br><small class="secondary">{{ r.caminho.rsplit(" > ", 1)[0] }}</small>{% endif %}
-                <div class="barra"><span style="width: {{ (valor * 100 / maximo) if maximo else 0 }}%"></span></div>
-            </td>
-            <td>{{ valor }}</td>
-            {% if aba == "prova" %}<td>{{ "%.2f"|format(r.pct_medio_por_concurso) }}%</td>{% endif %}
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% if aba == "prova" %}<p><small>Universo sob os filtros: {{ linhas[0].total_universo }} questões válidas.</small></p>{% endif %}
+<ol class="divide-y divide-slate-100">
+    {% for r in linhas %}
+    {% set valor = r.questoes if aba == "prova" else r.ocorrencias %}
+    {% set rotulo_valor = (valor ~ " questões · " ~ "%.2f"|format(r.pct_medio_por_concurso) ~ "% médio") if aba == "prova" else (valor ~ " itens") %}
+    <li class="flex gap-3">
+        <span class="w-6 shrink-0 pt-2 text-right text-xs tabular-nums text-slate-400">{{ loop.index }}</span>
+        <div class="min-w-0 flex-1">
+            {{ c.barra_ranking(r.no_nome, (valor * 100 / maximo) if maximo else 0, rotulo_valor, url_lista(r.no_id, filtros)) }}
+            {% if nivel_alvo != "materia" %}<p class="-mt-1 truncate pb-1 text-xs text-slate-500">{{ r.caminho.rsplit(" > ", 1)[0] }}</p>{% endif %}
+        </div>
+    </li>
+    {% endfor %}
+</ol>
 {% else %}
-<p>Nenhum resultado para esses filtros.</p>
+<p class="text-sm text-slate-600">Nenhum resultado para esses filtros.</p>
 {% endif %}
+{% endcall %}
 {% endblock %}
