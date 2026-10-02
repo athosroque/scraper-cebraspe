@@ -1,33 +1,66 @@
 {% extends "base.html" %}
+{% import "_componentes.html" as c %}
 
 {% block title %}Questão {{ questao.numero }} - {{ questao.concurso }} - CEBRASPE{% endblock %}
 
 {% block description %}Questão {{ questao.numero }} ({{ questao.orgao }} {{ questao.ano }}, CEBRASPE): {{ questao.enunciado|truncate(150) }}{% endblock %}
 
+{% block estilos_legados %}{% endblock %}
+
 {% block content %}
-<nav aria-label="breadcrumb">
-    <ul>
-        <li><a href="/">Início</a></li>
-        <li>Questão {{ questao.questao_chave }}</li>
-    </ul>
+{% set principal = (questao.nos|selectattr("papel", "equalto", "principal")|first) or (questao.nos|first) %}
+<nav aria-label="Trilha" class="mb-4 text-sm text-slate-600">
+    <ol class="flex flex-wrap items-center gap-1">
+        <li><a href="/" class="link">Questões</a></li>
+        {% if principal and principal.no_caminho %}
+        {# O caminho já vem montado da árvore; o separador varia entre " > " e " › ". #}
+        {% for parte in principal.no_caminho.replace(" > ", " › ").split(" › ") %}
+        <li aria-hidden="true">›</li>
+        <li class="{{ 'font-medium text-slate-900' if loop.last }}">{{ parte }}</li>
+        {% endfor %}
+        {% endif %}
+    </ol>
 </nav>
+
+{% call c.cabecalho("Questão " ~ questao.numero ~ " · " ~ questao.orgao ~ " " ~ questao.ano) %}
+<div class="flex flex-wrap gap-2">
+    {{ c.selo(questao.concurso) }}
+    {{ c.selo("Caderno " ~ questao.codigo_caderno) }}
+    {% for cargo in questao.cargos %}{{ c.selo("Cargo " ~ cargo.cargo_numero ~ " — " ~ cargo.cargo ~ " (" ~ cargo.nivel ~ ")") }}{% endfor %}
+</div>
+{% endcall %}
 
 {% include "_card_questao.html" %}
 
-<article style="margin-top: 2rem;">
-    <header><strong>Fonte Original</strong></header>
-    <p>
-        Esta questão foi extraída do concurso <strong>{{ questao.concurso }}</strong> ({{ questao.ano }}), 
-        caderno <code>{{ questao.codigo_caderno }}</code>.
+<div class="mt-6 grid gap-4 md:grid-cols-2">
+    {% call c.card() %}
+    <h2 class="text-base font-semibold text-slate-900">Fonte: CEBRASPE</h2>
+    <p class="mt-2 text-sm text-slate-700">
+        Concurso <strong>{{ questao.concurso }}</strong> ({{ questao.ano }}), caderno
+        <code class="rounded bg-slate-100 px-1">{{ questao.codigo_caderno }}</code>, item {{ questao.numero }}.
     </p>
-    {% if questao.link_pdf %}
-    <p>
-        <a href="{{ questao.link_pdf }}" target="_blank" rel="noopener noreferrer" role="button" class="outline">
-            Ver PDF Original no site do CEBRASPE
-        </a>
-    </p>
+    <div class="mt-3">
+        {% if questao.link_pdf %}
+        <a href="{{ questao.link_pdf }}" target="_blank" rel="noopener noreferrer" class="btn-secundario">Ver PDF original no site do CEBRASPE</a>
+        {% else %}
+        <p class="text-sm italic text-slate-500">O link para o PDF original não está disponível.</p>
+        {% endif %}
+    </div>
+    {% endcall %}
+
+    {% call c.card() %}
+    <h2 class="text-base font-semibold text-slate-900">Continue estudando</h2>
+    {% if questao.nos %}
+    <ul class="mt-2 space-y-1 text-sm">
+        {% for no in questao.nos %}
+        <li><a href="/questoes?no_id={{ no.no_id|urlencode }}" class="link">Mais questões de {{ no.no_nome }}</a></li>
+        {% endfor %}
+    </ul>
     {% else %}
-    <p class="secondary"><em>O link para o PDF original não está disponível.</em></p>
+    <p class="mt-2 text-sm text-slate-500">Esta questão ainda não foi classificada na árvore.</p>
     {% endif %}
-</article>
+    {# TODO 5F.7: "Questões parecidas" quando o endpoint existir. #}
+    <p class="mt-3 text-xs text-slate-500">Questões parecidas: em breve.</p>
+    {% endcall %}
+</div>
 {% endblock %}
