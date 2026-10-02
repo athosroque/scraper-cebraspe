@@ -1,18 +1,23 @@
 {% set questao = resultado %}
-<div id="{{ dom_id(resultado.questao_chave) }}" style="padding: 1rem; border-radius: var(--pico-border-radius); border: 1px solid var(--pico-muted-border-color); background-color: var(--pico-form-element-background-color);">
-    <p style="margin-bottom: 0.5rem;">
-        Sua resposta: <strong>{{ resultado.resposta }}</strong>
-    </p>
+{% if resultado.anulada %}
+    {% set tom = "border-amber-200 bg-amber-50 text-amber-900" %}
+{% elif resultado.acertou %}
+    {% set tom = "border-emerald-200 bg-emerald-50 text-emerald-900" %}
+{% else %}
+    {% set tom = "border-red-200 bg-red-50 text-red-900" %}
+{% endif %}
+<div id="{{ dom_id(resultado.questao_chave) }}" class="rounded-lg border p-4 text-sm {{ tom }}" role="status">
     {% if resultado.anulada %}
-    <p class="text-error" style="margin-bottom: 0;"><strong>Atenção:</strong> Esta questão foi anulada pela banca.</p>
+    <p class="font-semibold">Atenção: esta questão foi anulada pela banca.</p>
     {% elif resultado.acertou %}
-    <p class="text-success" style="margin-bottom: 0;"><strong>✅ Você acertou!</strong> O gabarito é {{ resultado.gabarito }}.</p>
+    <p class="font-semibold">✓ Você acertou! O gabarito é {{ resultado.gabarito }}.</p>
     {% else %}
-    <p class="text-error" style="margin-bottom: 0;"><strong>❌ Você errou.</strong> O gabarito é {{ resultado.gabarito }}.</p>
+    <p class="font-semibold">✗ Você errou. O gabarito é {{ resultado.gabarito }}.</p>
     {% endif %}
+    <p class="mt-1">Sua resposta: <strong>{{ resultado.resposta }}</strong></p>
     {% if resultado.gravada %}
-    <p style="margin: 0.5rem 0 0;"><small class="secondary">Resposta salva no seu histórico.</small></p>
+    <p class="mt-2 text-xs opacity-80">Resposta salva no seu histórico.</p>
     {% elif not logado and login_habilitado() %}
-    <p style="margin: 0.5rem 0 0;"><small class="secondary"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}">Entre com Google</a> para guardar seu histórico.</small></p>
+    <p class="mt-2 text-xs"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}" class="link">Entre com Google</a> para guardar seu histórico.</p>
     {% endif %}
 </div>

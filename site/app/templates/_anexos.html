@@ -1,8 +1,8 @@
 {% if questao.texto_base_texto %}
-<div style="margin-bottom: 1rem; white-space: pre-wrap; font-size: 0.9em;">{{ questao.texto_base_texto }}</div>
+<div class="mb-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-800">{{ questao.texto_base_texto }}</div>
 {% endif %}
 {% for fig in questao.figuras %}
 {% if fig.url %}
-<img src="{{ fig.url }}" alt="Figura da questão {{ questao.numero }}" loading="lazy" style="max-width: 100%; height: auto; display: block; margin-bottom: 0.5rem; border: 1px solid var(--pico-muted-border-color);">
+<img src="{{ fig.url }}" alt="Figura da questão {{ questao.numero }}" loading="lazy" class="mb-2 block h-auto max-w-full rounded border border-slate-200">
 {% endif %}
 {% endfor %}

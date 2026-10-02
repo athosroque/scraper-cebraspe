@@ -1,51 +1,42 @@
-<article style="margin-bottom: 2rem;">
-    <header>
-        <strong>Questão {{ questao.numero }}</strong> — 
-        <small class="secondary">
-            <a href="{{ url_questao(questao.questao_chave) }}" class="secondary">
-                {{ questao.orgao }} {{ questao.ano }} ({{ questao.banca }})
-            </a>
-        </small>
-        {% if questao.anulada %}
-        <span class="pico-background-danger" style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8em; color: white;">Anulada</span>
-        {% endif %}
+{% import "_componentes.html" as c %}
+<article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <header class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+        <strong class="text-slate-900">Questão {{ questao.numero }}</strong>
+        <a href="{{ url_questao(questao.questao_chave) }}" class="text-slate-600 hover:text-blue-700">{{ questao.orgao }} {{ questao.ano }} · {{ questao.banca }}</a>
+        {% if questao.anulada %}<span class="rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-red-200">Anulada</span>{% endif %}
+        {# TODO 5F.7: selo de incidência do nó principal ("mais cai") via c.selo(). #}
     </header>
 
     {% if questao.tem_texto_base or questao.tem_figuras %}
-    <details style="margin-bottom: 1rem; background-color: var(--pico-form-element-background-color); padding: 1rem; border-radius: var(--pico-border-radius);"{% if anexos_inline %} open{% endif %}>
-        <summary><strong>{% if questao.tem_texto_base %}Texto associado{% else %}Figuras{% endif %}{% if questao.tem_texto_base and questao.tem_figuras %} e figuras{% endif %}</strong></summary>
+    <details class="group mb-4 rounded-lg border border-slate-200 bg-slate-50"{% if anexos_inline %} open{% endif %}>
+        <summary class="cursor-pointer select-none px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900">
+            {% if questao.tem_texto_base %}Texto associado{% else %}Figuras{% endif %}{% if questao.tem_texto_base and questao.tem_figuras %} e figuras{% endif %}
+        </summary>
         {% if anexos_inline %}
-        <div style="margin-top: 1rem;">{% include "_anexos.html" %}</div>
+        <div class="border-t border-slate-200 px-4 py-3">{% include "_anexos.html" %}</div>
         {% else %}
-        <div style="margin-top: 1rem;" hx-get="{{ url_questao(questao.questao_chave) }}/anexos" hx-trigger="toggle from:closest details once" hx-swap="innerHTML"><small aria-busy="true">Carregando…</small></div>
+        <div class="border-t border-slate-200 px-4 py-3" hx-get="{{ url_questao(questao.questao_chave) }}/anexos" hx-trigger="toggle from:closest details once" hx-swap="innerHTML"><span class="text-xs text-slate-500" aria-busy="true">Carregando…</span></div>
         {% endif %}
     </details>
     {% endif %}
 
-    <div style="margin-bottom: 1.5rem; font-size: 1.05em; line-height: 1.6;">
-        {{ questao.enunciado }}
-    </div>
+    <p class="mb-4 whitespace-pre-line leading-relaxed text-slate-900">{{ questao.enunciado }}</p>
 
-    <!-- Container do Form e Resposta -->
     <div id="{{ dom_id(questao.questao_chave) }}">
-        <form hx-post="/q/correcao" hx-target="#{{ dom_id(questao.questao_chave) }}" hx-swap="outerHTML">
+        <form hx-post="/q/correcao" hx-target="#{{ dom_id(questao.questao_chave) }}" hx-swap="outerHTML" class="flex gap-3">
             <input type="hidden" name="chave" value="{{ questao.questao_chave }}">
-            <div class="grid" style="gap: 1rem;">
-                <button type="submit" name="resposta" value="C" class="outline">Certo</button>
-                <button type="submit" name="resposta" value="E" class="outline">Errado</button>
-            </div>
+            <button type="submit" name="resposta" value="C" class="btn-secundario flex-1 justify-center hover:border-emerald-400 hover:text-emerald-700 sm:flex-none sm:px-8">Certo</button>
+            <button type="submit" name="resposta" value="E" class="btn-secundario flex-1 justify-center hover:border-red-400 hover:text-red-700 sm:flex-none sm:px-8">Errado</button>
         </form>
     </div>
 
-    <footer style="font-size: 0.85em;">
-        <p style="margin-bottom: 0.3rem;"><small>Fonte: CEBRASPE — {{ questao.concurso }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</small></p>
-        <strong>Assuntos:</strong>
-        <ul style="display: inline; padding: 0; margin: 0; list-style: none;">
-            {% for no in questao.nos %}
-            <li style="display: inline; margin-right: 0.5rem;">
-                <span class="secondary">{{ no.no_caminho }}</span>
-            </li>
-            {% endfor %}
-        </ul>
+    <footer class="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
+        {% if questao.nos %}
+        <div class="mb-2 flex flex-wrap gap-1.5">
+            {% for no in questao.nos %}{{ c.selo(no.no_caminho) }}{% endfor %}
+        </div>
+        {% endif %}
+        <p>Fonte: CEBRASPE — {{ questao.concurso }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</p>
+        {# TODO 5F.7: "questões parecidas" (GET /api/v1/questoes/{chave}/parecidas). #}
     </footer>
 </article>

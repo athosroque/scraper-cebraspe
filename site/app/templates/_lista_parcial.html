@@ -1,37 +1,58 @@
-<div>
-    <header style="margin-bottom: 2rem;">
-        <hgroup>
-            <h2>Questões</h2>
-            <p>{{ pagina_questoes.total }} questões encontradas</p>
-        </hgroup>
-    </header>
+{% import "_componentes.html" as c %}
+{# Chips dos filtros ativos. Cada um leva à lista sem só aquele filtro (o
+   cargo depende do concurso, então sai junto com ele). #}
+{% set ativos = filtros.model_dump(exclude_defaults=True) %}
+{% macro url_sem(campo, outro=None) -%}
+/questoes{% set resto = {} %}{% for k, v in ativos.items() if k not in (campo, outro) %}{% set _ = resto.update({k: v}) %}{% endfor %}{% if resto %}?{{ resto|urlencode }}{% endif %}
+{%- endmacro %}
+{% set rotulos = {
+    "concurso": "Concurso",
+    "cargo_numero": "Cargo",
+    "orgao": "Órgão",
+    "nivel": "Nível",
+    "banca": "Banca",
+    "ano": "Ano",
+    "tipo_conhecimento": "Conhecimento",
+    "anuladas": "Anuladas",
+    "fora_do_edital": "Fora do edital",
+    "utilizaveis": "Itens",
+} %}
+{% set rotulos_historico = {"resolvidas": "Já resolvidas", "nao_resolvidas": "Não resolvidas", "certas": "Acertei", "erradas": "Errei"} %}
 
-    {% if pagina_questoes.total == 0 %}
-    <article>
-        <p>Nenhuma questão encontrada com estes filtros. Confira o assunto selecionado e o histórico na barra lateral.</p>
-    </article>
-    {% else %}
-        {% for questao in pagina_questoes.itens %}
-            {% include "_card_questao.html" %}
-        {% endfor %}
-
-        <!-- Paginação -->
-        <nav style="margin-top: 2rem; display: flex; justify-content: space-between;">
-            {% if pagina_questoes.pagina > 1 %}
-            <button hx-get="/" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Anterior</button>
-            {% else %}
-            <div></div>
-            {% endif %}
-
-            <div style="align-self: center;">
-                Página {{ pagina_questoes.pagina }} de {{ pagina_questoes.total_paginas }}
-            </div>
-
-            {% if pagina_questoes.pagina < pagina_questoes.total_paginas %}
-            <button hx-get="/" hx-vals='{"pagina": {{ pagina_questoes.pagina + 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true" class="outline">Próxima</button>
-            {% else %}
-            <div></div>
-            {% endif %}
-        </nav>
-    {% endif %}
+<div class="mb-4 flex flex-wrap items-center gap-2">
+    <p class="mr-2 text-sm text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total }}</strong> questões encontradas</p>
+    {% for campo, valor in ativos.items() %}
+        {% if campo == "no_id" %}
+            {{ c.chip("Assunto: " ~ (no_nome or valor), url_sem("no_id")) }}
+        {% elif campo == "historico" %}
+            {{ c.chip(rotulos_historico.get(valor, valor), url_sem("historico")) }}
+        {% elif campo == "concurso" %}
+            {{ c.chip(valor, url_sem("concurso", "cargo_numero")) }}
+        {% else %}
+            {{ c.chip(rotulos.get(campo, campo) ~ ": " ~ valor, url_sem(campo)) }}
+        {% endif %}
+    {% endfor %}
+    {% if ativos %}<a href="/questoes" class="link text-xs">Limpar filtros</a>{% endif %}
 </div>
+
+{% if pagina_questoes.total == 0 %}
+{% call c.card() %}
+<p class="text-sm text-slate-600">Nenhuma questão encontrada com estes filtros. Remova um dos filtros acima ou troque o assunto.</p>
+{% endcall %}
+{% else %}
+<div class="space-y-4">
+    {% for questao in pagina_questoes.itens %}
+        {% include "_card_questao.html" %}
+    {% endfor %}
+</div>
+
+<nav class="mt-6 flex items-center justify-between gap-3" aria-label="Paginação">
+    {% if pagina_questoes.pagina > 1 %}
+    <button type="button" class="btn-secundario" hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true">← Anterior</button>
+    {% else %}<span></span>{% endif %}
+    <span class="text-sm tabular-nums text-slate-600">Página {{ pagina_questoes.pagina }} de {{ pagina_questoes.total_paginas }}</span>
+    {% if pagina_questoes.pagina < pagina_questoes.total_paginas %}
+    <button type="button" class="btn-secundario" hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina + 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true">Próxima →</button>
+    {% else %}<span></span>{% endif %}
+</nav>
+{% endif %}
