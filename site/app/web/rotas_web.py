@@ -497,7 +497,8 @@ def conta(
             "usuario": usuario,
             "filtros": filtros,
             "desempenho": contas_servico.desempenho(usuario_id, filtros),
-            "resumo": contas_servico.resumo(usuario_id),
+            "resumo": contas_servico.resumo_completo(usuario_id),
+            "prioridades": contas_servico.prioridades(usuario_id, 5),
             "facetas": questoes_servico.obter_facetas(),
         },
     )

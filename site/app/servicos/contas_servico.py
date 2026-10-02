@@ -1,7 +1,18 @@
 """Regras de conta e histórico (5F.3): correção, gravação e desempenho por nó."""
 
-from app.modelos import FiltroQuestoes, NoDesempenho, RespostaResultado, Usuario
-from app.repositorio import questoes_repo, usuarios_repo
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
+
+from app.modelos import (
+    FiltroEstatistica,
+    FiltroQuestoes,
+    NoDesempenho,
+    Prioridade,
+    RespostaResultado,
+    ResumoConta,
+    Usuario,
+)
+from app.repositorio import estatisticas_repo, questoes_repo, usuarios_repo
 from app.servicos import questoes_servico
 
 
@@ -107,3 +118,82 @@ def resumo(usuario_id: int) -> dict:
         "erradas": total - certas,
         "percentual": round(100 * certas / total, 1) if total else None,
     }
+
+
+# -- Resumo e prioridades (5F.8) --
+FUSO_DIAS = "America/Sao_Paulo"
+MINIMO_RESPOSTAS_PRIORIDADE = 2
+# Sem LIMIT efetivo: a incidência precisa cobrir todo subassunto respondido.
+_SEM_LIMITE = 100_000
+
+
+def contar_dias_seguidos(dias: list[date], hoje: date) -> int:
+    """Dias consecutivos com resposta terminando hoje (ou ontem, se hoje ainda não teve)."""
+    conjunto = set(dias)
+    dia = hoje if hoje in conjunto else hoje - timedelta(days=1)
+    seguidos = 0
+    while dia in conjunto:
+        seguidos += 1
+        dia -= timedelta(days=1)
+    return seguidos
+
+
+def resumo_completo(usuario_id: int) -> ResumoConta:
+    """KPIs de `resumo()` + nota líquida (certo +1, errado −1) e dias seguidos."""
+    base = resumo(usuario_id)
+    hoje = datetime.now(ZoneInfo(FUSO_DIAS)).date()
+    dias = usuarios_repo.dias_com_resposta(usuario_id, FUSO_DIAS)
+    return ResumoConta(
+        **base,
+        nota_liquida=base["certas"] - base["erradas"],
+        erradas_pendentes=base["erradas"],
+        dias_seguidos=contar_dias_seguidos(dias, hoje),
+    )
+
+
+def _subassuntos(nos: list[NoDesempenho], caminho: tuple[str, ...] = ()):
+    for no in nos:
+        atual = (*caminho, no.nome)
+        if no.nivel == "subassunto":
+            yield no, " › ".join(atual)
+        yield from _subassuntos(no.filhos, atual)
+
+
+def prioridades(usuario_id: int, limite: int = 10) -> list[Prioridade]:
+    """Subassuntos com ≥ 2 respostas, por incidência na prova × taxa de erro.
+
+    As respostas (role `site_app`) e a incidência (`fn_prova_cobra`, role
+    `site_leitura`) são lidas em separado e cruzadas aqui pelo `no_id`:
+    nunca um JOIN entre `app.resposta` e as views.
+    """
+    candidatos = [
+        (no, caminho)
+        for no, caminho in _subassuntos(desempenho(usuario_id, FiltroQuestoes()))
+        if no.total >= MINIMO_RESPOSTAS_PRIORIDADE
+    ]
+    if not candidatos:
+        return []
+    incidencia = {
+        r["no_id"]: float(r["pct_medio_por_concurso"] or 0)
+        for r in estatisticas_repo.prova_cobra(
+            "subassunto", FiltroEstatistica().model_dump(), None, _SEM_LIMITE
+        )
+    }
+    itens = []
+    for no, caminho in candidatos:
+        taxa_erro = round(100 * (no.total - no.acertos) / no.total, 1)
+        pct = incidencia.get(no.id, 0.0)
+        itens.append(
+            Prioridade(
+                no_id=no.id,
+                nome=no.nome,
+                caminho=caminho,
+                respondidas=no.total,
+                acertos=no.acertos,
+                taxa_erro=taxa_erro,
+                incidencia=round(pct, 2),
+                prioridade=round(pct * taxa_erro / 100, 3),
+            )
+        )
+    itens.sort(key=lambda p: (-p.prioridade, -p.taxa_erro, -p.respondidas, p.nome))
+    return itens[: max(1, limite)]

@@ -69,6 +69,26 @@ def ultimas_respostas(usuario_id: int) -> dict[str, bool]:
         return dict(linhas)
 
 
+def dias_com_resposta(usuario_id: int, fuso: str) -> list:
+    """Datas distintas (no fuso dado) com alguma resposta, da mais recente à mais antiga.
+
+    Conta resposta avulsa e de simulado: dia seguido é dia em que o usuário estudou.
+    """
+    with get_conexao_app() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT DISTINCT (respondida_em AT TIME ZONE %s)::date AS dia
+            FROM app.resposta
+            WHERE usuario_id = %s
+            ORDER BY dia DESC
+            """,
+            (fuso, usuario_id),
+        )
+        linhas = cur.fetchall()
+        conn.rollback()
+        return [d for (d,) in linhas]
+
+
 def apagar_usuario(usuario_id: int) -> bool:
     """Apaga a conta; respostas e simulados saem em cascata."""
     with get_conexao_app() as conn, conn.cursor() as cur:

@@ -172,6 +172,52 @@ class NoDesempenho(BaseModel):
     filhos: list["NoDesempenho"] = []
 
 
+# -- Resumo e prioridades (5F.8) --
+class ResumoConta(BaseModel):
+    """KPIs da conta pela resposta mais recente de cada questão (fora de simulado)."""
+
+    resolvidas: int = Field(description="Questões distintas respondidas.")
+    certas: int = Field(description="Questões cuja última resposta acertou.")
+    erradas: int = Field(description="Questões cuja última resposta errou.")
+    percentual: float | None = Field(
+        description="Certas / resolvidas × 100, com 1 casa; `null` sem respostas."
+    )
+    nota_liquida: int = Field(
+        description="Regra CEBRASPE: certas − erradas (cada errada anula uma certa)."
+    )
+    erradas_pendentes: int = Field(
+        description="Erradas ainda não refeitas com acerto (caderno de erros)."
+    )
+    dias_seguidos: int = Field(
+        description=(
+            "Dias consecutivos com ao menos uma resposta (avulsa ou de simulado), "
+            "no fuso America/Sao_Paulo, terminando hoje ou ontem."
+        )
+    )
+
+
+class Prioridade(BaseModel):
+    """Subassunto sugerido para estudo: cai muito na prova e o usuário erra."""
+
+    no_id: str
+    nome: str
+    caminho: str = Field(description="Matéria › assunto › subassunto.")
+    respondidas: int = Field(description="Questões distintas respondidas no nó.")
+    acertos: int
+    taxa_erro: float = Field(
+        description="(respondidas − acertos) / respondidas × 100, com 1 casa."
+    )
+    incidencia: float = Field(
+        description=(
+            "% médio por concurso das questões no subassunto (`fn_prova_cobra`, "
+            "sem filtros); 0 se o nó não aparece no ranking."
+        )
+    )
+    prioridade: float = Field(
+        description="incidência × taxa de erro / 100 (ordem decrescente)."
+    )
+
+
 # -- Estatísticas (5F.4) --
 NivelAlvo = Literal["materia", "assunto", "subassunto"]
 

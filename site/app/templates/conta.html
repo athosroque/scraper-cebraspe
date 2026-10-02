@@ -10,12 +10,23 @@
 <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
     {{ c.kpi("Resolvidas", resumo.resolvidas) }}
     {{ c.kpi("Acerto", "%.1f%%"|format(resumo.percentual)) }}
-    {{ c.kpi("Certas", resumo.certas) }}
-    {{ c.kpi("Erradas", resumo.erradas) }}
+    {{ c.kpi("Nota líquida", resumo.nota_liquida, resumo.certas ~ " certas − " ~ resumo.erradas ~ " erradas") }}
+    {{ c.kpi("Dias seguidos", resumo.dias_seguidos, "com ao menos uma resposta") }}
 </div>
 
-{# TODO 5F.8: "o que estudar agora", "dias seguidos" e "nota líquida" #}
-<p class="mt-3 text-xs text-slate-500">Em breve: o que estudar agora, dias seguidos e nota líquida.</p>
+{% call c.card("mt-6") %}
+<h2 class="text-base font-semibold text-slate-900">O que estudar agora</h2>
+<p class="mt-1 text-xs text-slate-500">Subassuntos com pelo menos 2 respostas, pela incidência na prova × sua taxa de erro.</p>
+{% if prioridades %}
+<div class="mt-3">
+    {% for p in prioridades %}
+    {{ c.barra_ranking(p.caminho, p.taxa_erro, "%.1f%% de erro · cai %.1f%%"|format(p.taxa_erro, p.incidencia), url="/questoes?" ~ {"no_id": p.no_id}|urlencode, destaque=loop.first) }}
+    {% endfor %}
+</div>
+{% else %}
+<p class="mt-3 text-sm text-slate-600">Responda pelo menos 2 questões de um mesmo subassunto para ver sugestões.</p>
+{% endif %}
+{% endcall %}
 
 {% call c.card("mt-6") %}
 <div class="flex flex-wrap items-center justify-between gap-3">

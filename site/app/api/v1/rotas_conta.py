@@ -8,8 +8,10 @@ from app.auth import exigir_usuario_id, usuario_id_atual, verificar_csrf
 from app.modelos import (
     FiltroQuestoes,
     NoDesempenho,
+    Prioridade,
     RespostaEntrada,
     RespostaResultado,
+    ResumoConta,
     Usuario,
 )
 from app.servicos import contas_servico
@@ -56,6 +58,43 @@ def apagar_conta(request: Request, usuario_id: int = Depends(exigir_usuario_id))
     contas_servico.apagar_conta(usuario_id)
     request.session.clear()
     return Response(status_code=204)
+
+
+@router.get(
+    "/eu/resumo",
+    response_model=ResumoConta,
+    summary="Resumo da conta (KPIs)",
+    description=(
+        "Resolvidas, certas, erradas e acerto pela resposta mais recente de cada "
+        "questão (fora de simulado); nota líquida na regra CEBRASPE (certas − "
+        "erradas); erradas pendentes (caderno de erros) e dias seguidos com "
+        "resposta no fuso America/Sao_Paulo."
+    ),
+    responses={401: {"description": "Login necessário"}},
+)
+def resumo_conta(usuario_id: int = Depends(exigir_usuario_id)):
+    """KPIs do painel "Meu desempenho"."""
+    return contas_servico.resumo_completo(usuario_id)
+
+
+@router.get(
+    "/eu/prioridades",
+    response_model=list[Prioridade],
+    summary="O que estudar agora",
+    description=(
+        "Subassuntos com pelo menos 2 questões respondidas, ordenados por "
+        "incidência na prova (`fn_prova_cobra`, % médio por concurso) × taxa de "
+        "erro do usuário. Respostas e incidência são lidas em separado e "
+        "cruzadas no serviço."
+    ),
+    responses={401: {"description": "Login necessário"}},
+)
+def prioridades(
+    usuario_id: int = Depends(exigir_usuario_id),
+    limite: int = Query(10, ge=1, le=50, description="Máximo de subassuntos."),
+):
+    """Ranking de subassuntos para revisar primeiro."""
+    return contas_servico.prioridades(usuario_id, limite)
 
 
 @router.get(
