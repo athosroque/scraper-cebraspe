@@ -163,6 +163,12 @@ class Usuario(BaseModel):
     id: int
     email: str
     nome: str | None = None
+    concurso_alvo: str | None = Field(
+        None, description="Slug do concurso-alvo salvo (5F.8), ou nulo."
+    )
+    cargo_alvo: int | None = Field(
+        None, description="Número do cargo-alvo no concurso salvo, ou nulo."
+    )
 
 
 class RespostaEntrada(BaseModel):
@@ -486,3 +492,41 @@ class SimuladoResumo(BaseModel):
     inicio: Any
     fim: Any
     nota: float | None
+
+
+# -- Plano de estudo e concurso-alvo (5F.8) --
+class ConcursoAlvo(BaseModel):
+    """Concurso e cargo que o usuário está estudando."""
+
+    concurso: str = Field(
+        description="Slug do concurso (ex.: `PF_25_ADM`).", examples=["PF_25_ADM"]
+    )
+    cargo_numero: int = Field(
+        ge=1, description="Número do cargo no concurso.", examples=[1]
+    )
+
+
+class ItemPlano(BaseModel):
+    """Matéria do plano, com a prioridade de estudo."""
+
+    materia_id: str = Field(description="ID do nó da matéria na árvore mestre.")
+    rotulo_materia: str
+    pct_da_prova: float = Field(description="Peso da matéria na prova do cargo (%).")
+    respondidas: int = Field(
+        description="Questões da matéria respondidas pelo usuário (todas as provas)."
+    )
+    acertos: int
+    acerto: float = Field(
+        description="Acerto do usuário na matéria (0 a 1). Sem respostas, 0."
+    )
+    prioridade: float = Field(
+        description="`pct_da_prova` × (1 − `acerto`). Maior primeiro."
+    )
+
+
+class PlanoEstudo(BaseModel):
+    """Matérias do cargo ordenadas pela prioridade de estudo."""
+
+    concurso: str
+    cargo_numero: int
+    itens: list[ItemPlano]

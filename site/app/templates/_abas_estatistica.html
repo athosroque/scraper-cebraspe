@@ -1,6 +1,8 @@
 {% import "_componentes.html" as c %}
 {% call c.cabecalho("Meu concurso", "Escolha concurso e cargo para ver o peso das matérias, o que o edital cobra e o que a prova cobrou.") %}
-{# TODO 5F.8: concurso-alvo salvo na conta e "plano de estudo" (ainda sem endpoint). #}
+{% if alvo is defined and alvo %}
+<p class="mt-2 text-sm text-slate-600">Seu concurso-alvo: <a class="font-medium text-blue-700 hover:underline" href="/estatisticas/edital-vs-prova?concurso={{ alvo.concurso|urlencode }}&amp;cargo_numero={{ alvo.cargo_numero }}">{{ alvo.concurso }} · cargo {{ alvo.cargo_numero }}</a></p>
+{% endif %}
 {% endcall %}
 <nav aria-label="Estatísticas" class="mb-6 flex gap-1 overflow-x-auto border-b border-slate-200 text-sm">
     {% for chave, href, rotulo in [("edital_vs_prova", "/estatisticas/edital-vs-prova", "Edital × prova"), ("edital", "/estatisticas/edital", "O que o edital cobra"), ("prova", "/estatisticas", "O que mais cai")] %}

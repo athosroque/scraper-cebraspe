@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS app.simulado (
     nota numeric(6, 2) NULL
 );
 
+-- 5F.8: concurso-alvo do usuário (aditivo; os dois juntos ou nenhum).
+ALTER TABLE app.usuario ADD COLUMN IF NOT EXISTS concurso_alvo text;
+ALTER TABLE app.usuario ADD COLUMN IF NOT EXISTS cargo_alvo integer;
+
 CREATE INDEX IF NOT EXISTS resposta_usuario_chave_idx
     ON app.resposta (usuario_id, questao_chave, respondida_em DESC);
 

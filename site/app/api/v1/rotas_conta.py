@@ -6,8 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
 from app.auth import exigir_usuario_id, usuario_id_atual, verificar_csrf
 from app.modelos import (
+    ConcursoAlvo,
     FiltroQuestoes,
     NoDesempenho,
+    PlanoEstudo,
     Prioridade,
     RespostaEntrada,
     RespostaResultado,
@@ -39,7 +41,13 @@ def responder(entrada: RespostaEntrada, request: Request):
     return resultado
 
 
-@router.get("/eu", response_model=Usuario, summary="Usuário logado", responses=_401)
+@router.get(
+    "/eu",
+    response_model=Usuario,
+    summary="Usuário logado",
+    description="Dados da conta, com o concurso-alvo salvo (nulo se não houver).",
+    responses=_401,
+)
 def eu(usuario_id: int = Depends(exigir_usuario_id)):
     usuario = contas_servico.obter_usuario(usuario_id)
     if not usuario:
@@ -130,3 +138,67 @@ def desempenho(
         fora_do_edital=fora_do_edital,
     )
     return contas_servico.desempenho(usuario_id, filtros)
+
+
+# -- Plano de estudo e concurso-alvo (5F.8) --
+_404_CONCURSO = {404: {"description": "Concurso ou cargo sem prova na base"}}
+
+
+@router.get(
+    "/eu/concurso-alvo",
+    response_model=ConcursoAlvo | None,
+    summary="Concurso-alvo salvo",
+    description="Concurso e cargo que o usuário estuda; `null` se nada foi salvo.",
+    responses=_401,
+)
+def obter_concurso_alvo(usuario_id: int = Depends(exigir_usuario_id)):
+    """Lê o concurso-alvo da conta logada."""
+    return contas_servico.obter_concurso_alvo(usuario_id)
+
+
+@router.put(
+    "/eu/concurso-alvo",
+    response_model=ConcursoAlvo,
+    summary="Salva o concurso-alvo",
+    description=(
+        "Grava concurso e cargo na conta. O par precisa existir na base "
+        "(cargo com prova); senão, 404. Exige o header `X-CSRFToken`."
+    ),
+    dependencies=[Depends(verificar_csrf)],
+    responses={**_401, **_403, **_404_CONCURSO},
+)
+def salvar_concurso_alvo(
+    alvo: ConcursoAlvo, usuario_id: int = Depends(exigir_usuario_id)
+):
+    """Substitui o concurso-alvo da conta logada."""
+    try:
+        gravou = contas_servico.salvar_concurso_alvo(usuario_id, alvo)
+    except contas_servico.ConcursoInexistente:
+        raise HTTPException(status_code=404, detail="Concurso ou cargo não encontrado")
+    if not gravou:
+        raise HTTPException(status_code=401, detail="Login necessário")
+    return alvo
+
+
+@router.get(
+    "/eu/plano",
+    response_model=PlanoEstudo,
+    summary="Plano de estudo do cargo",
+    description=(
+        "Matérias do cargo ordenadas por `prioridade` = peso da matéria na prova "
+        "(`vw_peso_materia_cargo`) × (1 − acerto do usuário na matéria). O acerto "
+        "usa a resposta mais recente de cada questão, de qualquer prova; sem "
+        "respostas na matéria, o acerto é 0 e a prioridade é o próprio peso."
+    ),
+    responses={**_401, **_404_CONCURSO},
+)
+def plano(
+    usuario_id: int = Depends(exigir_usuario_id),
+    concurso: str = Query(description="Slug do concurso.", examples=["PF_25_ADM"]),
+    cargo_numero: int = Query(ge=1, description="Número do cargo.", examples=[1]),
+):
+    """Monta o plano de estudo da conta logada para um cargo."""
+    try:
+        return contas_servico.plano_estudo(usuario_id, concurso, cargo_numero)
+    except contas_servico.ConcursoInexistente:
+        raise HTTPException(status_code=404, detail="Concurso ou cargo não encontrado")
