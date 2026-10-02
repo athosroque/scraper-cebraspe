@@ -74,9 +74,9 @@ def _nome_do_no(arvore, no_id: str | None) -> str | None:
     return None
 
 
-def _nao_encontrada(request: Request) -> HTMLResponse:
+def _nao_encontrada(request: Request, titulo: str = "Página não encontrada", mensagem: str = "O endereço pode estar errado ou a página foi removida.") -> HTMLResponse:
     return templates.TemplateResponse(
-        request=request, name="nao_encontrada.html", status_code=404
+        request=request, name="nao_encontrada.html", status_code=404, context={"titulo": titulo, "mensagem": mensagem}
     )
 
 
@@ -134,6 +134,11 @@ def index(
     pagina_questoes = questoes_servico.listar_questoes(
         filtros, pagina, tamanho_pagina, usuario_id
     )
+    
+    if pagina > 1 and pagina > pagina_questoes.total_paginas:
+        params = dict(request.query_params)
+        params["pagina"] = str(pagina_questoes.total_paginas)
+        return RedirectResponse(f"/questoes?{urlencode(params)}", status_code=307)
 
     # A restauração de histórico do HTMX também manda HX-Request, mas espera a
     # página inteira.
@@ -169,7 +174,7 @@ def corrigir_questao(
 ):
     resultado = contas_servico.responder(chave, resposta, usuario_id)
     if not resultado:
-        return _nao_encontrada(request)
+        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
     return templates.TemplateResponse(
         request=request,
         name="_correcao.html",
@@ -182,7 +187,7 @@ def anexos_questao(request: Request, concurso: str, caderno: str, numero: int):
     """Texto-base e figuras, carregados sob demanda pelo card da lista."""
     questao = questoes_servico.obter_questao_por_chave(f"{concurso}|{caderno}|{numero}")
     if not questao:
-        return _nao_encontrada(request)
+        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
     return templates.TemplateResponse(
         request=request, name="_anexos.html", context={"questao": questao}
     )
@@ -193,7 +198,7 @@ def parecidas_questao(request: Request, concurso: str, caderno: str, numero: int
     """Questões parecidas, carregadas sob demanda pelo card da lista."""
     parecidas = questoes_servico.parecidas(f"{concurso}|{caderno}|{numero}")
     if parecidas is None:
-        return _nao_encontrada(request)
+        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
     return templates.TemplateResponse(
         request=request, name="_parecidas.html", context={"parecidas": parecidas}
     )
@@ -204,7 +209,7 @@ def detalhe_questao(request: Request, concurso: str, caderno: str, numero: int):
     chave = f"{concurso}|{caderno}|{numero}"
     questao = questoes_servico.obter_questao_por_chave(chave)
     if not questao:
-        return _nao_encontrada(request)
+        return _nao_encontrada(request, titulo="Questão não encontrada", mensagem="O endereço pode estar errado ou a questão foi removida.")
     return templates.TemplateResponse(
         request=request,
         name="questao_detalhe.html",
@@ -651,7 +656,7 @@ def painel_materia(
     # aviso no card): subassunto só com anuladas fica no ranking, com 0 válidas.
     materia = estatisticas_servico.detalhe_materia(no_id, filtros, 15)
     if materia is None:
-        return _nao_encontrada(request)
+        return _nao_encontrada(request, titulo="Matéria não encontrada", mensagem="O endereço pode estar errado ou a matéria foi removida.")
     linhas = materia.top_subassuntos
     filtros_lista = filtros.model_dump(exclude_none=True)
     return templates.TemplateResponse(

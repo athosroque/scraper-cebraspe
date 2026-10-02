@@ -47,7 +47,7 @@
 </div>
 
 <nav class="mt-6 flex items-center justify-between gap-3" aria-label="Paginação">
-    {% if pagina_questoes.pagina > 1 %}
+    {% if pagina_questoes.pagina > 1 and pagina_questoes.pagina <= pagina_questoes.total_paginas %}
     <button type="button" class="btn-secundario" hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true">← Anterior</button>
     {% else %}<span></span>{% endif %}
     <span class="text-sm tabular-nums text-slate-600">Página {{ pagina_questoes.pagina }} de {{ pagina_questoes.total_paginas }}</span>

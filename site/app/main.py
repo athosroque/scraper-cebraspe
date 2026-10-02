@@ -99,6 +99,23 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+from fastapi import Request
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.web.rotas_web import templates
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    accept = request.headers.get("accept", "")
+    if request.url.path.startswith("/api/") or "text/html" not in accept:
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+    if exc.status_code in (404, 405):
+        return templates.TemplateResponse(
+            request=request, name="nao_encontrada.html", status_code=exc.status_code, context={"titulo": "Página não encontrada", "mensagem": "O endereço pode estar errado ou a página foi removida."}
+        )
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
 # Sessão em cookie assinado (5F.3): só id do usuário, nome e token CSRF.
 app.add_middleware(
     SessionMiddleware,
