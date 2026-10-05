@@ -30,6 +30,7 @@ alerta com o texto na auditoria.
 """
 
 import re
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -121,6 +122,13 @@ PADRAO_VARIAVEL_ESPACADA = re.compile(r"\$ (?=[A-Z_][A-Z0-9_]*\b)")
 TOLERANCIA_BORDA_CODIGO = 8.0
 TOLERANCIA_RECUO = 2.0  # recuo real: 18 pt exatos; célula de tabela a 15 pt não conta
 TOLERANCIA_MESMA_LINHA = 2.0
+# Parágrafo do texto-base (5G.1): recuo da 1ª linha em relação à moda do x0
+# da coluna. No CEBRASPE é ~28,5 pt (56,8 × 28,3 em `167_CDNS_CG1_01`); acima
+# do teto é linha centralizada/à direita (fonte "Internet: <...>"), não recuo.
+RECUO_PARAGRAFO_MIN = 8.0
+RECUO_PARAGRAFO_MAX = 45.0
+TERMINAIS_PARAGRAFO = (".", "!", "?", ":", "”", '"', ")", "»")
+LIMITE_COLUNA_DIREITA = 290.0
 ALTURA_CABECALHO = 70  # faixa decorativa do topo da página (imagem de cabeçalho)
 TAMANHO_MINIMO_FIGURA = 15
 DPI_FIGURA = 150
@@ -145,6 +153,9 @@ class Linha:
     monoespacada: bool = False
     # Maior x1 da coluna da linha na página (ver `_marcar_borda_direita`).
     borda_direita: float | None = None
+    # x0 do primeiro span com texto (o PDF põe spans " " antes do recuo de
+    # parágrafo, e o x0 da linha ficaria na margem). None = usar `x0`.
+    x0_texto: float | None = None
 
     @property
     def bbox(self) -> list[float]:
@@ -289,6 +300,10 @@ def extrair_linhas(doc) -> list[Linha]:
                 sp0_font = sp0.get("font", "")
                 is_bold = bool(sp0_flags & 16) or ("bold" in sp0_font.lower())
                 is_mono = _linha_monoespacada(linha["spans"], mono_fonts)
+                x0_texto = next(
+                    (sp["bbox"][0] for sp in linha["spans"] if sp["text"].strip()),
+                    x0,
+                )
                 if (
                     atual is not None
                     and abs(centro - (atual.y0 + atual.y1) / 2)
@@ -296,6 +311,7 @@ def extrair_linhas(doc) -> list[Linha]:
                 ):
                     atual.texto = f"{atual.texto.rstrip()} {texto.strip()}"
                     atual.x0, atual.x1 = min(atual.x0, x0), max(atual.x1, x1)
+                    atual.x0_texto = min(atual.x0_texto, x0_texto)
                     atual.monoespacada = atual.monoespacada and is_mono
                     continue
                 atual = Linha(
@@ -315,6 +331,7 @@ def extrair_linhas(doc) -> list[Linha]:
                     .translate(SIMBOLO_PUA),
                     negrito=is_bold,
                     monoespacada=is_mono,
+                    x0_texto=x0_texto,
                 )
                 linhas.append(atual)
         _marcar_borda_direita(
@@ -700,8 +717,59 @@ def _formatar_codigo(bloco: list[tuple[Linha | str, str]]) -> str:
     return "\n".join(saida)
 
 
-def juntar_linhas(linhas: list[Linha | str]) -> str:
+def _x0_texto(linha: Linha | str) -> float | None:
+    if not isinstance(linha, Linha):
+        return None
+    return linha.x0_texto if linha.x0_texto is not None else linha.x0
+
+
+def _coluna_paragrafo(linha: Linha) -> tuple[int, bool]:
+    return (linha.pagina, (_x0_texto(linha) or 0.0) >= LIMITE_COLUNA_DIREITA)
+
+
+def _margens_prosa(linhas: list[Linha | str]) -> dict[tuple[int, bool], float]:
+    """Margem do corpo de cada coluna (página, lado): a moda do x0 do texto
+    das linhas, em pontos inteiros. A 1ª linha de parágrafo é minoria, então
+    não desloca a moda."""
+    contagem: dict[tuple[int, bool], Counter] = {}
+    for linha in linhas:
+        x0 = _x0_texto(linha)
+        if x0 is None:
+            continue
+        contagem.setdefault(_coluna_paragrafo(linha), Counter())[round(x0)] += 1
+    margens = {}
+    for coluna, cont in contagem.items():
+        moda, freq = cont.most_common(1)[0]
+        # Moda de 1 linha não é régua (texto de 1-2 linhas): sem parágrafo.
+        if freq >= 2:
+            margens[coluna] = float(moda)
+    return margens
+
+
+def _inicia_paragrafo(
+    linha: Linha | str, margens: dict[tuple[int, bool], float], anterior: str
+) -> bool:
+    """Linha recuada da margem do corpo (recuo de 1ª linha, ~28 pt no
+    CEBRASPE) depois de uma linha que fecha frase."""
+    x0 = _x0_texto(linha)
+    if x0 is None:
+        return False
+    margem = margens.get(_coluna_paragrafo(linha))
+    if margem is None:
+        return False
+    recuo = x0 - margem
+    return (
+        RECUO_PARAGRAFO_MIN <= recuo <= RECUO_PARAGRAFO_MAX
+        and anterior.rstrip().endswith(TERMINAIS_PARAGRAFO)
+    )
+
+
+def juntar_linhas(linhas: list[Linha | str], paragrafos: bool = False) -> str:
     """Junta linhas num parágrafo ou bloco de código/tabela.
+
+    - `paragrafos=True` (texto-base): linha com recuo de 1ª linha em relação
+      à margem da coluna abre parágrafo novo (`\\n\\n`). Enunciado de item
+      não usa (a chave da 5D depende dele).
 
     - Parágrafos de texto corrido: junta com espaço, desfaz quebra de linha e
       respeita hifenização (`executá-` + `los` -> `executá-los`).
@@ -736,6 +804,11 @@ def juntar_linhas(linhas: list[Linha | str]) -> str:
         classificadas.append((item, texto_limpo, eh_cod))
         anterior_era_codigo = eh_cod
 
+    margens = (
+        _margens_prosa([it for it, _, cod in classificadas if not cod])
+        if paragrafos
+        else {}
+    )
     resultado = ""
     anterior_era_codigo = False
     i = 0
@@ -755,6 +828,8 @@ def juntar_linhas(linhas: list[Linha | str]) -> str:
             resultado = texto_formatado
         elif anterior_era_codigo:
             resultado = f"{resultado}\n{texto_formatado}"
+        elif paragrafos and _inicia_paragrafo(item, margens, resultado):
+            resultado = f"{resultado}\n\n{texto_formatado}"
         elif resultado.endswith("-") and texto_formatado[:1].islower():
             resultado += texto_formatado
         else:
@@ -848,7 +923,7 @@ def segmentar(
             )
             k = fim
         comando = juntar_linhas(linhas[k:fim]) or None
-        base = juntar_linhas(linhas[inicio:k])
+        base = juntar_linhas(linhas[inicio:k], paragrafos=True)
         # O comando pode começar no meio da linha, colado ao fim do texto-base
         # ("... biodiversidade. Acerca desse tema, julgue ..."): a última frase
         # antes do "julgue" é o comando, o resto volta para o texto-base.
