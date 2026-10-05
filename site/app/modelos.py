@@ -560,6 +560,7 @@ class ItemSimulado(BaseModel):
                     "codigo_caderno": "094_PF_CB1_01",
                     "tipo_conhecimento": "basico",
                     "enunciado": _EX_ENUNCIADO,
+                    "secao": _EX_SECAO,
                     "texto_base_texto": "“A liberdade medieval”, disse o historiador…",
                     "figuras": [],
                 }
@@ -572,6 +573,10 @@ class ItemSimulado(BaseModel):
     codigo_caderno: str = Field(description=_D_CADERNO)
     tipo_conhecimento: str = Field(description=_D_TIPO)
     enunciado: str = Field(description="Texto do item a julgar.")
+    secao: str | None = Field(
+        None,
+        description="Comando da seção do caderno que agrupa o item (“julgue os itens…”).",
+    )
     texto_base_texto: str | None = Field(
         None, description="Texto-base compartilhado, quando houver."
     )

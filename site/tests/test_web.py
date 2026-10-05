@@ -263,3 +263,33 @@ def test_materia_de_cargo_com_rotulo(cliente):
     assert mat is not None
     html = cliente.get(f"/materias/{mat['id']}").text
     assert f"Conhecimentos específicos — {mat['nome']}" in html
+
+
+def test_comando_e_assunto_no_topo_da_pagina_canonica(cliente):
+    # PF_25_ADM 094_PF_CB2_01 item 24: os dados do item estão só no comando.
+    q = cliente.get("/api/v1/questoes/PF_25_ADM|094_PF_CB2_01|24").json()
+    assert "60 pessoas" in q["secao"]
+    html = cliente.get("/q/PF_25_ADM/094_PF_CB2_01/24").text
+    card = html[html.index("<article") :]
+    rodape = card.index("<footer")
+    i_assunto = card.index("data-assunto-topo")
+    i_comando = card.index("data-comando")
+    i_enunciado = card.index(q["enunciado"][:30])
+    assert i_assunto < i_comando < i_enunciado < rodape
+    assert "60 pessoas" in card[i_comando:i_enunciado]
+    assert "data-assunto-topo" not in card[rodape:]
+
+
+def test_lista_mostra_comando_e_recolhe_repetido(cliente):
+    html = cliente.get("/questoes", params={"tamanho_pagina": 50}).text
+    assert "data-comando" in html
+    assert "Mesmo comando da questão anterior" in html
+
+
+def test_simulado_traz_comando_sem_gabarito(cliente):
+    params = {"concurso": "PF_25_ADM", "cargo_numero": 1}
+    itens = cliente.get("/api/v1/simulados/prova", params=params).json()["itens"]
+    assert any(i["secao"] for i in itens)
+    assert all("gabarito" not in i for i in itens)
+    html = cliente.get("/simulado/prova", params=params).text
+    assert "data-comando" in html

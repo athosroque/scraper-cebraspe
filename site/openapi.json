@@ -2898,6 +2898,18 @@
             "title": "Enunciado",
             "description": "Texto do item a julgar."
           },
+          "secao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secao",
+            "description": "Comando da seção do caderno que agrupa o item (“julgue os itens…”)."
+          },
           "texto_base_texto": {
             "anyOf": [
               {
@@ -2938,6 +2950,7 @@
             "figuras": [],
             "numero": 1,
             "questao_chave": "PF_25_ADM|094_PF_CB1_01|1",
+            "secao": "Acerca das ideias e de aspectos linguísticos do texto precedente, julgue os itens a seguir.",
             "texto_base_texto": "“A liberdade medieval”, disse o historiador…",
             "tipo_conhecimento": "basico"
           }

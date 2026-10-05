@@ -37,7 +37,7 @@
         </details>
     </div>
 
-    {% set ns = namespace(tipo=None, texto=None, figuras=None) %}
+    {% set ns = namespace(tipo=None, texto=None, figuras=None, secao=None, caderno=None) %}
     <div class="space-y-4">
     {% for item in prova.itens %}
     {% if item.tipo_conhecimento != ns.tipo %}
@@ -54,6 +54,10 @@
     {% endfor %}
     {% endif %}
     {% set ns.figuras = item.figuras %}
+    {% if item.secao and (item.secao != ns.secao or item.codigo_caderno != ns.caderno) %}
+    <p class="whitespace-pre-line border-l-4 border-blue-700 bg-blue-50 px-3 py-2 text-sm italic text-slate-700" data-comando>{{ item.secao }}</p>
+    {% endif %}
+    {% set ns.secao = item.secao %}{% set ns.caderno = item.codigo_caderno %}
     <fieldset id="item-{{ loop.index }}" data-item class="scroll-mt-32 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <legend class="sr-only">Item {{ item.numero }}</legend>
         <p class="text-slate-900"><strong class="mr-2 inline-block rounded bg-slate-100 px-2 py-0.5 text-sm tabular-nums">{{ item.numero }}</strong>{{ item.enunciado }}</p>

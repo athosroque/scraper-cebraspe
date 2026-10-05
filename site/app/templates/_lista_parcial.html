@@ -45,9 +45,10 @@
     {% set ns = namespace(caderno=None, secao=None) %}
     {% for questao in pagina_questoes.itens %}
         {% set mesmo_texto = questao.tem_texto_base and questao.secao and questao.secao == ns.secao and questao.codigo_caderno == ns.caderno %}
+        {% set mesmo_comando = questao.secao and questao.secao == ns.secao and questao.codigo_caderno == ns.caderno %}
         {% set ns.caderno = questao.codigo_caderno %}
         {% set ns.secao = questao.secao %}
-        {% with questao=questao, mesmo_texto=mesmo_texto %}
+        {% with questao=questao, mesmo_texto=mesmo_texto, mesmo_comando=mesmo_comando %}
         {% include "_card_questao.html" %}
         {% endwith %}
     {% endfor %}
