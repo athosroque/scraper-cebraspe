@@ -46,6 +46,11 @@ STATUS_FALHA_SEM_QUESTAO = "falha_sem_questao"
 
 SEVERIDADE_BLOQUEANTE = "bloqueante"
 SEVERIDADE_INFORMATIVO = "informativo"
+# Alertas por item que tiram a questão do site (`questoes.utilizavel=false`)
+# sem derrubar o caderno inteiro (o que a severidade bloqueante faria).
+ALERTAS_ITEM_INUTILIZAVEL = frozenset(
+    {"simbolo_ilegivel", "possivel_preambulo_no_item"}
+)
 
 PADRAO_CABECALHO = re.compile(r"^\s*CEBRASPE\s*[–-].*Edital", re.IGNORECASE)
 PADRAO_FAIXA_SECAO = re.compile(r"^\s*--")  # "-- CONHECIMENTOS BÁSICOS --"
@@ -895,6 +900,32 @@ def _inicio_comando(linhas: list[Linha], inicio: int, fim: int) -> int | None:
     return k
 
 
+def _ruptura_do_item(
+    linhas: list[Linha], i_item: int, fim: int, margens: list[float], recuo: float
+) -> int | None:
+    """1ª linha de `linhas[i_item+1:fim]` que não continua o item: a anterior
+    fecha frase e ela está fora do recuo do item (margem da coluna ou recuo
+    de parágrafo). Item que anuncia material ("a seguir", ":") não rompe."""
+    for j in range(i_item + 1, fim):
+        anterior = linhas[j - 1].texto.rstrip()
+        if not anterior.endswith(TERMINAIS_COMANDO) or anterior.endswith(":"):
+            continue
+        if _eh_continuacao(linhas[j], margens, recuo):
+            continue
+        if PADRAO_ITEM_ANUNCIA.search(juntar_linhas(linhas[i_item:j])):
+            return None
+        return j
+    return None
+
+
+# Comando que retoma um material ("Com base nessas informações", "desses
+# dados") sem texto-base próprio: o material ficou em outro lugar.
+PADRAO_COMANDO_ANAFORICO = re.compile(
+    r"\b(?:n|d)?(?:ess|est)[ae]s?\s+(?:informa|dados|tabela|quadro|valores|situa)",
+    re.IGNORECASE,
+)
+
+
 @dataclass
 class ResultadoSegmentacao:
     itens: dict[int, dict] = field(default_factory=dict)
@@ -997,6 +1028,13 @@ def segmentar(
         )
 
         if pos + 1 < len(indices) and sufixo and tem_comando:
+            # Linha de tabela do grupo seguinte pode cair no recuo do item
+            # (célula a ~17 pt da margem, `072_STM_005_01` item 64) e parar a
+            # volta acima: o texto-base que vem antes do novo comando começa
+            # na 1ª linha, depois do fim de frase do item, fora do recuo.
+            ruptura = _ruptura_do_item(linhas, i_item, corte, margens, recuo)
+            if ruptura is not None:
+                corte = ruptura
             fim_item = corte
             k = _inicio_comando(linhas, corte, proximo)
             texto_item = juntar_linhas(linhas[i_item:corte])
@@ -1060,6 +1098,25 @@ def segmentar(
 
         if fim_item < proximo and pos + 1 < len(indices):
             grupo_atual = abrir_grupo(fim_item, proximo, ordem_itens[pos + 1])
+            # Resíduo: o comando novo retoma um material que não virou
+            # texto-base, e o item anterior segue depois de fechar frase —
+            # o material provavelmente ficou no item.
+            if (
+                grupo_atual["texto_base_ordem"] is None
+                and PADRAO_COMANDO_ANAFORICO.search(grupo_atual["secao"] or "")
+                and any(
+                    linhas[j - 1].texto.rstrip().endswith((".", "!", "?"))
+                    for j in range(i_item + 1, fim_item)
+                )
+            ):
+                res.alertas.append(
+                    {
+                        "tipo": "possivel_preambulo_no_item",
+                        "severidade": SEVERIDADE_INFORMATIVO,
+                        "item": numero,
+                        "texto": juntar_linhas(linhas[i_item:fim_item])[:300],
+                    }
+                )
     return res
 
 

@@ -1261,3 +1261,45 @@ class TestFigurasVetoriais:
         for tabela in (t1, t2):
             dono = dono_da_figura(tabela, 0, linhas, dono_linha, ignorar=[t1, t2])
             assert dono == ("preambulo", 7)
+
+
+GABARITO_STM_005_PAG1 = {
+    51: "E", 52: "C", 53: "E", 54: "C", 55: "C", 56: "E", 57: "X", 58: "C",
+    59: "E", 60: "C", 61: "C", 62: "E", 63: "C", 64: "E", 65: "C", 66: "E",
+    67: "E", 68: "C", 69: "C", 70: "E",
+}  # fmt: skip
+
+
+class TestPreambuloDepoisDoItem:
+    """`072_STM_005_01`, item 64: as células da tabela do grupo 65–68 ficam a
+    ~17 pt da margem, no recuo de continuação do item (5G.5)."""
+
+    def _extrair(self):
+        resultado, _ = extrair_caderno_objetivo(
+            FIXTURES / "072_STM_005_01_pag1.pdf", GABARITO_STM_005_PAG1, "STM5"
+        )
+        return resultado, {q["numero"]: q for q in resultado["questoes"]}
+
+    def test_preambulo_e_tabela_viram_texto_base_do_grupo_seguinte(self):
+        resultado, q = self._extrair()
+        assert resultado["status"] == STATUS_SUCESSO
+        assert q[64]["enunciado"] == (
+            "Pelo custeio variável, cada unidade produzida pela entidade custa "
+            "R$ 27 a menos do que pelo custeio por absorção."
+        )
+        ordem = q[65]["texto_base_ordem"]
+        base = resultado["textos_base"][ordem]["texto"]
+        assert base.startswith("Da contabilidade de uma entidade hipotética")
+        assert "lucro operacional líquido $ 48 $ 41" in base
+        assert all(q[n]["texto_base_ordem"] == ordem for n in (66, 67, 68))
+        assert q[65]["secao"].startswith("Com base nessas informações")
+        assert "possivel_preambulo_no_item" not in q[64]["alertas"]
+
+    def test_residuo_sem_ruptura_gera_alerta_que_inutiliza_o_item(self, monkeypatch):
+        import src.prova_parser as pp
+
+        monkeypatch.setattr(pp, "_ruptura_do_item", lambda *a, **k: None)
+        _, q = self._extrair()
+        assert "Da contabilidade" in q[64]["enunciado"]
+        assert "possivel_preambulo_no_item" in q[64]["alertas"]
+        assert not pp.ALERTAS_ITEM_INUTILIZAVEL.isdisjoint(q[64]["alertas"])

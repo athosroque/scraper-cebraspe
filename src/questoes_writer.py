@@ -12,6 +12,8 @@ questão parcial no banco distorceria a estatística sem aviso.
 
 from psycopg2.extras import Json
 
+from src.prova_parser import ALERTAS_ITEM_INUTILIZAVEL
+
 
 def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
     """Substitui textos-base e questões do caderno. Retorna o nº de questões."""
@@ -52,7 +54,7 @@ def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
             alertas_item = list(
                 dict.fromkeys(q.get("alertas") or alertas_por_item.get(q["numero"], []))
             )
-            utilizavel = "simbolo_ilegivel" not in alertas_item
+            utilizavel = ALERTAS_ITEM_INUTILIZAVEL.isdisjoint(alertas_item)
 
             cur.execute(
                 """
