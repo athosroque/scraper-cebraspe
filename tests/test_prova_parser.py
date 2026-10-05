@@ -19,8 +19,10 @@ from src.prova_parser import (
     _tema,
     _texto_spans,
     _unir_tiras,
+    dono_da_figura,
     extrair_caderno_discursivo,
     extrair_caderno_objetivo,
+    figuras_vetoriais_da_pagina,
     juntar_linhas,
     ligar_padrao_resposta,
     localizar_itens,
@@ -1189,3 +1191,73 @@ class TestParagrafosReal:
         assert partes[4].startswith("Ainda, o mapa de 2025")
         # Enunciado continua numa linha só.
         assert all("\n" not in q["enunciado"] for q in resultado["questoes"])
+
+
+class TestFigurasVetoriais:
+    """5G.3: tabelas e gráficos desenhados com vetores viram figura; o layout
+    do caderno (separadores, molduras, fundos brancos) não."""
+
+    @staticmethod
+    def _pagina():
+        doc = pymupdf.open()
+        return doc, doc.new_page(width=595, height=842)
+
+    @staticmethod
+    def _tabela(page, x0, y0, x1, y1, linhas=4):
+        passo = (y1 - y0) / linhas
+        for i in range(linhas + 1):
+            page.draw_line((x0, y0 + i * passo), (x1, y0 + i * passo))
+        for x in (x0, (x0 + x1) / 2, x1):
+            page.draw_line((x, y0), (x, y1))
+
+    def test_tabela_com_grade_vira_uma_figura(self):
+        _doc, page = self._pagina()
+        self._tabela(page, 310, 380, 560, 460)
+        regioes = figuras_vetoriais_da_pagina(page)
+        assert len(regioes) == 1
+        assert regioes[0].contains(pymupdf.Rect(310, 380, 560, 460))
+
+    def test_layout_do_caderno_e_ignorado(self):
+        _doc, page = self._pagina()
+        # Separador duplo entre grupos (2 linhas finas, ~4 pt de altura).
+        page.draw_line((27, 250), (293, 250))
+        page.draw_line((27, 254), (293, 254))
+        # Separador vertical de colunas (quase a página inteira).
+        page.draw_line((297, 63), (297, 805))
+        # Moldura em volta de um bloco de texto, sem traço interno.
+        page.draw_rect(pymupdf.Rect(40, 400, 280, 600))
+        # Fundo branco sem traço.
+        page.draw_rect(pymupdf.Rect(40, 620, 280, 700), color=None, fill=(1, 1, 1))
+        # Cabeçalho.
+        page.draw_rect(pymupdf.Rect(27, 46, 568, 63), color=None, fill=(0.85,) * 3)
+        assert figuras_vetoriais_da_pagina(page) == []
+
+    def test_regiao_sobre_figura_raster_nao_duplica(self):
+        _doc, page = self._pagina()
+        self._tabela(page, 310, 380, 560, 460)
+        raster = [pymupdf.Rect(300, 370, 570, 470)]
+        assert figuras_vetoriais_da_pagina(page, raster) == []
+
+    def test_texto_dentro_da_tabela_nao_e_vizinho(self):
+        # Duas tabelas empilhadas depois de um item, comando do grupo
+        # seguinte abaixo: as duas são do grupo seguinte (STM_005, itens 65-68).
+        linhas = [
+            Linha(0, 0, "64 Item anterior.", 310, 360, 560, 370, True),
+            Linha(0, 1, "célula da tabela 1", 315, 390, 400, 398, True),
+            Linha(0, 2, "célula da tabela 2", 315, 480, 400, 488, True),
+            Linha(
+                0, 3, "Com base nessas informações, julgue.", 310, 545, 560, 555, True
+            ),
+        ]
+        dono_linha = {
+            0: ("item", 64),
+            1: ("item", 64),
+            2: ("item", 64),
+            3: ("preambulo", 7),
+        }
+        t1 = pymupdf.Rect(309, 382, 561, 462)
+        t2 = pymupdf.Rect(309, 469, 561, 538)
+        assert dono_da_figura(t1, 0, linhas, dono_linha) == ("item", 64)
+        for tabela in (t1, t2):
+            dono = dono_da_figura(tabela, 0, linhas, dono_linha, ignorar=[t1, t2])
+            assert dono == ("preambulo", 7)

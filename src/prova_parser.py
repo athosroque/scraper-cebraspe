@@ -131,6 +131,15 @@ TERMINAIS_PARAGRAFO = (".", "!", "?", ":", "”", '"', ")", "»")
 LIMITE_COLUNA_DIREITA = 290.0
 ALTURA_CABECALHO = 70  # faixa decorativa do topo da página (imagem de cabeçalho)
 TAMANHO_MINIMO_FIGURA = 15
+# Figuras vetoriais (5G.3): traços a até FOLGA_VETORIAL pt viram uma região;
+# região com menos de TAMANHO_MINIMO_FIGURA_VETORIAL pt num dos lados é
+# separador de grupo (duas linhas finas paralelas, ~4 pt de altura).
+FOLGA_VETORIAL = 3.0
+TAMANHO_MINIMO_FIGURA_VETORIAL = 10
+ESPESSURA_LINHA = 2.0
+TOLERANCIA_BORDA = 2.0
+LIMIAR_BRANCO = 0.97
+ALTURA_RODAPE = 40
 DPI_FIGURA = 150
 
 
@@ -1093,11 +1102,110 @@ def figuras_da_pagina(page) -> list[pymupdf.Rect]:
     return _unir_tiras(rects)
 
 
+def _desenho_invisivel(desenho: dict) -> bool:
+    """Preenchimento branco sem traço (fundo de bloco) não aparece na página."""
+    preenchimento = desenho.get("fill")
+    return (
+        desenho.get("color") is None
+        and preenchimento is not None
+        and min(preenchimento) >= LIMIAR_BRANCO
+    )
+
+
+def _agrupar_proximos(
+    rects: list[pymupdf.Rect], folga: float
+) -> list[list[pymupdf.Rect]]:
+    """Fecho transitivo de retângulos a até `folga` pt um do outro."""
+    grupos: list[tuple[pymupdf.Rect, list[pymupdf.Rect]]] = [
+        (pymupdf.Rect(r), [r]) for r in rects
+    ]
+    mudou = True
+    while mudou:
+        mudou = False
+        saida: list[tuple[pymupdf.Rect, list[pymupdf.Rect]]] = []
+        for caixa, membros in grupos:
+            for outra, outros in saida:
+                if (outra + (-folga, -folga, folga, folga)).intersects(caixa):
+                    outra.include_rect(caixa)
+                    outros.extend(membros)
+                    mudou = True
+                    break
+            else:
+                saida.append((caixa, membros))
+        grupos = saida
+    return [membros for _, membros in grupos]
+
+
+def _so_moldura(membros: list[pymupdf.Rect], caixa: pymupdf.Rect) -> bool:
+    """Grupo cujos traços estão todos sobre a borda da própria caixa: é uma
+    moldura em volta de um bloco (retângulo ou 4 linhas), não uma figura.
+    Tabela e gráfico têm traço interno (linha de grade, eixo, célula)."""
+    t = TOLERANCIA_BORDA
+    for r in membros:
+        caixa_inteira = (
+            abs(r.x0 - caixa.x0) < t
+            and abs(r.x1 - caixa.x1) < t
+            and abs(r.y0 - caixa.y0) < t
+            and abs(r.y1 - caixa.y1) < t
+        )
+        horizontal_na_borda = r.height <= ESPESSURA_LINHA and (
+            abs(r.y0 - caixa.y0) < t or abs(r.y1 - caixa.y1) < t
+        )
+        vertical_na_borda = r.width <= ESPESSURA_LINHA and (
+            abs(r.x0 - caixa.x0) < t or abs(r.x1 - caixa.x1) < t
+        )
+        if not (caixa_inteira or horizontal_na_borda or vertical_na_borda):
+            return False
+    return True
+
+
+def figuras_vetoriais_da_pagina(
+    page, figuras_raster: list[pymupdf.Rect] | None = None
+) -> list[pymupdf.Rect]:
+    """Regiões desenhadas com vetores (tabelas com borda, gráficos,
+    diagramas): traços visíveis próximos unidos numa caixa.
+
+    Fica de fora o layout do caderno: cabeçalho/rodapé, traços de quase a
+    página inteira (separador de colunas), os separadores duplos entre
+    grupos (finos demais depois de unidos), molduras sem traço interno e o
+    que já é figura raster. A caixa devolvida tem uma folga para a borda da
+    tabela sair no recorte."""
+    altura, largura = page.rect.height, page.rect.width
+    rects = []
+    for desenho in page.get_drawings():
+        r = pymupdf.Rect(desenho["rect"])
+        if _desenho_invisivel(desenho):
+            continue
+        if r.y1 <= ALTURA_CABECALHO or r.y0 >= altura - ALTURA_RODAPE:
+            continue
+        if r.width > 0.8 * largura or r.height > 0.8 * altura:
+            continue
+        # Linha traçada (não preenchida) tem retângulo de altura/largura 0,
+        # que o PyMuPDF trata como vazio em `intersects`/`include_rect`.
+        rects.append(r + (-0.5, -0.5, 0.5, 0.5))
+    regioes = []
+    for membros in _agrupar_proximos(rects, FOLGA_VETORIAL):
+        caixa = pymupdf.Rect(membros[0])
+        for r in membros[1:]:
+            caixa.include_rect(r)
+        if (
+            caixa.width < TAMANHO_MINIMO_FIGURA_VETORIAL
+            or caixa.height < TAMANHO_MINIMO_FIGURA_VETORIAL
+            or _so_moldura(membros, caixa)
+        ):
+            continue
+        if any(caixa.intersects(f) for f in figuras_raster or []):
+            continue
+        regioes.append((caixa + (-2, -2, 2, 2)) & page.rect)
+    return sorted(regioes, key=lambda r: (r.y0, r.x0))
+
+
 def dono_da_figura(
     rect: pymupdf.Rect,
     pagina: int,
     linhas: list[Linha],
     dono_linha: dict[int, tuple[str, int]],
+    ignorar: list[pymupdf.Rect] | None = None,
 ) -> tuple[str, int] | None:
     """Trecho da linha logo acima da figura na mesma coluna (sobreposição
     horizontal); sem linha acima, o da primeira linha abaixo.
@@ -1106,10 +1214,17 @@ def dono_da_figura(
     (linha acima = item, linha abaixo = texto-base/comando) é do grupo
     seguinte — é o caso de "Considerando as figuras A e B, julgue ...". A
     figura do próprio item tem texto do item depois dela ("Nesse caso, ...")
-    ou o próximo item logo abaixo."""
+    ou o próximo item logo abaixo.
+
+    `ignorar`: regiões de figura vetorial da página. O texto dentro de uma
+    tabela desenhada é da própria tabela, não vizinho dela; sem isso, a
+    primeira de duas tabelas empilhadas acharia a segunda como linha abaixo."""
     acima, abaixo = None, None
     for i, linha in enumerate(linhas):
         if linha.pagina != pagina or i not in dono_linha:
+            continue
+        centro = pymupdf.Point((linha.x0 + linha.x1) / 2, (linha.y0 + linha.y1) / 2)
+        if any(centro in r for r in ignorar or []):
             continue
         sobrepoe = min(linha.x1, rect.x1) - max(linha.x0, rect.x0) > 0
         if not sobrepoe:
@@ -1183,14 +1298,25 @@ def extrair_caderno_objetivo(
         # Figuras.
         total_figuras = 0
         for num_pagina, page in enumerate(doc):
-            for n, rect in enumerate(figuras_da_pagina(page), start=1):
-                dono = dono_da_figura(rect, num_pagina, linhas, seg.dono_linha)
+            raster = figuras_da_pagina(page)
+            vetoriais = figuras_vetoriais_da_pagina(page, raster)
+            # Vetoriais depois das raster: o nome das raster não muda.
+            regioes = [(r, None) for r in raster] + [(r, "vetorial") for r in vetoriais]
+            for n, (rect, origem) in enumerate(regioes, start=1):
+                dono = dono_da_figura(
+                    rect, num_pagina, linhas, seg.dono_linha, ignorar=vetoriais
+                )
                 nome = f"{caderno}_{num_pagina + 1}_{n}.png"
                 figura = {
                     "arquivo": nome,
                     "pagina": num_pagina + 1,
                     "bbox": [round(v, 1) for v in rect],
                 }
+                if origem:
+                    # O texto da tabela/gráfico também está no enunciado ou
+                    # no texto-base (extraído como linhas); a imagem é a
+                    # forma legível, não substitui o texto.
+                    figura["origem"] = origem
                 if dir_figuras is not None:
                     dir_figuras.mkdir(parents=True, exist_ok=True)
                     page.get_pixmap(clip=rect, dpi=DPI_FIGURA).save(dir_figuras / nome)
