@@ -1096,3 +1096,96 @@ class TestCodigoQuebradoESimbolos:
         rodape = Linha(1, 5, "Espaço livre", 400.0, 800, 460.0, 810, True)
         _marcar_borda_direita([unica, rodape], 595.2, False)
         assert unica.borda_direita == rodape.borda_direita == 569.4
+
+
+# Parágrafos do texto-base (5G.1) ---------------------------------------------
+
+
+def _prosa(texto: str, x0: float, y0: float, pagina: int = 0, **kw) -> Linha:
+    return Linha(
+        pagina=pagina,
+        bloco=1,
+        texto=texto,
+        x0=kw.pop("x0_linha", x0),
+        y0=y0,
+        x1=280.0,
+        y1=y0 + 10,
+        inicio_bloco=False,
+        x0_texto=x0,
+        **kw,
+    )
+
+
+class TestParagrafosTextoBase:
+    def _texto(self) -> list[Linha]:
+        return [
+            _prosa("Primeiro parágrafo começa", 56.8, 50),
+            _prosa("e continua aqui.", 28.3, 62),
+            _prosa("Segundo parágrafo vem", 56.8, 74),
+            _prosa("com mais texto", 28.3, 86),
+            _prosa("e termina.", 28.3, 98),
+        ]
+
+    def test_recuo_da_primeira_linha_abre_paragrafo(self):
+        assert juntar_linhas(self._texto(), paragrafos=True) == (
+            "Primeiro parágrafo começa e continua aqui.\n\n"
+            "Segundo parágrafo vem com mais texto e termina."
+        )
+
+    def test_sem_flag_continua_juntando_com_espaco(self):
+        # Enunciado de item: a chave/hash da 5D depende do texto.
+        assert "\n" not in juntar_linhas(self._texto())
+
+    def test_span_vazio_na_margem_nao_esconde_o_recuo(self):
+        # O x0 da linha fica na margem (spans " " em 28,3 e 42,5); vale o
+        # x0 do primeiro span com texto.
+        linhas = self._texto()
+        linhas[2] = _prosa("Segundo parágrafo vem", 56.8, 74, x0_linha=28.3)
+        assert "\n\nSegundo" in juntar_linhas(linhas, paragrafos=True)
+
+    def test_recuo_sem_fim_de_frase_nao_quebra(self):
+        linhas = self._texto()
+        linhas[1] = _prosa("e continua aqui", 28.3, 62)
+        assert "\n" not in juntar_linhas(linhas, paragrafos=True)
+
+    def test_linha_muito_deslocada_nao_e_recuo(self):
+        # Fonte centralizada/à direita ("Internet: <...>") não é parágrafo.
+        linhas = self._texto() + [_prosa("Internet: <site>.", 171.3, 120)]
+        assert "\n\nInternet" not in juntar_linhas(linhas, paragrafos=True)
+
+    def test_moda_por_coluna(self):
+        # Parágrafo que continua na coluna da direita (margem 303,4).
+        linhas = self._texto() + [
+            _prosa("Terceiro na direita", 331.9, 50),
+            _prosa("segue aqui", 303.4, 62),
+            _prosa("e acaba.", 303.4, 74),
+        ]
+        partes = juntar_linhas(linhas, paragrafos=True).split("\n\n")
+        assert [p.split()[0] for p in partes] == ["Primeiro", "Segundo", "Terceiro"]
+
+    def test_texto_de_uma_linha_sem_regua(self):
+        linhas = [_prosa("Só uma.", 56.8, 50)]
+        assert juntar_linhas(linhas, paragrafos=True) == "Só uma."
+
+    def test_strings_sem_posicao_nao_quebram(self):
+        assert juntar_linhas(["Fim.", "Outra."], paragrafos=True) == "Fim. Outra."
+
+
+class TestParagrafosReal:
+    def test_texto_base_com_paragrafos(self):
+        gabarito = {
+            14: "E", 15: "C", 16: "E", 17: "E", 18: "C", 19: "C", 20: "C",
+            21: "C", 22: "C", 23: "E", 24: "E", 25: "X", 26: "E",
+        }  # fmt: skip
+        resultado, _ = extrair_caderno_objetivo(
+            FIXTURES / "167_CDNS_CG1_01_pag2.pdf", gabarito, "167_CDNS_CG1_01"
+        )
+        assert resultado["status"] == STATUS_SUCESSO
+        bases = [tb["texto"] for tb in resultado["textos_base"]]
+        uip = next(t for t in bases if t.startswith("Novos dados da União"))
+        partes = uip.split("\n\n")
+        assert len(partes) == 5
+        assert partes[1].startswith("Globalmente, a presença feminina")
+        assert partes[4].startswith("Ainda, o mapa de 2025")
+        # Enunciado continua numa linha só.
+        assert all("\n" not in q["enunciado"] for q in resultado["questoes"])
