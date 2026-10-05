@@ -45,19 +45,19 @@
     <select name="concurso" class="campo" aria-label="Concurso" onchange="this.form.submit()">
         <option value="">Todos os concursos</option>
         {% for f in facetas.concursos %}
-        <option value="{{ f.valor }}" {% if filtros.concurso == f.valor %}selected{% endif %}>{{ f.rotulo }}</option>
+        <option value="{{ f.valor }}" {% if f.valor in (filtros.concurso or []) %}selected{% endif %}>{{ f.rotulo }}</option>
         {% endfor %}
     </select>
     <select name="nivel" class="campo" aria-label="Nível" onchange="this.form.submit()">
         <option value="">Todos os níveis</option>
         {% for n in facetas.niveis %}
-        <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo }}</option>
+        <option value="{{ n.valor }}" {% if n.valor in (filtros.nivel or []) %}selected{% endif %}>{{ n.rotulo }}</option>
         {% endfor %}
     </select>
     <select name="tipo_conhecimento" class="campo" aria-label="Tipo de conhecimento" onchange="this.form.submit()">
         <option value="">Básico e específico</option>
         {% for t in facetas.tipos_conhecimento %}
-        <option value="{{ t.valor }}" {% if filtros.tipo_conhecimento == t.valor %}selected{% endif %}>{{ t.rotulo }}</option>
+        <option value="{{ t.valor }}" {% if t.valor in (filtros.tipo_conhecimento or []) %}selected{% endif %}>{{ t.rotulo }}</option>
         {% endfor %}
     </select>
     <noscript><button type="submit" class="btn-secundario">Filtrar</button></noscript>

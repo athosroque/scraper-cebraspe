@@ -13,6 +13,7 @@ from app.modelos import (
 from app.repositorio import questoes_repo
 from app.servicos.formatacao import (
     rotulo_concurso,
+    rotulo_materia,
     rotulo_nivel,
     rotulo_tipo_conhecimento,
 )
@@ -173,45 +174,96 @@ def obter_arvore(apenas_com_questoes: bool = True) -> list[NoArvore]:
     return arvore
 
 
-def obter_facetas() -> FacetasResponse:
-    dados = questoes_repo.obter_facetas()
+def _mapa_nos() -> dict[str, tuple[str, str, str]]:
+    """id → (nome, nível, caminho com ` › `), a partir da árvore em cache."""
+    mapa: dict[str, tuple[str, str, str]] = {}
+
+    def visitar(nos, prefixo):
+        for no in nos:
+            nome = rotulo_materia(no.nome, no.nome_de_cargo)
+            caminho = f"{prefixo} › {nome}" if prefixo else nome
+            mapa[no.id] = (nome, no.nivel, caminho)
+            visitar(no.filhos, caminho)
+
+    visitar(obter_arvore(apenas_com_questoes=False), "")
+    return mapa
+
+
+def obter_facetas(
+    filtros: FiltroQuestoes | None = None, usuario_id: int | None = None
+) -> FacetasResponse:
+    """Facetas da listagem. Com filtros, o total de cada valor considera os
+    outros filtros; valor zerado só aparece se estiver marcado."""
+    filtros = filtros or FiltroQuestoes()
+    from app.servicos.contas_servico import filtros_com_historico
+
+    filtros_dict = filtros_com_historico(filtros, usuario_id)
+    dados = questoes_repo.obter_facetas(filtros_dict)
+
+    def manter(r, campo) -> bool:
+        marcados = {str(v) for v in (filtros_dict.get(campo) or [])}
+        return r["total"] > 0 or str(r["valor"]) in marcados
+
+    def valores(faceta, campo, rotulo=str, conv=lambda v: v):
+        return [
+            {
+                "valor": conv(r["valor"]),
+                "rotulo": rotulo(str(r["valor"])),
+                "total": r["total"],
+            }
+            for r in dados.get(faceta, [])
+            if r["valor"] is not None and manter(r, campo)
+        ]
+
+    mapa = _mapa_nos()
+
+    def nos(faceta):
+        saida = []
+        for r in dados.get(faceta, []):
+            if r["valor"] not in mapa or not manter(r, "no_id"):
+                continue
+            nome, nivel, caminho = mapa[r["valor"]]
+            saida.append(
+                {
+                    "valor": r["valor"],
+                    "rotulo": nome,
+                    "nivel": nivel,
+                    "caminho": caminho,
+                    "total": r["total"],
+                }
+            )
+        return saida
 
     return FacetasResponse(
-        bancas=[
-            {"valor": r["valor"], "rotulo": str(r["valor"]), "total": r["total"]}
-            for r in dados["banca"]
-        ],
-        orgaos=[
-            {"valor": r["valor"], "rotulo": str(r["valor"]), "total": r["total"]}
-            for r in dados["orgao"]
-        ],
-        anos=[
-            {"valor": r["valor"], "rotulo": str(r["valor"]), "total": r["total"]}
-            for r in dados["ano"]
-        ],
-        concursos=[
+        bancas=valores("banca", "banca"),
+        orgaos=valores("orgao", "orgao"),
+        anos=valores("ano", "ano", conv=int),
+        concursos=valores("concurso", "concurso", rotulo_concurso),
+        niveis=valores("nivel", "nivel", rotulo_nivel),
+        tipos_conhecimento=valores(
+            "tipo_conhecimento", "tipo_conhecimento", rotulo_tipo_conhecimento
+        ),
+        cargos=[
             {
                 "valor": r["valor"],
-                "rotulo": rotulo_concurso(str(r["valor"])),
+                "cargo_numero": r["cargo_numero"],
+                "cargo": r["cargo"],
+                "concurso": r["concurso"],
+                "nivel": r["nivel"],
                 "total": r["total"],
             }
-            for r in dados["concurso"]
+            for r in dados.get("cargo", [])
+            if manter(r, "cargo")
         ],
-        niveis=[
+        materias=nos("materia"),
+        assuntos=nos("assunto"),
+        subassuntos=nos("subassunto"),
+        anuladas=[
             {
-                "valor": r["valor"],
-                "rotulo": rotulo_nivel(str(r["valor"])),
+                "valor": r["valor"] == "true",
+                "rotulo": "Anuladas" if r["valor"] == "true" else "Não anuladas",
                 "total": r["total"],
             }
-            for r in dados["nivel"]
+            for r in dados.get("anuladas", [])
         ],
-        tipos_conhecimento=[
-            {
-                "valor": r["valor"],
-                "rotulo": rotulo_tipo_conhecimento(str(r["valor"])),
-                "total": r["total"],
-            }
-            for r in dados["tipo_conhecimento"]
-        ],
-        cargos=dados["cargos"],
     )

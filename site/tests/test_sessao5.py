@@ -1,3 +1,4 @@
+import json
 import re
 
 import pytest
@@ -35,19 +36,29 @@ def test_canonical_og_e_twitter_presentes(cliente):
     assert 'aria-expanded="false"' in html and ":aria-expanded" in html
 
 
+def _facetas_do_painel(html):
+    m = re.search(
+        r'<script type="application/json" id="dados-facetas"[^>]*>(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    assert m, "facetas do painel ausentes"
+    return json.loads(m.group(1))
+
+
 def test_selects_de_concurso_usam_slug(cliente):
-    for url, nome in (("/questoes", "concurso"), ("/simulado", "concurso")):
-        valores = [v for v in _opcoes(cliente.get(url).text, nome) if v]
-        assert valores
-        assert all(re.fullmatch(r"[A-Z0-9_]+", v) for v in valores), valores
+    valores = [v for v in _opcoes(cliente.get("/simulado").text, "concurso") if v]
+    # 5G.4: na lista, o concurso é faceta (checkbox), com o slug como valor.
+    painel = _facetas_do_painel(cliente.get("/questoes").text)
+    valores += [f["valor"] for f in painel["concurso"]]
+    assert valores
+    assert all(re.fullmatch(r"[A-Z0-9_]+", v) for v in valores), valores
 
 
 def test_ordem_dos_filtros(cliente):
     html = cliente.get("/questoes").text
-    pos = [
-        html.index(f'<select name="{n}"')
-        for n in ("concurso", "cargo_numero", "orgao", "nivel")
-    ]
+    ordem = ("materia", "assunto", "subassunto", "orgao", "ano", "concurso", "cargo")
+    pos = [html.index(f'data-chave="{n}"') for n in ordem]
     assert pos == sorted(pos)
 
 

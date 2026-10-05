@@ -12,7 +12,7 @@
           "Questões"
         ],
         "summary": "Lista questões objetivas com filtros",
-        "description": "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.781 questões objetivas utilizáveis do piloto 2025 (2.800 com `utilizaveis=todas`).",
+        "description": "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, caderno e número. Cada filtro aceita vários valores (parâmetro repetido, ex.: `?ano=2025&ano=2024`), que combinam com OU; filtros diferentes combinam com E. Sem filtro, devolve as 2.781 questões objetivas utilizáveis do piloto 2025 (2.800 com `utilizaveis=todas`).",
         "operationId": "listar_questoes_api_v1_questoes_get",
         "parameters": [
           {
@@ -22,16 +22,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Banca (ex.: `CEBRASPE`).",
+              "description": "Banca (ex.: `CEBRASPE`). Repita para várias (OU).",
               "title": "Banca"
             },
-            "description": "Banca (ex.: `CEBRASPE`)."
+            "description": "Banca (ex.: `CEBRASPE`). Repita para várias (OU)."
           },
           {
             "name": "orgao",
@@ -40,16 +43,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Órgão (ex.: `PF`, `STM`). Valores em `/facetas`.",
+              "description": "Órgão (ex.: `PF`, `STM`). Repita para vários (OU). Valores em `/facetas`.",
               "title": "Orgao"
             },
-            "description": "Órgão (ex.: `PF`, `STM`). Valores em `/facetas`."
+            "description": "Órgão (ex.: `PF`, `STM`). Repita para vários (OU). Valores em `/facetas`."
           },
           {
             "name": "ano",
@@ -58,16 +64,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "integer"
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Ano do concurso (ex.: `2025`).",
+              "description": "Ano do concurso (ex.: `2025`). Repita para vários (OU).",
               "title": "Ano"
             },
-            "description": "Ano do concurso (ex.: `2025`)."
+            "description": "Ano do concurso (ex.: `2025`). Repita para vários (OU)."
           },
           {
             "name": "concurso",
@@ -76,16 +85,40 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Slug do concurso (ex.: `PF_25_ADM`).",
+              "description": "Slug do concurso (ex.: `PF_25_ADM`). Repita para vários (OU).",
               "title": "Concurso"
             },
-            "description": "Slug do concurso (ex.: `PF_25_ADM`)."
+            "description": "Slug do concurso (ex.: `PF_25_ADM`). Repita para vários (OU)."
+          },
+          {
+            "name": "cargo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Cargo como `CONCURSO:NUMERO` (ex.: `PF_25_ADM:1`). Repita para vários (OU), inclusive de concursos diferentes. Valores em `/facetas` (`cargos[].valor`).",
+              "title": "Cargo"
+            },
+            "description": "Cargo como `CONCURSO:NUMERO` (ex.: `PF_25_ADM:1`). Repita para vários (OU), inclusive de concursos diferentes. Valores em `/facetas` (`cargos[].valor`)."
           },
           {
             "name": "cargo_numero",
@@ -94,16 +127,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "integer"
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Número do cargo no edital. Use junto com `concurso`.",
+              "description": "Número do cargo no edital, junto com `concurso` (forma antiga; prefira `cargo`).",
               "title": "Cargo Numero"
             },
-            "description": "Número do cargo no edital. Use junto com `concurso`."
+            "description": "Número do cargo no edital, junto com `concurso` (forma antiga; prefira `cargo`)."
           },
           {
             "name": "nivel",
@@ -112,16 +148,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "`superior` ou `medio`.",
+              "description": "`superior` ou `medio`. Repita para os dois (OU).",
               "title": "Nivel"
             },
-            "description": "`superior` ou `medio`."
+            "description": "`superior` ou `medio`. Repita para os dois (OU)."
           },
           {
             "name": "tipo_conhecimento",
@@ -130,16 +169,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "`basico` ou `especifico`.",
+              "description": "`basico` ou `especifico`. Repita para os dois (OU).",
               "title": "Tipo Conhecimento"
             },
-            "description": "`basico` ou `especifico`."
+            "description": "`basico` ou `especifico`. Repita para os dois (OU)."
           },
           {
             "name": "no_id",
@@ -148,19 +190,22 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Nó da árvore (`/arvore`). Matéria ou assunto incluem as questões dos descendentes.",
+              "description": "Nó da árvore (`/arvore`), em qualquer nível. Matéria ou assunto incluem as questões dos descendentes. Repita para vários (OU).",
               "examples": [
                 "S-c33faee4a4"
               ],
               "title": "No Id"
             },
-            "description": "Nó da árvore (`/arvore`). Matéria ou assunto incluem as questões dos descendentes."
+            "description": "Nó da árvore (`/arvore`), em qualquer nível. Matéria ou assunto incluem as questões dos descendentes. Repita para vários (OU)."
           },
           {
             "name": "anuladas",
@@ -483,8 +528,230 @@
           "Facetas"
         ],
         "summary": "Valores possíveis dos filtros",
-        "description": "Cada valor vem com o total de questões distintas, para montar os filtros da interface.",
+        "description": "Cada valor vem com o total de questões distintas, para montar os filtros da interface. Aceita os mesmos filtros da listagem: o total de cada valor considera os outros filtros (não o próprio), e um valor marcado aparece mesmo com total 0. Sem filtro, conta as questões utilizáveis.",
         "operationId": "obter_facetas_api_v1_facetas_get",
+        "parameters": [
+          {
+            "name": "banca",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bancas marcadas.",
+              "title": "Banca"
+            },
+            "description": "Bancas marcadas."
+          },
+          {
+            "name": "orgao",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Órgãos marcados.",
+              "title": "Orgao"
+            },
+            "description": "Órgãos marcados."
+          },
+          {
+            "name": "ano",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Anos marcados.",
+              "title": "Ano"
+            },
+            "description": "Anos marcados."
+          },
+          {
+            "name": "concurso",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Concursos marcados (slug).",
+              "title": "Concurso"
+            },
+            "description": "Concursos marcados (slug)."
+          },
+          {
+            "name": "cargo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Cargos marcados (`CONCURSO:NUMERO`).",
+              "title": "Cargo"
+            },
+            "description": "Cargos marcados (`CONCURSO:NUMERO`)."
+          },
+          {
+            "name": "nivel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Níveis marcados.",
+              "title": "Nivel"
+            },
+            "description": "Níveis marcados."
+          },
+          {
+            "name": "tipo_conhecimento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tipos de conhecimento marcados.",
+              "title": "Tipo Conhecimento"
+            },
+            "description": "Tipos de conhecimento marcados."
+          },
+          {
+            "name": "no_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Nós da árvore marcados.",
+              "title": "No Id"
+            },
+            "description": "Nós da árvore marcados."
+          },
+          {
+            "name": "anuladas",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "incluir",
+                "excluir",
+                "so"
+              ],
+              "type": "string",
+              "description": "Tratamento das questões anuladas.",
+              "default": "incluir",
+              "title": "Anuladas"
+            },
+            "description": "Tratamento das questões anuladas."
+          },
+          {
+            "name": "utilizaveis",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "so",
+                "todas"
+              ],
+              "type": "string",
+              "description": "`so` (padrão) conta só as questões utilizáveis.",
+              "default": "so",
+              "title": "Utilizaveis"
+            },
+            "description": "`so` (padrão) conta só as questões utilizáveis."
+          },
+          {
+            "name": "historico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "todas",
+                "resolvidas",
+                "nao_resolvidas",
+                "certas",
+                "erradas"
+              ],
+              "type": "string",
+              "description": "Histórico do usuário logado. Diferente de `todas` sem login: 401.",
+              "default": "todas",
+              "title": "Historico"
+            },
+            "description": "Histórico do usuário logado. Diferente de `todas` sem login: 401."
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -492,6 +759,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FacetasResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Login necessário (cookie `sessao` ausente ou sem usuário).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -2565,6 +2852,12 @@
       },
       "FacetaCargo": {
         "properties": {
+          "valor": {
+            "type": "string",
+            "title": "Valor",
+            "description": "Valor a enviar no parâmetro `cargo` (`CONCURSO:NUMERO`).",
+            "default": ""
+          },
           "cargo_numero": {
             "type": "integer",
             "title": "Cargo Numero",
@@ -2601,6 +2894,45 @@
         ],
         "title": "FacetaCargo",
         "description": "Cargo possível no filtro, com o total de questões."
+      },
+      "FacetaNo": {
+        "properties": {
+          "valor": {
+            "type": "string",
+            "title": "Valor",
+            "description": "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
+          },
+          "rotulo": {
+            "type": "string",
+            "title": "Rotulo",
+            "description": "Nome do nó na árvore mestre."
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel",
+            "description": "Nível do nó: `materia`, `assunto` ou `subassunto`."
+          },
+          "caminho": {
+            "type": "string",
+            "title": "Caminho",
+            "description": "Caminho do nó, separado por ` › ` (ex.: `Língua Portuguesa › Sintaxe`)."
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Questões distintas no nó e nos descendentes."
+          }
+        },
+        "type": "object",
+        "required": [
+          "valor",
+          "rotulo",
+          "nivel",
+          "caminho",
+          "total"
+        ],
+        "title": "FacetaNo",
+        "description": "Nó da árvore possível no filtro `no_id`, com o caminho e o total de questões."
       },
       "FacetaValor": {
         "properties": {
@@ -2685,6 +3017,42 @@
             "type": "array",
             "title": "Cargos",
             "description": "Cargos por concurso."
+          },
+          "materias": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaNo"
+            },
+            "type": "array",
+            "title": "Materias",
+            "description": "Matérias da árvore.",
+            "default": []
+          },
+          "assuntos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaNo"
+            },
+            "type": "array",
+            "title": "Assuntos",
+            "description": "Assuntos da árvore.",
+            "default": []
+          },
+          "subassuntos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaNo"
+            },
+            "type": "array",
+            "title": "Subassuntos",
+            "description": "Subassuntos da árvore.",
+            "default": []
+          },
+          "anuladas": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Anuladas",
+            "description": "Questões anuladas (`true`) e não anuladas (`false`).",
+            "default": []
           }
         },
         "type": "object",

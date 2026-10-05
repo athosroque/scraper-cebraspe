@@ -1,0 +1,3 @@
+{# Contagens das facetas (JSON). No fragmento vai como hx-swap-oob, e o
+   painel relê no htmx:afterSettle. #}
+<script type="application/json" id="dados-facetas"{% if oob %} hx-swap-oob="true"{% endif %}>{{ dados_facetas|tojson }}</script>

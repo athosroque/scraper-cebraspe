@@ -3,7 +3,7 @@
 import hashlib
 import logging
 import pathlib
-from typing import Literal
+from typing import Annotated, Literal
 from urllib.parse import urlencode
 
 from authlib.integrations.base_client import OAuthError
@@ -92,16 +92,6 @@ def _url_lista(no_id: str, filtros: FiltroEstatistica) -> str:
 templates.env.globals["url_lista"] = _url_lista
 
 
-def _nome_do_no(arvore, no_id: str | None) -> str | None:
-    pilha = list(arvore)
-    while no_id and pilha:
-        no = pilha.pop()
-        if no.id == no_id:
-            return rotulo_materia(no.nome, no.nome_de_cargo)
-        pilha.extend(no.filhos)
-    return None
-
-
 def _nao_encontrada(
     request: Request,
     titulo: str = "Página não encontrada",
@@ -128,36 +118,45 @@ def inicio(request: Request):
 def index(
     request: Request,
     usuario_id: int | None = Depends(auth.usuario_id_atual),
-    banca: str | None = None,
-    orgao: str | None = None,
-    ano: int | None = None,
-    concurso: str | None = None,
-    # str: trocar o concurso manda `cargo_numero=`, que como int daria 422.
-    cargo_numero: str | None = None,
-    nivel: str | None = None,
-    tipo_conhecimento: str | None = None,
-    no_id: str | None = None,
-    anuladas: Literal["incluir", "excluir", "so"] = "incluir",
+    # Tudo como lista de texto: o modelo descarta vazio e valor inválido
+    # (`ano=` ou `cargo_numero=` como int dariam 422).
+    banca: Annotated[list[str] | None, Query()] = None,
+    orgao: Annotated[list[str] | None, Query()] = None,
+    ano: Annotated[list[str] | None, Query()] = None,
+    concurso: Annotated[list[str] | None, Query()] = None,
+    cargo: Annotated[list[str] | None, Query()] = None,
+    cargo_numero: Annotated[list[str] | None, Query()] = None,
+    nivel: Annotated[list[str] | None, Query()] = None,
+    tipo_conhecimento: Annotated[list[str] | None, Query()] = None,
+    no_id: Annotated[list[str] | None, Query()] = None,
+    anuladas: str = "incluir",
     fora_do_edital: Literal["todos", "sim", "nao"] = "todos",
     utilizaveis: Literal["so", "todas"] = "so",
-    historico: Literal[
-        "todas", "resolvidas", "nao_resolvidas", "certas", "erradas"
-    ] = "todas",
+    historico: str = "todas",
     pagina: int = 1,
     tamanho_pagina: int = 20,
 ):
-    # Select vazio chega como "": vale como "sem filtro".
+    if anuladas not in ("incluir", "excluir", "so"):
+        anuladas = "incluir"
+    if historico not in ("todas", "resolvidas", "nao_resolvidas", "certas", "erradas"):
+        historico = "todas"
+    # Link antigo (`concurso=X&cargo_numero=N`, ex.: da estatística) vira o
+    # cargo `X:N` do filtro multisseleção.
+    concursos = [c for c in concurso or [] if c]
+    numeros = [n for n in cargo_numero or [] if n.strip().isdigit()]
+    if len(concursos) == 1 and numeros:
+        cargo = [*(cargo or []), *(f"{concursos[0]}:{n.strip()}" for n in numeros)]
+        cargo_numero = []
     filtros = FiltroQuestoes(
-        banca=banca or None,
-        orgao=orgao or None,
+        banca=banca,
+        orgao=orgao,
         ano=ano,
-        concurso=concurso or None,
-        cargo_numero=int(cargo_numero)
-        if cargo_numero and cargo_numero.isdigit()
-        else None,
-        nivel=nivel or None,
-        tipo_conhecimento=tipo_conhecimento or None,
-        no_id=no_id or None,
+        concurso=concurso,
+        cargo=cargo,
+        cargo_numero=cargo_numero,
+        nivel=nivel,
+        tipo_conhecimento=tipo_conhecimento,
+        no_id=no_id,
         anuladas=anuladas,
         fora_do_edital=fora_do_edital,
         utilizaveis=utilizaveis,
@@ -171,8 +170,10 @@ def index(
     )
 
     if pagina > 1 and pagina > max(pagina_questoes.total_paginas, 1):
-        params = dict(request.query_params)
-        params["pagina"] = str(max(pagina_questoes.total_paginas, 1))
+        params = [
+            (k, v) for k, v in request.query_params.multi_items() if k != "pagina"
+        ]
+        params.append(("pagina", str(max(pagina_questoes.total_paginas, 1))))
         return RedirectResponse(f"/questoes?{urlencode(params)}", status_code=307)
 
     # A restauração de histórico do HTMX também manda HX-Request, mas espera a
@@ -180,20 +181,139 @@ def index(
     parcial = request.headers.get("HX-Request") and not request.headers.get(
         "HX-History-Restore-Request"
     )
-    contexto = {"pagina_questoes": pagina_questoes, "filtros": filtros}
-    # O chip do assunto precisa do nome também no fragmento.
-    arvore = questoes_servico.obter_arvore() if filtros.no_id or not parcial else []
-    contexto["no_nome"] = _nome_do_no(arvore, filtros.no_id)
-    if parcial:
-        nome = "_lista_parcial.html"
-    else:
-        nome = "lista_questoes.html"
-        contexto["arvore"] = arvore
-        contexto["facetas"] = questoes_servico.obter_facetas()
-
+    # Facetas sempre: o fragmento leva as contagens novas (OOB) para o painel.
+    facetas = questoes_servico.obter_facetas(filtros, usuario_id)
+    contexto = {
+        "pagina_questoes": pagina_questoes,
+        "filtros": filtros,
+        "facetas": facetas,
+        "chips": _chips(filtros, facetas),
+        "dados_facetas": _dados_facetas(facetas),
+        "parcial": bool(parcial),
+    }
+    nome = "_lista_parcial.html" if parcial else "lista_questoes.html"
     resposta = templates.TemplateResponse(request=request, name=nome, context=contexto)
     resposta.headers["Vary"] = "HX-Request"
     return resposta
+
+
+def _dados_facetas(facetas) -> dict[str, list[dict]]:
+    """Facetas no formato do painel (JSON lido pelo Alpine, nunca interpolado)."""
+
+    def simples(lista):
+        return [
+            {"valor": str(f.valor), "rotulo": f.rotulo, "total": f.total} for f in lista
+        ]
+
+    def nos(lista):
+        return [
+            {
+                "valor": n.valor,
+                "rotulo": n.rotulo,
+                "caminho": n.caminho,
+                "total": n.total,
+            }
+            for n in lista
+        ]
+
+    return {
+        "orgao": simples(facetas.orgaos),
+        "ano": simples(facetas.anos),
+        "concurso": simples(facetas.concursos),
+        "cargo": [
+            {
+                "valor": c.valor,
+                "rotulo": f"{c.cargo_numero} — {c.cargo} ({rotulo_nivel(c.nivel)})",
+                "caminho": rotulo_concurso(c.concurso),
+                "total": c.total,
+            }
+            for c in facetas.cargos
+        ],
+        "nivel": simples(facetas.niveis),
+        "tipo_conhecimento": simples(facetas.tipos_conhecimento),
+        "banca": simples(facetas.bancas),
+        "materia": nos(facetas.materias),
+        "assunto": nos(facetas.assuntos),
+        "subassunto": nos(facetas.subassuntos),
+        "anuladas": [
+            {
+                "valor": "so" if f.valor else "excluir",
+                "rotulo": f.rotulo,
+                "total": f.total,
+            }
+            for f in facetas.anuladas
+        ],
+    }
+
+
+_ROTULO_ANULADAS = {"excluir": "Sem anuladas", "so": "Só anuladas"}
+_ROTULO_HISTORICO = {
+    "resolvidas": "Já resolvidas",
+    "nao_resolvidas": "Não resolvidas",
+    "certas": "Acertei",
+    "erradas": "Errei",
+}
+
+
+def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
+    """Chips dos filtros ativos, cada um com a URL da lista sem aquele valor."""
+    pares: list[tuple[str, str]] = []
+    for campo, valor in filtros.model_dump(exclude_defaults=True).items():
+        for v in valor if isinstance(valor, list) else [valor]:
+            pares.append((campo, str(v)))
+
+    rotulos: dict[tuple[str, str], str] = {}
+    for campo, lista in [
+        ("banca", facetas.bancas),
+        ("orgao", facetas.orgaos),
+        ("ano", facetas.anos),
+        ("concurso", facetas.concursos),
+        ("nivel", facetas.niveis),
+        ("tipo_conhecimento", facetas.tipos_conhecimento),
+    ]:
+        for f in lista:
+            rotulos[(campo, str(f.valor))] = f.rotulo
+    for c in facetas.cargos:
+        rotulos[("cargo", c.valor)] = (
+            f"{rotulo_concurso(c.concurso)} · {c.cargo_numero} — {c.cargo}"
+        )
+    for n in [*facetas.materias, *facetas.assuntos, *facetas.subassuntos]:
+        rotulos[("no_id", n.valor)] = n.caminho
+    prefixos = {
+        "banca": "Banca",
+        "orgao": "Órgão",
+        "ano": "Ano",
+        "cargo_numero": "Cargo nº",
+        "nivel": "Nível",
+        "tipo_conhecimento": "Conhecimento",
+        "fora_do_edital": "Fora do edital",
+        "utilizaveis": "Itens",
+    }
+
+    chips = []
+    for i, (campo, valor) in enumerate(pares):
+        resto = [p for j, p in enumerate(pares) if j != i]
+        if campo == "concurso":
+            # Os cargos do concurso (e o número antigo) saem junto.
+            resto = [
+                p
+                for p in resto
+                if p[0] != "cargo_numero"
+                and not (p[0] == "cargo" and p[1].startswith(valor + ":"))
+            ]
+        if campo == "anuladas":
+            texto = _ROTULO_ANULADAS.get(valor, valor)
+        elif campo == "historico":
+            texto = _ROTULO_HISTORICO.get(valor, valor)
+        elif campo in ("concurso", "cargo", "no_id"):
+            texto = rotulos.get((campo, valor), valor)
+        else:
+            texto = (
+                f"{prefixos.get(campo, campo)}: {rotulos.get((campo, valor), valor)}"
+            )
+        url = "/questoes" + (f"?{urlencode(resto)}" if resto else "")
+        chips.append({"rotulo": texto, "url": url})
+    return chips
 
 
 @router.post(

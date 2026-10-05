@@ -1,39 +1,12 @@
 {% import "_componentes.html" as c %}
-{# Chips dos filtros ativos. Cada um leva à lista sem só aquele filtro (o
-   cargo depende do concurso, então sai junto com ele). #}
-{% set ativos = filtros.model_dump(exclude_defaults=True) %}
-{% macro url_sem(campo, outro=None) -%}
-/questoes{% set resto = {} %}{% for k, v in ativos.items() if k not in (campo, outro) %}{% set _ = resto.update({k: v}) %}{% endfor %}{% if resto %}?{{ resto|urlencode }}{% endif %}
-{%- endmacro %}
-{% set rotulos = {
-    "concurso": "Concurso",
-    "cargo_numero": "Cargo",
-    "orgao": "Órgão",
-    "nivel": "Nível",
-    "banca": "Banca",
-    "ano": "Ano",
-    "tipo_conhecimento": "Conhecimento",
-    "anuladas": "Anuladas",
-    "fora_do_edital": "Fora do edital",
-    "utilizaveis": "Itens",
-} %}
-{% set rotulos_historico = {"resolvidas": "Já resolvidas", "nao_resolvidas": "Não resolvidas", "certas": "Acertei", "erradas": "Errei"} %}
-
+{% if parcial %}{% with oob=true %}{% include "_dados_facetas.html" %}{% endwith %}{% endif %}
+{# Chips dos filtros ativos: cada um leva à lista sem só aquele valor. #}
 <div class="mb-4 flex flex-wrap items-center gap-2">
     <p class="mr-2 text-sm text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total|num }}</strong> questões encontradas</p>
-    {% for campo, valor in ativos.items() %}
-        {% if campo == "no_id" %}
-            {{ c.chip("Assunto: " ~ (no_nome or valor), url_sem("no_id")) }}
-        {% elif campo == "historico" %}
-            {{ c.chip(rotulos_historico.get(valor, valor), url_sem("historico")) }}
-        {% elif campo == "concurso" %}
-            {{ c.chip(rotulo_concurso(valor), url_sem("concurso", "cargo_numero")) }}
-        {% else %}
-            {% if campo == "nivel" %}{% set texto_valor = rotulo_nivel(valor) %}{% elif campo == "tipo_conhecimento" %}{% set texto_valor = rotulo_tipo_conhecimento(valor) %}{% else %}{% set texto_valor = valor %}{% endif %}
-            {{ c.chip(rotulos.get(campo, campo) ~ ": " ~ texto_valor, url_sem(campo)) }}
-        {% endif %}
+    {% for chip in chips %}
+        {{ c.chip(chip.rotulo, chip.url) }}
     {% endfor %}
-    {% if ativos %}<a href="/questoes" class="link text-xs">Limpar filtros</a>{% endif %}
+    {% if chips %}<a href="/questoes" class="link text-xs">Limpar tudo</a>{% endif %}
 </div>
 
 {% if pagina_questoes.total == 0 %}
