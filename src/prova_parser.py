@@ -1307,6 +1307,51 @@ def dono_da_figura(
 # Caderno objetivo -------------------------------------------------------------
 
 
+def _remover_texto_das_tabelas(seg, linhas: list[Linha]) -> None:
+    """Tira do texto-base as linhas que caem dentro de figura vetorial dele.
+
+    A tabela desenhada já aparece como imagem; o texto corrido das células
+    ("grupo patrimonial 20X1 20X0 ativo circulante $ 154 ...") só repete o
+    conteúdo de forma ilegível. Só o texto-base muda: o enunciado é a chave
+    da 5D e fica intacto.
+    """
+    for tb in seg.textos_base:
+        regioes = [
+            (f["pagina"] - 1, pymupdf.Rect(f["bbox"]))
+            for f in tb["figuras"]
+            if f.get("origem") == "vetorial"
+        ]
+        if not regioes or not tb["texto"]:
+            continue
+        indices = [
+            i
+            for i, dono in seg.dono_linha.items()
+            if dono == ("texto_base", tb["ordem"])
+        ]
+        if not indices:
+            continue
+        indices.sort()
+
+        def dentro(linha: Linha, regioes=regioes) -> bool:
+            cx, cy = (linha.x0 + linha.x1) / 2, (linha.y0 + linha.y1) / 2
+            return any(
+                pagina == linha.pagina and r.contains(pymupdf.Point(cx, cy))
+                for pagina, r in regioes
+            )
+
+        todas = [linhas[i] for i in indices]
+        fora = [linha for linha in todas if not dentro(linha)]
+        if len(fora) == len(todas):
+            continue
+        completo = juntar_linhas(todas, paragrafos=True)
+        # O fim do texto-base pode ter recebido a frase colada ao comando
+        # (ver `segmentar`); esse sufixo não está nas linhas e é mantido.
+        sufixo = (
+            tb["texto"][len(completo) :] if tb["texto"].startswith(completo) else ""
+        )
+        tb["texto"] = f"{juntar_linhas(fora, paragrafos=True)}{sufixo}".strip()
+
+
 def extrair_caderno_objetivo(
     pdf_path: Path,
     gabarito: dict[int, str] | None,
@@ -1415,6 +1460,8 @@ def extrair_caderno_objetivo(
                                 False,
                             )
                     seg.textos_base[ordem]["figuras"].append(figura)
+
+        _remover_texto_das_tabelas(seg, linhas)
 
     for item in seg.itens.values():
         if SIMBOLO_ILEGIVEL in item["enunciado"]:

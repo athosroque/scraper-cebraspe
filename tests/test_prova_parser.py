@@ -1290,7 +1290,10 @@ class TestPreambuloDepoisDoItem:
         ordem = q[65]["texto_base_ordem"]
         base = resultado["textos_base"][ordem]["texto"]
         assert base.startswith("Da contabilidade de uma entidade hipotética")
-        assert "lucro operacional líquido $ 48 $ 41" in base
+        # As duas tabelas viram figura vetorial; o texto das células sai.
+        assert "lucro operacional líquido" not in base
+        figuras = resultado["textos_base"][ordem]["figuras"]
+        assert [f.get("origem") for f in figuras] == ["vetorial", "vetorial"]
         assert all(q[n]["texto_base_ordem"] == ordem for n in (66, 67, 68))
         assert q[65]["secao"].startswith("Com base nessas informações")
         assert "possivel_preambulo_no_item" not in q[64]["alertas"]
