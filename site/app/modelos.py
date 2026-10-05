@@ -4,9 +4,10 @@ Todo campo leva `description` e os modelos principais trazem exemplo real
 (PF_25_ADM, caderno 094_PF_CB1_01, item 1): o Swagger é a documentação.
 """
 
+import re
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 _CHAVE = "Chave estável `concurso|caderno|numero` da questão (mesma da 5D)."
 _EX_CHAVE = "PF_25_ADM|094_PF_CB1_01|1"
@@ -80,17 +81,63 @@ _D_QUESITOS = "Quesitos da discursiva (número, texto e valor em pontos)."
 
 
 # -- Filtros (internos; os parâmetros de consulta são documentados nas rotas) --
-class FiltroQuestoes(BaseModel):
-    """Filtros da listagem de questões, montados a partir da query string."""
+_CAMPOS_LISTA = (
+    "banca",
+    "orgao",
+    "ano",
+    "concurso",
+    "cargo",
+    "cargo_numero",
+    "nivel",
+    "tipo_conhecimento",
+    "no_id",
+)
+_CAMPOS_INTEIROS = {"ano", "cargo_numero"}
+_PADRAO_CARGO = re.compile(r"^[A-Za-z0-9_]+:\d+$")
 
-    banca: str | None = Field(None, description="Banca (ex.: `CEBRASPE`).")
-    orgao: str | None = Field(None, description="Órgão (ex.: `PF`).")
-    ano: int | None = Field(None, description="Ano do concurso.")
-    concurso: str | None = Field(None, description=_D_CONCURSO)
-    cargo_numero: int | None = Field(None, description=_D_CARGO_NUMERO)
-    nivel: str | None = Field(None, description=_D_NIVEL)
-    tipo_conhecimento: str | None = Field(None, description=_D_TIPO)
-    no_id: str | None = Field(None, description=_D_NO_ID)
+
+class FiltroQuestoes(BaseModel):
+    """Filtros da listagem de questões, montados a partir da query string.
+
+    Cada filtro é uma lista (5G.4): os valores do mesmo filtro combinam com OU
+    e os filtros entre si com E. Valor único e vazio também são aceitos (o
+    vazio vale como "sem filtro"), para os links e chamadas antigos.
+    """
+
+    banca: list[str] | None = Field(None, description="Bancas (ex.: `CEBRASPE`).")
+    orgao: list[str] | None = Field(None, description="Órgãos (ex.: `PF`).")
+    ano: list[int] | None = Field(None, description="Anos do concurso.")
+    concurso: list[str] | None = Field(None, description=_D_CONCURSO)
+    cargo: list[str] | None = Field(
+        None, description="Cargos como `CONCURSO:NUMERO` (ex.: `PF_25_ADM:1`)."
+    )
+    cargo_numero: list[int] | None = Field(None, description=_D_CARGO_NUMERO)
+    nivel: list[str] | None = Field(None, description=_D_NIVEL)
+    tipo_conhecimento: list[str] | None = Field(None, description=_D_TIPO)
+    no_id: list[str] | None = Field(None, description=_D_NO_ID)
+
+    @field_validator(*_CAMPOS_LISTA, mode="before")
+    @classmethod
+    def _como_lista(cls, valor, info):
+        if valor is None:
+            return None
+        if isinstance(valor, (str, int)):
+            valor = [valor]
+        limpos = []
+        for v in valor:
+            v = str(v).strip() if v is not None else ""
+            if not v:
+                continue
+            if info.field_name in _CAMPOS_INTEIROS:
+                if not v.isdigit():
+                    continue
+                v = int(v)
+            elif info.field_name == "cargo" and not _PADRAO_CARGO.match(v):
+                continue
+            if v not in limpos:
+                limpos.append(v)
+        return limpos or None
+
     anuladas: Literal["incluir", "excluir", "so"] = Field(
         "incluir", description="Tratamento das questões anuladas."
     )
@@ -272,11 +319,26 @@ class FacetaValor(BaseModel):
 class FacetaCargo(BaseModel):
     """Cargo possível no filtro, com o total de questões."""
 
+    valor: str = Field(
+        "", description="Valor a enviar no parâmetro `cargo` (`CONCURSO:NUMERO`)."
+    )
     cargo_numero: int = Field(description=_D_CARGO_NUMERO)
     cargo: str = Field(description="Nome do cargo.")
     concurso: str = Field(description=_D_CONCURSO)
     nivel: str = Field(description=_D_NIVEL)
     total: int = Field(description="Questões distintas do cargo.")
+
+
+class FacetaNo(BaseModel):
+    """Nó da árvore possível no filtro `no_id`, com o caminho e o total de questões."""
+
+    valor: str = Field(description=_D_NO_ID)
+    rotulo: str = Field(description=_D_NO_NOME)
+    nivel: str = Field(description=_D_NO_NIVEL)
+    caminho: str = Field(
+        description="Caminho do nó, separado por ` › ` (ex.: `Língua Portuguesa › Sintaxe`)."
+    )
+    total: int = Field(description="Questões distintas no nó e nos descendentes.")
 
 
 class FacetasResponse(BaseModel):
@@ -291,6 +353,12 @@ class FacetasResponse(BaseModel):
         description="Tipos de conhecimento (básico/específico)."
     )
     cargos: list[FacetaCargo] = Field(description="Cargos por concurso.")
+    materias: list[FacetaNo] = Field([], description="Matérias da árvore.")
+    assuntos: list[FacetaNo] = Field([], description="Assuntos da árvore.")
+    subassuntos: list[FacetaNo] = Field([], description="Subassuntos da árvore.")
+    anuladas: list[FacetaValor] = Field(
+        [], description="Questões anuladas (`true`) e não anuladas (`false`)."
+    )
 
 
 # -- Contas e histórico (5F.3) --

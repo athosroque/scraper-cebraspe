@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException, Path, Query, Request
 
@@ -25,32 +25,67 @@ router = APIRouter(prefix="/questoes", tags=["Questões"])
     responses=R401,
     description=(
         "Uma entrada por questão (cargos e nós agregados), ordenada por concurso, "
-        "caderno e número. Os filtros combinam com E. Sem filtro, devolve as 2.781 "
+        "caderno e número. Cada filtro aceita vários valores (parâmetro repetido, "
+        "ex.: `?ano=2025&ano=2024`), que combinam com OU; filtros diferentes "
+        "combinam com E. Sem filtro, devolve as 2.781 "
         "questões objetivas utilizáveis do piloto 2025 (2.800 com `utilizaveis=todas`)."
     ),
 )
 def listar_questoes(
     request: Request,
-    banca: str | None = Query(None, description="Banca (ex.: `CEBRASPE`)."),
-    orgao: str | None = Query(
-        None, description="Órgão (ex.: `PF`, `STM`). Valores em `/facetas`."
-    ),
-    ano: int | None = Query(None, description="Ano do concurso (ex.: `2025`)."),
-    concurso: str | None = Query(
-        None, description="Slug do concurso (ex.: `PF_25_ADM`)."
-    ),
-    cargo_numero: int | None = Query(
-        None, description="Número do cargo no edital. Use junto com `concurso`."
-    ),
-    nivel: str | None = Query(None, description="`superior` ou `medio`."),
-    tipo_conhecimento: str | None = Query(
-        None, description="`basico` ou `especifico`."
-    ),
-    no_id: str | None = Query(
-        None,
-        description="Nó da árvore (`/arvore`). Matéria ou assunto incluem as questões dos descendentes.",
-        examples=["S-c33faee4a4"],
-    ),
+    banca: Annotated[
+        list[str] | None,
+        Query(description="Banca (ex.: `CEBRASPE`). Repita para várias (OU)."),
+    ] = None,
+    orgao: Annotated[
+        list[str] | None,
+        Query(
+            description="Órgão (ex.: `PF`, `STM`). Repita para vários (OU). Valores em `/facetas`.",
+        ),
+    ] = None,
+    ano: Annotated[
+        list[int] | None,
+        Query(description="Ano do concurso (ex.: `2025`). Repita para vários (OU)."),
+    ] = None,
+    concurso: Annotated[
+        list[str] | None,
+        Query(
+            description="Slug do concurso (ex.: `PF_25_ADM`). Repita para vários (OU)."
+        ),
+    ] = None,
+    cargo: Annotated[
+        list[str] | None,
+        Query(
+            description=(
+                "Cargo como `CONCURSO:NUMERO` (ex.: `PF_25_ADM:1`). Repita para vários "
+                "(OU), inclusive de concursos diferentes. Valores em `/facetas` (`cargos[].valor`)."
+            ),
+        ),
+    ] = None,
+    cargo_numero: Annotated[
+        list[int] | None,
+        Query(
+            description="Número do cargo no edital, junto com `concurso` (forma antiga; prefira `cargo`).",
+        ),
+    ] = None,
+    nivel: Annotated[
+        list[str] | None,
+        Query(description="`superior` ou `medio`. Repita para os dois (OU)."),
+    ] = None,
+    tipo_conhecimento: Annotated[
+        list[str] | None,
+        Query(description="`basico` ou `especifico`. Repita para os dois (OU)."),
+    ] = None,
+    no_id: Annotated[
+        list[str] | None,
+        Query(
+            description=(
+                "Nó da árvore (`/arvore`), em qualquer nível. Matéria ou assunto incluem as "
+                "questões dos descendentes. Repita para vários (OU)."
+            ),
+            examples=["S-c33faee4a4"],
+        ),
+    ] = None,
     anuladas: Literal["incluir", "excluir", "so"] = Query(
         "incluir", description="Tratamento das questões anuladas."
     ),
@@ -84,6 +119,7 @@ def listar_questoes(
         orgao=orgao,
         ano=ano,
         concurso=concurso,
+        cargo=cargo,
         cargo_numero=cargo_numero,
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
@@ -177,7 +213,59 @@ router_facetas = APIRouter(prefix="/facetas", tags=["Facetas"])
     "",
     response_model=FacetasResponse,
     summary="Valores possíveis dos filtros",
-    description="Cada valor vem com o total de questões distintas, para montar os filtros da interface.",
+    description=(
+        "Cada valor vem com o total de questões distintas, para montar os filtros da "
+        "interface. Aceita os mesmos filtros da listagem: o total de cada valor "
+        "considera os outros filtros (não o próprio), e um valor marcado aparece "
+        "mesmo com total 0. Sem filtro, conta as questões utilizáveis."
+    ),
+    responses=R401,
 )
-def obter_facetas():
-    return questoes_servico.obter_facetas()
+def obter_facetas(
+    request: Request,
+    banca: Annotated[list[str] | None, Query(description="Bancas marcadas.")] = None,
+    orgao: Annotated[list[str] | None, Query(description="Órgãos marcados.")] = None,
+    ano: Annotated[list[int] | None, Query(description="Anos marcados.")] = None,
+    concurso: Annotated[
+        list[str] | None, Query(description="Concursos marcados (slug).")
+    ] = None,
+    cargo: Annotated[
+        list[str] | None, Query(description="Cargos marcados (`CONCURSO:NUMERO`).")
+    ] = None,
+    nivel: Annotated[list[str] | None, Query(description="Níveis marcados.")] = None,
+    tipo_conhecimento: Annotated[
+        list[str] | None, Query(description="Tipos de conhecimento marcados.")
+    ] = None,
+    no_id: Annotated[
+        list[str] | None, Query(description="Nós da árvore marcados.")
+    ] = None,
+    anuladas: Literal["incluir", "excluir", "so"] = Query(
+        "incluir", description="Tratamento das questões anuladas."
+    ),
+    utilizaveis: Literal["so", "todas"] = Query(
+        "so", description="`so` (padrão) conta só as questões utilizáveis."
+    ),
+    historico: Literal[
+        "todas", "resolvidas", "nao_resolvidas", "certas", "erradas"
+    ] = Query(
+        "todas",
+        description="Histórico do usuário logado. Diferente de `todas` sem login: 401.",
+    ),
+):
+    filtros = FiltroQuestoes(
+        banca=banca,
+        orgao=orgao,
+        ano=ano,
+        concurso=concurso,
+        cargo=cargo,
+        nivel=nivel,
+        tipo_conhecimento=tipo_conhecimento,
+        no_id=no_id,
+        anuladas=anuladas,
+        utilizaveis=utilizaveis,
+        historico=historico,
+    )
+    try:
+        return questoes_servico.obter_facetas(filtros, usuario_id_atual(request))
+    except LoginNecessario:
+        raise HTTPException(status_code=401, detail="Login necessário") from None

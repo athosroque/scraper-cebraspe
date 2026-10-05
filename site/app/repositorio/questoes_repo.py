@@ -4,47 +4,61 @@ from app.cache import cache_ttl
 from app.db import get_conexao_leitura
 
 
-def montar_where(filtros_dict: dict, params: dict) -> str:
-    """WHERE sobre `vw_questoes` a partir dos filtros; preenche `params`."""
+def _lista(valor) -> list:
+    """Filtro como lista: chamadas internas ainda passam valor único."""
+    if valor is None or valor == "" or valor == []:
+        return []
+    if isinstance(valor, (list, tuple, set)):
+        return [v for v in valor if v not in (None, "")]
+    return [valor]
+
+
+# Filtro (chave do dict) → coluna de `vw_questoes`. Valores do mesmo filtro
+# combinam com OU (`= ANY`), filtros diferentes com E.
+_COLUNAS = {
+    "banca": "banca",
+    "orgao": "orgao",
+    "ano": "ano",
+    "concurso": "concurso",
+    "cargo_numero": "cargo_numero",
+    "nivel": "nivel",
+    "tipo_conhecimento": "tipo_conhecimento",
+}
+
+
+def montar_where(filtros_dict: dict, params: dict, ignorar: tuple = ()) -> str:
+    """WHERE sobre `vw_questoes` a partir dos filtros; preenche `params`.
+
+    `ignorar`: filtros deixados de fora (a faceta conta os valores dela
+    considerando só os outros filtros).
+    """
     condicoes = ["1 = 1"]
 
-    if filtros_dict.get("banca"):
-        condicoes.append("banca = %(banca)s")
-        params["banca"] = filtros_dict["banca"]
+    for chave, coluna in _COLUNAS.items():
+        valores = _lista(filtros_dict.get(chave))
+        if valores and chave not in ignorar:
+            condicoes.append(f"{coluna} = ANY(%({chave})s)")
+            params[chave] = valores
 
-    if filtros_dict.get("orgao"):
-        condicoes.append("orgao = %(orgao)s")
-        params["orgao"] = filtros_dict["orgao"]
+    cargos = _lista(filtros_dict.get("cargo"))
+    if cargos and "cargo" not in ignorar:
+        # `CONCURSO:NUMERO`: o número do cargo se repete entre concursos.
+        condicoes.append("(concurso || ':' || cargo_numero) = ANY(%(cargo)s)")
+        params["cargo"] = [str(c) for c in cargos]
 
-    if filtros_dict.get("ano"):
-        condicoes.append("ano = %(ano)s")
-        params["ano"] = filtros_dict["ano"]
-
-    if filtros_dict.get("concurso"):
-        condicoes.append("concurso = %(concurso)s")
-        params["concurso"] = filtros_dict["concurso"]
-
-    if filtros_dict.get("cargo_numero"):
-        condicoes.append("cargo_numero = %(cargo_numero)s")
-        params["cargo_numero"] = filtros_dict["cargo_numero"]
-
-    if filtros_dict.get("nivel"):
-        condicoes.append("nivel = %(nivel)s")
-        params["nivel"] = filtros_dict["nivel"]
-
-    if filtros_dict.get("tipo_conhecimento"):
-        condicoes.append("tipo_conhecimento = %(tipo_conhecimento)s")
-        params["tipo_conhecimento"] = filtros_dict["tipo_conhecimento"]
-
-    if filtros_dict.get("no_id"):
+    nos = _lista(filtros_dict.get("no_id"))
+    if nos and "no_id" not in ignorar:
+        # Nó em qualquer nível: matéria e assunto incluem os descendentes.
         condicoes.append(
-            "(no_id = %(no_id)s OR assunto_id = %(no_id)s OR materia_id = %(no_id)s)"
+            "(no_id = ANY(%(no_id)s) OR assunto_id = ANY(%(no_id)s)"
+            " OR materia_id = ANY(%(no_id)s))"
         )
-        params["no_id"] = filtros_dict["no_id"]
+        params["no_id"] = nos
 
-    if filtros_dict.get("anuladas") == "excluir":
+    anuladas = None if "anuladas" in ignorar else filtros_dict.get("anuladas")
+    if anuladas == "excluir":
         condicoes.append("anulada = false")
-    elif filtros_dict.get("anuladas") == "so":
+    elif anuladas == "so":
         condicoes.append("anulada = true")
 
     if filtros_dict.get("utilizaveis", "so") == "so":
@@ -237,42 +251,99 @@ def obter_arvore_com_contagens() -> list[dict]:
         return cur.fetchall()
 
 
-def obter_facetas() -> dict:
+# Colunas que as facetas leem: a view é avaliada uma vez só (CTE) e cada
+# faceta conta sobre essas linhas com o próprio FILTER.
+_COLUNAS_FACETA = """
+    questao_id, questao_chave, questao_canonica_id, banca, orgao, ano, concurso,
+    cargo_numero, cargo, nivel, tipo_conhecimento, no_id, no_nivel, assunto_id,
+    materia_id, anulada, utilizavel, fora_do_edital
+"""
+
+
+def obter_facetas(filtros_dict: dict | None = None) -> dict:
+    """Valores de cada filtro com o total de questões distintas.
+
+    O total de cada faceta considera os outros filtros (não o dela mesma):
+    marcar 2025 não zera os outros anos. Valores com total 0 também vêm, para
+    a interface manter visível o que já está marcado.
+    """
+    filtros_dict = filtros_dict or {}
+    params: dict = {}
+
+    def onde(*ignorar) -> str:
+        return montar_where(filtros_dict, params, ignorar)
+
+    partes = []
+    for faceta, coluna in [
+        ("banca", "banca"),
+        ("orgao", "orgao"),
+        ("ano", "ano"),
+        ("concurso", "concurso"),
+        ("nivel", "nivel"),
+        ("tipo_conhecimento", "tipo_conhecimento"),
+    ]:
+        partes.append(f"""
+            SELECT '{faceta}' AS faceta, {coluna}::text AS valor,
+                   NULL::text AS cargo, NULL::text AS concurso, NULL::int AS cargo_numero,
+                   NULL::text AS nivel, max(orgao) AS ord1, max(ano)::text AS ord2,
+                   count(DISTINCT questao_id) FILTER (WHERE {onde(faceta)}) AS total
+            FROM base GROUP BY {coluna}""")
+    partes.append(f"""
+            SELECT 'cargo', concurso || ':' || cargo_numero, max(cargo), concurso,
+                   cargo_numero, max(nivel), NULL, NULL,
+                   count(DISTINCT questao_id) FILTER (WHERE {onde("cargo", "cargo_numero")})
+            FROM base GROUP BY concurso, cargo_numero""")
+    nos = onde("no_id")
+    partes.append(f"""
+            SELECT 'materia', materia_id, NULL, NULL, NULL, NULL, NULL, NULL,
+                   count(DISTINCT questao_id) FILTER (WHERE {nos})
+            FROM base WHERE materia_id IS NOT NULL GROUP BY materia_id""")
+    partes.append(f"""
+            SELECT 'assunto', assunto_id, NULL, NULL, NULL, NULL, NULL, NULL,
+                   count(DISTINCT questao_id) FILTER (WHERE {nos})
+            FROM base WHERE assunto_id IS NOT NULL GROUP BY assunto_id""")
+    partes.append(f"""
+            SELECT 'subassunto', no_id, NULL, NULL, NULL, NULL, NULL, NULL,
+                   count(DISTINCT questao_id) FILTER (WHERE {nos})
+            FROM base WHERE no_nivel = 'subassunto' GROUP BY no_id""")
+    partes.append(f"""
+            SELECT 'anuladas', anulada::text, NULL, NULL, NULL, NULL, NULL, NULL,
+                   count(DISTINCT questao_id) FILTER (WHERE {onde("anuladas")})
+            FROM base GROUP BY anulada""")
+
+    query = (
+        f"WITH base AS MATERIALIZED (SELECT {_COLUNAS_FACETA} FROM vw_questoes) "
+        + " UNION ALL ".join(partes)
+    )
     with (
         get_conexao_leitura() as conn,
         conn.cursor(cursor_factory=RealDictCursor) as cur,
     ):
-        facetas = {}
-        for col in [
-            "banca",
-            "orgao",
-            "ano",
-            "tipo_conhecimento",
-        ]:
-            cur.execute(
-                f"SELECT {col} AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY {col} ORDER BY total DESC"
-            )
-            facetas[col] = cur.fetchall()
+        cur.execute(query, params)
+        linhas = cur.fetchall()
 
-        cur.execute(
-            "SELECT concurso AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY concurso ORDER BY max(orgao), max(ano)"
-        )
-        facetas["concurso"] = cur.fetchall()
-
-        cur.execute(
-            "SELECT nivel AS valor, count(DISTINCT questao_id) AS total FROM vw_questoes WHERE utilizavel GROUP BY nivel ORDER BY nivel DESC"
-        )
-        facetas["nivel"] = cur.fetchall()
-
-        cur.execute("""
-            SELECT cargo_numero, cargo, concurso, nivel, count(DISTINCT questao_id) AS total
-            FROM vw_questoes
-            WHERE utilizavel
-            GROUP BY cargo_numero, cargo, concurso, nivel
-            ORDER BY cargo_numero ASC
-        """)
-        facetas["cargos"] = cur.fetchall()
-        return facetas
+    facetas: dict[str, list[dict]] = {}
+    for r in linhas:
+        facetas.setdefault(r["faceta"], []).append(r)
+    for nome in (
+        "banca",
+        "orgao",
+        "ano",
+        "tipo_conhecimento",
+        "materia",
+        "assunto",
+        "subassunto",
+        "anuladas",
+    ):
+        facetas.setdefault(nome, []).sort(key=lambda r: (-r["total"], str(r["valor"])))
+    facetas.setdefault("concurso", []).sort(
+        key=lambda r: (r["ord1"] or "", r["ord2"] or "", r["valor"])
+    )
+    facetas.setdefault("nivel", []).sort(key=lambda r: str(r["valor"]), reverse=True)
+    facetas.setdefault("cargo", []).sort(
+        key=lambda r: (r["cargo_numero"], r["concurso"])
+    )
+    return facetas
 
 
 def desempenho_por_no(

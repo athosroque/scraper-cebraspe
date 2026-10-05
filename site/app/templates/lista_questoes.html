@@ -4,192 +4,159 @@
 {% block title %}Resolver questões — Questões CEBRASPE{% endblock %}
 
 {% block content %}
-{{ c.cabecalho("Resolver questões", "Filtre por concurso, cargo e assunto e corrija item a item, no padrão certo/errado do CEBRASPE.") }}
+{{ c.cabecalho("Resolver questões", "Marque órgão, ano, cargo, matéria, assunto e subassunto (vários de cada) e corrija item a item, no padrão certo/errado do CEBRASPE.") }}
 
-{# Árvore como JSON (tojson escapa <, > e &): a busca e o modal leem daqui,
-   sem nenhum nome interpolado em expressão do Alpine. #}
-{% set dados_arvore = [] %}
-{% for m in arvore %}
-    {% set assuntos = [] %}
-    {% for a in m.filhos %}
-        {% set subs = [] %}
-        {% for s in a.filhos %}{% set _ = subs.append({"id": s.id, "nome": s.nome, "total": s.total_questoes}) %}{% endfor %}
-        {% set _ = assuntos.append({"id": a.id, "nome": a.nome, "total": a.total_questoes, "filhos": subs}) %}
-    {% endfor %}
-    {% set _ = dados_arvore.append({"id": m.id, "nome": rotulo_materia(m.nome, m.nome_de_cargo), "total": m.total_questoes, "filhos": assuntos}) %}
-{% endfor %}
-<script type="application/json" id="dados-arvore">{{ dados_arvore|tojson }}</script>
+{# Facetas e seleção como JSON (tojson escapa <, > e &): o painel lê daqui,
+   sem nenhum valor interpolado em expressão do Alpine. As contagens chegam
+   de novo a cada filtro, pelo fragmento (hx-swap-oob do #dados-facetas). #}
+{% include "_dados_facetas.html" %}
+<script type="application/json" id="dados-selecao">{{ filtros.model_dump(exclude_none=True)|tojson }}</script>
 <script>
 document.addEventListener("alpine:init", () => {
-    const normalizar = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-    Alpine.data("filtroArvore", () => ({
-        aberto: false,
+    const normalizar = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const ler = (id) => JSON.parse(document.getElementById(id).textContent);
+    Alpine.store("facetas", ler("dados-facetas"));
+    document.body.addEventListener("htmx:afterSettle", () => {
+        const el = document.getElementById("dados-facetas");
+        if (el) Alpine.store("facetas", JSON.parse(el.textContent));
+    });
+
+    // Uma faceta: busca + checkboxes. Os marcados ficam sempre no DOM (com
+    // name), mesmo fora da busca, para irem no form.
+    Alpine.data("faceta", () => ({
+        // Declarados aqui: sem isso, a atribuição no init cai no escopo do
+        // x-data de fora (compartilhado entre as facetas).
+        chave: "",
+        limite: 8,
         busca: "",
-        selecionado: "",
-        nome: "",
-        arvore: [],
-        planos: [],
-        expandidos: {},
+        todos: false,
+        marcados: [],
         init() {
-            this.selecionado = this.$el.dataset.noId;
-            this.nome = this.$el.dataset.noNome;
-            this.arvore = JSON.parse(document.getElementById("dados-arvore").textContent);
-            for (const m of this.arvore) {
-                this.planos.push({ ...m, caminho: "", chave: normalizar(m.nome) });
-                for (const a of m.filhos) {
-                    this.planos.push({ ...a, caminho: m.nome, chave: normalizar(a.nome) });
-                    for (const s of a.filhos) {
-                        this.planos.push({ ...s, caminho: m.nome + " › " + a.nome, chave: normalizar(s.nome) });
-                    }
-                }
-            }
+            const d = this.$el.dataset;
+            this.chave = d.chave;
+            this.limite = parseInt(d.limite || "8");
+            const sel = ler("dados-selecao")[d.nome] || [];
+            const doNivel = new Set(this.itens.map((i) => i.valor));
+            // no_id serve a 3 facetas (matéria, assunto, subassunto).
+            this.marcados = sel.map(String).filter((v) => d.nome !== "no_id" || doNivel.has(v));
         },
-        get resultados() {
+        get itens() {
+            return this.$store.facetas[this.chave] || [];
+        },
+        get visiveis() {
             const termo = normalizar(this.busca.trim());
-            if (termo.length < 2) return [];
-            return this.planos.filter((n) => n.chave.includes(termo)).slice(0, 80);
+            const marcados = this.itens.filter((i) => this.marcados.includes(i.valor));
+            let resto = this.itens.filter((i) => !this.marcados.includes(i.valor));
+            if (termo) {
+                resto = resto.filter((i) => normalizar(i.rotulo + " " + (i.caminho || "")).includes(termo));
+                return marcados.concat(resto.slice(0, 100));
+            }
+            resto = resto.filter((i) => i.total > 0);
+            return marcados.concat(this.todos ? resto.slice(0, 300) : resto.slice(0, Math.max(0, this.limite - marcados.length)));
         },
-        abrir() {
-            this.aberto = true;
-            this.$nextTick(() => this.$refs.busca.focus());
+        get escondidos() {
+            return this.itens.filter((i) => i.total > 0).length - this.visiveis.length;
         },
-        alternar(id) {
-            this.expandidos[id] = !this.expandidos[id];
-        },
-        selecionar(no) {
-            this.selecionado = no ? no.id : "";
-            this.nome = no ? no.nome : "";
-            this.aberto = false;
-            this.$nextTick(() => document.getElementById("form-filtros").requestSubmit());
+        alternar(valor, ligado) {
+            this.marcados = ligado ? this.marcados.concat([valor]) : this.marcados.filter((v) => v !== valor);
         },
     }));
 });
 </script>
 
-{# hx-history="false": a página (com a árvore em JSON) estoura o localStorage do
-   cache de histórico; o voltar busca a página inteira no servidor. #}
-<form id="form-filtros" action="/questoes" method="get" hx-history="false"
-      hx-get="/questoes" hx-trigger="change, submit" hx-target="#lista-conteudo" hx-push-url="true"
-      class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Filtros de questões">
-    {# Página volta a 1 a cada mudança de filtro: o form não manda `pagina`. #}
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {% with cargos = facetas.cargos %}{% include "_select_cargo.html" %}{% endwith %}
-        <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Órgão
-            <select name="orgao" class="campo">
-                <option value="">Todos</option>
-                {% for o in facetas.orgaos %}
-                <option value="{{ o.valor }}" {% if filtros.orgao == o.valor %}selected{% endif %}>{{ o.rotulo }} ({{ o.total|num }})</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Nível
-            <select name="nivel" class="campo">
-                <option value="">Todos</option>
-                {% for n in facetas.niveis %}
-                <option value="{{ n.valor }}" {% if filtros.nivel == n.valor %}selected{% endif %}>{{ n.rotulo }} ({{ n.total|num }})</option>
-                {% endfor %}
-            </select>
-        </label>
+<div class="lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-6" x-data="{ painel: false }">
+    <button type="button" class="btn-secundario mb-4 w-full lg:hidden" @click="painel = !painel"
+            :aria-expanded="painel.toString()" aria-expanded="false" aria-controls="form-filtros">
+        <span x-text="painel ? 'Esconder filtros' : 'Mostrar filtros'">Filtros</span>
+    </button>
+
+    {# hx no form (nunca no input): cada mudança manda o form inteiro.
+       hx-history="false": a página (com as facetas em JSON) estoura o
+       localStorage do cache de histórico; o voltar busca a página inteira. #}
+    <form id="form-filtros" action="/questoes" method="get" hx-history="false"
+          hx-get="/questoes" hx-trigger="change, submit" hx-target="#lista-conteudo" hx-push-url="true"
+          class="mb-6 hidden space-y-1 self-start rounded-xl border border-slate-200 bg-white p-3 shadow-sm lg:block"
+          :class="painel && '!block'" aria-label="Filtros de questões">
+        {# Página volta a 1 a cada mudança de filtro: o form não manda `pagina`. #}
+        {% set grupos = [
+            ("materia", "no_id", "Matéria", 6, true),
+            ("assunto", "no_id", "Assunto", 6, false),
+            ("subassunto", "no_id", "Subassunto", 6, false),
+            ("orgao", "orgao", "Órgão", 8, true),
+            ("ano", "ano", "Ano", 8, true),
+            ("concurso", "concurso", "Concurso", 8, false),
+            ("cargo", "cargo", "Cargo", 6, false),
+            ("nivel", "nivel", "Nível", 8, true),
+            ("tipo_conhecimento", "tipo_conhecimento", "Conhecimento", 8, false),
+            ("banca", "banca", "Banca", 8, false),
+        ] %}
+        {% for chave, nome, titulo, limite, aberto in grupos %}
+        <details class="group border-b border-slate-100 py-2 last:border-0" {% if aberto or filtros[nome] %}open{% endif %}
+                 x-data="faceta" data-chave="{{ chave }}" data-nome="{{ nome }}" data-limite="{{ limite }}">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-1 py-1 text-sm font-semibold text-slate-800">
+                <span>{{ titulo }} <span class="ml-1 rounded-full bg-blue-50 px-2 text-xs font-medium text-blue-800" x-show="marcados.length" x-text="marcados.length" x-cloak></span></span>
+                <span class="text-slate-400 group-open:rotate-90" aria-hidden="true">›</span>
+            </summary>
+            <div class="mt-1 space-y-1">
+                <input type="search" x-model="busca" class="campo w-full py-1.5" placeholder="Pesquisar {{ titulo|lower }}"
+                       aria-label="Pesquisar {{ titulo|lower }}" @change.stop @keydown.enter.prevent>
+                <ul class="max-h-72 overflow-y-auto pr-1 text-sm">
+                    <template x-for="item in visiveis" :key="item.valor">
+                        <li>
+                            <label class="flex cursor-pointer items-start gap-2 rounded-md px-1 py-1 hover:bg-slate-50"
+                                   :class="item.total === 0 && !marcados.includes(item.valor) && 'opacity-50'">
+                                <input type="checkbox" name="{{ nome }}" class="mt-0.5 h-4 w-4 shrink-0 accent-blue-700"
+                                       :value="item.valor" :checked="marcados.includes(item.valor)"
+                                       @change="alternar(item.valor, $event.target.checked)">
+                                <span class="min-w-0 flex-1">
+                                    <span class="block break-words text-slate-800" x-text="item.rotulo"></span>
+                                    <span class="block break-words text-xs text-slate-500" x-show="item.caminho && item.caminho !== item.rotulo" x-text="item.caminho"></span>
+                                </span>
+                                <span class="shrink-0 tabular-nums text-xs text-slate-500" x-text="item.total.toLocaleString('pt-BR')"></span>
+                            </label>
+                        </li>
+                    </template>
+                    <li class="px-1 py-1 text-xs text-slate-500" x-show="visiveis.length === 0">Nada encontrado.</li>
+                </ul>
+                <button type="button" class="link px-1 text-xs" x-show="!busca && (escondidos > 0 || todos)" x-cloak
+                        @click="todos = !todos" x-text="todos ? 'Mostrar menos' : 'Mostrar mais (' + escondidos + ')'"></button>
+            </div>
+        </details>
+        {% endfor %}
+
+        <fieldset class="border-b border-slate-100 px-1 py-2">
+            <legend class="text-sm font-semibold text-slate-800">Anuladas</legend>
+            {% for valor, rotulo in [("incluir", "Incluir"), ("excluir", "Esconder"), ("so", "Só anuladas")] %}
+            <label class="mt-1 flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                <input type="radio" name="anuladas" value="{{ valor }}" class="h-4 w-4 accent-blue-700" {% if filtros.anuladas == valor %}checked{% endif %}>
+                {{ rotulo }}
+            </label>
+            {% endfor %}
+        </fieldset>
+
         {% if request.session.get("usuario_id") %}
-        <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Meu histórico
-            <select name="historico" class="campo">
+        <label class="flex flex-col gap-1 px-1 py-2 text-sm font-semibold text-slate-800">Meu histórico
+            <select name="historico" class="campo font-normal">
                 {% for valor, rotulo in [("todas", "Todas"), ("nao_resolvidas", "Não resolvidas"), ("resolvidas", "Já resolvidas"), ("erradas", "Errei (última resposta)"), ("certas", "Acertei (última resposta)")] %}
                 <option value="{{ valor }}" {% if filtros.historico == valor %}selected{% endif %}>{{ rotulo }}</option>
                 {% endfor %}
             </select>
         </label>
         {% endif %}
-    </div>
 
-    {# Filtros sem controle visível (vindos de link da estatística) seguem no form. #}
-    {% for campo in ["banca", "ano", "tipo_conhecimento"] %}
-    {% if filtros[campo] is not none %}<input type="hidden" name="{{ campo }}" value="{{ filtros[campo] }}">{% endif %}
-    {% endfor %}
-    {% for campo, padrao in [("anuladas", "incluir"), ("fora_do_edital", "todos"), ("utilizaveis", "so")] %}
-    {% if filtros[campo] != padrao %}<input type="hidden" name="{{ campo }}" value="{{ filtros[campo] }}">{% endif %}
-    {% endfor %}
-
-    <div class="mt-3" data-no-id="{{ filtros.no_id or '' }}" data-no-nome="{{ no_nome or '' }}" x-data="filtroArvore" @keydown.escape.window="aberto = false">
-        <input type="hidden" name="no_id" :value="selecionado" value="{{ filtros.no_id or '' }}">
-        <div class="flex flex-wrap items-center gap-2">
-            <button type="button" class="btn-secundario" @click="abrir()">Árvore de Assuntos</button>
-            <span class="text-sm text-slate-600" x-show="selecionado" x-cloak>Assunto: <strong class="text-slate-900" x-text="nome || 'selecionado'"></strong></span>
+        {# Filtros sem controle visível (link antigo ou da estatística) seguem no form. #}
+        {% for n in filtros.cargo_numero or [] %}<input type="hidden" name="cargo_numero" value="{{ n }}">{% endfor %}
+        {% for campo, padrao in [("fora_do_edital", "todos"), ("utilizaveis", "so")] %}
+        {% if filtros[campo] != padrao %}<input type="hidden" name="{{ campo }}" value="{{ filtros[campo] }}">{% endif %}
+        {% endfor %}
+        <div class="flex items-center justify-between gap-2 px-1 pt-2">
+            <a href="/questoes" class="link text-xs">Limpar tudo</a>
+            <noscript><button type="submit" class="btn-primario">Aplicar</button></noscript>
         </div>
+    </form>
 
-        <div class="fixed inset-0 z-40 flex items-start justify-center bg-slate-900/40 p-4 sm:p-8" x-show="aberto" x-cloak
-             @click.self="aberto = false" role="dialog" aria-modal="true" aria-labelledby="titulo-arvore">
-            <div class="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-xl bg-white shadow-xl">
-                <div class="flex items-center justify-between gap-3 border-b border-slate-200 p-4">
-                    <h2 id="titulo-arvore" class="text-lg font-semibold text-slate-900">Matéria, assunto e subassunto</h2>
-                    <button type="button" class="rounded-md p-1 text-slate-500 hover:text-slate-900" @click="aberto = false" aria-label="Fechar">✕</button>
-                </div>
-                <div class="border-b border-slate-200 p-4">
-                    <input type="search" x-ref="busca" x-model="busca" class="campo w-full" placeholder="Buscar assunto (ex.: licitação)" aria-label="Buscar assunto"
-                           @keydown.enter.prevent @change.stop>
-                </div>
-                <div class="overflow-y-auto p-2 text-sm">
-                    <template x-if="busca.trim().length >= 2">
-                        <ul>
-                            <template x-for="n in resultados" :key="n.id">
-                                <li>
-                                    <button type="button" class="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-50" @click="selecionar(n)">
-                                        <span class="font-medium text-slate-900" x-text="n.nome"></span>
-                                        <span class="tabular-nums text-slate-500" x-text="'(' + n.total + ')'"></span>
-                                        <span class="block text-xs text-slate-500" x-show="n.caminho" x-text="n.caminho"></span>
-                                    </button>
-                                </li>
-                            </template>
-                            <li class="px-3 py-2 text-slate-500" x-show="resultados.length === 0">Nenhum assunto encontrado.</li>
-                        </ul>
-                    </template>
-                    <template x-if="busca.trim().length < 2">
-                        <ul>
-                            <template x-for="m in arvore" :key="m.id">
-                                <li>
-                                    <div class="flex items-center gap-1">
-                                        <button type="button" class="w-6 shrink-0 text-slate-500" @click="alternar(m.id)" x-text="expandidos[m.id] ? '▾' : '▸'" :aria-label="'Expandir ' + m.nome"></button>
-                                        <button type="button" class="flex-1 rounded-md px-2 py-1.5 text-left font-semibold hover:bg-slate-50" :class="selecionado === m.id && 'bg-blue-50 text-blue-800'" @click="selecionar(m)">
-                                            <span x-text="m.nome"></span> <span class="font-normal tabular-nums text-slate-500" x-text="'(' + m.total + ')'"></span>
-                                        </button>
-                                    </div>
-                                    <ul class="ml-6" x-show="expandidos[m.id]">
-                                        <template x-for="a in m.filhos" :key="a.id">
-                                            <li>
-                                                <div class="flex items-center gap-1">
-                                                    <button type="button" class="w-6 shrink-0 text-slate-500" x-show="a.filhos.length" @click="alternar(a.id)" x-text="expandidos[a.id] ? '▾' : '▸'" :aria-label="'Expandir ' + a.nome"></button>
-                                                    <span class="w-6 shrink-0" x-show="!a.filhos.length"></span>
-                                                    <button type="button" class="flex-1 rounded-md px-2 py-1.5 text-left hover:bg-slate-50" :class="selecionado === a.id && 'bg-blue-50 text-blue-800'" @click="selecionar(a)">
-                                                        <span x-text="a.nome"></span> <span class="tabular-nums text-slate-500" x-text="'(' + a.total + ')'"></span>
-                                                    </button>
-                                                </div>
-                                                <ul class="ml-12" x-show="expandidos[a.id]">
-                                                    <template x-for="s in a.filhos" :key="s.id">
-                                                        <li>
-                                                            <button type="button" class="block w-full rounded-md px-2 py-1 text-left text-slate-700 hover:bg-slate-50" :class="selecionado === s.id && 'bg-blue-50 text-blue-800'" @click="selecionar(s)">
-                                                                <span x-text="s.nome"></span> <span class="tabular-nums text-slate-500" x-text="'(' + s.total + ')'"></span>
-                                                            </button>
-                                                        </li>
-                                                    </template>
-                                                </ul>
-                                            </li>
-                                        </template>
-                                    </ul>
-                                </li>
-                            </template>
-                        </ul>
-                    </template>
-                </div>
-                <div class="flex justify-end gap-2 border-t border-slate-200 p-3">
-                    <button type="button" class="btn-secundario" x-show="selecionado" @click="selecionar(null)">Limpar assunto</button>
-                    <button type="button" class="btn-secundario" @click="aberto = false">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <noscript><button type="submit" class="btn-primario mt-3">Aplicar</button></noscript>
-</form>
-
-<section id="lista-conteudo">
-    {% include "_lista_parcial.html" %}
-</section>
+    <section id="lista-conteudo" class="min-w-0">
+        {% include "_lista_parcial.html" %}
+    </section>
+</div>
 {% endblock %}
