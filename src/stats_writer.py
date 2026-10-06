@@ -106,9 +106,44 @@ def conectar(**kwargs):
     )
 
 
+# Privilégios dados a outras roles (as do site, `site/sql/app_schema.sql`) em
+# objetos do `public`. O schema recria as views com `DROP VIEW ... CASCADE`, o
+# que apaga os GRANTs: sem reaplicar, toda carga derruba o site com
+# "permission denied for view vw_questoes".
+_SQL_GRANTS_PUBLIC = """
+    SELECT format('GRANT %s ON %s TO %I', a.privilege_type,
+                  c.oid::regclass, r.rolname)
+      FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+     CROSS JOIN LATERAL aclexplode(c.relacl) a
+      JOIN pg_roles r ON r.oid = a.grantee
+     WHERE n.nspname = current_schema() AND a.grantee <> c.relowner
+    UNION ALL
+    SELECT format('GRANT EXECUTE ON FUNCTION %s TO %I',
+                  p.oid::regprocedure, r.rolname)
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+     CROSS JOIN LATERAL aclexplode(p.proacl) a
+      JOIN pg_roles r ON r.oid = a.grantee
+     WHERE n.nspname = current_schema() AND a.grantee <> p.proowner
+"""
+
+
 def criar_schema(conn) -> None:
     with conn, conn.cursor() as cur:
+        cur.execute(_SQL_GRANTS_PUBLIC)
+        grants = [linha[0] for linha in cur.fetchall()]
         cur.execute(SCHEMA_SQL.read_text(encoding="utf-8"))
+        for grant in grants:
+            # Objeto que deixou de existir no schema novo perde o GRANT.
+            cur.execute("SAVEPOINT grant_publico")
+            try:
+                cur.execute(grant)
+            except psycopg2.Error:
+                cur.execute("ROLLBACK TO SAVEPOINT grant_publico")
+                logger.warning("[GRANT_PERDIDO] %s", grant)
+            else:
+                cur.execute("RELEASE SAVEPOINT grant_publico")
 
 
 # Funções puras ----------------------------------------------------------------

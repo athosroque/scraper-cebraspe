@@ -711,7 +711,12 @@ WITH canonica AS (
     SELECT
         q.id AS questao_id,
         min(q.id) OVER (
-            PARTITION BY p.concurso_id, md5(q.enunciado), COALESCE(md5(tb.texto), ''), q.gabarito
+            -- Texto-base comparado sem espaços/quebras: o mesmo texto em
+            -- cadernos de layout diferente pode quebrar parágrafo (ou a
+            -- linha da fonte) em lugar diferente (5G.1).
+            PARTITION BY p.concurso_id, md5(q.enunciado),
+                COALESCE(md5(regexp_replace(tb.texto, '\s+', ' ', 'g')), ''),
+                q.gabarito
         ) AS questao_canonica_id
     FROM questoes q
     JOIN provas p ON p.id = q.prova_id
@@ -781,7 +786,9 @@ SELECT
     ctx.status_revisao,
     q.enunciado,
     q.secao,
-    q.figuras,
+    -- Figuras do texto-base (tabelas do grupo) antes das do item: o card só
+    -- lê esta coluna, e `tem_figuras` já considerava as duas.
+    COALESCE(tb.figuras, '[]'::jsonb) || q.figuras AS figuras,
     q.texto_base_id,
     tb.texto AS texto_base_texto,
     (q.texto_base_id IS NOT NULL) AS tem_texto_base,

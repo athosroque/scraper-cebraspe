@@ -591,6 +591,76 @@ class TestEstatisticasViews:
             assert "Língua Portuguesa > Ortografia > Acentuação gráfica" in row[4]
             assert row[5] == "C"
 
+    def test_vw_questoes_figuras_inclui_as_do_texto_base(self, conn, dados):
+        """Tabela recortada fica no texto-base do grupo; o card só lê `figuras`."""
+        q1_id = dados["questoes"]["q1"]
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE textos_base SET figuras = '[{"arquivo": "tb.png"}]'
+                 WHERE id = (SELECT texto_base_id FROM questoes WHERE id = %s)
+                """,
+                (q1_id,),
+            )
+            cur.execute(
+                """UPDATE questoes SET figuras = '[{"arquivo": "item.png"}]'
+                    WHERE id = %s""",
+                (q1_id,),
+            )
+            cur.execute(
+                """
+                SELECT DISTINCT figuras, tem_figuras FROM vw_questoes
+                 WHERE questao_id = %s
+                """,
+                (q1_id,),
+            )
+            figuras, tem_figuras = cur.fetchone()
+        assert [f["arquivo"] for f in figuras] == ["tb.png", "item.png"]
+        assert tem_figuras is True
+
+    def test_canonica_ignora_quebra_de_paragrafo_do_texto_base(self, conn, dados):
+        """Mesmo texto, quebrado em parágrafo em lugar diferente: 1 questão."""
+        q1_id, q7_id = dados["questoes"]["q1"], dados["questoes"]["q7"]
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE textos_base SET texto = 'Texto de apoio' || chr(10) || chr(10)
+                                               || 'da questão 1'
+                 WHERE id = (SELECT texto_base_id FROM questoes WHERE id = %s)
+                """,
+                (q7_id,),
+            )
+            cur.execute(
+                """
+                SELECT count(DISTINCT questao_canonica_id) FROM vw_questoes
+                 WHERE questao_id IN (%s, %s)
+                """,
+                (q1_id, q7_id),
+            )
+            assert cur.fetchone()[0] == 1
+
+    def test_criar_schema_preserva_grants_das_views(self, conn):
+        """O schema recria as views (DROP ... CASCADE); o GRANT do site volta."""
+        role = f"test_role_{uuid.uuid4().hex[:8]}"
+        with conn.cursor() as cur:
+            cur.execute(f"CREATE ROLE {role} NOLOGIN")
+            cur.execute(f"GRANT SELECT ON vw_questoes TO {role}")
+        conn.commit()
+        try:
+            stats_writer.criar_schema(conn)
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT has_table_privilege(%s, 'vw_questoes', 'SELECT')",
+                    (role,),
+                )
+                assert cur.fetchone()[0] is True
+        finally:
+            conn.rollback()
+            with conn.cursor() as cur:
+                cur.execute(f"DROP OWNED BY {role}")
+                cur.execute(f"DROP ROLE {role}")
+            conn.commit()
+
     def test_fn_prova_cobra_conta_distinto_com_filtro_de_varios_cargos(
         self, conn, dados
     ):
