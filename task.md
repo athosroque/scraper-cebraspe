@@ -809,18 +809,97 @@ enviar o bloco de uma etapa específica para o agente construir.
 - `[x]` **5F.4 — Páginas de estatística:** concluída em 2026-10-01. (1) o que mais cai, (2) o que o
   edital cobra e (3) edital × prova, por concurso/cargo/nível, a partir das
   views da 5E.
-- `[ ]` **5F.5 — Simulado:** refazer a prova de um concurso/cargo (básico +
+- `[x]` **5F.5 — Simulado:** concluída (ver `CLAUDE.md` §5). refazer a prova de um concurso/cargo (básico +
   específico na ordem original, cronômetro, discursiva com os quesitos). A
   correção segue a regra CEBRASPE (certo +1, errado −1, branco 0; anulada
   não conta) e mostra o desempenho por nó. Substitui o simulado em HTML
   estático planejado antes para a 5E.
-- `[ ]` **5F.6 — Deploy público:** Traefik/Cloudflare, rate limit, headers
+- `[ ]` **5F.6 — Deploy público (opcional, decisão do dono em
+  2026-10-06; o site ainda vai mudar muito antes de ir ao ar; detalhado
+  como 5F.12 no `plano-etapa-5f.md`):** Traefik/Cloudflare, rate limit, headers
   de segurança, backup do banco de usuários, CI (ruff/pytest + testes da
   API).
 - **Pronto quando:** o site está no ar com as 2.800 questões do piloto
   filtráveis pela árvore, um usuário cadastrado resolve questões e vê o
   próprio desempenho, e as três estatísticas e o simulado `PF_25_ADM` cargo
   1 funcionam, com a pontuação conferida à mão.
+
+---
+
+## Etapa 5G: Fidelidade ao caderno e filtros estilo Gran (antes do deploy)
+> **Por que existe (2026-10-05):** o dono achou inconsistências entre o site
+> e o PDF. Discover feito em 2026-10-05 (números abaixo medidos no banco e
+> nos JSONs de `questoes/`). **Cada subetapa é uma sessão.**
+
+**Achados do discover:**
+1. **Parágrafos do texto-base perdidos.** `juntar_linhas`
+   (`src/prova_parser.py`) junta todas as linhas de prosa com espaço: só 2
+   dos 123 textos-base têm quebra de linha. No PDF, o parágrafo é marcado
+   pelo recuo da 1ª linha (ex.: `167_CDNS_CG1_01`, x0 56,8 × 28,3 do corpo).
+   79 questões citam "primeiro/segundo/… parágrafo" ou "linha N" e ficam
+   difíceis de conferir.
+2. **Comando do grupo não aparece no site.** O texto "Julgue os itens…,
+   considerando que…" é gravado em `questoes.secao`, mas
+   `_card_questao.html` não o exibe. 714 itens têm comando com dados de
+   contexto. Caso do relato de Raciocínio Lógico: `094_PF_CB2_01` itens
+   24–26 ("entrevista com 60 pessoas, 17…, 53…") ficam sem os dados. Ali o
+   PDF não tem figura, o dado está só no comando.
+3. **Figuras vetoriais não são recortadas.** O parser só recorta imagem
+   raster. Há desenho vetorial grande em `072_STM_005_0*`, `072_STM_010_0*`
+   e `094_PF_005_0*` (gráficos/tabelas desenhados), que somem.
+4. **Assunto no rodapé.** O caminho matéria › assunto › subassunto fica no
+   `<footer>` do card; deve ir para o topo.
+5. **Filtros de valor único.** A lista só tem `orgao`, `nivel`,
+   `historico` e um `no_id`. Falta multisseleção com busca para cargo, ano,
+   matéria, assunto e subassunto (estilo Gran: lista pesquisável com
+   checkbox e chips do que foi marcado).
+
+- `[x]` **5G.1 — Parágrafos:** `juntar_linhas` quebra parágrafo (`\n\n`)
+  quando a linha começa com recuo de 1ª linha em relação à margem do bloco
+  (medir por `Linha.x0`, mesma régua de cluster/moda da 5C.1); preservar
+  numeração de linha impressa na margem, se houver. Reextrair (determinístico,
+  sem LLM), conferir que a chave da 5D não muda (hash do enunciado igual) e
+  renderizar `\n\n` como `<p>` no `_anexos.html`. Teste com o texto da CD.
+- `[x]` **5G.2 — Comando e assunto no topo:** card mostra o comando
+  (`secao`) acima do enunciado (uma vez por grupo, igual ao "mesmo texto"),
+  e o caminho matéria › assunto › subassunto no cabeçalho. Contrato da API:
+  `secao` já existe no modelo, conferir se sai no JSON.
+- `[x]` **5G.3 — Figuras vetoriais:** detectar agrupamentos de
+  `page.get_drawings()` acima de um tamanho mínimo e recortar a região como
+  PNG (mesmo dono/vínculo das figuras raster). Conferir os 3 cadernos acima.
+- `[x]` **5G.4 — Filtros multisseleção:** API aceita listas (`ano`,
+  `cargo`, `orgao`, `no_id`, …), facetas devolvem contagem por valor; UI com
+  painel pesquisável + checkbox + chips removíveis, URL compartilhável.
+  Atualizar `site/openapi.json`.
+- `[x]` **5G.5 — Item que engole o preâmbulo do grupo seguinte:** em
+  `072_STM_005_01`, o item 64 absorveu o preâmbulo ("Da contabilidade de uma
+  entidade hipotética…") e as duas tabelas do grupo 65–68, sem alerta. Único
+  caso no piloto, mas é regra do parser e se repete em layout igual.
+  (1) Diagnosticar a regra exata; (2) quando o comando muda, o trecho entre o
+  fim do item e o novo comando vira texto-base do grupo seguinte;
+  (3) alerta bloqueante (`utilizavel=false`) para o padrão residual; (4) teste
+  com a página real. Enunciados dos outros itens inalterados.
+- **Pronto quando:** as 79 questões que citam parágrafo batem com o PDF, os
+  itens 24–26 de `094_PF_CB2_01` mostram os dados, os 3 cadernos com
+  desenho vetorial mostram a figura e é possível filtrar por 2 anos + 2
+  cargos + 3 assuntos ao mesmo tempo.
+- **Validação do "pronto quando" (2026-10-06):** reextração completa
+  (`extrair_questoes --reprocessar`, 70/70 cadernos, 2.800 itens). Chaves da
+  5D, gabaritos, `secao` e `utilizavel` iguais aos de antes; só o enunciado
+  do STM 64 mudou (5G.5), com o hash atualizado em
+  `classificacao_questoes.json` (mesmo nó aprovado). As 88 questões que citam
+  parágrafo ou linha têm texto-base com parágrafos, e a contagem cobre o
+  maior ordinal citado (`072_STM_CG4_01`: 7 parágrafos, igual ao PDF).
+  PF_CB2 24–26 mostram o comando com os dados. Figuras vetoriais: STM_005
+  0→3, STM_010 0→2, PF_005 1→4. Filtro 2024+2025 × 2 cargos × 3 assuntos: 44
+  questões, igual ao SQL, com chips e facetas no Chromium headless. Corrigido
+  na validação: (a) `vw_questoes.figuras` não trazia as figuras do
+  texto-base (as tabelas não apareciam no site); (b) a reextração recria as
+  views e apagava os GRANTs do site (500 em toda a lista): `criar_schema`
+  agora guarda e reaplica os GRANTs; (c) o mesmo texto quebrado em
+  parágrafos diferentes em dois cadernos virava duas questões canônicas (LP
+  139 → 146): a chave canônica ignora espaços/quebras (2.676 grupos, igual a
+  antes). Só existe 2025 na base, então o "2 anos" testa a lista na API.
 
 ---
 

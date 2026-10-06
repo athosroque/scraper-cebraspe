@@ -261,7 +261,18 @@ Datasette continua só como ferramenta de revisão do dono.
       `/simulados/{id}/questoes`. Os TODOs do frontend Tailwind foram ligados.
       LP com 178 questões; plano de PF_25_ADM cargo 1 começa por AOF (17,80%).
       97 testes no `site/`, ruff verde.
-- **⚡ Prioridade atual: Etapa 5F.12 do `plano-etapa-5f.md`** (deploy).
+- [x] Etapa 5G — Fidelidade ao caderno e filtros (task.md): parágrafos do
+      texto-base pelo recuo da 1ª linha, comando do grupo e assunto no topo
+      do card, figuras vetoriais recortadas (tabelas desenhadas), filtros
+      multisseleção com facetas e chips, e o item que engolia o preâmbulo do
+      grupo seguinte (STM 64). Validada em 2026-10-06 com reextração
+      completa: chaves da 5D inalteradas, 88/88 questões que citam parágrafo
+      com parágrafos, filtro múltiplo igual ao SQL. A validação corrigiu as
+      figuras do texto-base fora da `vw_questoes`, os GRANTs do site apagados
+      a cada carga e a chave canônica sensível a quebra de parágrafo.
+      763 testes (+1 xfail), ruff verde.
+- **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
+  (o site ainda vai mudar muito antes de ir ao ar).
 
 ## 6. Patterns
 
@@ -674,6 +685,12 @@ Datasette continua só como ferramenta de revisão do dono.
   resultado apaga. E nada de `try` em `x-init`: Alpine só avalia expressão.
 - Nunca usar dois `TestClient(app)` ao mesmo tempo nos testes: os pools do
   banco são globais e o lifespan do primeiro a sair fecha os do outro.
+- Nunca dar GRANT a role do site esperando que ele sobreviva a uma carga:
+  `schema_estatisticas.sql` recria as views com `DROP ... CASCADE`.
+  `stats_writer.criar_schema` guarda e reaplica os GRANTs do schema; não
+  remover isso (sem ele, toda reextração derruba o site com 500).
+- Nunca comparar texto-base por hash do texto cru: a quebra de parágrafo
+  depende do layout do caderno. A chave canônica normaliza espaços.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança

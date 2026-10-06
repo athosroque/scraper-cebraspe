@@ -254,7 +254,9 @@ obrigue toda rota nova a nascer documentada.
   prova, resultado com "revisar as que errei"), página da questão, sobre, 404.
 - **Pronto quando:** todas as telas no novo visual; nenhum template usa Pico.
 
-### 5F.12 — Deploy público
+### 5F.12 — Deploy público (opcional)
+> Opcional por decisão do dono (2026-10-06): o site ainda vai mudar muito
+> antes de ir ao público.
 - `Dockerfile` (python:3.11-slim, uvicorn, usuário não root) e serviço
   `scraper-cebraspe-site` no `docker-compose.yml` (labels Traefik,
   `homelab_default`, figuras montadas `:ro`).

@@ -543,3 +543,28 @@ Testes novos conferem que todo `hx-target` é seletor válido e que o
 `no_id` não entra no `x-data`. Validação no Chromium headless (Playwright,
 já no venv) antes de marcar etapa de frontend como concluída.
 **Custo do aprendizado:** ~45 min de validação e correção.
+
+### [tags: postgres, grants, views, site, falha-silenciosa]
+**Sintoma:** depois de reextrair os cadernos (5G), toda a lista do site deu
+500 com `permission denied for view vw_questoes`. Os testes passavam.
+**Causa:** `schema_estatisticas.sql` recria as views com `DROP VIEW ...
+CASCADE` a cada carga, e o DROP leva junto os GRANTs que
+`site/sql/app_schema.sql` deu às roles do site. Os testes rodam como dono do
+banco, então nunca veem o problema.
+**Solução:** `stats_writer.criar_schema` lê os GRANTs do schema corrente
+(`aclexplode` em `pg_class`/`pg_proc`) antes do SQL e os reaplica depois
+(objeto que sumiu loga `[GRANT_PERDIDO]`). Teste com role temporária.
+**Custo do aprendizado:** ~15 min.
+
+### [tags: prova-parser, paragrafos, deduplicacao, cebraspe, falha-silenciosa]
+**Sintoma:** com os parágrafos da 5G.1, LP passou de 139 para 146 questões
+distintas, sem erro nenhum.
+**Causa:** o mesmo texto aparece em cadernos com layout diferente
+(`072_STM_CG1_01` × `CG2_01`), e num deles a linha da fonte ("Marcos
+Pivetta. In: Revista...") vira parágrafo à parte. A chave canônica fazia
+`md5(tb.texto)` e separou as duplicatas.
+**Solução:** a chave canônica usa `md5(regexp_replace(texto, '\s+', ' '))`.
+Conferir o total de `questao_canonica_id` antes e depois de toda mudança no
+texto extraído (2.676 no piloto).
+**Custo do aprendizado:** ~10 min.
+
