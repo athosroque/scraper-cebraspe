@@ -41,3 +41,4 @@ Este diretório armazena os Registros de Decisões de Arquitetura (**Architectur
 | [ADR-031](ADR-031-extracao-questoes-cadernos.md) | 2026-09-25 | Extração determinística de questões, gabaritos e discursivas dos cadernos de prova | Aceito |
 | [ADR-032](ADR-032-classificacao-questoes-arvore.md) | 2026-09-29 | Classificação das questões na árvore mestre, confiança em 2 camadas e governança humana | Aceito |
 | [ADR-033](ADR-033-site-publico-stack-e-deploy.md) | 2026-09-29 | Site público: FastAPI + Jinja/HTMX (migração futura via /api/v1), Google OAuth, schema `app`, deploy e direitos | Aceito |
+| [ADR-034](ADR-034-fidelidade-ao-caderno-e-filtros.md) | 2026-10-06 | Fidelidade ao caderno (parágrafos, comando, figuras vetoriais, item × preâmbulo) e filtros multisseleção; GRANTs preservados na carga e chave canônica sem quebra de parágrafo | Aceito |

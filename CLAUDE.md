@@ -270,7 +270,7 @@ Datasette continua só como ferramenta de revisão do dono.
       com parágrafos, filtro múltiplo igual ao SQL. A validação corrigiu as
       figuras do texto-base fora da `vw_questoes`, os GRANTs do site apagados
       a cada carga e a chave canônica sensível a quebra de parágrafo.
-      763 testes (+1 xfail), ruff verde.
+      763 testes (+1 xfail), ruff verde. Ver ADR-034.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -846,7 +846,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-032). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-034). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
 
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
 
