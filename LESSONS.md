@@ -568,3 +568,17 @@ Conferir o total de `questao_canonica_id` antes e depois de toda mudança no
 texto extraído (2.676 no piloto).
 **Custo do aprendizado:** ~10 min.
 
+
+### [tags: logging, pytest, falha-silenciosa, observabilidade]
+**Sintoma:** ao conferir o critério "0 exceções no log" da Etapa 6,
+`logs/scraper_cebraspe.log` tinha 661 MB e ~8 mil ERROR (timeout, PDF
+quebrado, ID inventado), que pareciam falhas reais do pipeline.
+**Causa:** `src/logger.py` liga o `FileHandler` na importação, e não havia
+`conftest.py`: cada execução do pytest gravava no log de produção os erros
+que os testes simulam de propósito (`x.test`, `XX_25`, `n998`). As falhas do
+LLM não trazem o slug na mensagem, então não dava para separar o real do
+simulado só pelo texto.
+**Solução:** `conftest.py` na raiz do projeto (vale para `tests/` e
+`site/tests/`) remove o `file_handler` do logger. O log antigo foi arquivado
+em `.gz`, e uma execução real com o log limpo deu 0 ERROR.
+**Custo do aprendizado:** ~15 min.

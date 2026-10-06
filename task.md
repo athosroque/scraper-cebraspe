@@ -819,6 +819,8 @@ enviar o bloco de uma etapa específica para o agente construir.
   como 5F.12 no `plano-etapa-5f.md`):** Traefik/Cloudflare, rate limit, headers
   de segurança, backup do banco de usuários, CI (ruff/pytest + testes da
   API).
+- `[x]` **5F.11b — Correções da interface web:** plano em
+  `correcoes-interface-5f.md` (6 sessões).
 - **Pronto quando:** o site está no ar com as 2.800 questões do piloto
   filtráveis pela árvore, um usuário cadastrado resolve questões e vê o
   próprio desempenho, e as três estatísticas e o simulado `PF_25_ADM` cargo
@@ -907,7 +909,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 ## Etapa 6: Teste Piloto e Validação
 > **Depende das Etapas 5B.1–5E** (árvore, classificação e estatísticas; a 5A foi concluída em 2026-09-23). O site (5F) pode seguir em paralelo depois da 5E.
 
-- `[ ]` Rodar o fluxo completo ponta a ponta (Crawler → Downloader → Parser
+- `[x]` Rodar o fluxo completo ponta a ponta (Crawler → Downloader → Parser
   → LLM → DB) para **1–2 concursos grandes de 2025 já encerrados** (ex:
   INSS, PF).
   > **Nota de Progresso (2026-09-21):** O pipeline de extração e validação
@@ -917,14 +919,27 @@ enviar o bloco de uma etapa específica para o agente construir.
   > sucesso e 0 alertas bloqueantes após a reconciliação do ADR-025 (2 informativos: PF e STM). A gravação no Postgres (Etapa 5) já foi feita em
   > 2026-09-22; a conclusão formal da Etapa 6 depende da revisão humana e da
   > aprovação no banco.
-- `[ ]` Critério de sucesso explícito: 0 exceções não tratadas no log; 100%
+- `[x]` Critério de sucesso explícito: 0 exceções não tratadas no log; 100%
   dos PDFs mapeados efetivamente baixados e validados; taxonomia extraída
   revisada manualmente e aprovada.
-- `[ ]` Inspecionar `logs/scraper_cebraspe.log` para checar saúde do
+- `[x]` Inspecionar `logs/scraper_cebraspe.log` para checar saúde do
   processo (sem bloqueios, sem timeout).
-- `[ ]` Aprovar a base no banco e só então considerar liberar a rotina para
+- `[x]` Aprovar a base no banco e só então considerar liberar a rotina para
   rodar em lote — agendamento (cron/systemd timer) fica para decisão
   posterior, fora deste piloto.
+- **Concluída em 2026-10-06.** PDFs: 158/158 dos manifestos presentes e
+  válidos (`%PDF-`) nos 5 concursos. Taxonomia: 150/150 chunks `sucesso`,
+  0 alertas bloqueantes e os 5 editais `APROVADO` (ADR-028), com os 5
+  concursos `aprovado` no banco. Questões: fila 145/145 `concluido`,
+  2.800 itens (2.781 utilizáveis). Log: os testes gravavam no log de
+  produção (661 MB, ~8 mil ERROR de cenários simulados como `x.test` e
+  `XX_25`). O `conftest.py` da raiz agora tira o arquivo do logger durante o
+  pytest, e o log antigo foi arquivado em
+  `logs/scraper_cebraspe.ate-2026-10-06.log.gz`. Com o log limpo,
+  `atualizar_revisao` + `extrair_questoes --reprocessar` deram 0 ERROR e
+  0 Traceback, só 3 WARNING esperados (editais administrativos fora da fila).
+  Nenhum ERROR do log antigo cita concurso ou URL real. O agendamento em lote
+  continua para decisão posterior.
 
 ## Etapa 7 (futura, fora do escopo atual): Cruzamento com o `study-rag-agent`
 - `[ ]` Pré-condição: Etapa 6 aprovada e `study-rag-db` já reconfigurado
@@ -937,8 +952,3 @@ enviar o bloco de uma etapa específica para o agente construir.
   `mart`/dbt) que lê os dois. Decisão a registrar em ADR próprio.
 - `[ ]` Caso de uso-alvo: "tópicos mais cobrados por matéria/ano que ainda não
   têm item de estudo" → plano de estudo priorizado.
-
-- [x] Etapa 5F.11b — Correções da interface web (antes do deploy 5F.12)
-  Plano autocontido em `correcoes-interface-5f.md` (6 sessões: bugs de rota,
-  rótulos/formatação, coerência dos números, curadoria da árvore, SEO/UX,
-  revalidação ao vivo). Executar uma sessão por conversa.

@@ -180,12 +180,14 @@ Datasette continua só como ferramenta de revisão do dono.
       Reconciliação total: 2.781 questões utilizáveis (2.652 válidas + 129 anuladas),
       19 ilegíveis descartadas. 4.055 pares expandidos na consistência 5D × 5E com 0
       divergências. 609 testes (+1 xfail) no pytest e ruff 100% verde.
-- [ ] Fase 6 — Piloto: fluxo ponta a ponta validado no crawler, downloader,
+- [x] Fase 6 — Piloto (concluída em 2026-10-06, ver `task.md`): fluxo ponta a ponta validado no crawler, downloader,
       parser e extração LLM para 5 concursos de 2025 (`PF_25_ADM`, `TCU_25_TEFC`,
       `IBAMA_25`, `STM_25` e `CD_25_NS`), acumulando 150 chunks sem bloqueios nem falhas
       de inferência (0 alertas de validação no `CD_25_NS`). Gravados com aprovação no
       Postgres (`status_revisao = 'aprovado'`). A revisão humana da Fase 4 foi
-      registrada e homologada no banco (Etapa 5A concluída, ADR-028). Depende das Etapas 5B.1–5E.
+      registrada e homologada no banco (Etapa 5A concluída, ADR-028). Critérios
+      conferidos: 158/158 PDFs válidos, fila 145/145, 0 ERROR no log de uma
+      execução real (log isolado dos testes pelo `conftest.py` da raiz).
 - [x] Etapa 5F.0 — Decisões do site público (ADR-033): FastAPI + Jinja2/HTMX/Alpine
       em 3 camadas (`repositorio` → `servicos` → `api/v1` JSON e `web` HTML) para
       migrar o frontend depois (SvelteKit) sem tocar a regra; só Google OAuth;
@@ -691,6 +693,9 @@ Datasette continua só como ferramenta de revisão do dono.
   remover isso (sem ele, toda reextração derruba o site com 500).
 - Nunca comparar texto-base por hash do texto cru: a quebra de parágrafo
   depende do layout do caderno. A chave canônica normaliza espaços.
+- Nunca remover o `conftest.py` da raiz: sem ele o pytest grava os erros
+  simulados (`x.test`, `XX_25`) em `logs/scraper_cebraspe.log`, e o log de
+  produção deixa de servir para auditar execução real.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 
 ## 8. Segurança
