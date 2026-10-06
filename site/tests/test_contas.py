@@ -1,7 +1,7 @@
 import pytest
-from tests.test_stats_writer import _postgres_disponivel
-
 from app.auth import destino_seguro
+
+from tests.test_stats_writer import _postgres_disponivel
 
 pytestmark = pytest.mark.skipif(
     not _postgres_disponivel(), reason="scraper-cebraspe-db indisponivel"

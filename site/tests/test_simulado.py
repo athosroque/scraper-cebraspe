@@ -1,7 +1,7 @@
 import pytest
-from tests.test_stats_writer import _postgres_disponivel
-
 from app.servicos.simulados_servico import corrigir, placar
+
+from tests.test_stats_writer import _postgres_disponivel
 
 banco = pytest.mark.skipif(
     not _postgres_disponivel(), reason="scraper-cebraspe-db indisponivel"
@@ -268,9 +268,8 @@ def test_login_caido_nao_corrige_simulado_gravado_como_avulso(cliente_logado):
     import base64
     import json
 
-    from itsdangerous import TimestampSigner
-
     from app.config import settings
+    from itsdangerous import TimestampSigner
 
     c, _ = cliente_logado
     r = c.post("/simulado/iniciar", data=PROVA, follow_redirects=False)

@@ -3,6 +3,7 @@
 import re
 
 import pytest
+
 from src import stats_writer
 from tests.test_stats_writer import _postgres_disponivel
 

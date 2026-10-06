@@ -1,4 +1,5 @@
 import pytest
+
 from tests.test_stats_writer import _postgres_disponivel
 
 pytestmark = pytest.mark.skipif(
@@ -96,7 +97,6 @@ def test_facetas(cliente):
 def test_permissoes_role_site_leitura():
     """Testa isoladamente que a role site_leitura não tem permissão de DELETE"""
     import psycopg2
-
     from app.config import settings
 
     conn = psycopg2.connect(

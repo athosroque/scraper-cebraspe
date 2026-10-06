@@ -4,6 +4,7 @@ import re
 from urllib.parse import parse_qs, urlparse
 
 import pytest
+
 from src import stats_writer
 from tests.test_stats_writer import _postgres_disponivel
 
