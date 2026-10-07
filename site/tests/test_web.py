@@ -282,12 +282,37 @@ def test_milhar_com_ponto_nos_totais(cliente):
     assert ">2.781</strong>" in html and ">2781<" not in html
 
 
-def test_materia_de_cargo_com_rotulo(cliente):
+def test_disciplina_curada_mostra_area_e_edital_mostra_cargo(cliente):
+    # 2026-10-07 (ADR-030): as 12 disciplinas com nome de cargo da PF viraram
+    # a área (Estatística, Psicologia...). O nó nunca vira "Conhecimentos
+    # específicos — <nome do nó>"; esse rótulo é só do lado do edital, com o
+    # cargo de verdade e por concurso.
     arvore = cliente.get("/api/v1/arvore").json()
-    mat = next((m for m in arvore if m.get("nome_de_cargo")), None)
-    assert mat is not None
+    nomes = {m["nome"] for m in arvore}
+    assert {"Estatística", "Psicologia", "Pedagogia", "COMUNICAÇÃO SOCIAL"} <= nomes
+    assert (
+        not {"ESTATÍSTICO", "PSICÓLOGO CLÍNICO", "TÉCNICO EM COMUNICAÇÃO SOCIAL"}
+        & nomes
+    )
+    assert not any(m.get("nome_de_cargo") for m in arvore)
+    mat = next(m for m in arvore if m["nome"] == "Estatística")
     html = cliente.get(f"/materias/{mat['id']}").text
-    assert f"Conhecimentos específicos — {mat['nome']}" in html
+    assert (
+        "Estatística" in html and "Conhecimentos específicos — Estatística" not in html
+    )
+
+    def rotulos(concurso, cargo):
+        params = {"concurso": concurso, "cargo_numero": cargo}
+        api = cliente.get("/api/v1/estatisticas/edital-vs-prova", params=params)
+        return {p["rotulo_materia"] for p in api.json()["peso_materias"]}
+
+    # PF cargo 14 e STM cargo 4 caem no mesmo nó (COMUNICAÇÃO SOCIAL).
+    assert "Conhecimentos específicos — TÉCNICO EM COMUNICAÇÃO SOCIAL" in rotulos(
+        "PF_25_ADM", 14
+    )
+    stm = rotulos("STM_25", 4)
+    assert "COMUNICAÇÃO SOCIAL" in stm
+    assert not any(r.startswith("Conhecimentos específicos") for r in stm)
 
 
 def test_comando_e_assunto_no_topo_da_pagina_canonica(cliente):

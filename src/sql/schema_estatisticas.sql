@@ -766,10 +766,17 @@ JOIN cargos_editais ce ON ce.id = pc.cargo_edital_id;
 -- Grão: 1 linha por (questão × cargo × nó aprovado). O site filtra por dimensões
 -- e agrupa por `questao_id`.
 CREATE OR REPLACE VIEW vw_questoes AS
+-- `nome_de_cargo` aqui é da disciplina (nó): o nó ainda tem o nome de uma
+-- matéria-cargo do edital (nó não curado). Depois que o dono renomeia o nó
+-- para a área (Estatística, Psicologia...), o card e os filtros mostram o
+-- nome do nó, nunca "Conhecimentos específicos — <nome do nó>" (ADR-030).
 WITH materia_info AS (
-    SELECT mn.no_id, bool_or(m.nome_de_cargo) AS nome_de_cargo, bool_or(m.nocoes) AS nocoes
+    SELECT mn.no_id,
+           bool_or(m.nome_de_cargo AND upper(m.nome) = upper(na.nome)) AS nome_de_cargo,
+           bool_or(m.nocoes) AS nocoes
     FROM materia_no mn
     JOIN dim_materia m ON m.id = mn.materia_id
+    JOIN no_arvore na ON na.id = mn.no_id
     GROUP BY mn.no_id
 )
 SELECT
@@ -1268,11 +1275,17 @@ WITH totais_cargo AS (
     WHERE b.nivel_alvo = 'materia'
     GROUP BY b.concurso, b.cargo_edital_id
 ),
+-- Por concurso: um nó pode juntar a matéria-cargo de um concurso com a
+-- matéria nomeada de outro (TÉCNICO EM COMUNICAÇÃO SOCIAL da PF fundido em
+-- COMUNICAÇÃO SOCIAL do STM, ADR-030). Agregar só por nó rotularia o cargo
+-- do STM como "Conhecimentos específicos".
 materia_info AS (
-    SELECT mn.no_id, bool_or(m.nome_de_cargo) AS nome_de_cargo, bool_or(m.nocoes) AS nocoes
+    SELECT mn.no_id, c.slug AS concurso, bool_or(m.nome_de_cargo) AS nome_de_cargo
     FROM materia_no mn
     JOIN dim_materia m ON m.id = mn.materia_id
-    GROUP BY mn.no_id
+    JOIN taxonomia_itens ti ON ti.materia_id = m.id
+    JOIN concursos c ON c.id = ti.concurso_id
+    GROUP BY mn.no_id, c.slug
 )
 SELECT
     b.concurso,
@@ -1300,7 +1313,7 @@ SELECT
 FROM vw_prova_cobra_base b
 JOIN vw_no_caminho nc ON nc.id = b.alvo_id
 JOIN totais_cargo tc ON tc.concurso = b.concurso AND tc.cargo_edital_id = b.cargo_edital_id
-LEFT JOIN materia_info mi ON mi.no_id = b.alvo_id
+LEFT JOIN materia_info mi ON mi.no_id = b.alvo_id AND mi.concurso = b.concurso
 WHERE b.nivel_alvo = 'materia'
 GROUP BY
     b.concurso, b.orgao, b.banca, b.ano,
@@ -1311,11 +1324,14 @@ GROUP BY
 -- Exibe tema, título, quesitos, gabarito/padrão de resposta e matérias associadas.
 -- Discursivas NÃO entram nas contagens de questões das views de incidência objetiva.
 CREATE OR REPLACE VIEW vw_discursivas AS
+-- Por concurso, como em `vw_peso_materia_cargo` (ADR-030).
 WITH materia_info AS (
-    SELECT mn.no_id, bool_or(m.nome_de_cargo) AS nome_de_cargo, bool_or(m.nocoes) AS nocoes
+    SELECT mn.no_id, c.slug AS concurso, bool_or(m.nome_de_cargo) AS nome_de_cargo
     FROM materia_no mn
     JOIN dim_materia m ON m.id = mn.materia_id
-    GROUP BY mn.no_id
+    JOIN taxonomia_itens ti ON ti.materia_id = m.id
+    JOIN concursos c ON c.id = ti.concurso_id
+    GROUP BY mn.no_id, c.slug
 )
 SELECT
     d.id AS discursiva_id,
@@ -1356,6 +1372,6 @@ JOIN provas_cargos pc ON pc.prova_id = p.id
 JOIN cargos_editais ce ON ce.id = pc.cargo_edital_id
 JOIN discursiva_no dn ON dn.discursiva_id = d.id
 JOIN vw_no_caminho nc ON nc.id = dn.no_id
-LEFT JOIN materia_info mi ON mi.no_id = nc.materia_id
+LEFT JOIN materia_info mi ON mi.no_id = nc.materia_id AND mi.concurso = c.slug
 LEFT JOIN no_arvore na_mat ON na_mat.id = nc.materia_id
 WHERE dn.status = 'aprovado' AND c.status_revisao = 'aprovado';

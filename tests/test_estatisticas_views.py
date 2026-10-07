@@ -732,39 +732,67 @@ class TestEstatisticasViews:
             assert row_lp[5] == 2
             assert row_lp[6] == Decimal("50.00")
 
+    @staticmethod
+    def _item_edital(cur, concurso_id, cargo_edital_id, dim_materia_id, nome):
+        """Item de edital mínimo: liga a matéria do edital ao concurso."""
+        cur.execute(
+            "INSERT INTO dim_topico (materia_id, chave, nome) VALUES (%s, %s, %s) RETURNING id",
+            (dim_materia_id, f"tema_{dim_materia_id}", nome),
+        )
+        topico_id = cur.fetchone()[0]
+        cur.execute(
+            """
+            INSERT INTO taxonomia_itens (concurso_id, cargo_edital_id, materia_id, topico_id,
+                nivel, tipo_conhecimento, chunk_index, topico_ordem, topico_nome)
+            VALUES (%s, %s, %s, %s, 'superior', 'especifico', 90, 1, %s)
+            """,
+            (concurso_id, cargo_edital_id, dim_materia_id, topico_id, nome),
+        )
+
+    @staticmethod
+    def _questao_no_no(cur, prova_id, numero, no_id):
+        cur.execute(
+            """
+            INSERT INTO questoes (prova_id, numero, enunciado, gabarito, anulada, utilizavel)
+            VALUES (%s, %s, %s, 'C', false, true)
+            RETURNING id
+            """,
+            (prova_id, numero, f"Questão Especial {numero}"),
+        )
+        q_id = cur.fetchone()[0]
+        cur.execute(
+            """
+            INSERT INTO questao_no (questao_id, no_id, papel, confianca, origem, status)
+            VALUES (%s, %s, 'principal', 'alta', 'humano', 'aprovado')
+            """,
+            (q_id, no_id),
+        )
+        return q_id
+
+    def _preparar_no_de_cargo(self, cur, dados):
+        """M-ESP: nó com o nome da matéria-cargo 'Especialista' do CONC_A cargo 1."""
+        cur.execute(
+            """
+            INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status)
+            VALUES ('M-ESP', 'materia', 'Especialista', NULL, 'humano', 'ativo')
+            """
+        )
+        cur.execute("SELECT id FROM dim_materia WHERE chave = 'cargo_especial'")
+        dm_esp_id = cur.fetchone()[0]
+        cur.execute(
+            "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, 'M-ESP')",
+            (dm_esp_id,),
+        )
+        conc_a = dados["concursos"]["CONC_A"]
+        self._item_edital(
+            cur, conc_a, dados["cargos"][(conc_a, 1)], dm_esp_id, "Tema especial"
+        )
+        return self._questao_no_no(cur, dados["provas"]["001"], 99, "M-ESP")
+
     def test_vw_peso_materia_cargo_rotulo_nome_de_cargo(self, conn, dados):
         """Matéria com nome_de_cargo=True é exibida como 'Conhecimentos específicos — <cargo>'."""
         with conn.cursor() as cur:
-            # Inserir um nó de matéria especial com nome_de_cargo
-            cur.execute(
-                """
-                INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status)
-                VALUES ('M-ESP', 'materia', 'Especialista', NULL, 'humano', 'ativo')
-                """
-            )
-            cur.execute("SELECT id FROM dim_materia WHERE chave = 'cargo_especial'")
-            dm_esp_id = cur.fetchone()[0]
-            cur.execute(
-                "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, 'M-ESP')",
-                (dm_esp_id,),
-            )
-            # Associar uma questão a M-ESP em CONC_A cargo 1
-            cur.execute(
-                """
-                INSERT INTO questoes (prova_id, numero, enunciado, gabarito, anulada, utilizavel)
-                VALUES (%s, 99, 'Questão Especial 99', 'C', false, true)
-                RETURNING id
-                """,
-                (dados["provas"]["001"],),
-            )
-            q_esp_id = cur.fetchone()[0]
-            cur.execute(
-                """
-                INSERT INTO questao_no (questao_id, no_id, papel, confianca, origem, status)
-                VALUES (%s, 'M-ESP', 'principal', 'alta', 'humano', 'aprovado')
-                """,
-                (q_esp_id,),
-            )
+            q_esp_id = self._preparar_no_de_cargo(cur, dados)
             cur.execute(
                 """
                 SELECT rotulo_materia, nome_de_cargo
@@ -775,6 +803,60 @@ class TestEstatisticasViews:
             row = cur.fetchone()
             assert row[0] == "Conhecimentos específicos — ANALISTA JUDICIÁRIO"
             assert row[1] is True
+            # O nó ainda tem o nome do cargo: o card usa o mesmo rótulo.
+            cur.execute(
+                "SELECT rotulo_materia, nome_de_cargo FROM vw_questoes WHERE questao_id = %s",
+                (q_esp_id,),
+            )
+            assert cur.fetchone() == (
+                "Conhecimentos específicos — ANALISTA JUDICIÁRIO",
+                True,
+            )
+
+    def test_no_de_cargo_curado_e_fundido_com_materia_nomeada(self, conn, dados):
+        """ADR-030 (2026-10-07): o nó renomeado para a área mostra o próprio nome
+        no card; o rótulo do edital segue pelo cargo e é avaliado por concurso,
+        então a matéria nomeada de outro concurso no mesmo nó não vira
+        'Conhecimentos específicos'."""
+        with conn.cursor() as cur:
+            q_esp_id = self._preparar_no_de_cargo(cur, dados)
+            cur.execute(
+                "UPDATE no_arvore SET nome = 'Área Especial' WHERE id = 'M-ESP'"
+            )
+            # CONC_B tem a matéria nomeada que caiu no mesmo nó.
+            cur.execute(
+                "INSERT INTO dim_materia (chave, nome) VALUES ('area_especial', 'ÁREA ESPECIAL') RETURNING id"
+            )
+            dm_area_id = cur.fetchone()[0]
+            cur.execute(
+                "INSERT INTO materia_no (materia_id, no_id) VALUES (%s, 'M-ESP')",
+                (dm_area_id,),
+            )
+            conc_b = dados["concursos"]["CONC_B"]
+            self._item_edital(
+                cur, conc_b, dados["cargos"][(conc_b, 1)], dm_area_id, "Tema da área"
+            )
+            q_b_id = self._questao_no_no(cur, dados["provas"]["CB_B"], 98, "M-ESP")
+
+            cur.execute(
+                """
+                SELECT concurso, rotulo_materia, nome_de_cargo FROM vw_peso_materia_cargo
+                WHERE materia_id = 'M-ESP' ORDER BY concurso
+                """
+            )
+            assert cur.fetchall() == [
+                ("CONC_A", "Conhecimentos específicos — ANALISTA JUDICIÁRIO", True),
+                ("CONC_B", "Área Especial", False),
+            ]
+            cur.execute(
+                "SELECT questao_id, rotulo_materia, nome_de_cargo FROM vw_questoes "
+                "WHERE questao_id = ANY(%s) ORDER BY questao_id",
+                ([q_esp_id, q_b_id],),
+            )
+            assert cur.fetchall() == [
+                (q_esp_id, "Área Especial", False),
+                (q_b_id, "Área Especial", False),
+            ]
 
     def test_vw_edital_vs_prova_situacoes_e_cobertura_descendente(self, conn, dados):
         """vw_edital_vs_prova classifica situações e aplica cobertura descendente."""

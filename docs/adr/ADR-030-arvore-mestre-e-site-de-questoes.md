@@ -203,6 +203,70 @@ estatística de edital.
   fundido). Direito Constitucional soma 97 ocorrências em 31 assuntos, e
   Processo Legislativo soma 17.
 
+## Curadoria das disciplinas com nome de cargo (2026-10-07)
+
+**Contexto.** No filtro "Disciplina" do site (ADR-035) apareciam 12 matérias
+com nome de cargo, todas da PF_25_ADM: cargos de especialidade cujo edital
+não nomeia a disciplina e cujo conteúdo vem direto sob `CARGO N: <nome>`
+(ADR-020). A semente da 5B.1 herdou esse nome para o nó, e o site o mostrava
+como "Conhecimentos específicos — ESTATÍSTICO".
+
+**Decisão do dono (aprovada por ele em 2026-10-07).** A disciplina é a área
+de conhecimento, nunca o cargo. O registro fica aqui, e não no ADR-035,
+porque é curadoria da árvore: o nome pertence ao **nó**, assim como o pai
+(ver "Decisão"), e o edital continua com o próprio nome. Tudo foi feito com
+`scripts/curar_arvore.py` (IDs estáveis, nada apagado):
+
+| Nó | Antes | Operação |
+|---|---|---|
+| `M-cbbbf8f182` | ESTATÍSTICO | `--renomear` → Estatística |
+| `M-ee88a66013` | FARMACÊUTICO | `--renomear` → Farmácia |
+| `M-6e5eb7ac2a` | ENFERMEIRO | `--renomear` → Enfermagem |
+| `M-5c9c7b8a03` | NUTRICIONISTA | `--renomear` → Nutrição |
+| `M-96b9554586` | ASSISTENTE SOCIAL | `--renomear` → Serviço Social |
+| `M-e779c36584` | MÉDICO CLÍNICO | `--renomear` → Clínica Médica |
+| `M-2692403fb0` | MÉDICO ORTOPEDISTA | `--renomear` → Ortopedia |
+| `M-33d82b0992` | MÉDICO PSIQUIATRA | `--renomear` → Psiquiatria |
+| `M-3d812a93de` | TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA | `--renomear` → Pedagogia |
+| `M-df20e3b736` | PSICÓLOGO ORGANIZACIONAL | `--renomear` → Psicologia (destino: tem mais assuntos, 28 × 10) |
+| `M-7e8b4f5f33` | PSICÓLOGO CLÍNICO | `--fundir` em `M-df20e3b736` |
+| `M-ce298959fd` | TÉCNICO EM COMUNICAÇÃO SOCIAL | `--fundir` em `M-47fdccf9bb` (COMUNICAÇÃO SOCIAL, do STM) |
+
+`fundir_nos` passa os filhos diretos para o destino, então não foi preciso
+`--mover` antes. Os assuntos não foram fundidos entre si: os homônimos que a
+junção criou (6 pares em Psicologia, 6 em Comunicação Social) ficam para o
+dono decidir com `--fundir` de assunto.
+
+**Rótulo "Conhecimentos específicos — <cargo>".** É do lado do edital
+(`dim_materia.nome_de_cargo`, intocado) e usa o cargo de verdade. Duas
+correções nas views, para que o rótulo não dependa do nome do nó:
+
+- `vw_questoes` (card, filtros, home, painel da disciplina): o
+  `nome_de_cargo` do nó só vale enquanto o nó **ainda tem o nome** da
+  matéria-cargo (`upper(dim_materia.nome) = upper(no_arvore.nome)`). Nó
+  curado mostra o próprio nome. Sem isso, o site mostraria
+  "Conhecimentos específicos — Estatística", usando o nome do nó como se
+  fosse o cargo.
+- `vw_peso_materia_cargo` e `vw_discursivas`: `nome_de_cargo` agregado por
+  **(nó, concurso)**, não só por nó. Com a fusão, o nó COMUNICAÇÃO SOCIAL
+  passou a juntar a matéria-cargo da PF e a matéria nomeada do STM, e o
+  `bool_or` por nó rotularia o cargo 4 do STM como "Conhecimentos
+  específicos". Saída igual à de antes, linha a linha (13 linhas de peso
+  das disciplinas afetadas e 64 discursivas).
+
+**Resultado** (retrato antes × depois, banco recarregado por
+`python -m src.stats_writer`, sem LLM): matérias ativas 76 → 74 (fundidas
+12 → 14), assuntos e subassuntos iguais; `questao_no` 2965 linhas / 2800
+questões, `vw_questao_no` 2781 utilizáveis com nó e 0 sem nó, `discursiva_no`
+64 / 34, `vw_arvore_edital_por_cargo` 9734 linhas / 1485 itens / 2540
+item × cargo, pontes 108 / 1260 / 2693, todos iguais. Facetas: 75 → 73
+disciplinas com questão, mesma soma (2809) e mesmas 2652 + 129 anuladas.
+Psicologia tem 140 questões (70 + 70) e COMUNICAÇÃO SOCIAL também (70 PF +
+70 STM). Em `fn_prova_cobra('materia')`, Psicologia conta 118 válidas
+distintas, não 136: 18 itens são idênticos nos cadernos do Psicólogo
+Clínico e do Organizacional e agora caem no mesmo nó (questão distinta,
+ADR-032).
+
 ## Alternativas Consideradas
 
 - **Manter a árvore emergente e implementar a "divisão de nomes compostos"
@@ -229,3 +293,5 @@ estatística de edital.
   schema e idempotência por concurso).
 - ADR-031 (extração de questões), ADR-032 (classificação e estatísticas, a
   escrever na 5D/5E), ADR-033 (stack e deploy do site, a escrever na 5F.0).
+- ADR-035 (card e filtros no formato Gran): o filtro "Disciplina" motivou a
+  curadoria das disciplinas com nome de cargo (2026-10-07).

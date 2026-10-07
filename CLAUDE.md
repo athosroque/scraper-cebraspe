@@ -283,7 +283,10 @@ Datasette continua só como ferramenta de revisão do dono.
       Chips no "Filtrar por:" do painel (Alpine; `<noscript>` sem JS), fora do
       fragmento da lista. Validada no Chromium headless em 1280 e 390 px
       (2026-10-06). Cascata disciplina → assunto → subassunto (5H.3) igual
-      no site e na API (`no_id`, 2026-10-07). 838 testes (+1 xfail) na raiz
+      no site e na API (`no_id`, 2026-10-07). Curadoria das 12 disciplinas
+      com nome de cargo da PF_25_ADM concluída (Opção A aprovada no ADR-030,
+      renomeando 10 para área de conhecimento e fundindo Psicologia e
+      Comunicação Social; 2026-10-07). 839 testes (+1 xfail) na raiz
       e 209 no `site/`, ruff verde.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
