@@ -295,3 +295,7 @@ ADR-032).
   escrever na 5D/5E), ADR-033 (stack e deploy do site, a escrever na 5F.0).
 - ADR-035 (card e filtros no formato Gran): o filtro "Disciplina" motivou a
   curadoria das disciplinas com nome de cargo (2026-10-07).
+
+### Fusão dos assuntos homônimos de Psicologia e Comunicação Social (2026-10-07)
+
+Depois da fusão das disciplinas (Opção A), 12 assuntos ficaram duplicados pelo nome dentro da mesma disciplina (6 em Psicologia, 6 em Comunicação Social), um nó de cada cargo de origem. O dono aprovou fundir os 12 pares: o cargo vive no item de edital e no caderno, não no nó, então nada se perde. Os subassuntos foram junto para o nó de destino; os que são paráfrases entre si ficam para uma curadoria à parte. Contagens inalteradas: `questao_no` 2.965, `vw_peso_materia_cargo` 289, `vw_questoes` utilizáveis 4.055.
