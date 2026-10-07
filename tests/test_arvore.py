@@ -940,3 +940,9 @@ def test_remover_no_proposto_se_orfao_respeita_aliases_fundidos():
     arv.nos[a2].pai = nid_temp
     _remover_no_proposto_se_orfao(arv, nid_temp)
     assert nid_temp in arv.nos
+
+
+def test_arvore_curada_sem_irmaos_homonimos():
+    """Guarda da curadoria: dois irmãos ativos com a mesma `chave_regra` duplicam o
+    filtro do site. Se falhar, funda com `curar_arvore.py --fundir ORIGEM:DESTINO`."""
+    assert detectar_homonimos(carregar()) == {}
