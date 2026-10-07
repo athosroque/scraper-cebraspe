@@ -25,6 +25,7 @@ from src.arvore import (
     resolver_no,
     salvar,
 )
+from src.canonico import chave_regra
 
 
 def test_criar_no():
@@ -946,3 +947,13 @@ def test_arvore_curada_sem_irmaos_homonimos():
     """Guarda da curadoria: dois irmãos ativos com a mesma `chave_regra` duplicam o
     filtro do site. Se falhar, funda com `curar_arvore.py --fundir ORIGEM:DESTINO`."""
     assert detectar_homonimos(carregar()) == {}
+
+
+def test_arvore_curada_sem_disciplinas_homonimas():
+    """`detectar_homonimos` só olha nós com pai; a disciplina é a raiz, então a
+    checagem de nome repetido entre disciplinas fica aqui."""
+    nomes: dict[str, list[str]] = {}
+    for no in carregar().nos.values():
+        if no.status == "ativo" and no.nivel == "materia":
+            nomes.setdefault(chave_regra(no.nome).chave, []).append(no.id)
+    assert {k: v for k, v in nomes.items() if len(v) > 1} == {}
