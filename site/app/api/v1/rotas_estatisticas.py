@@ -82,9 +82,8 @@ def edital_cobra(
     response_model=EditalVsProva,
     summary="Edital × prova de um cargo",
     description=(
-        "Cada nó do edital ou da prova do cargo, com a situação: cobrado no edital, "
-        "no edital e nunca cobrado, ou cobrado fora do edital. Inclui o peso de "
-        "cada matéria na prova."
+        "Cada nó do edital do cargo, com a situação: previsto e cobrado, ou previsto "
+        "e nunca cobrado. Inclui o peso de cada matéria na prova."
     ),
     responses=r404("Cargo sem edital nem prova."),
 )

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% import "_componentes.html" as c %}
 
-{% block title %}Escolha sua matéria - Questões CEBRASPE{% endblock %}
+{% block title %}Escolha sua disciplina - Questões CEBRASPE{% endblock %}
 
 {% block content %}
-{{ c.cabecalho("Escolha sua matéria", "Questões do CEBRASPE organizadas por matéria, assunto e subassunto.") }}
+{{ c.cabecalho("Escolha sua disciplina", "Questões do CEBRASPE organizadas por disciplina, assunto e subassunto.") }}
 
 {# Busca ignora acento e caixa: "lingua" acha "LÍNGUA PORTUGUESA". #}
 <div x-data="{
@@ -16,8 +16,8 @@
         return !Array.from(this.$refs.lista.children).some(el => this.norm(el.dataset.nome).includes(b));
     }
 }">
-    <label for="busca-materia" class="sr-only">Buscar matéria</label>
-    <input id="busca-materia" type="search" x-model="busca" placeholder="Buscar matéria..." autocomplete="off" class="campo mb-6 w-full sm:max-w-md">
+    <label for="busca-materia" class="sr-only">Buscar disciplina</label>
+    <input id="busca-materia" type="search" x-model="busca" placeholder="Buscar disciplina..." autocomplete="off" class="campo mb-6 w-full sm:max-w-md">
 
     {# % de incidência vem do mesmo serviço de /api/v1/materias (5F.7). #}
     <ul x-ref="lista" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -39,7 +39,7 @@
     </ul>
     
     <div x-show="vazia" style="display: none;" class="py-12 text-center">
-        <p class="text-sm text-slate-600">Nenhuma matéria encontrada para &laquo;<span x-text="busca" class="font-medium text-slate-900"></span>&raquo;</p>
+        <p class="text-sm text-slate-600">Nenhuma disciplina encontrada para &laquo;<span x-text="busca" class="font-medium text-slate-900"></span>&raquo;</p>
         <button type="button" @click="busca = ''" class="btn-secundario mt-4">Limpar busca</button>
     </div>
 </div>

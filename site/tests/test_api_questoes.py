@@ -133,8 +133,24 @@ def test_utilizaveis_todas_inclui_as_19_ilegiveis(cliente):
 
 def test_filtro_invalido_devolve_422(cliente):
     assert cliente.get("/api/v1/questoes?anuladas=xyz").status_code == 422
-    assert cliente.get("/api/v1/questoes?fora_do_edital=talvez").status_code == 422
     assert cliente.get("/api/v1/questoes?tamanho_pagina=51").status_code == 422
+
+
+def test_fora_do_edital_antigo_e_ignorado(cliente):
+    """O filtro saiu do site (ADR-035, 2026-10-07): link antigo com o parâmetro
+    não dá 422 e devolve o mesmo que sem ele."""
+    todas = cliente.get("/api/v1/questoes?tamanho_pagina=1").json()["total"]
+    for valor in ("nao", "sim", "talvez"):
+        r = cliente.get(f"/api/v1/questoes?fora_do_edital={valor}&tamanho_pagina=1")
+        assert r.status_code == 200
+        assert r.json()["total"] == todas
+        r = cliente.get(f"/api/v1/facetas?fora_do_edital={valor}")
+        assert r.status_code == 200
+    # Nem o filtro nem o campo do nó aparecem no contrato.
+    contrato = cliente.get("/openapi.json").text
+    assert "fora_do_edital" not in contrato
+    questao = cliente.get("/api/v1/questoes?tamanho_pagina=1").json()["itens"][0]
+    assert all("fora_do_edital" not in n for n in questao["nos"])
 
 
 def test_saude_ok(cliente):

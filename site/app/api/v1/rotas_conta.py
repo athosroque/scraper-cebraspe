@@ -1,7 +1,5 @@
 """Conta e histórico (5F.3). A sessão vem do cookie do login com Google."""
 
-from typing import Literal
-
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
 from app.api.v1.respostas_comuns import R401, R403, r404
@@ -141,9 +139,6 @@ def desempenho(
     no_id: str | None = Query(
         None, description="Nó da árvore; inclui os descendentes."
     ),
-    fora_do_edital: Literal["todos", "sim", "nao"] = Query(
-        "todos", description="Recorte por questão fora do edital do cargo."
-    ),
 ):
     filtros = FiltroQuestoes(
         orgao=orgao,
@@ -153,7 +148,6 @@ def desempenho(
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
         no_id=no_id,
-        fora_do_edital=fora_do_edital,
     )
     return contas_servico.desempenho(usuario_id, filtros)
 

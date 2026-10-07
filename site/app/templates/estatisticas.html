@@ -19,12 +19,12 @@
     </label>
     <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Nível da árvore
         <select name="nivel_alvo" class="campo">
-            {% for valor, rotulo in [("materia", "Matéria"), ("assunto", "Assunto"), ("subassunto", "Subassunto")] %}
+            {% for valor, rotulo in [("materia", "Disciplina"), ("assunto", "Assunto"), ("subassunto", "Subassunto")] %}
             <option value="{{ valor }}" {% if nivel_alvo == valor %}selected{% endif %}>{{ rotulo }}</option>
             {% endfor %}
         </select>
     </label>
-    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Matéria
+    <label class="flex flex-col gap-1 text-xs font-medium text-slate-600">Disciplina
         <select name="materia_id" class="campo" {% if nivel_alvo == "materia" %}disabled{% endif %}>
             <option value="">Todas</option>
             {% for m in materias %}
@@ -49,8 +49,8 @@
     {% if aba == "prova" and linhas %}{{ c.selo(linhas[0].total_universo|num ~ " questões válidas no universo") }}{% endif %}
 </div>
 <p class="mb-4 text-xs text-slate-500">
-{% if aba == "prova" %}Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da matéria (ou da prova, no nível matéria), com o mesmo peso para cada concurso.
-{% else %}Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a matéria acima dele; o item básico vale para cada cargo do nível.{% endif %}
+{% if aba == "prova" %}Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da disciplina (ou da prova, no nível disciplina), com o mesmo peso para cada concurso.
+{% else %}Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a disciplina acima dele; o item básico vale para cada cargo do nível.{% endif %}
 </p>
 {% if linhas %}
 <ol class="divide-y divide-slate-100">

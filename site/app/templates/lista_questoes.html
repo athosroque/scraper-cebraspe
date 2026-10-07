@@ -5,9 +5,11 @@
 
 {% block content %}
 {# Facetas do painel (5H.3): (chave no JSON das facetas, name no form, título).
-   A linha simples fica sempre visível; a avançada some no filtro simples. #}
+   A linha simples fica sempre visível; a avançada some no filtro simples.
+   Disciplina → Assunto → Subassunto em cascata: a chave é também o nível do
+   nó na árvore (o identificador continua `materia`; só o texto mudou). #}
 {% set facetas_simples = [
-    ("materia", "no_id", "Matéria"),
+    ("materia", "no_id", "Disciplina"),
     ("assunto", "no_id", "Assunto"),
     ("subassunto", "no_id", "Subassunto"),
     ("banca", "banca", "Banca"),
@@ -44,6 +46,8 @@ document.addEventListener("alpine:init", () => {
     const FACETAS = {{ (facetas_simples + facetas_avancadas)|tojson }};
     const AVANCADAS = {{ facetas_avancadas|map(attribute=1)|list|tojson }};
     const CHAVE_LS = "filtro_avancado";
+    // Nível do pai de cada faceta em cascata e o texto quando ele falta.
+    const PAI = { assunto: "materia", subassunto: "assunto" };
     const LIMITE = 200;
     const normalizar = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
     const ler = (id) => {
@@ -57,16 +61,24 @@ document.addEventListener("alpine:init", () => {
     Alpine.store("facetas", ler("dados-facetas") || {});
     document.body.addEventListener("htmx:afterSettle", reler);
     document.body.addEventListener("htmx:oobAfterSwap", reler);
+    // Recontagem em curso: o assunto de uma disciplina recém-marcada só chega
+    // com ela (o servidor manda só os assuntos das disciplinas marcadas).
+    const recontagem = (ligado) => (e) => {
+        if (e.detail && e.detail.elt && e.detail.elt.id === "recontagem") Alpine.store("filtros").recontando = ligado;
+    };
+    document.body.addEventListener("htmx:beforeRequest", recontagem(true));
+    document.body.addEventListener("htmx:afterRequest", recontagem(false));
 
     // Seleção pendente do form (só vale no botão Filtrar). Os controles leem
     // e escrevem aqui; os chips de "Filtrar por:" saem daqui.
     Alpine.store("filtros", {
         aberto: null,
-        avancado: false,
+        // Avançado é o padrão (5H.3); só a preferência salva "0" esconde.
+        avancado: true,
+        recontando: false,
         sel: {},
         texto: "",
         anuladas: false,
-        fora: false,
         historico: "",
         com: [],
         extras: [],
@@ -80,16 +92,51 @@ document.addEventListener("alpine:init", () => {
             this.sel = sel;
             this.texto = s.texto || "";
             this.anuladas = s.anuladas === "excluir";
-            this.fora = s.fora_do_edital === "nao";
             this.historico = ["nao_resolvidas", "erradas"].includes(s.historico) ? s.historico : "";
             this.com = lista("com");
             this.extras = ler("dados-extras") || [];
             this.removidos = [];
             this.aberto = null;
-            let preferencia = false;
-            try { preferencia = localStorage.getItem(CHAVE_LS) === "1"; } catch (e) {}
-            const ativo = AVANCADAS.some((n) => sel[n].length) || this.anuladas || this.fora || this.historico || this.com.length;
+            let preferencia = true;
+            try { preferencia = localStorage.getItem(CHAVE_LS) !== "0"; } catch (e) {}
+            const ativo = AVANCADAS.some((n) => sel[n].length) || this.anuladas || this.historico || this.com.length;
             this.avancado = Boolean(ativo) || preferencia;
+        },
+        // Nós das facetas de disciplina/assunto/subassunto por id, com o nível
+        // (= chave da faceta) e o pai. O marcado sempre vem nas facetas.
+        get nos() {
+            const facetas = Alpine.store("facetas") || {};
+            const mapa = new Map();
+            for (const nivel of ["materia", "assunto", "subassunto"]) {
+                for (const i of facetas[nivel] || []) mapa.set(String(i.valor), { ...i, nivel });
+            }
+            return mapa;
+        },
+        marcadosNivel(nivel) {
+            const nos = this.nos;
+            return (this.sel.no_id || []).filter((v) => (nos.get(v) || {}).nivel === nivel);
+        },
+        // Cascata: assunto sem a disciplina marcada sai, e subassunto sem o
+        // assunto marcado também. Id que não está nas facetas fica (o
+        // servidor resolve).
+        podar() {
+            const nos = this.nos;
+            const fica = (nivel, pais) => (v) => {
+                const i = nos.get(v);
+                return !i || i.nivel !== nivel || pais.has(String(i.pai));
+            };
+            let sel = (this.sel.no_id || []).filter(fica("assunto", new Set(this.marcadosNivel("materia"))));
+            const assuntos = new Set(sel.filter((v) => (nos.get(v) || {}).nivel === "assunto"));
+            sel = sel.filter(fica("subassunto", assuntos));
+            this.sel.no_id = sel;
+        },
+        // Nome do nó; com outro marcado de mesmo nome e nível, leva o pai.
+        nomeNo(v, ids) {
+            const nos = this.nos;
+            const item = nos.get(v);
+            const pai = nos.get(String(item.pai));
+            const repetido = ids.filter((x) => (nos.get(x) || {}).rotulo === item.rotulo).length > 1;
+            return repetido && pai ? item.rotulo + " (" + pai.rotulo + ")" : item.rotulo;
         },
         alternarAvancado() {
             this.avancado = !this.avancado;
@@ -110,7 +157,6 @@ document.addEventListener("alpine:init", () => {
             const e = this.extras[i];
             if (!e || this.removidos.includes(i)) return false;
             if (e.nome === "anuladas") return !this.anuladas;
-            if (e.nome === "fora_do_edital") return !this.fora;
             if (e.nome === "historico") return !this.historico;
             return true;
         },
@@ -119,13 +165,26 @@ document.addEventListener("alpine:init", () => {
             const saida = [];
             const tirar = (fn) => () => { fn(); this.recontar(); };
             for (const [chave, nome, titulo] of FACETAS) {
+                if (nome === "no_id") {
+                    // Só o nome do nó: o pai tem o chip dele. Tirar a
+                    // disciplina tira os assuntos dela (e assim por diante).
+                    const ids = this.marcadosNivel(chave);
+                    for (const v of ids) {
+                        const rotulo = titulo + ": " + this.nomeNo(v, ids);
+                        saida.push({
+                            id: "no_id=" + v,
+                            rotulo,
+                            tirar: tirar(() => { this.sel.no_id = this.sel.no_id.filter((x) => x !== v); this.podar(); }),
+                        });
+                    }
+                    continue;
+                }
                 const porValor = new Map((facetas[chave] || []).map((i) => [String(i.valor), i]));
                 for (const v of this.sel[nome] || []) {
                     const item = porValor.get(v);
                     if (!item) continue; // no_id de outro nível (ou valor que não existe)
                     let rotulo = item.rotulo;
                     if (nome === "cargo") rotulo = item.caminho + " · " + item.rotulo;
-                    else if (nome === "no_id" && item.caminho) rotulo = item.caminho;
                     saida.push({
                         id: nome + "=" + v,
                         rotulo: titulo + ": " + rotulo,
@@ -136,7 +195,6 @@ document.addEventListener("alpine:init", () => {
             const texto = this.texto.trim();
             if (texto) saida.push({ id: "texto", rotulo: "Palavra-chave: " + texto, tirar: tirar(() => { this.texto = ""; }) });
             if (this.anuladas) saida.push({ id: "anuladas", rotulo: "Excluir: anuladas", tirar: tirar(() => { this.anuladas = false; }) });
-            if (this.fora) saida.push({ id: "fora", rotulo: "Excluir: fora do edital", tirar: tirar(() => { this.fora = false; }) });
             if (this.historico) {
                 const rotulo = this.historico === "erradas" ? "Com: que errei" : "Excluir: já resolvidas";
                 saida.push({ id: "historico", rotulo, tirar: tirar(() => { this.historico = ""; }) });
@@ -175,10 +233,21 @@ document.addEventListener("alpine:init", () => {
         get aberto() {
             return this.$store.filtros.aberto === this.chave;
         },
-        get itens() {
-            return this.$store.facetas[this.chave] || [];
+        // Assunto só com disciplina marcada; subassunto só com assunto.
+        get habilitado() {
+            const pai = PAI[this.chave];
+            return !pai || this.$store.filtros.marcadosNivel(pai).length > 0;
         },
-        // no_id serve a 3 facetas (matéria, assunto, subassunto): cada uma
+        // Em cascata, só os filhos dos pais marcados (o servidor já manda
+        // assim; aqui vale também entre a marcação e a recontagem).
+        get itens() {
+            const todos = this.$store.facetas[this.chave] || [];
+            const pai = PAI[this.chave];
+            if (!pai) return todos;
+            const pais = new Set(this.$store.filtros.marcadosNivel(pai));
+            return todos.filter((i) => pais.has(String(i.pai)));
+        },
+        // no_id serve a 3 facetas (disciplina, assunto, subassunto): cada uma
         // fica só com os valores do seu nível.
         get marcados() {
             const doNivel = new Set(this.itens.map((i) => String(i.valor)));
@@ -196,10 +265,31 @@ document.addEventListener("alpine:init", () => {
             resto = termo
                 ? resto.filter((i) => normalizar(i.rotulo + " " + (i.caminho || "")).includes(termo))
                 : resto.filter((i) => i.total > 0);
+            const itens = topo.concat(resto.slice(0, LIMITE).map((i) => ({ ...i, marcado: false })));
             return {
-                itens: topo.concat(resto.slice(0, LIMITE).map((i) => ({ ...i, marcado: false }))),
+                grupos: this.agrupar(itens),
+                vazio: itens.length === 0,
                 escondidos: Math.max(0, resto.length - LIMITE),
             };
+        },
+        // Com mais de um pai marcado, as opções ficam sob o nome do pai (em
+        // vez de repetir o pai em cada linha), na ordem em que foram marcados.
+        agrupar(itens) {
+            const pai = PAI[this.chave];
+            const filtros = this.$store.filtros;
+            const pais = pai ? filtros.marcadosNivel(pai) : [];
+            if (pais.length < 2) return [{ id: "", titulo: "", itens }];
+            const porPai = new Map(pais.map((p) => [p, []]));
+            for (const i of itens) {
+                const k = String(i.pai);
+                if (!porPai.has(k)) porPai.set(k, []);
+                porPai.get(k).push(i);
+            }
+            const grupos = [];
+            for (const [id, doPai] of porPai) {
+                if (doPai.length && filtros.nos.has(id)) grupos.push({ id, titulo: filtros.nomeNo(id, pais), itens: doPai });
+            }
+            return grupos;
         },
         get resumo() {
             const n = this.marcados.length;
@@ -210,6 +300,7 @@ document.addEventListener("alpine:init", () => {
             else this.abrir();
         },
         abrir() {
+            if (!this.habilitado) return;
             this.antes = JSON.stringify(this.marcados);
             this.direita = false;
             this.$store.filtros.aberto = this.chave;
@@ -235,22 +326,44 @@ document.addEventListener("alpine:init", () => {
             const sel = this.$store.filtros.sel;
             const atual = sel[this.nome] || [];
             sel[this.nome] = ligado ? atual.concat([valor]) : atual.filter((v) => v !== valor);
+            if (this.nome === "no_id" && !ligado) this.$store.filtros.podar();
+            // O marcado sobe para o topo (o x-for move o nó e o foco cai no
+            // body): devolve o foco, senão Esc e Tab deixam o painel.
+            this.$nextTick(() => {
+                const caixa = [...this.$refs.painel.querySelectorAll("input[type=checkbox]")].find((el) => el.value === valor);
+                if (caixa && document.activeElement !== caixa) caixa.focus();
+            });
         },
     }));
 });
 </script>
 
+{# Cascata (5H.3): o servidor já desenha Assunto/Subassunto desabilitados
+   quando falta o pai marcado (sem piscar até o Alpine assumir). #}
+{% set sel_nos = filtros.no_id or [] %}
+{% set dicas = {
+    "assunto": ("Requer disciplina", dados_facetas.materia|selectattr("valor", "in", sel_nos)|list|length == 0),
+    "subassunto": ("Requer assunto", dados_facetas.assunto|selectattr("valor", "in", sel_nos)|list|length == 0),
+} %}
+{# Dica curta (cabe na coluna de 1280 px); a frase inteira vai no title. #}
+{% set explica = {
+    "assunto": "Escolha uma disciplina para liberar os assuntos dela",
+    "subassunto": "Escolha um assunto para liberar os subassuntos dele",
+} %}
 {% macro dropdown(chave, nome, titulo) %}
+{% set dica, desabilitado = dicas.get(chave, ("", False)) %}
 <div class="relative" x-data="faceta" data-chave="{{ chave }}" data-nome="{{ nome }}"
+     {% if chave in explica %}data-explica="{{ explica[chave] }}" :title="habilitado ? null : $el.dataset.explica"{% if desabilitado %} title="{{ explica[chave] }}"{% endif %}{% endif %}
      @click.outside="fechar(false)" @keydown.escape.stop="fechar(true)">
     <button type="button" x-ref="botao" id="botao-{{ chave }}"
-            class="flex min-h-[3.25rem] w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-sm shadow-sm transition hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500"
+            class="flex min-h-[3.25rem] w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-sm shadow-sm transition hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:shadow-none"
             :class="aberto && '!border-destaque-600 ring-1 ring-destaque-600'"
+            {% if desabilitado %}disabled {% endif %}:disabled="!habilitado"
             @click="alternar()" aria-haspopup="true" aria-expanded="false" :aria-expanded="aberto.toString()" aria-controls="painel-{{ chave }}">
         <span class="min-w-0">
-            <span class="block truncate font-medium text-slate-800">{{ titulo }}</span>
-            <span class="block truncate text-xs" :class="marcados.length ? 'font-medium text-destaque-700' : 'text-slate-500'"
-                  x-text="marcados.length ? resumo : 'Selecionar'">Selecionar</span>
+            <span class="block truncate font-medium" :class="habilitado ? 'text-slate-800' : 'text-slate-400'">{{ titulo }}</span>
+            <span class="block truncate text-xs" :class="marcados.length ? 'font-medium text-destaque-700' : (habilitado ? 'text-slate-500' : 'text-slate-400')"
+                  data-dica="{{ dica }}" x-text="!habilitado ? $el.dataset.dica : (marcados.length ? resumo : 'Selecionar')">{{ dica if desabilitado else "Selecionar" }}</span>
         </span>
         <span class="text-slate-500 transition" :class="aberto && 'rotate-180'">{{ c.icone("seta", "h-4 w-4") }}</span>
     </button>
@@ -264,23 +377,34 @@ document.addEventListener("alpine:init", () => {
             <input type="search" x-ref="busca" x-model="busca" class="campo w-full py-1.5 pl-8" placeholder="Busca rápida"
                    autocomplete="off" @keydown.enter.prevent>
         </label>
+        {# Cada opção mostra só o próprio nome (e o total); com vários pais
+           marcados, o nome do pai vira cabeçalho do grupo. O cargo mantém o
+           concurso na 2ª linha, que não repete o rótulo. #}
         <ul class="mt-2 max-h-72 overflow-y-auto pr-1 text-sm">
-            <template x-for="item in lista.itens" :key="item.valor">
+            <template x-for="grupo in lista.grupos" :key="grupo.id">
                 <li>
-                    <label class="flex cursor-pointer items-start gap-2 rounded-md px-1 py-1 hover:bg-slate-50"
-                           :class="item.total === 0 && !item.marcado && 'opacity-50'">
-                        <input type="checkbox" name="{{ nome }}" class="mt-0.5 h-4 w-4 shrink-0 accent-destaque-700"
-                               :value="item.valor" :checked="item.marcado"
-                               @change="marcar(item.valor, $event.target.checked)">
-                        <span class="min-w-0 flex-1">
-                            <span class="block break-words text-slate-800" x-text="item.rotulo"></span>
-                            <span class="block break-words text-xs text-slate-500" x-show="item.caminho && item.caminho !== item.rotulo" x-text="item.caminho"></span>
-                        </span>
-                        <span class="shrink-0 tabular-nums text-xs text-slate-500" x-text="item.total.toLocaleString('pt-BR')"></span>
-                    </label>
+                    <p class="sticky top-0 z-10 bg-white px-1 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                       x-show="grupo.titulo" x-text="grupo.titulo" data-grupo></p>
+                    <ul :aria-label="grupo.titulo || null">
+                        <template x-for="item in grupo.itens" :key="item.valor">
+                            <li>
+                                <label class="flex cursor-pointer items-start gap-2 rounded-md px-1 py-1 hover:bg-slate-50"
+                                       :class="item.total === 0 && !item.marcado && 'opacity-50'">
+                                    <input type="checkbox" name="{{ nome }}" class="mt-0.5 h-4 w-4 shrink-0 accent-destaque-700"
+                                           :value="item.valor" :checked="item.marcado"
+                                           @change="marcar(item.valor, $event.target.checked)">
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block break-words text-slate-800" x-text="item.rotulo"></span>
+                                        {% if nome == "cargo" %}<span class="block break-words text-xs text-slate-500" x-text="item.caminho"></span>{% endif %}
+                                    </span>
+                                    <span class="shrink-0 tabular-nums text-xs text-slate-500" x-text="item.total.toLocaleString('pt-BR')"></span>
+                                </label>
+                            </li>
+                        </template>
+                    </ul>
                 </li>
             </template>
-            <li class="px-1 py-1 text-xs text-slate-500" x-show="lista.itens.length === 0">Nada encontrado.</li>
+            <li class="px-1 py-1 text-xs text-slate-500" x-show="lista.vazio" x-text="$store.filtros.recontando ? 'Atualizando…' : 'Nada encontrado.'">Nada encontrado.</li>
         </ul>
         <p class="px-1 pt-1 text-xs text-slate-500" x-show="lista.escondidos > 0"
            x-text="'Mais ' + lista.escondidos.toLocaleString('pt-BR') + ' na busca rápida.'"></p>
@@ -303,7 +427,10 @@ document.addEventListener("alpine:init", () => {
       hx-get="/questoes" hx-trigger="submit" hx-target="#lista-conteudo" hx-push-url="true"
       x-data x-init="$store.filtros.carregar()"
       class="mb-6 space-y-3 rounded-xl bg-slate-100 p-4" aria-label="Filtros de questões">
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+    {# xl: 1ª coluna 1,5fr — em 6 colunas iguais o placeholder "Palavra-chave"
+       saía cortado em 1280 px (o input type=search reserva o espaço do botão
+       de limpar). A linha avançada usa a mesma grade para alinhar as colunas. #}
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(5,minmax(0,1fr))]">
         <div class="flex min-h-[3.25rem]">
             <label for="filtro-texto" class="sr-only">Palavra-chave</label>
             <input type="search" id="filtro-texto" name="texto" value="{{ filtros.texto or '' }}" placeholder="Palavra-chave"
@@ -317,7 +444,7 @@ document.addEventListener("alpine:init", () => {
     </div>
 
     <div id="filtros-avancados" class="space-y-3" x-show="$store.filtros.avancado">
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(5,minmax(0,1fr))]">
             {% for chave, nome, titulo in facetas_avancadas %}{{ dropdown(chave, nome, titulo) }}{% endfor %}
         </div>
 
@@ -328,11 +455,6 @@ document.addEventListener("alpine:init", () => {
                     <input type="checkbox" name="anuladas" value="excluir" class="h-4 w-4 accent-destaque-700"
                            x-model="$store.filtros.anuladas" @change="$store.filtros.recontar()"{% if filtros.anuladas == "excluir" %} checked{% endif %}>
                     Anuladas
-                </label>
-                <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">
-                    <input type="checkbox" name="fora_do_edital" value="nao" class="h-4 w-4 accent-destaque-700"
-                           x-model="$store.filtros.fora" @change="$store.filtros.recontar()"{% if filtros.fora_do_edital == "nao" %} checked{% endif %}>
-                    Fora do edital
                 </label>
                 {% if logado %}
                 <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">

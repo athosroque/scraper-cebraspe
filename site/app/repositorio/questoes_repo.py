@@ -113,11 +113,6 @@ def montar_where(filtros_dict: dict, params: dict, ignorar: tuple = ()) -> str:
     if filtros_dict.get("utilizaveis", "so") == "so":
         condicoes.append("utilizavel")
 
-    if filtros_dict.get("fora_do_edital") == "nao":
-        condicoes.append("fora_do_edital = false")
-    elif filtros_dict.get("fora_do_edital") == "sim":
-        condicoes.append("fora_do_edital = true")
-
     # Histórico do usuário (5F.3): as respostas ficam no schema `app`, que a
     # role de leitura não enxerga; o serviço resolve as chaves antes.
     if filtros_dict.get("chaves_incluir") is not None:
@@ -194,7 +189,6 @@ def buscar_questoes(
                 'assunto_id', q.assunto_id,
                 'papel', q.papel,
                 'confianca', q.confianca,
-                'fora_do_edital', q.fora_do_edital,
                 'rotulo_materia', q.rotulo_materia
             )) AS nos
         FROM vw_questoes q
@@ -251,7 +245,6 @@ def obter_questao_por_chave(chave: str) -> dict | None:
                 'assunto_id', q.assunto_id,
                 'papel', q.papel,
                 'confianca', q.confianca,
-                'fora_do_edital', q.fora_do_edital,
                 'rotulo_materia', q.rotulo_materia
             )) AS nos
         FROM vw_questoes q
@@ -315,7 +308,7 @@ def obter_arvore_com_contagens() -> list[dict]:
 _COLUNAS_FACETA = """
     questao_id, questao_chave, questao_canonica_id, banca, orgao, ano, concurso,
     cargo_numero, cargo, nivel, tipo_conhecimento, no_id, no_nivel, assunto_id,
-    materia_id, anulada, utilizavel, fora_do_edital
+    materia_id, anulada, utilizavel
 """
 
 

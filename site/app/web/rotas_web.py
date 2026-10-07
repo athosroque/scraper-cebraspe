@@ -164,7 +164,6 @@ def _filtros_da_query(
     texto: str | None = None,
     com: Annotated[list[str] | None, Query()] = None,
     anuladas: str = "incluir",
-    fora_do_edital: str = "todos",
     utilizaveis: str = "so",
     historico: str = "todas",
 ) -> FiltroQuestoes:
@@ -172,8 +171,6 @@ def _filtros_da_query(
     recontagem `/questoes/facetas`). Valor estranho vira o padrão, sem 422."""
     if anuladas not in ("incluir", "excluir", "so"):
         anuladas = "incluir"
-    if fora_do_edital not in ("todos", "sim", "nao"):
-        fora_do_edital = "todos"
     if utilizaveis not in ("so", "todas"):
         utilizaveis = "so"
     if historico not in ("todas", "resolvidas", "nao_resolvidas", "certas", "erradas"):
@@ -185,7 +182,7 @@ def _filtros_da_query(
     if len(concursos) == 1 and numeros:
         cargo = [*(cargo or []), *(f"{concursos[0]}:{n.strip()}" for n in numeros)]
         cargo_numero = []
-    return FiltroQuestoes(
+    filtros = FiltroQuestoes(
         banca=banca,
         orgao=orgao,
         ano=ano,
@@ -198,10 +195,13 @@ def _filtros_da_query(
         texto=texto,
         com=com,
         anuladas=anuladas,
-        fora_do_edital=fora_do_edital,
         utilizaveis=utilizaveis,
         # Sem login o filtro de histórico não aparece; link antigo vale "todas".
         historico=historico if usuario_id else "todas",
+    )
+    # Cascata do painel (5H.3): assunto órfão sai, link direto ganha os pais.
+    return filtros.model_copy(
+        update={"no_id": questoes_servico.coerir_nos(filtros.no_id)}
     )
 
 
@@ -233,8 +233,10 @@ def index(
 
     pagina = max(pagina, 1)
     tamanho_pagina = min(max(tamanho_pagina, 1), 50)
+    # No mesmo ramo da árvore vale o nó mais específico (disciplina + assunto
+    # marcado = só o assunto); a API segue em OU.
     pagina_questoes = questoes_servico.listar_questoes(
-        filtros, pagina, tamanho_pagina, usuario_id
+        filtros, pagina, tamanho_pagina, usuario_id, refinar_ramos=True
     )
 
     if pagina > 1 and pagina > max(pagina_questoes.total_paginas, 1):
@@ -245,11 +247,14 @@ def index(
         return RedirectResponse(f"/questoes?{urlencode(params)}", status_code=307)
 
     # Facetas sempre: o fragmento leva as contagens novas (OOB) para o painel.
-    facetas = questoes_servico.obter_facetas(filtros, usuario_id)
+    facetas = questoes_servico.obter_facetas(filtros, usuario_id, refinar_ramos=True)
     # Paginação com os filtros aplicados (a URL), não com o form: ele pode ter
     # mudanças pendentes, que só valem no botão Filtrar.
+    # `fora_do_edital` saiu do site (ADR-035): link antigo não o propaga.
     query_aplicada = [
-        (k, v) for k, v in request.query_params.multi_items() if k != "pagina"
+        (k, v)
+        for k, v in request.query_params.multi_items()
+        if k not in ("pagina", "fora_do_edital")
     ]
     contexto = {
         "pagina_questoes": pagina_questoes,
@@ -257,7 +262,7 @@ def index(
         "facetas": facetas,
         "chips": _chips(filtros, facetas),
         "extras": _filtros_extras(filtros),
-        "dados_facetas": _dados_facetas(facetas),
+        "dados_facetas": _dados_facetas(facetas, filtros),
         "materia_unica": _materia_unica(filtros, facetas),
         "query_aplicada": query_aplicada,
         "logado": usuario_id is not None,
@@ -277,11 +282,11 @@ def recontar_facetas(
 ):
     """Só as contagens das facetas para o form ainda não aplicado (ao fechar
     um dropdown). O painel relê o `#dados-facetas` trocado por OOB."""
-    facetas = questoes_servico.obter_facetas(filtros, usuario_id)
+    facetas = questoes_servico.obter_facetas(filtros, usuario_id, refinar_ramos=True)
     return templates.TemplateResponse(
         request=request,
         name="_dados_facetas.html",
-        context={"dados_facetas": _dados_facetas(facetas), "oob": True},
+        context={"dados_facetas": _dados_facetas(facetas, filtros), "oob": True},
     )
 
 
@@ -307,7 +312,6 @@ def _materia_unica(filtros: FiltroQuestoes, facetas) -> str | None:
 # opções que saíram da UI na 5H.3): seguem no form como hidden e viram chip.
 _ROTULO_EXTRA = {
     ("anuladas", "so"): "Só anuladas",
-    ("fora_do_edital", "sim"): "Só fora do edital",
     ("utilizaveis", "todas"): "Itens: todos (inclui ilegíveis)",
     ("historico", "resolvidas"): "Histórico: só resolvidas",
     ("historico", "certas"): "Histórico: acertei",
@@ -319,7 +323,7 @@ def _filtros_extras(filtros: FiltroQuestoes) -> list[dict]:
         {"nome": "cargo_numero", "valor": str(n), "rotulo": f"Cargo nº: {n}"}
         for n in filtros.cargo_numero or []
     ]
-    for campo in ("anuladas", "fora_do_edital", "utilizaveis", "historico"):
+    for campo in ("anuladas", "utilizaveis", "historico"):
         valor = getattr(filtros, campo)
         rotulo = _ROTULO_EXTRA.get((campo, valor))
         if rotulo:
@@ -327,25 +331,19 @@ def _filtros_extras(filtros: FiltroQuestoes) -> list[dict]:
     return extras
 
 
-def _dados_facetas(facetas) -> dict[str, list[dict]]:
-    """Facetas no formato do painel (JSON lido pelo Alpine, nunca interpolado)."""
+def _dados_facetas(facetas, filtros: FiltroQuestoes) -> dict[str, list[dict]]:
+    """Facetas no formato do painel (JSON lido pelo Alpine, nunca interpolado).
+
+    Disciplina, assunto e subassunto vêm em cascata (assunto só das
+    disciplinas marcadas, subassunto só dos assuntos marcados), cada opção
+    com o próprio nome e o `pai`, sem o caminho."""
 
     def simples(lista):
         return [
             {"valor": str(f.valor), "rotulo": f.rotulo, "total": f.total} for f in lista
         ]
 
-    def nos(lista):
-        return [
-            {
-                "valor": n.valor,
-                "rotulo": n.rotulo,
-                "caminho": n.caminho,
-                "total": n.total,
-            }
-            for n in lista
-        ]
-
+    nos = questoes_servico.opcoes_em_cascata(facetas, filtros.no_id)
     return {
         "orgao": simples(facetas.orgaos),
         "ano": simples(facetas.anos),
@@ -362,9 +360,7 @@ def _dados_facetas(facetas) -> dict[str, list[dict]]:
         "nivel": simples(facetas.niveis),
         "tipo_conhecimento": simples(facetas.tipos_conhecimento),
         "banca": simples(facetas.bancas),
-        "materia": nos(facetas.materias),
-        "assunto": nos(facetas.assuntos),
-        "subassunto": nos(facetas.subassuntos),
+        **nos,
         "anuladas": [
             {
                 "valor": "so" if f.valor else "excluir",
@@ -385,6 +381,22 @@ _ROTULO_HISTORICO = {
     "erradas": "Com: que errei",
 }
 _ROTULO_COM = {"texto_base": "Com: texto associado", "figuras": "Com: figuras"}
+
+
+_TITULO_NIVEL = {
+    "materia": "Disciplina",
+    "assunto": "Assunto",
+    "subassunto": "Subassunto",
+}
+
+
+def _descende_de(nos, no_id: str, ancestral: str) -> bool:
+    atual = nos[no_id].pai if no_id in nos else None
+    while atual is not None:
+        if atual == ancestral:
+            return True
+        atual = nos[atual].pai if atual in nos else None
+    return False
 
 
 def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
@@ -409,8 +421,21 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
         rotulos[("cargo", c.valor)] = (
             f"{rotulo_concurso(c.concurso)} · {c.cargo_numero} — {c.cargo}"
         )
-    for n in [*facetas.materias, *facetas.assuntos, *facetas.subassuntos]:
-        rotulos[("no_id", n.valor)] = n.caminho
+    # Nós: "Disciplina: <nome>" (o pai tem chip próprio); o pai entre
+    # parênteses só quando 2 nós marcados do mesmo nível têm o mesmo nome.
+    nos = questoes_servico.info_nos()
+    marcados = [n for n in filtros.no_id or [] if n in nos]
+    for n in marcados:
+        info = nos[n]
+        texto = info.nome
+        homonimos = [
+            m
+            for m in marcados
+            if nos[m].nivel == info.nivel and nos[m].nome == info.nome
+        ]
+        if len(homonimos) > 1 and info.pai in nos:
+            texto += f" ({nos[info.pai].nome})"
+        rotulos[("no_id", n)] = f"{_TITULO_NIVEL.get(info.nivel, info.nivel)}: {texto}"
     prefixos = {
         "banca": "Banca",
         "orgao": "Órgão",
@@ -432,14 +457,19 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
                 if p[0] != "cargo_numero"
                 and not (p[0] == "cargo" and p[1].startswith(valor + ":"))
             ]
+        if campo == "no_id" and valor in nos:
+            # Os filhos marcados do nó saem junto (cascata do painel).
+            resto = [
+                p
+                for p in resto
+                if not (p[0] == "no_id" and _descende_de(nos, p[1], valor))
+            ]
         if campo == "anuladas":
             texto = _ROTULO_ANULADAS.get(valor, valor)
         elif campo == "historico":
             texto = _ROTULO_HISTORICO.get(valor, valor)
         elif campo == "com":
             texto = _ROTULO_COM.get(valor, valor)
-        elif campo == "fora_do_edital":
-            texto = {"nao": "Excluir: fora do edital"}.get(valor, "Só fora do edital")
         elif campo == "utilizaveis":
             texto = _ROTULO_EXTRA[("utilizaveis", "todas")]
         elif campo in ("concurso", "cargo", "no_id"):
@@ -1034,8 +1064,8 @@ def painel_materia(
     if materia is None:
         return _nao_encontrada(
             request,
-            titulo="Matéria não encontrada",
-            mensagem="O endereço pode estar errado ou a matéria foi removida.",
+            titulo="Disciplina não encontrada",
+            mensagem="O endereço pode estar errado ou a disciplina foi removida.",
         )
     linhas = materia.top_subassuntos
     filtros_lista = filtros.model_dump(exclude_none=True)

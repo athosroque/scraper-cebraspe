@@ -6,7 +6,7 @@
 
 {% block content %}
 {% call c.cabecalho(rotulo_materia(materia.nome, materia.nome_de_cargo), "Subassuntos que mais caem nas provas, em questões objetivas distintas.") %}
-<a href="{{ url_resolver }}" class="btn-primario">Resolver questões desta matéria</a>
+<a href="{{ url_resolver }}" class="btn-primario">Resolver questões desta disciplina</a>
 {% endcall %}
 
 <div class="grid gap-6 lg:grid-cols-3">
@@ -28,14 +28,14 @@
         
         <p class="mt-3 text-xs text-slate-500">
             {% if outros >= 0 %}
-            Os subassuntos acima{% if outros > 0 %} e o grupo "Outros"{% endif %} somam {{ (soma_ranking + outros)|num }} de {{ materia.questoes_recorte|num }} questões da matéria no recorte.
+            Os subassuntos acima{% if outros > 0 %} e o grupo "Outros"{% endif %} somam {{ (soma_ranking + outros)|num }} de {{ materia.questoes_recorte|num }} questões da disciplina no recorte.
             {% else %}
-            Os subassuntos acima somam {{ soma_ranking|num }} para {{ materia.questoes_recorte|num }} questões da matéria no recorte: uma questão pode estar em até 2 subassuntos.
+            Os subassuntos acima somam {{ soma_ranking|num }} para {{ materia.questoes_recorte|num }} questões da disciplina no recorte: uma questão pode estar em até 2 subassuntos.
             {% endif %}
             Universo sob os filtros: {{ (linhas[0].total_universo if linhas else materia.questoes_recorte)|num }} questões válidas. Anuladas aparecem ao lado do subassunto e não entram na contagem.
         </p>
         {% else %}
-        <p class="text-sm text-slate-600">Nenhuma questão desta matéria para esses filtros.</p>
+        <p class="text-sm text-slate-600">Nenhuma questão desta disciplina para esses filtros.</p>
         {% endif %}
         {% endcall %}
     </div>
@@ -75,7 +75,7 @@
         <h2 class="mb-2 text-lg font-semibold text-slate-900">Desempenho e edital</h2>
         <dl class="grid grid-cols-2 gap-3 text-sm">
             <div>
-                <dt class="text-slate-500" title="Total de questões válidas da matéria em todos os concursos, sem filtro: não conta anuladas e conta uma só vez a questão repetida entre cadernos.">Questões da matéria</dt>
+                <dt class="text-slate-500" title="Total de questões válidas da disciplina em todos os concursos, sem filtro: não conta anuladas e conta uma só vez a questão repetida entre cadernos.">Questões da disciplina</dt>
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.total_questoes|num }}</dd>
             </div>
             <div>
@@ -87,7 +87,7 @@
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.anuladas_recorte|num }}</dd>
             </div>
             <div>
-                <dt class="text-slate-500" title="Peso da matéria no total de questões válidas encontradas pelos filtros.">Universo de comparação</dt>
+                <dt class="text-slate-500" title="Peso da disciplina no total de questões válidas encontradas pelos filtros.">Universo de comparação</dt>
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.pct_do_universo|pct }}</dd>
             </div>
         </dl>

@@ -48,10 +48,16 @@ def edital_cobra(
     return [LinhaEditalCobra(**r) for r in linhas]
 
 
+# "Cobrado fora do edital" saiu do site (decisão do dono, 2026-10-07, ADR-035):
+# a banca só cobra o que o edital prevê. A view guarda a situação (histórico).
+_SITUACOES_DO_SITE = ("cobrado_no_edital", "no_edital_nunca_cobrado")
+
+
 def edital_vs_prova(concurso: str, cargo_numero: int) -> EditalVsProva | None:
     nos = [
         LinhaEditalVsProva(**r)
         for r in estatisticas_repo.edital_vs_prova(concurso, cargo_numero)
+        if r["situacao"] in _SITUACOES_DO_SITE
     ]
     if not nos:
         return None

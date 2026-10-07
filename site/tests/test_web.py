@@ -157,14 +157,14 @@ def test_rotas_web_fora_do_openapi(cliente):
 def test_filtro_de_assunto_mostra_o_nome(cliente):
     materia = cliente.get("/api/v1/arvore").json()[0]
     r = cliente.get("/questoes", params={"no_id": materia["id"]})
-    # Chip com o nome (a matéria é a raiz do caminho), removível.
-    assert 'aria-label="Remover filtro ' + materia["nome"] + '"' in r.text
+    # Chip "Disciplina: <nome>" (5H.3: só o nome do nó, sem caminho), removível.
+    assert 'aria-label="Remover filtro Disciplina: ' + materia["nome"] + '"' in r.text
 
 
 def test_inicio_grade_de_materias(cliente):
     r = cliente.get("/")
     assert r.status_code == 200
-    assert "Escolha sua matéria" in r.text
+    assert "Escolha sua disciplina" in r.text
     assert "pico.min.css" not in r.text
     materia = cliente.get("/api/v1/arvore").json()[0]
     assert f'href="/materias/{materia["id"]}"' in r.text
@@ -174,7 +174,9 @@ def test_inicio_grade_de_materias(cliente):
     # o chip com o nome; o fragmento leva o nome nas facetas (OOB), que o
     # painel usa para rotular o chip.
     pagina = cliente.get("/questoes", params={"no_id": materia["id"]})
-    assert 'aria-label="Remover filtro ' + materia["nome"] + '"' in pagina.text
+    assert (
+        'aria-label="Remover filtro Disciplina: ' + materia["nome"] + '"' in pagina.text
+    )
     parcial = cliente.get("/questoes", params={"no_id": materia["id"]}, headers=HX)
     assert 'id="dados-facetas"' in parcial.text
     assert "Remover filtro" not in parcial.text
@@ -243,7 +245,7 @@ def test_404_api_responde_json(cliente):
 def test_404_de_materia_tem_texto_proprio(cliente):
     r = cliente.get("/materias/nao-existe", headers={"accept": "text/html"})
     assert r.status_code == 404
-    assert "Matéria não encontrada" in r.text
+    assert "Disciplina não encontrada" in r.text
 
 
 def test_405_preserva_allow_e_mostra_405(cliente):

@@ -1,7 +1,8 @@
 # ADR-035: Card da Questão e Filtros no Formato Gran, em Teal (Etapa 5H)
 
 ## Status
-Aceito (Etapa 5H concluída e validada no Chromium headless em 2026-10-06)
+Aceito (Etapa 5H concluída e validada no Chromium headless em 2026-10-06;
+revisão do painel 5H.3 em 2026-10-07)
 
 ## Data
 2026-10-06
@@ -33,7 +34,7 @@ Plano completo em `plano-etapa-5h.md`.
 4. **Filtros no topo** (`lista_questoes.html`): palavra-chave, dropdowns com
    busca rápida (Matéria, Assunto, Subassunto, Banca, Órgão; no modo avançado
    também Ano, Concurso, Cargo, Nível, Conhecimento), linhas "Excluir
-   questões" (anuladas, fora do edital, já resolvidas) e "Questões com"
+   questões" (anuladas, fora do edital — removido em 2026-10-07 —, já resolvidas) e "Questões com"
    (texto associado, figuras, que errei) e a barra "Filtrar por:" com chips.
    O estado pendente vive num `Alpine.store`; o `<form>` tem
    `hx-trigger="submit"` e **só busca no botão Filtrar**. Marcar e fechar um
@@ -64,6 +65,68 @@ Plano completo em `plano-etapa-5h.md`.
   ficariam; os testes antigos que liam o chip no fragmento passaram a ler a
   página inteira (`<noscript>`) e o nome nas facetas OOB.
 
+### Revisão do painel (5H.3, 2026-10-07)
+
+Pedido do dono depois da validação da 5H:
+
+- **"Disciplina" no lugar de "Matéria"** em todo texto visível do site
+  (painel, chips, card, home, menu, painel da disciplina, estatísticas,
+  edital × prova, conta, simulado, 404). Identificadores, a rota
+  `/materias/{id}`, parâmetros, campos da API e o `openapi.json` ficam como
+  estavam (as descrições do OpenAPI e a tag "Matérias" seguem com "matéria").
+- **Cascata Disciplina → Assunto → Subassunto.** Assunto fica desabilitado
+  ("Requer disciplina") sem disciplina marcada, e Subassunto sem assunto. As
+  opções vêm só dos pais marcados: o servidor manda assim (o JSON das
+  facetas leva o `pai` de cada nó, sem o caminho, o que também encolhe a
+  página) e o Alpine filtra de novo entre a marcação e a recontagem
+  ("Atualizando…" enquanto ela não chega). Desmarcar o pai (dropdown ou × do
+  chip) poda os filhos no store; o chip do `<noscript>` tira o nó e os filhos
+  marcados dele.
+- **Seleção coerente no servidor** (`questoes_servico.coerir_nos`, usada por
+  `/questoes` e `/questoes/facetas`): assunto de outra disciplina, quando há
+  disciplina marcada, é órfão e **é ignorado**; idem subassunto. Sem nada
+  marcado no nível de cima, o filho é link direto e **ganha os pais**. Motivo:
+  os links do card, da estatística e do painel da disciplina trazem só o
+  nó (`?no_id=<subassunto>`); descartá-los quebraria esses links, e
+  completá-los mostra a cadeia marcada com o mesmo resultado de antes. Já o
+  órfão com disciplina marcada só nasce de URL editada ou desatualizada, e o
+  painel nunca o mandaria (podaria ao desmarcar).
+- **No mesmo ramo vale o mais específico** (`refinar_por_ramo`, só no site):
+  disciplina + assunto dela = só o assunto; disciplina sem assunto marcado
+  vale inteira. Sem isso a cascata não serviria para nada, porque o `no_id` é
+  OU e a disciplina engoliria o assunto. A API `/api/v1/questoes` e
+  `/api/v1/facetas` **não** mudam (contrato da 5F.1: nós em OU, descendentes
+  incluídos); a diferença fica documentada aqui e no teste
+  `test_refino_por_ramo_na_lista`.
+- **Sem redundância nas caixas.** Conferido no Chromium antes da mudança:
+  cada opção de Assunto repetia o próprio nome numa 2ª linha com o caminho
+  inteiro (ex.: "Domínio da estrutura morfossintática do período" e, abaixo,
+  "LÍNGUA PORTUGUESA › Domínio da estrutura morfossintática do período"), e o
+  Subassunto repetia disciplina, assunto e o próprio nome; os chips também
+  usavam o caminho. Agora a opção mostra só o nome e o total; com 2+ pais
+  marcados, as opções ficam sob um cabeçalho com o nome do pai (com o avô
+  entre parênteses só se dois pais tiverem o mesmo nome). Chip:
+  "Disciplina: X", "Assunto: Y", com o pai entre parênteses só em homônimos.
+  O Cargo mantém o concurso na 2ª linha (não é repetição).
+- **Filtro avançado aberto por padrão.** Sem preferência salva abre
+  avançado; "Mostrar filtro simples" grava `0` no `localStorage` e só então
+  esconde. Sem JS a linha avançada aparece (o `x-show` não age).
+- **Foco ao marcar.** Achado na validação, anterior a esta revisão: marcar um
+  item que sobe para o topo (o `x-for` move o nó) jogava o foco no `body`, e
+  Esc/Tab deixavam o painel. O `marcar` devolve o foco ao checkbox.
+- **"Fora do edital" saiu do site** (decisão do dono, 2026-10-07): a banca
+  não pode cobrar nada fora do edital e só cobra o que está nos assuntos dele,
+  então a informação não tem valor. Saíram o checkbox "Excluir: fora do
+  edital" e o chip, o parâmetro `fora_do_edital` das rotas HTML, de
+  `/api/v1/questoes`, `/api/v1/facetas` e `/api/v1/eu/desempenho`, o campo
+  `fora_do_edital` dos nós da questão e a situação `cobrado_fora_do_edital`
+  de `/estatisticas/edital-vs-prova` e `/api/v1/estatisticas/edital-vs-prova`
+  (fica "Cobrado e previsto" e "Previsto e nunca cobrado").
+  `site/openapi.json` foi refeito. Link antigo com o parâmetro é **ignorado
+  em silêncio** (200, mesmo total, sem chip; a paginação não o propaga). O
+  banco, `src/`, `scripts/` e `canonico/` não mudaram: `fora_do_edital` da 5D
+  e a situação na `vw_edital_vs_prova` ficam como histórico.
+
 ## Consequências
 
 - Filtrar 2 matérias + órgão + "excluir anuladas" + palavra-chave só busca no
@@ -74,9 +137,17 @@ Plano completo em `plano-etapa-5h.md`.
   inalterada); Filtrar aplica (PF: 1.131; + excluir anuladas: 1.092); voltar
   do navegador restaura total e checkboxes; ID curto na palavra-chave abre a
   questão; sem rolagem horizontal e sem erro de JS.
-- A base do piloto não tem questão marcada `fora_do_edital` (5D), então
-  "Excluir: fora do edital" hoje não tira nada; o controle fica para quando
-  houver.
+- ~~A base do piloto não tem questão marcada `fora_do_edital` (5D), então
+  "Excluir: fora do edital" hoje não tira nada.~~ Controle removido na
+  revisão de 2026-10-07 (ver acima).
+- Revisão 5H.3 validada no Chromium headless (1280 e 390 px): Assunto e
+  Subassunto desabilitados no início; LÍNGUA PORTUGUESA + DIREITO
+  ADMINISTRATIVO agrupam os assuntos sob os 2 nomes; subassunto só do
+  assunto marcado; desmarcar a disciplina poda assunto e subassunto (chips
+  inclusive); Filtrar com LP › "Domínio da estrutura morfossintática do
+  período" + DIREITO ADMINISTRATIVO dá 205 (= 63 + 142, igual à API com
+  `no_id=[assunto, DA]`); voltar do navegador restaura 205 e a seleção; sem
+  rolagem horizontal e sem erro de JS.
 - Remover um chip não aplica na hora (só no Filtrar), coerente com a regra do
   botão; diferente da 5G, em que cada mudança buscava.
 

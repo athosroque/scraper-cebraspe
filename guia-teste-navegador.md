@@ -23,18 +23,23 @@ Instruções para a IA que vai testar o site num navegador real (ex.: Claude in 
 
 ## 2. Lista de questões (`/questoes`)
 
-1. A lista carrega e mostra "N questões encontradas" com milhar com ponto. Cada card tem a barra cinza (posição · ID curto `Q` + 8 hex · matéria ▸ assunto).
-2. **Painel no topo:** palavra-chave, dropdowns Matéria/Assunto/Subassunto/Banca/Órgão e "Mostrar filtro avançado" (Ano, Concurso, Cargo, Nível, Conhecimento + linhas "Excluir questões" e "Questões com"). A escolha simples/avançado é lembrada; com filtro avançado ativo, o avançado abre sozinho.
+1. A lista carrega e mostra "N questões encontradas" com milhar com ponto. Cada card tem a barra cinza (posição · ID curto `Q` + 8 hex · disciplina ▸ assunto). No site inteiro o texto visível diz **Disciplina** (nunca "Matéria"); a URL `/materias/<id>` e os parâmetros da API não mudaram.
+2. **Painel no topo:** palavra-chave, dropdowns Disciplina/Assunto/Subassunto/Banca/Órgão e, **já aberto por padrão**, o filtro avançado (Ano, Concurso, Cargo, Nível, Conhecimento + linhas "Excluir questões" — Anuladas, Já resolvidas — e "Questões com"). "Mostrar filtro simples" esconde e a escolha é lembrada; sem preferência salva (ou com filtro avançado ativo) abre avançado. Sem JS a linha avançada também aparece. Não existe mais "Fora do edital" (ver item 13).
+2a. **Cascata:** sem disciplina marcada, Assunto fica desabilitado ("Requer disciplina", frase inteira no tooltip); sem assunto marcado, Subassunto também ("Requer assunto"). Marcar uma disciplina habilita Assunto na hora, e as opções são **só os assuntos das disciplinas marcadas** (idem subassunto → assuntos marcados). Cada opção mostra só o nome do nó e o total; com 2+ pais marcados, as opções ficam agrupadas sob o nome do pai (cabeçalho em caixa alta). Logo depois de marcar uma disciplina nova, o Assunto pode mostrar "Atualizando…" até a recontagem chegar.
+2b. **Desmarcar** a disciplina (no dropdown ou no × do chip) tira na hora os assuntos dela e os subassuntos desses assuntos (chips e checkboxes); o mesmo de assunto → subassunto. Nada busca antes do Filtrar.
+2c. **Disciplina + assunto valem pelo mais específico:** LÍNGUA PORTUGUESA + "Domínio da estrutura morfossintática do período" + DIREITO ADMINISTRATIVO (sem assunto) = 63 + 142 = **205** (o assunto refina a disciplina dele; a outra disciplina vale inteira). A API `/api/v1/questoes` segue com os nós em OU (contrato da 5F.1).
+2d. **URL compartilhável:** link com só um assunto/subassunto (vindo do card, da estatística ou do painel da disciplina) abre com a cadeia inteira marcada (disciplina → assunto → subassunto) e o mesmo total de antes. URL com assunto de outra disciplina que não a marcada ignora esse assunto (órfão) em silêncio.
 3. **Dropdown:** abre, a busca rápida restringe a lista, marcar mostra "N selecionado(s)" e o chip em "Filtrar por:". Esc ou clique fora fecha.
 4. **Nada busca antes do Filtrar:** marcar, desmarcar, remover chip ou mudar checkbox **não** troca a lista nem a URL. Ao fechar o dropdown, só os números das outras facetas mudam (recontagem em `/questoes/facetas`).
 5. **Filtrar** aplica tudo: a lista muda sem recarregar a página (HTMX), a URL leva os filtros (ex.: `orgao=PF&anuladas=excluir`) e a página volta para 1. Conferido: PF = 1.131; PF + excluir anuladas = 1.092.
 6. **Palavra-chave:** sem acento acha acentuado; várias palavras valem em E. Um ID curto (ex.: `q564333ae`, minúsculas aceitas) abre a própria questão.
 7. "Já resolvidas" e "Que errei" ficam desabilitados sem login (dica "Entre para usar"). Com login, filtram pelo histórico.
 8. **Paginação:** páginas 2, 3 e a última; `?pagina=999` cai na última; `?pagina=0` e `?pagina=-1` não quebram. A paginação usa os filtros aplicados, não o form pendente.
-9. Voltar/avançar do navegador restaura a lista, o total e os checkboxes da URL (página inteira, não só o fragmento).
+9. Voltar/avançar do navegador restaura a lista, o total e os checkboxes da URL (página inteira, não só o fragmento), inclusive a cascata (Assunto habilitado quando a URL tem disciplina).
 10. Sem JS: os chips aparecem (via `<noscript>`) com o link que tira só aquele filtro.
 11. 📱 390 px: dropdowns em coluna, painel do dropdown cabe na tela, sem rolagem horizontal; "Questões parecidas" pode quebrar em 2 linhas (aceito).
 12. Compartilhamento: copie a URL filtrada, abra em nova aba e confirme o mesmo resultado.
+13. **"Fora do edital" saiu do site** (decisão do dono, 2026-10-07: a banca só cobra o que o edital prevê). Link antigo com `?fora_do_edital=nao` (ou `sim`) abre sem erro, sem chip e com o mesmo total de sem o parâmetro; a paginação não propaga o parâmetro.
 
 ## 3. Resolver uma questão (card e página canônica)
 
@@ -52,12 +57,12 @@ Instruções para a IA que vai testar o site num navegador real (ex.: Claude in 
 Abra pela grade da home. Teste com **LÍNGUA PORTUGUESA** e com uma matéria de cargo (ex.: Estatístico).
 
 1. LP mostra **139** como total de questões (válidas distintas). Anote se aparecer 178 ou 2.xxx em algum lugar para LP.
-2. O tooltip de "Questões da matéria" é legível e diz que anuladas não contam e que a repetida entre cadernos conta uma vez. Os 4 KPIs têm rótulos claros.
+2. O tooltip de "Questões da disciplina" é legível e diz que anuladas não contam e que a repetida entre cadernos conta uma vez. Os 4 KPIs têm rótulos claros.
 3. Ranking "O que mais cai": barras proporcionais, números com milhar com ponto, links levam à lista filtrada (`/questoes?no_id=...`) e a lista abre com o filtro aplicado.
 4. A frase de reconciliação sob o ranking é coerente (soma dos subassuntos × total) e **não** diz "Anuladas ficam fora" ao lado de um "+ N anuladas".
-5. Filtros de nível e cargo mudam os números; "Resolver questões desta matéria" leva à lista filtrada.
+5. Filtros de nível e cargo mudam os números; "Resolver questões desta disciplina" leva à lista filtrada.
 6. Matéria de cargo mostra o título "Conhecimentos específicos — <cargo>".
-7. ID inexistente (`/materias/nao-existe`) → 404 com layout do site e texto **"Matéria não encontrada"**.
+7. ID inexistente (`/materias/nao-existe`) → 404 com layout do site e texto **"Disciplina não encontrada"**.
 
 ## 5. Estatísticas
 
@@ -71,9 +76,9 @@ Abra pela grade da home. Teste com **LÍNGUA PORTUGUESA** e com uma matéria de 
 2. Contagens com milhar com ponto; rótulos sem slug cru.
 
 ### `/estatisticas/edital-vs-prova`
-1. Escolha **PF_25_ADM**, cargo 1: esperado ≈ **139 nós cobrados, 125 nunca cobrados, 0 fora do edital** (anote qualquer diferença).
+1. Escolha **PF_25_ADM**, cargo 1: só 2 KPIs, **"Cobrado e previsto" ≈ 140** e **"Previsto e nunca cobrado" ≈ 125** (anote qualquer diferença). Não há mais "cobrado fora do edital" (página nem API).
 2. Percentuais calculados corretamente (ex.: `acerto` em porcentagem sensata, entre 0 e 100) — a precedência do filtro já foi um bug.
-3. Teste o cargo **Contador** (CARGO 3 da PF): não deve aparecer nenhum "cobrado fora do edital".
+3. Teste o cargo **Contador** (CARGO 3 da PF): só as 2 situações aparecem, e nenhum texto "fora do edital".
 4. Cargo inexistente (`?cargo_numero=abc` ou número que não existe) → 404 com texto **"Cargo não encontrado"**, sem erro 500.
 
 ## 6. Simulado anônimo (`/simulado`)
@@ -82,7 +87,7 @@ Abra pela grade da home. Teste com **LÍNGUA PORTUGUESA** e com uma matéria de 
 2. A prova abre na ordem original (básico, depois específico), com cronômetro correndo.
 3. Marque algumas respostas, recarregue a página: o **rascunho** deve ser restaurado (localStorage).
 4. Envie a prova (marque tudo "Certo" no PF_25_ADM cargo 1): esperado **58 − 60 = −2 de 118** (anuladas fora da nota e do máximo). Anote o resultado exato.
-5. A página de resultado mostra placar por matéria, as discursivas (tema/quesitos, padrão de resposta só aqui) e um aviso de itens ilegíveis quando aplicável (PF cargo 5).
+5. A página de resultado mostra placar "Por disciplina", as discursivas (tema/quesitos, padrão de resposta só aqui) e um aviso de itens ilegíveis quando aplicável (PF cargo 5).
 6. Após o resultado, o rascunho foi apagado; voltar à prova não reaparece com marcações antigas.
 7. Se o envio falhar (simule offline no DevTools antes de enviar): as marcações **não podem sumir**.
 8. Abra `/simulado/999999999` → 404 com texto **"Simulado não encontrado"**. Abra `/simulado/prova?concurso=XXX&cargo_numero=1` → "Prova não encontrada".

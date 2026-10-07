@@ -44,7 +44,6 @@ _EX_NO = {
     "assunto_id": "A-56b9b718fa",
     "papel": "principal",
     "confianca": "alta",
-    "fora_do_edital": False,
     "rotulo_materia": "LÍNGUA PORTUGUESA",
 }
 _EX_QUESTAO = {
@@ -182,9 +181,6 @@ class FiltroQuestoes(BaseModel):
     anuladas: Literal["incluir", "excluir", "so"] = Field(
         "incluir", description="Tratamento das questões anuladas."
     )
-    fora_do_edital: Literal["todos", "sim", "nao"] = Field(
-        "todos", description="Recorte por questão fora do edital do cargo."
-    )
     utilizaveis: Literal["so", "todas"] = Field(
         "so", description="`so` esconde as questões com extração ilegível."
     )
@@ -222,9 +218,6 @@ class NoInfo(BaseModel):
     papel: str | None = Field(None, description="`principal` ou `secundario`.")
     confianca: str | None = Field(
         None, description="Confiança da classificação: `alta`, `media` ou `baixa`."
-    )
-    fora_do_edital: bool | None = Field(
-        None, description="`true` quando o nó não está previsto no edital do cargo."
     )
     rotulo_materia: str | None = Field(
         None,
@@ -635,9 +628,9 @@ class LinhaEditalVsProva(BaseModel):
     materia_id: str | None = Field(description=_D_MATERIA_ID)
     previsao: int = Field(description="Itens do edital do cargo no nó.")
     questoes: int = Field(description="Questões distintas da prova do cargo no nó.")
-    situacao: Literal[
-        "cobrado_no_edital", "no_edital_nunca_cobrado", "cobrado_fora_do_edital"
-    ] = Field(description="Situação do nó no edital × prova.")
+    situacao: Literal["cobrado_no_edital", "no_edital_nunca_cobrado"] = Field(
+        description="Situação do nó no edital × prova."
+    )
 
 
 class PesoMateria(BaseModel):

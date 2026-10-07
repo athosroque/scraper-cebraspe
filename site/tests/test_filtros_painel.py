@@ -129,7 +129,6 @@ def test_id_curto_desconhecido_nao_redireciona(cliente):
     ("nome", "valor", "params"),
     [
         ("anuladas", "excluir", {"anuladas": "excluir"}),
-        ("fora_do_edital", "nao", {"fora_do_edital": "nao"}),
         ("com", "texto_base", {"com": "texto_base"}),
         ("com", "figuras", {"com": "figuras"}),
     ],
@@ -143,14 +142,36 @@ def test_checkbox_do_painel_filtra_e_fica_marcada(cliente, nome, valor, params):
     assert " checked" in _tag(pagina.text, caixa)
     total = _total_api(cliente, **params)
     todas = _total_api(cliente)
-    if nome == "fora_do_edital":
-        # A base do piloto não tem questão fora do edital (5D): não tira nada.
-        assert total == todas - _total_api(cliente, fora_do_edital="sim")
-    else:
-        assert 0 < total < todas
+    assert 0 < total < todas
     assert _total_html(pagina.text) == total
     parcial = cliente.get("/questoes", params=params, headers=HX)
     assert _total_html(parcial.text) == total
+
+
+def test_fora_do_edital_saiu_do_painel(cliente):
+    """Decisão do dono (2026-10-07, ADR-035): a banca só cobra o que o edital
+    prevê, então "fora do edital" não tem valor e sai do site. Link antigo com
+    o parâmetro é ignorado em silêncio (sem 422, sem chip, mesmo total)."""
+    todas = _total_api(cliente)
+    pagina = cliente.get("/questoes")
+    assert 'name="fora_do_edital"' not in pagina.text
+    assert "fora do edital" not in pagina.text.lower()
+    for valor in ("nao", "sim", "x"):
+        for headers in ({}, HX):
+            r = cliente.get(
+                "/questoes", params={"fora_do_edital": valor}, headers=headers
+            )
+            assert r.status_code == 200
+            assert _total_html(r.text) == todas
+            assert "fora do edital" not in r.text.lower()
+        r = cliente.get(
+            "/questoes/facetas", params={"fora_do_edital": valor}, headers=HX
+        )
+        assert r.status_code == 200
+    # Sem chip nem hidden "extra" para o parâmetro antigo.
+    r = cliente.get("/questoes", params={"fora_do_edital": "sim"})
+    assert 'name="fora_do_edital"' not in r.text
+    assert 'aria-label="Remover filtro' not in r.text  # chip do <noscript>
 
 
 def test_excluir_anuladas_e_o_complemento_das_anuladas(cliente):

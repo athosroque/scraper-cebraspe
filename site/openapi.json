@@ -225,23 +225,6 @@
             "description": "Tratamento das questões anuladas."
           },
           {
-            "name": "fora_do_edital",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "todos",
-                "sim",
-                "nao"
-              ],
-              "type": "string",
-              "description": "`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro.",
-              "default": "todos",
-              "title": "Fora Do Edital"
-            },
-            "description": "`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro."
-          },
-          {
             "name": "utilizaveis",
             "in": "query",
             "required": false,
@@ -1241,23 +1224,6 @@
               "title": "No Id"
             },
             "description": "Nó da árvore; inclui os descendentes."
-          },
-          {
-            "name": "fora_do_edital",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "todos",
-                "sim",
-                "nao"
-              ],
-              "type": "string",
-              "description": "Recorte por questão fora do edital do cargo.",
-              "default": "todos",
-              "title": "Fora Do Edital"
-            },
-            "description": "Recorte por questão fora do edital do cargo."
           }
         ],
         "responses": {
@@ -1819,7 +1785,7 @@
           "Estatísticas"
         ],
         "summary": "Edital × prova de um cargo",
-        "description": "Cada nó do edital ou da prova do cargo, com a situação: cobrado no edital, no edital e nunca cobrado, ou cobrado fora do edital. Inclui o peso de cada matéria na prova.",
+        "description": "Cada nó do edital do cargo, com a situação: previsto e cobrado, ou previsto e nunca cobrado. Inclui o peso de cada matéria na prova.",
         "operationId": "edital_vs_prova_api_v1_estatisticas_edital_vs_prova_get",
         "parameters": [
           {
@@ -3499,8 +3465,7 @@
             "type": "string",
             "enum": [
               "cobrado_no_edital",
-              "no_edital_nunca_cobrado",
-              "cobrado_fora_do_edital"
+              "no_edital_nunca_cobrado"
             ],
             "title": "Situacao",
             "description": "Situação do nó no edital × prova."
@@ -3930,18 +3895,6 @@
             "title": "Confianca",
             "description": "Confiança da classificação: `alta`, `media` ou `baixa`."
           },
-          "fora_do_edital": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Fora Do Edital",
-            "description": "`true` quando o nó não está previsto no edital do cargo."
-          },
           "rotulo_materia": {
             "anyOf": [
               {
@@ -3968,7 +3921,6 @@
           {
             "assunto_id": "A-56b9b718fa",
             "confianca": "alta",
-            "fora_do_edital": false,
             "materia_id": "M-0f9a364d06",
             "no_caminho": "LÍNGUA PORTUGUESA > Domínio dos mecanismos de coesão textual > Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
             "no_id": "SL-f514698ce9",
@@ -4457,7 +4409,6 @@
               {
                 "assunto_id": "A-56b9b718fa",
                 "confianca": "alta",
-                "fora_do_edital": false,
                 "materia_id": "M-0f9a364d06",
                 "no_caminho": "LÍNGUA PORTUGUESA > Domínio dos mecanismos de coesão textual > Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
                 "no_id": "SL-f514698ce9",
@@ -4647,7 +4598,6 @@
               {
                 "assunto_id": "A-56b9b718fa",
                 "confianca": "alta",
-                "fora_do_edital": false,
                 "materia_id": "M-0f9a364d06",
                 "no_caminho": "LÍNGUA PORTUGUESA > Domínio dos mecanismos de coesão textual > Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
                 "no_id": "SL-f514698ce9",

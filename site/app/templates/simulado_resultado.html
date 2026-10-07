@@ -45,12 +45,12 @@ try { localStorage.removeItem(document.getElementById("rascunho-corrigido").data
 
 <div class="mt-8 grid gap-6 lg:grid-cols-2">
     <section>
-        <h2 class="mb-3 text-lg font-semibold text-slate-900">Por matéria</h2>
+        <h2 class="mb-3 text-lg font-semibold text-slate-900">Por disciplina</h2>
         {% call c.card() %}
         {% for m in resultado.por_materia %}
         {{ c.barra_ranking(m.nome, (100 * m.certas / m.nota_maxima) if m.nota_maxima else 0, m.nota ~ " / " ~ m.nota_maxima ~ " (" ~ m.certas ~ "C " ~ m.erradas ~ "E " ~ m.brancos ~ "B)") }}
         {% endfor %}
-        <p class="mt-2 text-xs text-slate-500">Barra: acertos sobre o máximo da matéria. Valor: nota (certas − erradas) / máximo.</p>
+        <p class="mt-2 text-xs text-slate-500">Barra: acertos sobre o máximo da disciplina. Valor: nota (certas − erradas) / máximo.</p>
         {% endcall %}
     </section>
 

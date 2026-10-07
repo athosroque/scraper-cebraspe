@@ -2,7 +2,7 @@
 {% import "_componentes.html" as c %}
 
 {% block title %}Edital × prova - Questões CEBRASPE{% endblock %}
-{% block description %}O que o edital de cada cargo do CEBRASPE previu e a prova cobrou: assuntos cobrados, nunca cobrados e cobrados fora do edital.{% endblock %}
+{% block description %}O que o edital de cada cargo do CEBRASPE previu e a prova cobrou: assuntos cobrados e previstos, e previstos e nunca cobrados.{% endblock %}
 
 {% block content %}
 {% include "_abas_estatistica.html" %}
@@ -20,11 +20,10 @@
 {% endcall %}
 {% else %}
 {% set rotulos = {
-    "cobrado_no_edital": "Previsto no edital e cobrado",
-    "no_edital_nunca_cobrado": "No edital, nunca cobrado",
-    "cobrado_fora_do_edital": "Cobrado fora do edital",
+    "cobrado_no_edital": "Cobrado e previsto",
+    "no_edital_nunca_cobrado": "Previsto e nunca cobrado",
 } %}
-<div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+<div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
     {% for chave, rotulo in rotulos.items() %}
     {{ c.kpi(rotulo, resultado.resumo.get(chave, 0), "nós da árvore") }}
     {% endfor %}
@@ -32,11 +31,11 @@
 
 <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 {% call c.card() %}
-<h2 class="mb-2 text-lg font-semibold text-slate-900">Peso de cada matéria na prova</h2>
+<h2 class="mb-2 text-lg font-semibold text-slate-900">Peso de cada disciplina na prova</h2>
 {% for p in resultado.peso_materias %}
 {{ c.barra_ranking(p.rotulo_materia, p.pct_da_prova, p.questoes ~ " q · " ~ "%.2f"|format(p.pct_da_prova) ~ "%", url_lista(p.materia_id, filtros), destaque=loop.first) }}
 {% endfor %}
-<p class="mt-3 text-xs text-slate-500">Total da prova: {{ resultado.peso_materias[0].total_cargo if resultado.peso_materias else 0 }} questões válidas. A questão com nós em duas matérias conta nas duas, então a soma pode passar de 100%.</p>
+<p class="mt-3 text-xs text-slate-500">Total da prova: {{ resultado.peso_materias[0].total_cargo if resultado.peso_materias else 0 }} questões válidas. A questão com nós em duas disciplinas conta nas duas, então a soma pode passar de 100%.</p>
 {% endcall %}
 
 {% call c.card("self-start") %}
@@ -56,7 +55,7 @@
 </form>
 {% endif %}
 {% if plano and plano.itens %}
-<p class="mb-2 text-xs text-slate-500">Prioridade = peso da matéria na prova × (1 − seu acerto na matéria). Sem respostas, o acerto conta como 0.</p>
+<p class="mb-2 text-xs text-slate-500">Prioridade = peso da disciplina na prova × (1 − seu acerto na disciplina). Sem respostas, o acerto conta como 0.</p>
 <ol class="space-y-1 text-sm">
 {% for i in plano.itens[:10] %}
 <li class="flex justify-between gap-3"><a class="text-slate-900 hover:text-destaque-700" href="{{ url_lista(i.materia_id, filtros) }}">{{ loop.index }}. {{ i.rotulo_materia }}</a><span class="whitespace-nowrap text-slate-500">{{ i.pct_da_prova|pct }} · {% if i.respondidas %}{{ (100 * i.acerto)|pct }} de acerto{% else %}sem respostas{% endif %}</span></li>
@@ -99,6 +98,6 @@
 </details>
 {% endfor %}
 </div>
-<p class="mt-3 text-xs text-slate-500">O item do edital num nó cobre também os nós abaixo dele. A questão classificada direto num assunto não desce para o subassunto previsto abaixo, que pode aparecer como nunca cobrado.</p>
+<p class="mt-3 text-xs text-slate-500">Só entram os nós previstos no edital do cargo: a banca cobra o que o edital prevê. O item do edital num nó cobre também os nós abaixo dele. A questão classificada direto num assunto não desce para o subassunto previsto abaixo, que pode aparecer como nunca cobrado.</p>
 {% endif %}
 {% endblock %}

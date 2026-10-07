@@ -42,7 +42,7 @@ def test_painel_lista_top_igual_fn_prova_cobra(cliente):
     assert ids == [e[0] for e in esperado]
     assert "anuladas=excluir" not in r.text
     assert "nivel=medio" in r.text
-    assert "Resolver questões desta matéria" in r.text
+    assert "Resolver questões desta disciplina" in r.text
 
 
 def test_no_que_nao_e_materia_da_404(cliente):

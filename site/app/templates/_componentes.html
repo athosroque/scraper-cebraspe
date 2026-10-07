@@ -23,12 +23,12 @@
 </span>
 {% endmacro %}
 
-{# Subtítulo da lista de questões: "Sobre <matéria>" com uma só matéria
+{# Subtítulo da lista de questões: "Sobre <disciplina>" com uma só disciplina
    marcada. No fragmento vai por OOB, para acompanhar o botão Filtrar. #}
 {% macro subtitulo_lista(materia_unica, oob=False) %}
 <p id="subtitulo-lista" class="mt-1 text-sm text-slate-600"{% if oob %} hx-swap-oob="true"{% endif %}>
     {%- if materia_unica %}Sobre <strong class="font-semibold text-slate-800">{{ materia_unica }}</strong>
-    {%- else %}Marque órgão, ano, cargo, matéria, assunto e subassunto (vários de cada) e corrija item a item, no padrão certo/errado do CEBRASPE.{% endif -%}
+    {%- else %}Marque órgão, ano, cargo, disciplina, assunto e subassunto (vários de cada) e corrija item a item, no padrão certo/errado do CEBRASPE.{% endif -%}
 </p>
 {% endmacro %}
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Questões CEBRASPE{% endblock %}</title>
-    <meta name="description" content="{% block description %}Questões de concursos do CEBRASPE para resolver, filtradas por matéria, assunto e subassunto.{% endblock %}">
+    <meta name="description" content="{% block description %}Questões de concursos do CEBRASPE para resolver, filtradas por disciplina, assunto e subassunto.{% endblock %}">
     <link rel="canonical" href="{{ request.url.replace(query='') }}">
     <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
@@ -44,7 +44,7 @@
     {% set caminho = request.url.path %}
     {% set itens_menu = [
         ("/questoes", "Questões"),
-        ("/", "Matérias"),
+        ("/", "Disciplinas"),
         ("/estatisticas", "Meu concurso"),
         ("/simulado", "Simulados"),
     ] %}

@@ -1,5 +1,5 @@
 {% import "_componentes.html" as c %}
-{% call c.cabecalho("Meu concurso", "Escolha concurso e cargo para ver o peso das matérias, o que o edital cobra e o que a prova cobrou.") %}
+{% call c.cabecalho("Meu concurso", "Escolha concurso e cargo para ver o peso das disciplinas, o que o edital cobra e o que a prova cobrou.") %}
 {% if alvo is defined and alvo %}
 <p class="mt-2 text-sm text-slate-600">Seu concurso-alvo: <a class="font-medium text-destaque-700 hover:underline" href="/estatisticas/edital-vs-prova?concurso={{ alvo.concurso|urlencode }}&amp;cargo_numero={{ alvo.cargo_numero }}">{{ alvo.concurso }} · cargo {{ alvo.cargo_numero }}</a></p>
 {% endif %}

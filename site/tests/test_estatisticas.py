@@ -84,7 +84,9 @@ def test_edital_vs_prova_pf_cargo_1(cliente):
         _consulta(
             """
             SELECT situacao, count(*) FROM vw_edital_vs_prova
-            WHERE concurso = 'PF_25_ADM' AND cargo_numero = 1 GROUP BY situacao
+            WHERE concurso = 'PF_25_ADM' AND cargo_numero = 1
+              AND situacao <> 'cobrado_fora_do_edital'
+            GROUP BY situacao
             """
         )
     )
@@ -105,12 +107,21 @@ def test_edital_vs_prova_pf_cargo_1(cliente):
         n["no_id"] for n in api["nos"] if n["situacao"] == "no_edital_nunca_cobrado"
     } == nunca
     assert api["peso_materias"]
+    # "Cobrado fora do edital" saiu do site (ADR-035, 2026-10-07): nem na API
+    # nem na página, mesmo que a view ainda tenha a situação.
+    assert "cobrado_fora_do_edital" not in api["resumo"]
+    assert {n["situacao"] for n in api["nos"]} <= {
+        "cobrado_no_edital",
+        "no_edital_nunca_cobrado",
+    }
 
     html = cliente.get("/estatisticas/edital-vs-prova", params=params).text
     assert (
-        f"No edital, nunca cobrado</strong> ({esperado['no_edital_nunca_cobrado']})"
+        f"Previsto e nunca cobrado</strong> ({esperado['no_edital_nunca_cobrado']})"
         in html
     )
+    assert f"Cobrado e previsto</strong> ({esperado['cobrado_no_edital']})" in html
+    assert "fora do edital" not in html.lower()
 
 
 def test_edital_vs_prova_cargo_inexistente(cliente):

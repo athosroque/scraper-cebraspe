@@ -1,6 +1,7 @@
 import math
 import re
 import threading
+from typing import NamedTuple
 
 from app.cache import cache_ttl
 from app.modelos import (
@@ -32,14 +33,18 @@ def listar_questoes(
     tamanho_pagina: int,
     usuario_id: int | None = None,
     chaves_incluir: list[str] | None = None,
+    refinar_ramos: bool = False,
 ) -> PaginaQuestoes:
     """Lista paginada. `chaves_incluir` restringe a um conjunto de chaves
-    (ex.: as erradas de um simulado), somado aos filtros."""
+    (ex.: as erradas de um simulado), somado aos filtros. `refinar_ramos`
+    (só o site): no mesmo ramo da árvore vale o nó mais específico."""
     tamanho_pagina = max(1, min(50, tamanho_pagina))
     pagina = max(1, pagina)
     offset = (pagina - 1) * tamanho_pagina
 
     filtros_dict = filtros_para_repo(filtros, usuario_id)
+    if refinar_ramos:
+        filtros_dict["no_id"] = refinar_por_ramo(filtros_dict.get("no_id"))
     if chaves_incluir is not None:
         anteriores = filtros_dict.get("chaves_incluir")
         filtros_dict["chaves_incluir"] = (
@@ -221,32 +226,162 @@ def obter_arvore(apenas_com_questoes: bool = True) -> list[NoArvore]:
     return arvore
 
 
-def _mapa_nos() -> dict[str, tuple[str, str, str]]:
-    """id → (nome, nível, caminho com ` › `), a partir da árvore em cache."""
-    mapa: dict[str, tuple[str, str, str]] = {}
+class NoInfo(NamedTuple):
+    nome: str
+    nivel: str
+    caminho: str
+    pai: str | None
 
-    def visitar(nos, prefixo):
+
+def _mapa_nos() -> dict[str, NoInfo]:
+    """id → nome, nível, caminho com ` › ` e pai, a partir da árvore em cache."""
+    mapa: dict[str, NoInfo] = {}
+
+    def visitar(nos, prefixo, pai):
         for no in nos:
             nome = rotulo_materia(no.nome, no.nome_de_cargo)
             caminho = f"{prefixo} › {nome}" if prefixo else nome
-            mapa[no.id] = (nome, no.nivel, caminho)
-            visitar(no.filhos, caminho)
+            mapa[no.id] = NoInfo(nome, no.nivel, caminho, pai)
+            visitar(no.filhos, caminho, no.id)
 
-    visitar(obter_arvore(apenas_com_questoes=False), "")
+    visitar(obter_arvore(apenas_com_questoes=False), "", None)
     return mapa
 
 
+def info_nos() -> dict[str, NoInfo]:
+    """Nós da árvore inteira (inclusive sem questão) por id."""
+    return _mapa_nos()
+
+
+# -- Cascata disciplina → assunto → subassunto do painel do site (5H.3) --
+# Só o site usa estas regras; a API segue com o `no_id` em OU (contrato da
+# 5F.1): matéria ou assunto sempre incluem os descendentes.
+_NIVEIS = ("materia", "assunto", "subassunto")
+
+
+def _ancestral(mapa: dict[str, NoInfo], no_id: str, nivel: str) -> str | None:
+    atual = mapa[no_id].pai
+    while atual is not None and atual in mapa:
+        if mapa[atual].nivel == nivel:
+            return atual
+        atual = mapa[atual].pai
+    return None
+
+
+def coerir_nos(no_ids: list[str] | None) -> list[str] | None:
+    """Seleção de nós coerente com a cascata do painel, de cima para baixo.
+
+    - Assunto cuja disciplina não está marcada, quando há disciplina marcada,
+      é órfão e sai (o painel o teria limpado ao desmarcar a disciplina).
+      Idem subassunto cujo assunto (ou disciplina) não está marcado.
+    - Sem nenhum nó marcado no nível de cima, o filho é link direto (card,
+      estatística, painel da disciplina): os ancestrais entram, para o painel
+      mostrar a cadeia marcada e o resultado continuar o mesmo.
+
+    Id desconhecido (fora da árvore) fica como veio, no fim.
+    """
+    if not no_ids:
+        return no_ids
+    mapa = _mapa_nos()
+    por_nivel: dict[str, list[str]] = {n: [] for n in _NIVEIS}
+    desconhecidos: list[str] = []
+    for no_id in dict.fromkeys(no_ids):
+        info = mapa.get(no_id)
+        if info and info.nivel in por_nivel:
+            por_nivel[info.nivel].append(no_id)
+        else:
+            desconhecidos.append(no_id)
+
+    marcados: dict[str, list[str]] = {"materia": list(por_nivel["materia"])}
+    for nivel, acima in (
+        ("assunto", ["materia"]),
+        ("subassunto", ["materia", "assunto"]),
+    ):
+        # O que já estava marcado em cada nível de cima antes de completar.
+        havia = {n: set(marcados[n]) for n in acima}
+        marcados[nivel] = []
+        for no_id in por_nivel[nivel]:
+            cadeia = {n: _ancestral(mapa, no_id, n) for n in acima}
+            if any(havia[n] and cadeia[n] not in havia[n] for n in acima):
+                continue  # órfão
+            marcados[nivel].append(no_id)
+            for n in acima:
+                if cadeia[n] and cadeia[n] not in marcados[n]:
+                    marcados[n].append(cadeia[n])
+    return [
+        *marcados["materia"],
+        *marcados["assunto"],
+        *marcados["subassunto"],
+        *desconhecidos,
+    ]
+
+
+def refinar_por_ramo(no_ids: list[str] | None) -> list[str] | None:
+    """Nós para a consulta do site: no mesmo ramo vale o mais específico.
+
+    Disciplina com assunto marcado fica só com os assuntos marcados (e assunto
+    com subassunto, só com os subassuntos); disciplina sem filho marcado vale
+    inteira. Os nós restantes combinam em OU, como na API.
+    """
+    if not no_ids:
+        return no_ids
+    mapa = _mapa_nos()
+    com_filho: set[str] = set()
+    for no_id in no_ids:
+        atual = mapa[no_id].pai if no_id in mapa else None
+        while atual is not None:
+            com_filho.add(atual)
+            atual = mapa[atual].pai if atual in mapa else None
+    return [n for n in no_ids if n not in com_filho]
+
+
+def opcoes_em_cascata(
+    facetas: FacetasResponse, no_ids: list[str] | None
+) -> dict[str, list[dict]]:
+    """Opções de disciplina, assunto e subassunto do painel do site.
+
+    Assunto só das disciplinas marcadas e subassunto só dos assuntos marcados
+    (sem pai marcado, a lista vem vazia). Cada opção leva o próprio nome e o
+    `pai`, nunca o caminho: o painel agrupa sob o nome do pai.
+    """
+    mapa = _mapa_nos()
+    marcados = set(no_ids or [])
+
+    def opcoes(lista, restringir: bool):
+        saida = []
+        for n in lista:
+            pai = mapa[n.valor].pai if n.valor in mapa else None
+            if restringir and pai not in marcados:
+                continue
+            saida.append(
+                {"valor": n.valor, "rotulo": n.rotulo, "total": n.total, "pai": pai}
+            )
+        return saida
+
+    return {
+        "materia": opcoes(facetas.materias, False),
+        "assunto": opcoes(facetas.assuntos, True),
+        "subassunto": opcoes(facetas.subassuntos, True),
+    }
+
+
 def obter_facetas(
-    filtros: FiltroQuestoes | None = None, usuario_id: int | None = None
+    filtros: FiltroQuestoes | None = None,
+    usuario_id: int | None = None,
+    refinar_ramos: bool = False,
 ) -> FacetasResponse:
     """Facetas da listagem. Com filtros, o total de cada valor considera os
-    outros filtros; valor zerado só aparece se estiver marcado."""
+    outros filtros; valor zerado só aparece se estiver marcado. `refinar_ramos`
+    como em `listar_questoes` (o nó marcado continua nas facetas)."""
     filtros = filtros or FiltroQuestoes()
     filtros_dict = filtros_para_repo(filtros, usuario_id)
+    selecionados = dict(filtros_dict)
+    if refinar_ramos:
+        filtros_dict["no_id"] = refinar_por_ramo(filtros_dict.get("no_id"))
     dados = questoes_repo.obter_facetas(filtros_dict)
 
     def manter(r, campo) -> bool:
-        marcados = {str(v) for v in (filtros_dict.get(campo) or [])}
+        marcados = {str(v) for v in (selecionados.get(campo) or [])}
         return r["total"] > 0 or str(r["valor"]) in marcados
 
     def valores(faceta, campo, rotulo=str, conv=lambda v: v):
@@ -267,7 +402,7 @@ def obter_facetas(
         for r in dados.get(faceta, []):
             if r["valor"] not in mapa or not manter(r, "no_id"):
                 continue
-            nome, nivel, caminho = mapa[r["valor"]]
+            nome, nivel, caminho, _ = mapa[r["valor"]]
             saida.append(
                 {
                     "valor": r["valor"],

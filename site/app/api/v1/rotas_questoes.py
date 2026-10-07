@@ -103,10 +103,6 @@ def listar_questoes(
     anuladas: Literal["incluir", "excluir", "so"] = Query(
         "incluir", description="Tratamento das questões anuladas."
     ),
-    fora_do_edital: Literal["todos", "sim", "nao"] = Query(
-        "todos",
-        description="`sim`: só questões classificadas fora do edital do cargo; `nao`: só dentro.",
-    ),
     utilizaveis: Literal["so", "todas"] = Query(
         "so",
         description=(
@@ -146,7 +142,6 @@ def listar_questoes(
         texto=texto,
         com=com,
         anuladas=anuladas,
-        fora_do_edital=fora_do_edital,
         utilizaveis=utilizaveis,
         historico=historico,
     )

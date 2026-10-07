@@ -80,7 +80,13 @@ def test_combinacao_2_anos_2_cargos_3_assuntos(cliente):
         t.split("</noscript>")[0].count('aria-label="Remover filtro')
         for t in noscript[1:]
     )
-    assert chips == 2 + 2 + 3
+    # Desde a cascata (5H.3), o assunto sem disciplina marcada é link direto:
+    # a disciplina de cada um entra na seleção e ganha chip.
+    from app.servicos import questoes_servico
+
+    nos = questoes_servico.info_nos()
+    disciplinas = {nos[a].pai for a in assuntos}
+    assert chips == 2 + 2 + 3 + len(disciplinas)
 
 
 def test_servico_lista_com_listas(cliente):
