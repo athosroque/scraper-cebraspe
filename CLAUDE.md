@@ -286,7 +286,7 @@ Datasette continua só como ferramenta de revisão do dono.
       no site e na API (`no_id`, 2026-10-07). Curadoria das 12 disciplinas
       com nome de cargo da PF_25_ADM concluída (Opção A aprovada no ADR-030,
       renomeando 10 para área de conhecimento e fundindo Psicologia e
-      Comunicação Social; 2026-10-07). 631 testes (+1 xfail) em `tests/`
+      Comunicação Social; assuntos e subassuntos homônimos fundidos, com teste guarda; 2026-10-07). 631 testes (+1 xfail) em `tests/`
       e 209 em `site/tests/`, ruff verde.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
@@ -658,6 +658,12 @@ Datasette continua só como ferramenta de revisão do dono.
   concursos (ADR-030).
 - Nunca criar nó da árvore automaticamente a partir de nome novo de edital:
   o que a regra não mapeia fica pendente para a curadoria.
+- Nunca deixar dois nós ativos com o mesmo nome (pela `chave_regra`) sob o mesmo
+  pai, nem duas disciplinas de mesmo nome: o filtro do site mostra o nome
+  repetido e a incidência se divide. Ao fundir ou renomear disciplina, rode
+  `pytest tests/test_arvore.py`; os testes `*_sem_irmaos_homonimos` e
+  `*_sem_disciplinas_homonimas` guardam isso. Cargo não é atributo do nó
+  (ADR-030). Paráfrase (nome diferente) segue com o dono.
 - Nunca classificar a questão só entre os nós do edital do caderno: a
   questão fora do edital ficaria sem nó, e o "edital × prova" perderia o
   lado "cobrado fora do edital".
