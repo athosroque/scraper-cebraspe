@@ -29,7 +29,7 @@ def _filtros(concurso, cargo_numero, nivel, tipo_conhecimento) -> FiltroEstatist
 
 
 _NIVEL_ALVO = Query("subassunto", description="Nível da árvore do ranking.")
-_MATERIA = Query(None, description="Restringe o ranking a uma matéria (id do nó).")
+_MATERIA = Query(None, description="Restringe o ranking a uma disciplina (id do nó).")
 _LIMITE = Query(20, ge=1, le=200, description="Tamanho do ranking (máx. 200).")
 
 
@@ -83,7 +83,7 @@ def edital_cobra(
     summary="Edital × prova de um cargo",
     description=(
         "Cada nó do edital do cargo, com a situação: previsto e cobrado, ou previsto "
-        "e nunca cobrado. Inclui o peso de cada matéria na prova."
+        "e nunca cobrado. Inclui o peso de cada disciplina na prova."
     ),
     responses=r404("Cargo sem edital nem prova."),
 )

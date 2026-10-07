@@ -62,15 +62,15 @@ TAGS = [
     },
     {
         "name": "Árvore",
-        "description": "Árvore mestre matéria → assunto → subassunto com contagem de questões.",
+        "description": "Árvore mestre disciplina → assunto → subassunto com contagem de questões.",
     },
     {
         "name": "Facetas",
         "description": "Valores possíveis dos filtros, com o total de questões de cada um.",
     },
     {
-        "name": "Matérias",
-        "description": "Matérias da árvore com resumo e os subassuntos que mais caem.",
+        "name": "Disciplinas",
+        "description": "Disciplinas da árvore com resumo e os subassuntos que mais caem.",
     },
     {
         "name": "Conta",

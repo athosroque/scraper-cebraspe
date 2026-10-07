@@ -234,9 +234,9 @@ def index(
     pagina = max(pagina, 1)
     tamanho_pagina = min(max(tamanho_pagina, 1), 50)
     # No mesmo ramo da árvore vale o nó mais específico (disciplina + assunto
-    # marcado = só o assunto); a API segue em OU.
+    # marcado = só o assunto), como na API.
     pagina_questoes = questoes_servico.listar_questoes(
-        filtros, pagina, tamanho_pagina, usuario_id, refinar_ramos=True
+        filtros, pagina, tamanho_pagina, usuario_id
     )
 
     if pagina > 1 and pagina > max(pagina_questoes.total_paginas, 1):
@@ -247,7 +247,7 @@ def index(
         return RedirectResponse(f"/questoes?{urlencode(params)}", status_code=307)
 
     # Facetas sempre: o fragmento leva as contagens novas (OOB) para o painel.
-    facetas = questoes_servico.obter_facetas(filtros, usuario_id, refinar_ramos=True)
+    facetas = questoes_servico.obter_facetas(filtros, usuario_id)
     # Paginação com os filtros aplicados (a URL), não com o form: ele pode ter
     # mudanças pendentes, que só valem no botão Filtrar.
     # `fora_do_edital` saiu do site (ADR-035): link antigo não o propaga.
@@ -282,7 +282,7 @@ def recontar_facetas(
 ):
     """Só as contagens das facetas para o form ainda não aplicado (ao fechar
     um dropdown). O painel relê o `#dados-facetas` trocado por OOB."""
-    facetas = questoes_servico.obter_facetas(filtros, usuario_id, refinar_ramos=True)
+    facetas = questoes_servico.obter_facetas(filtros, usuario_id)
     return templates.TemplateResponse(
         request=request,
         name="_dados_facetas.html",

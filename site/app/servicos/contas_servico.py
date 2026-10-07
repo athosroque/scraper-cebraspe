@@ -76,9 +76,13 @@ def filtros_com_historico(filtros: FiltroQuestoes, usuario_id: int | None) -> di
 
 
 def desempenho(usuario_id: int, filtros: FiltroQuestoes) -> list[NoDesempenho]:
-    """Árvore matéria → assunto → subassunto só com os nós respondidos."""
+    """Árvore disciplina → assunto → subassunto só com os nós respondidos.
+
+    O `no_id` segue a cascata da listagem (`nos_da_consulta`, 5H.3)."""
     ultimas = usuarios_repo.ultimas_respostas(usuario_id)
     filtros_dict = filtros.model_dump(exclude_none=True)
+    if filtros_dict.get("no_id"):
+        filtros_dict["no_id"] = questoes_servico.nos_da_consulta(filtros_dict["no_id"])
     linhas = questoes_repo.desempenho_por_no(
         filtros_dict, list(ultimas), list(ultimas.values())
     )

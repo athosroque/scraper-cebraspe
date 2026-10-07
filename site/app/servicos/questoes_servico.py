@@ -33,18 +33,15 @@ def listar_questoes(
     tamanho_pagina: int,
     usuario_id: int | None = None,
     chaves_incluir: list[str] | None = None,
-    refinar_ramos: bool = False,
 ) -> PaginaQuestoes:
     """Lista paginada. `chaves_incluir` restringe a um conjunto de chaves
-    (ex.: as erradas de um simulado), somado aos filtros. `refinar_ramos`
-    (só o site): no mesmo ramo da árvore vale o nó mais específico."""
+    (ex.: as erradas de um simulado), somado aos filtros. Os nós seguem a
+    cascata (`nos_da_consulta`), no site e na API."""
     tamanho_pagina = max(1, min(50, tamanho_pagina))
     pagina = max(1, pagina)
     offset = (pagina - 1) * tamanho_pagina
 
     filtros_dict = filtros_para_repo(filtros, usuario_id)
-    if refinar_ramos:
-        filtros_dict["no_id"] = refinar_por_ramo(filtros_dict.get("no_id"))
     if chaves_incluir is not None:
         anteriores = filtros_dict.get("chaves_incluir")
         filtros_dict["chaves_incluir"] = (
@@ -110,8 +107,9 @@ def chave_do_termo(texto: str | None) -> str | None:
 
 
 def filtros_para_repo(filtros: FiltroQuestoes, usuario_id: int | None) -> dict:
-    """Filtros prontos para o repositório: histórico do usuário (5F.3) e o
-    atalho do ID curto, que troca a palavra-chave pela própria questão.
+    """Filtros prontos para o repositório: histórico do usuário (5F.3), o
+    atalho do ID curto, que troca a palavra-chave pela própria questão, e os
+    nós da cascata (`nos_da_consulta`, 5H.3).
 
     Levanta `LoginNecessario` quando o histórico pede login e não há usuário.
     """
@@ -123,6 +121,8 @@ def filtros_para_repo(filtros: FiltroQuestoes, usuario_id: int | None) -> dict:
     if chave is not None:
         filtros_dict.pop("texto", None)
         filtros_dict["chave_codigo"] = chave
+    if filtros_dict.get("no_id"):
+        filtros_dict["no_id"] = nos_da_consulta(filtros_dict["no_id"])
     return filtros_dict
 
 
@@ -253,9 +253,9 @@ def info_nos() -> dict[str, NoInfo]:
     return _mapa_nos()
 
 
-# -- Cascata disciplina → assunto → subassunto do painel do site (5H.3) --
-# Só o site usa estas regras; a API segue com o `no_id` em OU (contrato da
-# 5F.1): matéria ou assunto sempre incluem os descendentes.
+# -- Cascata disciplina → assunto → subassunto (5H.3) --
+# Vale para o site e para toda a API que aceita `no_id` (decisão do dono,
+# 2026-10-07): a mesma URL dá o mesmo resultado nos dois.
 _NIVEIS = ("materia", "assunto", "subassunto")
 
 
@@ -317,11 +317,11 @@ def coerir_nos(no_ids: list[str] | None) -> list[str] | None:
 
 
 def refinar_por_ramo(no_ids: list[str] | None) -> list[str] | None:
-    """Nós para a consulta do site: no mesmo ramo vale o mais específico.
+    """No mesmo ramo vale o nó mais específico.
 
     Disciplina com assunto marcado fica só com os assuntos marcados (e assunto
     com subassunto, só com os subassuntos); disciplina sem filho marcado vale
-    inteira. Os nós restantes combinam em OU, como na API.
+    inteira. Os nós restantes combinam em OU.
     """
     if not no_ids:
         return no_ids
@@ -333,6 +333,13 @@ def refinar_por_ramo(no_ids: list[str] | None) -> list[str] | None:
             com_filho.add(atual)
             atual = mapa[atual].pai if atual in mapa else None
     return [n for n in no_ids if n not in com_filho]
+
+
+def nos_da_consulta(no_ids: list[str] | None) -> list[str] | None:
+    """Nós que entram na consulta: seleção coerente (`coerir_nos`) e, no
+    mesmo ramo, só o mais específico (`refinar_por_ramo`). Idempotente: a
+    seleção que o site já coeriu dá o mesmo resultado."""
+    return refinar_por_ramo(coerir_nos(no_ids))
 
 
 def opcoes_em_cascata(
@@ -368,16 +375,14 @@ def opcoes_em_cascata(
 def obter_facetas(
     filtros: FiltroQuestoes | None = None,
     usuario_id: int | None = None,
-    refinar_ramos: bool = False,
 ) -> FacetasResponse:
     """Facetas da listagem. Com filtros, o total de cada valor considera os
-    outros filtros; valor zerado só aparece se estiver marcado. `refinar_ramos`
-    como em `listar_questoes` (o nó marcado continua nas facetas)."""
+    outros filtros; valor zerado só aparece se estiver marcado. A consulta usa
+    os nós da cascata, como em `listar_questoes`, mas o nó marcado (inclusive
+    o pai que o refino tira) continua nas facetas."""
     filtros = filtros or FiltroQuestoes()
     filtros_dict = filtros_para_repo(filtros, usuario_id)
-    selecionados = dict(filtros_dict)
-    if refinar_ramos:
-        filtros_dict["no_id"] = refinar_por_ramo(filtros_dict.get("no_id"))
+    selecionados = {**filtros_dict, "no_id": coerir_nos(filtros.no_id)}
     dados = questoes_repo.obter_facetas(filtros_dict)
 
     def manter(r, campo) -> bool:

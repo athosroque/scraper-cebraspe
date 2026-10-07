@@ -199,13 +199,13 @@
                   "type": "null"
                 }
               ],
-              "description": "Nó da árvore (`/arvore`), em qualquer nível. Matéria ou assunto incluem as questões dos descendentes. Repita para vários (OU).",
+              "description": "Nó da árvore (`/arvore`), em qualquer nível; disciplina e assunto incluem as questões dos descendentes. Repita para vários. Vale a cascata disciplina → assunto → subassunto, a mesma do site: **no mesmo ramo vale o nó mais específico** (disciplina com assunto marcado vale só pelos assuntos marcados, e assunto com subassunto, só pelos subassuntos; disciplina sem filho marcado vale inteira), e os nós que sobram combinam com OU. Assunto de outra disciplina, quando há disciplina marcada, é ignorado (idem subassunto cujo assunto ou disciplina não está marcado). Nó sem nada marcado no nível de cima vale sozinho, como link direto. Ex.: disciplina A + um assunto de A + disciplina B = questões do assunto OU de B.",
               "examples": [
                 "S-c33faee4a4"
               ],
               "title": "No Id"
             },
-            "description": "Nó da árvore (`/arvore`), em qualquer nível. Matéria ou assunto incluem as questões dos descendentes. Repita para vários (OU)."
+            "description": "Nó da árvore (`/arvore`), em qualquer nível; disciplina e assunto incluem as questões dos descendentes. Repita para vários. Vale a cascata disciplina → assunto → subassunto, a mesma do site: **no mesmo ramo vale o nó mais específico** (disciplina com assunto marcado vale só pelos assuntos marcados, e assunto com subassunto, só pelos subassuntos; disciplina sem filho marcado vale inteira), e os nós que sobram combinam com OU. Assunto de outra disciplina, quando há disciplina marcada, é ignorado (idem subassunto cujo assunto ou disciplina não está marcado). Nó sem nada marcado no nível de cima vale sozinho, como link direto. Ex.: disciplina A + um assunto de A + disciplina B = questões do assunto OU de B."
           },
           {
             "name": "anuladas",
@@ -503,7 +503,7 @@
           "Árvore"
         ],
         "summary": "Árvore mestre com contagem de questões",
-        "description": "Matéria → assunto → subassunto. A contagem é de questões distintas e sobe a árvore.",
+        "description": "Disciplina → assunto → subassunto. A contagem é de questões distintas e sobe a árvore.",
         "operationId": "obter_arvore_api_v1_arvore_get",
         "parameters": [
           {
@@ -719,10 +719,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Nós da árvore marcados.",
+              "description": "Nó da árvore (`/arvore`), em qualquer nível; disciplina e assunto incluem as questões dos descendentes. Repita para vários. Vale a cascata disciplina → assunto → subassunto, a mesma do site: **no mesmo ramo vale o nó mais específico** (disciplina com assunto marcado vale só pelos assuntos marcados, e assunto com subassunto, só pelos subassuntos; disciplina sem filho marcado vale inteira), e os nós que sobram combinam com OU. Assunto de outra disciplina, quando há disciplina marcada, é ignorado (idem subassunto cujo assunto ou disciplina não está marcado). Nó sem nada marcado no nível de cima vale sozinho, como link direto. Ex.: disciplina A + um assunto de A + disciplina B = questões do assunto OU de B.",
               "title": "No Id"
             },
-            "description": "Nós da árvore marcados."
+            "description": "Nó da árvore (`/arvore`), em qualquer nível; disciplina e assunto incluem as questões dos descendentes. Repita para vários. Vale a cascata disciplina → assunto → subassunto, a mesma do site: **no mesmo ramo vale o nó mais específico** (disciplina com assunto marcado vale só pelos assuntos marcados, e assunto com subassunto, só pelos subassuntos; disciplina sem filho marcado vale inteira), e os nós que sobram combinam com OU. Assunto de outra disciplina, quando há disciplina marcada, é ignorado (idem subassunto cujo assunto ou disciplina não está marcado). Nó sem nada marcado no nível de cima vale sozinho, como link direto. Ex.: disciplina A + um assunto de A + disciplina B = questões do assunto OU de B."
           },
           {
             "name": "texto",
@@ -1220,10 +1220,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Nó da árvore; inclui os descendentes.",
+              "description": "Nó da árvore; inclui os descendentes. Aceita um nó só, então a cascata de `no_id` da listagem não muda o resultado.",
               "title": "No Id"
             },
-            "description": "Nó da árvore; inclui os descendentes."
+            "description": "Nó da árvore; inclui os descendentes. Aceita um nó só, então a cascata de `no_id` da listagem não muda o resultado."
           }
         ],
         "responses": {
@@ -1386,7 +1386,7 @@
           "Conta"
         ],
         "summary": "Plano de estudo do cargo",
-        "description": "Matérias do cargo ordenadas por `prioridade` = peso da matéria na prova (`vw_peso_materia_cargo`) × (1 − acerto do usuário na matéria). O acerto usa a resposta mais recente de cada questão, de qualquer prova; sem respostas na matéria, o acerto é 0 e a prioridade é o próprio peso.",
+        "description": "Disciplinas do cargo ordenadas por `prioridade` = peso da disciplina na prova (`vw_peso_materia_cargo`) × (1 − acerto do usuário na disciplina). O acerto usa a resposta mais recente de cada questão, de qualquer prova; sem respostas na disciplina, o acerto é 0 e a prioridade é o próprio peso.",
         "operationId": "plano_api_v1_eu_plano_get",
         "security": [
           {
@@ -1500,10 +1500,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Restringe o ranking a uma matéria (id do nó).",
+              "description": "Restringe o ranking a uma disciplina (id do nó).",
               "title": "Materia Id"
             },
-            "description": "Restringe o ranking a uma matéria (id do nó)."
+            "description": "Restringe o ranking a uma disciplina (id do nó)."
           },
           {
             "name": "limite",
@@ -1659,10 +1659,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Restringe o ranking a uma matéria (id do nó).",
+              "description": "Restringe o ranking a uma disciplina (id do nó).",
               "title": "Materia Id"
             },
-            "description": "Restringe o ranking a uma matéria (id do nó)."
+            "description": "Restringe o ranking a uma disciplina (id do nó)."
           },
           {
             "name": "limite",
@@ -1785,7 +1785,7 @@
           "Estatísticas"
         ],
         "summary": "Edital × prova de um cargo",
-        "description": "Cada nó do edital do cargo, com a situação: previsto e cobrado, ou previsto e nunca cobrado. Inclui o peso de cada matéria na prova.",
+        "description": "Cada nó do edital do cargo, com a situação: previsto e cobrado, ou previsto e nunca cobrado. Inclui o peso de cada disciplina na prova.",
         "operationId": "edital_vs_prova_api_v1_estatisticas_edital_vs_prova_get",
         "parameters": [
           {
@@ -1848,10 +1848,10 @@
     "/api/v1/materias": {
       "get": {
         "tags": [
-          "Matérias"
+          "Disciplinas"
         ],
-        "summary": "Lista as matérias com o volume de questões",
-        "description": "Matérias da árvore mestre ativa que têm questão objetiva utilizável, com o total de questões distintas (a contagem sobe a árvore, anuladas incluídas) e o % de incidência sobre o total. Maior volume primeiro.",
+        "summary": "Lista as disciplinas com o volume de questões",
+        "description": "Disciplinas da árvore mestre ativa que têm questão objetiva utilizável, com o total de questões distintas (a contagem sobe a árvore, anuladas incluídas) e o % de incidência sobre o total. Maior volume primeiro.",
         "operationId": "listar_materias_api_v1_materias_get",
         "responses": {
           "200": {
@@ -1874,10 +1874,10 @@
     "/api/v1/materias/{materia_id}": {
       "get": {
         "tags": [
-          "Matérias"
+          "Disciplinas"
         ],
-        "summary": "Resumo de uma matéria",
-        "description": "Resumo da matéria e os subassuntos que mais caem (`fn_prova_cobra`) no recorte de concurso, cargo e nível. O cargo só vale junto com o concurso.",
+        "summary": "Resumo de uma disciplina",
+        "description": "Resumo da disciplina e os subassuntos que mais caem (`fn_prova_cobra`) no recorte de concurso, cargo e nível. O cargo só vale junto com o concurso.",
         "operationId": "detalhe_materia_api_v1_materias__materia_id__get",
         "parameters": [
           {
@@ -1886,10 +1886,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "ID do nó da matéria na árvore mestre (ex.: `M-0f9a364d06`).",
+              "description": "ID do nó da disciplina na árvore mestre (ex.: `M-0f9a364d06`).",
               "title": "Materia Id"
             },
-            "description": "ID do nó da matéria na árvore mestre (ex.: `M-0f9a364d06`)."
+            "description": "ID do nó da disciplina na árvore mestre (ex.: `M-0f9a364d06`)."
           },
           {
             "name": "concurso",
@@ -1972,7 +1972,7 @@
             }
           },
           "404": {
-            "description": "O id não é uma matéria ativa da árvore mestre."
+            "description": "O id não é uma disciplina ativa da árvore mestre."
           },
           "422": {
             "description": "Parâmetro de consulta inválido."
@@ -1983,10 +1983,10 @@
     "/api/v1/busca": {
       "get": {
         "tags": [
-          "Matérias"
+          "Disciplinas"
         ],
         "summary": "Busca nós da árvore por nome",
-        "description": "Nós ativos (matéria, assunto, subassunto) cujo nome contém o termo, sem acento e sem caixa (`lingua` acha `LÍNGUA PORTUGUESA`). Começo do nome primeiro, depois matéria → assunto → subassunto. Máximo de 20.",
+        "description": "Nós ativos (disciplina, assunto, subassunto) cujo nome contém o termo, sem acento e sem caixa (`lingua` acha `LÍNGUA PORTUGUESA`). Começo do nome primeiro, depois disciplina → assunto → subassunto. Máximo de 20.",
         "operationId": "buscar_api_v1_busca_get",
         "parameters": [
           {
@@ -2865,7 +2865,7 @@
             },
             "type": "array",
             "title": "Peso Materias",
-            "description": "Peso de cada matéria na prova."
+            "description": "Peso de cada disciplina na prova."
           }
         },
         "type": "object",
@@ -3071,7 +3071,7 @@
             },
             "type": "array",
             "title": "Materias",
-            "description": "Matérias da árvore.",
+            "description": "Disciplinas da árvore.",
             "default": []
           },
           "assuntos": {
@@ -3145,17 +3145,17 @@
               }
             ],
             "title": "Materia Id",
-            "description": "Matéria do subassunto."
+            "description": "Disciplina do subassunto."
           },
           "posicao": {
             "type": "integer",
             "title": "Posicao",
-            "description": "Posição no ranking da matéria (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
+            "description": "Posição no ranking da disciplina (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
           },
           "total_subassuntos": {
             "type": "integer",
             "title": "Total Subassuntos",
-            "description": "Quantos subassuntos da matéria têm questão no ranking."
+            "description": "Quantos subassuntos da disciplina têm questão no ranking."
           },
           "questoes": {
             "type": "integer",
@@ -3171,7 +3171,7 @@
           "questoes"
         ],
         "title": "Incidencia",
-        "description": "Posição do subassunto principal no ranking \"o que mais cai\" da matéria."
+        "description": "Posição do subassunto principal no ranking \"o que mais cai\" da disciplina."
       },
       "ItemCorrigido": {
         "properties": {
@@ -3240,32 +3240,32 @@
           "materia_id": {
             "type": "string",
             "title": "Materia Id",
-            "description": "ID do nó da matéria na árvore mestre."
+            "description": "ID do nó da disciplina na árvore mestre."
           },
           "rotulo_materia": {
             "type": "string",
             "title": "Rotulo Materia",
-            "description": "Nome da matéria (ou \"Conhecimentos específicos — <cargo>\")."
+            "description": "Nome da disciplina (ou \"Conhecimentos específicos — <cargo>\")."
           },
           "pct_da_prova": {
             "type": "number",
             "title": "Pct Da Prova",
-            "description": "Peso da matéria na prova do cargo (%)."
+            "description": "Peso da disciplina na prova do cargo (%)."
           },
           "respondidas": {
             "type": "integer",
             "title": "Respondidas",
-            "description": "Questões da matéria respondidas pelo usuário (todas as provas)."
+            "description": "Questões da disciplina respondidas pelo usuário (todas as provas)."
           },
           "acertos": {
             "type": "integer",
             "title": "Acertos",
-            "description": "Questões da matéria com a última resposta certa."
+            "description": "Questões da disciplina com a última resposta certa."
           },
           "acerto": {
             "type": "number",
             "title": "Acerto",
-            "description": "Acerto do usuário na matéria (0 a 1). Sem respostas, 0."
+            "description": "Acerto do usuário na disciplina (0 a 1). Sem respostas, 0."
           },
           "prioridade": {
             "type": "number",
@@ -3284,7 +3284,7 @@
           "prioridade"
         ],
         "title": "ItemPlano",
-        "description": "Matéria do plano, com a prioridade de estudo."
+        "description": "Disciplina do plano, com a prioridade de estudo."
       },
       "ItemSimulado": {
         "properties": {
@@ -3398,7 +3398,7 @@
               }
             ],
             "title": "Materia Id",
-            "description": "Id do nó de matéria ao qual o nó pertence."
+            "description": "Id do nó de disciplina ao qual o nó pertence."
           },
           "ocorrencias": {
             "type": "integer",
@@ -3449,7 +3449,7 @@
               }
             ],
             "title": "Materia Id",
-            "description": "Id do nó de matéria ao qual o nó pertence."
+            "description": "Id do nó de disciplina ao qual o nó pertence."
           },
           "previsao": {
             "type": "integer",
@@ -3512,7 +3512,7 @@
               }
             ],
             "title": "Materia Id",
-            "description": "Id do nó de matéria ao qual o nó pertence."
+            "description": "Id do nó de disciplina ao qual o nó pertence."
           },
           "questoes": {
             "type": "integer",
@@ -3537,7 +3537,7 @@
           "pct_medio_por_concurso": {
             "type": "number",
             "title": "Pct Medio Por Concurso",
-            "description": "Média entre concursos do % do nó dentro da matéria (subassunto/assunto) ou da prova (matéria), com peso igual por concurso."
+            "description": "Média entre concursos do % do nó dentro da disciplina (subassunto/assunto) ou da prova (disciplina), com peso igual por concurso."
           }
         },
         "type": "object",
@@ -3560,7 +3560,7 @@
           "id": {
             "type": "string",
             "title": "Id",
-            "description": "ID estável do nó de nível matéria."
+            "description": "ID estável do nó de nível disciplina (`materia`)."
           },
           "nome": {
             "type": "string",
@@ -3570,37 +3570,37 @@
           "total_questoes": {
             "type": "integer",
             "title": "Total Questoes",
-            "description": "Questões objetivas utilizáveis distintas (anuladas incluídas) classificadas na matéria ou abaixo dela (a contagem sobe a árvore)."
+            "description": "Questões objetivas utilizáveis distintas (anuladas incluídas) classificadas na disciplina ou abaixo dela (a contagem sobe a árvore)."
           },
           "pct_incidencia": {
             "type": "number",
             "title": "Pct Incidencia",
-            "description": "`total_questoes` sobre o total de questões utilizáveis distintas, em %. A soma entre matérias pode passar de 100 (questão em 2 nós)."
+            "description": "`total_questoes` sobre o total de questões utilizáveis distintas, em %. A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
           },
           "nome_de_cargo": {
             "type": "boolean",
             "title": "Nome De Cargo",
-            "description": "A matéria é o próprio nome de um cargo (conhecimentos específicos sem matéria nomeada no edital)."
+            "description": "A disciplina é o próprio nome de um cargo (conhecimentos específicos sem disciplina nomeada no edital)."
           },
           "questoes_recorte": {
             "type": "integer",
             "title": "Questoes Recorte",
-            "description": "Questões válidas distintas da matéria sob os filtros (`fn_prova_cobra`)."
+            "description": "Questões válidas distintas da disciplina sob os filtros (`fn_prova_cobra`)."
           },
           "anuladas_recorte": {
             "type": "integer",
             "title": "Anuladas Recorte",
-            "description": "Anuladas da matéria sob os filtros."
+            "description": "Anuladas da disciplina sob os filtros."
           },
           "pct_do_universo": {
             "type": "number",
             "title": "Pct Do Universo",
-            "description": "Participação da matéria no universo de questões válidas sob os filtros, em %."
+            "description": "Participação da disciplina no universo de questões válidas sob os filtros, em %."
           },
           "itens_edital": {
             "type": "integer",
             "title": "Itens Edital",
-            "description": "Itens de edital distintos na matéria sob os filtros (concursos aprovados)."
+            "description": "Itens de edital distintos na disciplina sob os filtros (concursos aprovados)."
           },
           "top_subassuntos": {
             "items": {
@@ -3608,7 +3608,7 @@
             },
             "type": "array",
             "title": "Top Subassuntos",
-            "description": "Subassuntos que mais caem na matéria sob os filtros, maior primeiro."
+            "description": "Subassuntos que mais caem na disciplina sob os filtros, maior primeiro."
           }
         },
         "type": "object",
@@ -3625,14 +3625,14 @@
           "top_subassuntos"
         ],
         "title": "MateriaDetalhe",
-        "description": "Resumo da matéria com o recorte dos filtros e os subassuntos que mais caem."
+        "description": "Resumo da disciplina com o recorte dos filtros e os subassuntos que mais caem."
       },
       "MateriaResumo": {
         "properties": {
           "id": {
             "type": "string",
             "title": "Id",
-            "description": "ID estável do nó de nível matéria."
+            "description": "ID estável do nó de nível disciplina (`materia`)."
           },
           "nome": {
             "type": "string",
@@ -3642,17 +3642,17 @@
           "total_questoes": {
             "type": "integer",
             "title": "Total Questoes",
-            "description": "Questões objetivas utilizáveis distintas (anuladas incluídas) classificadas na matéria ou abaixo dela (a contagem sobe a árvore)."
+            "description": "Questões objetivas utilizáveis distintas (anuladas incluídas) classificadas na disciplina ou abaixo dela (a contagem sobe a árvore)."
           },
           "pct_incidencia": {
             "type": "number",
             "title": "Pct Incidencia",
-            "description": "`total_questoes` sobre o total de questões utilizáveis distintas, em %. A soma entre matérias pode passar de 100 (questão em 2 nós)."
+            "description": "`total_questoes` sobre o total de questões utilizáveis distintas, em %. A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
           },
           "nome_de_cargo": {
             "type": "boolean",
             "title": "Nome De Cargo",
-            "description": "A matéria é o próprio nome de um cargo (conhecimentos específicos sem matéria nomeada no edital)."
+            "description": "A disciplina é o próprio nome de um cargo (conhecimentos específicos sem disciplina nomeada no edital)."
           }
         },
         "type": "object",
@@ -3664,7 +3664,7 @@
           "nome_de_cargo"
         ],
         "title": "MateriaResumo",
-        "description": "Matéria da árvore ativa com o volume de questões objetivas utilizáveis."
+        "description": "Disciplina da árvore ativa com o volume de questões objetivas utilizáveis."
       },
       "MateriaSimulado": {
         "properties": {
@@ -3707,12 +3707,12 @@
           "materia_id": {
             "type": "string",
             "title": "Materia Id",
-            "description": "Id do nó de matéria."
+            "description": "Id do nó de disciplina."
           },
           "nome": {
             "type": "string",
             "title": "Nome",
-            "description": "Nome da matéria para exibição."
+            "description": "Nome da disciplina para exibição."
           }
         },
         "type": "object",
@@ -3721,7 +3721,7 @@
           "nome"
         ],
         "title": "MateriaSimulado",
-        "description": "Placar do simulado numa matéria (pelo nó principal de cada item)."
+        "description": "Placar do simulado numa disciplina (pelo nó principal de cada item)."
       },
       "NoArvore": {
         "properties": {
@@ -3748,7 +3748,7 @@
           "nome_de_cargo": {
             "type": "boolean",
             "title": "Nome De Cargo",
-            "description": "A matéria é o próprio nome de um cargo (exibir como conhecimentos específicos).",
+            "description": "A disciplina é o próprio nome de um cargo (exibir como conhecimentos específicos).",
             "default": false
           },
           "filhos": {
@@ -3857,7 +3857,7 @@
               }
             ],
             "title": "Materia Id",
-            "description": "Id do nó de matéria ao qual o nó pertence."
+            "description": "Id do nó de disciplina ao qual o nó pertence."
           },
           "assunto_id": {
             "anyOf": [
@@ -3869,7 +3869,7 @@
               }
             ],
             "title": "Assunto Id",
-            "description": "Id do nó de assunto (vazio quando o nó é matéria)."
+            "description": "Id do nó de assunto (vazio quando o nó é disciplina)."
           },
           "papel": {
             "anyOf": [
@@ -3905,7 +3905,7 @@
               }
             ],
             "title": "Rotulo Materia",
-            "description": "Nome da matéria para exibição (matéria com nome de cargo vira “Conhecimentos específicos — <cargo>”)."
+            "description": "Nome da disciplina para exibição (disciplina com nome de cargo vira “Conhecimentos específicos — <cargo>”)."
           }
         },
         "type": "object",
@@ -3916,7 +3916,7 @@
           "no_caminho"
         ],
         "title": "NoInfo",
-        "description": "Nó da árvore mestre (matéria → assunto → subassunto) em que a questão foi classificada (Etapa 5D).",
+        "description": "Nó da árvore mestre (disciplina → assunto → subassunto) em que a questão foi classificada (Etapa 5D).",
         "examples": [
           {
             "assunto_id": "A-56b9b718fa",
@@ -3978,22 +3978,22 @@
           "materia_id": {
             "type": "string",
             "title": "Materia Id",
-            "description": "Id do nó de matéria."
+            "description": "Id do nó de disciplina."
           },
           "rotulo_materia": {
             "type": "string",
             "title": "Rotulo Materia",
-            "description": "Nome da matéria para exibição."
+            "description": "Nome da disciplina para exibição."
           },
           "questoes": {
             "type": "integer",
             "title": "Questoes",
-            "description": "Questões válidas da matéria na prova."
+            "description": "Questões válidas da disciplina na prova."
           },
           "anuladas": {
             "type": "integer",
             "title": "Anuladas",
-            "description": "Questões anuladas da matéria."
+            "description": "Questões anuladas da disciplina."
           },
           "total_cargo": {
             "type": "integer",
@@ -4016,7 +4016,7 @@
           "pct_da_prova"
         ],
         "title": "PesoMateria",
-        "description": "Peso de uma matéria na prova do cargo (`vw_peso_materia_cargo`)."
+        "description": "Peso de uma disciplina na prova do cargo (`vw_peso_materia_cargo`)."
       },
       "PlacarSimulado": {
         "properties": {
@@ -4079,7 +4079,7 @@
             },
             "type": "array",
             "title": "Itens",
-            "description": "Matérias, da maior prioridade para a menor."
+            "description": "Disciplinas, da maior prioridade para a menor."
           }
         },
         "type": "object",
@@ -4089,7 +4089,7 @@
           "itens"
         ],
         "title": "PlanoEstudo",
-        "description": "Matérias do cargo ordenadas pela prioridade de estudo."
+        "description": "Disciplinas do cargo ordenadas pela prioridade de estudo."
       },
       "Prioridade": {
         "properties": {
@@ -4106,7 +4106,7 @@
           "caminho": {
             "type": "string",
             "title": "Caminho",
-            "description": "Matéria › assunto › subassunto."
+            "description": "Disciplina › assunto › subassunto."
           },
           "respondidas": {
             "type": "integer",
@@ -4325,7 +4325,7 @@
                 "type": "null"
               }
             ],
-            "description": "Posição do subassunto principal no ranking da matéria. `null` quando o nó principal não é subassunto ou a questão não foi classificada."
+            "description": "Posição do subassunto principal no ranking da disciplina. `null` quando o nó principal não é subassunto ou a questão não foi classificada."
           },
           "texto_base_texto": {
             "anyOf": [
@@ -4550,7 +4550,7 @@
                 "type": "null"
               }
             ],
-            "description": "Posição do subassunto principal no ranking da matéria. `null` quando o nó principal não é subassunto ou a questão não foi classificada."
+            "description": "Posição do subassunto principal no ranking da disciplina. `null` quando o nó principal não é subassunto ou a questão não foi classificada."
           }
         },
         "type": "object",
@@ -4757,7 +4757,7 @@
           "caminho": {
             "type": "string",
             "title": "Caminho",
-            "description": "Caminho matéria → assunto → subassunto."
+            "description": "Caminho disciplina → assunto → subassunto."
           },
           "materia_id": {
             "anyOf": [
@@ -4769,7 +4769,7 @@
               }
             ],
             "title": "Materia Id",
-            "description": "ID da matéria do nó."
+            "description": "ID da disciplina do nó."
           }
         },
         "type": "object",
@@ -4828,7 +4828,7 @@
             },
             "type": "array",
             "title": "Por Materia",
-            "description": "Placar por matéria."
+            "description": "Placar por disciplina."
           },
           "itens": {
             "items": {
@@ -4882,7 +4882,7 @@
           "discursivas"
         ],
         "title": "ResultadoSimulado",
-        "description": "Resultado de um simulado: placar geral, por matéria e por item."
+        "description": "Resultado de um simulado: placar geral, por disciplina e por item."
       },
       "ResumoConta": {
         "properties": {
@@ -5207,15 +5207,15 @@
     },
     {
       "name": "Árvore",
-      "description": "Árvore mestre matéria → assunto → subassunto com contagem de questões."
+      "description": "Árvore mestre disciplina → assunto → subassunto com contagem de questões."
     },
     {
       "name": "Facetas",
       "description": "Valores possíveis dos filtros, com o total de questões de cada um."
     },
     {
-      "name": "Matérias",
-      "description": "Matérias da árvore com resumo e os subassuntos que mais caem."
+      "name": "Disciplinas",
+      "description": "Disciplinas da árvore com resumo e os subassuntos que mais caem."
     },
     {
       "name": "Conta",

@@ -137,7 +137,11 @@ def desempenho(
         None, description="`basico` ou `especifico`."
     ),
     no_id: str | None = Query(
-        None, description="Nó da árvore; inclui os descendentes."
+        None,
+        description=(
+            "Nó da árvore; inclui os descendentes. Aceita um nó só, então a "
+            "cascata de `no_id` da listagem não muda o resultado."
+        ),
     ),
 ):
     filtros = FiltroQuestoes(
@@ -197,10 +201,10 @@ def salvar_concurso_alvo(
     response_model=PlanoEstudo,
     summary="Plano de estudo do cargo",
     description=(
-        "Matérias do cargo ordenadas por `prioridade` = peso da matéria na prova "
-        "(`vw_peso_materia_cargo`) × (1 − acerto do usuário na matéria). O acerto "
+        "Disciplinas do cargo ordenadas por `prioridade` = peso da disciplina na prova "
+        "(`vw_peso_materia_cargo`) × (1 − acerto do usuário na disciplina). O acerto "
         "usa a resposta mais recente de cada questão, de qualquer prova; sem "
-        "respostas na matéria, o acerto é 0 e a prioridade é o próprio peso."
+        "respostas na disciplina, o acerto é 0 e a prioridade é o próprio peso."
     ),
     responses={**_401, **_404_CONCURSO},
 )

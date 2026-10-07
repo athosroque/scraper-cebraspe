@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Path, Query, Request
 from app.api.v1.respostas_comuns import R401, r404
 from app.auth import usuario_id_atual
 from app.modelos import (
+    D_FILTRO_NO_ID,
     FacetasResponse,
     FiltroQuestoes,
     NoArvore,
@@ -92,13 +93,7 @@ def listar_questoes(
     ] = None,
     no_id: Annotated[
         list[str] | None,
-        Query(
-            description=(
-                "Nó da árvore (`/arvore`), em qualquer nível. Matéria ou assunto incluem as "
-                "questões dos descendentes. Repita para vários (OU)."
-            ),
-            examples=["S-c33faee4a4"],
-        ),
+        Query(description=D_FILTRO_NO_ID, examples=["S-c33faee4a4"]),
     ] = None,
     anuladas: Literal["incluir", "excluir", "so"] = Query(
         "incluir", description="Tratamento das questões anuladas."
@@ -212,7 +207,7 @@ router_arvore = APIRouter(prefix="/arvore", tags=["Árvore"])
     "",
     response_model=list[NoArvore],
     summary="Árvore mestre com contagem de questões",
-    description="Matéria → assunto → subassunto. A contagem é de questões distintas e sobe a árvore.",
+    description="Disciplina → assunto → subassunto. A contagem é de questões distintas e sobe a árvore.",
 )
 def obter_arvore(
     apenas_com_questoes: bool = Query(
@@ -252,9 +247,7 @@ def obter_facetas(
     tipo_conhecimento: Annotated[
         list[str] | None, Query(description="Tipos de conhecimento marcados.")
     ] = None,
-    no_id: Annotated[
-        list[str] | None, Query(description="Nós da árvore marcados.")
-    ] = None,
+    no_id: Annotated[list[str] | None, Query(description=D_FILTRO_NO_ID)] = None,
     texto: Annotated[str | None, Query(description=_D_TEXTO)] = None,
     com: Annotated[list[str] | None, Query(description=_D_COM)] = None,
     anuladas: Literal["incluir", "excluir", "so"] = Query(

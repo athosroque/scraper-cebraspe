@@ -72,8 +72,9 @@ Pedido do dono depois da validação da 5H:
 - **"Disciplina" no lugar de "Matéria"** em todo texto visível do site
   (painel, chips, card, home, menu, painel da disciplina, estatísticas,
   edital × prova, conta, simulado, 404). Identificadores, a rota
-  `/materias/{id}`, parâmetros, campos da API e o `openapi.json` ficam como
-  estavam (as descrições do OpenAPI e a tag "Matérias" seguem com "matéria").
+  `/materias/{id}`, parâmetros e campos da API ficam como estavam. (As
+  descrições do OpenAPI e a tag "Matérias" mudaram depois, ver "API igual ao
+  site" abaixo.)
 - **Cascata Disciplina → Assunto → Subassunto.** Assunto fica desabilitado
   ("Requer disciplina") sem disciplina marcada, e Subassunto sem assunto. As
   opções vêm só dos pais marcados: o servidor manda assim (o JSON das
@@ -91,13 +92,31 @@ Pedido do dono depois da validação da 5H:
   completá-los mostra a cadeia marcada com o mesmo resultado de antes. Já o
   órfão com disciplina marcada só nasce de URL editada ou desatualizada, e o
   painel nunca o mandaria (podaria ao desmarcar).
-- **No mesmo ramo vale o mais específico** (`refinar_por_ramo`, só no site):
+- **No mesmo ramo vale o mais específico** (`refinar_por_ramo`):
   disciplina + assunto dela = só o assunto; disciplina sem assunto marcado
   vale inteira. Sem isso a cascata não serviria para nada, porque o `no_id` é
-  OU e a disciplina engoliria o assunto. A API `/api/v1/questoes` e
-  `/api/v1/facetas` **não** mudam (contrato da 5F.1: nós em OU, descendentes
-  incluídos); a diferença fica documentada aqui e no teste
-  `test_refino_por_ramo_na_lista`.
+  OU e a disciplina engoliria o assunto. Na primeira entrega (commit
+  `025d893`) só o site refinava, e a API ficava em OU puro (contrato da
+  5F.1), então a mesma URL dava totais diferentes.
+- **API igual ao site** (decisão do dono, 2026-10-07). A coerência e o refino
+  viraram o padrão do serviço (`questoes_servico.nos_da_consulta` =
+  `refinar_por_ramo(coerir_nos(...))`, aplicado em `filtros_para_repo`), e a
+  opção `refinar_ramos` saiu. Valem para todo endpoint que aceita `no_id`:
+  `/api/v1/questoes`, `/api/v1/facetas` e `/api/v1/eu/desempenho` (este
+  aceita um nó só, então na prática não muda), além das rotas HTML. A regra
+  está na descrição do parâmetro `no_id` no OpenAPI (`D_FILTRO_NO_ID`). Nas
+  facetas, o nó marcado continua entre as opções mesmo quando o refino o tira
+  da consulta. `coerir_nos` é idempotente: o site já coere a seleção para os
+  chips, e o serviço aplica de novo sem mudar nada. Os outros endpoints não
+  recebem `no_id` (`/estatisticas/*` usa `materia_id`, `/busca` usa `q`,
+  `/questoes/{chave}/parecidas` usa o nó principal da questão, e as questões
+  do simulado vêm por chave). Teste: `test_site_e_api_dao_o_mesmo_total` e
+  `test_exemplo_do_dono_igual_no_site_e_na_api` (LP + "Domínio da estrutura
+  morfossintática do período" + Direito Administrativo = 205 nos dois).
+  Na mesma decisão, as descrições, a tag ("Disciplinas") e as mensagens
+  `detail` da API passaram a dizer "disciplina" ("Disciplina não
+  encontrada"); identificadores, paths, parâmetros e campos (`materia_id`,
+  `/materias`, `materias`) ficam como estavam.
 - **Sem redundância nas caixas.** Conferido no Chromium antes da mudança:
   cada opção de Assunto repetia o próprio nome numa 2ª linha com o caminho
   inteiro (ex.: "Domínio da estrutura morfossintática do período" e, abaixo,
@@ -145,9 +164,10 @@ Pedido do dono depois da validação da 5H:
   ADMINISTRATIVO agrupam os assuntos sob os 2 nomes; subassunto só do
   assunto marcado; desmarcar a disciplina poda assunto e subassunto (chips
   inclusive); Filtrar com LP › "Domínio da estrutura morfossintática do
-  período" + DIREITO ADMINISTRATIVO dá 205 (= 63 + 142, igual à API com
-  `no_id=[assunto, DA]`); voltar do navegador restaura 205 e a seleção; sem
-  rolagem horizontal e sem erro de JS.
+  período" + DIREITO ADMINISTRATIVO dá 205 (= 63 + 142); voltar do
+  navegador restaura 205 e a seleção; sem rolagem horizontal e sem erro de
+  JS. Desde o alinhamento da API (2026-10-07), a mesma URL em
+  `/api/v1/questoes` também dá 205.
 - Remover um chip não aplica na hora (só no Filtrar), coerente com a regra do
   botão; diferente da 5G, em que cada mudança buscava.
 

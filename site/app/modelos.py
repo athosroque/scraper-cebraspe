@@ -72,10 +72,24 @@ _D_CARGO_NUMERO = "Número do cargo no edital do concurso."
 _D_NIVEL = "Nível do cargo: `superior` ou `medio`."
 _D_TIPO = "Tipo de conhecimento: `basico` ou `especifico`."
 _D_NO_ID = "Id estável do nó da árvore mestre (prefixo `M-`, `A-` ou `S`)."
+# Parâmetro `no_id` de `/questoes` e `/facetas` (5H.3): a mesma cascata do
+# painel do site (`questoes_servico.nos_da_consulta`).
+D_FILTRO_NO_ID = (
+    "Nó da árvore (`/arvore`), em qualquer nível; disciplina e assunto incluem as "
+    "questões dos descendentes. Repita para vários. Vale a cascata disciplina → "
+    "assunto → subassunto, a mesma do site: **no mesmo ramo vale o nó mais "
+    "específico** (disciplina com assunto marcado vale só pelos assuntos marcados, "
+    "e assunto com subassunto, só pelos subassuntos; disciplina sem filho marcado "
+    "vale inteira), e os nós que sobram combinam com OU. Assunto de outra "
+    "disciplina, quando há disciplina marcada, é ignorado (idem subassunto cujo "
+    "assunto ou disciplina não está marcado). Nó sem nada marcado no nível de "
+    "cima vale sozinho, como link direto. Ex.: disciplina A + um assunto de A + "
+    "disciplina B = questões do assunto OU de B."
+)
 _D_NO_NOME = "Nome do nó na árvore mestre."
 _D_NO_NIVEL = "Nível do nó: `materia`, `assunto` ou `subassunto`."
 _D_CAMINHO = "Caminho do nó na árvore, separado por ` > `."
-_D_MATERIA_ID = "Id do nó de matéria ao qual o nó pertence."
+_D_MATERIA_ID = "Id do nó de disciplina ao qual o nó pertence."
 _D_CADERNO = "Código do caderno de prova (ex.: `094_PF_CB1_01`)."
 _D_NUMERO = "Número do item no caderno."
 _D_FIGURAS = "Figuras recortadas do PDF, com caminho e URL para exibir."
@@ -203,7 +217,7 @@ class CargoInfo(BaseModel):
 
 
 class NoInfo(BaseModel):
-    """Nó da árvore mestre (matéria → assunto → subassunto) em que a questão foi classificada (Etapa 5D)."""
+    """Nó da árvore mestre (disciplina → assunto → subassunto) em que a questão foi classificada (Etapa 5D)."""
 
     model_config = ConfigDict(json_schema_extra={"examples": [_EX_NO]})
 
@@ -213,7 +227,7 @@ class NoInfo(BaseModel):
     no_caminho: str = Field(description=_D_CAMINHO)
     materia_id: str | None = Field(None, description=_D_MATERIA_ID)
     assunto_id: str | None = Field(
-        None, description="Id do nó de assunto (vazio quando o nó é matéria)."
+        None, description="Id do nó de assunto (vazio quando o nó é disciplina)."
     )
     papel: str | None = Field(None, description="`principal` ou `secundario`.")
     confianca: str | None = Field(
@@ -222,22 +236,22 @@ class NoInfo(BaseModel):
     rotulo_materia: str | None = Field(
         None,
         description=(
-            "Nome da matéria para exibição (matéria com nome de cargo vira "
+            "Nome da disciplina para exibição (disciplina com nome de cargo vira "
             "“Conhecimentos específicos — <cargo>”)."
         ),
     )
 
 
 class Incidencia(BaseModel):
-    """Posição do subassunto principal no ranking "o que mais cai" da matéria."""
+    """Posição do subassunto principal no ranking "o que mais cai" da disciplina."""
 
     no_id: str = Field(description="Subassunto principal da questão.")
-    materia_id: str | None = Field(None, description="Matéria do subassunto.")
+    materia_id: str | None = Field(None, description="Disciplina do subassunto.")
     posicao: int = Field(
-        description="Posição no ranking da matéria (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
+        description="Posição no ranking da disciplina (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
     )
     total_subassuntos: int = Field(
-        description="Quantos subassuntos da matéria têm questão no ranking."
+        description="Quantos subassuntos da disciplina têm questão no ranking."
     )
     questoes: int = Field(description="Questões válidas distintas no subassunto.")
 
@@ -291,7 +305,7 @@ class QuestaoResumo(BaseModel):
     incidencia: Incidencia | None = Field(
         None,
         description=(
-            "Posição do subassunto principal no ranking da matéria. `null` quando o "
+            "Posição do subassunto principal no ranking da disciplina. `null` quando o "
             "nó principal não é subassunto ou a questão não foi classificada."
         ),
     )
@@ -344,7 +358,7 @@ class NoArvore(BaseModel):
     )
     nome_de_cargo: bool = Field(
         False,
-        description="A matéria é o próprio nome de um cargo (exibir como conhecimentos específicos).",
+        description="A disciplina é o próprio nome de um cargo (exibir como conhecimentos específicos).",
     )
     filhos: list["NoArvore"] = Field([], description="Nós filhos.")
 
@@ -394,7 +408,7 @@ class FacetasResponse(BaseModel):
         description="Tipos de conhecimento (básico/específico)."
     )
     cargos: list[FacetaCargo] = Field(description="Cargos por concurso.")
-    materias: list[FacetaNo] = Field([], description="Matérias da árvore.")
+    materias: list[FacetaNo] = Field([], description="Disciplinas da árvore.")
     assuntos: list[FacetaNo] = Field([], description="Assuntos da árvore.")
     subassuntos: list[FacetaNo] = Field([], description="Subassuntos da árvore.")
     anuladas: list[FacetaValor] = Field(
@@ -497,7 +511,7 @@ class Prioridade(BaseModel):
 
     no_id: str = Field(description="ID do subassunto na árvore mestre.")
     nome: str = Field(description="Nome do subassunto.")
-    caminho: str = Field(description="Matéria › assunto › subassunto.")
+    caminho: str = Field(description="Disciplina › assunto › subassunto.")
     respondidas: int = Field(description="Questões distintas respondidas no nó.")
     acertos: int = Field(
         description="Questões do subassunto com a última resposta certa."
@@ -546,53 +560,53 @@ class LinhaProvaCobra(BaseModel):
     pct_do_universo: float = Field(description="`questoes` / `total_universo` × 100.")
     pct_medio_por_concurso: float = Field(
         description=(
-            "Média entre concursos do % do nó dentro da matéria (subassunto/assunto) "
-            "ou da prova (matéria), com peso igual por concurso."
+            "Média entre concursos do % do nó dentro da disciplina (subassunto/assunto) "
+            "ou da prova (disciplina), com peso igual por concurso."
         )
     )
 
 
-# -- Matérias e busca (5F.7) --
+# -- Disciplinas e busca (5F.7) --
 class MateriaResumo(BaseModel):
-    """Matéria da árvore ativa com o volume de questões objetivas utilizáveis."""
+    """Disciplina da árvore ativa com o volume de questões objetivas utilizáveis."""
 
-    id: str = Field(description="ID estável do nó de nível matéria.")
+    id: str = Field(description="ID estável do nó de nível disciplina (`materia`).")
     nome: str = Field(description="Nome do nó na árvore mestre.")
     total_questoes: int = Field(
         description=(
             "Questões objetivas utilizáveis distintas (anuladas incluídas) "
-            "classificadas na matéria ou abaixo dela (a contagem sobe a árvore)."
+            "classificadas na disciplina ou abaixo dela (a contagem sobe a árvore)."
         )
     )
     pct_incidencia: float = Field(
         description=(
             "`total_questoes` sobre o total de questões utilizáveis distintas, em %. "
-            "A soma entre matérias pode passar de 100 (questão em 2 nós)."
+            "A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
         )
     )
     nome_de_cargo: bool = Field(
         description=(
-            "A matéria é o próprio nome de um cargo (conhecimentos específicos "
-            "sem matéria nomeada no edital)."
+            "A disciplina é o próprio nome de um cargo (conhecimentos específicos "
+            "sem disciplina nomeada no edital)."
         )
     )
 
 
 class MateriaDetalhe(MateriaResumo):
-    """Resumo da matéria com o recorte dos filtros e os subassuntos que mais caem."""
+    """Resumo da disciplina com o recorte dos filtros e os subassuntos que mais caem."""
 
     questoes_recorte: int = Field(
-        description="Questões válidas distintas da matéria sob os filtros (`fn_prova_cobra`)."
+        description="Questões válidas distintas da disciplina sob os filtros (`fn_prova_cobra`)."
     )
-    anuladas_recorte: int = Field(description="Anuladas da matéria sob os filtros.")
+    anuladas_recorte: int = Field(description="Anuladas da disciplina sob os filtros.")
     pct_do_universo: float = Field(
-        description="Participação da matéria no universo de questões válidas sob os filtros, em %."
+        description="Participação da disciplina no universo de questões válidas sob os filtros, em %."
     )
     itens_edital: int = Field(
-        description="Itens de edital distintos na matéria sob os filtros (concursos aprovados)."
+        description="Itens de edital distintos na disciplina sob os filtros (concursos aprovados)."
     )
     top_subassuntos: list[LinhaProvaCobra] = Field(
-        description="Subassuntos que mais caem na matéria sob os filtros, maior primeiro."
+        description="Subassuntos que mais caem na disciplina sob os filtros, maior primeiro."
     )
 
 
@@ -602,8 +616,8 @@ class ResultadoBusca(BaseModel):
     id: str = Field(description="ID estável do nó.")
     nome: str = Field(description="Nome do nó.")
     nivel: str = Field(description="`materia`, `assunto` ou `subassunto`.")
-    caminho: str = Field(description="Caminho matéria → assunto → subassunto.")
-    materia_id: str | None = Field(description="ID da matéria do nó.")
+    caminho: str = Field(description="Caminho disciplina → assunto → subassunto.")
+    materia_id: str | None = Field(description="ID da disciplina do nó.")
 
 
 class LinhaEditalCobra(BaseModel):
@@ -634,12 +648,12 @@ class LinhaEditalVsProva(BaseModel):
 
 
 class PesoMateria(BaseModel):
-    """Peso de uma matéria na prova do cargo (`vw_peso_materia_cargo`)."""
+    """Peso de uma disciplina na prova do cargo (`vw_peso_materia_cargo`)."""
 
-    materia_id: str = Field(description="Id do nó de matéria.")
-    rotulo_materia: str = Field(description="Nome da matéria para exibição.")
-    questoes: int = Field(description="Questões válidas da matéria na prova.")
-    anuladas: int = Field(description="Questões anuladas da matéria.")
+    materia_id: str = Field(description="Id do nó de disciplina.")
+    rotulo_materia: str = Field(description="Nome da disciplina para exibição.")
+    questoes: int = Field(description="Questões válidas da disciplina na prova.")
+    anuladas: int = Field(description="Questões anuladas da disciplina.")
     total_cargo: int = Field(description="Questões válidas da prova do cargo.")
     pct_da_prova: float = Field(description="`questoes` / `total_cargo` × 100.")
 
@@ -652,7 +666,7 @@ class EditalVsProva(BaseModel):
     resumo: dict[str, int] = Field(description="Total de nós por situação.")
     nos: list[LinhaEditalVsProva] = Field(description="Nós com a situação de cada um.")
     peso_materias: list[PesoMateria] = Field(
-        description="Peso de cada matéria na prova."
+        description="Peso de cada disciplina na prova."
     )
 
 
@@ -789,14 +803,14 @@ class PlacarSimulado(BaseModel):
 
 
 class MateriaSimulado(PlacarSimulado):
-    """Placar do simulado numa matéria (pelo nó principal de cada item)."""
+    """Placar do simulado numa disciplina (pelo nó principal de cada item)."""
 
-    materia_id: str = Field(description="Id do nó de matéria.")
-    nome: str = Field(description="Nome da matéria para exibição.")
+    materia_id: str = Field(description="Id do nó de disciplina.")
+    nome: str = Field(description="Nome da disciplina para exibição.")
 
 
 class ResultadoSimulado(BaseModel):
-    """Resultado de um simulado: placar geral, por matéria e por item."""
+    """Resultado de um simulado: placar geral, por disciplina e por item."""
 
     simulado_id: int | None = Field(
         None, description="Preenchido quando o simulado foi gravado (com login)."
@@ -808,7 +822,7 @@ class ResultadoSimulado(BaseModel):
         0, description="Itens ilegíveis fora da prova, da nota e do máximo."
     )
     placar: PlacarSimulado = Field(description="Placar geral.")
-    por_materia: list[MateriaSimulado] = Field(description="Placar por matéria.")
+    por_materia: list[MateriaSimulado] = Field(description="Placar por disciplina.")
     itens: list[ItemCorrigido] = Field(description="Correção item a item.")
     discursivas: list[DiscursivaSimulado] = Field(
         description="Discursivas com o padrão de resposta."
@@ -853,19 +867,21 @@ class ConcursoAlvo(BaseModel):
 
 
 class ItemPlano(BaseModel):
-    """Matéria do plano, com a prioridade de estudo."""
+    """Disciplina do plano, com a prioridade de estudo."""
 
-    materia_id: str = Field(description="ID do nó da matéria na árvore mestre.")
+    materia_id: str = Field(description="ID do nó da disciplina na árvore mestre.")
     rotulo_materia: str = Field(
-        description='Nome da matéria (ou "Conhecimentos específicos — <cargo>").'
+        description='Nome da disciplina (ou "Conhecimentos específicos — <cargo>").'
     )
-    pct_da_prova: float = Field(description="Peso da matéria na prova do cargo (%).")
+    pct_da_prova: float = Field(description="Peso da disciplina na prova do cargo (%).")
     respondidas: int = Field(
-        description="Questões da matéria respondidas pelo usuário (todas as provas)."
+        description="Questões da disciplina respondidas pelo usuário (todas as provas)."
     )
-    acertos: int = Field(description="Questões da matéria com a última resposta certa.")
+    acertos: int = Field(
+        description="Questões da disciplina com a última resposta certa."
+    )
     acerto: float = Field(
-        description="Acerto do usuário na matéria (0 a 1). Sem respostas, 0."
+        description="Acerto do usuário na disciplina (0 a 1). Sem respostas, 0."
     )
     prioridade: float = Field(
         description="`pct_da_prova` × (1 − `acerto`). Maior primeiro."
@@ -873,10 +889,10 @@ class ItemPlano(BaseModel):
 
 
 class PlanoEstudo(BaseModel):
-    """Matérias do cargo ordenadas pela prioridade de estudo."""
+    """Disciplinas do cargo ordenadas pela prioridade de estudo."""
 
     concurso: str = Field(description=_D_CONCURSO)
     cargo_numero: int = Field(description=_D_CARGO_NUMERO)
     itens: list[ItemPlano] = Field(
-        description="Matérias, da maior prioridade para a menor."
+        description="Disciplinas, da maior prioridade para a menor."
     )

@@ -282,8 +282,9 @@ Datasette continua só como ferramenta de revisão do dono.
       `/questoes/facetas` (só OOB); ID curto na palavra-chave abre a questão.
       Chips no "Filtrar por:" do painel (Alpine; `<noscript>` sem JS), fora do
       fragmento da lista. Validada no Chromium headless em 1280 e 390 px
-      (2026-10-06). 805 testes (+1 xfail) na raiz e 176 no `site/`, ruff
-      verde.
+      (2026-10-06). Cascata disciplina → assunto → subassunto (5H.3) igual
+      no site e na API (`no_id`, 2026-10-07). 838 testes (+1 xfail) na raiz
+      e 209 no `site/`, ruff verde.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 

@@ -1,22 +1,24 @@
-"""Matérias e busca na árvore (5F.7)."""
+"""Disciplinas e busca na árvore (5F.7)."""
 
 from fastapi import APIRouter, HTTPException, Path, Query
 
 from app.modelos import FiltroEstatistica, MateriaDetalhe, MateriaResumo, ResultadoBusca
 from app.servicos import estatisticas_servico
 
-router = APIRouter(tags=["Matérias"])
+router = APIRouter(tags=["Disciplinas"])
 
-_RESPOSTA_404 = {404: {"description": "O id não é uma matéria ativa da árvore mestre."}}
+_RESPOSTA_404 = {
+    404: {"description": "O id não é uma disciplina ativa da árvore mestre."}
+}
 _RESPOSTA_422 = {422: {"description": "Parâmetro de consulta inválido."}}
 
 
 @router.get(
     "/materias",
     response_model=list[MateriaResumo],
-    summary="Lista as matérias com o volume de questões",
+    summary="Lista as disciplinas com o volume de questões",
     description=(
-        "Matérias da árvore mestre ativa que têm questão objetiva utilizável, com o "
+        "Disciplinas da árvore mestre ativa que têm questão objetiva utilizável, com o "
         "total de questões distintas (a contagem sobe a árvore, anuladas incluídas) "
         "e o % de incidência sobre o total. Maior volume primeiro."
     ),
@@ -28,16 +30,16 @@ def listar_materias():
 @router.get(
     "/materias/{materia_id}",
     response_model=MateriaDetalhe,
-    summary="Resumo de uma matéria",
+    summary="Resumo de uma disciplina",
     description=(
-        "Resumo da matéria e os subassuntos que mais caem (`fn_prova_cobra`) no "
+        "Resumo da disciplina e os subassuntos que mais caem (`fn_prova_cobra`) no "
         "recorte de concurso, cargo e nível. O cargo só vale junto com o concurso."
     ),
     responses={**_RESPOSTA_404, **_RESPOSTA_422},
 )
 def detalhe_materia(
     materia_id: str = Path(
-        description="ID do nó da matéria na árvore mestre (ex.: `M-0f9a364d06`)."
+        description="ID do nó da disciplina na árvore mestre (ex.: `M-0f9a364d06`)."
     ),
     concurso: str | None = Query(
         None, description="Slug do concurso (ex.: `PF_25_ADM`)."
@@ -55,7 +57,7 @@ def detalhe_materia(
     )
     detalhe = estatisticas_servico.detalhe_materia(materia_id, filtros, limite)
     if detalhe is None:
-        raise HTTPException(status_code=404, detail="Matéria não encontrada")
+        raise HTTPException(status_code=404, detail="Disciplina não encontrada")
     return detalhe
 
 
@@ -64,9 +66,9 @@ def detalhe_materia(
     response_model=list[ResultadoBusca],
     summary="Busca nós da árvore por nome",
     description=(
-        "Nós ativos (matéria, assunto, subassunto) cujo nome contém o termo, sem "
+        "Nós ativos (disciplina, assunto, subassunto) cujo nome contém o termo, sem "
         "acento e sem caixa (`lingua` acha `LÍNGUA PORTUGUESA`). Começo do nome "
-        "primeiro, depois matéria → assunto → subassunto. Máximo de 20."
+        "primeiro, depois disciplina → assunto → subassunto. Máximo de 20."
     ),
     responses=_RESPOSTA_422,
 )

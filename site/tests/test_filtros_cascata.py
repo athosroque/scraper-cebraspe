@@ -1,7 +1,7 @@
 """Cascata Disciplina → Assunto → Subassunto do painel (5H.3): rótulo
 "Disciplina", assunto desabilitado sem disciplina, opções restritas aos pais
 marcados, seleção coerente no servidor (órfão sai, link direto ganha os pais),
-refino por ramo na consulta do site e filtro avançado como padrão."""
+refino por ramo na consulta (site e API iguais) e filtro avançado como padrão."""
 
 import json
 import re
@@ -80,6 +80,25 @@ def test_coerir_nos(arvore_falsa, entrada, esperado):
 )
 def test_refinar_por_ramo(arvore_falsa, entrada, esperado):
     assert arvore_falsa.refinar_por_ramo(entrada) == esperado
+
+
+@pytest.mark.parametrize(
+    ("entrada", "esperado"),
+    [
+        (None, None),
+        (["M1", "A1"], ["A1"]),
+        (["S1"], ["S1"]),
+        (["M1", "A2"], ["M1"]),
+        (["M1", "M2", "A1"], ["M2", "A1"]),
+        # Assunto de disciplina não marcada, diante de outra marcada: órfão.
+        (["A1", "M2"], ["M2"]),
+    ],
+)
+def test_nos_da_consulta(arvore_falsa, entrada, esperado):
+    """Coerência e refino juntos, como a listagem, as facetas e o desempenho
+    usam (site e API)."""
+    assert arvore_falsa.nos_da_consulta(entrada) == esperado
+    assert arvore_falsa.nos_da_consulta(arvore_falsa.coerir_nos(entrada)) == esperado
 
 
 # --- página e recontagem (banco real) -------------------------------------------
@@ -275,22 +294,59 @@ def test_link_direto_ganha_os_pais(cliente, arvore):
 
 
 @com_banco
-def test_refino_por_ramo_na_lista(cliente, arvore):
-    d, a, outra = arvore["disciplina"], arvore["assunto"], arvore["outra"]
+def test_site_e_api_dao_o_mesmo_total(cliente, arvore):
+    """A API segue a mesma cascata do site (decisão do dono, 2026-10-07): a
+    mesma seleção de nós dá o mesmo total nas duas."""
+    d, a, s = arvore["disciplina"], arvore["assunto"], arvore["sub"]
+    outra, a_outra = arvore["outra"], arvore["assunto_outra"]
     so_disciplina = _total_api(cliente, no_id=d)
     so_assunto = _total_api(cliente, no_id=a)
     assert so_assunto < so_disciplina
-    r = cliente.get("/questoes", params={"no_id": [d, a]}, headers=HX)
-    assert _total_html(r.text) == so_assunto
-    # A outra disciplina, sem assunto marcado, vale inteira.
-    r = cliente.get("/questoes", params={"no_id": [d, outra, a]}, headers=HX)
-    assert _total_html(r.text) == _total_api(cliente, no_id=[a, outra])
-    # A API não muda (contrato da 5F.1): nós em OU, a disciplina inteira.
-    assert _total_api(cliente, no_id=[d, a]) == so_disciplina
-    # A faceta de banca (fora da árvore) conta o recorte refinado.
+    casos = [
+        [d],
+        [d, a],
+        [d, a, s],
+        [d, outra, a],
+        [d, a_outra],  # órfão
+        [s],  # link direto
+        [a, outra],  # assunto órfão diante da outra disciplina
+    ]
+    for nos in casos:
+        r = cliente.get("/questoes", params={"no_id": nos}, headers=HX)
+        assert _total_html(r.text) == _total_api(cliente, no_id=nos), nos
+    # No mesmo ramo vale o mais específico; órfão é ignorado.
+    assert _total_api(cliente, no_id=[d, a]) == so_assunto
+    assert _total_api(cliente, no_id=[d, a, s]) == _total_api(cliente, no_id=s)
+    assert _total_api(cliente, no_id=[d, a_outra]) == so_disciplina
+    assert _total_api(cliente, no_id=[a, outra]) == _total_api(cliente, no_id=outra)
+    # A outra disciplina, sem assunto marcado, vale inteira ao lado do assunto.
+    ambos = _total_api(cliente, no_id=[d, outra, a])
+    assert max(so_assunto, _total_api(cliente, no_id=outra)) < ambos
+    # As facetas fora da árvore contam o recorte refinado, no site e na API, e
+    # a disciplina marcada continua entre as opções.
     r = cliente.get("/questoes/facetas", params={"no_id": [d, a]}, headers=HX)
     banca = _json(r.text, "dados-facetas")["banca"]
     assert sum(b["total"] for b in banca) == so_assunto
+    api = cliente.get("/api/v1/facetas", params={"no_id": [d, a]}).json()
+    assert sum(b["total"] for b in api["bancas"]) == so_assunto
+    assert d in {m["valor"] for m in api["materias"]}
+
+
+LP = "M-0f9a364d06"
+LP_MORFOSSINTAXE = "A-351189f1a6"  # Domínio da estrutura morfossintática do período
+DIREITO_ADMINISTRATIVO = "M-6f50f4f1dd"
+
+
+@com_banco
+def test_exemplo_do_dono_igual_no_site_e_na_api(cliente):
+    """LP + "Domínio da estrutura morfossintática do período" + Direito
+    Administrativo = 205 (63 do assunto + 142 da disciplina), nos dois."""
+    nos = [LP, LP_MORFOSSINTAXE, DIREITO_ADMINISTRATIVO]
+    r = cliente.get("/questoes", params={"no_id": nos})
+    assert _total_html(r.text) == 205
+    assert _total_api(cliente, no_id=nos) == 205
+    assert _total_api(cliente, no_id=LP_MORFOSSINTAXE) == 63
+    assert _total_api(cliente, no_id=DIREITO_ADMINISTRATIVO) == 142
 
 
 @com_banco
