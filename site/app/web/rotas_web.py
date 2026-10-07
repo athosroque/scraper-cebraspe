@@ -1,8 +1,8 @@
 """Rotas HTML do site (5F.2). Reusam a camada `servicos`, como a API v1."""
 
-import hashlib
 import logging
 import pathlib
+import re
 from typing import Annotated, Literal
 from urllib.parse import urlencode
 
@@ -14,6 +14,14 @@ from app.servicos import (
     estatisticas_servico,
     questoes_servico,
     simulados_servico,
+)
+from app.servicos.formatacao import (
+    ROTULO_NIVEL,
+    hash_chave,
+    rotulo_concurso,
+    rotulo_materia,
+    rotulo_nivel,
+    rotulo_tipo_conhecimento,
 )
 from authlib.integrations.base_client import OAuthError
 from fastapi import APIRouter, Depends, Form, Query, Request
@@ -32,7 +40,7 @@ templates = Jinja2Templates(
 def dom_id(chave: str) -> str:
     # A chave estável tem `|`, que em seletor CSS separa namespace: o
     # `hx-target="#..."` quebraria no querySelector do HTMX.
-    return "q-" + hashlib.sha1(chave.encode()).hexdigest()[:12]
+    return "q-" + hash_chave(chave)[:12]
 
 
 def filtro_num(valor: float | None) -> str:
@@ -46,14 +54,6 @@ def filtro_pct(valor: float | None) -> str:
         return ""
     return f"{valor:.2f}%".replace(".", ",")
 
-
-from app.servicos.formatacao import (
-    ROTULO_NIVEL,
-    rotulo_concurso,
-    rotulo_materia,
-    rotulo_nivel,
-    rotulo_tipo_conhecimento,
-)
 
 templates.env.filters["num"] = filtro_num
 templates.env.filters["pct"] = filtro_pct
@@ -75,6 +75,41 @@ def _url_questao(chave: str) -> str:
 
 
 templates.env.globals["url_questao"] = _url_questao
+
+
+def _nos_do_card(nos) -> list[dict]:
+    """Nós da questão para a barra do card: principal primeiro, cada um com o
+    caminho em partes (nome + id do nó daquele nível, quando conhecido)."""
+    saida = []
+    for no in sorted(nos or [], key=lambda n: n.papel != "principal"):
+        # O caminho vem montado da árvore; o separador varia entre " > " e " › ".
+        partes = [p.strip() for p in re.split(r" [>›] ", no.no_caminho or "")]
+        partes = [p for p in partes if p] or [no.no_nome]
+        ids = {
+            "subassunto": [no.materia_id, no.assunto_id, no.no_id],
+            "assunto": [no.materia_id, no.no_id],
+        }.get(no.no_nivel, [no.no_id])
+        if len(ids) == len(partes):
+            # A 1ª parte é a matéria: matéria com nome de cargo ganha o rótulo.
+            partes[0] = no.rotulo_materia or partes[0]
+        else:
+            # Caminho fora do padrão: só a última parte tem id garantido.
+            ids = [None] * (len(partes) - 1) + [no.no_id]
+        itens = [{"nome": n, "no_id": i} for n, i in zip(partes, ids)]
+        if saida:
+            # Secundário: só o trecho que difere do principal (", Concordância"
+            # em vez de repetir "LÍNGUA PORTUGUESA ▸ ..."); a última parte fica.
+            comum = 0
+            for a, b in zip(saida[0]["partes"], itens[:-1]):
+                if a["nome"] != b["nome"]:
+                    break
+                comum += 1
+            itens = itens[comum:]
+        saida.append({"no_id": no.no_id, "materia_id": no.materia_id, "partes": itens})
+    return saida
+
+
+templates.env.globals["nos_do_card"] = _nos_do_card
 
 
 def _url_lista(no_id: str, filtros: FiltroEstatistica) -> str:
@@ -113,9 +148,7 @@ def inicio(request: Request):
     )
 
 
-@router.get("/questoes", response_class=HTMLResponse)
-def index(
-    request: Request,
+def _filtros_da_query(
     usuario_id: int | None = Depends(auth.usuario_id_atual),
     # Tudo como lista de texto: o modelo descarta vazio e valor inválido
     # (`ano=` ou `cargo_numero=` como int dariam 422).
@@ -128,15 +161,21 @@ def index(
     nivel: Annotated[list[str] | None, Query()] = None,
     tipo_conhecimento: Annotated[list[str] | None, Query()] = None,
     no_id: Annotated[list[str] | None, Query()] = None,
+    texto: str | None = None,
+    com: Annotated[list[str] | None, Query()] = None,
     anuladas: str = "incluir",
-    fora_do_edital: Literal["todos", "sim", "nao"] = "todos",
-    utilizaveis: Literal["so", "todas"] = "so",
+    fora_do_edital: str = "todos",
+    utilizaveis: str = "so",
     historico: str = "todas",
-    pagina: int = 1,
-    tamanho_pagina: int = 20,
-):
+) -> FiltroQuestoes:
+    """Filtros da lista a partir da query string (rota `/questoes` e a
+    recontagem `/questoes/facetas`). Valor estranho vira o padrão, sem 422."""
     if anuladas not in ("incluir", "excluir", "so"):
         anuladas = "incluir"
+    if fora_do_edital not in ("todos", "sim", "nao"):
+        fora_do_edital = "todos"
+    if utilizaveis not in ("so", "todas"):
+        utilizaveis = "so"
     if historico not in ("todas", "resolvidas", "nao_resolvidas", "certas", "erradas"):
         historico = "todas"
     # Link antigo (`concurso=X&cargo_numero=N`, ex.: da estatística) vira o
@@ -146,7 +185,7 @@ def index(
     if len(concursos) == 1 and numeros:
         cargo = [*(cargo or []), *(f"{concursos[0]}:{n.strip()}" for n in numeros)]
         cargo_numero = []
-    filtros = FiltroQuestoes(
+    return FiltroQuestoes(
         banca=banca,
         orgao=orgao,
         ano=ano,
@@ -156,12 +195,42 @@ def index(
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
         no_id=no_id,
+        texto=texto,
+        com=com,
         anuladas=anuladas,
         fora_do_edital=fora_do_edital,
         utilizaveis=utilizaveis,
         # Sem login o filtro de histórico não aparece; link antigo vale "todas".
         historico=historico if usuario_id else "todas",
     )
+
+
+def _eh_fragmento(request: Request) -> bool:
+    # A restauração de histórico do HTMX também manda HX-Request, mas espera a
+    # página inteira.
+    return bool(
+        request.headers.get("HX-Request")
+        and not request.headers.get("HX-History-Restore-Request")
+    )
+
+
+@router.get("/questoes", response_class=HTMLResponse)
+def index(
+    request: Request,
+    filtros: Annotated[FiltroQuestoes, Depends(_filtros_da_query)],
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+    pagina: int = 1,
+    tamanho_pagina: int = 20,
+):
+    parcial = _eh_fragmento(request)
+    # Palavra-chave que é um ID curto existente abre a própria questão (5H.4).
+    chave = questoes_servico.chave_do_termo(filtros.texto)
+    if chave:
+        if parcial:
+            # Submit do form pelo HTMX: ele segue o header e troca a página.
+            return HTMLResponse("", headers={"HX-Redirect": _url_questao(chave)})
+        return RedirectResponse(_url_questao(chave), status_code=303)
+
     pagina = max(pagina, 1)
     tamanho_pagina = min(max(tamanho_pagina, 1), 50)
     pagina_questoes = questoes_servico.listar_questoes(
@@ -175,25 +244,87 @@ def index(
         params.append(("pagina", str(max(pagina_questoes.total_paginas, 1))))
         return RedirectResponse(f"/questoes?{urlencode(params)}", status_code=307)
 
-    # A restauração de histórico do HTMX também manda HX-Request, mas espera a
-    # página inteira.
-    parcial = request.headers.get("HX-Request") and not request.headers.get(
-        "HX-History-Restore-Request"
-    )
     # Facetas sempre: o fragmento leva as contagens novas (OOB) para o painel.
     facetas = questoes_servico.obter_facetas(filtros, usuario_id)
+    # Paginação com os filtros aplicados (a URL), não com o form: ele pode ter
+    # mudanças pendentes, que só valem no botão Filtrar.
+    query_aplicada = [
+        (k, v) for k, v in request.query_params.multi_items() if k != "pagina"
+    ]
     contexto = {
         "pagina_questoes": pagina_questoes,
         "filtros": filtros,
         "facetas": facetas,
         "chips": _chips(filtros, facetas),
+        "extras": _filtros_extras(filtros),
         "dados_facetas": _dados_facetas(facetas),
-        "parcial": bool(parcial),
+        "materia_unica": _materia_unica(filtros, facetas),
+        "query_aplicada": query_aplicada,
+        "logado": usuario_id is not None,
+        "parcial": parcial,
     }
     nome = "_lista_parcial.html" if parcial else "lista_questoes.html"
     resposta = templates.TemplateResponse(request=request, name=nome, context=contexto)
     resposta.headers["Vary"] = "HX-Request"
     return resposta
+
+
+@router.get("/questoes/facetas", response_class=HTMLResponse)
+def recontar_facetas(
+    request: Request,
+    filtros: Annotated[FiltroQuestoes, Depends(_filtros_da_query)],
+    usuario_id: int | None = Depends(auth.usuario_id_atual),
+):
+    """Só as contagens das facetas para o form ainda não aplicado (ao fechar
+    um dropdown). O painel relê o `#dados-facetas` trocado por OOB."""
+    facetas = questoes_servico.obter_facetas(filtros, usuario_id)
+    return templates.TemplateResponse(
+        request=request,
+        name="_dados_facetas.html",
+        context={"dados_facetas": _dados_facetas(facetas), "oob": True},
+    )
+
+
+def _url_pagina(query: list[tuple[str, str]], pagina: int) -> str:
+    return "/questoes?" + urlencode([*query, ("pagina", str(pagina))])
+
+
+templates.env.globals["url_pagina"] = _url_pagina
+
+
+def _materia_unica(filtros: FiltroQuestoes, facetas) -> str | None:
+    """Nome da matéria quando exatamente uma está marcada ("Sobre ...")."""
+    marcados = set(filtros.no_id or [])
+    nomes = [m.rotulo for m in facetas.materias if m.valor in marcados]
+    if len(nomes) != 1:
+        return None
+    # Nome todo em maiúsculas ("LÍNGUA PORTUGUESA") vira minúsculas, como no
+    # Gran; nome já com caixa mista fica como está (siglas).
+    return nomes[0].lower() if nomes[0].isupper() else nomes[0]
+
+
+# Filtros aceitos na URL sem controle no painel (link antigo, estatística,
+# opções que saíram da UI na 5H.3): seguem no form como hidden e viram chip.
+_ROTULO_EXTRA = {
+    ("anuladas", "so"): "Só anuladas",
+    ("fora_do_edital", "sim"): "Só fora do edital",
+    ("utilizaveis", "todas"): "Itens: todos (inclui ilegíveis)",
+    ("historico", "resolvidas"): "Histórico: só resolvidas",
+    ("historico", "certas"): "Histórico: acertei",
+}
+
+
+def _filtros_extras(filtros: FiltroQuestoes) -> list[dict]:
+    extras = [
+        {"nome": "cargo_numero", "valor": str(n), "rotulo": f"Cargo nº: {n}"}
+        for n in filtros.cargo_numero or []
+    ]
+    for campo in ("anuladas", "fora_do_edital", "utilizaveis", "historico"):
+        valor = getattr(filtros, campo)
+        rotulo = _ROTULO_EXTRA.get((campo, valor))
+        if rotulo:
+            extras.append({"nome": campo, "valor": valor, "rotulo": rotulo})
+    return extras
 
 
 def _dados_facetas(facetas) -> dict[str, list[dict]]:
@@ -245,13 +376,15 @@ def _dados_facetas(facetas) -> dict[str, list[dict]]:
     }
 
 
-_ROTULO_ANULADAS = {"excluir": "Sem anuladas", "so": "Só anuladas"}
+# Mesmos rótulos dos chips do painel (Alpine) e dos extras.
+_ROTULO_ANULADAS = {"excluir": "Excluir: anuladas", "so": "Só anuladas"}
 _ROTULO_HISTORICO = {
-    "resolvidas": "Já resolvidas",
-    "nao_resolvidas": "Não resolvidas",
-    "certas": "Acertei",
-    "erradas": "Errei",
+    "resolvidas": "Histórico: só resolvidas",
+    "nao_resolvidas": "Excluir: já resolvidas",
+    "certas": "Histórico: acertei",
+    "erradas": "Com: que errei",
 }
+_ROTULO_COM = {"texto_base": "Com: texto associado", "figuras": "Com: figuras"}
 
 
 def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
@@ -285,8 +418,7 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
         "cargo_numero": "Cargo nº",
         "nivel": "Nível",
         "tipo_conhecimento": "Conhecimento",
-        "fora_do_edital": "Fora do edital",
-        "utilizaveis": "Itens",
+        "texto": "Palavra-chave",
     }
 
     chips = []
@@ -304,6 +436,12 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
             texto = _ROTULO_ANULADAS.get(valor, valor)
         elif campo == "historico":
             texto = _ROTULO_HISTORICO.get(valor, valor)
+        elif campo == "com":
+            texto = _ROTULO_COM.get(valor, valor)
+        elif campo == "fora_do_edital":
+            texto = {"nao": "Excluir: fora do edital"}.get(valor, "Só fora do edital")
+        elif campo == "utilizaveis":
+            texto = _ROTULO_EXTRA[("utilizaveis", "todas")]
         elif campo in ("concurso", "cargo", "no_id"):
             texto = rotulos.get((campo, valor), valor)
         else:
@@ -323,9 +461,20 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
 def corrigir_questao(
     request: Request,
     chave: str = Form(...),
-    resposta: Literal["C", "E"] = Form(...),
+    resposta: str | None = Form(None),
     usuario_id: int | None = Depends(auth.usuario_id_atual),
 ):
+    if resposta not in ("C", "E"):
+        # Sem marcação (ou valor estranho): o HTMX troca o form por ele mesmo
+        # com o aviso, em vez de um 422 que ele não mostraria.
+        return templates.TemplateResponse(
+            request=request,
+            name="_form_resposta.html",
+            context={
+                "chave": chave,
+                "aviso": "Marque Certo ou Errado antes de responder.",
+            },
+        )
     resultado = contas_servico.responder(chave, resposta, usuario_id)
     if not resultado:
         return _nao_encontrada(
@@ -338,6 +487,19 @@ def corrigir_questao(
         name="_correcao.html",
         context={"resultado": resultado, "logado": usuario_id is not None},
     )
+
+
+@router.get("/q/{codigo}", response_class=HTMLResponse)
+def questao_por_codigo(request: Request, codigo: str):
+    """Atalho do ID curto (`Q` + 8 hex) para a URL canônica da questão."""
+    chave = questoes_servico.chave_por_codigo(codigo)
+    if not chave:
+        return _nao_encontrada(
+            request,
+            titulo="Questão não encontrada",
+            mensagem="O código pode estar errado ou a questão foi removida.",
+        )
+    return RedirectResponse(_url_questao(chave), status_code=301)
 
 
 @router.get("/q/{concurso}/{caderno}/{numero}/anexos", response_class=HTMLResponse)

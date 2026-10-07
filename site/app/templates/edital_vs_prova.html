@@ -42,7 +42,7 @@
 {% call c.card("self-start") %}
 <h2 class="mb-2 text-lg font-semibold text-slate-900">Plano de estudo</h2>
 {% if not logado %}
-<p class="text-sm text-slate-600">{% if login_habilitado() %}<a class="font-medium text-blue-700 hover:underline" href="/entrar?voltar=/estatisticas/edital-vs-prova">Entre</a> para{% else %}Com login, dá para{% endif %} salvar este concurso como alvo e ver um plano de estudo pelas suas respostas.</p>
+<p class="text-sm text-slate-600">{% if login_habilitado() %}<a class="font-medium text-destaque-700 hover:underline" href="/entrar?voltar=/estatisticas/edital-vs-prova">Entre</a> para{% else %}Com login, dá para{% endif %} salvar este concurso como alvo e ver um plano de estudo pelas suas respostas.</p>
 {% else %}
 {% set e_alvo = alvo and alvo.concurso == filtros.concurso and alvo.cargo_numero == filtros.cargo_numero %}
 {% if e_alvo %}
@@ -59,7 +59,7 @@
 <p class="mb-2 text-xs text-slate-500">Prioridade = peso da matéria na prova × (1 − seu acerto na matéria). Sem respostas, o acerto conta como 0.</p>
 <ol class="space-y-1 text-sm">
 {% for i in plano.itens[:10] %}
-<li class="flex justify-between gap-3"><a class="text-slate-900 hover:text-blue-700" href="{{ url_lista(i.materia_id, filtros) }}">{{ loop.index }}. {{ i.rotulo_materia }}</a><span class="whitespace-nowrap text-slate-500">{{ i.pct_da_prova|pct }} · {% if i.respondidas %}{{ (100 * i.acerto)|pct }} de acerto{% else %}sem respostas{% endif %}</span></li>
+<li class="flex justify-between gap-3"><a class="text-slate-900 hover:text-destaque-700" href="{{ url_lista(i.materia_id, filtros) }}">{{ loop.index }}. {{ i.rotulo_materia }}</a><span class="whitespace-nowrap text-slate-500">{{ i.pct_da_prova|pct }} · {% if i.respondidas %}{{ (100 * i.acerto)|pct }} de acerto{% else %}sem respostas{% endif %}</span></li>
 {% endfor %}
 </ol>
 {% endif %}

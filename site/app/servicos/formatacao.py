@@ -1,3 +1,5 @@
+import hashlib
+
 ROTULO_NIVEL = {"superior": "Superior", "medio": "Médio"}
 
 ROTULO_TIPO_CONHECIMENTO = {"basico": "Básico", "especifico": "Específico"}
@@ -29,3 +31,13 @@ def rotulo_tipo_conhecimento(valor: str) -> str:
 def rotulo_materia(nome: str, nome_de_cargo: bool = False) -> str:
     """Matéria que é o nome de um cargo vira "Conhecimentos específicos — <cargo>"."""
     return f"Conhecimentos específicos — {nome}" if nome_de_cargo else nome
+
+
+def hash_chave(chave: str) -> str:
+    """SHA-1 (hex) da chave estável `concurso|caderno|numero`."""
+    return hashlib.sha1(chave.encode()).hexdigest()
+
+
+def codigo_curto(chave: str) -> str:
+    """ID curto estável da questão (`Q` + 8 hex maiúsculos do SHA-1 da chave)."""
+    return "Q" + hash_chave(chave)[:8].upper()

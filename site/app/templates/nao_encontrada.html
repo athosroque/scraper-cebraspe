@@ -2,7 +2,7 @@
 {% block title %}{{ titulo|default("Página não encontrada") }} - Questões CEBRASPE{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-lg py-12 text-center">
-    <p class="text-sm font-semibold text-blue-700">Erro {{ codigo|default(404) }}</p>
+    <p class="text-sm font-semibold text-destaque-700">Erro {{ codigo|default(404) }}</p>
     <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">{{ titulo|default("Página não encontrada") }}</h1>
     <p class="mt-2 text-sm text-slate-600">{{ mensagem|default("O endereço pode estar errado ou a página foi removida.") }}</p>
     <div class="mt-6 flex flex-wrap justify-center gap-3">

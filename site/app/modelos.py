@@ -9,6 +9,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.servicos.formatacao import codigo_curto
+
 _CHAVE = "Chave estável `concurso|caderno|numero` da questão (mesma da 5D)."
 _EX_CHAVE = "PF_25_ADM|094_PF_CB1_01|1"
 _EX_ENUNCIADO = (
@@ -48,6 +50,7 @@ _EX_NO = {
 _EX_QUESTAO = {
     "questao_id": 63231,
     "questao_chave": _EX_CHAVE,
+    "codigo": codigo_curto(_EX_CHAVE),
     "numero": 1,
     "codigo_caderno": "094_PF_CB1_01",
     "concurso": "PF_25_ADM",
@@ -94,6 +97,9 @@ _CAMPOS_LISTA = (
 )
 _CAMPOS_INTEIROS = {"ano", "cargo_numero"}
 _PADRAO_CARGO = re.compile(r"^[A-Za-z0-9_]+:\d+$")
+# 5H.4: `com` aceita só estes valores (o resto é descartado).
+VALORES_COM = ("texto_base", "figuras")
+TAMANHO_MAX_TEXTO = 100
 
 
 class FiltroQuestoes(BaseModel):
@@ -115,6 +121,41 @@ class FiltroQuestoes(BaseModel):
     nivel: list[str] | None = Field(None, description=_D_NIVEL)
     tipo_conhecimento: list[str] | None = Field(None, description=_D_TIPO)
     no_id: list[str] | None = Field(None, description=_D_NO_ID)
+    # 5H.4
+    texto: str | None = Field(
+        None,
+        description=(
+            "Palavra-chave no enunciado ou no comando da seção, sem diferenciar "
+            "maiúsculas nem acentos; cada palavra precisa aparecer. ID curto "
+            "(`Q` + 8 hex) filtra só aquela questão."
+        ),
+    )
+    com: list[Literal["texto_base", "figuras"]] | None = Field(
+        None,
+        description="Só questões com `texto_base` e/ou `figuras` (vários = E).",
+    )
+
+    @field_validator("texto", mode="before")
+    @classmethod
+    def _texto_aparado(cls, valor):
+        if valor is None:
+            return None
+        valor = " ".join(str(valor).split())[:TAMANHO_MAX_TEXTO].strip()
+        return valor or None
+
+    @field_validator("com", mode="before")
+    @classmethod
+    def _com_conhecidos(cls, valor):
+        if valor is None:
+            return None
+        if isinstance(valor, str):
+            valor = [valor]
+        limpos = []
+        for v in valor:
+            v = str(v).strip() if v is not None else ""
+            if v in VALORES_COM and v not in limpos:
+                limpos.append(v)
+        return limpos or None
 
     @field_validator(*_CAMPOS_LISTA, mode="before")
     @classmethod
@@ -219,6 +260,13 @@ class QuestaoResumo(BaseModel):
     questao_chave: str = Field(
         description="Chave estável `concurso|caderno|numero` (mesma da 5D). Use no detalhe e para guardar respostas.",
         examples=[_EX_CHAVE],
+    )
+    codigo: str = Field(
+        description=(
+            "ID curto estável: `Q` + 8 hex maiúsculos do SHA-1 de `questao_chave`. "
+            "A página `/q/<codigo>` redireciona para a questão."
+        ),
+        examples=[codigo_curto(_EX_CHAVE)],
     )
     numero: int = Field(description=_D_NUMERO)
     codigo_caderno: str = Field(description=_D_CADERNO)

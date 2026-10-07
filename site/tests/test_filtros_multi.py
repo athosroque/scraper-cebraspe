@@ -72,8 +72,15 @@ def test_combinacao_2_anos_2_cargos_3_assuntos(cliente):
     assert r.status_code == 200
     total_fmt = f"{dados['total']:,}".replace(",", ".")
     assert f">{total_fmt}</strong> questões encontradas" in r.text
-    # Um chip por valor marcado (2024 não tem questão, mas segue marcado).
-    assert r.text.count('aria-label="Remover filtro') == 2 + 2 + 3
+    # Um chip por valor marcado (2024 não tem questão, mas segue marcado). Desde
+    # a 5H.3 os chips do servidor ficam no <noscript> da página inteira.
+    pagina = cliente.get("/questoes", params=params)
+    noscript = pagina.text.split("<noscript>")
+    chips = sum(
+        t.split("</noscript>")[0].count('aria-label="Remover filtro')
+        for t in noscript[1:]
+    )
+    assert chips == 2 + 2 + 3
 
 
 def test_servico_lista_com_listas(cliente):

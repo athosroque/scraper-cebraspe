@@ -26,13 +26,62 @@ _COLUNAS = {
 }
 
 
+def _escapar_like(termo: str) -> str:
+    """Termo literal no `ILIKE`: `%`, `_` e `\\` não viram curinga."""
+    return termo.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+# `com` (5H.4) → coluna booleana de `vw_questoes`.
+_COLUNAS_COM = {"texto_base": "tem_texto_base", "figuras": "tem_figuras"}
+
+
+def condicoes_conteudo(filtros_dict: dict, params: dict) -> list[str]:
+    """Filtros sobre o conteúdo da questão (5H.4): palavra-chave, `com` e o
+    atalho do ID curto (`chave_codigo`, resolvido pelo serviço).
+
+    Palavra-chave: cada palavra precisa aparecer (E, em qualquer ordem) no
+    enunciado ou no comando da seção, sem diferenciar maiúsculas nem acentos
+    (`unaccent` + `ILIKE`). O termo vai sempre por parâmetro.
+    """
+    condicoes = []
+    if filtros_dict.get("chave_codigo") is not None:
+        condicoes.append("questao_chave = %(chave_codigo)s")
+        params["chave_codigo"] = filtros_dict["chave_codigo"]
+
+    texto = (filtros_dict.get("texto") or "").strip()
+    casamentos = []
+    for i, palavra in enumerate(texto.split()):
+        nome = f"texto_{i}"
+        casamentos.append(
+            f"unaccent(concat_ws(' ', enunciado, secao)) ILIKE unaccent(%({nome})s)"
+        )
+        params[nome] = f"%{_escapar_like(palavra)}%"
+    if casamentos:
+        # Subconsulta à parte com `OFFSET 0`: sem ela o planejador empurra o
+        # ILIKE para dentro da view, estima 1 linha e escolhe laços aninhados
+        # (~5 s em vez de ~0,3 s). A role do site só lê as views.
+        condicoes.append(
+            "questao_id IN (SELECT questao_id FROM ("
+            "SELECT DISTINCT questao_id, enunciado, secao FROM vw_questoes OFFSET 0"
+            f") t WHERE {' AND '.join(casamentos)})"
+        )
+
+    for valor in _lista(filtros_dict.get("com")):
+        if valor in _COLUNAS_COM:
+            condicoes.append(_COLUNAS_COM[valor])
+    return condicoes
+
+
 def montar_where(filtros_dict: dict, params: dict, ignorar: tuple = ()) -> str:
     """WHERE sobre `vw_questoes` a partir dos filtros; preenche `params`.
 
     `ignorar`: filtros deixados de fora (a faceta conta os valores dela
-    considerando só os outros filtros).
+    considerando só os outros filtros). `"conteudo"` deixa de fora os filtros
+    de `condicoes_conteudo` (as facetas os calculam uma vez só, na base).
     """
     condicoes = ["1 = 1"]
+    if "conteudo" not in ignorar:
+        condicoes += condicoes_conteudo(filtros_dict, params)
 
     for chave, coluna in _COLUNAS.items():
         valores = _lista(filtros_dict.get(chave))
@@ -219,6 +268,16 @@ def obter_questao_por_chave(chave: str) -> dict | None:
         return row
 
 
+def todas_as_chaves() -> list[str]:
+    """Chaves de todas as questões, inclusive as não utilizáveis (o detalhe as abre)."""
+    with (
+        get_conexao_leitura() as conn,
+        conn.cursor(cursor_factory=RealDictCursor) as cur,
+    ):
+        cur.execute("SELECT DISTINCT questao_chave FROM vw_questoes")
+        return [r["questao_chave"] for r in cur.fetchall()]
+
+
 @cache_ttl(300)
 def obter_arvore_com_contagens() -> list[dict]:
     with (
@@ -269,9 +328,13 @@ def obter_facetas(filtros_dict: dict | None = None) -> dict:
     """
     filtros_dict = filtros_dict or {}
     params: dict = {}
+    # Palavra-chave e `com` valem para toda faceta: calculados uma vez por
+    # linha na base (o `unaccent` não se repete em cada FILTER).
+    conteudo = " AND ".join(condicoes_conteudo(filtros_dict, params)) or "true"
 
     def onde(*ignorar) -> str:
-        return montar_where(filtros_dict, params, ignorar)
+        where = montar_where(filtros_dict, params, (*ignorar, "conteudo"))
+        return f"{where} AND casa_conteudo"
 
     partes = []
     for faceta, coluna in [
@@ -312,7 +375,8 @@ def obter_facetas(filtros_dict: dict | None = None) -> dict:
             FROM base GROUP BY anulada""")
 
     query = (
-        f"WITH base AS MATERIALIZED (SELECT {_COLUNAS_FACETA} FROM vw_questoes) "
+        "WITH base AS MATERIALIZED ("
+        f"SELECT {_COLUNAS_FACETA}, ({conteudo}) AS casa_conteudo FROM vw_questoes) "
         + " UNION ALL ".join(partes)
     )
     with (

@@ -906,6 +906,37 @@ enviar o bloco de uma etapa específica para o agente construir.
 ---
 
 
+## Etapa 5H: Card da questão e filtros no formato Gran (cor teal)
+> **Por que existe (2026-10-06):** o dono pediu o card e os filtros do site no
+> formato do Gran Questões, com teal no lugar do laranja. Plano completo em
+> `plano-etapa-5h.md`. **Cada subetapa é uma sessão.**
+
+- `[x]` **5H.1 — Cor e ID curto:** token `destaque` (teal) em
+  `tailwind.config.js`, todos os `*-blue-*` trocados, CSS refeito. Campo
+  `codigo` (`Q` + 8 hex do SHA-1 da chave) em `QuestaoResumo`, rota
+  `/q/{codigo}` → 301 para a canônica, teste de colisão nas 2.800 chaves,
+  `openapi.json` reexportado.
+- `[x]` **5H.2 — Card novo:** barra cinza (posição · ID · matéria ▸ assunto),
+  linha Ano/Banca/Órgão/Prova com links de filtro, "Texto associado ⊕",
+  radios Certo/Errado + Responder (macro `form_resposta`), barra de ações
+  (estatísticas, parecidas, PDF, notificar erro) e "Fonte: CEBRASPE".
+- `[x]` **5H.3 — Filtros no topo:** dropdowns com busca rápida, aplicação só no
+  botão Filtrar, recontagem ao fechar (`/questoes/facetas`), barra
+  "Filtrar por:", simples/avançado, linhas "Excluir questões" e "Questões com".
+- `[x]` **5H.4 — Filtros novos no backend:** `texto` (palavra-chave com
+  `unaccent`) e `com` (texto associado, figuras) na API e nas facetas; termo
+  igual a um ID curto leva à questão.
+- `[x]` **5H.5 — Validação e documentação:** Chromium headless (1280 e 390 px),
+  `guia-teste-navegador.md`, ADR-035, `CLAUDE.md`.
+- **Pronto quando:** o card da lista, do detalhe e da revisão do simulado segue
+  o layout em teal; toda questão tem ID curto único e `/q/<ID>` abre a
+  questão; filtrar por 2 matérias + 1 órgão + "excluir anuladas" +
+  palavra-chave só busca ao clicar Filtrar e dá o mesmo total que o SQL;
+  nenhum `blue-` sobra nos templates; ruff e pytest verdes.
+
+---
+
+
 ## Etapa 6: Teste Piloto e Validação
 > **Depende das Etapas 5B.1–5E** (árvore, classificação e estatísticas; a 5A foi concluída em 2026-09-23). O site (5F) pode seguir em paralelo depois da 5E.
 

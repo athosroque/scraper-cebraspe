@@ -1,12 +1,12 @@
 {% import "_componentes.html" as c %}
 {% call c.cabecalho("Meu concurso", "Escolha concurso e cargo para ver o peso das matérias, o que o edital cobra e o que a prova cobrou.") %}
 {% if alvo is defined and alvo %}
-<p class="mt-2 text-sm text-slate-600">Seu concurso-alvo: <a class="font-medium text-blue-700 hover:underline" href="/estatisticas/edital-vs-prova?concurso={{ alvo.concurso|urlencode }}&amp;cargo_numero={{ alvo.cargo_numero }}">{{ alvo.concurso }} · cargo {{ alvo.cargo_numero }}</a></p>
+<p class="mt-2 text-sm text-slate-600">Seu concurso-alvo: <a class="font-medium text-destaque-700 hover:underline" href="/estatisticas/edital-vs-prova?concurso={{ alvo.concurso|urlencode }}&amp;cargo_numero={{ alvo.cargo_numero }}">{{ alvo.concurso }} · cargo {{ alvo.cargo_numero }}</a></p>
 {% endif %}
 {% endcall %}
 <nav aria-label="Estatísticas" class="mb-6 flex gap-1 overflow-x-auto border-b border-slate-200 text-sm">
     {% for chave, href, rotulo in [("prova", "/estatisticas", "O que mais cai"), ("edital", "/estatisticas/edital", "O que o edital cobra"), ("edital_vs_prova", "/estatisticas/edital-vs-prova", "Edital × prova")] %}
     <a href="{{ href }}" {% if aba == chave %}aria-current="page"{% endif %}
-       class="-mb-px whitespace-nowrap border-b-2 px-3 py-2 font-medium {{ 'border-blue-700 text-blue-700' if aba == chave else 'border-transparent text-slate-600 hover:text-slate-900' }}">{{ rotulo }}</a>
+       class="-mb-px whitespace-nowrap border-b-2 px-3 py-2 font-medium {{ 'border-destaque-700 text-destaque-700' if aba == chave else 'border-transparent text-slate-600 hover:text-slate-900' }}">{{ rotulo }}</a>
     {% endfor %}
 </nav>

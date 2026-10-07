@@ -1,162 +1,421 @@
 {% extends "base.html" %}
 {% import "_componentes.html" as c %}
 
-{% block title %}Resolver questões — Questões CEBRASPE{% endblock %}
+{% block title %}Questões de Concurso — Questões CEBRASPE{% endblock %}
 
 {% block content %}
-{{ c.cabecalho("Resolver questões", "Marque órgão, ano, cargo, matéria, assunto e subassunto (vários de cada) e corrija item a item, no padrão certo/errado do CEBRASPE.") }}
+{# Facetas do painel (5H.3): (chave no JSON das facetas, name no form, título).
+   A linha simples fica sempre visível; a avançada some no filtro simples. #}
+{% set facetas_simples = [
+    ("materia", "no_id", "Matéria"),
+    ("assunto", "no_id", "Assunto"),
+    ("subassunto", "no_id", "Subassunto"),
+    ("banca", "banca", "Banca"),
+    ("orgao", "orgao", "Órgão"),
+] %}
+{% set facetas_avancadas = [
+    ("ano", "ano", "Ano"),
+    ("concurso", "concurso", "Concurso"),
+    ("cargo", "cargo", "Cargo"),
+    ("nivel", "nivel", "Nível"),
+    ("tipo_conhecimento", "tipo_conhecimento", "Conhecimento"),
+] %}
 
-{# Facetas e seleção como JSON (tojson escapa <, > e &): o painel lê daqui,
-   sem nenhum valor interpolado em expressão do Alpine. As contagens chegam
-   de novo a cada filtro, pelo fragmento (hx-swap-oob do #dados-facetas). #}
+<nav aria-label="Trilha" class="mb-2 text-xs text-slate-500">
+    <a href="/" class="hover:text-destaque-700 hover:underline">Início</a>
+    <span class="mx-1" aria-hidden="true">/</span>
+    <span class="text-slate-700" aria-current="page">Questões</span>
+</nav>
+<div class="mb-4">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Questões de Concurso</h1>
+    {{ c.subtitulo_lista(materia_unica) }}
+</div>
+
+{# Facetas, seleção e filtros extras como JSON (tojson escapa <, > e &): o
+   painel lê daqui, sem nenhum valor interpolado em expressão do Alpine. As
+   contagens chegam de novo pelo fragmento e pela recontagem (OOB). #}
 {% include "_dados_facetas.html" %}
 <script type="application/json" id="dados-selecao">{{ filtros.model_dump(exclude_none=True)|tojson }}</script>
+<script type="application/json" id="dados-extras">{{ extras|tojson }}</script>
 <script>
+// Tudo dentro do callback: a restauração de histórico do HTMX reexecuta este
+// script, e um `const` no escopo global quebraria na 2ª vez.
 document.addEventListener("alpine:init", () => {
+    const FACETAS = {{ (facetas_simples + facetas_avancadas)|tojson }};
+    const AVANCADAS = {{ facetas_avancadas|map(attribute=1)|list|tojson }};
+    const CHAVE_LS = "filtro_avancado";
+    const LIMITE = 200;
     const normalizar = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-    const ler = (id) => JSON.parse(document.getElementById(id).textContent);
-    Alpine.store("facetas", ler("dados-facetas"));
-    document.body.addEventListener("htmx:afterSettle", () => {
-        const el = document.getElementById("dados-facetas");
-        if (el) Alpine.store("facetas", JSON.parse(el.textContent));
+    const ler = (id) => {
+        const el = document.getElementById(id);
+        return el ? JSON.parse(el.textContent) : null;
+    };
+    const reler = () => {
+        const dados = ler("dados-facetas");
+        if (dados) Alpine.store("facetas", dados);
+    };
+    Alpine.store("facetas", ler("dados-facetas") || {});
+    document.body.addEventListener("htmx:afterSettle", reler);
+    document.body.addEventListener("htmx:oobAfterSwap", reler);
+
+    // Seleção pendente do form (só vale no botão Filtrar). Os controles leem
+    // e escrevem aqui; os chips de "Filtrar por:" saem daqui.
+    Alpine.store("filtros", {
+        aberto: null,
+        avancado: false,
+        sel: {},
+        texto: "",
+        anuladas: false,
+        fora: false,
+        historico: "",
+        com: [],
+        extras: [],
+        removidos: [],
+        carregar() {
+            reler();
+            const s = ler("dados-selecao") || {};
+            const lista = (k) => (s[k] || []).map(String);
+            const sel = {};
+            for (const [, nome] of FACETAS) sel[nome] = lista(nome);
+            this.sel = sel;
+            this.texto = s.texto || "";
+            this.anuladas = s.anuladas === "excluir";
+            this.fora = s.fora_do_edital === "nao";
+            this.historico = ["nao_resolvidas", "erradas"].includes(s.historico) ? s.historico : "";
+            this.com = lista("com");
+            this.extras = ler("dados-extras") || [];
+            this.removidos = [];
+            this.aberto = null;
+            let preferencia = false;
+            try { preferencia = localStorage.getItem(CHAVE_LS) === "1"; } catch (e) {}
+            const ativo = AVANCADAS.some((n) => sel[n].length) || this.anuladas || this.fora || this.historico || this.com.length;
+            this.avancado = Boolean(ativo) || preferencia;
+        },
+        alternarAvancado() {
+            this.avancado = !this.avancado;
+            this.aberto = null;
+            try { localStorage.setItem(CHAVE_LS, this.avancado ? "1" : "0"); } catch (e) {}
+        },
+        // Depois do Alpine aplicar o estado (ex.: `disabled` dos extras).
+        recontar() {
+            setTimeout(() => htmx.trigger(document.body, "recontar"), 0);
+        },
+        // "Já resolvidas" e "Que errei" mandam o mesmo `historico`: um só.
+        marcarHistorico(valor, ligado) {
+            this.historico = ligado ? valor : "";
+            this.recontar();
+        },
+        // O controle visível com o mesmo name vence o extra (nunca 2 valores).
+        extraAtivo(i) {
+            const e = this.extras[i];
+            if (!e || this.removidos.includes(i)) return false;
+            if (e.nome === "anuladas") return !this.anuladas;
+            if (e.nome === "fora_do_edital") return !this.fora;
+            if (e.nome === "historico") return !this.historico;
+            return true;
+        },
+        get chips() {
+            const facetas = Alpine.store("facetas") || {};
+            const saida = [];
+            const tirar = (fn) => () => { fn(); this.recontar(); };
+            for (const [chave, nome, titulo] of FACETAS) {
+                const porValor = new Map((facetas[chave] || []).map((i) => [String(i.valor), i]));
+                for (const v of this.sel[nome] || []) {
+                    const item = porValor.get(v);
+                    if (!item) continue; // no_id de outro nível (ou valor que não existe)
+                    let rotulo = item.rotulo;
+                    if (nome === "cargo") rotulo = item.caminho + " · " + item.rotulo;
+                    else if (nome === "no_id" && item.caminho) rotulo = item.caminho;
+                    saida.push({
+                        id: nome + "=" + v,
+                        rotulo: titulo + ": " + rotulo,
+                        tirar: tirar(() => { this.sel[nome] = this.sel[nome].filter((x) => x !== v); }),
+                    });
+                }
+            }
+            const texto = this.texto.trim();
+            if (texto) saida.push({ id: "texto", rotulo: "Palavra-chave: " + texto, tirar: tirar(() => { this.texto = ""; }) });
+            if (this.anuladas) saida.push({ id: "anuladas", rotulo: "Excluir: anuladas", tirar: tirar(() => { this.anuladas = false; }) });
+            if (this.fora) saida.push({ id: "fora", rotulo: "Excluir: fora do edital", tirar: tirar(() => { this.fora = false; }) });
+            if (this.historico) {
+                const rotulo = this.historico === "erradas" ? "Com: que errei" : "Excluir: já resolvidas";
+                saida.push({ id: "historico", rotulo, tirar: tirar(() => { this.historico = ""; }) });
+            }
+            const rotulosCom = { texto_base: "Com: texto associado", figuras: "Com: figuras" };
+            for (const v of this.com) {
+                saida.push({ id: "com=" + v, rotulo: rotulosCom[v] || v, tirar: tirar(() => { this.com = this.com.filter((x) => x !== v); }) });
+            }
+            this.extras.forEach((e, i) => {
+                if (this.extraAtivo(i)) saida.push({ id: "extra" + i, rotulo: e.rotulo, tirar: tirar(() => { this.removidos.push(i); }) });
+            });
+            return saida;
+        },
     });
 
-    // Uma faceta: busca + checkboxes. Os marcados ficam sempre no DOM (com
-    // name), mesmo fora da busca, para irem no form.
+    // Um dropdown de faceta: busca rápida + checkboxes. Os marcados ficam
+    // sempre no DOM (com name), mesmo fora da busca e com o painel fechado
+    // (x-show, nunca x-if), para irem no form.
     Alpine.data("faceta", () => ({
         // Declarados aqui: sem isso, a atribuição no init cai no escopo do
         // x-data de fora (compartilhado entre as facetas).
         chave: "",
-        limite: 8,
+        nome: "",
         busca: "",
-        todos: false,
-        marcados: [],
+        direita: false,
+        antes: null,
         init() {
-            const d = this.$el.dataset;
-            this.chave = d.chave;
-            this.limite = parseInt(d.limite || "8");
-            const sel = ler("dados-selecao")[d.nome] || [];
-            const doNivel = new Set(this.itens.map((i) => i.valor));
-            // no_id serve a 3 facetas (matéria, assunto, subassunto).
-            this.marcados = sel.map(String).filter((v) => d.nome !== "no_id" || doNivel.has(v));
+            this.chave = this.$el.dataset.chave;
+            this.nome = this.$el.dataset.nome;
+            // Fechou (clique fora, Esc, botão ou outro dropdown aberto):
+            // reconta as facetas se a seleção mudou.
+            this.$watch("$store.filtros.aberto", (valor) => {
+                if (valor !== this.chave && this.antes !== null) this.aoFechar();
+            });
+        },
+        get aberto() {
+            return this.$store.filtros.aberto === this.chave;
         },
         get itens() {
             return this.$store.facetas[this.chave] || [];
         },
-        get visiveis() {
+        // no_id serve a 3 facetas (matéria, assunto, subassunto): cada uma
+        // fica só com os valores do seu nível.
+        get marcados() {
+            const doNivel = new Set(this.itens.map((i) => String(i.valor)));
+            return (this.$store.filtros.sel[this.nome] || []).filter((v) => doNivel.has(v));
+        },
+        get lista() {
             const termo = normalizar(this.busca.trim());
-            const marcados = this.itens.filter((i) => this.marcados.includes(i.valor));
-            let resto = this.itens.filter((i) => !this.marcados.includes(i.valor));
-            if (termo) {
-                resto = resto.filter((i) => normalizar(i.rotulo + " " + (i.caminho || "")).includes(termo));
-                return marcados.concat(resto.slice(0, 100));
+            const marcados = new Set(this.marcados);
+            const topo = [];
+            let resto = [];
+            for (const i of this.itens) {
+                if (marcados.has(i.valor)) topo.push({ ...i, marcado: true });
+                else resto.push(i);
             }
-            resto = resto.filter((i) => i.total > 0);
-            return marcados.concat(this.todos ? resto.slice(0, 300) : resto.slice(0, Math.max(0, this.limite - marcados.length)));
+            resto = termo
+                ? resto.filter((i) => normalizar(i.rotulo + " " + (i.caminho || "")).includes(termo))
+                : resto.filter((i) => i.total > 0);
+            return {
+                itens: topo.concat(resto.slice(0, LIMITE).map((i) => ({ ...i, marcado: false }))),
+                escondidos: Math.max(0, resto.length - LIMITE),
+            };
         },
-        get escondidos() {
-            return this.itens.filter((i) => i.total > 0).length - this.visiveis.length;
+        get resumo() {
+            const n = this.marcados.length;
+            return n === 1 ? "1 selecionado" : n + " selecionados";
         },
-        alternar(valor, ligado) {
-            this.marcados = ligado ? this.marcados.concat([valor]) : this.marcados.filter((v) => v !== valor);
+        alternar() {
+            if (this.aberto) this.fechar(false);
+            else this.abrir();
+        },
+        abrir() {
+            this.antes = JSON.stringify(this.marcados);
+            this.direita = false;
+            this.$store.filtros.aberto = this.chave;
+            this.$nextTick(() => {
+                // Painel que passaria da borda da tela abre alinhado à direita.
+                const r = this.$refs.painel.getBoundingClientRect();
+                this.direita = r.right > document.documentElement.clientWidth - 8;
+                this.$refs.busca.focus();
+            });
+        },
+        fechar(focar) {
+            if (!this.aberto) return;
+            this.$store.filtros.aberto = null;
+            if (focar) this.$refs.botao.focus();
+        },
+        aoFechar() {
+            const mudou = JSON.stringify(this.marcados) !== this.antes;
+            this.antes = null;
+            this.busca = "";
+            if (mudou) this.$store.filtros.recontar();
+        },
+        marcar(valor, ligado) {
+            const sel = this.$store.filtros.sel;
+            const atual = sel[this.nome] || [];
+            sel[this.nome] = ligado ? atual.concat([valor]) : atual.filter((v) => v !== valor);
         },
     }));
 });
 </script>
 
-<div class="lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-6" x-data="{ painel: false }">
-    <button type="button" class="btn-secundario mb-4 w-full lg:hidden" @click="painel = !painel"
-            :aria-expanded="painel.toString()" aria-expanded="false" aria-controls="form-filtros">
-        <span x-text="painel ? 'Esconder filtros' : 'Mostrar filtros'">Filtros</span>
+{% macro dropdown(chave, nome, titulo) %}
+<div class="relative" x-data="faceta" data-chave="{{ chave }}" data-nome="{{ nome }}"
+     @click.outside="fechar(false)" @keydown.escape.stop="fechar(true)">
+    <button type="button" x-ref="botao" id="botao-{{ chave }}"
+            class="flex min-h-[3.25rem] w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-sm shadow-sm transition hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500"
+            :class="aberto && '!border-destaque-600 ring-1 ring-destaque-600'"
+            @click="alternar()" aria-haspopup="true" aria-expanded="false" :aria-expanded="aberto.toString()" aria-controls="painel-{{ chave }}">
+        <span class="min-w-0">
+            <span class="block truncate font-medium text-slate-800">{{ titulo }}</span>
+            <span class="block truncate text-xs" :class="marcados.length ? 'font-medium text-destaque-700' : 'text-slate-500'"
+                  x-text="marcados.length ? resumo : 'Selecionar'">Selecionar</span>
+        </span>
+        <span class="text-slate-500 transition" :class="aberto && 'rotate-180'">{{ c.icone("seta", "h-4 w-4") }}</span>
     </button>
-
-    {# hx no form (nunca no input): cada mudança manda o form inteiro.
-       hx-history="false": a página (com as facetas em JSON) estoura o
-       localStorage do cache de histórico; o voltar busca a página inteira. #}
-    <form id="form-filtros" action="/questoes" method="get" hx-history="false"
-          hx-get="/questoes" hx-trigger="change, submit" hx-target="#lista-conteudo" hx-push-url="true"
-          class="mb-6 hidden space-y-1 self-start rounded-xl border border-slate-200 bg-white p-3 shadow-sm lg:block"
-          :class="painel && '!block'" aria-label="Filtros de questões">
-        {# Página volta a 1 a cada mudança de filtro: o form não manda `pagina`. #}
-        {% set grupos = [
-            ("materia", "no_id", "Matéria", 6, true),
-            ("assunto", "no_id", "Assunto", 6, false),
-            ("subassunto", "no_id", "Subassunto", 6, false),
-            ("orgao", "orgao", "Órgão", 8, true),
-            ("ano", "ano", "Ano", 8, true),
-            ("concurso", "concurso", "Concurso", 8, false),
-            ("cargo", "cargo", "Cargo", 6, false),
-            ("nivel", "nivel", "Nível", 8, true),
-            ("tipo_conhecimento", "tipo_conhecimento", "Conhecimento", 8, false),
-            ("banca", "banca", "Banca", 8, false),
-        ] %}
-        {% for chave, nome, titulo, limite, aberto in grupos %}
-        <details class="group border-b border-slate-100 py-2 last:border-0" {% if aberto or filtros[nome] %}open{% endif %}
-                 x-data="faceta" data-chave="{{ chave }}" data-nome="{{ nome }}" data-limite="{{ limite }}">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-1 py-1 text-sm font-semibold text-slate-800">
-                <span>{{ titulo }} <span class="ml-1 rounded-full bg-blue-50 px-2 text-xs font-medium text-blue-800" x-show="marcados.length" x-text="marcados.length" x-cloak></span></span>
-                <span class="text-slate-400 group-open:rotate-90" aria-hidden="true">›</span>
-            </summary>
-            <div class="mt-1 space-y-1">
-                <input type="search" x-model="busca" class="campo w-full py-1.5" placeholder="Pesquisar {{ titulo|lower }}"
-                       aria-label="Pesquisar {{ titulo|lower }}" @change.stop @keydown.enter.prevent>
-                <ul class="max-h-72 overflow-y-auto pr-1 text-sm">
-                    <template x-for="item in visiveis" :key="item.valor">
-                        <li>
-                            <label class="flex cursor-pointer items-start gap-2 rounded-md px-1 py-1 hover:bg-slate-50"
-                                   :class="item.total === 0 && !marcados.includes(item.valor) && 'opacity-50'">
-                                <input type="checkbox" name="{{ nome }}" class="mt-0.5 h-4 w-4 shrink-0 accent-blue-700"
-                                       :value="item.valor" :checked="marcados.includes(item.valor)"
-                                       @change="alternar(item.valor, $event.target.checked)">
-                                <span class="min-w-0 flex-1">
-                                    <span class="block break-words text-slate-800" x-text="item.rotulo"></span>
-                                    <span class="block break-words text-xs text-slate-500" x-show="item.caminho && item.caminho !== item.rotulo" x-text="item.caminho"></span>
-                                </span>
-                                <span class="shrink-0 tabular-nums text-xs text-slate-500" x-text="item.total.toLocaleString('pt-BR')"></span>
-                            </label>
-                        </li>
-                    </template>
-                    <li class="px-1 py-1 text-xs text-slate-500" x-show="visiveis.length === 0">Nada encontrado.</li>
-                </ul>
-                <button type="button" class="link px-1 text-xs" x-show="!busca && (escondidos > 0 || todos)" x-cloak
-                        @click="todos = !todos" x-text="todos ? 'Mostrar menos' : 'Mostrar mais (' + escondidos + ')'"></button>
-            </div>
-        </details>
-        {% endfor %}
-
-        <fieldset class="border-b border-slate-100 px-1 py-2">
-            <legend class="text-sm font-semibold text-slate-800">Anuladas</legend>
-            {% for valor, rotulo in [("incluir", "Incluir"), ("excluir", "Esconder"), ("so", "Só anuladas")] %}
-            <label class="mt-1 flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-                <input type="radio" name="anuladas" value="{{ valor }}" class="h-4 w-4 accent-blue-700" {% if filtros.anuladas == valor %}checked{% endif %}>
-                {{ rotulo }}
-            </label>
-            {% endfor %}
-        </fieldset>
-
-        {% if request.session.get("usuario_id") %}
-        <label class="flex flex-col gap-1 px-1 py-2 text-sm font-semibold text-slate-800">Meu histórico
-            <select name="historico" class="campo font-normal">
-                {% for valor, rotulo in [("todas", "Todas"), ("nao_resolvidas", "Não resolvidas"), ("resolvidas", "Já resolvidas"), ("erradas", "Errei (última resposta)"), ("certas", "Acertei (última resposta)")] %}
-                <option value="{{ valor }}" {% if filtros.historico == valor %}selected{% endif %}>{{ rotulo }}</option>
-                {% endfor %}
-            </select>
+    <div id="painel-{{ chave }}" x-ref="painel" x-show="aberto" x-cloak role="group" aria-label="{{ titulo }}"
+         class="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 bg-white p-2 shadow-lg sm:w-72 sm:min-w-full"
+         :class="direita ? 'right-0' : 'left-0'">
+        <label class="relative block">
+            <span class="sr-only">Busca rápida em {{ titulo|lower }}</span>
+            <span class="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-slate-400">{{ c.icone("busca", "h-4 w-4") }}</span>
+            {# Sem name: não vai no form; Enter não submete. #}
+            <input type="search" x-ref="busca" x-model="busca" class="campo w-full py-1.5 pl-8" placeholder="Busca rápida"
+                   autocomplete="off" @keydown.enter.prevent>
         </label>
-        {% endif %}
-
-        {# Filtros sem controle visível (link antigo ou da estatística) seguem no form. #}
-        {% for n in filtros.cargo_numero or [] %}<input type="hidden" name="cargo_numero" value="{{ n }}">{% endfor %}
-        {% for campo, padrao in [("fora_do_edital", "todos"), ("utilizaveis", "so")] %}
-        {% if filtros[campo] != padrao %}<input type="hidden" name="{{ campo }}" value="{{ filtros[campo] }}">{% endif %}
-        {% endfor %}
-        <div class="flex items-center justify-between gap-2 px-1 pt-2">
-            <a href="/questoes" class="link text-xs">Limpar tudo</a>
-            <noscript><button type="submit" class="btn-primario">Aplicar</button></noscript>
-        </div>
-    </form>
-
-    <section id="lista-conteudo" class="min-w-0">
-        {% include "_lista_parcial.html" %}
-    </section>
+        <ul class="mt-2 max-h-72 overflow-y-auto pr-1 text-sm">
+            <template x-for="item in lista.itens" :key="item.valor">
+                <li>
+                    <label class="flex cursor-pointer items-start gap-2 rounded-md px-1 py-1 hover:bg-slate-50"
+                           :class="item.total === 0 && !item.marcado && 'opacity-50'">
+                        <input type="checkbox" name="{{ nome }}" class="mt-0.5 h-4 w-4 shrink-0 accent-destaque-700"
+                               :value="item.valor" :checked="item.marcado"
+                               @change="marcar(item.valor, $event.target.checked)">
+                        <span class="min-w-0 flex-1">
+                            <span class="block break-words text-slate-800" x-text="item.rotulo"></span>
+                            <span class="block break-words text-xs text-slate-500" x-show="item.caminho && item.caminho !== item.rotulo" x-text="item.caminho"></span>
+                        </span>
+                        <span class="shrink-0 tabular-nums text-xs text-slate-500" x-text="item.total.toLocaleString('pt-BR')"></span>
+                    </label>
+                </li>
+            </template>
+            <li class="px-1 py-1 text-xs text-slate-500" x-show="lista.itens.length === 0">Nada encontrado.</li>
+        </ul>
+        <p class="px-1 pt-1 text-xs text-slate-500" x-show="lista.escondidos > 0"
+           x-text="'Mais ' + lista.escondidos.toLocaleString('pt-BR') + ' na busca rápida.'"></p>
+    </div>
 </div>
+{% endmacro %}
+
+{% set titulo_login = "Entre com Google para usar" %}
+
+{# Recontagem das facetas ao fechar um dropdown: fora do form, para não
+   herdar hx-target/hx-push-url dele. Só troca o #dados-facetas (OOB). #}
+<div id="recontagem" hidden hx-get="/questoes/facetas" hx-include="#form-filtros"
+     hx-trigger="recontar from:body" hx-swap="none" hx-sync="this:replace"></div>
+
+{# hx no form (nunca no input): só o botão Filtrar (submit, inclusive Enter
+   na palavra-chave) aplica, e manda o form inteiro sem `pagina` (volta a 1).
+   hx-history="false": a página (com as facetas em JSON) estoura o
+   localStorage do cache de histórico; o voltar busca a página inteira. #}
+<form id="form-filtros" action="/questoes" method="get" hx-history="false"
+      hx-get="/questoes" hx-trigger="submit" hx-target="#lista-conteudo" hx-push-url="true"
+      x-data x-init="$store.filtros.carregar()"
+      class="mb-6 space-y-3 rounded-xl bg-slate-100 p-4" aria-label="Filtros de questões">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+        <div class="flex min-h-[3.25rem]">
+            <label for="filtro-texto" class="sr-only">Palavra-chave</label>
+            <input type="search" id="filtro-texto" name="texto" value="{{ filtros.texto or '' }}" placeholder="Palavra-chave"
+                   maxlength="200" autocomplete="off"
+                   class="min-w-0 flex-1 rounded-l-lg border border-r-0 border-slate-300 bg-white px-3 text-sm text-slate-900 shadow-sm focus:border-destaque-700 focus:outline-none focus:ring-1 focus:ring-destaque-700"
+                   x-model="$store.filtros.texto" @change="$store.filtros.recontar()">
+            <button type="submit" class="flex items-center rounded-r-lg border border-destaque-200 bg-destaque-100 px-3 text-destaque-800 hover:bg-destaque-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500"
+                    aria-label="Buscar pela palavra-chave">{{ c.icone("busca", "h-5 w-5") }}</button>
+        </div>
+        {% for chave, nome, titulo in facetas_simples %}{{ dropdown(chave, nome, titulo) }}{% endfor %}
+    </div>
+
+    <div id="filtros-avancados" class="space-y-3" x-show="$store.filtros.avancado">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+            {% for chave, nome, titulo in facetas_avancadas %}{{ dropdown(chave, nome, titulo) }}{% endfor %}
+        </div>
+
+        <div class="flex flex-col gap-2 text-sm sm:flex-row sm:items-center" role="group" aria-labelledby="rotulo-excluir">
+            <span id="rotulo-excluir" class="font-semibold text-slate-700 sm:w-36 sm:shrink-0">Excluir questões</span>
+            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">
+                    <input type="checkbox" name="anuladas" value="excluir" class="h-4 w-4 accent-destaque-700"
+                           x-model="$store.filtros.anuladas" @change="$store.filtros.recontar()"{% if filtros.anuladas == "excluir" %} checked{% endif %}>
+                    Anuladas
+                </label>
+                <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">
+                    <input type="checkbox" name="fora_do_edital" value="nao" class="h-4 w-4 accent-destaque-700"
+                           x-model="$store.filtros.fora" @change="$store.filtros.recontar()"{% if filtros.fora_do_edital == "nao" %} checked{% endif %}>
+                    Fora do edital
+                </label>
+                {% if logado %}
+                <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">
+                    <input type="checkbox" name="historico" value="nao_resolvidas" class="h-4 w-4 accent-destaque-700"
+                           :checked="$store.filtros.historico === 'nao_resolvidas'"
+                           @change="$store.filtros.marcarHistorico('nao_resolvidas', $event.target.checked)"{% if filtros.historico == "nao_resolvidas" %} checked{% endif %}>
+                    Já resolvidas
+                </label>
+                {% else %}
+                <label class="inline-flex cursor-not-allowed items-center gap-2 text-slate-400" title="{{ titulo_login }}">
+                    <input type="checkbox" name="historico" value="nao_resolvidas" class="h-4 w-4" disabled title="{{ titulo_login }}">
+                    Já resolvidas
+                </label>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2 text-sm sm:flex-row sm:items-center" role="group" aria-labelledby="rotulo-com">
+            <span id="rotulo-com" class="font-semibold text-slate-700 sm:w-36 sm:shrink-0">Questões com</span>
+            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                {% for valor, rotulo in [("texto_base", "Texto associado"), ("figuras", "Figuras")] %}
+                <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">
+                    <input type="checkbox" name="com" value="{{ valor }}" class="h-4 w-4 accent-destaque-700"
+                           x-model="$store.filtros.com" @change="$store.filtros.recontar()"{% if valor in (filtros.com or []) %} checked{% endif %}>
+                    {{ rotulo }}
+                </label>
+                {% endfor %}
+                {% if logado %}
+                <label class="inline-flex cursor-pointer items-center gap-2 text-slate-700">
+                    <input type="checkbox" name="historico" value="erradas" class="h-4 w-4 accent-destaque-700"
+                           :checked="$store.filtros.historico === 'erradas'"
+                           @change="$store.filtros.marcarHistorico('erradas', $event.target.checked)"{% if filtros.historico == "erradas" %} checked{% endif %}>
+                    Que errei
+                </label>
+                {% else %}
+                <label class="inline-flex cursor-not-allowed items-center gap-2 text-slate-400" title="{{ titulo_login }}">
+                    <input type="checkbox" name="historico" value="erradas" class="h-4 w-4" disabled title="{{ titulo_login }}">
+                    Que errei
+                </label>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Filtros sem controle no painel (link antigo, estatística, "Só
+       anuladas"...): seguem no form e viram chip; o × desliga o hidden. #}
+    {% for e in extras %}
+    <input type="hidden" name="{{ e.nome }}" value="{{ e.valor }}" data-extra="{{ loop.index0 }}"
+           :disabled="!$store.filtros.extraAtivo(Number($el.dataset.extra))">
+    {% endfor %}
+
+    <div class="flex justify-end">
+        <button type="button" x-cloak class="inline-flex items-center gap-1.5 text-sm font-medium text-destaque-700 hover:underline"
+                @click="$store.filtros.alternarAvancado()" aria-controls="filtros-avancados"
+                :aria-expanded="$store.filtros.avancado.toString()">
+            <span x-text="$store.filtros.avancado ? 'Mostrar filtro simples' : 'Mostrar filtro avançado'"></span>
+            <span x-show="$store.filtros.avancado">{{ c.icone("menos", "h-4 w-4") }}</span>
+            <span x-show="!$store.filtros.avancado">{{ c.icone("mais", "h-4 w-4") }}</span>
+        </button>
+    </div>
+
+    <div class="flex flex-col gap-3 border-t border-slate-200 pt-3 md:flex-row md:items-center md:justify-between">
+        <div class="flex min-w-0 flex-wrap items-center gap-2" aria-live="polite">
+            <span class="text-sm font-semibold text-slate-700">Filtrar por:</span>
+            <template x-for="chip in $store.filtros.chips" :key="chip.id">
+                <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-medium text-destaque-800 ring-1 ring-destaque-200">
+                    <span class="truncate" x-text="chip.rotulo"></span>
+                    <button type="button" class="shrink-0 rounded-full text-destaque-700 hover:text-destaque-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500"
+                            :aria-label="'Remover filtro ' + chip.rotulo" @click="chip.tirar()">{{ c.icone("remover", "h-4 w-4") }}</button>
+                </span>
+            </template>
+            <span class="text-xs text-slate-500" x-show="!$store.filtros.chips.length" x-cloak>nenhum filtro</span>
+            {# Sem JS: os chips do servidor, cada um com o link sem aquele valor. #}
+            <noscript>{% for chip in chips %}{{ c.chip(chip.rotulo, chip.url) }} {% endfor %}</noscript>
+        </div>
+        <div class="flex shrink-0 items-center justify-end gap-4">
+            <a href="/questoes" class="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-destaque-700">{{ c.icone("limpar", "h-4 w-4") }} Limpar</a>
+            <button type="submit" class="btn-primario px-6">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<section id="lista-conteudo" class="min-w-0">
+    {% include "_lista_parcial.html" %}
+</section>
 {% endblock %}

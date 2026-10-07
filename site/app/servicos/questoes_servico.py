@@ -1,6 +1,8 @@
 import math
+import re
 import threading
 
+from app.cache import cache_ttl
 from app.modelos import (
     FacetasResponse,
     FiltroQuestoes,
@@ -12,11 +14,16 @@ from app.modelos import (
 )
 from app.repositorio import questoes_repo
 from app.servicos.formatacao import (
+    codigo_curto,
     rotulo_concurso,
     rotulo_materia,
     rotulo_nivel,
     rotulo_tipo_conhecimento,
 )
+
+
+def _montar(modelo, row: dict):
+    return modelo(**row, codigo=codigo_curto(row["questao_chave"]))
 
 
 def listar_questoes(
@@ -32,10 +39,7 @@ def listar_questoes(
     pagina = max(1, pagina)
     offset = (pagina - 1) * tamanho_pagina
 
-    # Import tardio: contas_servico importa este módulo.
-    from app.servicos.contas_servico import filtros_com_historico
-
-    filtros_dict = filtros_com_historico(filtros, usuario_id)
+    filtros_dict = filtros_para_repo(filtros, usuario_id)
     if chaves_incluir is not None:
         anteriores = filtros_dict.get("chaves_incluir")
         filtros_dict["chaves_incluir"] = (
@@ -48,7 +52,7 @@ def listar_questoes(
 
     total_paginas = math.ceil(total / tamanho_pagina) if total > 0 else 0
 
-    itens = [_com_incidencia(QuestaoResumo(**row)) for row in linhas]
+    itens = [_com_incidencia(_montar(QuestaoResumo, row)) for row in linhas]
 
     return PaginaQuestoes(
         total=total,
@@ -71,7 +75,50 @@ def obter_questao_por_chave(chave: str) -> QuestaoDetalhe | None:
             f["url"] = f"/figuras/{f['path_relativo']}"
 
     row["figuras"] = figuras
-    return _com_incidencia(QuestaoDetalhe(**row))
+    return _com_incidencia(_montar(QuestaoDetalhe, row))
+
+
+# -- ID curto (5H.1) --
+_PADRAO_CODIGO = re.compile(r"^Q[0-9A-F]{8}$")
+
+
+@cache_ttl(300)
+def _chaves_por_codigo() -> dict[str, str]:
+    return {codigo_curto(c): c for c in questoes_repo.todas_as_chaves()}
+
+
+def chave_por_codigo(codigo: str) -> str | None:
+    """Chave da questão a partir do ID curto (aceita minúsculas). `None` se não existe."""
+    codigo = codigo.strip().upper()
+    if not _PADRAO_CODIGO.match(codigo):
+        return None
+    return _chaves_por_codigo().get(codigo)
+
+
+def chave_do_termo(texto: str | None) -> str | None:
+    """Atalho do ID curto na palavra-chave (5H.4): a chave da questão quando o
+    termo inteiro (aparado, minúsculas aceitas) é um ID curto que existe.
+    `None` para termo vazio, outro texto ou ID desconhecido."""
+    if not texto:
+        return None
+    return chave_por_codigo(texto)
+
+
+def filtros_para_repo(filtros: FiltroQuestoes, usuario_id: int | None) -> dict:
+    """Filtros prontos para o repositório: histórico do usuário (5F.3) e o
+    atalho do ID curto, que troca a palavra-chave pela própria questão.
+
+    Levanta `LoginNecessario` quando o histórico pede login e não há usuário.
+    """
+    # Import tardio: contas_servico importa este módulo.
+    from app.servicos.contas_servico import filtros_com_historico
+
+    filtros_dict = filtros_com_historico(filtros, usuario_id)
+    chave = chave_do_termo(filtros.texto)
+    if chave is not None:
+        filtros_dict.pop("texto", None)
+        filtros_dict["chave_codigo"] = chave
+    return filtros_dict
 
 
 # -- Incidência (5F.7) --
@@ -139,7 +186,7 @@ def parecidas(chave: str, limite: int = 5) -> list[QuestaoResumo] | None:
         "apenas_canonicas": True,
     }
     linhas, _ = questoes_repo.buscar_questoes(filtros, max(1, min(20, limite)), 0)
-    return [_com_incidencia(QuestaoResumo(**r)) for r in linhas]
+    return [_com_incidencia(_montar(QuestaoResumo, r)) for r in linhas]
 
 
 def obter_arvore(apenas_com_questoes: bool = True) -> list[NoArvore]:
@@ -195,9 +242,7 @@ def obter_facetas(
     """Facetas da listagem. Com filtros, o total de cada valor considera os
     outros filtros; valor zerado só aparece se estiver marcado."""
     filtros = filtros or FiltroQuestoes()
-    from app.servicos.contas_servico import filtros_com_historico
-
-    filtros_dict = filtros_com_historico(filtros, usuario_id)
+    filtros_dict = filtros_para_repo(filtros, usuario_id)
     dados = questoes_repo.obter_facetas(filtros_dict)
 
     def manter(r, campo) -> bool:

@@ -1,0 +1,5 @@
+{# Form de resposta devolvido pelo POST /q/correcao sem marcação (mesmo id). #}
+{% import "_componentes.html" as c %}
+<div id="{{ dom_id(chave) }}">
+    {{ c.form_resposta(chave, aviso=aviso) }}
+</div>

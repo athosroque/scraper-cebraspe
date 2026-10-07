@@ -112,10 +112,19 @@ def test_correcao_anulada(cliente):
     assert "anulada pela banca" in r.text
 
 
-def test_correcao_rejeita_resposta_invalida(cliente):
+@pytest.mark.parametrize("resposta", [None, "", "X"])
+def test_correcao_sem_marcacao_devolve_o_form_com_aviso(cliente, resposta):
+    # Sem marcação o HTMX troca o form por ele mesmo com o aviso (não um 422).
     q = _questao(cliente)
-    r = cliente.post("/q/correcao", data={"chave": q["questao_chave"], "resposta": "X"})
-    assert r.status_code == 422
+    dados = {"chave": q["questao_chave"]}
+    if resposta is not None:
+        dados["resposta"] = resposta
+    r = cliente.post("/q/correcao", data=dados)
+    assert r.status_code == 200
+    assert "Marque Certo ou Errado antes de responder." in r.text
+    assert re.search(r'<div id="q-[0-9a-f]{12}">', r.text)
+    assert r.text.count('name="resposta"') == 2
+    assert "Você acertou" not in r.text and "Você errou" not in r.text
 
 
 def test_pagina_canonica(cliente):
@@ -160,9 +169,16 @@ def test_inicio_grade_de_materias(cliente):
     materia = cliente.get("/api/v1/arvore").json()[0]
     assert f'href="/materias/{materia["id"]}"' in r.text
     assert f'href="/questoes?no_id={materia["id"]}"' in r.text
-    # O chip do assunto também sai no fragmento, com o nome.
+    # Desde a 5H.3 o chip mora no "Filtrar por:" do painel (Alpine; <noscript>
+    # com o link do servidor), não no fragmento da lista. A página inteira traz
+    # o chip com o nome; o fragmento leva o nome nas facetas (OOB), que o
+    # painel usa para rotular o chip.
+    pagina = cliente.get("/questoes", params={"no_id": materia["id"]})
+    assert 'aria-label="Remover filtro ' + materia["nome"] + '"' in pagina.text
     parcial = cliente.get("/questoes", params={"no_id": materia["id"]}, headers=HX)
-    assert 'aria-label="Remover filtro ' + materia["nome"] + '"' in parcial.text
+    assert 'id="dados-facetas"' in parcial.text
+    assert "Remover filtro" not in parcial.text
+    assert materia["nome"] in parcial.text
 
 
 def test_cargo_vazio_ao_trocar_concurso_nao_da_422(cliente):
@@ -173,10 +189,10 @@ def test_cargo_vazio_ao_trocar_concurso_nao_da_422(cliente):
 
 
 def test_chip_remove_so_aquele_filtro(cliente):
+    # Os chips do servidor ficam no <noscript> do painel (página inteira, 5H.3).
     r = cliente.get(
         "/questoes",
         params={"concurso": "PF_25_ADM", "cargo_numero": "1", "nivel": "superior"},
-        headers=HX,
     )
     # O link antigo vira o cargo `PF_25_ADM:1` (5G.4).
     assert 'href="/questoes?concurso=PF_25_ADM&amp;cargo=PF_25_ADM%3A1"' in r.text
@@ -300,3 +316,69 @@ def test_simulado_traz_comando_sem_gabarito(cliente):
     assert all("gabarito" not in i for i in itens)
     html = cliente.get("/simulado/prova", params=params).text
     assert "data-comando" in html
+
+
+# -- 5H.2: card novo da questão --
+def _cards(html):
+    return html.split("<article")[1:]
+
+
+def test_card_da_lista_tem_posicao_codigo_e_resposta(cliente):
+    params = {"tamanho_pagina": 5, "pagina": 2}
+    api = cliente.get("/api/v1/questoes", params=params).json()["itens"]
+    cards = _cards(cliente.get("/questoes", params=params, headers=HX).text)
+    assert len(cards) == len(api)
+    for i, (item, card) in enumerate(zip(api, cards), start=6):
+        assert re.search(rf"data-posicao[^>]*>{i}</span>", card)
+        assert f">{item['codigo']}</a>" in card
+        # Dois radios e o Responder sem `disabled` estático (só o do Alpine).
+        assert card.count('type="radio" name="resposta"') == 2
+        botao = re.search(r"<button[^>]*>Responder</button>", card).group(0)
+        assert ":disabled=" in botao
+        assert re.search(r"\sdisabled[\s>=]", botao.replace(":disabled=", "")) is None
+        assert '<legend class="sr-only">Sua resposta</legend>' in card
+
+
+def test_detalhe_nao_mostra_posicao(cliente):
+    q = _questao(cliente)
+    html = cliente.get(_url(q["questao_chave"])).text
+    assert "data-posicao" not in html
+    assert f">{q['codigo']}</a>" in html
+
+
+def test_card_metadados_e_acoes(cliente):
+    q = cliente.get("/api/v1/questoes/PF_25_ADM|094_PF_CB2_01|24").json()
+    card = _cards(cliente.get("/q/PF_25_ADM/094_PF_CB2_01/24").text)[0]
+    assert 'href="/questoes?banca=CEBRASPE"' in card
+    assert 'href="/questoes?orgao=PF"' in card
+    assert 'href="/questoes?concurso=PF_25_ADM"' in card
+    cargo = q["cargos"][0]
+    assert (
+        f"CEBRASPE - 2025 - PF - Cargo {cargo['cargo_numero']}: {cargo['cargo']}"
+        in card
+    )
+    # Cada nível do caminho do nó principal linka a lista daquele nó.
+    principal = next(n for n in q["nos"] if n["papel"] == "principal")
+    for no_id in (principal["materia_id"], principal["no_id"]):
+        assert f'href="/questoes?no_id={no_id}"' in card
+    assert f'href="/materias/{principal["materia_id"]}"' in card
+    assert f"subject=Erro%20na%20quest%C3%A3o%20{q['codigo']}" in card
+    assert f'href="{q["link_pdf"]}"' in card and "Caderno (PDF)" in card
+    # Crédito da fonte continua obrigatório (ADR-033).
+    assert "Fonte: CEBRASPE — PF 2025, caderno 094_PF_CB2_01, item 24." in card
+
+
+def test_card_da_lista_sem_pdf_e_com_parecidas_sob_demanda(cliente):
+    html = cliente.get("/questoes", params={"tamanho_pagina": 3}, headers=HX).text
+    assert "Caderno (PDF)" not in html
+    assert 'hx-trigger="toggle[target.open] once"' in html
+    assert "Notificar erro" in html
+
+
+def test_caderno_basico_mostra_quantos_cargos(cliente):
+    # Caderno básico CB1 da PF: aplicado aos cargos de nível superior.
+    q = cliente.get("/api/v1/questoes/PF_25_ADM|094_PF_CB1_01|13").json()
+    assert len(q["cargos"]) > 1
+    card = _cards(cliente.get(_url(q["questao_chave"])).text)[0]
+    assert f"· {len(q['cargos'])} cargos" in card
+    assert "CEBRASPE - 2025 - PF</a>" in card

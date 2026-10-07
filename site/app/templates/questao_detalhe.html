@@ -7,27 +7,16 @@
 
 
 {% block content %}
-{% set principal = (questao.nos|selectattr("papel", "equalto", "principal")|first) or (questao.nos|first) %}
+{# O caminho do assunto, o ID curto e a prova já estão na barra do card. #}
 <nav aria-label="Trilha" class="mb-4 text-sm text-slate-600">
     <ol class="flex flex-wrap items-center gap-1">
-        <li><a href="/" class="link">Questões</a></li>
-        {% if principal and principal.no_caminho %}
-        {# O caminho já vem montado da árvore; o separador varia entre " > " e " › ". #}
-        {% for parte in principal.no_caminho.replace(" > ", " › ").split(" › ") %}
+        <li><a href="/questoes" class="link">Questões</a></li>
         <li aria-hidden="true">›</li>
-        <li class="{{ 'font-medium text-slate-900' if loop.last }}">{{ parte }}</li>
-        {% endfor %}
-        {% endif %}
+        <li class="font-medium text-slate-900">{{ questao.codigo }}</li>
     </ol>
 </nav>
 
-{% call c.cabecalho("Questão " ~ questao.numero ~ " · " ~ questao.orgao ~ " " ~ questao.ano) %}
-<div class="flex flex-wrap gap-2">
-    {{ c.selo(questao.concurso) }}
-    {{ c.selo("Caderno " ~ questao.codigo_caderno) }}
-    {% for cargo in questao.cargos %}{{ c.selo("Cargo " ~ cargo.cargo_numero ~ " — " ~ cargo.cargo ~ " (" ~ cargo.nivel ~ ")") }}{% endfor %}
-</div>
-{% endcall %}
+{{ c.cabecalho("Questão " ~ questao.numero ~ " · " ~ questao.orgao ~ " " ~ questao.ano, "Caderno " ~ questao.codigo_caderno ~ ", item " ~ questao.numero) }}
 
 {% include "_card_questao.html" %}
 
@@ -59,7 +48,7 @@
     <p class="mt-2 text-sm text-slate-500">Esta questão ainda não foi classificada na árvore.</p>
     {% endif %}
     {% if questao.nos %}
-    <h3 class="mt-4 text-sm font-semibold text-slate-900">Questões parecidas</h3>
+    <h3 id="parecidas" class="mt-4 scroll-mt-20 text-sm font-semibold text-slate-900">Questões parecidas</h3>
     <div class="mt-2 text-sm">{% include "_parecidas.html" %}</div>
     {% endif %}
     {% endcall %}

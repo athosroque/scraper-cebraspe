@@ -40,7 +40,7 @@
     <script defer src="/static/alpine.min.js"></script>
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token(request) }}"}'>
-    <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-blue-700">Pular para o conteúdo</a>
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-destaque-700">Pular para o conteúdo</a>
     {% set caminho = request.url.path %}
     {% set itens_menu = [
         ("/questoes", "Questões"),
@@ -90,7 +90,7 @@
                   class="block px-3 py-2 text-sm font-medium text-emerald-600" aria-live="polite">
                 Acertos: <span x-text="acertos"></span>
             </span>
-            <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="block px-3 py-2 text-sm font-semibold text-blue-700">Entrar com Google</a>
+            <a href="/entrar?voltar={{ request.url.path|urlencode }}" class="block px-3 py-2 text-sm font-semibold text-destaque-700">Entrar com Google</a>
             {% endif %}
         </div>
     </header>

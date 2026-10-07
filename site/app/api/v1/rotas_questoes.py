@@ -17,6 +17,20 @@ from app.servicos.contas_servico import LoginNecessario
 
 router = APIRouter(prefix="/questoes", tags=["Questões"])
 
+# 5H.4: palavra-chave e "Questões com", iguais na listagem e nas facetas.
+_D_TEXTO = (
+    "Palavra-chave no enunciado ou no comando da seção, sem diferenciar maiúsculas "
+    "nem acentos (`acao` acha “ação”). Com várias palavras, cada uma precisa "
+    "aparecer, em qualquer ordem (E). `%` e `_` valem como texto, não como "
+    "curinga. Vale até o 100º caractere (o resto é ignorado); vazio = sem filtro. "
+    "Um ID curto (`Q` + 8 hex, ex.: `Q6AAB4214`) de questão existente filtra só "
+    "aquela questão."
+)
+_D_COM = (
+    "Só questões com `texto_base` e/ou `figuras`. Repita para os dois: a questão "
+    "precisa ter ambos (E). Outros valores são ignorados (sem 422)."
+)
+
 
 @router.get(
     "",
@@ -109,6 +123,11 @@ def listar_questoes(
             "questão). Diferente de `todas` sem login: 401."
         ),
     ),
+    texto: Annotated[
+        str | None,
+        Query(description=_D_TEXTO, examples=["administração"]),
+    ] = None,
+    com: Annotated[list[str] | None, Query(description=_D_COM)] = None,
     pagina: int = Query(1, ge=1, description="Página, a partir de 1."),
     tamanho_pagina: int = Query(
         20, ge=1, le=50, description="Itens por página (máx. 50)."
@@ -124,6 +143,8 @@ def listar_questoes(
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
         no_id=no_id,
+        texto=texto,
+        com=com,
         anuladas=anuladas,
         fora_do_edital=fora_do_edital,
         utilizaveis=utilizaveis,
@@ -239,6 +260,8 @@ def obter_facetas(
     no_id: Annotated[
         list[str] | None, Query(description="Nós da árvore marcados.")
     ] = None,
+    texto: Annotated[str | None, Query(description=_D_TEXTO)] = None,
+    com: Annotated[list[str] | None, Query(description=_D_COM)] = None,
     anuladas: Literal["incluir", "excluir", "so"] = Query(
         "incluir", description="Tratamento das questões anuladas."
     ),
@@ -261,6 +284,8 @@ def obter_facetas(
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
         no_id=no_id,
+        texto=texto,
+        com=com,
         anuladas=anuladas,
         utilizaveis=utilizaveis,
         historico=historico,

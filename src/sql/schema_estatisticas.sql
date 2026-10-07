@@ -9,6 +9,14 @@
 -- schema de propósito — o teste de integração roda num schema temporário via
 -- `search_path`.
 
+-- Extensões ------------------------------------------------------------------
+
+-- `unaccent`: palavra-chave da listagem do site sem diferenciar acentos (5H.4).
+-- Sempre em `public` (não no schema temporário dos testes), onde a role de
+-- leitura do site a enxerga pelo `search_path` padrão. Extensão "trusted" no
+-- PG16: o dono do banco cria sem superusuário.
+CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
+
 -- Dimensões ------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS dim_orgao (

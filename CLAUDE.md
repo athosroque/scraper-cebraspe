@@ -273,6 +273,17 @@ Datasette continua só como ferramenta de revisão do dono.
       figuras do texto-base fora da `vw_questoes`, os GRANTs do site apagados
       a cada carga e a chave canônica sensível a quebra de parágrafo.
       763 testes (+1 xfail), ruff verde. Ver ADR-034.
+- [x] Etapa 5H — Card da questão e filtros no formato Gran, em teal
+      (ADR-035, `plano-etapa-5h.md`): token `destaque` (teal), ID curto `Q` +
+      8 hex (`/q/<ID>` → 301), card com barra cinza, radios + Responder e
+      barra de ações; painel no topo com dropdowns de busca rápida,
+      palavra-chave (`texto`, `unaccent`), "Excluir questões" e "Questões
+      com" (`com`), aplicado só no botão Filtrar; recontagem em
+      `/questoes/facetas` (só OOB); ID curto na palavra-chave abre a questão.
+      Chips no "Filtrar por:" do painel (Alpine; `<noscript>` sem JS), fora do
+      fragmento da lista. Validada no Chromium headless em 1280 e 390 px
+      (2026-10-06). 805 testes (+1 xfail) na raiz e 176 no `site/`, ruff
+      verde.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -851,7 +862,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-034). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-035). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
 
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
 

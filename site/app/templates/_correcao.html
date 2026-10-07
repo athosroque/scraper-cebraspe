@@ -1,40 +1,43 @@
+{% import "_componentes.html" as c %}
 {% set questao = resultado %}
 {% if resultado.anulada %}
     {% set tom = "border-amber-200 bg-amber-50 text-amber-900" %}
+    {% set tom_icone = "bg-amber-500" %}
 {% elif resultado.acertou %}
     {% set tom = "border-emerald-200 bg-emerald-50 text-emerald-900" %}
+    {% set tom_icone = "bg-emerald-600" %}
 {% else %}
     {% set tom = "border-red-200 bg-red-50 text-red-900" %}
+    {% set tom_icone = "bg-red-600" %}
 {% endif %}
 {% set gab_texto = "Certo" if resultado.gabarito == "C" else "Errado" if resultado.gabarito == "E" else resultado.gabarito %}
 {% set resp_texto = "Certo" if resultado.resposta == "C" else "Errado" if resultado.resposta == "E" else resultado.resposta %}
-<div id="{{ dom_id(resultado.questao_chave) }}" class="rounded-lg border p-4 text-sm {{ tom }}" role="status" x-data="{ tentando: false }">
-    <div x-show="!tentando">
-        {% if resultado.anulada %}
-        <p class="font-semibold">Atenção: esta questão foi anulada pela banca.</p>
-        {% elif resultado.acertou %}
-        <p class="font-semibold">✓ Você acertou! O gabarito é {{ gab_texto }}.</p>
-        {% else %}
-        <p class="font-semibold">✗ Você errou. O gabarito é {{ gab_texto }}.</p>
-        {% endif %}
-        <p class="mt-1">Sua resposta: <strong>{{ resp_texto }}</strong></p>
-        
-        {% if resultado.gravada %}
-        <p class="mt-2 text-xs opacity-80">Resposta salva no seu histórico.</p>
-        {% elif not logado and login_habilitado() %}
-        <div class="mt-2 flex items-center gap-3" data-chave="{{ resultado.questao_chave }}"
-             {% if resultado.acertou %}x-init="registrarAcerto($el.dataset.chave); $dispatch('acerto-registrado')"{% endif %}>
-            <p class="text-xs"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}" class="link">Entre com Google</a> para guardar seu histórico.</p>
-            <button type="button" @click="tentando = true" class="btn-secundario text-xs bg-white px-2 py-1">Tentar de novo</button>
+<div id="{{ dom_id(resultado.questao_chave) }}" x-data="{ tentando: false }">
+    <div x-show="!tentando" class="flex gap-3 rounded-lg border p-4 text-sm {{ tom }}" role="status">
+        <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white {{ tom_icone }}" aria-hidden="true">{% if resultado.anulada %}!{% elif resultado.acertou %}✓{% else %}✗{% endif %}</span>
+        <div class="min-w-0 flex-1">
+            {% if resultado.anulada %}
+            <p class="font-semibold">Atenção: esta questão foi anulada pela banca.</p>
+            {% elif resultado.acertou %}
+            <p class="font-semibold">Você acertou! O gabarito é {{ gab_texto }}.</p>
+            {% else %}
+            <p class="font-semibold">Você errou. O gabarito é {{ gab_texto }}.</p>
+            {% endif %}
+            <p class="mt-1">Sua resposta: <strong>{{ resp_texto }}</strong></p>
+
+            {% if resultado.gravada %}
+            <p class="mt-2 text-xs opacity-80">Resposta salva no seu histórico.</p>
+            {% elif not logado and login_habilitado() %}
+            <div class="mt-3 flex flex-wrap items-center gap-3" data-chave="{{ resultado.questao_chave }}"
+                 {% if resultado.acertou %}x-init="registrarAcerto($el.dataset.chave); $dispatch('acerto-registrado')"{% endif %}>
+                <p class="text-xs"><a href="/entrar?voltar={{ url_questao(resultado.questao_chave)|urlencode }}" class="font-medium underline hover:no-underline">Entre com Google</a> para guardar seu histórico.</p>
+                <button type="button" @click="tentando = true" class="btn-secundario px-3 py-1 text-xs">Tentar de novo</button>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
-    
+
     <div x-show="tentando" x-cloak>
-        <form hx-post="/q/correcao" hx-target="#{{ dom_id(resultado.questao_chave) }}" hx-swap="outerHTML" class="flex gap-3" aria-label="Responder questão novamente">
-            <input type="hidden" name="chave" value="{{ resultado.questao_chave }}">
-            <button type="submit" name="resposta" value="C" class="btn-secundario flex-1 justify-center hover:border-emerald-400 hover:text-emerald-700 sm:flex-none sm:px-8">Certo</button>
-            <button type="submit" name="resposta" value="E" class="btn-secundario flex-1 justify-center hover:border-red-400 hover:text-red-700 sm:flex-none sm:px-8">Errado</button>
-        </form>
+        {{ c.form_resposta(resultado.questao_chave, rotulo="Responder questão novamente") }}
     </div>
 </div>

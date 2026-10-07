@@ -1,59 +1,103 @@
 {% import "_componentes.html" as c %}
-<article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-    <header class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-        <strong class="text-slate-900">Questão {{ questao.numero }}</strong>
-        <a href="{{ url_questao(questao.questao_chave) }}" class="text-slate-600 hover:text-blue-700">{{ questao.orgao }} {{ questao.ano }} · {{ questao.banca }}</a>
-        {% if questao.anulada %}<span class="rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-red-200">Anulada</span>{% endif %}
-        {% if questao.incidencia and questao.incidencia.posicao <= 3 %}{{ c.selo("Mais cai · " ~ questao.incidencia.posicao ~ "º da matéria") }}{% endif %}
-    </header>
-    {% if questao.nos %}
-    <div class="mb-3 flex flex-wrap gap-1.5 text-xs" data-assunto-topo aria-label="Assunto">
-        {% for no in questao.nos %}{{ c.selo(no.no_caminho) }}{% endfor %}
-    </div>
-    {% endif %}
-
-    {% if questao.tem_texto_base or questao.tem_figuras %}
-    <details class="group mb-4 rounded-lg border border-slate-200 bg-slate-50"{% if anexos_inline %} open{% endif %}>
-        <summary class="cursor-pointer select-none px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900">
-            {% if questao.tem_texto_base %}Texto associado{% else %}Figuras{% endif %}{% if questao.tem_texto_base and questao.tem_figuras %} e figuras{% endif %}
-            {% if mesmo_texto %}<span class="ml-2 font-normal text-slate-500">(mesmo texto da questão anterior)</span>{% endif %}
-        </summary>
-        {% if anexos_inline %}
-        <div class="border-t border-slate-200 px-4 py-3">{% include "_anexos.html" %}</div>
-        {% else %}
-        <div class="border-t border-slate-200 px-4 py-3" hx-get="{{ url_questao(questao.questao_chave) }}/anexos" hx-trigger="toggle from:closest details once" hx-swap="innerHTML"><span class="text-xs text-slate-500" aria-busy="true">Carregando…</span></div>
+{# Card da questão (5H.2). `posicao` só vem da lista (número do item na
+   página); detalhe e simulado não passam. #}
+{% set nos_card = nos_do_card(questao.nos) %}
+{% set materia_principal = nos_card[0].materia_id if nos_card else None %}
+<article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex flex-wrap items-start gap-2 bg-slate-100 px-3 py-2 text-sm sm:px-5">
+        {% if posicao %}
+        <span class="rounded bg-white px-2 py-0.5 font-semibold tabular-nums text-slate-700 ring-1 ring-slate-200" data-posicao title="Posição na página">{{ posicao }}</span>
         {% endif %}
-    </details>
-    {% endif %}
-
-    {% if questao.secao %}
-    {% if mesmo_comando %}
-    <details class="mb-3 text-sm text-slate-600" data-comando>
-        <summary class="cursor-pointer select-none italic">Mesmo comando da questão anterior</summary>
-        <p class="mt-2 whitespace-pre-line border-l-4 border-blue-700 bg-blue-50 px-3 py-2 italic text-slate-700">{{ questao.secao }}</p>
-    </details>
-    {% else %}
-    <p class="mb-3 whitespace-pre-line border-l-4 border-blue-700 bg-blue-50 px-3 py-2 text-sm italic text-slate-700" data-comando>{{ questao.secao }}</p>
-    {% endif %}
-    {% endif %}
-
-    <p class="mb-4 whitespace-pre-line leading-relaxed text-slate-900">{{ questao.enunciado }}</p>
-
-    <div id="{{ dom_id(questao.questao_chave) }}">
-        <form hx-post="/q/correcao" hx-target="#{{ dom_id(questao.questao_chave) }}" hx-swap="outerHTML" class="flex gap-3" aria-label="Responder questão">
-            <input type="hidden" name="chave" value="{{ questao.questao_chave }}">
-            <button type="submit" name="resposta" value="C" class="btn-secundario flex-1 justify-center hover:border-emerald-400 hover:text-emerald-700 sm:flex-none sm:px-8">Certo</button>
-            <button type="submit" name="resposta" value="E" class="btn-secundario flex-1 justify-center hover:border-red-400 hover:text-red-700 sm:flex-none sm:px-8">Errado</button>
-        </form>
+        <a href="{{ url_questao(questao.questao_chave) }}" class="rounded bg-slate-500 px-2 py-0.5 font-mono font-semibold tracking-wide text-white hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 focus-visible:ring-offset-1" title="Página da questão {{ questao.codigo }}">{{ questao.codigo }}</a>
+        {% if nos_card %}
+        <div class="min-w-0 flex-1 basis-48 break-words py-0.5 leading-snug text-slate-700" data-assunto-topo aria-label="Assunto">
+            {% for no in nos_card %}{% if not loop.first %}<span class="text-slate-400">, </span>{% endif %}
+            {%- for parte in no.partes -%}
+            {%- if not loop.first %} <span class="text-slate-400" aria-hidden="true">▸</span> {% endif -%}
+            {%- if parte.no_id -%}
+            <a href="/questoes?no_id={{ parte.no_id|urlencode }}" class="hover:text-destaque-700 hover:underline{{ ' font-medium text-slate-900' if loop.last }}">{{ parte.nome }}</a>
+            {%- else -%}
+            <span class="{{ 'font-medium text-slate-900' if loop.last }}">{{ parte.nome }}</span>
+            {%- endif -%}
+            {%- endfor %}{% endfor %}
+        </div>
+        {% endif %}
     </div>
 
-    <footer class="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
-        <p>Fonte: CEBRASPE — {{ rotulo_concurso(questao.concurso) }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</p>
-        {% if questao.nos and not anexos_inline %}
-        <details class="mt-2" hx-get="{{ url_questao(questao.questao_chave) }}/parecidas" hx-trigger="toggle[target.open] once" hx-target="find .parecidas-container" hx-swap="innerHTML">
-            <summary class="cursor-pointer select-none font-medium text-slate-600 hover:text-blue-700">Questões parecidas</summary>
-            <div class="mt-2 parecidas-container"><span aria-busy="true">Carregando…</span></div>
+    <div class="px-4 pb-4 pt-3 sm:px-5">
+        {% set rotulo_prova = "CEBRASPE - " ~ questao.ano ~ " - " ~ rotulo_concurso(questao.concurso).replace(" " ~ questao.ano, "") %}
+        <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-200 pb-3 text-xs text-slate-600">
+            <span><strong class="font-semibold text-slate-700">Ano:</strong> {{ questao.ano }}</span>
+            <span><strong class="font-semibold text-slate-700">Banca:</strong> <a href="/questoes?banca={{ questao.banca|urlencode }}" class="text-destaque-700 hover:underline">{{ questao.banca }}</a></span>
+            <span><strong class="font-semibold text-slate-700">Órgão:</strong> <a href="/questoes?orgao={{ questao.orgao|urlencode }}" class="text-destaque-700 hover:underline">{{ questao.orgao }}</a></span>
+            <span class="min-w-0 break-words"><strong class="font-semibold text-slate-700">Prova:</strong>
+                {% if questao.cargos|length == 1 %}{% set cargo = questao.cargos[0] %}
+                <a href="/questoes?concurso={{ questao.concurso|urlencode }}" class="text-destaque-700 hover:underline">{{ rotulo_prova }} - Cargo {{ cargo.cargo_numero }}: {{ cargo.cargo }}</a>
+                {% else %}
+                <a href="/questoes?concurso={{ questao.concurso|urlencode }}" class="text-destaque-700 hover:underline">{{ rotulo_prova }}</a>
+                {% if questao.cargos %}<span class="cursor-help underline decoration-dotted underline-offset-2" title="{% for cargo in questao.cargos %}Cargo {{ cargo.cargo_numero }}: {{ cargo.cargo }}{% if not loop.last %}&#10;{% endif %}{% endfor %}">· {{ questao.cargos|length }} cargos</span>{% endif %}
+                {% endif %}
+            </span>
+            {% if questao.anulada or (questao.incidencia and questao.incidencia.posicao <= 3) %}
+            <span class="ml-auto flex flex-wrap gap-1.5">
+                {% if questao.anulada %}<span class="rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-red-200">Anulada</span>{% endif %}
+                {% if questao.incidencia and questao.incidencia.posicao <= 3 %}{{ c.selo("Mais cai · " ~ questao.incidencia.posicao ~ "º da matéria") }}{% endif %}
+            </span>
+            {% endif %}
+        </div>
+
+        {% if questao.tem_texto_base or questao.tem_figuras %}
+        <details class="group mb-4"{% if anexos_inline %} open{% endif %}>
+            <summary class="inline-flex cursor-pointer select-none list-none items-center gap-1.5 rounded text-sm font-medium text-destaque-700 hover:text-destaque-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 [&::-webkit-details-marker]:hidden">
+                {% if questao.tem_texto_base %}Texto associado{% else %}Figuras{% endif %}{% if questao.tem_texto_base and questao.tem_figuras %} e figuras{% endif %}
+                <span class="group-open:hidden">{{ c.icone("mais", "h-4 w-4") }}</span><span class="hidden group-open:inline">{{ c.icone("menos", "h-4 w-4") }}</span>
+                {% if mesmo_texto %}<span class="ml-1 font-normal text-slate-500">(mesmo texto da questão anterior)</span>{% endif %}
+            </summary>
+            {% if anexos_inline %}
+            <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">{% include "_anexos.html" %}</div>
+            {% else %}
+            <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3" hx-get="{{ url_questao(questao.questao_chave) }}/anexos" hx-trigger="toggle from:closest details once" hx-swap="innerHTML"><span class="text-xs text-slate-500" aria-busy="true">Carregando…</span></div>
+            {% endif %}
         </details>
         {% endif %}
+
+        {% if questao.secao %}
+        {% if mesmo_comando %}
+        <details class="mb-3 text-sm text-slate-600" data-comando>
+            <summary class="cursor-pointer select-none italic">Mesmo comando da questão anterior</summary>
+            <p class="mt-2 whitespace-pre-line border-l-4 border-destaque-700 bg-destaque-50 px-3 py-2 italic text-slate-700">{{ questao.secao }}</p>
+        </details>
+        {% else %}
+        <p class="mb-3 whitespace-pre-line border-l-4 border-destaque-700 bg-destaque-50 px-3 py-2 text-sm italic text-slate-700" data-comando>{{ questao.secao }}</p>
+        {% endif %}
+        {% endif %}
+
+        <p class="mb-5 whitespace-pre-line break-words leading-relaxed text-slate-900">{{ questao.enunciado }}</p>
+
+        <div id="{{ dom_id(questao.questao_chave) }}">
+            {{ c.form_resposta(questao.questao_chave) }}
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-200 px-4 py-3 sm:px-5">
+        {% set acao = "inline-flex items-center gap-2 rounded text-sm text-slate-600 hover:text-destaque-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500" %}
+        <div class="grid grid-cols-2 gap-x-4 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6">
+            {% if materia_principal %}
+            <a href="/materias/{{ materia_principal|urlencode }}" class="{{ acao }}">{{ c.icone("estatisticas") }}Estatísticas</a>
+            {% endif %}
+            {% if questao.nos and not anexos_inline %}
+            <details class="group open:order-last open:col-span-2 sm:open:basis-full" hx-get="{{ url_questao(questao.questao_chave) }}/parecidas" hx-trigger="toggle[target.open] once" hx-target="find .parecidas-container" hx-swap="innerHTML">
+                <summary class="{{ acao|replace('inline-flex', 'flex w-fit') }} cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">{{ c.icone("parecidas") }}Questões parecidas</summary>
+                <div class="parecidas-container mt-2 text-sm"><span class="text-xs text-slate-500" aria-busy="true">Carregando…</span></div>
+            </details>
+            {% elif questao.nos %}
+            <a href="#parecidas" class="{{ acao }}">{{ c.icone("parecidas") }}Questões parecidas</a>
+            {% endif %}
+            {% if questao.link_pdf is defined and questao.link_pdf %}
+            <a href="{{ questao.link_pdf }}" target="_blank" rel="noopener noreferrer" class="{{ acao }}">{{ c.icone("pdf") }}Caderno (PDF)</a>
+            {% endif %}
+            <a href="mailto:athosroque@hotmail.com?subject={{ ('Erro na questão ' ~ questao.codigo)|urlencode }}" class="{{ acao }}">{{ c.icone("notificar") }}Notificar erro</a>
+        </div>
+        <p class="mt-3 text-xs text-slate-500">Fonte: CEBRASPE — {{ rotulo_concurso(questao.concurso) }}, caderno {{ questao.codigo_caderno }}, item {{ questao.numero }}.</p>
     </footer>
 </article>

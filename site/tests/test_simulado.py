@@ -323,7 +323,10 @@ def test_duracao_nota_anterior_e_revisar_erradas(cliente_logado):
     html = c.get(f"/simulado/{s2}").text
     assert "Duração" in html and "Simulado anterior" in html
     assert f"/simulado/{s2}/revisar?situacao=errado" in html
-    assert "Questão" in c.get(f"/simulado/{s2}/revisar").text
+    # O card (5H.2) aparece sem a posição da lista.
+    revisar = c.get(f"/simulado/{s2}/revisar").text
+    assert "<article" in revisar and "Sua resposta" in revisar
+    assert "data-posicao" not in revisar
 
     c.cookies.clear()
     assert c.get(f"/api/v1/simulados/{s2}/questoes").status_code == 401

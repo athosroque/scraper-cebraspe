@@ -1,13 +1,7 @@
 {% import "_componentes.html" as c %}
-{% if parcial %}{% with oob=true %}{% include "_dados_facetas.html" %}{% endwith %}{% endif %}
-{# Chips dos filtros ativos: cada um leva à lista sem só aquele valor. #}
-<div class="mb-4 flex flex-wrap items-center gap-2">
-    <p class="mr-2 text-sm text-slate-600"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total|num }}</strong> questões encontradas</p>
-    {% for chip in chips %}
-        {{ c.chip(chip.rotulo, chip.url) }}
-    {% endfor %}
-    {% if chips %}<a href="/questoes" class="link text-xs">Limpar tudo</a>{% endif %}
-</div>
+{% if parcial %}{% with oob=true %}{% include "_dados_facetas.html" %}{% endwith %}{{ c.subtitulo_lista(materia_unica, oob=true) }}{% endif %}
+{# Os chips ficam no "Filtrar por:" do painel; aqui, só o total. #}
+<p class="mb-4 text-sm text-slate-600" aria-live="polite"><strong class="tabular-nums text-slate-900">{{ pagina_questoes.total|num }}</strong> questões encontradas</p>
 
 {% if pagina_questoes.total == 0 %}
 {% call c.card() %}
@@ -21,19 +15,24 @@
         {% set mesmo_comando = questao.secao and questao.secao == ns.secao and questao.codigo_caderno == ns.caderno %}
         {% set ns.caderno = questao.codigo_caderno %}
         {% set ns.secao = questao.secao %}
-        {% with questao=questao, mesmo_texto=mesmo_texto, mesmo_comando=mesmo_comando %}
+        {% set posicao = (pagina_questoes.pagina - 1) * pagina_questoes.tamanho_pagina + loop.index %}
+        {% with questao=questao, mesmo_texto=mesmo_texto, mesmo_comando=mesmo_comando, posicao=posicao %}
         {% include "_card_questao.html" %}
         {% endwith %}
     {% endfor %}
 </div>
 
+{# Paginação com os filtros aplicados (a URL), não com o form, que pode ter
+   mudanças pendentes até o botão Filtrar. #}
 <nav class="mt-6 flex items-center justify-between gap-3" aria-label="Paginação">
     {% if pagina_questoes.pagina > 1 and pagina_questoes.pagina <= pagina_questoes.total_paginas %}
-    <button type="button" class="btn-secundario" hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina - 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true">← Anterior</button>
+    {% set url = url_pagina(query_aplicada, pagina_questoes.pagina - 1) %}
+    <a href="{{ url }}" class="btn-secundario" hx-get="{{ url }}" hx-target="#lista-conteudo" hx-swap="innerHTML show:#lista-conteudo:top" hx-push-url="true">← Anterior</a>
     {% else %}<span></span>{% endif %}
     <span class="text-sm tabular-nums text-slate-600">Página {{ pagina_questoes.pagina }} de {{ pagina_questoes.total_paginas }}</span>
     {% if pagina_questoes.pagina < pagina_questoes.total_paginas %}
-    <button type="button" class="btn-secundario" hx-get="/questoes" hx-vals='{"pagina": {{ pagina_questoes.pagina + 1 }}}' hx-include="#form-filtros" hx-target="#lista-conteudo" hx-push-url="true">Próxima →</button>
+    {% set url = url_pagina(query_aplicada, pagina_questoes.pagina + 1) %}
+    <a href="{{ url }}" class="btn-secundario" hx-get="{{ url }}" hx-target="#lista-conteudo" hx-swap="innerHTML show:#lista-conteudo:top" hx-push-url="true">Próxima →</a>
     {% else %}<span></span>{% endif %}
 </nav>
 {% endif %}

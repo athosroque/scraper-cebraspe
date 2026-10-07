@@ -42,3 +42,4 @@ Este diretório armazena os Registros de Decisões de Arquitetura (**Architectur
 | [ADR-032](ADR-032-classificacao-questoes-arvore.md) | 2026-09-29 | Classificação das questões na árvore mestre, confiança em 2 camadas e governança humana | Aceito |
 | [ADR-033](ADR-033-site-publico-stack-e-deploy.md) | 2026-09-29 | Site público: FastAPI + Jinja/HTMX (migração futura via /api/v1), Google OAuth, schema `app`, deploy e direitos | Aceito |
 | [ADR-034](ADR-034-fidelidade-ao-caderno-e-filtros.md) | 2026-10-06 | Fidelidade ao caderno (parágrafos, comando, figuras vetoriais, item × preâmbulo) e filtros multisseleção; GRANTs preservados na carga e chave canônica sem quebra de parágrafo | Aceito |
+| [ADR-035](ADR-035-card-e-filtros-formato-gran.md) | 2026-10-06 | Card da questão e filtros no formato Gran em teal: ID curto, Responder, dropdowns no topo aplicados só no Filtrar, recontagem em `/questoes/facetas`, palavra-chave e "questões com" | Aceito |

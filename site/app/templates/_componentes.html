@@ -17,22 +17,31 @@
 {# Chip de filtro ativo. `remover_url` limpa só este filtro. #}
 {% macro chip(rotulo, remover_url=None, ativo=True) %}
 <span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium
-    {{ 'bg-blue-50 text-blue-800 ring-1 ring-blue-200' if ativo else 'bg-slate-100 text-slate-700' }}">
+    {{ 'bg-destaque-50 text-destaque-800 ring-1 ring-destaque-200' if ativo else 'bg-slate-100 text-slate-700' }}">
     {{ rotulo }}
-    {% if remover_url %}<a href="{{ remover_url }}" class="ml-1 text-blue-700 hover:text-blue-900" aria-label="Remover filtro {{ rotulo }}">×</a>{% endif %}
+    {% if remover_url %}<a href="{{ remover_url }}" class="ml-1 text-destaque-700 hover:text-destaque-900" aria-label="Remover filtro {{ rotulo }}">×</a>{% endif %}
 </span>
+{% endmacro %}
+
+{# Subtítulo da lista de questões: "Sobre <matéria>" com uma só matéria
+   marcada. No fragmento vai por OOB, para acompanhar o botão Filtrar. #}
+{% macro subtitulo_lista(materia_unica, oob=False) %}
+<p id="subtitulo-lista" class="mt-1 text-sm text-slate-600"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {%- if materia_unica %}Sobre <strong class="font-semibold text-slate-800">{{ materia_unica }}</strong>
+    {%- else %}Marque órgão, ano, cargo, matéria, assunto e subassunto (vários de cada) e corrija item a item, no padrão certo/errado do CEBRASPE.{% endif -%}
+</p>
 {% endmacro %}
 
 {# Barra de ranking: `percentual` de 0 a 100. "Mais cai" fica discreto. #}
 {% macro barra_ranking(rotulo, percentual, valor=None, url=None, destaque=False) %}
 <div class="py-2">
     <div class="flex items-baseline justify-between gap-3 text-sm">
-        {% if url %}<a href="{{ url }}" class="truncate text-slate-900 hover:text-blue-700">{{ rotulo }}</a>
+        {% if url %}<a href="{{ url }}" class="truncate text-slate-900 hover:text-destaque-700">{{ rotulo }}</a>
         {% else %}<span class="truncate text-slate-900">{{ rotulo }}</span>{% endif %}
         <span class="shrink-0 tabular-nums text-slate-600">{{ valor if valor is not none else '%.1f%%'|format(percentual) }}</span>
     </div>
     <div class="mt-1 h-2 rounded-full bg-slate-100">
-        <div class="h-2 rounded-full {{ 'bg-blue-700' if destaque else 'bg-blue-300' }}" style="width: {{ [percentual, 100]|min }}%"></div>
+        <div class="h-2 rounded-full {{ 'bg-destaque-700' if destaque else 'bg-destaque-300' }}" style="width: {{ [percentual, 100]|min }}%"></div>
     </div>
 </div>
 {% endmacro %}
@@ -48,4 +57,44 @@
 {# Selo discreto de incidência ("mais cai"). #}
 {% macro selo(texto) %}
 <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{{ texto }}</span>
+{% endmacro %}
+
+{# Ícone de traço (20px, `currentColor`), sem biblioteca. Decorativo: o texto
+   ao lado dá o nome; link só de ícone precisa de `aria-label` próprio. #}
+{% macro icone(nome, classe="h-5 w-5") %}
+<svg class="{{ classe }} shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{%- if nome == "estatisticas" %}<path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-9"/>
+{%- elif nome == "parecidas" %}<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 4H5a1 1 0 0 0-1 1v11"/>
+{%- elif nome == "pdf" %}<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>
+{%- elif nome == "notificar" %}<path d="M5 21V4"/><path d="M5 4h13l-2.5 4.5L18 13H5"/>
+{%- elif nome == "mais" %}<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>
+{%- elif nome == "menos" %}<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>
+{%- elif nome == "seta" %}<path d="m6 9 6 6 6-6"/>
+{%- elif nome == "busca" %}<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+{%- elif nome == "limpar" %}<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>
+{%- elif nome == "remover" %}<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>
+{%- endif %}
+</svg>
+{% endmacro %}
+
+{# Form de resposta Certo/Errado do card e do "Tentar de novo" da correção.
+   O alvo é o `div` com `dom_id(chave)` que envolve o form. Sem JS o botão
+   fica habilitado (o `disabled` só vem do Alpine); o servidor devolve este
+   mesmo form com o aviso quando chega sem marcação. #}
+{% macro form_resposta(chave, aviso=None, rotulo="Responder questão") %}
+<form hx-post="/q/correcao" hx-target="#{{ dom_id(chave) }}" hx-swap="outerHTML" x-data="{ r: null }" aria-label="{{ rotulo }}" class="space-y-4">
+    <input type="hidden" name="chave" value="{{ chave }}">
+    <fieldset class="flex flex-wrap gap-x-8 gap-y-3">
+        <legend class="sr-only">Sua resposta</legend>
+        {% for valor, texto in [("C", "Certo"), ("E", "Errado")] %}
+        <label class="inline-flex cursor-pointer items-center gap-3 text-base text-slate-800">
+            <input type="radio" name="resposta" value="{{ valor }}" @change="r = $el.value"
+                   class="h-7 w-7 shrink-0 cursor-pointer appearance-none rounded-full border-2 border-destaque-600 bg-white transition checked:border-destaque-600 checked:bg-destaque-600 checked:shadow-[inset_0_0_0_5px_#fff] hover:border-destaque-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 focus-visible:ring-offset-2">
+            <span>{{ texto }}</span>
+        </label>
+        {% endfor %}
+    </fieldset>
+    {% if aviso %}<p class="text-sm font-medium text-red-700" role="alert">{{ aviso }}</p>{% endif %}
+    <button type="submit" class="btn-primario px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" :disabled="!r">Responder</button>
+</form>
 {% endmacro %}

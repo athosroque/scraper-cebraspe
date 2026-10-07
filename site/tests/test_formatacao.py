@@ -35,3 +35,10 @@ def test_rotulos_de_nivel_tipo_e_materia():
     assert rotulo_tipo_conhecimento("basico") == "Básico"
     assert rotulo_materia("Analista", True) == "Conhecimentos específicos — Analista"
     assert rotulo_materia("Direito Penal", False) == "Direito Penal"
+
+
+def test_codigo_curto_formato_estavel():
+    from app.servicos.formatacao import codigo_curto
+
+    # SHA-1 da chave: o valor não pode mudar entre versões (links publicados).
+    assert codigo_curto("PF_25_ADM|094_PF_CB1_01|1") == "Q6AAB4214"

@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from app.auth import destino_seguro
 
@@ -121,7 +123,11 @@ def test_historico_e_desempenho(cliente_logado):
     assert pagina.status_code == 200
     assert "Desempenho por assunto" in pagina.text
     assert "Caderno de erros" in pagina.text
-    assert "Meu histórico" in c.get("/questoes").text
+    # Logado, "Já resolvidas" e "Que errei" ficam habilitados (5H.3).
+    lista = c.get("/questoes").text
+    for valor in ("nao_resolvidas", "erradas"):
+        tag = re.search(rf'<input[^>]*name="historico" value="{valor}"[^>]*>', lista)
+        assert tag and "disabled" not in tag.group(0)
 
 
 def test_anulada_nao_grava(cliente_logado):

@@ -277,6 +277,48 @@
             "description": "Filtra pelo histórico do usuário logado (resposta mais recente de cada questão). Diferente de `todas` sem login: 401."
           },
           {
+            "name": "texto",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Palavra-chave no enunciado ou no comando da seção, sem diferenciar maiúsculas nem acentos (`acao` acha “ação”). Com várias palavras, cada uma precisa aparecer, em qualquer ordem (E). `%` e `_` valem como texto, não como curinga. Vale até o 100º caractere (o resto é ignorado); vazio = sem filtro. Um ID curto (`Q` + 8 hex, ex.: `Q6AAB4214`) de questão existente filtra só aquela questão.",
+              "examples": [
+                "administração"
+              ],
+              "title": "Texto"
+            },
+            "description": "Palavra-chave no enunciado ou no comando da seção, sem diferenciar maiúsculas nem acentos (`acao` acha “ação”). Com várias palavras, cada uma precisa aparecer, em qualquer ordem (E). `%` e `_` valem como texto, não como curinga. Vale até o 100º caractere (o resto é ignorado); vazio = sem filtro. Um ID curto (`Q` + 8 hex, ex.: `Q6AAB4214`) de questão existente filtra só aquela questão."
+          },
+          {
+            "name": "com",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só questões com `texto_base` e/ou `figuras`. Repita para os dois: a questão precisa ter ambos (E). Outros valores são ignorados (sem 422).",
+              "title": "Com"
+            },
+            "description": "Só questões com `texto_base` e/ou `figuras`. Repita para os dois: a questão precisa ter ambos (E). Outros valores são ignorados (sem 422)."
+          },
+          {
             "name": "pagina",
             "in": "query",
             "required": false,
@@ -698,6 +740,45 @@
               "title": "No Id"
             },
             "description": "Nós da árvore marcados."
+          },
+          {
+            "name": "texto",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Palavra-chave no enunciado ou no comando da seção, sem diferenciar maiúsculas nem acentos (`acao` acha “ação”). Com várias palavras, cada uma precisa aparecer, em qualquer ordem (E). `%` e `_` valem como texto, não como curinga. Vale até o 100º caractere (o resto é ignorado); vazio = sem filtro. Um ID curto (`Q` + 8 hex, ex.: `Q6AAB4214`) de questão existente filtra só aquela questão.",
+              "title": "Texto"
+            },
+            "description": "Palavra-chave no enunciado ou no comando da seção, sem diferenciar maiúsculas nem acentos (`acao` acha “ação”). Com várias palavras, cada uma precisa aparecer, em qualquer ordem (E). `%` e `_` valem como texto, não como curinga. Vale até o 100º caractere (o resto é ignorado); vazio = sem filtro. Um ID curto (`Q` + 8 hex, ex.: `Q6AAB4214`) de questão existente filtra só aquela questão."
+          },
+          {
+            "name": "com",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só questões com `texto_base` e/ou `figuras`. Repita para os dois: a questão precisa ter ambos (E). Outros valores são ignorados (sem 422).",
+              "title": "Com"
+            },
+            "description": "Só questões com `texto_base` e/ou `figuras`. Repita para os dois: a questão precisa ter ambos (E). Outros valores são ignorados (sem 422)."
           },
           {
             "name": "anuladas",
@@ -4187,6 +4268,14 @@
               "PF_25_ADM|094_PF_CB1_01|1"
             ]
           },
+          "codigo": {
+            "type": "string",
+            "title": "Codigo",
+            "description": "ID curto estável: `Q` + 8 hex maiúsculos do SHA-1 de `questao_chave`. A página `/q/<codigo>` redireciona para a questão.",
+            "examples": [
+              "Q6AAB4214"
+            ]
+          },
           "numero": {
             "type": "integer",
             "title": "Numero",
@@ -4324,6 +4413,7 @@
         "required": [
           "questao_id",
           "questao_chave",
+          "codigo",
           "numero",
           "codigo_caderno",
           "concurso",
@@ -4357,6 +4447,7 @@
                 "nivel": "superior"
               }
             ],
+            "codigo": "Q6AAB4214",
             "codigo_caderno": "094_PF_CB1_01",
             "concurso": "PF_25_ADM",
             "enunciado": "Dada a relação de contraste estabelecida entre as duas primeiras orações do último período do texto, seria coerente e gramaticalmente correto inserir, entre vírgulas, a expressão não obstante logo após “pobres”.",
@@ -4401,6 +4492,14 @@
             "description": "Chave estável `concurso|caderno|numero` (mesma da 5D). Use no detalhe e para guardar respostas.",
             "examples": [
               "PF_25_ADM|094_PF_CB1_01|1"
+            ]
+          },
+          "codigo": {
+            "type": "string",
+            "title": "Codigo",
+            "description": "ID curto estável: `Q` + 8 hex maiúsculos do SHA-1 de `questao_chave`. A página `/q/<codigo>` redireciona para a questão.",
+            "examples": [
+              "Q6AAB4214"
             ]
           },
           "numero": {
@@ -4507,6 +4606,7 @@
         "required": [
           "questao_id",
           "questao_chave",
+          "codigo",
           "numero",
           "codigo_caderno",
           "concurso",
@@ -4538,6 +4638,7 @@
                 "nivel": "superior"
               }
             ],
+            "codigo": "Q6AAB4214",
             "codigo_caderno": "094_PF_CB1_01",
             "concurso": "PF_25_ADM",
             "enunciado": "Dada a relação de contraste estabelecida entre as duas primeiras orações do último período do texto, seria coerente e gramaticalmente correto inserir, entre vírgulas, a expressão não obstante logo após “pobres”.",
