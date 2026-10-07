@@ -299,3 +299,5 @@ ADR-032).
 ### Fusão dos assuntos homônimos de Psicologia e Comunicação Social (2026-10-07)
 
 Depois da fusão das disciplinas (Opção A), 12 assuntos ficaram duplicados pelo nome dentro da mesma disciplina (6 em Psicologia, 6 em Comunicação Social), um nó de cada cargo de origem. O dono aprovou fundir os 12 pares: o cargo vive no item de edital e no caderno, não no nó, então nada se perde. Os subassuntos foram junto para o nó de destino; os que são paráfrases entre si ficam para uma curadoria à parte. Contagens inalteradas: `questao_no` 2.965, `vw_peso_materia_cargo` 289, `vw_questoes` utilizáveis 4.055.
+
+Na sequência (2026-10-07), o dono aprovou fundir também os assuntos homônimos das demais disciplinas (16 fusões em TI, Contabilidade e Raciocínio Lógico) e os subassuntos de texto idêntico (61 fusões, comparação sem caixa, acento e pontuação). Ficaram para decisão do dono: os subassuntos parafraseados, o assunto "Estoques" (paráfrase) e "Plano de Contas e Procedimentos de Escrituração" (conteúdos diferentes sob o mesmo nome). Contagens inalteradas: `questao_no` 2.965, `vw_peso_materia_cargo` 289, utilizáveis 4.055.
