@@ -1,0 +1,25 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+exclude = [
+    ".git",
+    "venv",
+    ".venv",
+    "scratch",
+    "data",
+    "revisao_piloto",
+    "questoes",
+    "site/bin",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = [
+    "E501",  # line length gerido pelo formatter
+    "E402",  # imports tardios para lifespan/templates no site/app/main.py
+    "E741",  # variáveis de uma letra em loops locais históricos (ex: `l` em lotes)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src", "app"]

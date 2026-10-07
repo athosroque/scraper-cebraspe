@@ -1,6 +1,6 @@
 import pytest
-from app.servicos.simulados_servico import corrigir, placar
 
+from app.servicos.simulados_servico import corrigir, placar
 from tests.test_stats_writer import _postgres_disponivel
 
 banco = pytest.mark.skipif(
@@ -268,8 +268,9 @@ def test_login_caido_nao_corrige_simulado_gravado_como_avulso(cliente_logado):
     import base64
     import json
 
-    from app.config import settings
     from itsdangerous import TimestampSigner
+
+    from app.config import settings
 
     c, _ = cliente_logado
     r = c.post("/simulado/iniciar", data=PROVA, follow_redirects=False)

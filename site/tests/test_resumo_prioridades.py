@@ -3,8 +3,8 @@
 from datetime import date
 
 import pytest
-from app.servicos.contas_servico import contar_dias_seguidos
 
+from app.servicos.contas_servico import contar_dias_seguidos
 from tests.test_stats_writer import _postgres_disponivel
 
 banco = pytest.mark.skipif(

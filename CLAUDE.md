@@ -535,6 +535,13 @@ Datasette continua só como ferramenta de revisão do dono.
 - Cobertura descendente edital × prova (`vw_edital_vs_prova`): item de edital em nó X cobre X e todos os descendentes de X. Na prova, o apontamento sobe; na comparação, checa se há ancestral-ou-igual previsto no edital daquele cargo (`cobrado_no_edital`, `no_edital_nunca_cobrado`, `cobrado_fora_do_edital`).
 - Peso por matéria em cargo (`vw_peso_materia_cargo`): proporção de cada matéria dentro do total da prova do cargo (básico + específico); matérias identificadas como nome de cargo (`nome_de_cargo = true`) são formatadas como `"Conhecimentos específicos — <cargo>"`.
 - Discursivas analíticas (`vw_discursivas`): isola estritamente os temas e quesitos das 64 discursivas associadas aos nós da árvore mestre, sem interferir nem computar nas contagens das views de questões objetivas.
+- Testes e Ruff por etapas (`Makefile` e marcadores do `pytest.ini`):
+  - Etapa 1 (`make test-fast` / `pytest -m "unit and not db"`): executa `ruff check .` e testes unitários em memória (~18s, sem I/O nem banco).
+  - Etapa 2A (`make test-pipeline` / `pytest tests/`): suíte do scraper, parsers, taxonomia e árvore (~1m15s).
+  - Etapa 2B (`make test-site` / `pytest site/tests/`): suíte da web, rotas, API e simulados (~3m20s). Para pular testes lentos (>3s), usar `make test-site-fast` (`-m "not slow"`).
+  - Etapa 3 (`make test-all` / `make check`): suíte completa de 840 testes e verificação de formatação.
+  - Marcadores registrados no `pytest.ini`: `unit`, `db`, `pipeline`, `site`, `slow`.
+  - Configuração central do Ruff em `pyproject.toml` (targets, ignores e exclusões de `scratch/`, `data/`, etc.).
 
 ## 7. Anti-patterns
 
@@ -866,7 +873,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-035). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-036). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
 
 ### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
 
@@ -1596,6 +1603,12 @@ card). Ver ADR-033.
 **Decisão:** A base única para a porcentagem de incidência na home e no painel de matéria passa a ser "válidas desduplicadas" (computadas via `fn_prova_cobra`). Na tela do painel, os 4 KPIs receberam rótulos mais diretos e tooltips de explicação ("Questões da matéria", "Distintas no recorte", "Anuladas", "Universo de comparação"). O ranking "O que mais cai" também foi complementado com uma linha agregadora "Outros / direto no assunto", para que a soma visível feche exatamente com o total do recorte e a explicação de escopo fique clara (adicionado teste de reconciliação para a LP).
 **Motivo:** Usuários reportaram inconsistências ou confusão entre o número do ranking, o total sem filtro e o número do recorte, visto que cada query contava itens de maneira ligeiramente diferente.
 **Alternativas descartadas:** Mostrar a porcentagem usando a tabela bruta de questões sem desduplicar (causava peso maior do que a matéria realmente tem nos cadernos).
+ 
+### 2026-10-07 — Divisão e agrupamento de testes e ruff por etapas (ADR-036)
+
+**Decisão:** Configuração oficial do Ruff (`pyproject.toml`), marcadores semânticos no Pytest (`pytest.ini` e `conftest.py`) e `Makefile` com atalhos de etapas (`test-fast`, `test-pipeline`, `test-site`, `test-site-fast`, `test-all`, `check`).
+**Motivo:** A suíte atingiu 840 testes levando 4m45s totais, com 72% do tempo concentrado em `site/tests/` devido a consultas SQL no Postgres. Testes unitários sem banco rodam agora em ~18s via `make test-fast` (15× mais rápido).
+**Alternativas descartadas:** Paralelização cega com `pytest-xdist` em toda a base (risco de concorrência e flakiness contra o Postgres compartilhado); reorganização física de diretórios. Ver ADR-036.
 
 ## 13. LESSONS.md (do projeto)
 

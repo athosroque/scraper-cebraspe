@@ -3,8 +3,8 @@
 import re
 
 import pytest
-from app.servicos.formatacao import codigo_curto
 
+from app.servicos.formatacao import codigo_curto
 from tests.test_stats_writer import _postgres_disponivel
 
 pytestmark = pytest.mark.skipif(

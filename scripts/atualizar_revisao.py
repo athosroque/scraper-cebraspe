@@ -100,10 +100,19 @@ def _reaplicar_permissoes_site() -> None:
     # `site_leitura`: sem reaplicar, o site responde "permission denied".
     # Subprocesso porque o diretório `site/` colide com o módulo `site` da
     # stdlib (não dá para importar). Best-effort, como o restart do Datasette.
-    script = Path(__file__).resolve().parents[1] / "site" / "scripts" / "aplicar_schema_app.py"
+    script = (
+        Path(__file__).resolve().parents[1]
+        / "site"
+        / "scripts"
+        / "aplicar_schema_app.py"
+    )
     try:
         resultado = subprocess.run(
-            [sys.executable, str(script)], capture_output=True, text=True, timeout=60, check=False
+            [sys.executable, str(script)],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
         )
     except (OSError, subprocess.SubprocessError) as e:
         logger.warning(f"[SITE] Não foi possível reaplicar as permissões do site: {e}")

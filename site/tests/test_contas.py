@@ -1,8 +1,8 @@
 import re
 
 import pytest
-from app.auth import destino_seguro
 
+from app.auth import destino_seguro
 from tests.test_stats_writer import _postgres_disponivel
 
 pytestmark = pytest.mark.skipif(

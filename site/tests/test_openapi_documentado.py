@@ -6,6 +6,7 @@ caminho; todo schema próprio e todo campo dele têm descrição.
 """
 
 import pytest
+
 from app.main import app
 
 METODOS = {"get", "post", "put", "patch", "delete"}

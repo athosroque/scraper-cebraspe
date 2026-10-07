@@ -6,6 +6,11 @@ import re
 from typing import Annotated, Literal
 from urllib.parse import urlencode
 
+from authlib.integrations.base_client import OAuthError
+from fastapi import APIRouter, Depends, Form, Query, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+
 from app import auth
 from app.api.v1.respostas_comuns import R403
 from app.modelos import ConcursoAlvo, FiltroEstatistica, FiltroQuestoes, NivelAlvo
@@ -23,10 +28,6 @@ from app.servicos.formatacao import (
     rotulo_nivel,
     rotulo_tipo_conhecimento,
 )
-from authlib.integrations.base_client import OAuthError
-from fastapi import APIRouter, Depends, Form, Query, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 
 router = APIRouter(tags=["Web"], include_in_schema=False)
 # Login/logout ficam no contrato (5F.6); as demais rotas HTML, não.
