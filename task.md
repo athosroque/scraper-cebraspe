@@ -7,7 +7,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 > **Revisão 2026-09-19:** este plano foi revisado após checar o código já
 > existente (`src/spider.py`, `src/models_scraper.py`, `src/logger.py`) e
 > testar o site do CEBRASPE ao vivo com Playwright. Os achados que motivaram
-> a revisão estão registrados em `CLAUDE.md` (seção 12, Log de decisões) e
+> a revisão estão registrados nos ADRs (`docs/adr/`, ADR-001 a ADR-008) e
 > `LESSONS.md`. Alvo confirmado: **concursos ENCERRADOS de 2025** (edital,
 > prova e gabarito já publicados) — não 2026 em andamento.
 
@@ -87,7 +87,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 - `[x]` Manter a priorização de grandes cargos (INSS, PF, PRF, Receita) para
   o piloto. Também migrada do texto do link (sempre "MAIS INFORMAÇÕES") para
   o slug da URL — mesma causa-raiz do bug do filtro de ano; ver
-  `CLAUDE.md` (seção 12).
+  ADR-004.
 - `[x]` Manter o mapeamento de PDFs de Edital de Abertura, Provas e
   Gabaritos por concurso (lógica já existe em `map_pdf_links`). Validado ao
   vivo contra um concurso real (`AGSUS_25_CCE`): retornou 3 editais, 10
@@ -108,7 +108,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   extração de órgão corretas para todos (`PF_25_ADM`, `TCU_25_TEFC`
   priorizados; `AGSUS_25_CCE` → `AGSUS`, etc.). 3 testes de regressão
   adicionados em `tests/test_spider.py`
-  (`TestGetContestLinksResolveHref`). Ver `CLAUDE.md`, seção 12.
+  (`TestGetContestLinksResolveHref`). Ver ADR-008.
 
 ## Etapa 3: Download e Organização Estruturada
 - `[x]` Criar `src/downloader.py` com função de download que valida
@@ -140,7 +140,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   AVALIAÇÃO (HABILIDADES E CONHECIMENTOS)" — cronograma, critérios de
   desempate e requisitos/atividades por cargo são dados operacionais do
   concurso, não conteúdo programático, e foram descartados. Racional
-  completo em `CLAUDE.md`, seção 12.
+  completo no ADR-009.
 - `[x]` Criado `src/edital_parser.py` (PyMuPDF). **Achado real, não
   hipotético:** a seção não tem colunas paralelas (confirmado por
   coordenadas de bloco — todo bloco de corpo de texto com x0 ≈ 42.5), mas
@@ -195,7 +195,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   mitigação (3/5, mesma assinatura de falha do baseline num caso — indício
   de que o backend ignora o parâmetro). Novo default de produção já
   aplicado em `src/taxonomia_extractor.py`. Racional completo em
-  `CLAUDE.md` seção 12 e `LESSONS.md`.
+  ADR-016 e `LESSONS.md`.
 - `[x]` **Validação heurística de-para e relatórios visuais (ADR-017 e ADR-018):**
   `scripts/validar_taxonomia.py` compara itens numerados do texto-fonte contra
   a taxonomia extraída usando correspondência de texto normalizado por substring,
@@ -618,8 +618,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 ## Etapa 5B.2: Curadoria da árvore do piloto (LLM com lista fechada + aprovação do dono)
 > **Detalhes da implementação e da decisão do dono:** ADR-030, seção
 > "Implementação (Etapa 5B.2)". O plano das 2 sessões
-> (`plano-etapa-5b2.md`) foi removido ao concluir a etapa e fica no
-> histórico do git. Aqui fica só o resumo.
+> (`docs/planos/plano-etapa-5b2.md`) está arquivado. Aqui fica só o resumo.
 >
 > **Decisões do dono (2026-09-28, não reabrir):** `A-4529f205f7`
 > "Licitações e contratos administrativos" é **dividido** entre
@@ -715,14 +714,14 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 
 ## Etapa 5C.1: Correções da revisão da 5C (antes da 5D)
-- `[x]` Executar as 5 sessões de `correcoes-etapa-5c.md`, uma por conversa
+- `[x]` Executar as 5 sessões de `docs/planos/correcoes-etapa-5c.md`, uma por conversa
   (posição dos itens, alertas no banco, fila/gabaritos, discursivas,
   documentação). O arquivo é autocontido: não precisa reler este `task.md`.
 - **Pronto quando:** as 5 sessões estão marcadas e a verificação padrão do
   arquivo mantém os números da 5C.
 
 ## Etapa 5D: Classificação das questões na árvore mestre (LLM, lista fechada)
-> **Detalhes da implementação e plano de execução:** [`plano-etapa-5d.md`](file:///home/athos/homelab/scraper_cebraspe/plano-etapa-5d.md).
+> **Detalhes da implementação e plano de execução:** [`docs/planos/plano-etapa-5d.md`](docs/planos/plano-etapa-5d.md).
 > O arquivo é autocontido e dividido em 3 sessões independentes (uma por conversa).
 > Cada sessão roda seus testes e verificações antes de avançar.
 >
@@ -737,7 +736,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ## Etapa 5E: Estatísticas (views no banco)
 > **Plano de execução em 3 sessões (A `materia_origem`, B base plana + "o que
-> mais cai", C edital × prova + fechamento):** `plano-etapa-5e.md` (concluído em 2026-09-29).
+> mais cai", C edital × prova + fechamento):** `docs/planos/plano-etapa-5e.md` (concluído em 2026-09-29).
 
 - `[x]` Todas as views sobem pela árvore (matéria › assunto › subassunto) e
   são filtráveis por `banca`, `orgao`, `ano`, `concurso`, `cargo`, `nivel` e
@@ -779,13 +778,13 @@ enviar o bloco de uma etapa específica para o agente construir.
 > Questões, com mais filtros e estatísticas. O Datasette continua só como
 > ferramenta de revisão do dono (SSO). **Cada subetapa é uma sessão.** Antes
 > da 5F.1, detalhar as subetapas num arquivo autocontido
-> (`plano-etapa-5f.md`), no padrão do `correcoes-etapa-5c.md`.
+> (`docs/planos/plano-etapa-5f.md`), no padrão do `docs/planos/correcoes-etapa-5c.md`.
 
 - `[x]` **5F.0 — Decisões (ADR-033):** concluída em 2026-09-29. FastAPI +
   Jinja/HTMX em 3 camadas (migração futura para SvelteKit via `/api/v1`),
   só Google OAuth, schema `app` com roles no mesmo banco (chave estável da
   5D), serviço público sem Zero Trust, postura de crédito à fonte.
-  Subetapas detalhadas em `plano-etapa-5f.md`. Itens decididos:
+  Subetapas detalhadas em `docs/planos/plano-etapa-5f.md`. Itens decididos:
   - stack da API e do frontend;
   - autenticação (provedor próprio × OAuth);
   - hospedagem no Xeon via Traefik + Cloudflare Tunnel, **sem** o Zero
@@ -814,13 +813,38 @@ enviar o bloco de uma etapa específica para o agente construir.
   correção segue a regra CEBRASPE (certo +1, errado −1, branco 0; anulada
   não conta) e mostra o desempenho por nó. Substitui o simulado em HTML
   estático planejado antes para a 5E.
-- `[ ]` **5F.6 — Deploy público (opcional, decisão do dono em
-  2026-10-06; o site ainda vai mudar muito antes de ir ao ar; detalhado
-  como 5F.12 no `plano-etapa-5f.md`):** Traefik/Cloudflare, rate limit, headers
-  de segurança, backup do banco de usuários, CI (ruff/pytest + testes da
-  API).
+- `[ ]` **5F.12 — Deploy público (opcional, decisão do dono em
+  2026-10-06; o site ainda vai mudar muito antes de ir ao ar):**
+  - `Dockerfile` (python:3.11-slim, uvicorn, usuário não root) e serviço
+    `scraper-cebraspe-site` no `docker-compose.yml` (labels Traefik,
+    `homelab_default`, figuras montadas `:ro`).
+  - Cloudflare Tunnel para o subdomínio público, **sem** Access; middleware
+    de rate limit no Traefik; headers (CSP, HSTS, nosniff); `/saude`.
+  - Backup `pg_dump -n app` diário (systemd timer do usuário) com retenção
+    de 14 dias.
+  - CI: ruff + pytest do `site/` no workflow do projeto.
+  - **Checklist de direitos:** o dono lê os termos de `cebraspe.org.br`; sem
+    proibição expressa → público; com proibição → fica atrás do Access.
 - `[x]` **5F.11b — Correções da interface web:** plano em
-  `correcoes-interface-5f.md` (6 sessões).
+  `docs/planos/correcoes-interface-5f.md` (6 sessões).
+- `[ ]` **Pendências herdadas de `correcoes-interface-5f.md`** (conferir se
+  a curadoria da 5H já resolveu antes de abrir sessão):
+  - validação da Sessão 6 em navegador real (só houve Chromium headless);
+  - "TI + Estatística": qual matéria recebe a parte de Estatística;
+  - "Despesa(s) de exercícios anteriores": em 2026-10-08 a árvore ainda tem
+    um assunto (`A-25cda6b4f4`) e um subassunto (`SL-0b8742283d`) ativos
+    com o mesmo nome;
+  - padrão de caixa dos nomes de nó (117 em minúscula): normalizar na
+    exibição ou no dado;
+  - base dos percentuais exibidos.
+- **Ideias opcionais do site** (sem compromisso, vieram do plano da 5F):
+  - recuperar as 19 questões ilegíveis (`simbolo_ilegivel`, caderno
+    `094_PF_005_01`) recortando o item do PDF como imagem na extração;
+  - "% de acerto da comunidade" por questão (agregado anônimo de
+    `app.resposta`);
+  - filtro rápido "nunca cobrado no edital do meu cargo";
+  - sitemap XML das páginas de questão;
+  - modo escuro via `prefers-color-scheme`.
 - **Pronto quando:** o site está no ar com as 2.800 questões do piloto
   filtráveis pela árvore, um usuário cadastrado resolve questões e vê o
   próprio desempenho, e as três estatísticas e o simulado `PF_25_ADM` cargo
@@ -909,7 +933,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 ## Etapa 5H: Card da questão e filtros no formato Gran (cor teal)
 > **Por que existe (2026-10-06):** o dono pediu o card e os filtros do site no
 > formato do Gran Questões, com teal no lugar do laranja. Plano completo em
-> `plano-etapa-5h.md`. **Cada subetapa é uma sessão.**
+> `docs/planos/plano-etapa-5h.md`. **Cada subetapa é uma sessão.**
 
 - `[x]` **5H.1 — Cor e ID curto:** token `destaque` (teal) em
   `tailwind.config.js`, todos os `*-blue-*` trocados, CSS refeito. Campo
@@ -927,7 +951,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   `unaccent`) e `com` (texto associado, figuras) na API e nas facetas; termo
   igual a um ID curto leva à questão.
 - `[x]` **5H.5 — Validação e documentação:** Chromium headless (1280 e 390 px),
-  `guia-teste-navegador.md`, ADR-035, `CLAUDE.md`.
+  `docs/guia-teste-navegador.md`, ADR-035, `CLAUDE.md`.
 - **Pronto quando:** o card da lista, do detalhe e da revisão do simulado segue
   o layout em teal; toda questão tem ID curto único e `/q/<ID>` abre a
   questão; filtrar por 2 matérias + 1 órgão + "excluir anuladas" +
@@ -983,3 +1007,50 @@ enviar o bloco de uma etapa específica para o agente construir.
   `mart`/dbt) que lê os dois. Decisão a registrar em ADR próprio.
 - `[ ]` Caso de uso-alvo: "tópicos mais cobrados por matéria/ano que ainda não
   têm item de estudo" → plano de estudo priorizado.
+
+## Etapa 8: Múltipla escolha, inventário 2020→hoje e ingestão em lotes
+> **Detalhes e plano de execução:** [`plano-etapa-8.md`](plano-etapa-8.md). O arquivo é
+> autocontido; uma sessão (conversa) por subetapa.
+>
+> **Decisões do dono (2026-10-08):** inventário persistido de **2020 até hoje** com os anos
+> disponíveis mapeados pelo crawler; ingestão em **lotes de 2 concursos** com pausa de revisão
+> e retomada; ordem dos anos **2025 → 2026 → 2024 → 2023 → 2022 → 2021 → 2020**; suporte a
+> **múltipla escolha** antes de qualquer lote novo (hoje tudo é Certo/Errado).
+- `[x]` **8.0 Inventário** (concluído e revisado em 2026-10-08): classificador fino de link
+  (`src/inventario.py`), `scripts/inventariar_concursos.py`, `inventario/anos.json` (497 concursos
+  únicos), `inventario/concursos.jsonl` (346 concursos de 2020+, todos mapeados, 0 com erro,
+  18.248 PDFs), tabelas `inv_concurso`/`inv_pdf`, view `vw_inventario_ano` e
+  `inventario/RELATORIO.md` (cobertura por ano, formato da amostra e os 3 cadernos ME para a 8.M).
+  - `[x]` Revisão: mapeamento completo (era 67 de 337), tipo `prova_outra` (oral, didática,
+    tribuna, desempenho), escrita/subjetiva/prática como discursiva, comunicado/relação/edital
+    como administrativo, `\bprovas?\b` em vez de substring; `caderno_objetivo` 2.953 → 2.642.
+    Reclassificação offline (`--reclassificar`) a partir de `pdfs[].texto`.
+  - `[x]` Formato: "julgue" só conta como CE sem alternativas A–D na mesma questão. Amostra
+    refeita (todos de 2025/2026 com caderno + 3 por ano de 2020–2024): 83 cadernos, 42 CE e
+    41 ME, 0 misto, 0 `?`. Os 42 objetivos do piloto continuam CE.
+  - `[x]` Ano de 4 dígitos no slug só `_19YY`/`_20YY`; testes que leem `data/` pulam sem os
+    dados.
+  - `[ ]` Pendente para a 8.1: `map_pdf_links` (download) ainda usa a classificação antiga;
+    "PROVA PRÁTICA – OPÇÃO …" de técnico (prova manual) entra como `caderno_discursivo`;
+    caderno único "PROVAS OBJETIVAS E DISCURSIVA" entra como objetivo.
+  - `[x]` Pausa 0, parte `incluir` (2026-10-09, ADR-037): os 55 alertas do relatório foram
+    validados ao vivo (contagem de PDFs igual nas 55 páginas). O que não entra no site está
+    em `inventario/exclusoes.json` (16 concursos: cancelado, só títulos, página vazia,
+    discursiva sem caderno, exame de certificação e páginas só de curso de formação), e
+    PDF de curso de formação fica fora mesmo em concurso incluído (97 PDFs em 19
+    concursos). Classificador corrigido: `caderno_com_gabarito` (158), justificativa e
+    recurso como administrativo, abertura do SEBRAE ("Comunicado nº 1"), "QUESTÃO
+    DISCURSIVA" como caderno. Prova não aplicada vira `aguardando_prova` (26), e o
+    relatório fica com 0 alertas reais. Falta decidir o tamanho do lote e os concursos em
+    andamento.
+- `[ ]` **8.M Múltipla escolha**: `questoes.tipo` + `alternativas`, gabarito A–E, parser de
+  alternativas calibrado com PDFs ME reais, classificação 5D, site e simulado por tipo, ADR-038.
+  Inclui o layout `caderno_com_gabarito` (questão e gabarito no mesmo PDF; CAESB_24 é ME).
+  Gate: piloto inalterado (2.800 itens, chaves 5D idênticas), `make test-all` verde.
+- `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
+  `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
+  por lote.
+- `[ ]` **8.2+ Lotes**: 2025 → 2026 → 2024 … 2020, 2 concursos por vez; 1º lote de cada ano é
+  de calibração.
+- **Pronto quando:** todos os concursos marcados `incluir` no inventário estão `aprovado`, as
+  views da 5E reconciliam e a suíte completa está verde.

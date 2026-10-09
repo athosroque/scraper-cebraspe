@@ -3,10 +3,12 @@ import random
 import re
 import time
 from pathlib import Path
+from typing import Any
 from urllib.parse import urljoin
 
 from playwright.sync_api import Page, sync_playwright
 
+from src.inventario import SLUGS_NAVEGACAO, classificar_link_pdf
 from src.logger import logger
 
 # Import tardio (dentro de run()) para evitar import circular: downloader.py
@@ -65,35 +67,44 @@ def setup_stealth(page: Page):
 
 def extract_slug(url: str) -> str:
     """Last path segment of the contest URL, used as its stable identifier."""
-    return url.rstrip("/").split("/")[-1]
+    clean_url = url.split("#")[0].split("?")[0]
+    return clean_url.rstrip("/").split("/")[-1]
+
+
+# Ano no slug: 4 dígitos só se for plausível (19YY/20YY); senão o sufixo _YY.
+# Um código numérico de 4 dígitos no slug não pode virar ano.
+PADRAO_ANO_SLUG = re.compile(r"_((?:19|20)\d{2}|\d{2})(_|$)")
 
 
 def extract_year_from_slug(url: str) -> int | None:
-    """Extracts the 2-digit year suffix from the contest's URL slug.
+    """Extrai o ano (4 dígitos ou sufixo de 2 dígitos) do slug da URL do concurso.
 
     O texto visível de todo card de concurso na listagem é sempre
     "MAIS INFORMAÇÕES" (confirmado ao vivo) — o ano só existe no slug da URL,
-    ex: TJ_CE_25_NOTARIOS -> 25 -> 2025.
+    ex: TJ_CE_25_NOTARIOS -> 25 -> 2025 ou INSS_2015 -> 2015.
     """
     slug = extract_slug(url)
-    match = re.search(r"_(\d{2})(_|$)", slug)
+    match = PADRAO_ANO_SLUG.search(slug)
     if not match:
         return None
-    return 2000 + int(match.group(1))
+    val = match.group(1)
+    if len(val) == 4:
+        return int(val)
+    return 2000 + int(val)
 
 
 def extract_orgao_from_slug(url: str) -> str:
-    """Segmento de órgão do slug: tudo antes do token de ano de 2 dígitos.
+    """Segmento de órgão do slug: tudo antes do token de ano (4 ou 2 dígitos).
 
     Mesma razão dos outros extractors: o texto do link não carrega o nome do
     órgão (é sempre "MAIS INFORMAÇÕES"), então a Etapa 3 (downloader, que
     organiza PDFs por órgão) também depende do slug. Ex:
-    TJ_CE_25_NOTARIOS -> "TJ_CE". Sem match de ano no slug, usa o slug
-    inteiro como fallback (não deveria ocorrer para concursos já filtrados
+    TJ_CE_25_NOTARIOS -> "TJ_CE", INSS_2015 -> "INSS". Sem match de ano no slug,
+    usa o slug inteiro como fallback (não deveria ocorrer para concursos já filtrados
     por target_year).
     """
     slug = extract_slug(url)
-    match = re.search(r"_(\d{2})(_|$)", slug)
+    match = PADRAO_ANO_SLUG.search(slug)
     if not match:
         return slug
     return slug[: match.start()] or slug
@@ -115,6 +126,141 @@ def mark_processed(slug: str, processed_slugs: set[str]):
         json.dumps(sorted(processed_slugs), ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+
+
+URLS_LISTAGENS_CEBRASPE = [
+    ("https://www.cebraspe.org.br/concursos/encerrado", "encerrado"),
+    ("https://www.cebraspe.org.br/concursos/em-andamento", "em_andamento"),
+    ("https://www.cebraspe.org.br/concursos/inscricoes-abertas", "inscricoes_abertas"),
+    ("https://www.cebraspe.org.br/concursos/novos", "novos"),
+]
+
+PRIORIDADE_SITUACAO = {
+    "encerrado": 4,
+    "em_andamento": 3,
+    "inscricoes_abertas": 2,
+    "novos": 1,
+}
+
+
+def listar_concursos(page: Page, url_listagem: str, situacao: str) -> list[dict]:
+    """Navega até uma listagem de concursos e extrai os metadados dos concursos encontrados.
+
+    Descarta links para fora do domínio Cebraspe e slugs de navegação institucional.
+    """
+    logger.info(f"Navegando para listagem {situacao}: {url_listagem}")
+    page.goto(url_listagem, timeout=60000)
+    stealth_wait()
+
+    contests_by_slug: dict[str, dict] = {}
+    links = page.locator("a").element_handles()
+
+    for link in links:
+        raw_href = link.get_attribute("href")
+        if not raw_href or raw_href.startswith("#"):
+            continue
+
+        href = urljoin(page.url, raw_href)
+        if not href.startswith("https://www.cebraspe.org.br/concursos/"):
+            continue
+
+        slug = extract_slug(href)
+        raw_slug = raw_href.rstrip("/").split("/")[-1].lstrip("#")
+        if (
+            not slug
+            or slug == "concursos"
+            or slug in SLUGS_NAVEGACAO
+            or raw_slug in SLUGS_NAVEGACAO
+        ):
+            continue
+
+        ano = extract_year_from_slug(href)
+        orgao = extract_orgao_from_slug(href)
+        text = link.inner_text().strip()
+
+        if slug not in contests_by_slug:
+            contests_by_slug[slug] = {
+                "slug": slug,
+                "orgao": orgao,
+                "ano": ano,
+                "situacao": situacao,
+                "url": href,
+                "title": text,
+            }
+        elif not contests_by_slug[slug]["title"] and text:
+            contests_by_slug[slug]["title"] = text
+
+    return list(contests_by_slug.values())
+
+
+def listar_todas_listagens(page_or_spider: Any, page: Page | None = None) -> list[dict]:
+    """Mapeia as 4 listagens do CEBRASPE e desduplica por slug com prioridade de situação.
+
+    Prioridade: encerrado > em_andamento > inscricoes_abertas > novos.
+    Retorna a lista desduplicada ordenada por slug.
+    """
+    actual_page: Page = page if page is not None else page_or_spider
+    concursos_por_slug: dict[str, dict] = {}
+
+    for url, situacao in URLS_LISTAGENS_CEBRASPE:
+        itens = listar_concursos(actual_page, url, situacao)
+        for item in itens:
+            slug = item["slug"]
+            if slug not in concursos_por_slug:
+                concursos_por_slug[slug] = item
+            else:
+                existente = concursos_por_slug[slug]
+                sit_existente = existente.get("situacao", "")
+                sit_nova = item.get("situacao", "")
+                if sit_existente != sit_nova:
+                    prio_existente = PRIORIDADE_SITUACAO.get(sit_existente, 0)
+                    prio_nova = PRIORIDADE_SITUACAO.get(sit_nova, 0)
+                    if prio_nova > prio_existente:
+                        logger.warning(
+                            f"Conflito de situação para o slug '{slug}': "
+                            f"'{sit_existente}' -> '{sit_nova}'. Prevalece a situação mais avançada."
+                        )
+                        concursos_por_slug[slug] = item
+                    else:
+                        logger.warning(
+                            f"Conflito de situação para o slug '{slug}': "
+                            f"'{sit_nova}' vs '{sit_existente}'. Mantida a situação mais avançada '{sit_existente}'."
+                        )
+
+    return sorted(concursos_por_slug.values(), key=lambda x: x["slug"])
+
+
+def mapear_links_pdf(page: Page, contest_url: str) -> list[dict]:
+    """Mapeia todos os links de PDF de uma página de concurso do CEBRASPE.
+
+    Classifica cada PDF utilizando classificar_link_pdf de src.inventario.
+    """
+    logger.info(f"Mapeando PDFs para {contest_url}")
+    page.goto(contest_url, timeout=60000)
+    stealth_wait()
+
+    links = page.locator("a").element_handles()
+    pdfs = []
+    for link in links:
+        raw_href = link.get_attribute("href")
+        if not raw_href or not raw_href.lower().endswith(".pdf"):
+            continue
+
+        text = link.inner_text().strip()
+        href = urljoin(page.url, raw_href)
+        classif = classificar_link_pdf(text)
+        pdfs.append(
+            {
+                "url": href,
+                "texto": text,
+                "tipo": classif["tipo"],
+                "versao": classif["versao"],
+                "curso_formacao": classif["curso_formacao"],
+            }
+        )
+
+    logger.info(f"Mapeados {len(pdfs)} links de PDF para {contest_url}")
+    return pdfs
 
 
 class CebraspeSpider:
@@ -183,6 +329,20 @@ class CebraspeSpider:
         # Sort by priority (descending)
         unique_contests.sort(key=lambda x: x["priority"], reverse=True)
         return unique_contests
+
+    def listar_concursos(
+        self, page: Page, url_listagem: str, situacao: str
+    ) -> list[dict]:
+        """Navega até uma listagem de concursos e extrai os metadados dos concursos encontrados."""
+        return listar_concursos(page, url_listagem, situacao)
+
+    def listar_todas_listagens(self, page: Page) -> list[dict]:
+        """Mapeia as 4 listagens do CEBRASPE, desduplicando por slug com prioridade de situação."""
+        return listar_todas_listagens(page)
+
+    def mapear_links_pdf(self, page: Page, contest_url: str) -> list[dict]:
+        """Mapeia todos os links de PDF de uma página de concurso classificando cada um."""
+        return mapear_links_pdf(page, contest_url)
 
     def map_pdf_links(self, page: Page, contest_url: str) -> dict[str, list]:
         """Maps PDF links for Edital de Abertura, Provas, and Gabaritos."""

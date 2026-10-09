@@ -296,8 +296,7 @@ crawl (Etapa 2), não reconstruído depois a partir do PDF (Etapa 4).
 `<concurso_dir>/provas_texto_link.json` (chave = nome do arquivo). Modelagem
 cargo↔prova em `models_scraper.py` (`ProvaObjetiva.cargos_numeros`) trata
 Conhecimentos Básicos como N:1 (compartilhado por grupo de cargos) e
-Conhecimentos Específicos/Discursiva como 1:1. Ver decisão em `CLAUDE.md`
-(seção 12).
+Conhecimentos Específicos/Discursiva como 1:1. Ver ADR-027.
 **Custo do aprendizado:** ~30 min, repetido **duas vezes** na mesma sessão —
 a primeira aplicação desse fix (em `spider.py`/`models_scraper.py`) foi
 perdida entre uma conversa e outra porque este projeto nunca foi commitado
@@ -365,7 +364,7 @@ em si veio cortado no meio (`json.JSONDecodeError: Unterminated string`,
 ~7510 chars) com `max_tokens=8192`, ou seja o teto também é insuficiente
 pro output final em chunks grandes, não só pro reasoning. `MAX_TOKENS=24576`
 e `REQUEST_TIMEOUT=240` adotados como novo default de produção. Ver
-CLAUDE.md seção 12 pro racional completo.
+ADR-016 pro racional completo.
 **Custo do aprendizado:** ~15 min diagnóstico inicial (2026-09-19) + ~1h
 entre implementação de retry/parametrização, experimento controlado (20
 chamadas reais) e análise dos resultados (2026-09-20).
@@ -582,3 +581,45 @@ simulado só pelo texto.
 `site/tests/`) remove o `file_handler` do logger. O log antigo foi arquivado
 em `.gz`, e uma execução real com o log limpo deu 0 ERROR.
 **Custo do aprendizado:** ~15 min.
+
+### [tags: inventario, classificacao, falha-silenciosa, testes, multipla-escolha]
+**Sintoma:** a 8.0 foi dada como pronta com o invariante "todo concurso 2020+
+tem `data_mapeamento` ou `erro`" verde, mas o `concursos.jsonl` tinha 67 dos
+337 concursos listados. Além disso, 12% dos links `caderno_objetivo` eram
+prova oral, escrita, didática ou comunicado, e 4 cadernos ME puros saíam
+`misto`.
+**Causa:** o teste só percorria os registros que existiam no JSONL, então
+concurso nunca mapeado não aparecia nele. O classificador mandava para
+`caderno_objetivo` todo link com a substring "prova" (inclusive "Aprova o
+Regulamento" e "Comunicado – Suspensão da prova objetiva"). E questão ME do
+CEBRASPE usa "Julgue os itens ... Assinale a opção correta", que a heurística
+contava como comando CE.
+**Solução:** o invariante parte de `anos.json` (`cobertura_por_ano`: listados ×
+mapeados × erro × sem estado) e exige 0 sem estado. O classificador usa
+`\bprovas?\b`, prefixo administrativo (comunicado, relação, edital…), tipo
+`prova_outra` (oral, didática, tribuna, desempenho) e escrita/subjetiva/
+prática como discursiva. No formato, "julgue" só conta como CE quando não há
+bloco de alternativas A–D na mesma questão. Reclassificação offline pelos
+`pdfs[].texto` (`--reclassificar`), sem raspar de novo.
+**Custo do aprendizado:** ~1h (remapeamento de 281 concursos e reamostragem).
+
+### [tags: inventario, classificacao, falha-silenciosa, cebraspe]
+**Sintoma:** o `RELATORIO.md` da 8.0 listava 55 concursos "sem edital" ou "sem
+caderno/gabarito". Abertas ao vivo, as 55 páginas tinham exatamente os PDFs do
+inventário, e 9 alertas eram falsos. Além disso, 8 concursos com prova
+objetiva (CAESB_24, PC_DF_24_ADM, TC_DF_23…) tinham `caderno_objetivo = 0`
+sem alerta nenhum, porque também tinham caderno discursivo.
+**Causa:** o tipo vinha só do texto do link, e o CEBRASPE usa formatos fora do
+padrão. "PROVA E GABARITO DEFINITIVO" é um PDF único, com questões e gabarito,
+e caía em `gabarito` porque essa regra vem antes da de prova. O SEBRAE abre
+com "Comunicado nº 1 – Abertura" e publica a discursiva como "QUESTÃO
+DISCURSIVA (ESTUDO DE CASO)", sem "prova". Já "edital de abertura" citado no
+meio do título ("Prorrogação … do edital de abertura") virava abertura.
+**Solução:** tipo `caderno_com_gabarito` (conta como caderno e gabarito),
+abertura só no início do título, justificativa e recurso como administrativo
+(exceto o título que começa com "gabarito": o cargo pode ter "recursos") e
+lista `inventario/exclusoes.json` para o que é verdadeiro e fica fora do site
+(ADR-037). Antes de decidir sobre alerta de arquivo ausente, comparar a
+contagem de `<a>` da página ao vivo com o inventário.
+**Custo do aprendizado:** ~1h30 (validação ao vivo de 55 páginas e
+reclassificação).

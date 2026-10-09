@@ -1375,3 +1375,58 @@ JOIN vw_no_caminho nc ON nc.id = dn.no_id
 LEFT JOIN materia_info mi ON mi.no_id = nc.materia_id AND mi.concurso = c.slug
 LEFT JOIN no_arvore na_mat ON na_mat.id = nc.materia_id
 WHERE dn.status = 'aprovado' AND c.status_revisao = 'aprovado';
+
+-- Tabelas do Inventário (Etapa 8.0) -------------------------------------------
+
+CREATE TABLE IF NOT EXISTS inv_concurso (
+    slug TEXT PRIMARY KEY,
+    orgao TEXT NOT NULL,
+    ano INTEGER,
+    situacao TEXT NOT NULL,
+    url TEXT NOT NULL,
+    data_mapeamento TIMESTAMPTZ,
+    qtd_editais INTEGER NOT NULL DEFAULT 0,
+    qtd_cadernos INTEGER NOT NULL DEFAULT 0,
+    qtd_gabaritos INTEGER NOT NULL DEFAULT 0,
+    qtd_padroes INTEGER NOT NULL DEFAULT 0,
+    qtd_administrativos INTEGER NOT NULL DEFAULT 0,
+    qtd_nao_classificados INTEGER NOT NULL DEFAULT 0,
+    formato_provavel TEXT,
+    alertas TEXT[] NOT NULL DEFAULT '{}',
+    incluir BOOLEAN,
+    no_banco BOOLEAN NOT NULL DEFAULT false,
+    erro TEXT
+);
+
+CREATE TABLE IF NOT EXISTS inv_pdf (
+    id SERIAL PRIMARY KEY,
+    concurso_slug TEXT NOT NULL REFERENCES inv_concurso(slug) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    texto TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    versao TEXT,
+    UNIQUE (concurso_slug, url)
+);
+
+-- Fora do site (ADR-037): incluir=false vem de inventario/exclusoes.json, e o
+-- PDF de curso de formação não vai para o lote mesmo em concurso incluído.
+ALTER TABLE inv_concurso ADD COLUMN IF NOT EXISTS categoria_exclusao TEXT;
+ALTER TABLE inv_concurso ADD COLUMN IF NOT EXISTS motivo_exclusao TEXT;
+ALTER TABLE inv_pdf ADD COLUMN IF NOT EXISTS curso_formacao BOOLEAN NOT NULL DEFAULT false;
+
+DROP VIEW IF EXISTS vw_inventario_ano;
+CREATE VIEW vw_inventario_ano AS
+SELECT
+    ano,
+    situacao,
+    COUNT(*) AS total_concursos,
+    COUNT(*) FILTER (WHERE incluir IS FALSE) AS concursos_fora_do_site,
+    SUM(qtd_cadernos) AS total_cadernos,
+    SUM(qtd_gabaritos) AS total_gabaritos,
+    SUM(qtd_padroes) AS total_padroes,
+    COUNT(*) FILTER (WHERE formato_provavel = 'me') AS concursos_me,
+    COUNT(*) FILTER (WHERE formato_provavel = 'ce') AS concursos_ce,
+    COUNT(*) FILTER (WHERE no_banco) AS concursos_no_banco
+FROM inv_concurso
+GROUP BY ano, situacao
+ORDER BY ano DESC NULLS LAST, situacao;

@@ -1,0 +1,26 @@
+{
+  "descricao": "Concursos do inventário que NÃO entram no site de questões (ADR-037). Fonte única: lida por src/inventario.carregar_exclusoes, aplicada no --mapear e no --reclassificar (incluir=false). Concurso listado aqui não é remapeado, não entra na amostra nem em lote, e sai dos alertas do RELATORIO.md. Editar à mão; categoria tem de existir em CATEGORIAS_EXCLUSAO.",
+  "decidido_em": "2026-10-09",
+  "verificado": "Páginas abertas ao vivo em 2026-10-08: a contagem de PDFs bate com o inventário; os motivos vêm dos documentos da própria página.",
+  "regras_pdf": {
+    "curso_formacao": "PDF de prova de curso de formação (texto do link com 'curso de formação') não vai para o site, mesmo dentro de concurso incluído: cobra o conteúdo do curso, não o edital. Implementado em pdf_vai_para_o_site."
+  },
+  "concursos": [
+    {"slug": "AGSUS_26_UGP_UAC", "categoria": "cancelado", "motivo": "Link 'Cancelamento do Edital nº 2'; nenhuma prova publicada."},
+    {"slug": "IBGE_20_AGENTE", "categoria": "cancelado", "motivo": "'Comunicado – cancelamento do processo seletivo e devolução de taxa de inscrição' (censo adiado)."},
+    {"slug": "IBGE_20_RECENSEADOR", "categoria": "cancelado", "motivo": "Mesmo cancelamento do IBGE_20_AGENTE; só editais, anexos e apostila."},
+    {"slug": "PREF_PIRENOPOLIS_20", "categoria": "cancelado", "motivo": "Só 'Edital nº 1 – Abertura' e 'Comunicado – Aviso de Suspensão'."},
+    {"slug": "NAV_BRASIL_24_PSS", "categoria": "sem_prova", "motivo": "PSS por avaliação curricular de títulos e experiência profissional."},
+    {"slug": "SEMA_MT_21_PSS", "categoria": "sem_prova", "motivo": "PSS por análise curricular e documental (títulos e experiência)."},
+    {"slug": "SEMA_MT_25_PSS", "categoria": "sem_prova", "motivo": "PSS por análise curricular e documental (títulos e experiência)."},
+    {"slug": "SINFRA_MT_21_PSS", "categoria": "sem_prova", "motivo": "PSS por análise curricular e documental (títulos e experiência)."},
+    {"slug": "SEFAZ_RR_21_CF", "categoria": "pagina_vazia", "motivo": "Página existe, mas 'Editais, comunicados e informações' está vazia (0 links)."},
+    {"slug": "INPP_24", "categoria": "discursiva_sem_caderno", "motivo": "Só discursiva; publicados os padrões de resposta (cargos 1 a 7), sem o caderno com o enunciado."},
+    {"slug": "MCTI_LNA_23_PESQUISADOR", "categoria": "discursiva_sem_caderno", "motivo": "Só discursiva; publicado o padrão de resposta, sem o caderno com o enunciado."},
+    {"slug": "DREI_26_EXAME_APTIDAO", "categoria": "nao_e_concurso", "motivo": "Exame de aptidão para tradutores e intérpretes públicos (tradução por idioma), sem caderno publicado."},
+    {"slug": "ANEEL_25_CF", "categoria": "curso_formacao", "motivo": "Página só do curso de formação do CNU (sem edital de abertura)."},
+    {"slug": "ANS_25_CF", "categoria": "curso_formacao", "motivo": "Página só do curso de formação do CNU (sem edital de abertura)."},
+    {"slug": "ANTAQ_25_CF", "categoria": "curso_formacao", "motivo": "Página só do curso de formação do CNU (sem edital de abertura)."},
+    {"slug": "MTE_25", "categoria": "curso_formacao", "motivo": "Página só do curso de formação de auditor-fiscal do trabalho (CNU); o documento base é 'Edital nº 1 – Informações gerais sobre o Curso de Formação'."}
+  ]
+}

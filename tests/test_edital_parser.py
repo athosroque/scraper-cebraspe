@@ -250,7 +250,7 @@ NOTA_RETIFICACAO = (
 )
 
 # Regressão do achado ao vivo 2026-09-20 (chunk 30, PSICÓLOGO ORGANIZACIONAL,
-# ver CLAUDE.md seção 12): nota de retificação embutida no meio do texto
+# ver ADR-016): nota de retificação embutida no meio do texto
 # programático — ruído administrativo, não conteúdo de estudo.
 SECAO_COM_RETIFICACAO = f"""OBJETOS DE AVALIAÇÃO
 CARGO 12: PSICÓLOGO ORGANIZACIONAL

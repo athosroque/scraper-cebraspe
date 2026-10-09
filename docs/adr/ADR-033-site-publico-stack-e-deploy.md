@@ -219,4 +219,4 @@ UX fique limitada pelo HTMX. Até lá, migrar é custo sem ganho.
 - ADR-026 (banco próprio), ADR-030 (árvore mestre e objetivo do site),
   ADR-031 (extração, DELETE + INSERT por caderno), ADR-032 (chave estável
   da questão, 5E).
-- `plano-etapa-5f.md` (execução por sessão).
+- `docs/planos/plano-etapa-5f.md` (execução por sessão).

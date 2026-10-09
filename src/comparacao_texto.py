@@ -121,6 +121,17 @@ PADRAO_CARGOS_MENCIONADOS = re.compile(
     re.IGNORECASE,
 )
 
+# Padrão de resposta da discursiva (singular ou plural) — funciona tanto no
+# texto bruto quanto no texto normalizado.
+PADRAO_PADRAO_RESPOSTA = re.compile(r"\bpadr\w*\s+.*\brespostas?\b", re.IGNORECASE)
+
+# Editais e comunicados administrativos que citam termos como prova/edital
+# mas não são cadernos nem editais de abertura.
+PADRAO_EDITAL_ADMINISTRATIVO = re.compile(
+    r"edital\s+n[ºo]|resultado|loca(?:l|is)\s+de\s+(?:aplica|realiza)|comunicado\s*[-–\s]+\s*loca(?:l|is)\b|convoca|reabertura|retifica",
+    re.IGNORECASE,
+)
+
 
 def extrair_cargos_do_texto(texto: str) -> list[int]:
     """Cargos citados no texto, na ordem em que aparecem e sem repetição.

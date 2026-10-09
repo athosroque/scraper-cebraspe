@@ -15,7 +15,7 @@ Questões (prints de 2026-10-06), trocando o laranja do Gran por **teal**. O
 card era um bloco único com botões Certo/Errado de um clique, e os filtros
 ficavam numa barra lateral de `<details>` que buscava a cada checkbox. O
 `questao_id` do banco muda a cada recarga, então não servia como ID visível.
-Plano completo em `plano-etapa-5h.md`.
+Plano completo em `docs/planos/plano-etapa-5h.md`.
 
 ## Decisão
 

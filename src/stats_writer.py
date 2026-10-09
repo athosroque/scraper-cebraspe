@@ -39,7 +39,7 @@ from pathlib import Path
 
 import psycopg2
 from dotenv import load_dotenv
-from psycopg2.extras import Json, execute_batch
+from psycopg2.extras import Json, execute_batch, execute_values
 
 from src import arvore, canonico, classificacao, gabarito_parser
 from src.comparacao_texto import extrair_cargos_do_texto, normalizar
@@ -63,10 +63,17 @@ PASTA_CATEGORIA_FILA = {"Provas": "prova", "Gabaritos": "gabarito"}
 # sem acento/pontuação). Ordem importa: "PADRÃO ... RESPOSTA – PROVA
 # DISCURSIVA" é gabarito, não prova; edital administrativo que cita prova
 # (resultado, locais) caiu em Provas/ antes da correção do spider.
-PADRAO_EDITAL_ADMINISTRATIVO = re.compile(
-    r"\bedital\b|\bresultado\b|\blocais de aplicacao\b"
-)
-PADRAO_PADRAO_RESPOSTA = re.compile(r"\bpadr\w* .*\brespostas?\b")
+try:
+    from src.comparacao_texto import (
+        PADRAO_EDITAL_ADMINISTRATIVO,
+        PADRAO_PADRAO_RESPOSTA,
+    )
+except (ImportError, AttributeError):
+    PADRAO_EDITAL_ADMINISTRATIVO = re.compile(
+        r"\bedital\b|\bresultado\b|\blocais de aplicacao\b"
+    )
+    PADRAO_PADRAO_RESPOSTA = re.compile(r"\bpadr\w* .*\brespostas?\b")
+
 PADRAO_DISCURSIVA = re.compile(r"\bdiscursivas?\b")
 PADRAO_BASICA = re.compile(r"\bconhecimentos (?:basicos|gerais)\b")
 PADRAO_ESPECIFICA = re.compile(r"\bconhecimentos especificos\b")
@@ -1175,6 +1182,101 @@ def gravar_estatisticas(
     finally:
         if proprio:
             conn.close()
+
+
+def gravar_inventario(conn, concursos: list[dict]) -> None:
+    """Grava o inventário de concursos e PDFs (Etapa 8.0) no banco de dados.
+
+    Substitui de forma transacional e idempotente o conteúdo de `inv_pdf` e
+    `inv_concurso` utilizando inserção em lote via `execute_values`.
+    """
+    valores_concurso = []
+    valores_pdf = []
+    seen_pdfs: set[tuple[str, str]] = set()
+
+    for c in concursos:
+        slug = c["slug"]
+        valores_concurso.append(
+            (
+                slug,
+                c.get("orgao", ""),
+                c.get("ano"),
+                c.get("situacao", ""),
+                c.get("url", ""),
+                c.get("data_mapeamento"),
+                c.get("qtd_editais", 0),
+                c.get("qtd_cadernos", 0),
+                c.get("qtd_gabaritos", 0),
+                c.get("qtd_padroes", 0),
+                c.get("qtd_administrativos", 0),
+                c.get("qtd_nao_classificados", 0),
+                c.get("formato_provavel"),
+                c.get("alertas") or [],
+                c.get("incluir"),
+                (c.get("exclusao") or {}).get("categoria"),
+                (c.get("exclusao") or {}).get("motivo"),
+                bool(c.get("no_banco", False)),
+                c.get("erro"),
+            )
+        )
+        for pdf in c.get("pdfs") or []:
+            url = pdf["url"]
+            if (slug, url) in seen_pdfs:
+                continue
+            seen_pdfs.add((slug, url))
+            valores_pdf.append(
+                (
+                    slug,
+                    url,
+                    pdf.get("texto") or "",
+                    pdf.get("tipo") or "",
+                    pdf.get("versao"),
+                    bool(pdf.get("curso_formacao")),
+                )
+            )
+
+    with conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM inv_pdf")
+        cur.execute("DELETE FROM inv_concurso")
+
+        if valores_concurso:
+            execute_values(
+                cur,
+                """
+                INSERT INTO inv_concurso (
+                    slug, orgao, ano, situacao, url, data_mapeamento,
+                    qtd_editais, qtd_cadernos, qtd_gabaritos, qtd_padroes,
+                    qtd_administrativos, qtd_nao_classificados,
+                    formato_provavel, alertas, incluir, categoria_exclusao,
+                    motivo_exclusao, no_banco, erro
+                ) VALUES %s
+                """,
+                valores_concurso,
+            )
+
+        if valores_pdf:
+            execute_values(
+                cur,
+                """
+                INSERT INTO inv_pdf (
+                    concurso_slug, url, texto, tipo, versao, curso_formacao
+                ) VALUES %s
+                """,
+                valores_pdf,
+            )
+
+        cur.execute("SAVEPOINT grant_inventario")
+        try:
+            cur.execute(
+                "GRANT SELECT ON inv_concurso, inv_pdf, vw_inventario_ano TO site_leitura, site_app"
+            )
+            cur.execute("RELEASE SAVEPOINT grant_inventario")
+        except Exception:
+            cur.execute("ROLLBACK TO SAVEPOINT grant_inventario")
+
+    logger.info(
+        f"[INVENTARIO] Gravados {len(valores_concurso)} concursos e {len(valores_pdf)} PDFs no inventário."
+    )
 
 
 if __name__ == "__main__":

@@ -89,7 +89,7 @@ Datasette continua só como ferramenta de revisão do dono.
       não aborta o lote, idempotência por registro local
       (`data/processed_concursos.json`). Auditado ao vivo em 2026-09-19:
       encontrado e corrigido um bug crítico de href relativo que zerava o
-      resultado do crawler em produção (ver seção 12) — 31 concursos de
+      resultado do crawler em produção (ADR-008) — 31 concursos de
       2025 confirmados após a correção.
 - [x] Fase 3 — Download: `downloader.py` valida PDFs (magic bytes `%PDF-` +
       Content-Type) e grava em `data/<ano>/CEBRASPE/<orgao_slug>/{Editais,
@@ -140,7 +140,7 @@ Datasette continua só como ferramenta de revisão do dono.
       Gabaritos em hash (TCU/CD) ligados pelo código impresso no PDF. Bug de recuo em `_recuo_item`
       corrigido para a faixa estrita de 12 a 24 pt. JSONs gerados em `questoes/` mantidos localmente
       (`questoes/` no `.gitignore`). 374 testes no pytest e ruff verde (ADR-031).
-- [x] Etapa 5C.1 — Correções da extração (Sessões 1 a 5, correcoes-etapa-5c.md): posição dos itens por x0 (cluster/moda); alertas no item no Postgres (alertas text[], utilizavel boolean, view vw_questoes_utilizaveis); fila reprocessada por assinatura_grupo; lock pg_try_advisory_lock (5031001); gabarito definitivo x preliminar no cabeçalho; quesitos discursivos após comando; tema anafórico rejeitado; padrão ligado por chave de título. 435 testes (+1 xfail) no pytest e base inalterada (ADR-031).
+- [x] Etapa 5C.1 — Correções da extração (Sessões 1 a 5, `docs/planos/correcoes-etapa-5c.md`): posição dos itens por x0 (cluster/moda); alertas no item no Postgres (alertas text[], utilizavel boolean, view vw_questoes_utilizaveis); fila reprocessada por assinatura_grupo; lock pg_try_advisory_lock (5031001); gabarito definitivo x preliminar no cabeçalho; quesitos discursivos após comando; tema anafórico rejeitado; padrão ligado por chave de título. 435 testes (+1 xfail) no pytest e base inalterada (ADR-031).
 - [x] Etapa 5B.1 — Árvore mestre semeada com a 5B (ADR-030): `canonico/arvore.json`
       (3730 nós: 89/1148/2493, 4050 mapeamentos `semente`, 100% dos nomes),
       `src/arvore.py`, `scripts/semear_arvore.py` (recusa sobrescrever árvore
@@ -193,7 +193,7 @@ Datasette continua só como ferramenta de revisão do dono.
       migrar o frontend depois (SvelteKit) sem tocar a regra; só Google OAuth;
       schema `app` no `scraper-cebraspe-db` com roles `site_leitura`/`site_app`
       e chave estável da 5D; deploy via Traefik + Tunnel sem Access. Plano em
-      `plano-etapa-5f.md`.
+      `docs/planos/plano-etapa-5f.md`.
 - [x] Etapa 5F.1 — API de leitura (ADR-033): `questao_chave` em `vw_questoes`
       (2.800 chaves, 1:1 com a 5D; as 34 restantes da 5D são discursivas);
       `site/app` em 3 camadas com `GET /api/v1/questoes` (filtros + paginação,
@@ -274,7 +274,7 @@ Datasette continua só como ferramenta de revisão do dono.
       a cada carga e a chave canônica sensível a quebra de parágrafo.
       763 testes (+1 xfail), ruff verde. Ver ADR-034.
 - [x] Etapa 5H — Card da questão e filtros no formato Gran, em teal
-      (ADR-035, `plano-etapa-5h.md`): token `destaque` (teal), ID curto `Q` +
+      (ADR-035, `docs/planos/plano-etapa-5h.md`): token `destaque` (teal), ID curto `Q` +
       8 hex (`/q/<ID>` → 301), card com barra cinza, radios + Responder e
       barra de ações; painel no topo com dropdowns de busca rápida,
       palavra-chave (`texto`, `unaccent`), "Excluir questões" e "Questões
@@ -288,6 +288,31 @@ Datasette continua só como ferramenta de revisão do dono.
       renomeando 10 para área de conhecimento e fundindo Psicologia e
       Comunicação Social; assuntos e subassuntos homônimos fundidos, com teste guarda; 2026-10-07). 631 testes (+1 xfail) em `tests/`
       e 209 em `site/tests/`, ruff verde.
+- [x] Etapa 8.0 — Inventário 2020+ e classificador fino (`plano-etapa-8.md`,
+      revisada em 2026-10-08): `src/inventario.py` (classificador de link,
+      `resumir_pdfs`, `reclassificar_inventario`, `detectar_formato_caderno`,
+      `cobertura_por_ano`, `escolher_cadernos_calibracao_me`), `spider.py`
+      (`listar_todas_listagens`, `mapear_links_pdf`, ano `_19YY/_20YY` além de
+      `_YY`), `scripts/inventariar_concursos.py` (`--listagens`, `--mapear`,
+      `--reclassificar` offline, `--amostra-formato`, `--gravar-banco`,
+      `--relatorio`), `inv_concurso`/`inv_pdf`/`vw_inventario_ano`. 497 concursos
+      nas 4 listagens; os 346 de 2020+ (337 encerrados/em andamento + 9 com
+      inscrição aberta ou novos) mapeados, 0 com erro, 0 sem estado; 18.248 PDFs.
+      Classificador: tipo novo `prova_outra` (oral, didática, tribuna,
+      desempenho), escrita/subjetiva/prática como discursiva e comunicado/
+      relação/edital como administrativo; `caderno_objetivo` caiu de 2.953 para
+      2.642 no mesmo corpus. Formato: "julgue" só conta como CE sem alternativas
+      A–D na mesma questão; amostra de 83 cadernos (42 CE, 41 ME, 0 misto,
+      0 `?`); os 42 objetivos do piloto seguem CE. Cadernos ME para a 8.M no
+      `inventario/RELATORIO.md` (`BANRISUL_25` com figura, `SEBRAE_26_PSE_1`
+      básico, `SEFA_PR_25` específico). Piloto inalterado (70 provas, 145 na
+      fila, 2.800 questões). 809 testes (+1 xfail) em `tests/`, ruff verde.
+      Pausa 0, parte `incluir` (2026-10-09, ADR-037): os 55 alertas foram validados ao
+      vivo, e o que fica fora do site está em `inventario/exclusoes.json` (16 concursos
+      + PDF de curso de formação). Também entraram `caderno_com_gabarito`, a abertura do
+      SEBRAE e `aguardando_prova` (26). Relatório com 0 alertas reais.
+- [ ] Etapa 8.M — Múltipla escolha (próxima sessão): `questoes.tipo` + `alternativas`, gabarito A–E,
+      parser ME calibrado com os cadernos reais identificados no inventário, site e simulado por tipo.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -349,7 +374,7 @@ Datasette continua só como ferramenta de revisão do dono.
   Telegram). Decisão do dono em 2026-09-25. Defaults atuais do extrator:
   `MAX_TOKENS=12000`, `REQUEST_TIMEOUT=120`, reasoning 3000 — vieram do merge
   `b823c31` e substituíram os `24576`/`240` registrados na decisão de
-  2026-09-20 (§12), que ficam só como histórico.
+  2026-09-20 (ADR-016), que ficam só como histórico.
 - Chaves do OpenRouter são dedicadas por etapa (`llm_openrouter.ETAPA_*` +
   `chave_openrouter`): `OPENROUTER_KEY_TAXONOMIA_EDITAL`, `_SINONIMOS`,
   `_CURADORIA_ARVORE`, `_CLASSIFICACAO_QUESTOES` e `_TELEGRAM`. O nome da chave
@@ -535,6 +560,11 @@ Datasette continua só como ferramenta de revisão do dono.
 - Cobertura descendente edital × prova (`vw_edital_vs_prova`): item de edital em nó X cobre X e todos os descendentes de X. Na prova, o apontamento sobe; na comparação, checa se há ancestral-ou-igual previsto no edital daquele cargo (`cobrado_no_edital`, `no_edital_nunca_cobrado`, `cobrado_fora_do_edital`).
 - Peso por matéria em cargo (`vw_peso_materia_cargo`): proporção de cada matéria dentro do total da prova do cargo (básico + específico); matérias identificadas como nome de cargo (`nome_de_cargo = true`) são formatadas como `"Conhecimentos específicos — <cargo>"`.
 - Discursivas analíticas (`vw_discursivas`): isola estritamente os temas e quesitos das 64 discursivas associadas aos nós da árvore mestre, sem interferir nem computar nas contagens das views de questões objetivas.
+- O que fica fora do site é decidido só em `inventario/exclusoes.json` (slug, categoria
+  de `CATEGORIAS_EXCLUSAO`, motivo), lido por `inventario.carregar_exclusoes`. Concurso da
+  lista não é remapeado, não entra em amostra nem em lote e sai dos alertas. PDF de curso
+  de formação fica fora por `pdf_vai_para_o_site`. Alerta do inventário vem do texto do
+  link: antes de tratar como "sem arquivo", conferir a página ao vivo (ADR-037).
 - Testes e Ruff por etapas (`Makefile` e marcadores do `pytest.ini`):
   - Etapa 1 (`make test-fast` / `pytest -m "unit and not db"`): executa `ruff check .` e testes unitários em memória (~18s, sem I/O nem banco).
   - Etapa 2A (`make test-pipeline` / `pytest tests/`): suíte do scraper, parsers, taxonomia e árvore (~1m15s).
@@ -550,7 +580,7 @@ Datasette continua só como ferramenta de revisão do dono.
   do CEBRASPE usam href relativo (`/concursos/PF_25_ADM`), e um
   `href.startswith("https://...")` sem resolver descarta 100% dos links
   silenciosamente (0 resultados, sem exceção). Achado ao vivo em
-  2026-09-19, ver seção 12.
+  2026-09-19, ver ADR-008.
 - Nunca filtrar ano com regex no texto do link — o ano está no slug da URL
   (ex: `TJ_CE_25_NOTARIOS` → 2025), não aparece como "2025" no texto visível.
 - Nunca envolver o loop de concursos inteiro num único `try/except` (mascara
@@ -572,7 +602,7 @@ Datasette continua só como ferramenta de revisão do dono.
   hífen — perde silenciosamente todo cabeçalho com dígito (`CARGO N:`),
   vírgula ou parênteses, e o conteúdo correspondente é engolido pelo chunk
   anterior sem erro nenhum. Achado ao vivo em 2026-09-19 (chunk de 41850
-  chars engolindo ~14 cargos), ver seção 12 e `LESSONS.md`.
+  chars engolindo ~14 cargos), ver ADR-010 e `LESSONS.md`.
 - Nunca chamar modelo de raciocínio com `max_tokens` baixo pra `glm-5.3-flash` — o
   `content` volta `null` mesmo sem erro de rede se o orçamento acabar no
   `reasoning_content`.
@@ -767,7 +797,7 @@ Além das tabelas (`chunks`/`taxonomia_topicos`/`taxonomia_subtopicos`/
 um **relatório HTML de página única por edital** — texto-fonte e taxonomia
 extraída lado a lado por chunk, com os alertas de
 `scripts/validar_taxonomia.py` destacados — pra não precisar alternar entre
-tabelas pra fazer o de-para manualmente (ver §12, decisão de 2026-09-21).
+tabelas pra fazer o de-para manualmente (ADR-018).
 
 **Não é preciso rodar nada manualmente depois de uma extração.**
 `scripts/revisar_taxonomia_piloto.py` e `scripts/reprocessar_falhas_piloto.py`
@@ -876,745 +906,21 @@ resultado = download_concurso_pdfs(
   usa o slug e não o texto do link).
 - `task.md` é a fonte de verdade para granularidade de passos; este
   `CLAUDE.md` mantém a visão de fase/status.
+- Plano de etapa (`plano-etapa-N.md`) fica na raiz só enquanto a etapa está
+  em andamento. Ao concluir, levar o que ficou aberto para o `task.md` e
+  fazer `git mv` para `docs/planos/` (índice em `docs/planos/README.md`).
+  Não apagar: `task.md` e ADRs citam esses arquivos.
 
 ## 12. Log de decisões
 
-> 💡 **Nota:** As decisões técnicas e arquiteturais deste projeto foram formalizadas e catalogadas individualmente em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-036). O registro abaixo mantém a memória cronológica das decisões tomadas durante as sessões:
+As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-037;
+o `README.md` de lá é o índice com data e título). Antes de reabrir uma
+escolha de stack, banco, parser ou site, ler o ADR correspondente.
 
-### 2026-09-19 — Filtro de ano por slug de URL, não por texto do link
-
-**Decisão:** Extrair o ano do sufixo `_YY` no slug da URL do concurso (ex:
-`_25` → 2025), em vez de regex `2025` no texto do link.
-**Motivo:** Teste ao vivo no site confirmou que o texto de cada card é sempre
-"MAIS INFORMAÇÕES" — a regex original (`re.search(r'2025', text)` sobre o
-texto do link, em `spider.py`) nunca teria retornado resultado nenhum.
-**Alternativas descartadas:** Regex no texto visível (implementação
-original) — comprovadamente quebrada, falha silenciosa (sem erro, só
-retorna lista vazia).
-
-### 2026-09-19 — Fonte primária de crawling é `/concursos/encerrado`
-**Decisão:** Priorizar a aba "Encerrados" como fonte dos concursos 2025, não
-a raiz `/concursos/`.
-**Motivo:** A raiz retornou 80 links de concurso vs. 423 em `/encerrado`;
-Prova e Gabarito só existem para concursos já realizados.
-**Alternativas descartadas:** Crawlear só a raiz — insuficiente para o
-objetivo de PDFs de prova/gabarito.
-
-### 2026-09-19 — Novas tabelas na mesma instância Postgres do study-rag-agent
-
-> **Substituída em 2026-09-21 pelo ADR-026** (banco próprio) — ver a última
-> entrada deste log.
-**Decisão:** Tabelas de estatísticas deste projeto vivem em `study-rag-db`
-(mesma instância, rede `homelab_default`), desenhadas como star schema, com
-FK opcional para `itens_estudo`.
-**Motivo:** Reaproveita infra já provisionada, permite FK real (em vez de
-ETL externo) e o objetivo final (cruzar estatísticas por matéria/tema/ano
-para ML e planos de estudo) é exatamente o forte de um modelo relacional com
-colunas `JSONB` para campos irregulares.
-**Alternativas descartadas:** Instância Postgres própria; banco não
-relacional (Mongo) — descartado porque agregação/estatística/ML sobre
-matéria×tema×ano é o caso de uso central de um schema relacional, não de um
-document store.
-
-### 2026-09-19 — Priorização de cargo também migrada do texto do link para o slug
-**Decisão:** Ao implementar a Etapa 2, a checagem de keywords (INSS, PF,
-PRF, ...) foi movida de `re.search` sobre o texto do link para uma
-comparação por segmentos do slug da URL (`slug.split("_"/"-")` contra um
-set de keywords).
-**Motivo:** Mesma causa-raiz documentada no filtro de ano — o texto de todo
-card é sempre "MAIS INFORMAÇÕES", então a priorização original também nunca
-teria disparado (achado não listado explicitamente no `task.md`, mas
-decorre diretamente do mesmo teste ao vivo). Além disso, `\b` de regex não
-funciona bem sobre slug com underscore (`\w` inclui `_`), então a primeira
-tentativa de correção (regex com `\b` direto no slug) também falhou
-silenciosamente — corrigido comparando segmentos pós-`split`, não regex com
-fronteira de palavra.
-**Alternativas descartadas:** Manter checagem apenas no texto do link
-(mantém o bug); regex `\b` direto no slug (não cria fronteira em
-underscore, mesmo problema).
-
-### 2026-09-19 — Idempotência via registro JSON local, não pasta em `data/`
-**Decisão:** A Etapa 2 registra slugs processados com sucesso em
-`data/processed_concursos.json` (array JSON), checado no início do loop e
-atualizado após cada concurso bem-sucedido.
-**Motivo:** A estrutura de pastas `data/<ano>/CEBRASPE/<orgao>/...` só passa
-a existir na Etapa 3 (downloader); checar pasta em disco não é viável antes
-disso. Um registro JSON simples é suficiente para o piloto e pode ser
-substituído/complementado por uma checagem de pasta quando o downloader
-existir.
-**Alternativas descartadas:** Adiar idempotência para a Etapa 3 — rejeitado
-porque o `task.md` pede idempotência já na Etapa 2, e o crawler sozinho já
-é caro o suficiente (network + stealth wait) para justificar não reprocessar
-concursos.
-
-### 2026-09-19 — Nome de órgão também vem do slug, não do texto do link
-**Decisão:** Adicionar `extract_orgao_from_slug` em `spider.py` (segmento do
-slug antes do token de ano `_YY`, ex: `TJ_CE_25_NOTARIOS` → `TJ_CE`) e
-incluir a chave `orgao` no dict retornado por `get_contest_links`.
-**Motivo:** A Etapa 3 (downloader) precisa de um nome de órgão para montar
-`data/<ano>/CEBRASPE/<orgao_slug>/...`, mas nada no crawler produzia isso —
-`ConcursoMetadados.orgao` existe no modelo desde a Etapa 1, porém
-`get_contest_links` só devolvia `title` (sempre "MAIS INFORMAÇÕES", mesma
-causa-raiz do filtro de ano) e nunca populava esse campo. Extrair do slug é
-consistente com o padrão já usado para ano e priorização.
-**Alternativas descartadas:** Buscar o nome do órgão na página de detalhe do
-concurso (H1/breadcrumb) — mais preciso, mas exige nova navegação Playwright
-por concurso (custo de rede/tempo) e não foi validado ao vivo nesta sessão;
-fica como possível refinamento futuro se o slug abreviado (ex: `TJ_CE`) se
-mostrar insuficiente para leitura humana das pastas.
-
-### 2026-09-19 — Dedup de download em duas camadas (URL + hash de conteúdo)
-**Decisão:** `downloader.py` mantém um manifesto JSON por concurso
-(`.manifest.json` dentro da pasta do órgão) mapeando URL → {hash, path}.
-Antes de baixar, verifica se a URL já está no manifesto (pula a requisição
-de rede); depois de baixar, verifica se o hash do conteúdo já corresponde a
-um arquivo existente (evita gravar duplicata em disco quando dois links
-apontam pro mesmo PDF).
-**Motivo:** O `task.md` pede dedup "por hash de conteúdo entre execuções",
-mas só o hash não evita a requisição de rede repetida (precisa baixar antes
-de saber o hash) — o manifesto por URL resolve a reexecução idempotente, e a
-checagem de hash resolve duplicata de conteúdo sob URLs diferentes
-(retificação de edital que reaponta pro mesmo arquivo, por exemplo).
-**Alternativas descartadas:** Dedup só por nome de arquivo — falso-positivo
-(nomes iguais, conteúdo diferente) e falso-negativo (nomes diferentes,
-mesmo conteúdo) fáceis de ocorrer em PDFs do CEBRASPE.
-
-### 2026-09-19 — Auditoria pós-Etapa 3: href relativo zerava o crawler em produção
-**Decisão:** Em `get_contest_links`, resolver todo `href` com
-`urljoin(page.url, href)` antes de compará-lo contra
-`"https://www.cebraspe.org.br/concursos/"`, em vez de comparar o atributo
-cru do HTML direto.
-**Motivo:** Auditoria ao vivo (Playwright real contra
-`/concursos/encerrado`, não mock) revelou que os 424 cards da listagem
-usam **href relativo** (`/concursos/PF_25_ADM`), não absoluto —
-`get_attribute("href")` devolve exatamente o que está no atributo HTML, sem
-resolver contra a base da página (diferente da propriedade `.href` do DOM,
-resolvida pelo browser). O filtro `href.startswith("https://www.cebraspe.org.br/concursos/")`
-— presente desde o commit inicial do projeto e mantido sem alteração pela
-Etapa 2 — descartava **100% dos cards**, silenciosamente: `get_contest_links`
-retornava lista vazia sem lançar exceção, mesmo padrão de falha do bug do
-filtro de ano já documentado, mas desta vez no ponto de entrada do crawler,
-mascarando que nenhuma das correções da Etapa 2 (filtro de ano,
-priorização, idempotência) chegava a ser exercitada em produção — apesar de
-`task.md` e este `CLAUDE.md` marcarem a Fase 2 como concluída. Confirmado
-antes/depois da correção: 0 → 31 concursos de 2025 encontrados contra o
-site real; `download_concurso_pdfs` (Etapa 3) validado ponta a ponta com
-PDFs reais de um desses concursos (`AGSUS_25_CCE`).
-**Alternativas descartadas:** Nenhuma — é uma correção direta de bug, sem
-trade-off. Reforça a lição já registrada em `LESSONS.md` de sempre validar
-o crawler contra o DOM real, nunca assumir a forma de um atributo HTML sem
-inspecionar ao vivo.
-
-### 2026-09-19 — Etapa 4: só a seção "OBJETOS DE AVALIAÇÃO" vale a pena extrair
-**Decisão:** `edital_parser.py` recorta exclusivamente a seção "OBJETOS DE
-AVALIAÇÃO (HABILIDADES E CONHECIMENTOS)" do edital (usa o texto do
-marcador, não o número do item — varia por concurso).
-**Motivo:** Análise manual do edital real `PF_25_ADM` (68 páginas): é a
-única seção com estrutura matéria→tópico→subtópico, o dado que a Fase 5
-(banco de estatísticas) precisa. Cronograma, critérios de desempate e
-requisitos/atividades por cargo (vistos nas páginas 1–3 e 63–64) são dados
-operacionais do concurso — não conteúdo de estudo — e não servem ao
-objetivo do projeto (cruzar estatísticas de incidência de tópico por
-matéria/ano para planos de estudo).
-**Alternativas descartadas:** Extrair também requisitos/atividades por
-cargo (dá pra montar uma dimensão "cargo" mais rica) — descartado por
-agora porque foge do escopo de "conteúdo de estudo" da Etapa 4; pode virar
-uma dimensão auxiliar na Fase 5 se fizer falta, sem precisar mudar o parser.
-
-### 2026-09-19 — Chunking em dois níveis (cargo + matéria), não só matéria
-**Decisão:** `dividir_por_cargo_e_materia` percorre cabeçalhos de cargo
-(`CARGO N: <nome>`) e de matéria juntos, mantendo o cargo corrente; gera 1
-chunk por matéria nomeada, e 1 chunk pelo próprio cargo quando ele não tem
-matéria nomeada à parte (especialidades médicas: o cabeçalho do cargo já é
-o rótulo do conteúdo).
-**Motivo:** O `task.md` pede chunking "por cargo, ... disciplinas" — os
-dois eixos coexistem de verdade no mesmo edital (ver achado abaixo e em
-`LESSONS.md`): cargos administrativos agrupam várias matérias nomeadas;
-cargos de especialidade (Médico Clínico, Médico Ortopedista, ...) não têm
-matéria própria, só o nome do cargo mesmo. Um chunking só-por-matéria perde
-a associação com o cargo (necessária pra Fase 5 relacionar taxonomia →
-cargo → concurso); um chunking só-por-cargo perde a granularidade de
-matéria nos cargos administrativos.
-**Alternativas descartadas:** Chunking só por matéria (primeira versão) —
-comprovadamente quebrado: perdeu silenciosamente ~14 cargos inteiros dentro
-de 1 chunk de 41850 chars, por o regex de matéria não reconhecer cabeçalhos
-com dígito/vírgula/parênteses. Ver `LESSONS.md`.
-
-### 2026-09-19 — Extração LLM via `requests` direto, não LangChain
-**Decisão:** `taxonomia_extractor.py` faz POST direto (`requests`) para
-`{LITELLM_BASE_URL}/chat/completions`, sem adicionar `langchain-openai`
-como dependência nova.
-**Motivo:** O `study-rag-agent` usa `langchain_openai.ChatOpenAI` contra o
-mesmo LiteLLM, mas ele já depende de LangChain pro grafo inteiro (LangGraph).
-O `scraper_cebraspe` tem stack enxuta e já depende de `requests` (Etapa 3).
-O LiteLLM expõe um schema compatível com a API de chat da OpenAI — não há
-ganho em trazer uma dependência pesada só para 1 chamada de extração.
-**Alternativas descartadas:** `langchain-openai` (mesmo padrão do
-`study-rag-agent`) — rejeitado por trazer uma dependência nova grande sem
-necessidade; SDK oficial `openai` — mesma objeção, `requests` já resolve.
-
-### 2026-09-19 — Chave de API do LiteLLM: virtual key gerada, nunca a master key
-**Decisão:** Gerada uma virtual key (`key_alias: scraper-cebraspe`, escopo
-`models: ["glm-5.3-flash"]`) via `POST {LITELLM_BASE_URL}/key/generate` com
-a master key do `study-rag-agent`, salva só em `.env` local (gitignored).
-**Motivo:** A master key do LiteLLM está documentada em texto puro no
-`CLAUDE.md`/`docker-compose.yml` do `study-rag-agent` (issue de segurança
-conhecida, fora do escopo deste projeto — ver seção 8). Usá-la direto nas
-chamadas de extração deste projeto propagaria esse problema; uma virtual
-key escopada segue o mesmo padrão já usado lá para o "Hermes Agent".
-**Alternativas descartadas:** Usar a master key direto — descartado por
-segurança (nenhum motivo técnico pra precisar de uma master key só pra
-chamar 1 modelo).
-
-### 2026-09-19 — `run()` nunca chamava o downloader; registro de idempotência mentia
-**Decisão:** `CebraspeSpider.run()` agora chama `download_concurso_pdfs`
-logo após `map_pdf_links` e só marca o slug como processado
-(`mark_processed`) depois do download rodar — nunca antes.
-**Motivo:** Auditoria ao vivo (`python -m src.spider` rodado pelo usuário)
-mostrou que `run()` mapeava os PDFs, logava as contagens e já marcava o
-concurso como "processado" em `data/processed_concursos.json` **sem nunca
-chamar `download_concurso_pdfs`** — a Etapa 2 e a Etapa 3 nunca tinham sido
-ligadas, apesar de ambas constarem como `[x]` no Progresso. Resultado real
-encontrado: 13 slugs no registro, mas só 1 (`PF_25_ADM`) com pasta de
-download de verdade; os outros 12 (`AGSUS_25_CCE`, `TCU_25_TEFC`, etc.)
-seriam pulados para sempre em execuções futuras sem nunca ter baixado nada.
-Registro limpo manualmente para conter só `PF_25_ADM`.
-**Efeito colateral corrigido junto:** nessa mesma auditoria, o
-`map_pdf_links` também tinha regredido — voltou a descartar o texto do link
-de cada prova (guardava só a URL, perdendo a distinção CB1/CB2/DISC descrita
-na decisão de 2026-09-19 sobre cargo↔prova) e a logar só contagens
-agregadas, sem sinalizar PDFs não classificados. Reaplicado o formato
-`{"url": ..., "texto": ...}` e o log `[PROVA-PDF]`/`nao_classificados`.
-Como `download_concurso_pdfs` esperava `list[str]` de URLs, ele foi ajustado
-para aceitar também `list[dict]` nessa forma e persistir o texto em
-`<concurso_dir>/provas_texto_link.json` (chave = nome do arquivo baixado),
-para a Etapa 4 consumir depois sem precisar reconstruir a informação a
-partir do PDF (que não a contém).
-**Risco de processo identificado:** este diretório nunca foi commitado em
-nenhuma branch (raiz do `homelab` está com `scraper_cebraspe/` totalmente
-untracked); existe uma worktree separada (`worktree-scraper-cebraspe-etapa3`)
-com commits próprios da Etapa 2/3 que nunca foi mergeada de volta. É provável
-que essa regressão tenha entrado ao sincronizar arquivos entre as duas
-cópias sem levar em conta o ajuste de `texto`. Recomendado começar a
-commitar este projeto para não perder trabalho de novo (ver aviso ao
-usuário na conversa).
-**Alternativas descartadas:** Nenhuma — bug de wiring, sem trade-off.
-
-### 2026-09-20 — Trilha de auditoria de entrada/saída do parser+extractor
-**Decisão:** `scripts/revisar_taxonomia_piloto.py` agora salva, além do
-`<edital>.json` de resultado, um `<edital>.auditoria.json` com os metadados
-do corte de seção (páginas/chars totais do PDF, offsets, se achou o
-marcador de fim) e, por chunk, cargo/matéria/offsets/tamanho/**o texto
-exato enviado ao LLM**/status. `ChunkTaxonomia` ganhou `offset_inicio`/
-`offset_fim` e um `chunk_index` estável (posição na lista de chunking) foi
-adicionado a `auditoria_chunks`, `resultados` e `chunks_com_falha` pra ligar
-os dois arquivos sem depender do par `(cargo, materia)` como string.
-**Motivo:** `logs/scraper_cebraspe.log` só registrava contagens agregadas
-(quantos chunks, quantas falhas) — não dava pra auditar depois se o corte
-da seção "OBJETOS DE AVALIAÇÃO" descartou/reteve o texto certo, nem
-inspecionar o texto que efetivamente foi pro LLM em cada chunk que falhou.
-**Alternativas descartadas:** Registrar isso só no log (texto de 39 chunks
-por edital não cabe legível em log de linha única); casar auditoria↔resultado
-só por `(cargo, materia)` — frágil pra cargos com matéria repetida/nula.
-
-### 2026-09-20 — Revisão navegável via Datasette e Traefik/Cloudflare Tunnel
-**Decisão:** Novo `scripts/gerar_db_datasette.py` lê todos os pares
-`revisao_piloto/<edital>.json`+`<edital>.auditoria.json` (funciona também
-com o arquivo legado sem auditoria) e reconstrói do zero
-`revisao_piloto/revisao.db` (`sqlite-utils`, tabelas `editais`/`chunks`/
-`taxonomia_topicos`/`taxonomia_subtopicos`, FTS5 habilitado em texto de
-chunk e nomes de tópico/subtópico). Novo `docker-compose.yml` sobe
-`datasetteproject/datasette` servindo esse banco. Antes restrito ao
-`127.0.0.1:8011`, a pedido do usuário o serviço foi exposto via Traefik
-na rede `homelab_default` e associado ao Cloudflare Tunnel em
-`datasette.projetoathos.com.br`, com autenticação restrita via SSO para
-o email do usuário.
-**Motivo:** Ferramenta de apoio ao checkpoint de revisão humana da Etapa 4
-(`status_revisao_humana: PENDENTE`) — precisa navegar/comparar entrada
-(chunk enviado ao LLM) e saída (taxonomia extraída) lado a lado sem escrever
-frontend. Reconstrução completa (não incremental) porque na escala do
-piloto (poucos editais) upsert só adiciona risco de linha obsoleta sem
-ganho. A exposição via Cloudflare Tunnel foi necessária para permitir a
-revisão fora da rede local. **Isso não é e não substitui** o banco de
-produção da Fase 5 (Postgres próprio `scraper-cebraspe-db`, ADR-026) —
-é descartável/regenerável a qualquer momento a partir dos JSONs.
-**Alternativas descartadas:** Upsert incremental — complexidade sem
-benefício na escala atual; Postgres em vez de SQLite pra essa ferramenta —
-rejeitado porque duplicaria a decisão já fechada da Fase 5 pra um uso
-completamente diferente (revisão descartável vs. estatística de produção).
-
-### 2026-09-20 — Retry + max_tokens/timeout maiores para reduzir falhas de extração; reasoning-off descartado
-**Decisão:** `extrair_taxonomia_chunk` (`src/taxonomia_extractor.py`) ganhou
-retry com backoff (3 tentativas, 5s/15s) e `max_tokens`/`timeout`/
-`reasoning` parametrizáveis (default reproduz produção). Novo default de
-produção: `MAX_TOKENS=24576` (era 8192), `REQUEST_TIMEOUT=240` (era 120s).
-`edital_parser.py` ganhou `_limpar_ruido_edital` — remove nota de
-retificação de edital embutida no meio do texto programático (achado no
-chunk `PSICÓLOGO ORGANIZACIONAL`) antes de virar `ChunkTaxonomia.texto`.
-**Motivo:** Comparando dois runs reais completos do mesmo edital (39
-chunks, 2026-09-19 e 2026-09-20), só 2 das 5 falhas de cada run coincidiam
-— a falha é majoritariamente não-determinística, não estrutural por chunk.
-Um experimento controlado (`scripts/experimento_falhas_llm.py`, 20 chamadas
-reais, 1 tentativa por config pra isolar o efeito) nos 5 chunks que
-falharam no run de 20/09 comparou: baseline (8192/120s) 2/5 sucesso;
-`max_tokens=24576,timeout=240s` **5/5**; `thinking: disabled` 3/5 (mesmo
-chunk falhou com a mesma assinatura ligado e desligado — z-ai/OpenRouter
-provavelmente ignora o parâmetro); `thinking:disabled`+texto limpo 4/5.
-Achado extra: no chunk maior (6977 chars), a falha não era só reasoning —
-o `content` (JSON) em si veio cortado no meio
-(`json.JSONDecodeError: Unterminated string`, ~7510 chars) com
-`max_tokens=8192`, confirmando que o teto também é insuficiente pro output
-final em chunks grandes, não só pro reasoning. `max_tokens`/`timeout`
-maiores foi a única config que fechou 5/5 — adotada como default. Fecha o
-item `validacao-pendente` registrado em `LESSONS.md`.
-**Alternativas descartadas:** Desligar reasoning via `thinking`/
-`reasoning_effort` como mitigação de produção — tecnicamente repassado pelo
-LiteLLM (`openrouter/chat/transformation.py`, confirmado no pacote
-instalado) mas sem evidência de que o backend obedece; resultado do
-experimento (3/5, mesma assinatura de falha que o baseline num caso) não
-justifica confiar nisso sem verificação mais forte — se algum dia isso for
-revisitado, precisa de um teste isolado que prove a diferença de
-comportamento, não só taxa de sucesso agregada. Fallback pra modelo sem
-reasoning já no gateway (`tencent/hy3:free`, `xiaomi/mimo-v2.5-pro`) —
-descartado por agora, qualidade da extração nessa tarefa específica nunca
-foi verificada. Generalizar a limpeza de ruído pro cabeçalho de transição
-de seção do chunk `TÉCNICO EM COMUNICAÇÃO SOCIAL` (`CONHECIMENTOS
-ESPECÍFICOS PARA O CARGO DE NÍVEL MÉDIO` grudado na cauda) — descartado por
-enquanto, é um caso só, regex genérico demais arrisca cortar conteúdo
-legítimo de outro edital.
-
-### 2026-09-21 — Desacoplamento total do LiteLLM e migração para OpenRouter direto
-
-**Decisão:** Remoção completa do SDK `litellm` do repositório (`requirements.txt`, ambiente virtual e código-fonte). O bot do Telegram (`src/telegram_bot.py`) e o extrator de taxonomia (`src/taxonomia_extractor.py`) agora chamam diretamente o endpoint REST do OpenRouter (`https://openrouter.ai/api/v1/chat/completions`) com chaves dedicadas (`TELEGRAM_OPENROUTER_API_KEY` e `OPENROUTER_API_KEY`) e enviam telemetria assíncrona ao Langfuse diretamente via REST (`/api/public/ingestion`).
-**Motivo:** Evita sobrecarga de SDKs intermediários, incompatibilidades com callbacks de OpenTelemetry/Langfuse v3 e conflito de compartilhamento de chaves e métricas entre serviços distintos.
-**Alternativas descartadas:** Manter LiteLLM apenas no Telegram Bot — descartado para eliminar complexidade desnecessária e manter padrão arquitetural único e enxuto em todo o repositório.
-
-### 2026-09-21 — Validação heurística de-para + relatório de página única para o checkpoint de revisão humana
-
-**Decisão:** Dois scripts novos, ligados por `chunk_index`: `scripts/validar_taxonomia.py`
-compara, por chunk, os itens numerados de primeiro nível do texto-fonte
-(`texto_enviado_llm` em `.auditoria.json`) contra `topico["nome"]` extraído
-(`.json`), gerando `<edital>.validacao.json` com alertas `topico_ausente`
-(item na fonte sem correspondência extraída), `topico_extra` (tópico
-extraído sem correspondência literal na fonte) e `chunk_sem_extracao`
-(chunk com `status="falha"` e itens na fonte). A comparação é por **texto
-normalizado** do item completo (substring), não por número — o LLM não
-preserva a numeração original de forma consistente entre chunks do mesmo
-edital, então um diff por número sozinho gera falso-positivo maciço (ver
-`LESSONS.md`). `scripts/gerar_relatorio_revisao.py` consome o mesmo trio de
-JSONs e gera um relatório HTML estático de página única por edital (texto-
-fonte e taxonomia lado a lado por chunk, alertas destacados), servido pelo
-Datasette via `--static relatorio:/data/relatorio` (`docker-compose.yml`) —
-sem plugin novo, reaproveitando Traefik/Cloudflare Tunnel já configurados.
-`gerar_db_datasette.py` ganhou a tabela `alertas_validacao` e a coluna
-`editais.total_alertas` (carregamento opcional do `.validacao.json`, mesmo
-padrão condicional do `.auditoria.json`).
-**Motivo:** Usuário relatou dificuldade em fazer o de-para manual entre
-texto do edital e taxonomia extraída navegando as tabelas separadas do
-Datasette, e pediu uma forma de sinalizar automaticamente tópico que
-"ficou de fora" da extração. Validado contra o edital piloto real (39
-chunks): a primeira versão (diff por número) gerou 385 alertas; a versão
-final gerou 2, ambos achados genuínos (não ruído de heurística) — um caso
-onde o LLM consolidou 2 itens duplicados do próprio edital num tópico só, e
-um caso de numeração corrompida no texto extraído do PDF-fonte (chunk
-`TÉCNICO EM COMUNICAÇÃO SOCIAL`).
-**Alternativas descartadas:** Diff por número de item — descartado depois
-de comprovar que o LLM não preserva numeração de forma confiável entre
-chunks (mesmo edital, mesma extração); validação via segundo LLM como
-"juiz" — descartada por ora (mais cara, não-determinística, e a heurística
-textual já convergiu pra sinal/ruído aceitável no piloto); view/canned
-query dentro do próprio Datasette em vez de relatório HTML separado —
-descartada porque o renderizador tabular padrão do Datasette não faz layout
-de duas colunas nem destaque de texto, exigiria plugin novo pra um ganho
-menor que gerar o HTML estático direto.
-
-### 2026-09-21 — Pipeline automático dos artefatos de revisão a cada extração
-
-**Decisão:** Novo `scripts/atualizar_revisao.py`
-(`atualizar_artefatos_revisao`) encapsula a sequência
-`validar_taxonomia` → `gerar_relatorio_revisao` → `gerar_db_datasette` →
-restart do container Datasette, e passa a ser chamado automaticamente ao
-final de `scripts/revisar_taxonomia_piloto.py` (`revisar_edital_piloto`) e
-`scripts/reprocessar_falhas_piloto.py` (`reprocessar_falhas`, quando há
-sucesso novo) — substitui a lógica de restart que já existia duplicada só
-em `reprocessar_falhas_piloto.py`. O restart é best-effort: captura
-`OSError`/`returncode != 0` e só loga aviso, nunca lança exceção — o
-pipeline de extração (que já pagou a chamada LLM) não pode falhar por causa
-do Datasette local estar fora do ar.
-**Motivo:** Usuário pediu que o fluxo de validação (ADR-017/ADR-018)
-"entre no pipeline, rode automaticamente a cada extração" em vez de exigir
-4 comandos manuais depois de cada rodada. Mesma classe de risco já
-documentada 2x neste projeto (`run()` nunca chamando o downloader, achado
-de 2026-09-19; href relativo do ADR-008): passo manual esquecido não lança
-erro, só deixa o artefato seguinte desatualizado silenciosamente.
-**Alternativas descartadas:** Hook de `git commit`/pre-commit — descartado
-por acoplar controle de versão a infraestrutura local sem necessidade;
-cron/systemd timer regenerando periodicamente — descartado por atrasar a
-atualização (objetivo é "logo após a extração") e desperdiçar ciclos na
-escala atual do piloto; propagar exceção se o restart do Datasette falhar —
-descartado por quebrar o retorno da extração por um problema de
-infraestrutura não relacionado ao resultado já salvo em disco. Ver
-ADR-019 para o detalhamento completo.
-
-### 2026-09-21 — Classificação de chunk por nível, tipo de conhecimento e concurso
-
-**Decisão:** O chunking passa a reconhecer o cabeçalho de bloco
-`CONHECIMENTOS BÁSICOS/ESPECÍFICOS PARA ... NÍVEL SUPERIOR/MÉDIO` como um
-terceiro tipo de marcador, que define `tipo_conhecimento`/`nivel` dos chunks
-seguintes. Cada chunk ganha também `cargo_numero`, `materia_normalizada` e
-`apenas_discursiva`. O `<edital>.json` ganha `concurso` (slug/órgão/ano,
-resolvido pelo manifesto do downloader) e `cargos` (número/nome/nível).
-**Motivo:** O usuário quer filtrar questões por nível, básico/específico e
-tópico do edital. No piloto, os básicos de superior e de médio saíam
-idênticos (`cargo=None`, mesmo nome de matéria), e o concurso não aparecia
-em nenhum artefato. O piloto foi completado por backfill (tudo vem do
-parser), e o filtro `PF_25_ADM` × nível × tipo foi validado no banco de
-revisão: 39/39 chunks classificados e 0 alertas de classificação.
-**Alternativas descartadas:** Distinguir por posição/`chunk_index` (não é
-filtro); pedir o nível ao LLM (o dado é determinístico no cabeçalho);
-reorganizar `data/` por concurso (fica como follow-up, o manifesto já
-resolve). Ver ADR-020.
-
-### 2026-09-21 — Reparo local determinístico para nome de tópico numérico
-
-**Decisão:** Um teste de ponta a ponta do zero contra `PF_25_ADM` achou 88
-alertas de validação (vs. 2 históricos, ADR-018) — causa: em 2 dos 39
-chunks (CARGO 3: CONTADOR — "CONTABILIDADE APLICADA AO SETOR PÚBLICO" e
-"MATEMÁTICA FINANCEIRA"), o LLM preencheu `topico["nome"]` com o numeral do
-item da fonte ("1", "2", ...) em vez do texto do tópico — estruturalmente
-válido (`status="sucesso"`), semanticamente errado. Em vez de um retry cego
-reaproveitando o loop genérico (mesma chamada, mesmo prompt, sem contexto
-do erro — desenho inicial, descartado), a correção final é um **reparo
-local determinístico, sem chamada nova ao LLM**: o texto-fonte já tem o
-item completo pra cada numeral, mapeado pela mesma extração de itens
-numerados que `validar_taxonomia.py` já usa (`extrair_itens_numerados`,
-movida para `src/edital_parser.py` pra reparo e validação nunca
-divergirem). Complementado por reforço do prompt (mitigação na origem, sem
-garantia) e um quinto tipo de alerta passivo (`topico_nome_numerico`) como
-rede de segurança para dados já persistidos ou casos que o reparo não
-cubra. `reprocessar_falhas_piloto.py` ganhou `--chunks 17,21` para forçar
-reprocessamento por `chunk_index` mesmo com `status="sucesso"`. Refinamento
-adicional na mesma sessão: quando o reparo não mapeia todo numeral,
-`extrair_taxonomia_chunk` passa a devolver `tuple[TaxonomiaEdital | None,
-str | None]` (antes só `TaxonomiaEdital | None`) — o motivo, quando
-identificado, vira o `status` persistido do chunk
-(`STATUS_FALHA_NOME_NUMERICO_NAO_MAPEADO =
-"falha_nome_numerico_nao_mapeado"`), não o `"falha"` genérico de
-rede/timeout/parse. A seleção padrão de `reprocessar_falhas_piloto.py`
-(sem `--chunks`) e `gerar_relatorio_revisao.py::renderizar_chunk` foram
-generalizados de `status == "falha"` para `status not in (None,
-"sucesso")`, senão o novo status específico escaparia do reprocessamento
-automático e do aviso "sem taxonomia" no relatório HTML.
-**Motivo:** O dono do projeto rejeitou o retry cego original por não passar
-contexto nenhum ao LLM (repetir a tarefa sem corrigir nada, arriscando
-consumir tokens à toa) e pediu uma etapa específica, transparente e
-rastreável. O reparo local resolve isso por completo: custo zero de
-tokens, determinístico, e rastreável por log com tag própria
-(`[REPARO_NOME_NUMERICO]`/`[REPARO_NOME_NUMERICO_FALHOU]`) e por metadata
-estruturado (`status: "reparado"|"falhou"`) no Langfuse para os dois
-desfechos — sem misturar com retry de falha técnica. Depois, o próprio
-dono pediu explicitamente um status diferente de "falha" genérica para
-esse caso semântico, já que repetir a chamada pode não resolver (não é
-instabilidade transitória). Verificado contra os dados reais do achado
-(restaurados do `.bak`): reparo local corrigiu 32 + 11 tópicos sem nenhuma
-chamada ao LLM; reprocessamento real via `--chunks 17,21` (LLM de verdade,
-prompt reforçado) devolveu `total_alertas` a 2 (os mesmos genuínos do
-ADR-018).
-**Alternativas descartadas:** Retry cego reaproveitando o loop genérico
-(desenho original); uma chamada LLM corretiva dedicada (mais robusta a
-casos não cobertos pelo reparo local, mas custa tokens sempre que o bug
-ocorre — fica como possível fallback futuro); validator Pydantic em
-`Topico.nome` (não tem acesso ao texto-fonte, que o reparo precisa);
-persistir só o flag de reparo bem-sucedido sem mudar o contrato de retorno
-de `extrair_taxonomia_chunk` (não cobria o desfecho de falha, que era
-justamente o que precisava de um status próprio). Ver ADR-021.
-
-### 2026-09-21 — Classificação de erros/exceções na chamada ao OpenRouter
-
-**Decisão:** `_chamar_llm_uma_vez` (`src/taxonomia_extractor.py`) parou de
-colapsar toda falha técnica no mesmo `motivo_falha=None` → `status="falha"`
-genérico. Cada tipo de exceção/etapa ganhou status próprio: timeout
-(`requests.exceptions.Timeout` → `falha_timeout`), conexão recusada
-(`ConnectionError` → `falha_conexao`), HTTP 429 (`falha_rate_limit`), outro
-HTTP de erro (`falha_http`), qualquer outra `RequestException` não
-classificada (`falha_rede`), resposta sem `content`/`finish_reason`
-truncado (`falha_conteudo_vazio`), JSON malformado (`falha_parse_json`) e
-JSON válido mas fora do schema `TaxonomiaEdital` (`falha_validacao_schema`)
-— além do `falha_nome_numerico_nao_mapeado` já existente do ADR-021. Nova
-função `_falha_chamada` centraliza log com tag própria por tipo
-(`[FALHA_TIMEOUT]`, `[FALHA_CONEXAO]`, `[FALHA_RATE_LIMIT]`, `[FALHA_HTTP]`,
-`[FALHA_REDE]`) e registro no Langfuse. Todo caminho de falha (inclusive o
-semântico do ADR-021) agora inclui `metadata["tipo_erro"] = <status>` no
-Langfuse, filtrável no dashboard sem abrir log.
-**Motivo:** Pedido do dono do projeto para rastrear "os diferentes tipos de
-erros ou exceções dos scripts de cada chamada ou etapa para o
-openrouter/langfuse" — mesma exigência de rastreabilidade do ADR-021,
-estendida a todo o espectro de falha técnica (não só o caso semântico).
-Timeout/conexão/rate-limit são tipicamente transitórios (retry tende a
-resolver); conteúdo vazio/parse/schema tendem a se repetir com os mesmos
-parâmetros (retry sozinho não ajuda) — misturar os dois no mesmo "falha"
-esconde essa diferença do relatório HTML/Datasette e do Langfuse.
-Nenhum consumidor do `status` do chunk precisou mudar: a generalização já
-feita no ADR-021 (`status not in (None, "sucesso")`) absorve qualquer novo
-status técnico automaticamente.
-**Alternativas descartadas:** Manter status técnico único e diferenciar só
-via `metadata["tipo_erro"]` no Langfuse — descartado porque o `status` é o
-campo que aparece no relatório HTML/Datasette, não só no Langfuse; um
-status por código HTTP individual (`falha_http_401`, `falha_http_500`, ...)
-— descartado por ora, sem caso de uso concreto que precise da granularidade
-completa; classificar por regex na mensagem de exceção em vez de por tipo
-de exceção Python — descartado, a hierarquia tipada do `requests` já é mais
-robusta que casar texto de mensagem de erro. Ver ADR-022.
-
-### 2026-09-21 — Migração da telemetria Langfuse para SDK oficial (OTel)
-
-**Decisão:** Migração completa da camada de observabilidade em `src/taxonomia_extractor.py` e `src/telegram_bot.py` de requisições manuais REST (`POST /api/public/ingestion`) para o SDK oficial `langfuse.Langfuse` (v3, OTel). As generations passam a ser abertas imediatamente antes da requisição HTTP ao OpenRouter (`_abrir_generation`), fornecendo medição de latência real. O fechamento e envio são centralizados em `_registrar_langfuse` (síncrono e não bloqueante, com exportação em thread em segundo plano e flush via `atexit`).
-**Motivo:** A API REST v3 de ingestão do Langfuse entra em sunset em 2026-11-16 (passando a aceitar apenas scores e rejeitando traces/generations). Além disso, requisições REST manuais com `requests.post` sem checagem de resposta silenciavam falhas como HTTP 401 por chave inválida. O SDK oficial já constava nas dependências (`langfuse>=3,<4`), tornando a migração de custo zero de dependências.
-**Alternativas descartadas:** Manter o endpoint REST até a data limite (acumularia débito técnico crítico); exportador OTLP cru via requests (reinventaria buffer e retry já validados no SDK). Ver ADR-023.
-
-### 2026-09-21 — Expansão da extração 2025 (IBAMA, STM, TCU) e eliminação de falsos positivos na validação
-
-**Decisão:** Expansão do pipeline de extração e validação para mais 3 grandes editais de 2025: `IBAMA_25` (33 chunks), `STM_25` (53 chunks) e `TCU_25_TEFC` (10 chunks), somando com `PF_25_ADM` (39 chunks) um total de 135 chunks processados com 100% de sucesso na chamada LLM. Para acomodar as peculiaridades dos novos editais, `edital_parser.py` recebeu normalização de espaços `\xa0`, suporte a títulos de cargo multi-linha sem itens, colons parentéticos em matérias (`(?:\s*\([^)]*\))?:`), cabeçalhos `CONHECIMENTOS GERAIS` e detecção de cargo único/nível em páginas preliminares. Em `validar_taxonomia.py`, foram implementadas 5 heurísticas de eliminação de falsos positivos: composição NFC preliminar, substituição de ligaduras corrompidas de fontes do CEBRASPE (`Ɵ`→`ti`, etc.), verificação de cobertura conjunta em tópicos e subtópicos, correspondência exata/fronteira `\b` para termos com >= 3 caracteres e checagem em texto integral do chunk antes de apontar `topico_extra`.
-**Motivo:** A primeira execução do validador sobre o edital do IBAMA retornou 1.271 alertas em 33 chunks já auditados como sucesso no LLM. A investigação comprovou que se tratava quase exclusivamente de ruído heurístico (fontes embutidas do CEBRASPE com glifos privados para ligaduras, acentos em NFD e itens alocados pelo modelo em `subtopicos`). Com os ajustes, os alertas no IBAMA caíram para apenas 1 (achado real), e a base consolidada de 135 chunks de 2025 estabilizou com apenas 3 alertas no total (PF: 1, STM: 1, IBAMA: 1, TCU: 0).
-**Alternativas descartadas:** Afrouxar a validação para verificar apenas contagem agregada de tópicos (perderia a rastreabilidade item a item); aceitar acentos corrompidos nas saídas sem tratamento determinístico (poluiria o banco de estatísticas final).
-
-### 2026-09-21 — Coleta e extração da Câmara dos Deputados 2025 (CD_25_NS) e refinamentos do parser
-
-**Decisão:** Coleta estruturada completa do concurso `CD_25_NS` (Câmara dos Deputados 2025 - Nível Superior), integrando 2 editais, 7 cadernos de provas (objetivas e discursivas) e 4 gabaritos definitivos ao repositório local. A extração híbrida do edital de abertura atualizado foi concluída com 15/15 chunks com 100% de sucesso na chamada LLM e 0 alertas de validação, elevando a base consolidada de 2025 para 5 concursos e 150 chunks. Para viabilizar a extração limpa das matérias do edital da Câmara, implementou-se em `src/edital_parser.py`: (1) reconhecimento de quebras de linha em cabeçalhos de matéria condicionadas a conectivos (`(?:,\s*|\s+(?:E|OU|DE|DA|DO|DOS|DAS))\s*\n`), permitindo casar títulos multi-linha como "REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS, REGIMENTO COMUM DO CONGRESSO NACIONAL E CÓDIGO DE ÉTICA" sem absorver indevidamente títulos de cargos multi-linha; (2) detecção determinística de prefixos de matéria em caixa alta antes do primeiro item numerado quando o edital omite o delimitador dois-pontos antes do item 1 (caso de "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS 1 Constituição..."). Em `src/spider.py`, aplicou-se fronteira de palavra `\bABERTURA\b` na regex de editais para evitar falsos positivos com termos administrativos como "reabertura".
-**Motivo:** O edital da Câmara dos Deputados possui um formato tipográfico com longos títulos de matérias com quebras de linha conectivas e omissão de dois-pontos no primeiro bloco de matéria do Cargo 2. Sem os ajustes, o Cargo 1 acumulava o título da matéria no rótulo do cargo, e o Cargo 2 era catalogado com a própria matéria repetindo o nome do cargo. Além disso, no crawler, editais administrativos de retificação citando "reabertura de período de acesso à prova" estavam sendo mapeados erroneamente como editais de abertura.
-**Alternativas descartadas:** Tratar os nomes das matérias por substituição pontual via hardcoding no parser (quebraria a generalização para futuros editais federais do CEBRASPE); relaxar `PADRAO_MATERIA` para qualquer quebra de linha (regrediu testes de cargos com layout quebrado no IBAMA). Ver ADR-024.
-
-### 2026-09-21 — Tratamento automático dos 3 alertas residuais da validação
-
-**Decisão:** Cada alerta residual tinha uma causa diferente, então o tratamento
-também é diferente. (1) IBAMA_25 #32: o LLM omitiu o item `1 IN Ibama 05/2021.`.
-Nova etapa `reinjetar_itens_ausentes` (pós-LLM, sem nova chamada) reinjeta item
-de primeiro nível omitido, só se for simples. (2) PF_25_ADM #31 (qualificador
-entre parênteses para desambiguar item repetido no edital) e (3) STM_25 #31
-(erro de digitação `bBiblioteca` corrigido pelo LLM): viram
-`topico_divergencia_leve` com severidade `informativo`, fora de
-`total_alertas`. A comparação textual foi movida para `src/comparacao_texto.py`,
-compartilhada entre reparo e validador. Também entraram a remoção da assinatura
-do fim da seção (presente nos 5 editais) e duas regras novas no prompt.
-Backfill via `scripts/reconciliar_taxonomia.py`.
-**Motivo:** O dono do projeto pediu uma etapa automática no pipeline para os
-alertas residuais, com prós e contras de cada alternativa. O diagnóstico
-mostrou 1 perda real de dado e 2 falsos positivos. Suprimir tudo esconderia a
-perda; forçar o nome literal da fonte reintroduziria o erro de digitação.
-Resultado: 3 → 0 alertas bloqueantes, 2 informativos visíveis, e 1 único
-tópico alterado na base.
-**Alternativas descartadas:** Reprocessar o chunk automaticamente (retry cego,
-ADR-021); chamada corretiva ao LLM (tokens, não determinística, sem caso real
-que exija); campo `numero` no `Topico` (schema + reextração); lista de alertas
-aceitos (não é automática, fica para a revisão humana). Ver ADR-025.
-
-### 2026-09-21 — Banco Postgres próprio, independente do study-rag-agent
-
-**Decisão:** A Fase 5 passa a usar um Postgres 16 próprio
-(`scraper-cebraspe-db`, `postgres:16-alpine`, banco/usuário `cebraspe`, porta
-`127.0.0.1:5435`, rede `homelab_default`) em vez da instância `study-rag-db`.
-Nenhuma FK para `itens_estudo`: as dimensões carregam chave natural
-normalizada, e o cruzamento vira a Etapa 7 do `task.md` (tabela de mapeamento
-+ `postgres_fdw` ou camada analítica).
-**Motivo:** Revisão do plano da Etapa 5 pelo dono do projeto, antes de haver
-código de banco. Os domínios são diferentes (material de estudo pessoal ×
-dados públicos de concursos). A FK prevista tinha a direção errada e ficaria
-sempre `NULL`. O `study-rag-db` precisa ser reconfigurado (`postgres/postgres`,
-porta `5434` em `0.0.0.0`), e acoplar os dois quebraria um a cada mudança do
-outro. A senha do banco novo não tem default no compose.
-**Alternativas descartadas:** Manter a decisão de 2026-09-19; outro database
-na mesma instância (mantém a dependência operacional e ainda exige
-`postgres_fdw` para JOIN); schema dentro de `study_rag` (maior acoplamento).
-Ver ADR-026, que substitui o ADR-003.
-
-### 2026-09-22 — Star schema de estatísticas, gravação idempotente e fila de provas
-
-**Decisão:** DDL em `src/sql/schema_estatisticas.sql`: dimensões
-`dim_orgao`/`dim_ano`/`dim_materia`/`dim_topico`/`dim_cargo`, fatos
-`concursos`/`cargos_editais`/`taxonomia_itens` (1 tópico de 1 chunk,
-subtópicos em `JSONB`), `provas` + ponte `provas_cargos` e
-`fila_extracao_questoes`. `src/stats_writer.py` faz upsert das dimensões por
-chave natural e substitui os fatos de cada concurso numa transação. A fila
-usa upsert por `sha256` sem tocar `status`. O writer roda no fim de
-`atualizar_revisao.py` (best-effort). Dado pendente de revisão entra
-marcado, e a view de estatística oficial só conta `aprovado`.
-**Motivo:** Etapa 5 do `task.md`. A substituição por concurso evita tópico
-órfão depois de uma reextração. A fila preserva o estado do consumidor. O
-texto do link, a única fonte de tipo e cargos do caderno, tem formatos
-variados (intervalo, lista, cargo único, sem cargo, CB/CG) e lixo legado
-(editais administrativos e padrões de resposta em `Provas/`). O
-classificador trata esses casos e foi testado contra todos os textos reais.
-**Alternativas descartadas:** upsert linha a linha nos fatos (deixa órfão);
-uma linha por subtópico (sem uso estatístico ainda); não gravar dado
-pendente (a aprovação precisa chegar ao banco — via JSON, ADR-028); `nivel` em `provas` (é
-atributo do cargo). Ver ADR-027.
-
-### 2026-09-23 — Restrição de cargo fora do nome da matéria e aprovação da Fase 4
-
-**Decisão:** A restrição `(APENAS/SOMENTE PARA O(S) CARGO(S) ...)` sai do nome
-da matéria e vira `cargos_restritos`, gravado como `INTEGER[]` em
-`taxonomia_itens`. Espaços repetidos são colapsados. `extrair_cargos_do_texto`
-foi para `comparacao_texto`, usada pelo parser e pelo writer. A aprovação
-da Fase 4 entrou no `status_revisao_humana` dos 5 JSONs. Na auditoria da
-entrega, entraram também: restrição sem número fica no nome, parêntese
-aninhado, várias restrições e checagem do backfill pelo texto.
-**Motivo:** Etapa 5A. A restrição no nome duplicava matérias no STM, e o
-espaço duplo duplicava no IBAMA (`dim_materia` de 106 para 102).
-**Alternativas descartadas:** restrição no nome; `UPDATE` no banco
-(revertido pelo writer); regex própria de cargo no parser (divergiria do
-writer). Ver ADR-028.
-
-### 2026-09-25 — Camada canônica de sinônimos e reasoning padrão de 3000 tokens
-
-**Decisão:** Etapa 5B. `canonico/sinonimos.json` guarda entradas (nomes com
-a mesma chave de regra no mesmo pai) e grupos canônicos com ID estável,
-origem e status. Regras determinísticas juntam e aprovam sozinhas; o LLM
-propõe o resto por lista fechada de IDs, em 3 passos (matéria, assunto,
-subassunto), e tudo sai `proposto`. O mapeamento só muda com aprovação
-(`aprovar_sinonimos.py`); sem decisão, cada nome é o próprio canônico
-(identidade). O núcleo de chamada ao OpenRouter virou
-`src/llm_openrouter.chamar_llm_json`, e o dono fixou reasoning de 3000
-tokens em toda chamada (`REASONING_PADRAO`, fonte única). Os defaults do
-extrator continuam 12000/120 (merge `b823c31`), não os 24576/240 da decisão
-de 2026-09-20. No banco, tabelas canônicas com o ID do JSON, `nocoes` em
-`dim_materia` e subtópico como linha (`dim_subtopico` + `taxonomia_subitens`).
-**Motivo:** o dono decidiu regra + LLM + aprovação humana, e a similaridade
-de texto tem falsos positivos medidos. Canônico NULL até a revisão tiraria
-~4 mil nomes sem sinônimo da estatística; a identidade dá o resultado de
-antes sem inventar nada. Execução real: 20 chamadas, US$ 0,0139, 106
-propostas pendentes (3 matérias, 40 assuntos, 63 subassuntos).
-**Alternativas descartadas:** similaridade de texto; LLM sobre todas as
-entradas de uma vez; rodar o LLM no pipeline automático (custa tokens a
-cada extração); IDs estáveis no prompt (IDs locais curtos erram menos).
-Ver ADR-029.
-
-### 2026-09-25 — Extração determinística de questões, gabaritos e discursivas dos cadernos (Etapa 5C)
-
-**Decisão:** Extração 100% determinística sem LLM para cadernos de provas e
-gabaritos dos 5 concursos de 2025. `src/gabarito_parser.py` lê a grade de
-respostas (C/E/X), extrai o código do caderno impresso no corpo do PDF
-(resolvendo gabaritos com nome em hash do TCU e CD) e lê o padrão de resposta
-discursivo. `src/prova_parser.py` segmenta em duas colunas por ordenação
-visual, isola itens pelo span próprio em negrito, extrai textos-base
-compartilhados, recorta figuras raster para `data/.../figuras/` vinculando
-por interseção vertical, extrai quesitos discursivos com `valor_pontos` e
-pontuação total conferida, e calibra o recuo de continuação do item na janela
-estrita de 12 a 24 pt (~18 pt real), eliminando a captura indevida de
-parágrafos de texto-base (~28–29 pt). `src/questoes_writer.py` persiste em
-`textos_base`, `questoes` e `discursivas` no Postgres próprio, e
-`scripts/extrair_questoes.py` consome a fila. Os arquivos JSON gerados em
-`questoes/` são mantidos localmente (`questoes/` no `.gitignore`) por volume,
-sendo 100% regeneráveis sob demanda. 70 cadernos processados, 2.800 itens
-(129 anulados), 34 discursivas / 107 quesitos, 145 PDFs na fila concluídos,
-0 falhas e 374 testes verdes no pytest.
-**Motivo:** Etapa 5C do `task.md`. O objetivo real é saber o que a banca cobra
-e viabilizar simulados com refazer de prova.
-**Alternativas descartadas:** Chamada ao LLM para estruturar questões (custo e
-não-determinismo desnecessários quando a grade e a numeração são regulares);
-commitar 140 JSONs pesados no git (sobrecarregaria o repositório com dados
-geráveis por script); tolerância genérica de recuo 8–30 pt (engolia a 1ª linha
-do texto-base após item de 1 linha). Ver ADR-031.
-
-### 2026-09-27 — Correções da extração dos cadernos (Etapa 5C.1, Sessões 1 a 5, ADR-031)
-
-**Decisão:** Consolidação das correções e robustez do pipeline de extração de cadernos e gabaritos em 5 sessões (ADR-031):
-1. **Posição dos itens:** Identificação de itens por x0 na margem da coluna via moda/cluster em vez de flag negrito de fonte (apenas 9,64% das fontes do CEBRASPE usavam flag negrito); itens duplicados ou fora de ordem são bloqueantes; trechos sem recuo anexados ao item com alerta informativo `trecho_sem_recuo_anexado_ao_item`. Vinculação de figuras raster à linha logo acima na mesma coluna com sobreposição horizontal (exceção item → preâmbulo).
-2. **Alertas no banco:** Persistência de `alertas text[]` e flag `utilizavel boolean` na tabela `questoes` com view `vw_questoes_utilizaveis` para isolar itens que exigem revisão.
-3. **Fila e concorrência:** Reprocessamento automático de grupos via hash sha256 (`fila_extracao_questoes.assinatura_grupo`) em qualquer status quando a composição de gabaritos muda; flag `--reprocessar-erros` para tratar falhas e órfãos; advisory lock de sessão (`pg_try_advisory_lock(5_031_001)`) garantindo consumidor de execução única sem concorrência destrutiva na fila.
-4. **Versão de gabarito e discursivas:** Classificação de versão (`definitivo` × `preliminar`) estritamente pelo cabeçalho (ou prefixo do arquivo) com preferência determinística pelo definitivo e alertas informativos (`mais_de_um_gabarito`, `gabarito_preliminar`). Quesitos discursivos extraídos estritamente após o primeiro verbo de comando (`redija`, `elabore`, `aborde`, `discorra`), evitando confusão com datas; tema anafórico rejeitado para `None` com alerta `tema_anaforico`; padrão de resposta ligado preferencialmente por chave de título (`_chave_titulo`), caindo na ligação por ordem se alguma chave faltar ou se repetir; número da questão tirado do título (`Questão N`), com repetição ou buraco gerando o alerta informativo `numeracao_discursiva`; alertas `sem_quesitos` e `quesito_sem_valor`; remoção do rodapé repetido e do cabeçalho institucional em caixa alta no fim da seção do padrão.
-5. **Documentação e alinhamento:** Remoção do plano obsoleto `concluir-etapa-5c.md`, documentação de gotchas em `LESSONS.md`, alinhamento de contagens (123 textos-base) e ADR-031 atualizado. 435 testes aprovados (+1 xfail) e suite 100% verde.
-**Motivo:** Correções identificadas na revisão da Etapa 5C antes do avanço para a Etapa 5D (`correcoes-etapa-5c.md`).
-**Alternativas descartadas:** Confiar em flags de fonte para segmentação de itens; buscar "definitivo" no corpo do documento (o padrão do cargo 2 da PF cita a palavra no texto); capturar quesitos antes do comando discursivo (falso positivo em datas); reprocessamento apenas de status pendentes (não pegava gabaritos associados a posteriori). Ver ADR-031.
-
-### 2026-09-28 — Site público de questões como objetivo e árvore mestre semeada com a 5B
-
-**Decisão:** O objetivo do produto passa a ser um site público de questões
-(portfólio, estilo Gran Questões), começando pelo piloto 2025, com a questão
-como entidade central e o subassunto como unidade de estudo. As
-estatísticas, em ordem, são: o que mais cai na prova, o que o edital cobra,
-edital × prova e desempenho pessoal. A taxonomia vira uma **árvore mestre
-curada** (`canonico/arvore.json`), semeada com os grupos aprovados da 5B
-(mesmo ID). Item de edital e questão apontam para nós (N:N). O roteiro passa
-a ser 5B.1 (árvore e banco) → 5B.2 (curadoria) → 5D (questão na árvore) →
-5E (views) → 5F (site). A antiga 5B.1 ("divisão de nomes compostos") foi
-descartada antes de ser implementada.
-**Motivo:** Ao planejar a divisão de nomes compostos, o modelo de árvore
-emergente dos editais exigiu mecanismos especiais para o composto
-(`Disposições gerais, servidores públicos`) e para a matéria composta do CD
-(realocação de 16 + 11 assuntos), e mesmo assim não resolvia a granularidade
-diferente entre editais. O dono apontou que a arquitetura misturava o
-objetivo do produto (site de questões) com estatística de edital. Numa
-árvore fixa com mapeamento N:N, os três casos viram mapeamento comum.
-**Alternativas descartadas:** divisão 1 → N com realocação de filhos (plano
-original); árvore do zero (perderia a revisão da 5B); taxonomia de terceiros
-(sem fonte aberta, risco autoral); simulado estático no Datasette (movido
-para o site). Ver ADR-030.
-
-
-
-### 2026-09-29 — Classificação das questões na árvore mestre (Etapa 5D)
-
-**Decisão:** Ponte semântica entre as 2.800 questões objetivas e 34 discursivas
-extraídas e a árvore mestre curada (3.577 nós). Fonte da verdade canônica em
-`canonico/classificacao_questoes.json` (chave estável `<slug>|<caderno>|<numero>`,
-hash SHA-1 do enunciado), com confiança categórica (`alta`, `media`, `baixa`) e
-cardinalidade até 2 nós (`principal` e opcional `secundario`). O cálculo de
-`fora_do_edital` é estritamente local (duas passadas: preferencial do edital do
-cargo com flag `false`; reserva das matérias do caderno com flag `true`). Se
-nenhum nó servir, registra `sem_no = true` (sem criação automática de nós pelo
-pipeline). Banco Postgres é derivado (`questao_no`, `discursiva_no` e view
-`vw_questao_no`). Relatório HTML em `classificacao.html` com ordenação por
-criticidade (`sem_no` → `baixa` → `media` → `alta`) e CLI de curadoria humana
-`scripts/curar_classificacao.py` sob governança soberana do dono.
-**Motivo:** Etapa 5D do ADR-030 e ADR-032. Rodada real concluída com 450 chamadas
-ao LLM ($0.1939 USD, 0 falhas finais): 2.412 nós alta, 613 média, 3 baixa e 1
-item sem nó.
-**Alternativas descartadas:** Enviar a árvore inteira no prompt (estouro de
-contexto); permitir que o LLM crie nós automaticamente (alucinação taxonômica);
-amarrar por IDs seriais de banco (incompatível com DELETE+INSERT de cadernos).
-Ver ADR-032.
-
-### 2026-09-29 — Stack e deploy do site público (Etapa 5F.0)
-
-**Decisão:** FastAPI + Jinja2/HTMX/Alpine renderizado no servidor, em 3
-camadas (`repositorio` → `servicos` → `api/v1` e `web`), com toda tela
-espelhada em JSON para migrar o frontend depois (SvelteKit) sem tocar a
-regra. Só Google OAuth. Dados de usuário no schema `app` do mesmo banco,
-com roles separadas e a chave estável da 5D (nunca `questoes.id`). Serviço
-público via Traefik + Tunnel, sem Access. Republicação com crédito à fonte
-e canal de remoção; termos do CEBRASPE conferidos pelo dono antes do deploy.
-**Motivo:** o dono preferiu começar em Python e migrar depois; a separação
-em camadas é o que torna essa migração barata.
-**Alternativas descartadas:** SvelteKit/Vue/Astro já agora; senha própria
-ou auth gerenciado; Postgres separado para usuários. Ver ADR-033.
-
-### 2026-10-01 — Frontend de resolução (Etapa 5F.2) e texto-base sob demanda
-
-**Decisão:** As páginas usam a mesma camada `servicos` da API, em rotas
-HTML fora do OpenAPI. A primeira entrega pôs `texto_base_texto` e `figuras`
-em `QuestaoResumo` para o card da lista. O dono decidiu carregar esses
-campos sob demanda (`GET /q/.../anexos`, disparado ao abrir o `<details>`),
-o que mantém o contrato da 5F.1. A validação da entrega achou e corrigiu
-bugs que os testes de rota não pegavam: id com `|` quebrando o `hx-target`,
-XSS do `no_id` dentro do `x-data`, `$nextTick` sem `this`, select que
-perdia os outros filtros e fragmento devolvido na restauração de histórico.
-**Motivo:** a listagem com 50 itens passava de ~14 KB para ~68 KB, e a
-maior parte dos cards não tem o texto-base aberto.
-**Alternativas descartadas:** manter os campos na listagem (contrato maior,
-payload 5×); carregar anexos de todo card no `load` (uma requisição por
-card). Ver ADR-033.
-
-### 2026-10-02 — Coerência dos números do painel de matéria (Etapa 5F.12 - Sessão 3)
-
-**Decisão:** A base única para a porcentagem de incidência na home e no painel de matéria passa a ser "válidas desduplicadas" (computadas via `fn_prova_cobra`). Na tela do painel, os 4 KPIs receberam rótulos mais diretos e tooltips de explicação ("Questões da matéria", "Distintas no recorte", "Anuladas", "Universo de comparação"). O ranking "O que mais cai" também foi complementado com uma linha agregadora "Outros / direto no assunto", para que a soma visível feche exatamente com o total do recorte e a explicação de escopo fique clara (adicionado teste de reconciliação para a LP).
-**Motivo:** Usuários reportaram inconsistências ou confusão entre o número do ranking, o total sem filtro e o número do recorte, visto que cada query contava itens de maneira ligeiramente diferente.
-**Alternativas descartadas:** Mostrar a porcentagem usando a tabela bruta de questões sem desduplicar (causava peso maior do que a matéria realmente tem nos cadernos).
- 
-### 2026-10-07 — Divisão e agrupamento de testes e ruff por etapas (ADR-036)
-
-**Decisão:** Configuração oficial do Ruff (`pyproject.toml`), marcadores semânticos no Pytest (`pytest.ini` e `conftest.py`) e `Makefile` com atalhos de etapas (`test-fast`, `test-pipeline`, `test-site`, `test-site-fast`, `test-all`, `check`).
-**Motivo:** A suíte atingiu 840 testes levando 4m45s totais, com 72% do tempo concentrado em `site/tests/` devido a consultas SQL no Postgres. Testes unitários sem banco rodam agora em ~18s via `make test-fast` (15× mais rápido).
-**Alternativas descartadas:** Paralelização cega com `pytest-xdist` em toda a base (risco de concorrência e flakiness contra o Postgres compartilhado); reorganização física de diretórios. Ver ADR-036.
+- Decisão nova vira ADR novo (ou seção "Atualização" no ADR existente), não
+  entrada aqui. Este arquivo só cita o número do ADR em §5–§7.
+- O log cronológico que ficava aqui (2026-09-19 a 2026-10-07) foi removido em
+  2026-10-08 por duplicar os ADRs; está no histórico do git.
 
 ## 13. LESSONS.md (do projeto)
 
