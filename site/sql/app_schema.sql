@@ -16,11 +16,27 @@ CREATE TABLE IF NOT EXISTS app.resposta (
     id bigserial PRIMARY KEY,
     usuario_id bigint REFERENCES app.usuario ON DELETE CASCADE,
     questao_chave text NOT NULL,
-    resposta char(1) CHECK (resposta IN ('C','E')),
+    resposta char(1) CHECK (resposta IN ('A', 'B', 'C', 'D', 'E')),
     acertou boolean NOT NULL,
     simulado_id bigint NULL,
     respondida_em timestamptz DEFAULT now()
 );
+
+DO $$
+DECLARE
+    r record;
+BEGIN
+    FOR r IN (
+        SELECT conname, pg_get_constraintdef(oid) as def
+        FROM pg_constraint
+        WHERE conrelid = 'app.resposta'::regclass AND contype = 'c'
+    ) LOOP
+        IF r.def LIKE '%''C''%' AND NOT r.def LIKE '%''A''%' THEN
+            EXECUTE 'ALTER TABLE app.resposta DROP CONSTRAINT ' || quote_ident(r.conname);
+            EXECUTE 'ALTER TABLE app.resposta ADD CONSTRAINT ' || quote_ident(r.conname) || ' CHECK (resposta IN (''A'', ''B'', ''C'', ''D'', ''E''))';
+        END IF;
+    END LOOP;
+END $$;
 
 CREATE TABLE IF NOT EXISTS app.simulado (
     id bigserial PRIMARY KEY,

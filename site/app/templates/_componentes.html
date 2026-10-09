@@ -77,13 +77,25 @@
 </svg>
 {% endmacro %}
 
-{# Form de resposta Certo/Errado do card e do "Tentar de novo" da correção.
+{# Form de resposta Certo/Errado ou Múltipla Escolha do card e do "Tentar de novo" da correção.
    O alvo é o `div` com `dom_id(chave)` que envolve o form. Sem JS o botão
    fica habilitado (o `disabled` só vem do Alpine); o servidor devolve este
    mesmo form com o aviso quando chega sem marcação. #}
-{% macro form_resposta(chave, aviso=None, rotulo="Responder questão") %}
+{% macro form_resposta(chave, aviso=None, rotulo="Responder questão", tipo="certo_errado", alternativas=None) %}
 <form hx-post="/q/correcao" hx-target="#{{ dom_id(chave) }}" hx-swap="outerHTML" x-data="{ r: null }" aria-label="{{ rotulo }}" class="space-y-4">
     <input type="hidden" name="chave" value="{{ chave }}">
+    {% if tipo == "multipla_escolha" and alternativas %}
+    <fieldset class="space-y-2.5">
+        <legend class="sr-only">Sua resposta</legend>
+        {% for alt in alternativas %}
+        <label class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-3 text-slate-800 transition hover:bg-slate-50 has-[:checked]:border-destaque-600 has-[:checked]:bg-destaque-50/40">
+            <input type="radio" name="resposta" value="{{ alt.letra }}" @change="r = $el.value"
+                   class="mt-0.5 h-5 w-5 shrink-0 cursor-pointer appearance-none rounded-full border-2 border-destaque-600 bg-white transition checked:border-destaque-600 checked:bg-destaque-600 checked:shadow-[inset_0_0_0_4px_#fff] hover:border-destaque-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 focus-visible:ring-offset-2">
+            <span class="leading-relaxed"><strong class="font-semibold text-slate-900">{{ alt.letra }})</strong> {{ alt.texto }}</span>
+        </label>
+        {% endfor %}
+    </fieldset>
+    {% else %}
     <fieldset class="flex flex-wrap gap-x-8 gap-y-3">
         <legend class="sr-only">Sua resposta</legend>
         {% for valor, texto in [("C", "Certo"), ("E", "Errado")] %}
@@ -94,6 +106,7 @@
         </label>
         {% endfor %}
     </fieldset>
+    {% endif %}
     {% if aviso %}<p class="text-sm font-medium text-red-700" role="alert">{{ aviso }}</p>{% endif %}
     <button type="submit" class="btn-primario px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" :disabled="!r">Responder</button>
 </form>

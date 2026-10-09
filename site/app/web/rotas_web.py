@@ -22,11 +22,13 @@ from app.servicos import (
 )
 from app.servicos.formatacao import (
     ROTULO_NIVEL,
+    ROTULO_TIPO_QUESTAO,
     hash_chave,
     rotulo_concurso,
     rotulo_materia,
     rotulo_nivel,
     rotulo_tipo_conhecimento,
+    rotulo_tipo_questao,
 )
 
 router = APIRouter(tags=["Web"], include_in_schema=False)
@@ -62,10 +64,12 @@ templates.env.globals["dom_id"] = dom_id
 templates.env.globals["csrf_token"] = auth.token_csrf
 templates.env.globals["login_habilitado"] = auth.login_habilitado
 templates.env.globals["ROTULO_NIVEL"] = ROTULO_NIVEL
+templates.env.globals["ROTULO_TIPO_QUESTAO"] = ROTULO_TIPO_QUESTAO
 templates.env.globals["rotulo_concurso"] = rotulo_concurso
 templates.env.globals["rotulo_materia"] = rotulo_materia
 templates.env.globals["rotulo_nivel"] = rotulo_nivel
 templates.env.globals["rotulo_tipo_conhecimento"] = rotulo_tipo_conhecimento
+templates.env.globals["rotulo_tipo_questao"] = rotulo_tipo_questao
 
 logger = logging.getLogger(__name__)
 
@@ -161,6 +165,7 @@ def _filtros_da_query(
     cargo_numero: Annotated[list[str] | None, Query()] = None,
     nivel: Annotated[list[str] | None, Query()] = None,
     tipo_conhecimento: Annotated[list[str] | None, Query()] = None,
+    tipo: Annotated[list[str] | None, Query()] = None,
     no_id: Annotated[list[str] | None, Query()] = None,
     texto: str | None = None,
     com: Annotated[list[str] | None, Query()] = None,
@@ -192,6 +197,7 @@ def _filtros_da_query(
         cargo_numero=cargo_numero,
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
+        tipo=tipo,
         no_id=no_id,
         texto=texto,
         com=com,
@@ -360,6 +366,7 @@ def _dados_facetas(facetas, filtros: FiltroQuestoes) -> dict[str, list[dict]]:
         ],
         "nivel": simples(facetas.niveis),
         "tipo_conhecimento": simples(facetas.tipos_conhecimento),
+        "tipo": simples(facetas.tipos),
         "banca": simples(facetas.bancas),
         **nos,
         "anuladas": [
@@ -415,6 +422,7 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
         ("concurso", facetas.concursos),
         ("nivel", facetas.niveis),
         ("tipo_conhecimento", facetas.tipos_conhecimento),
+        ("tipo", facetas.tipos),
     ]:
         for f in lista:
             rotulos[(campo, str(f.valor))] = f.rotulo
@@ -444,6 +452,7 @@ def _chips(filtros: FiltroQuestoes, facetas) -> list[dict]:
         "cargo_numero": "Cargo nº",
         "nivel": "Nível",
         "tipo_conhecimento": "Conhecimento",
+        "tipo": "Formato",
         "texto": "Palavra-chave",
     }
 
@@ -495,18 +504,26 @@ def corrigir_questao(
     resposta: str | None = Form(None),
     usuario_id: int | None = Depends(auth.usuario_id_atual),
 ):
-    if resposta not in ("C", "E"):
-        # Sem marcação (ou valor estranho): o HTMX troca o form por ele mesmo
-        # com o aviso, em vez de um 422 que ele não mostraria.
+    try:
+        resultado = contas_servico.responder(chave, resposta, usuario_id)
+    except contas_servico.RespostaForaDoFormato as e:
+        # Sem marcação (ou letra que a questão não aceita): o HTMX troca o form
+        # por ele mesmo com o aviso, em vez de um 422 que ele não mostraria. O
+        # tipo vem do banco, não do form.
         return templates.TemplateResponse(
             request=request,
             name="_form_resposta.html",
             context={
                 "chave": chave,
-                "aviso": "Marque Certo ou Errado antes de responder.",
+                "tipo": e.tipo,
+                "alternativas": e.alternativas,
+                "aviso": (
+                    "Escolha uma alternativa antes de responder."
+                    if e.tipo == "multipla_escolha"
+                    else "Marque Certo ou Errado antes de responder."
+                ),
             },
         )
-    resultado = contas_servico.responder(chave, resposta, usuario_id)
     if not resultado:
         return _nao_encontrada(
             request,
@@ -737,11 +754,11 @@ _PREFIXO_RESPOSTA = "r:"
 
 
 def _respostas_do_form(form) -> dict[str, str]:
-    """Campos `r:<chave>` com C/E; em branco ou valor inválido fica de fora."""
+    """Campos `r:<chave>` com resposta (A-E); em branco ou valor inválido fica de fora."""
     return {
         campo[len(_PREFIXO_RESPOSTA) :]: valor
         for campo, valor in form.items()
-        if campo.startswith(_PREFIXO_RESPOSTA) and valor in ("C", "E")
+        if campo.startswith(_PREFIXO_RESPOSTA) and valor in ("A", "B", "C", "D", "E")
     }
 
 

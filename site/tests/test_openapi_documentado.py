@@ -103,3 +103,22 @@ def test_parametros_com_descricao(spec):
         if not p.get("description")
     ]
     assert not faltando, faltando
+
+
+def test_toda_description_e_texto(spec):
+    # Vírgula sobrando em `description=("..." "...",)` vira tupla, e o Swagger
+    # recebe uma lista no lugar do texto (OpenAPI exige string).
+    erradas = []
+
+    def visitar(no, caminho):
+        if isinstance(no, dict):
+            for k, v in no.items():
+                if k == "description" and not isinstance(v, str):
+                    erradas.append(caminho)
+                visitar(v, f"{caminho}/{k}")
+        elif isinstance(no, list):
+            for i, v in enumerate(no):
+                visitar(v, f"{caminho}/{i}")
+
+    visitar(spec, "")
+    assert not erradas, erradas

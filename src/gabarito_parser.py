@@ -30,11 +30,34 @@ import pymupdf
 from src.comparacao_texto import extrair_cargos_do_texto
 from src.edital_parser import extrair_texto_paginas
 
-# 094_PF_CB1_01, 072_STM_CG2_01, 167_CDNS_002_01, 108_TCUTEFC_001_01
-PADRAO_CODIGO_CADERNO = re.compile(r"\b(\d{3})_([A-Z0-9]+)_(C[BG]\d+|\d{3})_(\d{2})\b")
+# 094_PF_CB1_01, 072_STM_CG2_01, 167_CDNS_002_01, 108_TCUTEFC_001_01 e, com
+# sublinhado na sigla do concurso, 169_SEBRAE_26_PSE_1_CG1_02 (SEBRAE 2026) e
+# 053_SEBRAE_PSE_CG1_02. A sigla aceita até 4 segmentos extras `_XXX`; como o
+# código termina em fronteira de palavra, um código sem sublinhado na sigla
+# continua casando igual (mesmo trecho, mesmo token).
+PADRAO_CODIGO_CADERNO = re.compile(
+    r"\b(\d{3})_([A-Z0-9]+(?:_[A-Z0-9]+){0,4})_(C[BG]\d+|\d{3})_(\d{2})\b"
+)
 PADRAO_JUSTIFICATIVA = re.compile(r"justificativas?\s+de\s+altera", re.IGNORECASE)
 PADRAO_PADRAO_RESPOSTA = re.compile(r"PADR[ÃA]O\s+DE\s+RESPOSTA", re.IGNORECASE)
-LETRAS_VALIDAS = {"C", "E", "X"}
+
+QUESTAO_CERTO_ERRADO = "certo_errado"
+QUESTAO_MULTIPLA_ESCOLHA = "multipla_escolha"
+GRADE_MISTA = "misto"
+# O rótulo da linha de números diz o tipo da questão: conferido nas 42 grades
+# do piloto (todas `Item`, só C/E/X) e nas 3 grades ME da amostra da 8.0
+# (BANRISUL_25, SEBRAE_26, SEFA_PR_25: todas `Questão`, A–E/X). Validar a letra
+# pelo tipo impede que uma letra espúria numa grade C/E passe calada.
+TIPO_POR_ROTULO = {
+    "Item": QUESTAO_CERTO_ERRADO,
+    "Questão": QUESTAO_MULTIPLA_ESCOLHA,
+    "Questao": QUESTAO_MULTIPLA_ESCOLHA,
+}
+LETRAS_POR_TIPO = {
+    QUESTAO_CERTO_ERRADO: frozenset({"C", "E", "X"}),
+    QUESTAO_MULTIPLA_ESCOLHA: frozenset({"A", "B", "C", "D", "E", "X"}),
+}
+LETRAS_VALIDAS = set().union(*LETRAS_POR_TIPO.values())
 
 # Cabeçalho de cada questão no padrão de resposta de caderno com várias:
 # "Prova Discursiva – Questão 1 – Conhecimentos Básicos", "Prova Discursiva –
@@ -63,12 +86,33 @@ VERSAO_PRELIMINAR = "preliminar"
 
 @dataclass
 class GradeGabarito:
-    """Grade definitiva de um caderno objetivo."""
+    """Grade definitiva de um caderno objetivo.
+
+    `tipos` guarda o tipo de cada número, lido do rótulo da linha da grade
+    (`Item` → C/E, `Questão` → ME). `tipo_detectado` sai dele: um tipo só,
+    esse tipo; os dois na mesma grade, `GRADE_MISTA`. Sem `tipos` (grade
+    montada à mão, fora de `ler_grade`), cai na regra antiga pelas letras.
+    """
 
     codigo_caderno: str | None
     respostas: dict[int, str] = field(default_factory=dict)
     cabecalho: str | None = None
     alertas: list[str] = field(default_factory=list)
+    tipo_detectado: str | None = None
+    tipos: dict[int, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.tipo_detectado is not None:
+            return
+        presentes = set(self.tipos.values())
+        if len(presentes) == 1:
+            self.tipo_detectado = presentes.pop()
+        elif presentes:
+            self.tipo_detectado = GRADE_MISTA
+        elif any(letra in {"A", "B", "D"} for letra in self.respostas.values()):
+            self.tipo_detectado = QUESTAO_MULTIPLA_ESCOLHA
+        else:
+            self.tipo_detectado = QUESTAO_CERTO_ERRADO
 
     @property
     def numeros(self) -> list[int]:
@@ -93,7 +137,8 @@ def codigo_caderno_do_texto(texto: str) -> str | None:
 
 
 def token_caderno(codigo: str | None) -> str | None:
-    """`094_PF_CB1_01` -> `CB1`; `167_CDNS_002_01` -> `002`."""
+    """`094_PF_CB1_01` -> `CB1`; `167_CDNS_002_01` -> `002`;
+    `169_SEBRAE_26_PSE_1_CG1_02` -> `CG1`."""
     m = PADRAO_CODIGO_CADERNO.fullmatch(codigo or "")
     return m.group(3) if m else None
 
@@ -105,7 +150,7 @@ def classificar_documento(texto: str) -> str:
     if PADRAO_PADRAO_RESPOSTA.search(texto):
         return TIPO_PADRAO_RESPOSTA
     if re.search(r"GABARITOS?\s+OFICIA", texto, re.IGNORECASE) and re.search(
-        r"^\s*Item\b", texto, re.MULTILINE
+        r"^\s*(?:Item|Quest[ãa]o)\b", texto, re.MULTILINE
     ):
         return TIPO_GRADE
     return TIPO_DESCONHECIDO
@@ -131,16 +176,30 @@ def _centro_x(w) -> float:
 
 
 def ler_grade_de_linhas(linhas: list[list[tuple]]) -> tuple[dict[int, str], list[str]]:
-    """Casa cada linha `Item ...` com a linha `Gabarito ...` logo abaixo, por
-    coluna (centro x mais próximo). Descarta o enchimento `0`.
+    """`(respostas, alertas)` de `ler_grade_tipada_de_linhas`, sem os tipos."""
+    respostas, _tipos, alertas = ler_grade_tipada_de_linhas(linhas)
+    return respostas, alertas
+
+
+def ler_grade_tipada_de_linhas(
+    linhas: list[list[tuple]],
+) -> tuple[dict[int, str], dict[int, str], list[str]]:
+    """Casa cada linha `Item ...` ou `Questão ...` com a linha `Gabarito ...`
+    logo abaixo, por coluna (centro x mais próximo). Descarta o enchimento `0`.
+
+    Devolve `(respostas, tipos, alertas)`. O tipo de cada número vem do rótulo
+    da linha (`TIPO_POR_ROTULO`), e a letra é validada contra o tipo
+    (`LETRAS_POR_TIPO`): `A` numa linha `Item` vira alerta, não resposta.
 
     Função pura sobre as linhas de palavras (tuplas no formato do
     `page.get_text("words")`) para poder ser testada sem PDF.
     """
     respostas: dict[int, str] = {}
+    tipos: dict[int, str] = {}
     alertas: list[str] = []
     for i, linha in enumerate(linhas):
-        if not linha or linha[0][4] != "Item":
+        tipo = TIPO_POR_ROTULO.get(linha[0][4]) if linha else None
+        if tipo is None:
             continue
         numeros = [w for w in linha[1:] if w[4].isdigit() and w[4] != "0"]
         if not numeros:
@@ -167,13 +226,14 @@ def ler_grade_de_linhas(linhas: list[list[tuple]]) -> tuple[dict[int, str], list
             if letra is None or abs(_centro_x(letra) - _centro_x(w)) > 8:
                 alertas.append(f"item {numero} sem letra na mesma coluna")
                 continue
-            if letra[4] not in LETRAS_VALIDAS:
+            if letra[4] not in LETRAS_POR_TIPO[tipo]:
                 alertas.append(f"item {numero} com gabarito inválido {letra[4]!r}")
                 continue
             if numero in respostas:
                 alertas.append(f"item {numero} repetido na grade")
             respostas[numero] = letra[4]
-    return respostas, alertas
+            tipos[numero] = tipo
+    return respostas, tipos, alertas
 
 
 def classificar_versao(texto: str, nome_arquivo: str = "") -> str | None:
@@ -218,12 +278,14 @@ def classificar_versao(texto: str, nome_arquivo: str = "") -> str | None:
 
 def _ler_grade_doc(doc: pymupdf.Document) -> GradeGabarito:
     respostas: dict[int, str] = {}
+    tipos: dict[int, str] = {}
     alertas: list[str] = []
     texto = ""
     for page in doc:
         texto += page.get_text().replace("\xa0", " ") + "\n"
-        r, a = ler_grade_de_linhas(_linhas_de_palavras(page))
+        r, t, a = ler_grade_tipada_de_linhas(_linhas_de_palavras(page))
         respostas.update(r)
+        tipos.update(t)
         alertas.extend(a)
     cabecalho = None
     m = re.search(
@@ -237,11 +299,17 @@ def _ler_grade_doc(doc: pymupdf.Document) -> GradeGabarito:
     if numeros and numeros != list(range(numeros[0], numeros[-1] + 1)):
         faltando = sorted(set(range(numeros[0], numeros[-1] + 1)) - set(numeros))
         alertas.append(f"grade com buraco na numeração: {faltando}")
+    if len(set(tipos.values())) > 1:
+        alertas.append(
+            "grade com linhas `Item` e `Questão` misturadas: "
+            f"{sorted(set(tipos.values()))}"
+        )
     return GradeGabarito(
         codigo_caderno=codigo_caderno_do_texto(texto),
         respostas=respostas,
         cabecalho=cabecalho,
         alertas=alertas,
+        tipos=tipos,
     )
 
 

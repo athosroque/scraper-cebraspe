@@ -75,7 +75,7 @@
         <p class="mb-5 whitespace-pre-line break-words leading-relaxed text-slate-900">{{ questao.enunciado }}</p>
 
         <div id="{{ dom_id(questao.questao_chave) }}">
-            {{ c.form_resposta(questao.questao_chave) }}
+            {{ c.form_resposta(questao.questao_chave, tipo=questao.tipo, alternativas=questao.alternativas) }}
         </div>
     </div>
 

@@ -184,6 +184,27 @@
             "description": "`basico` ou `especifico`. Repita para os dois (OU)."
           },
           {
+            "name": "tipo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Formato da questão (`certo_errado` ou `multipla_escolha`). Repita para os dois (OU).",
+              "title": "Tipo"
+            },
+            "description": "Formato da questão (`certo_errado` ou `multipla_escolha`). Repita para os dois (OU)."
+          },
+          {
             "name": "no_id",
             "in": "query",
             "required": false,
@@ -704,6 +725,27 @@
             "description": "Tipos de conhecimento marcados."
           },
           {
+            "name": "tipo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Formatos marcados (`certo_errado` ou `multipla_escolha`).",
+              "title": "Tipo"
+            },
+            "description": "Formatos marcados (`certo_errado` ou `multipla_escolha`)."
+          },
+          {
             "name": "no_id",
             "in": "query",
             "required": false,
@@ -856,7 +898,7 @@
           "Conta"
         ],
         "summary": "Corrige uma resposta (e grava no histórico, com login)",
-        "description": "Sem login, só corrige. Questão anulada nunca é gravada.",
+        "description": "Sem login, só corrige. Questão anulada nunca é gravada. A letra é conferida contra o tipo da questão: `C`/`E` no certo/errado, as letras das alternativas na múltipla escolha. Fora disso: 422.",
         "operationId": "responder_api_v1_respostas_post",
         "requestBody": {
           "content": {
@@ -2679,6 +2721,34 @@
   },
   "components": {
     "schemas": {
+      "Alternativa": {
+        "properties": {
+          "letra": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ],
+            "title": "Letra",
+            "description": "Letra da alternativa (`A`, `B`, `C`, `D` ou `E`)."
+          },
+          "texto": {
+            "type": "string",
+            "title": "Texto",
+            "description": "Texto da alternativa."
+          }
+        },
+        "type": "object",
+        "required": [
+          "letra",
+          "texto"
+        ],
+        "title": "Alternativa",
+        "description": "Alternativa de questão de múltipla escolha."
+      },
       "CargoInfo": {
         "properties": {
           "cargo_edital_id": {
@@ -3100,6 +3170,15 @@
             "title": "Anuladas",
             "description": "Questões anuladas (`true`) e não anuladas (`false`).",
             "default": []
+          },
+          "tipos": {
+            "items": {
+              "$ref": "#/components/schemas/FacetaValor"
+            },
+            "type": "array",
+            "title": "Tipos",
+            "description": "Formatos de questão (`certo_errado` ou `multipla_escolha`).",
+            "default": []
           }
         },
         "type": "object",
@@ -3195,7 +3274,10 @@
               {
                 "type": "string",
                 "enum": [
+                  "A",
+                  "B",
                   "C",
+                  "D",
                   "E"
                 ]
               },
@@ -3209,7 +3291,7 @@
           "gabarito": {
             "type": "string",
             "title": "Gabarito",
-            "description": "Gabarito definitivo (`C`, `E` ou `X`)."
+            "description": "Gabarito definitivo (`A`..`E`, `C`, `E` ou `X`)."
           },
           "situacao": {
             "type": "string",
@@ -3228,7 +3310,6 @@
           "questao_chave",
           "numero",
           "codigo_caderno",
-          "resposta",
           "gabarito",
           "situacao"
         ],
@@ -3312,6 +3393,31 @@
             "type": "string",
             "title": "Enunciado",
             "description": "Texto do item a julgar."
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "certo_errado",
+              "multipla_escolha"
+            ],
+            "title": "Tipo",
+            "description": "Formato do item: `certo_errado` ou `multipla_escolha`.",
+            "default": "certo_errado"
+          },
+          "alternativas": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Alternativa"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternativas",
+            "description": "Alternativas do item quando múltipla escolha (A–E)."
           },
           "secao": {
             "anyOf": [
@@ -4261,7 +4367,32 @@
           "gabarito": {
             "type": "string",
             "title": "Gabarito",
-            "description": "Gabarito definitivo: `C` (certo), `E` (errado) ou `X` (anulada)."
+            "description": "Gabarito definitivo: `C` (certo), `E` (errado), `A`..`E` ou `X` (anulada)."
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "certo_errado",
+              "multipla_escolha"
+            ],
+            "title": "Tipo",
+            "description": "Formato do item: `certo_errado` ou `multipla_escolha`.",
+            "default": "certo_errado"
+          },
+          "alternativas": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Alternativa"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternativas",
+            "description": "Alternativas do item quando múltipla escolha (A–E)."
           },
           "anulada": {
             "type": "boolean",
@@ -4426,6 +4557,7 @@
             "tem_figuras": false,
             "tem_texto_base": true,
             "texto_base_texto": "“A liberdade medieval”, disse o historiador…",
+            "tipo": "certo_errado",
             "utilizavel": true
           }
         ]
@@ -4486,7 +4618,32 @@
           "gabarito": {
             "type": "string",
             "title": "Gabarito",
-            "description": "Gabarito definitivo: `C` (certo), `E` (errado) ou `X` (anulada)."
+            "description": "Gabarito definitivo: `C` (certo), `E` (errado), `A`..`E` ou `X` (anulada)."
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "certo_errado",
+              "multipla_escolha"
+            ],
+            "title": "Tipo",
+            "description": "Formato do item: `certo_errado` ou `multipla_escolha`.",
+            "default": "certo_errado"
+          },
+          "alternativas": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Alternativa"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternativas",
+            "description": "Alternativas do item quando múltipla escolha (A–E)."
           },
           "anulada": {
             "type": "boolean",
@@ -4575,7 +4732,7 @@
           "nos"
         ],
         "title": "QuestaoResumo",
-        "description": "Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados.",
+        "description": "Questão objetiva (certo/errado ou múltipla escolha) na listagem. Uma entrada por questão, com cargos e nós agregados.",
         "examples": [
           {
             "ano": 2025,
@@ -4614,6 +4771,7 @@
             "secao": "Acerca das ideias e de aspectos linguísticos do texto precedente, julgue os itens a seguir.",
             "tem_figuras": false,
             "tem_texto_base": true,
+            "tipo": "certo_errado",
             "utilizavel": true
           }
         ]
@@ -4631,11 +4789,14 @@
           "resposta": {
             "type": "string",
             "enum": [
+              "A",
+              "B",
               "C",
+              "D",
               "E"
             ],
             "title": "Resposta",
-            "description": "`C` (certo) ou `E` (errado)."
+            "description": "Resposta: `C`/`E` para certo/errado ou `A`..`E` para múltipla escolha."
           }
         },
         "type": "object",
@@ -4662,7 +4823,10 @@
           "resposta": {
             "type": "string",
             "enum": [
+              "A",
+              "B",
               "C",
+              "D",
               "E"
             ],
             "title": "Resposta",
@@ -4671,7 +4835,7 @@
           "gabarito": {
             "type": "string",
             "title": "Gabarito",
-            "description": "Gabarito definitivo (`C`, `E` ou `X`)."
+            "description": "Gabarito definitivo (`A`..`E`, `C`, `E` ou `X`)."
           },
           "anulada": {
             "type": "boolean",
@@ -4687,6 +4851,31 @@
             "type": "boolean",
             "title": "Gravada",
             "description": "`true` quando entrou no histórico do usuário."
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "certo_errado",
+              "multipla_escolha"
+            ],
+            "title": "Tipo",
+            "description": "Formato do item: `certo_errado` ou `multipla_escolha`.",
+            "default": "certo_errado"
+          },
+          "alternativas": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Alternativa"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternativas",
+            "description": "Alternativas do item quando múltipla escolha (A–E)."
           }
         },
         "type": "object",
@@ -4717,13 +4906,16 @@
             "additionalProperties": {
               "type": "string",
               "enum": [
+                "A",
+                "B",
                 "C",
+                "D",
                 "E"
               ]
             },
             "type": "object",
             "title": "Respostas",
-            "description": "Chave da questão → `C`/`E`. Item ausente conta como em branco."
+            "description": "Chave da questão → alternativa ou `C`/`E`. Item ausente conta como em branco."
           }
         },
         "type": "object",
@@ -4967,13 +5159,16 @@
             "additionalProperties": {
               "type": "string",
               "enum": [
+                "A",
+                "B",
                 "C",
+                "D",
                 "E"
               ]
             },
             "type": "object",
             "title": "Respostas",
-            "description": "Chave da questão → `C`/`E`. Item ausente conta como em branco."
+            "description": "Chave da questão → alternativa ou `C`/`E`. Item ausente conta como em branco."
           },
           "concurso": {
             "type": "string",

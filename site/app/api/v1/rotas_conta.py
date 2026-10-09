@@ -27,14 +27,21 @@ _403 = R403
     "/respostas",
     response_model=RespostaResultado,
     summary="Corrige uma resposta (e grava no histórico, com login)",
-    description="Sem login, só corrige. Questão anulada nunca é gravada.",
+    description=(
+        "Sem login, só corrige. Questão anulada nunca é gravada. A letra é conferida "
+        "contra o tipo da questão: `C`/`E` no certo/errado, as letras das alternativas "
+        "na múltipla escolha. Fora disso: 422."
+    ),
     dependencies=[Depends(verificar_csrf)],
     responses={**r404("Questão não encontrada."), **_403},
 )
 def responder(entrada: RespostaEntrada, request: Request):
-    resultado = contas_servico.responder(
-        entrada.questao_chave, entrada.resposta, usuario_id_atual(request)
-    )
+    try:
+        resultado = contas_servico.responder(
+            entrada.questao_chave, entrada.resposta, usuario_id_atual(request)
+        )
+    except contas_servico.RespostaForaDoFormato as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
     if not resultado:
         raise HTTPException(status_code=404, detail="Questão não encontrada")
     return resultado

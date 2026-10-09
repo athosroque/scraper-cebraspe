@@ -57,6 +57,8 @@ _EX_QUESTAO = {
     "banca": "CEBRASPE",
     "ano": 2025,
     "gabarito": "C",
+    "tipo": "certo_errado",
+    "alternativas": None,
     "anulada": False,
     "utilizavel": True,
     "enunciado": _EX_ENUNCIADO,
@@ -107,6 +109,7 @@ _CAMPOS_LISTA = (
     "nivel",
     "tipo_conhecimento",
     "no_id",
+    "tipo",
 )
 _CAMPOS_INTEIROS = {"ano", "cargo_numero"}
 _PADRAO_CARGO = re.compile(r"^[A-Za-z0-9_]+:\d+$")
@@ -134,6 +137,10 @@ class FiltroQuestoes(BaseModel):
     nivel: list[str] | None = Field(None, description=_D_NIVEL)
     tipo_conhecimento: list[str] | None = Field(None, description=_D_TIPO)
     no_id: list[str] | None = Field(None, description=_D_NO_ID)
+    tipo: list[str] | None = Field(
+        None,
+        description="Formato da questão (`certo_errado` ou `multipla_escolha`).",
+    )
     # 5H.4
     texto: str | None = Field(
         None,
@@ -256,8 +263,17 @@ class Incidencia(BaseModel):
     questoes: int = Field(description="Questões válidas distintas no subassunto.")
 
 
+class Alternativa(BaseModel):
+    """Alternativa de questão de múltipla escolha."""
+
+    letra: Literal["A", "B", "C", "D", "E"] = Field(
+        description="Letra da alternativa (`A`, `B`, `C`, `D` ou `E`)."
+    )
+    texto: str = Field(description="Texto da alternativa.")
+
+
 class QuestaoResumo(BaseModel):
-    """Questão objetiva (certo/errado) na listagem. Uma entrada por questão, com cargos e nós agregados."""
+    """Questão objetiva (certo/errado ou múltipla escolha) na listagem. Uma entrada por questão, com cargos e nós agregados."""
 
     model_config = ConfigDict(json_schema_extra={"examples": [_EX_QUESTAO]})
 
@@ -282,7 +298,15 @@ class QuestaoResumo(BaseModel):
     banca: str = Field(description="Banca organizadora (`CEBRASPE`).")
     ano: int = Field(description="Ano do concurso.")
     gabarito: str = Field(
-        description="Gabarito definitivo: `C` (certo), `E` (errado) ou `X` (anulada)."
+        description="Gabarito definitivo: `C` (certo), `E` (errado), `A`..`E` ou `X` (anulada)."
+    )
+    tipo: Literal["certo_errado", "multipla_escolha"] = Field(
+        "certo_errado",
+        description="Formato do item: `certo_errado` ou `multipla_escolha`.",
+    )
+    alternativas: list[Alternativa] | None = Field(
+        None,
+        description="Alternativas do item quando múltipla escolha (A–E).",
     )
     anulada: bool = Field(description="`true` quando a banca anulou o item.")
     utilizavel: bool = Field(
@@ -414,6 +438,9 @@ class FacetasResponse(BaseModel):
     anuladas: list[FacetaValor] = Field(
         [], description="Questões anuladas (`true`) e não anuladas (`false`)."
     )
+    tipos: list[FacetaValor] = Field(
+        [], description="Formatos de questão (`certo_errado` ou `multipla_escolha`)."
+    )
 
 
 # -- Contas e histórico (5F.3) --
@@ -439,7 +466,9 @@ class RespostaEntrada(BaseModel):
     )
 
     questao_chave: str = Field(description=_CHAVE, examples=[_EX_CHAVE])
-    resposta: Literal["C", "E"] = Field(description="`C` (certo) ou `E` (errado).")
+    resposta: Literal["A", "B", "C", "D", "E"] = Field(
+        description="Resposta: `C`/`E` para certo/errado ou `A`..`E` para múltipla escolha."
+    )
 
 
 class RespostaResultado(BaseModel):
@@ -461,11 +490,21 @@ class RespostaResultado(BaseModel):
     )
 
     questao_chave: str = Field(description=_CHAVE)
-    resposta: Literal["C", "E"] = Field(description="Resposta enviada.")
-    gabarito: str = Field(description="Gabarito definitivo (`C`, `E` ou `X`).")
+    resposta: Literal["A", "B", "C", "D", "E"] = Field(description="Resposta enviada.")
+    gabarito: str = Field(
+        description="Gabarito definitivo (`A`..`E`, `C`, `E` ou `X`)."
+    )
     anulada: bool = Field(description="`true` quando a questão foi anulada.")
     acertou: bool = Field(description="`true` quando a resposta bate com o gabarito.")
     gravada: bool = Field(description="`true` quando entrou no histórico do usuário.")
+    tipo: Literal["certo_errado", "multipla_escolha"] = Field(
+        "certo_errado",
+        description="Formato do item: `certo_errado` ou `multipla_escolha`.",
+    )
+    alternativas: list[Alternativa] | None = Field(
+        None,
+        description="Alternativas do item quando múltipla escolha (A–E).",
+    )
 
 
 class NoDesempenho(BaseModel):
@@ -696,6 +735,14 @@ class ItemSimulado(BaseModel):
     codigo_caderno: str = Field(description=_D_CADERNO)
     tipo_conhecimento: str = Field(description=_D_TIPO)
     enunciado: str = Field(description="Texto do item a julgar.")
+    tipo: Literal["certo_errado", "multipla_escolha"] = Field(
+        "certo_errado",
+        description="Formato do item: `certo_errado` ou `multipla_escolha`.",
+    )
+    alternativas: list[Alternativa] | None = Field(
+        None,
+        description="Alternativas do item quando múltipla escolha (A–E).",
+    )
     secao: str | None = Field(
         None,
         description="Comando da seção do caderno que agrupa o item (“julgue os itens…”).",
@@ -743,9 +790,9 @@ class RespostasSimulado(BaseModel):
         json_schema_extra={"examples": [{"respostas": {_EX_CHAVE: "C"}}]}
     )
 
-    respostas: dict[str, Literal["C", "E"]] = Field(
+    respostas: dict[str, Literal["A", "B", "C", "D", "E"]] = Field(
         default_factory=dict,
-        description="Chave da questão → `C`/`E`. Item ausente conta como em branco.",
+        description="Chave da questão → alternativa ou `C`/`E`. Item ausente conta como em branco.",
     )
 
 
@@ -782,10 +829,13 @@ class ItemCorrigido(BaseModel):
     questao_chave: str = Field(description=_CHAVE)
     numero: int = Field(description=_D_NUMERO)
     codigo_caderno: str = Field(description=_D_CADERNO)
-    resposta: Literal["C", "E"] | None = Field(
-        description="Resposta marcada (vazio = em branco)."
+    resposta: Literal["A", "B", "C", "D", "E"] | None = Field(
+        None,
+        description="Resposta marcada (vazio = em branco).",
     )
-    gabarito: str = Field(description="Gabarito definitivo (`C`, `E` ou `X`).")
+    gabarito: str = Field(
+        description="Gabarito definitivo (`A`..`E`, `C`, `E` ou `X`)."
+    )
     situacao: Literal["certo", "errado", "branco", "anulada"] = Field(
         description="Resultado do item."
     )

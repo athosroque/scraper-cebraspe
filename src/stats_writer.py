@@ -41,7 +41,7 @@ import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import Json, execute_batch, execute_values
 
-from src import arvore, canonico, classificacao, gabarito_parser
+from src import arvore, canonico, classificacao, gabarito_parser, questoes_writer
 from src.comparacao_texto import extrair_cargos_do_texto, normalizar
 from src.downloader import (
     DATA_DIR,
@@ -978,14 +978,24 @@ def aplicar_classificacao(
         cur.execute(
             """
             SELECT c.slug, p.codigo_caderno, p.arquivo, p.identificador,
-                   q.numero, q.id, q.enunciado
+                   q.numero, q.id, q.enunciado, q.tipo, q.alternativas
             FROM questoes q
             JOIN provas p ON p.id = q.prova_id
             JOIN concursos c ON c.id = p.concurso_id
             """
         )
         map_questoes = {}
-        for slug, cod_caderno, arquivo, ident, num, q_id, enunciado in cur.fetchall():
+        for (
+            slug,
+            cod_caderno,
+            arquivo,
+            ident,
+            num,
+            q_id,
+            enunciado,
+            tipo,
+            alternativas,
+        ) in cur.fetchall():
             cad_nome = nome_caderno(
                 {
                     "slug": slug,
@@ -994,7 +1004,12 @@ def aplicar_classificacao(
                     "identificador": ident,
                 }
             )
-            map_questoes[f"{slug}|{cad_nome}|{num}"] = (q_id, enunciado)
+            map_questoes[f"{slug}|{cad_nome}|{num}"] = (
+                q_id,
+                enunciado,
+                tipo,
+                alternativas,
+            )
 
         # Mapeia chaves de discursivas
         cur.execute(
@@ -1027,11 +1042,16 @@ def aplicar_classificacao(
                 continue
 
             alvo = map_discursivas.get(chave) or map_questoes.get(chave)
-            if alvo is not None and (
-                reg.hash_enunciado != classificacao.calcular_hash_enunciado(alvo[1])
-            ):
-                desatualizados.append(chave)
-                continue
+            if alvo is not None:
+                if chave in map_discursivas:
+                    hash_esperado = classificacao.calcular_hash_enunciado(alvo[1])
+                else:
+                    hash_esperado = questoes_writer.calcular_hash_5d(
+                        alvo[1], tipo=alvo[2], alternativas=alvo[3]
+                    )
+                if reg.hash_enunciado != hash_esperado:
+                    desatualizados.append(chave)
+                    continue
 
             if chave in map_discursivas:
                 d_id = map_discursivas[chave][0]

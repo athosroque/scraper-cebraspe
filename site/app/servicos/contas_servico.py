@@ -17,10 +17,21 @@ from app.modelos import (
 )
 from app.repositorio import estatisticas_repo, questoes_repo, usuarios_repo
 from app.servicos import questoes_servico
+from app.servicos.formatacao import letras_validas
 
 
 class LoginNecessario(Exception):
     """Filtro de histórico pedido sem usuário logado."""
+
+
+class RespostaForaDoFormato(ValueError):
+    """Letra que a questão não aceita (`A` num C/E, `E` num ME de A a D, ou vazia)."""
+
+    def __init__(self, tipo: str, alternativas, letras: tuple[str, ...]):
+        super().__init__(f"Resposta deve ser uma de: {', '.join(letras)}.")
+        self.tipo = tipo
+        self.alternativas = alternativas
+        self.letras = letras
 
 
 def entrar_com_google(google_sub: str, email: str, nome: str | None) -> Usuario:
@@ -37,12 +48,16 @@ def apagar_conta(usuario_id: int) -> bool:
 
 
 def responder(
-    chave: str, resposta: str, usuario_id: int | None
+    chave: str, resposta: str | None, usuario_id: int | None
 ) -> RespostaResultado | None:
-    """Corrige e, com login, grava. Anulada não grava: não há certo nem errado."""
+    """Corrige e, com login, grava. Anulada não grava: não há certo nem errado.
+    Letra fora do formato da questão levanta `RespostaForaDoFormato`."""
     questao = questoes_servico.obter_questao_por_chave(chave)
     if not questao:
         return None
+    letras = letras_validas(questao.tipo, questao.alternativas)
+    if resposta not in letras:
+        raise RespostaForaDoFormato(questao.tipo, questao.alternativas, letras)
     acertou = not questao.anulada and questao.gabarito == resposta
     gravar = usuario_id is not None and not questao.anulada
     if gravar:
@@ -54,6 +69,8 @@ def responder(
         anulada=questao.anulada,
         acertou=acertou,
         gravada=gravar,
+        tipo=questao.tipo,
+        alternativas=questao.alternativas,
     )
 
 

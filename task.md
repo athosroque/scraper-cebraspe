@@ -1043,14 +1043,73 @@ enviar o bloco de uma etapa específica para o agente construir.
     DISCURSIVA" como caderno. Prova não aplicada vira `aguardando_prova` (26), e o
     relatório fica com 0 alertas reais. Falta decidir o tamanho do lote e os concursos em
     andamento.
-- `[ ]` **8.M Múltipla escolha**: `questoes.tipo` + `alternativas`, gabarito A–E, parser de
-  alternativas calibrado com PDFs ME reais, classificação 5D, site e simulado por tipo, ADR-038.
-  Inclui o layout `caderno_com_gabarito` (questão e gabarito no mesmo PDF; CAESB_24 é ME).
+- `[/]` **8.M Múltipla escolha**:
+  - `[ ]` Layout `caderno_com_gabarito` (questão e gabarito no mesmo PDF; CAESB_24 é ME).
+  - `[x]` Schema e persistência (`src/sql/schema_estatisticas.sql`, `src/questoes_writer.py`, `src/stats_writer.py`): `questoes.tipo`, `alternativas jsonb`, check `A-E` e `X`, hash 5D com alternativas para ME e estável para CE.
+  - `[x]` Parser de gabaritos (`src/gabarito_parser.py`): `LETRAS_VALIDAS` expandido, cabeçalho `Questão`/`Item`, validação com PDFs reais.
+  - `[x]` Parser de cadernos ME (`src/prova_parser.py`): `_eff_y0` em blocos, segmentação de enunciados e alternativas A–E (multilinhas, figuras), calibração 100% verde nos 3 PDFs reais da amostra (`BANRISUL_25`, `SEBRAE_26_PSE_1`, `SEFA_PR_25`).
+    - `[x]` Revisão (2026-10-09): rótulo "Texto X" no meio da seção era engolido pela
+      alternativa E, e selos "Questão N" criavam texto-base vazio. Corrigido com testes de
+      contagem exata nos 3 PDFs; piloto C/E re-parseado com 0 diferenças.
+      **Decisão do dono (2026-10-09):** no ME, o texto-base vale para quem cita o rótulo; o
+      texto que abre a seção vale para a seção inteira; o texto no meio da seção vale só para
+      a questão seguinte e para as que o citam. A herança "até a próxima seção" do C/E daria o
+      Texto 1A3 do `SEFA_PR_25` (seção única) a 23 questões sem relação.
+  - `[x]` Classificação 5D (`scripts/classificar_questoes.py`, `src/classificacao.py`): alternativas no prompt LLM e hash 5D.
+  - `[x]` Site e simulado (`site/`, ADR-038): modelos Pydantic, respostas A–E validadas pelo
+    tipo da questão (letra fora do formato é recusada na API e no form e vira branco no
+    simulado), pontuação +1/−1 no C/E e +1/0 no ME, radios em teal, gabarito em destaque na
+    correção, faceta "Formato" e OpenAPI. Ainda sem questão ME no banco: falta o teste no
+    Chromium headless e 1 concurso ME de ponta a ponta (Gate).
+  - `[x]` Revisão de gabarito e schema (2026-10-09): código de caderno com sublinhado na sigla
+    (`169_SEBRAE_26_PSE_1_CG1_02`) reconhecido; tipo da grade pelo rótulo (`Item` → C/E,
+    `Questão` → ME) com letras validadas por tipo; constraints `questoes_gabarito_tipo_check`
+    e `questoes_alternativas_tipo_check`; `vw_comparativo_nivel` com ME e média de percentuais
+    por concurso × cargo. 42 grades do piloto e 2.530 questões re-parseadas sem diferença.
+  - `[ ]` **Antes do Gate — ligação prova ME ↔ gabarito** (`stats_writer.py`, achado da revisão):
+    - SEBRAE_26_PSE_1 não liga: 4 cadernos básicos (TIPO 1–4) deixam a regra "única básica"
+      ambígua, e PERFIL I/II/III não vira número de cargo. Usar o sufixo `_NN` (= TIPO N) e o
+      TIPO do texto do link, ou ligar pelo texto do link (`GABARITO … – X` ↔ `PROVA … – X`).
+    - SEFA_PR_25: risco de o gabarito objetivo do cargo 1 ser ligado à discursiva
+      (`discursiva_por_cargo`, perto da l.745, não confere o tipo). Confirmar numa carga real.
+    - O tipo da grade (`GradeGabarito.tipos`) não chega ao `prova_parser`
+      (`extrair_questoes.py` passa só `.respostas`); `_eh_multipla_escolha` ainda decide pelas
+      letras A/B/D.
+    - Código `059_SEFAZRJANALISTA_CG_01` (`CG` sem dígito) não casa `PADRAO_CODIGO_CADERNO`.
+  - `[ ]` `fn_prova_cobra`: `pct_do_universo` soma bruto entre concursos quando o filtro pega
+    vários (o site usa como `pct_incidencia`), e `pct_medio_por_concurso` é por concurso, não
+    por concurso × cargo; o site ordena por `questoes` bruto. Alinhar à regra de 2026-10-09
+    junto com a pendência "Incidência de subassunto com vários recortes" (fim do arquivo).
   Gate: piloto inalterado (2.800 itens, chaves 5D idênticas), `make test-all` verde.
 - `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
   `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
   por lote.
+  - `[ ]` Checagem automática (pedido do dono, 2026-10-09): alerta para questão ME cujo
+    enunciado ou alternativas mencionam "texto", "tabela", "figura", "gráfico" ou "quadro"
+    e que ficou sem texto-base e sem figura. Cobre o risco da regra de herança do ME
+    (questão que usa um texto sem citar o rótulo e não vem logo depois dele). Excluir o
+    caso em que o "texto precedente" está no próprio enunciado (BANRISUL Q22, SEFA_PR Q11
+    e Q50). O alerta entra no relatório do lote para revisão na pausa, sem bloquear.
 - `[ ]` **8.2+ Lotes**: 2025 → 2026 → 2024 … 2020, 2 concursos por vez; 1º lote de cada ano é
   de calibração.
 - **Pronto quando:** todos os concursos marcados `incluir` no inventário estão `aprovado`, as
   views da 5E reconciliam e a suíte completa está verde.
+
+## Pendências posteriores (fora de etapa)
+
+- `[ ]` **Incidência de subassunto com vários recortes** (pedido do dono, 2026-10-09).
+  Mostrar lado a lado, para cada nó (matéria › assunto › subassunto):
+  - % na **prova** (concurso × cargo) — já existe em `vw_prova_cobra_no`;
+  - % **geral da banca** (todos os concursos) — já existe em `fn_prova_cobra(p_banca => ...)`,
+    como média de percentuais por concurso; falta expor junto do % da prova no site;
+  - % de um **assunto/matéria filtrado por banca** (e órgão, ano, cargo, nível).
+
+  Filtros novos que faltam em `fn_prova_cobra` e no site:
+  - `p_formato` (`certo_errado` | `multipla_escolha`): ME e C/E contam igualmente por padrão
+    (decisão de 2026-10-09);
+  - **gabarito C ou E**. Confirmar com o dono antes de implementar se é (a) incidência só
+    entre itens de gabarito C (ou E), ou (b) a proporção C × E dentro do nó (hoje em
+    `vw_certo_errado_por_no`, só para C/E).
+
+  Regra: agregar entre concursos sempre pela média dos percentuais por concurso × cargo,
+  nunca pela soma bruta (decisão de 2026-10-09).

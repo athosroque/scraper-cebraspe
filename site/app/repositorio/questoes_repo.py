@@ -23,6 +23,7 @@ _COLUNAS = {
     "cargo_numero": "cargo_numero",
     "nivel": "nivel",
     "tipo_conhecimento": "tipo_conhecimento",
+    "tipo": "tipo",
 }
 
 
@@ -168,6 +169,8 @@ def buscar_questoes(
             q.banca,
             q.ano,
             q.gabarito,
+            q.tipo,
+            q.alternativas,
             q.anulada,
             q.utilizavel,
             q.enunciado,
@@ -195,7 +198,7 @@ def buscar_questoes(
         JOIN pagina_ids p ON p.questao_id = q.questao_id
         GROUP BY
             q.questao_id, q.questao_chave, q.concurso, q.codigo_caderno, q.numero,
-            q.orgao, q.banca, q.ano, q.gabarito, q.anulada, q.utilizavel,
+            q.orgao, q.banca, q.ano, q.gabarito, q.tipo, q.alternativas, q.anulada, q.utilizavel,
             q.enunciado, q.secao, q.tem_texto_base, q.tem_figuras
         ORDER BY q.concurso, q.codigo_caderno, q.numero
         """
@@ -221,6 +224,8 @@ def obter_questao_por_chave(chave: str) -> dict | None:
             q.banca,
             q.ano,
             q.gabarito,
+            q.tipo,
+            q.alternativas,
             q.anulada,
             q.utilizavel,
             q.enunciado,
@@ -253,7 +258,7 @@ def obter_questao_por_chave(chave: str) -> dict | None:
         WHERE q.questao_chave = %(chave)s
         GROUP BY
             q.questao_id, q.questao_chave, q.concurso, q.codigo_caderno, q.numero,
-            q.orgao, q.banca, q.ano, q.gabarito, q.anulada, q.utilizavel,
+            q.orgao, q.banca, q.ano, q.gabarito, q.tipo, q.alternativas, q.anulada, q.utilizavel,
             q.enunciado, q.secao, q.tem_texto_base, q.tem_figuras, q.texto_base_texto, q.figuras, f.url
         """
         cur.execute(query, {"chave": chave})
@@ -308,7 +313,7 @@ def obter_arvore_com_contagens() -> list[dict]:
 _COLUNAS_FACETA = """
     questao_id, questao_chave, questao_canonica_id, banca, orgao, ano, concurso,
     cargo_numero, cargo, nivel, tipo_conhecimento, no_id, no_nivel, assunto_id,
-    materia_id, anulada, utilizavel
+    materia_id, anulada, utilizavel, tipo
 """
 
 
@@ -337,6 +342,7 @@ def obter_facetas(filtros_dict: dict | None = None) -> dict:
         ("concurso", "concurso"),
         ("nivel", "nivel"),
         ("tipo_conhecimento", "tipo_conhecimento"),
+        ("tipo", "tipo"),
     ]:
         partes.append(f"""
             SELECT '{faceta}' AS faceta, {coluna}::text AS valor,
@@ -387,6 +393,7 @@ def obter_facetas(filtros_dict: dict | None = None) -> dict:
         "orgao",
         "ano",
         "tipo_conhecimento",
+        "tipo",
         "materia",
         "assunto",
         "subassunto",

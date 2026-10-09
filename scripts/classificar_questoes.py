@@ -39,6 +39,7 @@ from src.llm_openrouter import (
     chamar_llm_json,
 )
 from src.logger import logger
+from src.questoes_writer import calcular_hash_5d
 from src.stats_writer import conectar, nome_caderno
 
 PROJETO_DIR = Path(__file__).resolve().parent.parent
@@ -370,6 +371,24 @@ def montar_prompt_lote(
             linhas.append(
                 f"Item {it['numero']}:{fig_str} {it.get('enunciado', '').strip()}"
             )
+            if it.get("tipo") == "multipla_escolha" and it.get("alternativas"):
+                alts = it.get("alternativas")
+                if isinstance(alts, str):
+                    try:
+                        alts = json.loads(alts)
+                    except Exception:
+                        alts = []
+                if alts:
+                    linhas.append("Alternativas:")
+                    for alt in alts:
+                        if isinstance(alt, dict):
+                            letra = alt.get("letra", "")
+                            txt = alt.get("texto", "").strip()
+                            linhas.append(f"({letra}) {txt}")
+                        elif isinstance(alt, (list, tuple)) and len(alt) >= 2:
+                            linhas.append(f"({alt[0]}) {str(alt[1]).strip()}")
+                        else:
+                            linhas.append(str(alt).strip())
 
     linhas.extend(
         [
@@ -380,6 +399,9 @@ def montar_prompt_lote(
     )
 
     return "\n".join(linhas)
+
+
+montar_prompt_usuario = montar_prompt_lote
 
 
 def classificar_lote(
@@ -550,14 +572,14 @@ def carregar_dados_caderno(
 
             cur.execute(
                 """
-                SELECT id, numero, enunciado, secao, texto_base_id, figuras, utilizavel
+                SELECT id, numero, enunciado, secao, texto_base_id, figuras, utilizavel, tipo, alternativas
                 FROM questoes
                 WHERE prova_id = %s
                 ORDER BY numero
                 """,
                 (prova_id,),
             )
-            for q_id, num, enun, sec, tb_id, figs, util in cur.fetchall():
+            for q_id, num, enun, sec, tb_id, figs, util, tipo, alts in cur.fetchall():
                 itens.append(
                     {
                         "id": q_id,
@@ -567,6 +589,8 @@ def carregar_dados_caderno(
                         "texto_base_id": tb_id,
                         "figuras": figs,
                         "utilizavel": util,
+                        "tipo": tipo or "certo_errado",
+                        "alternativas": alts,
                     }
                 )
 
@@ -638,7 +662,11 @@ def processar_caderno(
             chave = classificacao.chave_questao(
                 slug, cad_nome, num, discursiva=is_discursiva
             )
-            h = classificacao.calcular_hash_enunciado(it.get("enunciado", ""))
+            h = calcular_hash_5d(
+                it.get("enunciado", ""),
+                tipo=it.get("tipo") or "certo_errado",
+                alternativas=it.get("alternativas"),
+            )
 
             reg = cq.registros.get(chave)
             if (
@@ -715,7 +743,11 @@ def processar_caderno(
             chave = classificacao.chave_questao(
                 slug, cad_nome, it_orig["numero"], discursiva=is_discursiva
             )
-            h = classificacao.calcular_hash_enunciado(it_orig.get("enunciado", ""))
+            h = calcular_hash_5d(
+                it_orig.get("enunciado", ""),
+                tipo=it_orig.get("tipo") or "certo_errado",
+                alternativas=it_orig.get("alternativas"),
+            )
 
             if item_resp.nenhum_serve:
                 itens_para_reserva.append(it_orig)
@@ -764,7 +796,11 @@ def processar_caderno(
                 chave = classificacao.chave_questao(
                     slug, cad_nome, it["numero"], discursiva=is_discursiva
                 )
-                h = classificacao.calcular_hash_enunciado(it.get("enunciado", ""))
+                h = calcular_hash_5d(
+                    it.get("enunciado", ""),
+                    tipo=it.get("tipo") or "certo_errado",
+                    alternativas=it.get("alternativas"),
+                )
                 classificacao.mapear_questao(
                     cq,
                     arv,
@@ -837,8 +873,10 @@ def processar_caderno(
                         it_orig["numero"],
                         discursiva=is_discursiva,
                     )
-                    h = classificacao.calcular_hash_enunciado(
-                        it_orig.get("enunciado", "")
+                    h = calcular_hash_5d(
+                        it_orig.get("enunciado", ""),
+                        tipo=it_orig.get("tipo") or "certo_errado",
+                        alternativas=it_orig.get("alternativas"),
                     )
 
                     if item_resp.nenhum_serve:

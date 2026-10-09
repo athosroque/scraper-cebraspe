@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -722,3 +723,350 @@ class TestClassificacaoPipeline:
         assert mock_post.call_count == 0
         assert conta.chamadas == 0
         assert not classif_path.exists()
+
+
+class TestClassificacaoMultiplaEscolha:
+    """Testes específicos para suporte a múltipla escolha (Etapa 8.M — Task 4)."""
+
+    def test_montar_prompt_usuario_multipla_escolha_com_alternativas(self):
+        cad_info = {
+            "concurso_slug": "PF_25_ADM",
+            "orgao": "Polícia Federal",
+            "cargos": ["Agente"],
+            "tipo": "objetiva_especifica",
+            "niveis": ["Superior"],
+        }
+        itens = [
+            {
+                "numero": 1,
+                "enunciado": "A respeito dos atos administrativos, assinale a opção correta.",
+                "tipo": "multipla_escolha",
+                "alternativas": [
+                    {"letra": "A", "texto": "A presunção de legitimidade é absoluta."},
+                    {
+                        "letra": "B",
+                        "texto": "A competência pode ser totalmente renunciada.",
+                    },
+                    {"letra": "C", "texto": "A revogação produz efeitos ex tunc."},
+                    {
+                        "letra": "D",
+                        "texto": "A anulação de ato ilegal é dever da administração.",
+                    },
+                    {
+                        "letra": "E",
+                        "texto": "O motivo independe de veracidade factual.",
+                    },
+                ],
+            }
+        ]
+        cands_formatados = "[C1] DIREITO ADMINISTRATIVO (matéria)\n  [C2] Atos Administrativos (assunto)"
+
+        prompt = cq_script.montar_prompt_usuario(cad_info, itens, cands_formatados)
+
+        # Valida que o prompt contém enunciado e alternativas formatadas
+        assert (
+            "Item 1: A respeito dos atos administrativos, assinale a opção correta."
+            in prompt
+        )
+        assert "Alternativas:" in prompt
+        assert "(A) A presunção de legitimidade é absoluta." in prompt
+        assert "(B) A competência pode ser totalmente renunciada." in prompt
+        assert "(C) A revogação produz efeitos ex tunc." in prompt
+        assert "(D) A anulação de ato ilegal é dever da administração." in prompt
+        assert "(E) O motivo independe de veracidade factual." in prompt
+
+        # Valida que montar_prompt_lote produz exatamente a mesma saída
+        prompt_lote = cq_script.montar_prompt_lote(cad_info, itens, cands_formatados)
+        assert prompt == prompt_lote
+
+    def test_montar_prompt_usuario_certo_errado_sem_alternativas(self):
+        cad_info = {
+            "concurso_slug": "PF_25_ADM",
+            "orgao": "Polícia Federal",
+            "cargos": ["Agente"],
+            "tipo": "objetiva_basica",
+            "niveis": ["Superior"],
+        }
+        itens = [
+            {
+                "numero": 1,
+                "enunciado": "O ato administrativo possui presunção de legitimidade relativa.",
+                "tipo": "certo_errado",
+                "alternativas": None,
+            },
+            {
+                "numero": 2,
+                "enunciado": "A revogação decorre de razões de oportunidade e conveniência.",
+                # ausência de campos tipo e alternativas (retrocompatibilidade)
+            },
+        ]
+        cands_formatados = "[C1] DIREITO ADMINISTRATIVO (matéria)"
+
+        prompt = cq_script.montar_prompt_usuario(cad_info, itens, cands_formatados)
+
+        assert "Alternativas:" not in prompt
+        assert "(A)" not in prompt
+        assert (
+            "Item 1: O ato administrativo possui presunção de legitimidade relativa."
+            in prompt
+        )
+        assert (
+            "Item 2: A revogação decorre de razões de oportunidade e conveniência."
+            in prompt
+        )
+
+    def test_montar_prompt_multipla_escolha_com_alternativas_json_string(self):
+        cad_info = {
+            "concurso_slug": "TESTE",
+            "orgao": "TESTE",
+            "cargos": [],
+            "tipo": "objetiva",
+        }
+        itens = [
+            {
+                "numero": 5,
+                "enunciado": "Enunciado ME em string json",
+                "tipo": "multipla_escolha",
+                "alternativas": json.dumps(
+                    [
+                        {"letra": "A", "texto": "Opção A"},
+                        {"letra": "B", "texto": "Opção B"},
+                    ]
+                ),
+            }
+        ]
+        prompt = cq_script.montar_prompt_usuario(cad_info, itens, "C1")
+        assert "Alternativas:" in prompt
+        assert "(A) Opção A" in prompt
+        assert "(B) Opção B" in prompt
+
+    def test_montar_prompt_multipla_escolha_sem_alternativas(self):
+        cad_info = {
+            "concurso_slug": "TESTE",
+            "orgao": "TESTE",
+            "cargos": [],
+            "tipo": "objetiva",
+        }
+        itens = [
+            {
+                "numero": 1,
+                "enunciado": "Questão ME sem alternativas cadastradas.",
+                "tipo": "multipla_escolha",
+                "alternativas": [],
+            }
+        ]
+        prompt = cq_script.montar_prompt_usuario(cad_info, itens, "C1")
+        assert "Alternativas:" not in prompt
+        assert "Item 1: Questão ME sem alternativas cadastradas." in prompt
+
+    def test_hash_5d_itens_me_e_ce(self):
+        enunciado = "Acerca da organização político-administrativa do Estado brasileiro, assinale a opção correta."
+        alts = [
+            {"letra": "A", "texto": "Brasília é capital federal."},
+            {"letra": "B", "texto": "Os estados possuem soberania."},
+        ]
+
+        # 1. Certo ou Errado: hash é SHA-1 estrito do enunciado limpo
+        hash_ce_padrao = hashlib.sha1(enunciado.strip().encode()).hexdigest()
+        hash_ce_calc = cq_script.calcular_hash_5d(enunciado, tipo="certo_errado")
+        assert hash_ce_calc == hash_ce_padrao
+
+        # Mesmo se alternativas forem passadas acidentalmente para certo_errado, hash é apenas do enunciado
+        hash_ce_com_alts = cq_script.calcular_hash_5d(
+            enunciado, tipo="certo_errado", alternativas=alts
+        )
+        assert hash_ce_com_alts == hash_ce_padrao
+
+        # Equivalência via classificacao.calcular_hash_enunciado
+        assert (
+            classificacao.calcular_hash_enunciado(enunciado, tipo="certo_errado")
+            == hash_ce_padrao
+        )
+
+        # 2. Múltipla Escolha: hash incorpora alternativas normalizadas
+        hash_me_calc = cq_script.calcular_hash_5d(
+            enunciado, tipo="multipla_escolha", alternativas=alts
+        )
+        assert hash_me_calc != hash_ce_padrao
+
+        # Verificação da fórmula com json ordenado
+        alts_norm = json.dumps(alts, sort_keys=True, ensure_ascii=False)
+        esperado_me = hashlib.sha1(
+            f"{enunciado.strip()}{alts_norm}".encode()
+        ).hexdigest()
+        assert hash_me_calc == esperado_me
+
+        # Equivalência via classificacao.calcular_hash_enunciado
+        assert (
+            classificacao.calcular_hash_enunciado(
+                enunciado, tipo="multipla_escolha", alternativas=alts
+            )
+            == esperado_me
+        )
+
+        # Idempotência com chaves de dicionário em ordem diferente
+        alts_invertidos = [
+            {"texto": "Brasília é capital federal.", "letra": "A"},
+            {"texto": "Os estados possuem soberania.", "letra": "B"},
+        ]
+        assert (
+            cq_script.calcular_hash_5d(
+                enunciado, tipo="multipla_escolha", alternativas=alts_invertidos
+            )
+            == hash_me_calc
+        )
+
+        # Alteração de alternativa muda o hash
+        alts_modificados = [
+            {"letra": "A", "texto": "Brasília é capital federal alterada."},
+            {"letra": "B", "texto": "Os estados possuem soberania."},
+        ]
+        assert (
+            cq_script.calcular_hash_5d(
+                enunciado, tipo="multipla_escolha", alternativas=alts_modificados
+            )
+            != hash_me_calc
+        )
+
+    def test_carregar_dados_caderno_carrega_tipo_e_alternativas(self):
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cur
+
+        mock_cur.fetchone.return_value = (
+            1,
+            "CAD_ME",
+            "prova.pdf",
+            "IDENT",
+            "objetiva_especifica",
+            "CONC",
+            "ORG",
+            ["Cargo"],
+            ["Superior"],
+        )
+
+        mock_cur.fetchall.side_effect = [
+            # textos_base
+            [],
+            # questoes: (id, numero, enunciado, secao, texto_base_id, figuras, utilizavel, tipo, alternativas)
+            [
+                (
+                    101,
+                    1,
+                    "Enunciado ME",
+                    "Secao A",
+                    None,
+                    [],
+                    True,
+                    "multipla_escolha",
+                    [{"letra": "A", "texto": "Opcao A"}],
+                ),
+                (
+                    102,
+                    2,
+                    "Enunciado CE",
+                    "Secao A",
+                    None,
+                    [],
+                    True,
+                    "certo_errado",
+                    None,
+                ),
+            ],
+        ]
+
+        info, itens, textos_map = cq_script.carregar_dados_caderno(mock_conn, 1)
+
+        assert len(itens) == 2
+        assert itens[0]["tipo"] == "multipla_escolha"
+        assert itens[0]["alternativas"] == [{"letra": "A", "texto": "Opcao A"}]
+        assert itens[1]["tipo"] == "certo_errado"
+        assert itens[1]["alternativas"] is None
+
+    def test_processar_caderno_multipla_escolha_grava_hash_5d(
+        self, arvore_teste: arvore.ArvoreMestre, tmp_path: Path
+    ):
+        classif_path = tmp_path / "classificacao.json"
+        cq = classificacao.ClassificacaoQuestoes()
+        conta = cq_script.Contabilidade()
+
+        alts = [
+            {"letra": "A", "texto": "Texto A"},
+            {"letra": "B", "texto": "Texto B"},
+        ]
+        itens_me = [
+            {
+                "numero": 1,
+                "enunciado": "Questão de múltipla escolha.",
+                "tipo": "multipla_escolha",
+                "alternativas": alts,
+                "texto_base_id": None,
+            }
+        ]
+
+        cands_pref = {
+            "M-ADM": {
+                "id": "M-ADM",
+                "nome": "DIREITO ADMINISTRATIVO",
+                "nivel": "materia",
+                "materia_id": "M-ADM",
+            },
+            "A-ATOS": {
+                "id": "A-ATOS",
+                "nome": "Atos Administrativos",
+                "nivel": "assunto",
+                "materia_id": "M-ADM",
+            },
+            "S-ANUL": {
+                "id": "S-ANUL",
+                "nome": "Anulação",
+                "nivel": "subassunto",
+                "materia_id": "M-ADM",
+                "assunto_id": "A-ATOS",
+            },
+        }
+        resp_me = [
+            {"numero": 1, "nos": ["C3"], "confianca": "alta", "nenhum_serve": False}
+        ]
+
+        mock_conn = MagicMock()
+        with (
+            patch.object(
+                cq_script.candidatos_questao,
+                "candidatos_preferenciais",
+                return_value=cands_pref,
+            ),
+            patch.object(
+                cq_script,
+                "carregar_dados_caderno",
+                return_value=(
+                    {
+                        "prova_id": 42,
+                        "nome_caderno": "CAD_ME_01",
+                        "concurso_slug": "CONC_ME",
+                        "tipo": "objetiva_especifica",
+                    },
+                    itens_me,
+                    {},
+                ),
+            ),
+            patch.object(
+                llm_openrouter.requests, "post", return_value=_resposta_mock(resp_me)
+            ),
+        ):
+            cq_script.processar_caderno(
+                mock_conn,
+                prova_id=42,
+                arv=arvore_teste,
+                cq=cq,
+                conta=conta,
+                classificacao_path=classif_path,
+            )
+
+        chave = "CONC_ME|CAD_ME_01|1"
+        assert chave in cq.registros
+        reg = cq.registros[chave]
+        hash_esperado = cq_script.calcular_hash_5d(
+            itens_me[0]["enunciado"], tipo="multipla_escolha", alternativas=alts
+        )
+        assert reg.hash_enunciado == hash_esperado

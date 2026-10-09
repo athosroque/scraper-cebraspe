@@ -10,9 +10,38 @@ questão nenhuma: fica só no JSON de revisão e na fila com `status = 'erro'` �
 questão parcial no banco distorceria a estatística sem aviso.
 """
 
+import hashlib
+import json
+
 from psycopg2.extras import Json
 
 from src.prova_parser import ALERTAS_ITEM_INUTILIZAVEL
+
+
+def calcular_hash_5d(
+    enunciado: str,
+    tipo: str = "certo_errado",
+    alternativas: list | None = None,
+) -> str:
+    """Calcula o hash SHA-1 de 5D da questão (estabilidade do piloto).
+
+    - Para `tipo == 'certo_errado'`: SHA-1 apenas do enunciado normalizado (idêntico ao
+      atual, garantindo 100% de estabilidade para as 2.800 questões).
+    - Para `tipo == 'multipla_escolha'`: SHA-1 do enunciado concatenado com as
+      alternativas normalizadas (`json.dumps(alternativas, sort_keys=True, ensure_ascii=False)`).
+    """
+    enunciado_limpo = (enunciado or "").strip()
+    if tipo == "multipla_escolha":
+        alts = alternativas
+        if isinstance(alts, str):
+            try:
+                alts = json.loads(alts)
+            except Exception:
+                pass
+        alts_norm = json.dumps(alts or [], sort_keys=True, ensure_ascii=False)
+        conteudo = f"{enunciado_limpo}{alts_norm}"
+        return hashlib.sha1(conteudo.encode("utf-8")).hexdigest()
+    return hashlib.sha1(enunciado_limpo.encode("utf-8")).hexdigest()
 
 
 def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
@@ -56,11 +85,17 @@ def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
             )
             utilizavel = ALERTAS_ITEM_INUTILIZAVEL.isdisjoint(alertas_item)
 
+            tipo_questao = q.get("tipo") or "certo_errado"
+            alternativas_raw = q.get("alternativas")
+            alternativas_json = (
+                Json(alternativas_raw) if alternativas_raw is not None else None
+            )
+
             cur.execute(
                 """
                 INSERT INTO questoes
-                    (prova_id, numero, enunciado, texto_base_id, gabarito, anulada, figuras, secao, alertas, utilizavel)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (prova_id, numero, enunciado, texto_base_id, gabarito, tipo, alternativas, anulada, figuras, secao, alertas, utilizavel)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     prova_id,
@@ -68,6 +103,8 @@ def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
                     q["enunciado"],
                     texto_base_id,
                     q["gabarito"],
+                    tipo_questao,
+                    alternativas_json,
                     q["anulada"],
                     Json(q["figuras"]),
                     q["secao"],

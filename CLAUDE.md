@@ -311,8 +311,10 @@ Datasette continua só como ferramenta de revisão do dono.
       vivo, e o que fica fora do site está em `inventario/exclusoes.json` (16 concursos
       + PDF de curso de formação). Também entraram `caderno_com_gabarito`, a abertura do
       SEBRAE e `aguardando_prova` (26). Relatório com 0 alertas reais.
-- [ ] Etapa 8.M — Múltipla escolha (próxima sessão): `questoes.tipo` + `alternativas`, gabarito A–E,
-      parser ME calibrado com os cadernos reais identificados no inventário, site e simulado por tipo.
+- [ ] Etapa 8.M — Múltipla escolha (em andamento, `plano-etapa-8m.md`, ADR-038): `questoes.tipo` +
+      `alternativas`, gabarito A–E, parser ME calibrado com os cadernos reais do inventário, site e
+      simulado por tipo (resposta sempre conferida pelo tipo da questão). Falta o Gate: ligação
+      prova ME ↔ gabarito e 1 concurso ME de ponta a ponta no site.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 

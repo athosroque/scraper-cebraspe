@@ -10,6 +10,7 @@ from src.gabarito_parser import (
     TIPO_PADRAO_RESPOSTA,
     VERSAO_DEFINITIVO,
     VERSAO_PRELIMINAR,
+    GradeGabarito,
     _padrao_de_paginas,
     classificar_documento,
     classificar_versao,
@@ -18,10 +19,15 @@ from src.gabarito_parser import (
     ler_documento,
     ler_grade,
     ler_grade_de_linhas,
+    ler_grade_tipada_de_linhas,
     token_caderno,
 )
 
+CE = gabarito_parser.QUESTAO_CERTO_ERRADO
+ME = gabarito_parser.QUESTAO_MULTIPLA_ESCOLHA
+
 FIXTURES = Path(__file__).parent / "fixtures" / "questoes"
+AMOSTRAS_DIR = Path(__file__).resolve().parent.parent / "data" / "inventario_amostra"
 
 
 def _palavra(x, texto, y=100):
@@ -40,8 +46,9 @@ def gerar_pdf_grade(
     codigo: str,
     respostas: dict[int, str],
     titulo: str = "GABARITOS OFICIAIS DEFINITIVOS",
+    rotulo_item: str = "Item",
 ) -> Path:
-    """PDF sintético no layout da grade do CEBRASPE: linhas `Item` e
+    """PDF sintético no layout da grade do CEBRASPE: linhas `Item` ou `Questão` e
     `Gabarito` de 20 colunas, com `0` de enchimento."""
     doc = pymupdf.open()
     page = doc.new_page()
@@ -53,7 +60,7 @@ def gerar_pdf_grade(
         fatia = numeros[i : i + 20]
         cel_num = [str(n) for n in fatia] + ["0"] * (20 - len(fatia))
         cel_let = [respostas[n] for n in fatia] + ["0"] * (20 - len(fatia))
-        page.insert_text((30, y), "Item", fontsize=7)
+        page.insert_text((30, y), rotulo_item, fontsize=7)
         page.insert_text((30, y + 8), "Gabarito", fontsize=7)
         for j, (num, let) in enumerate(zip(cel_num, cel_let)):
             page.insert_text((70 + j * 24, y), num, fontsize=7)
@@ -94,6 +101,139 @@ class TestGradePorPosicao:
         grade = ler_grade(pdf)
         assert grade.respostas == esperado
         assert grade.codigo_caderno == "001_XX_001_01"
+        assert grade.tipo_detectado == "certo_errado"
+        assert grade.tipos == dict.fromkeys(esperado, CE)
+
+    def test_multipla_escolha_com_rotulo_questao_e_letras_a_a_e(self):
+        linhas = [
+            _linha(100, "Questão", ["1", "2", "3", "4", "5", "6"]),
+            _linha(108, "Gabarito", ["A", "B", "C", "D", "E", "X"]),
+        ]
+        respostas, alertas = ler_grade_de_linhas(linhas)
+        assert respostas == {1: "A", 2: "B", 3: "C", 4: "D", 5: "E", 6: "X"}
+        assert alertas == []
+
+    def test_multipla_escolha_com_rotulo_questao_sem_acento(self):
+        linhas = [
+            _linha(100, "Questao", ["10", "11"]),
+            _linha(108, "Gabarito", ["A", "D"]),
+        ]
+        respostas, alertas = ler_grade_de_linhas(linhas)
+        assert respostas == {10: "A", 11: "D"}
+        assert alertas == []
+
+    def test_me_com_letra_invalida_fora_de_a_a_e_x_vira_alerta(self):
+        linhas = [
+            _linha(100, "Questão", ["1", "2", "3"]),
+            _linha(108, "Gabarito", ["A", "F", "Z"]),
+        ]
+        respostas, alertas = ler_grade_de_linhas(linhas)
+        assert respostas == {1: "A"}
+        assert alertas == [
+            "item 2 com gabarito inválido 'F'",
+            "item 3 com gabarito inválido 'Z'",
+        ]
+
+    def test_pdf_sintetico_multipla_escolha(self, tmp_path):
+        letras = ["A", "B", "C", "D", "E", "X"]
+        esperado = {n: letras[n % len(letras)] for n in range(1, 31)}
+        pdf = gerar_pdf_grade(
+            tmp_path / "g_me.pdf",
+            "002_YY_001_01",
+            esperado,
+            rotulo_item="Questão",
+        )
+        grade = ler_grade(pdf)
+        assert grade.respostas == esperado
+        assert grade.codigo_caderno == "002_YY_001_01"
+        assert grade.tipo_detectado == "multipla_escolha"
+        assert grade.tipos == dict.fromkeys(esperado, ME)
+        assert grade.alertas == []
+
+    def test_pdf_sintetico_grade_item_com_letra_de_me_alerta_e_segue_ce(self, tmp_path):
+        # Letra espúria numa grade `Item` não pode virar ME calada.
+        respostas = {1: "C", 2: "A", 3: "E", 4: "X"}
+        pdf = gerar_pdf_grade(tmp_path / "g.pdf", "001_XX_001_01", respostas)
+        grade = ler_grade(pdf)
+        assert grade.respostas == {1: "C", 3: "E", 4: "X"}
+        assert grade.alertas == [
+            "item 2 com gabarito inválido 'A'",
+            "grade com buraco na numeração: [2]",
+        ]
+        assert grade.tipo_detectado == "certo_errado"
+
+
+class TestTipoPorRotulo:
+    def test_item_aceita_so_c_e_x(self):
+        linhas = [
+            _linha(100, "Item", ["1", "2", "3", "4", "5", "6"]),
+            _linha(108, "Gabarito", ["C", "E", "X", "A", "B", "D"]),
+        ]
+        respostas, tipos, alertas = ler_grade_tipada_de_linhas(linhas)
+        assert respostas == {1: "C", 2: "E", 3: "X"}
+        assert tipos == {1: CE, 2: CE, 3: CE}
+        assert alertas == [
+            "item 4 com gabarito inválido 'A'",
+            "item 5 com gabarito inválido 'B'",
+            "item 6 com gabarito inválido 'D'",
+        ]
+
+    def test_questao_aceita_a_a_e_e_x(self):
+        linhas = [
+            _linha(100, "Questão", ["1", "2", "3", "4", "5", "6"]),
+            _linha(108, "Gabarito", ["A", "B", "C", "D", "E", "X"]),
+        ]
+        respostas, tipos, alertas = ler_grade_tipada_de_linhas(linhas)
+        assert respostas == {1: "A", 2: "B", 3: "C", 4: "D", 5: "E", 6: "X"}
+        assert tipos == dict.fromkeys(range(1, 7), ME)
+        assert alertas == []
+
+    def test_questao_so_com_c_e_continua_me(self):
+        # Caderno ME cujo gabarito só tem C e E: o rótulo decide, não as letras.
+        linhas = [
+            _linha(100, "Questao", ["1", "2"]),
+            _linha(108, "Gabarito", ["C", "E"]),
+        ]
+        respostas, tipos, alertas = ler_grade_tipada_de_linhas(linhas)
+        assert respostas == {1: "C", 2: "E"}
+        assert tipos == {1: ME, 2: ME}
+        assert GradeGabarito("x", respostas, tipos=tipos).tipo_detectado == ME
+
+    def test_rotulo_desconhecido_e_ignorado(self):
+        linhas = [
+            _linha(100, "Número", ["1", "2"]),
+            _linha(108, "Gabarito", ["A", "B"]),
+        ]
+        assert ler_grade_tipada_de_linhas(linhas) == ({}, {}, [])
+
+    def test_pdf_com_linhas_item_e_questao_alerta_grade_mista(self, tmp_path):
+        doc = pymupdf.open()
+        page = doc.new_page()
+        page.insert_text((200, 60), "GABARITOS OFICIAIS DEFINITIVOS", fontsize=9)
+        for y, rotulo, numero, letra in (
+            (120, "Item", "1", "C"),
+            (150, "Questão", "2", "A"),
+        ):
+            page.insert_text((30, y), rotulo, fontsize=7)
+            page.insert_text((30, y + 8), "Gabarito", fontsize=7)
+            page.insert_text((70, y), numero, fontsize=7)
+            page.insert_text((72, y + 8), letra, fontsize=7)
+        doc.save(tmp_path / "misto.pdf")
+        grade = ler_grade(tmp_path / "misto.pdf")
+        assert grade.respostas == {1: "C", 2: "A"}
+        assert grade.tipos == {1: CE, 2: ME}
+        assert grade.tipo_detectado == gabarito_parser.GRADE_MISTA
+        assert grade.alertas == [
+            "grade com linhas `Item` e `Questão` misturadas: "
+            "['certo_errado', 'multipla_escolha']"
+        ]
+
+    def test_ler_grade_de_linhas_mantem_retorno_sem_tipos(self):
+        linhas = [
+            _linha(100, "Item", ["1"]),
+            _linha(108, "Gabarito", ["C"]),
+        ]
+        assert ler_grade_de_linhas(linhas) == ({1: "C"}, [])
 
 
 class TestGabaritosReais:
@@ -111,6 +251,8 @@ class TestGabaritosReais:
             grade.cabecalho == "CONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR"
         )
         assert grade.alertas == []
+        assert grade.tipos == dict.fromkeys(range(1, 51), CE)
+        assert grade.tipo_detectado == "certo_errado"
 
     def test_gabarito_em_hash_traz_o_codigo_do_caderno_no_conteudo(self):
         doc = ler_documento(FIXTURES / "gabarito_hash_CD_001.pdf")
@@ -120,6 +262,52 @@ class TestGabaritosReais:
         assert grade.numeros == list(range(91, 181))
         assert grade.anulados == [93, 97, 115, 117, 126, 155, 166]
         assert grade.cabecalho.startswith("CARGO 1: ANALISTA LEGISLATIVO")
+
+    def test_grade_banrisul_me_real(self):
+        pdf = AMOSTRAS_DIR / "Gab_BANRISUL_25_CB1.pdf"
+        if not pdf.exists():
+            pytest.skip("Amostra Gab_BANRISUL_25_CB1.pdf não encontrada")
+        grade = ler_grade(pdf)
+        assert grade.codigo_caderno == "077_BANRISUL_CB1_01"
+        assert grade.tipos == dict.fromkeys(range(1, 31), ME)
+        assert len(grade.respostas) == 30
+        assert grade.numeros == list(range(1, 31))
+        assert grade.anulados == [15]
+        assert set(grade.respostas.values()).issubset({"A", "B", "C", "D", "E", "X"})
+        assert grade.tipo_detectado == "multipla_escolha"
+        assert grade.alertas == []
+
+    def test_grade_sebrae_me_real(self):
+        pdf = AMOSTRAS_DIR / "Gab_SEBRAE_26_TIPO2.pdf"
+        if not pdf.exists():
+            pytest.skip("Amostra Gab_SEBRAE_26_TIPO2.pdf não encontrada")
+        grade = ler_grade(pdf)
+        # Sigla com sublinhado (SEBRAE_26_PSE_1): sem ela o gabarito não liga
+        # ao caderno no pipeline.
+        assert grade.codigo_caderno == "169_SEBRAE_26_PSE_1_CG1_02"
+        assert token_caderno(grade.codigo_caderno) == "CG1"
+        assert ler_documento(pdf)["codigo_caderno"] == "169_SEBRAE_26_PSE_1_CG1_02"
+        assert grade.tipos == dict.fromkeys(range(1, 16), ME)
+        assert len(grade.respostas) == 15
+        assert grade.numeros == list(range(1, 16))
+        assert grade.anulados == []
+        assert set(grade.respostas.values()).issubset({"A", "B", "C", "D", "E", "X"})
+        assert grade.tipo_detectado == "multipla_escolha"
+        assert grade.alertas == []
+
+    def test_grade_sefa_pr_me_real(self):
+        pdf = AMOSTRAS_DIR / "Gab_SEFA_PR_25_CARGO1.pdf"
+        if not pdf.exists():
+            pytest.skip("Amostra Gab_SEFA_PR_25_CARGO1.pdf não encontrada")
+        grade = ler_grade(pdf)
+        assert grade.codigo_caderno == "177_SEFAPR_001_01"
+        assert grade.tipos == dict.fromkeys(range(1, 51), ME)
+        assert len(grade.respostas) == 50
+        assert grade.numeros == list(range(1, 51))
+        assert grade.anulados == [4, 39]
+        assert set(grade.respostas.values()).issubset({"A", "B", "C", "D", "E", "X"})
+        assert grade.tipo_detectado == "multipla_escolha"
+        assert grade.alertas == []
 
 
 class TestClassificacaoECodigo:
@@ -132,6 +320,9 @@ class TestClassificacaoECodigo:
                 TIPO_PADRAO_RESPOSTA,
             ),
             ("GABARITOS OFICIAIS DEFINITIVOS\nItem\n1\n2", TIPO_GRADE),
+            ("GABARITOS OFICIAIS DEFINITIVOS\nQuestão\n1\n2", TIPO_GRADE),
+            ("GABARITOS OFICIAIS DEFINITIVOS\nQuestao\n1\n2", TIPO_GRADE),
+            ("GABARITO OFICIAL PRELIMINAR\n  Questão 1\n2", TIPO_GRADE),
             ("qualquer outra coisa", gabarito_parser.TIPO_DESCONHECIDO),
         ],
     )
@@ -145,6 +336,10 @@ class TestClassificacaoECodigo:
             ("072_STM_CG5_01", "CG5"),
             ("167_CDNS_002_01", "002"),
             ("108_TCUTEFC_001_01", "001"),
+            ("169_SEBRAE_26_PSE_1_CG1_02", "CG1"),
+            ("053_SEBRAE_PSE_CG1_02", "CG1"),
+            ("084_PC_CE_001_01", "001"),
+            ("077_BANRISUL_CB1", None),
             (None, None),
             ("lixo", None),
         ],
@@ -155,6 +350,17 @@ class TestClassificacaoECodigo:
     def test_codigo_no_meio_do_texto(self):
         assert codigo_caderno_do_texto("0\n0\n167_CDNS_CG1_01\n0") == "167_CDNS_CG1_01"
         assert codigo_caderno_do_texto("sem código") is None
+
+    def test_codigo_com_sublinhado_na_sigla(self):
+        texto = "Aplicação: 15/03/2026\n169_SEBRAE_26_PSE_1_CG1_02\n0"
+        assert codigo_caderno_do_texto(texto) == "169_SEBRAE_26_PSE_1_CG1_02"
+
+    def test_codigo_sem_sublinhado_casa_o_mesmo_trecho(self):
+        # A sigla com segmentos extras não estica um código antigo: o trecho
+        # casado e o token são os mesmos de antes.
+        texto = "x 094_PF_CB1_01 y 167_CDNS_002_01"
+        assert codigo_caderno_do_texto(texto) == "094_PF_CB1_01"
+        assert codigo_caderno_do_texto("CÓDIGO 167_CDNS_002_01.") == "167_CDNS_002_01"
 
 
 class TestPadraoResposta:
@@ -353,3 +559,37 @@ class TestLeituraDocumento:
         assert len(chamadas) == 1
         assert doc["tipo"] == TIPO_GRADE
         assert doc["versao"] == VERSAO_DEFINITIVO
+
+
+class TestTipoDetectado:
+    def test_certo_errado_apenas_c_e_x(self):
+        grade = GradeGabarito(codigo_caderno="001", respostas={1: "C", 2: "E", 3: "X"})
+        assert grade.tipo_detectado == "certo_errado"
+
+    def test_certo_errado_grade_vazia(self):
+        grade = GradeGabarito(codigo_caderno="001")
+        assert grade.tipo_detectado == "certo_errado"
+
+    def test_multipla_escolha_com_a_b_ou_d(self):
+        for letra in ("A", "B", "D"):
+            grade = GradeGabarito(codigo_caderno="001", respostas={1: letra, 2: "C"})
+            assert grade.tipo_detectado == "multipla_escolha"
+
+    def test_tipos_por_numero_decidem_sobre_as_letras(self):
+        so_c_e = {1: "C", 2: "E"}
+        grade = GradeGabarito("001", so_c_e, tipos={1: ME, 2: ME})
+        assert grade.tipo_detectado == "multipla_escolha"
+        grade = GradeGabarito("001", {1: "C"}, tipos={1: CE})
+        assert grade.tipo_detectado == "certo_errado"
+
+    def test_tipos_misturados_viram_grade_mista(self):
+        grade = GradeGabarito("001", {1: "C", 2: "A"}, tipos={1: CE, 2: ME})
+        assert grade.tipo_detectado == gabarito_parser.GRADE_MISTA
+
+    def test_tipo_detectado_explicito_preservado(self):
+        grade = GradeGabarito(
+            codigo_caderno="001",
+            respostas={1: "C"},
+            tipo_detectado="multipla_escolha",
+        )
+        assert grade.tipo_detectado == "multipla_escolha"

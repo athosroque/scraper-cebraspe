@@ -41,7 +41,7 @@ try { localStorage.removeItem(document.getElementById("rascunho-corrigido").data
     {% endif %}
 </p>
 {% endif %}
-<p class="mt-2 text-xs text-slate-600">Certo +1, errado −1, em branco 0. Item anulado fica fora da nota e do máximo.{% if not resultado.simulado_id %} Sem login, este resultado não fica guardado.{% endif %}</p>
+<p class="mt-2 text-xs text-slate-600">Certo/Errado: acerto +1, erro −1. Múltipla escolha: acerto +1, erro 0. Em branco 0. Item anulado fica fora da nota e do máximo.{% if not resultado.simulado_id %} Sem login, este resultado não fica guardado.{% endif %}</p>
 
 <div class="mt-8 grid gap-6 lg:grid-cols-2">
     <section>

@@ -261,7 +261,9 @@ CREATE TABLE IF NOT EXISTS questoes (
     numero INTEGER NOT NULL,
     enunciado TEXT NOT NULL,
     texto_base_id INTEGER,
-    gabarito TEXT NOT NULL CHECK (gabarito IN ('C', 'E', 'X')),
+    gabarito TEXT NOT NULL CONSTRAINT questoes_gabarito_check CHECK (gabarito IN ('A', 'B', 'C', 'D', 'E', 'X')),
+    tipo VARCHAR(20) NOT NULL DEFAULT 'certo_errado' CONSTRAINT questoes_tipo_check CHECK (tipo IN ('certo_errado', 'multipla_escolha')),
+    alternativas JSONB DEFAULT NULL,
     anulada BOOLEAN NOT NULL DEFAULT false,
     figuras JSONB NOT NULL DEFAULT '[]'::jsonb,
     -- Comando do grupo ("Julgue os itens relativos a X"): pista para a
@@ -269,7 +271,13 @@ CREATE TABLE IF NOT EXISTS questoes (
     secao TEXT,
     alertas TEXT[] NOT NULL DEFAULT '{}',
     utilizavel BOOLEAN NOT NULL DEFAULT true,
-    UNIQUE (prova_id, numero)
+    UNIQUE (prova_id, numero),
+    -- Etapa 8.M: regras cruzadas tipo × gabarito × alternativas (repetidas no
+    -- bloco de migração abaixo, para banco criado antes da 8.M).
+    CONSTRAINT questoes_gabarito_tipo_check
+        CHECK (tipo = 'multipla_escolha' OR gabarito IN ('C', 'E', 'X')),
+    CONSTRAINT questoes_alternativas_tipo_check
+        CHECK ((tipo = 'certo_errado') = (alternativas IS NULL))
 );
 
 CREATE INDEX IF NOT EXISTS idx_questoes_prova ON questoes (prova_id);
@@ -322,6 +330,60 @@ END $$;
 -- Etapa 5C.1 (Sessão 2): alertas no item e flag de usabilidade para 5D/5E.
 ALTER TABLE questoes ADD COLUMN IF NOT EXISTS alertas TEXT[] NOT NULL DEFAULT '{}';
 ALTER TABLE questoes ADD COLUMN IF NOT EXISTS utilizavel BOOLEAN NOT NULL DEFAULT true;
+
+-- Etapa 8.M: tipo da questão (certo_errado / multipla_escolha) e alternativas (JSONB)
+ALTER TABLE questoes ADD COLUMN IF NOT EXISTS tipo VARCHAR(20) NOT NULL DEFAULT 'certo_errado';
+ALTER TABLE questoes ADD COLUMN IF NOT EXISTS alternativas JSONB DEFAULT NULL;
+
+DO $$
+BEGIN
+    -- Atualiza constraint de tipo se não existir
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid = 'questoes'::regclass AND conname = 'questoes_tipo_check'
+    ) THEN
+        ALTER TABLE questoes ADD CONSTRAINT questoes_tipo_check
+            CHECK (tipo IN ('certo_errado', 'multipla_escolha'));
+    END IF;
+
+    -- Atualiza constraint de gabarito para aceitar A-E e X (ME + C/E)
+    IF EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid = 'questoes'::regclass AND conname = 'questoes_gabarito_check'
+    ) THEN
+        IF NOT pg_get_constraintdef((
+            SELECT oid FROM pg_constraint
+            WHERE conrelid = 'questoes'::regclass AND conname = 'questoes_gabarito_check'
+        )) LIKE '%''A''%' THEN
+            ALTER TABLE questoes DROP CONSTRAINT questoes_gabarito_check;
+            ALTER TABLE questoes ADD CONSTRAINT questoes_gabarito_check
+                CHECK (gabarito IN ('A', 'B', 'C', 'D', 'E', 'X'));
+        END IF;
+    ELSE
+        ALTER TABLE questoes ADD CONSTRAINT questoes_gabarito_check
+            CHECK (gabarito IN ('A', 'B', 'C', 'D', 'E', 'X'));
+    END IF;
+
+    -- Regras cruzadas: questão C/E só tem gabarito C/E/X e nunca alternativas;
+    -- questão ME sempre tem alternativas (lista, mesmo vazia). As linhas do
+    -- piloto (tipo default certo_errado, gabarito C/E/X, alternativas NULL)
+    -- passam nas duas.
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid = 'questoes'::regclass AND conname = 'questoes_gabarito_tipo_check'
+    ) THEN
+        ALTER TABLE questoes ADD CONSTRAINT questoes_gabarito_tipo_check
+            CHECK (tipo = 'multipla_escolha' OR gabarito IN ('C', 'E', 'X'));
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid = 'questoes'::regclass AND conname = 'questoes_alternativas_tipo_check'
+    ) THEN
+        ALTER TABLE questoes ADD CONSTRAINT questoes_alternativas_tipo_check
+            CHECK ((tipo = 'certo_errado') = (alternativas IS NULL));
+    END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_questoes_utilizavel ON questoes (utilizavel);
 CREATE INDEX IF NOT EXISTS idx_questoes_alertas ON questoes USING gin (alertas);
@@ -379,6 +441,9 @@ CREATE INDEX IF NOT EXISTS idx_discursiva_no_no ON discursiva_no (no_id);
 CREATE INDEX IF NOT EXISTS idx_discursiva_no_status ON discursiva_no (status);
 
 -- Views ----------------------------------------------------------------------
+-- Regra das estatísticas de questão (Etapa 8.M): ME e C/E contam igualmente na
+-- incidência; agregação entre concursos é média de percentuais por
+-- concurso×cargo, nunca soma bruta; estatísticas de gabarito C/E filtram tipo.
 
 DROP VIEW IF EXISTS vw_discursivas CASCADE;
 DROP VIEW IF EXISTS vw_peso_materia_cargo CASCADE;
@@ -796,6 +861,8 @@ SELECT
     ctx.cargo,
     ctx.nivel,
     ctx.gabarito,
+    q.tipo,
+    q.alternativas,
     ctx.anulada,
     ctx.utilizavel,
     ctx.status_revisao,
@@ -1078,6 +1145,9 @@ CREATE OR REPLACE VIEW vw_prova_cobra_materia AS
 SELECT * FROM vw_prova_cobra_no WHERE nivel_alvo = 'materia';
 
 -- Proporção de itens Certo / Errado e taxa de anulação por nó.
+-- Só questões C/E (`q.tipo = 'certo_errado'`): a proporção de Certo/Errado não
+-- existe para múltipla escolha, e o gabarito A–E não entra aqui. A incidência
+-- do nó (com ME) fica em `vw_comparativo_nivel` e `fn_prova_cobra`.
 -- Percentual de C e E calculado sobre o total de itens válidos (não anulados).
 -- Percentual de anulação calculado sobre o total geral de itens.
 CREATE OR REPLACE VIEW vw_certo_errado_por_no AS
@@ -1095,36 +1165,90 @@ SELECT
 FROM vw_prova_cobra_base b
 JOIN questoes q ON q.id = b.questao_id
 JOIN vw_no_caminho nc ON nc.id = b.alvo_id
+WHERE q.tipo = 'certo_errado'
 GROUP BY b.alvo_id, nc.caminho, nc.nivel;
 
--- Comparativo Médio × Superior por nó.
--- Permite ver a diferença de incidência de um nó entre provas de nível médio e superior.
+-- Comparativo Médio × Superior por nó, com C/E e ME juntos (incidência
+-- independe do formato).
+-- `pct_medio`/`pct_superior` são MÉDIAS de percentuais: para cada
+-- concurso×cargo do nível, % do nó = questões válidas distintas do nó
+-- (`questao_canonica_id`, sem anuladas) / universo do concurso×cargo (as
+-- mesmas regras de `vw_prova_cobra_no`, mas com básico + específico juntos,
+-- a prova inteira do cargo). Somar contagens brutas faria o concurso C/E
+-- (~120 itens) pesar o dobro do ME (~50–60 questões).
+-- Entram na média todos os concurso×cargo do nível com universo > 0; quem não
+-- tem questão no nó entra com 0% (sem isso a média só veria quem cobrou o nó
+-- e ficaria inflada). Nível sem nenhum concurso×cargo dá NULL.
+-- `questoes_medio`/`questoes_superior` seguem como contagem bruta informativa
+-- (não use para percentual); `cargos_medio`/`cargos_superior` são os
+-- denominadores da média.
 CREATE OR REPLACE VIEW vw_comparativo_nivel AS
-WITH totais_universo AS (
+WITH b AS MATERIALIZED (
+    SELECT * FROM vw_prova_cobra_base WHERE nivel IN ('medio', 'superior')
+),
+universo AS (
+    SELECT concurso, cargo_edital_id, nivel,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total
+    FROM b
+    GROUP BY concurso, cargo_edital_id, nivel
+    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
+),
+cargos_nivel AS (
+    SELECT nivel, count(*) AS n_cargos FROM universo GROUP BY nivel
+),
+por_cargo AS (
+    SELECT alvo_id, concurso, cargo_edital_id, nivel,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS questoes
+    FROM b
+    GROUP BY alvo_id, concurso, cargo_edital_id, nivel
+),
+media AS (
+    -- Soma dos % de quem cobrou o nó dividida por TODOS os concurso×cargo do
+    -- nível: os que não cobraram entram com 0%.
+    SELECT p.alvo_id, p.nivel, sum(p.questoes * 100.0 / u.total) / cn.n_cargos AS pct
+    FROM por_cargo p
+    JOIN universo u ON u.concurso = p.concurso
+                   AND u.cargo_edital_id = p.cargo_edital_id
+                   AND u.nivel = p.nivel
+    JOIN cargos_nivel cn ON cn.nivel = p.nivel
+    GROUP BY p.alvo_id, p.nivel, cn.n_cargos
+),
+contagem AS (
+    SELECT alvo_id,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada AND nivel = 'medio') AS questoes_medio,
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada AND nivel = 'superior') AS questoes_superior
+    FROM b
+    GROUP BY alvo_id
+    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
+),
+pcts AS (
     SELECT
-        count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada AND nivel = 'medio') AS total_medio,
-        count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada AND nivel = 'superior') AS total_superior
-    FROM vw_prova_cobra_base
+        c.alvo_id,
+        c.questoes_medio,
+        c.questoes_superior,
+        CASE WHEN cm.n_cargos IS NULL THEN NULL ELSE COALESCE(mm.pct, 0) END AS pct_medio,
+        CASE WHEN cs.n_cargos IS NULL THEN NULL ELSE COALESCE(ms.pct, 0) END AS pct_superior,
+        COALESCE(cm.n_cargos, 0) AS cargos_medio,
+        COALESCE(cs.n_cargos, 0) AS cargos_superior
+    FROM contagem c
+    LEFT JOIN cargos_nivel cm ON cm.nivel = 'medio'
+    LEFT JOIN cargos_nivel cs ON cs.nivel = 'superior'
+    LEFT JOIN media mm ON mm.alvo_id = c.alvo_id AND mm.nivel = 'medio'
+    LEFT JOIN media ms ON ms.alvo_id = c.alvo_id AND ms.nivel = 'superior'
 )
 SELECT
-    b.alvo_id AS no_id,
+    p.alvo_id AS no_id,
     nc.caminho,
     nc.nivel AS no_nivel,
-    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') AS questoes_medio,
-    count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') AS questoes_superior,
-    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') * 100.0 / NULLIF(t.total_medio, 0), 2) AS pct_medio,
-    round(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') * 100.0 / NULLIF(t.total_superior, 0), 2) AS pct_superior,
-    round(
-        COALESCE(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') * 100.0 / NULLIF(t.total_superior, 0), 0) -
-        COALESCE(count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') * 100.0 / NULLIF(t.total_medio, 0), 0),
-        2
-    ) AS diferenca_pct
-FROM vw_prova_cobra_base b
-JOIN vw_no_caminho nc ON nc.id = b.alvo_id
-CROSS JOIN totais_universo t
-GROUP BY b.alvo_id, nc.caminho, nc.nivel, t.total_medio, t.total_superior
-HAVING count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'medio') > 0
-    OR count(DISTINCT b.questao_canonica_id) FILTER (WHERE NOT b.anulada AND b.nivel = 'superior') > 0;
+    p.questoes_medio,
+    p.questoes_superior,
+    round(p.pct_medio, 2) AS pct_medio,
+    round(p.pct_superior, 2) AS pct_superior,
+    round(COALESCE(p.pct_superior, 0) - COALESCE(p.pct_medio, 0), 2) AS diferenca_pct,
+    p.cargos_medio,
+    p.cargos_superior
+FROM pcts p
+JOIN vw_no_caminho nc ON nc.id = p.alvo_id;
 
 -- Cruzamento Edital × Prova por (concurso × cargo × nó).
 -- Compara a cobertura do edital com as questões efetivamente cobradas na prova.

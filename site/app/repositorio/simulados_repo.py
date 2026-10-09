@@ -21,7 +21,7 @@ def itens_da_prova(concurso: str, cargo_numero: int) -> list[dict]:
             SELECT
                 questao_chave, numero, codigo_caderno, tipo_conhecimento,
                 cargo, nivel, enunciado, secao, texto_base_texto, figuras,
-                gabarito, anulada,
+                gabarito, anulada, tipo, alternativas,
                 (array_agg(materia_id ORDER BY papel = 'principal' DESC))[1]
                     AS materia_id,
                 (array_agg(rotulo_materia ORDER BY papel = 'principal' DESC))[1]
@@ -32,7 +32,7 @@ def itens_da_prova(concurso: str, cargo_numero: int) -> list[dict]:
               AND utilizavel
             GROUP BY questao_chave, numero, codigo_caderno, tipo_conhecimento,
                      cargo, nivel, enunciado, secao, texto_base_texto, figuras,
-                     gabarito, anulada
+                     gabarito, anulada, tipo, alternativas
             ORDER BY tipo_conhecimento <> 'basico', codigo_caderno, numero
             """,
             {"concurso": concurso, "cargo_numero": cargo_numero},

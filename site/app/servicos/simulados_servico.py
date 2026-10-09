@@ -13,6 +13,7 @@ from app.modelos import (
     SimuladoResumo,
 )
 from app.repositorio import simulados_repo
+from app.servicos.formatacao import letras_validas
 
 
 class SimuladoJaEncerrado(Exception):
@@ -60,17 +61,40 @@ def situacao(gabarito: str, anulada: bool, resposta: str | None) -> str:
     return "certo" if resposta == gabarito else "errado"
 
 
-def placar(situacoes: list[str]) -> PlacarSimulado:
-    """Certo +1, errado −1, branco 0; anulada não entra na nota nem no máximo."""
-    certas = situacoes.count("certo")
-    erradas = situacoes.count("errado")
-    anuladas = situacoes.count("anulada")
+def placar(situacoes: list[str | tuple[str, str]]) -> PlacarSimulado:
+    """Pontuação do simulado por formato:
+    - certo_errado: acerto = +1, erro = -1, em branco = 0 (anulada desconsiderada).
+    - multipla_escolha: acerto = +1, erro = 0, em branco = 0 (anulada desconsiderada).
+    """
+    certas = 0
+    erradas = 0
+    brancos = 0
+    anuladas = 0
+    nota = 0
+    for el in situacoes:
+        if isinstance(el, tuple):
+            sit, tipo = el
+        else:
+            sit, tipo = el, "certo_errado"
+
+        if sit == "certo":
+            certas += 1
+            nota += 1
+        elif sit == "errado":
+            erradas += 1
+            if tipo != "multipla_escolha":
+                nota -= 1
+        elif sit == "anulada":
+            anuladas += 1
+        elif sit == "branco":
+            brancos += 1
+
     return PlacarSimulado(
         certas=certas,
         erradas=erradas,
-        brancos=situacoes.count("branco"),
+        brancos=brancos,
         anuladas=anuladas,
-        nota=certas - erradas,
+        nota=nota,
         nota_maxima=len(situacoes) - anuladas,
     )
 
@@ -78,11 +102,16 @@ def placar(situacoes: list[str]) -> PlacarSimulado:
 def corrigir(
     itens: list[dict], respostas: dict[str, str]
 ) -> tuple[PlacarSimulado, list[MateriaSimulado], list[ItemCorrigido]]:
-    """Corrige os itens da prova. Resposta para chave fora da prova é ignorada."""
+    """Corrige os itens da prova. Resposta para chave fora da prova é ignorada, e
+    letra fora do formato do item (`A` num C/E) conta como em branco."""
     corrigidos = []
-    por_materia: dict[str, tuple[str, list[str]]] = {}
+    situacoes: list[tuple[str, str]] = []
+    por_materia: dict[str, tuple[str, list[tuple[str, str]]]] = {}
     for item in itens:
+        tipo = item.get("tipo", "certo_errado")
         resposta = respostas.get(item["questao_chave"])
+        if resposta not in letras_validas(tipo, item.get("alternativas")):
+            resposta = None
         sit = situacao(item["gabarito"], item["anulada"], resposta)
         corrigidos.append(
             ItemCorrigido(
@@ -94,15 +123,18 @@ def corrigir(
                 situacao=sit,
             )
         )
+        situacoes.append((sit, tipo))
         if item.get("materia_id"):
             nome = item.get("materia_nome") or item["materia_id"]
-            por_materia.setdefault(item["materia_id"], (nome, []))[1].append(sit)
+            por_materia.setdefault(item["materia_id"], (nome, []))[1].append(
+                (sit, tipo)
+            )
     materias = [
         MateriaSimulado(materia_id=mid, nome=nome, **placar(sits).model_dump())
         for mid, (nome, sits) in por_materia.items()
     ]
     materias.sort(key=lambda m: (-m.nota_maxima, m.nome))
-    return placar([i.situacao for i in corrigidos]), materias, corrigidos
+    return placar(situacoes), materias, corrigidos
 
 
 def iniciar(usuario_id: int, concurso: str, cargo_numero: int) -> int | None:

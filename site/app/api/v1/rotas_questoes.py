@@ -91,6 +91,14 @@ def listar_questoes(
         list[str] | None,
         Query(description="`basico` ou `especifico`. Repita para os dois (OU)."),
     ] = None,
+    tipo: Annotated[
+        list[str] | None,
+        Query(
+            description=(
+                "Formato da questão (`certo_errado` ou `multipla_escolha`). Repita para os dois (OU)."
+            ),
+        ),
+    ] = None,
     no_id: Annotated[
         list[str] | None,
         Query(description=D_FILTRO_NO_ID, examples=["S-c33faee4a4"]),
@@ -133,6 +141,7 @@ def listar_questoes(
         cargo_numero=cargo_numero,
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
+        tipo=tipo,
         no_id=no_id,
         texto=texto,
         com=com,
@@ -247,6 +256,10 @@ def obter_facetas(
     tipo_conhecimento: Annotated[
         list[str] | None, Query(description="Tipos de conhecimento marcados.")
     ] = None,
+    tipo: Annotated[
+        list[str] | None,
+        Query(description="Formatos marcados (`certo_errado` ou `multipla_escolha`)."),
+    ] = None,
     no_id: Annotated[list[str] | None, Query(description=D_FILTRO_NO_ID)] = None,
     texto: Annotated[str | None, Query(description=_D_TEXTO)] = None,
     com: Annotated[list[str] | None, Query(description=_D_COM)] = None,
@@ -271,6 +284,7 @@ def obter_facetas(
         cargo=cargo,
         nivel=nivel,
         tipo_conhecimento=tipo_conhecimento,
+        tipo=tipo,
         no_id=no_id,
         texto=texto,
         com=com,

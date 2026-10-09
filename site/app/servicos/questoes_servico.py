@@ -20,6 +20,7 @@ from app.servicos.formatacao import (
     rotulo_materia,
     rotulo_nivel,
     rotulo_tipo_conhecimento,
+    rotulo_tipo_questao,
 )
 
 
@@ -428,6 +429,7 @@ def obter_facetas(
         tipos_conhecimento=valores(
             "tipo_conhecimento", "tipo_conhecimento", rotulo_tipo_conhecimento
         ),
+        tipos=valores("tipo", "tipo", rotulo_tipo_questao),
         cargos=[
             {
                 "valor": r["valor"],

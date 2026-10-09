@@ -11,7 +11,6 @@ Cada registro contém:
 - `apontamentos`: lista de até 2 apontamentos (1 'principal' e opcionalmente 1 'secundario').
 """
 
-import hashlib
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -68,10 +67,15 @@ def chave_questao(
     return f"{concurso.strip()}|{codigo_caderno.strip()}|{num_str}"
 
 
-def calcular_hash_enunciado(enunciado: str) -> str:
-    """Calcula o hash SHA-1 do enunciado limpo."""
-    limpo = (enunciado or "").strip()
-    return hashlib.sha1(limpo.encode("utf-8")).hexdigest()
+def calcular_hash_enunciado(
+    enunciado: str,
+    tipo: str = "certo_errado",
+    alternativas: list | None = None,
+) -> str:
+    """Calcula o hash SHA-1 do enunciado limpo (ou 5D com alternativas para múltipla escolha)."""
+    from src.questoes_writer import calcular_hash_5d
+
+    return calcular_hash_5d(enunciado, tipo=tipo, alternativas=alternativas)
 
 
 def validar_registro(

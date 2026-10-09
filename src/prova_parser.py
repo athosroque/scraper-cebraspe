@@ -54,9 +54,39 @@ ALERTAS_ITEM_INUTILIZAVEL = frozenset(
 
 PADRAO_CABECALHO = re.compile(r"^\s*CEBRASPE\s*[–-].*Edital", re.IGNORECASE)
 PADRAO_FAIXA_SECAO = re.compile(r"^\s*--")  # "-- CONHECIMENTOS BÁSICOS --"
+# Código de controle impresso no rodapé dos cadernos ME
+# (`<SEFAPR177001A01E2977>`, `<SEBRAE_26_PSE_1169CG1A01E1035>`): todos os
+# cadernos da amostra 2020+ terminam em `A<2 dígitos>E<4 dígitos>`. Sensível a
+# maiúsculas e nesse formato, para `<html>`/`<div>` de questão de TI ficarem.
 PADRAO_RUIDO = re.compile(
-    r"^\s*(?:Espaço livre|PROVAS? OBJETIVAS?|RASCUNHO)\s*$", re.IGNORECASE
+    r"^\s*(?:Espaço livre|PROVAS? OBJETIVAS?|RASCUNHO|(?-i:<[A-Z0-9_]+A\d{2}E\d{4}>))\s*$",
+    re.IGNORECASE,
 )
+PADRAO_QUESTAO_ME = re.compile(r"^\s*Quest[ãa]o\s+(\d+)\b", re.IGNORECASE)
+# Cabeçalho de seção ME ("LÍNGUA PORTUGUESA", "RACIOCÍNIO LÓGICO",
+# "CONHECIMENTOS DO SEBRAE"): sempre em caixa alta. Sensível a caixa, senão
+# a linha quebrada de uma alternativa ("legislação vigente.") corta a questão
+# (ver `_eh_cabecalho_secao_me`).
+PADRAO_CABECALHO_SECAO_ME = re.compile(
+    r"^\s*(?:L[ÍI]NGUA\s+[A-ZÀ-Ú]+|CONHECIMENTOS\b.*|NO[ÇC][ÕO]ES\s+DE\b.*|ADMINISTRA[ÇC][ÃA]O\s*$|RACIOC[ÍI]NIO\s+L[ÓO]GICO\b.*|LEGISLA[ÇC][ÃA]O\b.*|DIREITO\s+[A-ZÀ-Ú]+|INFORM[ÁA]TICA\b.*)"
+)
+# Rótulo de texto-base ME, sozinho na linha: "Texto CB1A1", "Texto CB1A3-II",
+# "Texto 1A3", "Text CB1A2" (prova de inglês), "Textos CG1A1-I e CG1A1-II".
+ROTULO_TEXTO_ME = r"[A-Z0-9]*\d[A-Z0-9]*(?:-[A-Z0-9]+)*"
+PADRAO_TEXTO_ROTULO_ME = re.compile(
+    rf"^\s*Text(?:os?|s)?\s+{ROTULO_TEXTO_ME}(?:\s*(?:,|e|and)\s*{ROTULO_TEXTO_ME})*\s*$"
+)
+# Citação do rótulo no enunciado ("mencionados no texto CB1A3-I", "of text
+# CB1A2"); o rótulo em si é sensível a caixa.
+PADRAO_CITA_TEXTO_ME = re.compile(
+    rf"\btext(?:os?|s)?\s+(?-i:({ROTULO_TEXTO_ME}))", re.IGNORECASE
+)
+# Selo "Questão N" (tarja + ícone) e a faixa "PROVA OBJETIVA -- ... --" dos
+# cadernos ME são imagens; não são figura da questão.
+ALTURA_MAX_SELO_ME = 30.0
+FOLGA_SELO_ME = 30.0
+ALTURA_MAX_FAIXA_ME = 50.0
+PADRAO_LETRA_ALT = re.compile(r"^(?:\(?([A-E])\)|([A-E])[\.\)]|([A-E])\s+)")
 # "julgue os itens", "assertiva a ser julgada" e, nos textos em inglês, "judge".
 PADRAO_COMANDO_OBJETIVO = re.compile(
     r"\bjulgue\b|\bjulgad[ao]s?\b|\bjudge\b", re.IGNORECASE
@@ -217,14 +247,22 @@ def ordenar_blocos(blocos: list[dict], largura_pagina: float) -> list[dict]:
     meio = largura_pagina / 2
     texto = [b for b in blocos if b.get("type") == 0]
 
+    def _eff_y0(b: dict) -> float:
+        lines = [
+            l
+            for l in b.get("lines", [])
+            if "".join(s["text"] for s in l.get("spans", [])).strip()
+        ]
+        return min((l["bbox"][1] for l in lines), default=b["bbox"][1])
+
     def coluna_direita(b) -> bool:
         return b["bbox"][0] >= meio - 12
 
     if _duas_colunas(texto, largura_pagina):
         return sorted(
-            texto, key=lambda b: (coluna_direita(b), b["bbox"][1], b["bbox"][0])
+            texto, key=lambda b: (coluna_direita(b), _eff_y0(b), b["bbox"][0])
         )
-    return sorted(texto, key=lambda b: (b["bbox"][1], b["bbox"][0]))
+    return sorted(texto, key=lambda b: (_eff_y0(b), b["bbox"][0]))
 
 
 def _duas_colunas(blocos_texto: list[dict], largura_pagina: float) -> bool:
@@ -1120,6 +1158,371 @@ def segmentar(
     return res
 
 
+# Múltipla escolha -------------------------------------------------------------
+
+
+def _eh_multipla_escolha(
+    linhas: list[Linha], esperados: list[int], gabarito: dict[int, str]
+) -> bool:
+    """Detecta se o caderno segue o formato de Múltipla Escolha (A-E ou A-D)."""
+    if any(letra in {"A", "B", "D"} for letra in gabarito.values()):
+        return True
+    achados_me = sum(
+        1
+        for l in linhas
+        if (m := PADRAO_QUESTAO_ME.match(l.texto)) and int(m.group(1)) in esperados
+    )
+    if achados_me >= max(1, len(esperados) // 2):
+        return True
+    return False
+
+
+LETRAS_ALT = "ABCDE"
+
+
+def _marcador_no_span(linha: Linha, letra: str) -> bool:
+    """A letra vem num span próprio (o círculo com a letra do caderno real)."""
+    return linha.primeiro_span.strip() in {
+        letra,
+        f"{letra})",
+        f"({letra})",
+        f"{letra}.",
+    }
+
+
+def _eh_marcador_alt(linha: Linha, letra: str, margens: list[float]) -> bool:
+    """Marcador da alternativa `letra` (caminho de reserva).
+
+    Além do span próprio, aceita a letra no mesmo span do texto só com
+    pontuação explícita (`A)`, `(A)`, `A.`): a letra solta seguida de espaço
+    é ambígua com o artigo ("A respeito das funções ..., assinale"). A linha
+    tem de abrir bloco, estar em negrito ou na margem da coluna (`margens`,
+    medidas no próprio trecho)."""
+    if _marcador_no_span(linha, letra):
+        return True
+    if not re.match(rf"^\s*(?:\({letra}\)|{letra}[.)])\s", linha.texto):
+        return False
+    return bool(
+        linha.negrito
+        or linha.inicio_bloco
+        or _na_margem_coluna(linha, margens, tolerancia=6.0)
+    )
+
+
+def _sequencia_alternativas(trecho: list[Linha], eh_marcador) -> list[tuple[str, int]]:
+    """Primeira ocorrência de A, depois de B, ... na ordem do trecho."""
+    achadas: list[tuple[str, int]] = []
+    for i, linha in enumerate(trecho):
+        if len(achadas) == len(LETRAS_ALT):
+            break
+        letra = LETRAS_ALT[len(achadas)]
+        if eh_marcador(linha, letra):
+            achadas.append((letra, i))
+    return achadas
+
+
+def _localizar_alternativas_questao(
+    trecho: list[Linha],
+) -> list[tuple[str, int]]:
+    """Localiza as alternativas A, B, C, D (e E) no trecho da questão.
+    Devolve lista de tuplas `(letra, indice_no_trecho)`.
+    """
+    # 1. A letra num span próprio (formato dos cadernos reais).
+    estritos = _sequencia_alternativas(trecho, _marcador_no_span)
+    if len(estritos) in (4, 5):
+        return estritos
+
+    # 2. Reserva: letra no span do texto, com pontuação explícita.
+    margens = _detectar_margens_colunas(trecho)
+    return _sequencia_alternativas(
+        trecho, lambda linha, letra: _eh_marcador_alt(linha, letra, margens)
+    )
+
+
+def _eh_cabecalho_secao_me(texto: str) -> bool:
+    """Cabeçalho de seção ME: palavra-chave em caixa alta e nenhuma letra
+    minúscula fora de parênteses (`LEGISLAÇÃO (Lei n.º ...)` vale; a
+    alternativa quebrada em "LEGISLAÇÃO vigente" não)."""
+    texto = texto.strip()
+    if not PADRAO_CABECALHO_SECAO_ME.match(texto):
+        return False
+    return not re.search(r"[a-zà-ÿ]", re.sub(r"\([^)]*\)", "", texto))
+
+
+def _eh_rotulo_texto_me(texto: str) -> bool:
+    return PADRAO_TEXTO_ROTULO_ME.match(texto) is not None
+
+
+def localizar_questoes_me(
+    linhas: list[Linha],
+    esperados: list[int],
+    alertas: list[dict] | None = None,
+) -> dict[int, tuple[int, bool]]:
+    """Localiza as linhas onde cada questão de múltipla escolha começa (`Questão N`).
+    Devolve `{numero: (indice_da_linha, estrito)}`.
+    """
+    achados: dict[int, tuple[int, bool]] = {}
+    candidatos_por_numero: dict[int, list[int]] = {}
+    for i, linha in enumerate(linhas):
+        m = PADRAO_QUESTAO_ME.match(linha.texto)
+        if m:
+            num = int(m.group(1))
+            candidatos_por_numero.setdefault(num, []).append(i)
+
+    pos = 0
+    numeros_duplicados: set[int] = set()
+    for numero in esperados:
+        cands = candidatos_por_numero.get(numero, [])
+        if len(cands) == 1:
+            idx = cands[0]
+            if idx >= pos:
+                achados[numero] = (idx, True)
+                pos = idx + 1
+            else:
+                if alertas is not None:
+                    alertas.append(
+                        {
+                            "tipo": "marcador_fora_de_ordem",
+                            "severidade": SEVERIDADE_BLOQUEANTE,
+                            "item": numero,
+                            "indice": idx,
+                            "linhas": [linhas[idx].texto[:100]],
+                        }
+                    )
+        elif len(cands) > 1:
+            numeros_duplicados.add(numero)
+            if alertas is not None:
+                alertas.append(
+                    {
+                        "tipo": "marcador_duplicado",
+                        "severidade": SEVERIDADE_BLOQUEANTE,
+                        "item": numero,
+                        "indices": cands,
+                        "linhas": [linhas[i].texto[:100] for i in cands],
+                    }
+                )
+    return achados
+
+
+def marcadores_fora_do_gabarito_me(
+    linhas: list[Linha],
+    esperados: list[int],
+) -> list[int]:
+    """Questões ME delimitadas por 'Questão N' que continuam a sequência
+    do gabarito para fora dela (max+1, max+2... ou min-1...).
+    """
+    if not esperados:
+        return []
+    questoes_no_texto = {
+        int(m.group(1)) for l in linhas if (m := PADRAO_QUESTAO_ME.match(l.texto))
+    }
+    extras = []
+    for passo, inicio in ((1, esperados[-1] + 1), (-1, esperados[0] - 1)):
+        n = inicio
+        while n > 0 and n in questoes_no_texto:
+            extras.append(n)
+            n += passo
+    return sorted(extras)
+
+
+def _processar_preambulo_me(
+    linhas_preambulo: list[Linha],
+) -> tuple[str | None, list[Linha] | None]:
+    """Separa o cabeçalho de seção e as linhas de texto-base do preâmbulo ME."""
+    if not linhas_preambulo:
+        return None, None
+    secao = None
+    inicio_base = 0
+    l0 = linhas_preambulo[0].texto.strip()
+    if _eh_cabecalho_secao_me(l0):
+        secao = l0
+        inicio_base = 1
+
+    resto = linhas_preambulo[inicio_base:]
+    if not resto:
+        return secao, None
+
+    txt_resto = juntar_linhas(resto, paragrafos=True)
+    if (
+        len(resto) <= 2
+        and not _eh_rotulo_texto_me(resto[0].texto)
+        and len(txt_resto) < 80
+        and _eh_cabecalho_secao_me(resto[0].texto)
+    ):
+        secao = txt_resto
+        return secao, None
+    # Só linha vazia: não vira texto-base vazio.
+    if not txt_resto.strip():
+        return secao, None
+
+    return secao, resto
+
+
+def _segmentar_me(
+    linhas: list[Linha], achados: dict[int, tuple[int, bool]]
+) -> ResultadoSegmentacao:
+    res = ResultadoSegmentacao()
+    ordem_itens = sorted(achados, key=lambda n: achados[n][0])
+    if not ordem_itens:
+        return res
+    indices = [achados[n][0] for n in ordem_itens]
+
+    # Alcance do texto-base no ME (diferente do grupo C/E, que divide o
+    # texto até o próximo comando):
+    # - a questão que cita o rótulo ("texto CB1A3-I") aponta para ele;
+    # - o texto que abre a seção (antes da 1ª questão dela, ex.: o texto de
+    #   Língua Portuguesa) vale para a seção inteira;
+    # - o texto no meio da seção vale só para a questão logo depois dele e
+    #   para as que o citam. Herdar até a próxima seção daria o "Texto 1A3"
+    #   do SEFA_PR (seção única) a 23 questões sem relação com ele.
+    secao_atual: str | None = None
+    texto_base_atual: int | None = None
+    texto_base_abre_secao = False
+    primeira_apos_texto = False
+    questoes_na_secao = 0
+    # Rótulo impresso ("CB1A3-I") -> ordem do texto-base.
+    ordem_por_rotulo: dict[str, int] = {}
+
+    def _tratar_preambulo(inicio: int, fim: int, num_seguinte: int) -> None:
+        nonlocal secao_atual, texto_base_atual, texto_base_abre_secao
+        nonlocal primeira_apos_texto, questoes_na_secao
+        if inicio >= fim:
+            return
+        linhas_preambulo = linhas[inicio:fim]
+        sec, base_lines = _processar_preambulo_me(linhas_preambulo)
+        if sec:
+            secao_atual = sec
+            questoes_na_secao = 0
+            tam_sec = len(linhas_preambulo) - len(base_lines or [])
+            for k in range(inicio, inicio + tam_sec):
+                res.dono_linha[k] = ("comando", num_seguinte)
+        if base_lines:
+            ordem_base = len(res.textos_base)
+            base_texto = juntar_linhas(base_lines, paragrafos=True)
+            if _eh_rotulo_texto_me(base_lines[0].texto):
+                for rotulo in re.findall(ROTULO_TEXTO_ME, base_lines[0].texto):
+                    ordem_por_rotulo.setdefault(rotulo, ordem_base)
+            res.textos_base.append(
+                {
+                    "ordem": ordem_base,
+                    "texto": base_texto,
+                    "paginas": sorted({l.pagina + 1 for l in base_lines}),
+                    "linhas_brutas": [l.texto for l in base_lines],
+                    "figuras": [],
+                }
+            )
+            idx_base_start = fim - len(base_lines)
+            for k in range(idx_base_start, fim):
+                res.dono_linha[k] = ("texto_base", ordem_base)
+            texto_base_atual = ordem_base
+            texto_base_abre_secao = questoes_na_secao == 0
+            primeira_apos_texto = True
+        elif sec and not base_lines:
+            texto_base_atual = None
+
+    _tratar_preambulo(0, indices[0], ordem_itens[0])
+
+    for pos, numero in enumerate(ordem_itens):
+        i_item = indices[pos]
+        proximo = indices[pos + 1] if pos + 1 < len(indices) else len(linhas)
+        trecho = linhas[i_item:proximo]
+
+        alts_loc = _localizar_alternativas_questao(trecho)
+        letras = [a[0] for a in alts_loc]
+
+        if letras not in (["A", "B", "C", "D", "E"], ["A", "B", "C", "D"]):
+            res.alertas.append(
+                {
+                    "tipo": "alternativas_invalidas",
+                    "severidade": SEVERIDADE_BLOQUEANTE,
+                    "item": numero,
+                    "encontradas": letras,
+                }
+            )
+
+        if not alts_loc:
+            fim_item = proximo
+            enunciado = juntar_linhas(trecho)
+            enunciado = PADRAO_QUESTAO_ME.sub("", enunciado, count=1).strip(" -.:\t")
+            alts_res: list[dict] = []
+        else:
+            idx_alt_a = alts_loc[0][1]
+            enun_linhas = trecho[1:idx_alt_a]
+            m_header = PADRAO_QUESTAO_ME.match(trecho[0].texto)
+            sobra_header = (
+                trecho[0].texto[m_header.end() :].strip(" -.:\t") if m_header else ""
+            )
+            enunciado = juntar_linhas(enun_linhas)
+            if sobra_header:
+                enunciado = (
+                    f"{sobra_header} {enunciado}".strip() if enunciado else sobra_header
+                )
+
+            last_j = alts_loc[-1][1]
+            corte_tb = None
+            for k in range(last_j + 1, len(trecho)):
+                l = trecho[k]
+                if (
+                    _eh_cabecalho_secao_me(l.texto)
+                    or _eh_rotulo_texto_me(l.texto)
+                    or PADRAO_FAIXA_SECAO.match(l.texto.strip())
+                ):
+                    corte_tb = k
+                    break
+
+            fim_item = corte_tb if corte_tb is not None else len(trecho)
+
+            alts_res = []
+            for alt_idx, (letra, j_start) in enumerate(alts_loc):
+                if alt_idx + 1 < len(alts_loc):
+                    j_end = alts_loc[alt_idx + 1][1]
+                else:
+                    j_end = fim_item
+                alt_lines = trecho[j_start:j_end]
+                alt_raw = juntar_linhas(alt_lines)
+                alt_clean = re.sub(
+                    rf"^\s*(?:\(?{letra}\)|{letra}[\.\)]|{letra})\s*", "", alt_raw
+                ).strip()
+                alts_res.append({"letra": letra, "texto": alt_clean})
+
+        citados = [
+            ordem_por_rotulo[r]
+            for r in PADRAO_CITA_TEXTO_ME.findall(enunciado)
+            if r in ordem_por_rotulo
+        ]
+        if citados:
+            texto_base_item = citados[0]
+        elif texto_base_abre_secao or primeira_apos_texto:
+            texto_base_item = texto_base_atual
+        else:
+            texto_base_item = None
+        primeira_apos_texto = False
+        questoes_na_secao += 1
+
+        brutas = [linha.texto for linha in trecho[:fim_item]]
+        res.itens[numero] = {
+            "numero": numero,
+            "enunciado": enunciado,
+            "tipo": "multipla_escolha",
+            "alternativas": alts_res,
+            "secao": secao_atual,
+            "texto_base_ordem": texto_base_item,
+            "texto_base_herdado": False,
+            "grupo": numero,
+            "marcador_estrito": achados[numero][1],
+            "pagina": linhas[i_item].pagina + 1,
+            "linhas_brutas": brutas,
+            "figuras": [],
+        }
+        for k in range(i_item, i_item + fim_item):
+            res.dono_linha[k] = ("item", numero)
+
+        if fim_item < len(trecho) and pos + 1 < len(ordem_itens):
+            _tratar_preambulo(i_item + fim_item, proximo, ordem_itens[pos + 1])
+
+    return res
+
+
 # Figuras ----------------------------------------------------------------------
 
 
@@ -1255,6 +1658,34 @@ def figuras_vetoriais_da_pagina(
             continue
         regioes.append((caixa + (-2, -2, 2, 2)) & page.rect)
     return sorted(regioes, key=lambda r: (r.y0, r.x0))
+
+
+def _figura_decorativa_me(
+    rect: pymupdf.Rect, pagina: int, linhas: list[Linha], largura_pagina: float
+) -> bool:
+    """Imagem de layout do caderno ME, não figura de questão.
+
+    - Faixa "PROVA OBJETIVA -- CONHECIMENTOS ... --" de largura total (mais
+      alta que as tarjas que `figuras_da_pagina` já descarta).
+    - Selo da questão: tarja e ícone na altura da linha "Questão N" (até
+      `ALTURA_MAX_SELO_ME` pt de altura, a até `FOLGA_SELO_ME` pt dela na
+      horizontal). Sem o filtro, o selo de uma questão logo abaixo do
+      cabeçalho de seção virava um texto-base vazio.
+    """
+    if rect.width > 0.8 * largura_pagina and rect.height < ALTURA_MAX_FAIXA_ME:
+        return True
+    if rect.height > ALTURA_MAX_SELO_ME:
+        return False
+    for linha in linhas:
+        if linha.pagina != pagina or not PADRAO_QUESTAO_ME.match(linha.texto):
+            continue
+        sobrepoe_v = min(linha.y1, rect.y1) - max(linha.y0, rect.y0) > 0
+        perto_h = (
+            rect.x0 <= linha.x1 + FOLGA_SELO_ME and rect.x1 >= linha.x0 - FOLGA_SELO_ME
+        )
+        if sobrepoe_v and perto_h:
+            return True
+    return False
 
 
 def dono_da_figura(
@@ -1393,9 +1824,15 @@ def extrair_caderno_objetivo(
         auditoria["linhas_removidas"] = removidas
         esperados = sorted(gabarito)
         alertas_loc: list[dict] = []
-        achados = localizar_itens(linhas, esperados, alertas=alertas_loc)
-        resultado["alertas"].extend(alertas_loc)
-        seg = segmentar(linhas, achados)
+        eh_me = _eh_multipla_escolha(linhas, esperados, gabarito)
+        if eh_me:
+            achados = localizar_questoes_me(linhas, esperados, alertas=alertas_loc)
+            resultado["alertas"].extend(alertas_loc)
+            seg = _segmentar_me(linhas, achados)
+        else:
+            achados = localizar_itens(linhas, esperados, alertas=alertas_loc)
+            resultado["alertas"].extend(alertas_loc)
+            seg = segmentar(linhas, achados)
 
         # Figuras.
         total_figuras = 0
@@ -1403,6 +1840,12 @@ def extrair_caderno_objetivo(
             raster = figuras_da_pagina(page)
             vetoriais = figuras_vetoriais_da_pagina(page, raster)
             # Vetoriais depois das raster: o nome das raster não muda.
+            if eh_me:
+                raster = [
+                    r
+                    for r in raster
+                    if not _figura_decorativa_me(r, num_pagina, linhas, page.rect.width)
+                ]
             regioes = [(r, None) for r in raster] + [(r, "vetorial") for r in vetoriais]
             for n, (rect, origem) in enumerate(regioes, start=1):
                 dono = dono_da_figura(
@@ -1435,7 +1878,9 @@ def extrair_caderno_objetivo(
                 tipo, chave = dono
                 if tipo == "texto_base":
                     seg.textos_base[chave]["figuras"].append(figura)
-                elif tipo == "item":
+                elif tipo == "item" or eh_me:
+                    # ME: o "comando" é o cabeçalho de seção antes da questão
+                    # `chave`; a figura é da questão, nunca texto-base vazio.
                     seg.itens[chave]["figuras"].append(figura)
                 else:
                     # Figura no preâmbulo do grupo (entre o comando e o item
@@ -1464,7 +1909,9 @@ def extrair_caderno_objetivo(
         _remover_texto_das_tabelas(seg, linhas)
 
     for item in seg.itens.values():
-        if SIMBOLO_ILEGIVEL in item["enunciado"]:
+        alts = item.get("alternativas") or []
+        textos_item = [item["enunciado"]] + [a["texto"] for a in alts]
+        if any(SIMBOLO_ILEGIVEL in t for t in textos_item):
             resultado["alertas"].append(
                 {
                     "tipo": "simbolo_ilegivel",
@@ -1476,7 +1923,10 @@ def extrair_caderno_objetivo(
             item["texto_base_ordem"] is not None
             and seg.textos_base[item["texto_base_ordem"]]["figuras"]
         )
-        if PADRAO_MENCIONA_FIGURA.search(item["enunciado"]) and not tem_figura:
+        if (
+            any(PADRAO_MENCIONA_FIGURA.search(t) for t in textos_item)
+            and not tem_figura
+        ):
             # Figura vetorial (desenhada com traços, não imagem) não é
             # extraída: fica o alerta para conferir no PDF.
             resultado["alertas"].append(
@@ -1490,7 +1940,11 @@ def extrair_caderno_objetivo(
     resultado["alertas"].extend(seg.alertas)
     faltando = [n for n in esperados if n not in seg.itens]
     vazios = [n for n, item in seg.itens.items() if not item["enunciado"].strip()]
-    extras = marcadores_fora_do_gabarito(linhas, esperados)
+    extras = (
+        marcadores_fora_do_gabarito_me(linhas, esperados)
+        if eh_me
+        else marcadores_fora_do_gabarito(linhas, esperados)
+    )
     resultado["itens_faltando"] = faltando
     resultado["itens_fora_do_gabarito"] = extras
     resultado["itens_extraidos"] = len(seg.itens) - len(vazios)
@@ -1538,6 +1992,8 @@ def extrair_caderno_objetivo(
                 "pagina": item["pagina"],
                 "figuras": item["figuras"],
                 "alertas": item_alertas,
+                "tipo": item.get("tipo", "certo_errado"),
+                "alternativas": item.get("alternativas"),
             }
         )
     resultado["textos_base"] = [

@@ -1,3 +1,5 @@
+import re
+from functools import cache
 from pathlib import Path
 
 import pymupdf
@@ -6,16 +8,20 @@ import pytest
 from src.gabarito_parser import ler_grade
 from src.prova_parser import (
     PADRAO_COMANDO_REFERE_TEXTO,
+    PADRAO_TEXTO_ROTULO_ME,
     STATUS_FALHA_ITENS_DIVERGENTES,
     STATUS_FALHA_SEM_GABARITO,
     STATUS_SUCESSO,
     Linha,
     _chave_titulo,
     _eh_codigo_ou_tabela,
+    _eh_multipla_escolha,
     _extrair_quesitos,
     _linha_monoespacada,
     _marcar_borda_direita,
+    _processar_preambulo_me,
     _recuo_item,
+    _segmentar_me,
     _tema,
     _texto_spans,
     _unir_tiras,
@@ -26,7 +32,10 @@ from src.prova_parser import (
     juntar_linhas,
     ligar_padrao_resposta,
     localizar_itens,
+    localizar_questoes_me,
+    marcadores_fora_do_gabarito_me,
     ordenar_blocos,
+    remover_ruido,
     segmentar,
 )
 
@@ -1306,3 +1315,512 @@ class TestPreambuloDepoisDoItem:
         assert "Da contabilidade" in q[64]["enunciado"]
         assert "possivel_preambulo_no_item" in q[64]["alertas"]
         assert not pp.ALERTAS_ITEM_INUTILIZAVEL.isdisjoint(q[64]["alertas"])
+
+
+class TestMultiplaEscolhaSintetico:
+    """Testes unitários para cadernos de múltipla escolha sintéticos."""
+
+    def test_localizacao_e_segmentacao_basica_5_alternativas(self):
+        linhas = [
+            _l("Questão 1"),
+            _l("Qual é a capital do Brasil?", inicio=False),
+            _l("A ", primeiro_span="A"),
+            _l("Brasília.", inicio=False),
+            _l("B ", primeiro_span="B"),
+            _l("Rio de Janeiro.", inicio=False),
+            _l("C ", primeiro_span="C"),
+            _l("São Paulo.", inicio=False),
+            _l("D ", primeiro_span="D"),
+            _l("Salvador.", inicio=False),
+            _l("E ", primeiro_span="E"),
+            _l("Belo Horizonte.", inicio=False),
+        ]
+        gabarito = {1: "A"}
+        assert _eh_multipla_escolha(linhas, [1], gabarito)
+        achados = localizar_questoes_me(linhas, [1])
+        assert achados == {1: (0, True)}
+        seg = _segmentar_me(linhas, achados)
+        assert len(seg.itens) == 1
+        item = seg.itens[1]
+        assert item["enunciado"] == "Qual é a capital do Brasil?"
+        assert item["tipo"] == "multipla_escolha"
+        assert len(item["alternativas"]) == 5
+        assert [a["letra"] for a in item["alternativas"]] == ["A", "B", "C", "D", "E"]
+        assert item["alternativas"][0]["texto"] == "Brasília."
+        assert item["alternativas"][4]["texto"] == "Belo Horizonte."
+
+    def test_4_alternativas_estilo_parenteses_e_ponto(self):
+        linhas = [
+            _l("Questão 1"),
+            _l("Acerca do tema, assinale a opção correta.", inicio=False),
+            _l("A) Opção A.", primeiro_span="A)"),
+            _l("B) Opção B.", primeiro_span="B)"),
+            _l("C) Opção C.", primeiro_span="C)"),
+            _l("D) Opção D.", primeiro_span="D)"),
+        ]
+        achados = localizar_questoes_me(linhas, [1])
+        seg = _segmentar_me(linhas, achados)
+        item = seg.itens[1]
+        assert len(item["alternativas"]) == 4
+        assert [a["letra"] for a in item["alternativas"]] == ["A", "B", "C", "D"]
+        assert item["alternativas"][0]["texto"] == "Opção A."
+
+    def test_alternativa_multilinha(self):
+        linhas = [
+            _l("Questão 1"),
+            _l("Enunciado da questão.", inicio=False),
+            _l("A Primeira linha da alternativa A,", primeiro_span="A"),
+            _l("segunda linha da alternativa A,", inicio=False),
+            _l("e terceira linha da alternativa A.", inicio=False),
+            _l("B Linha única de B.", primeiro_span="B"),
+            _l("C Linha única de C.", primeiro_span="C"),
+            _l("D Linha única de D.", primeiro_span="D"),
+        ]
+        achados = localizar_questoes_me(linhas, [1])
+        seg = _segmentar_me(linhas, achados)
+        item = seg.itens[1]
+        assert (
+            item["alternativas"][0]["texto"]
+            == "Primeira linha da alternativa A, segunda linha da alternativa A, e terceira linha da alternativa A."
+        )
+
+    def test_alternativa_faltando_gera_alerta_bloqueante(self):
+        # Questão com apenas 3 alternativas (falta D)
+        linhas = [
+            _l("Questão 1"),
+            _l("Enunciado.", inicio=False),
+            _l("A Opção A.", primeiro_span="A"),
+            _l("B Opção B.", primeiro_span="B"),
+            _l("C Opção C.", primeiro_span="C"),
+        ]
+        achados = localizar_questoes_me(linhas, [1])
+        seg = _segmentar_me(linhas, achados)
+        assert any(
+            a["tipo"] == "alternativas_invalidas" and a["severidade"] == "bloqueante"
+            for a in seg.alertas
+        )
+
+    def test_alternativas_nao_consecutivas_gera_alerta_bloqueante(self):
+        # Pula a letra C (tem A, B, D, E)
+        linhas = [
+            _l("Questão 1"),
+            _l("Enunciado.", inicio=False),
+            _l("A Opção A.", primeiro_span="A"),
+            _l("B Opção B.", primeiro_span="B"),
+            _l("D Opção D.", primeiro_span="D"),
+            _l("E Opção E.", primeiro_span="E"),
+        ]
+        achados = localizar_questoes_me(linhas, [1])
+        seg = _segmentar_me(linhas, achados)
+        assert any(
+            a["tipo"] == "alternativas_invalidas" and a["severidade"] == "bloqueante"
+            for a in seg.alertas
+        )
+
+    def test_marcador_duplicado_gera_alerta_bloqueante(self):
+        linhas = [
+            _l("Questão 1"),
+            _l("Enunciado 1.", inicio=False),
+            _l("Questão 1"),
+            _l("Enunciado duplicado.", inicio=False),
+        ]
+        alertas: list[dict] = []
+        achados = localizar_questoes_me(linhas, [1], alertas=alertas)
+        assert 1 not in achados
+        assert any(
+            a["tipo"] == "marcador_duplicado" and a["severidade"] == "bloqueante"
+            for a in alertas
+        )
+
+    def test_marcador_fora_de_ordem_gera_alerta_bloqueante(self):
+        linhas = [
+            _l("Questão 2"),
+            _l("Questão 1"),
+        ]
+        alertas: list[dict] = []
+        localizar_questoes_me(linhas, [1, 2], alertas=alertas)
+        assert any(
+            a["tipo"] == "marcador_fora_de_ordem" and a["severidade"] == "bloqueante"
+            for a in alertas
+        )
+
+    def test_marcadores_fora_do_gabarito_me(self):
+        linhas = [
+            _l("Questão 1"),
+            _l("Questão 2"),
+            _l("Questão 3"),
+        ]
+        # Gabarito só espera 1 e 2
+        extras = marcadores_fora_do_gabarito_me(linhas, [1, 2])
+        assert extras == [3]
+
+    @staticmethod
+    def _questao(numero, enunciado, letras="ABCDE"):
+        linhas = [_l(f"Questão {numero}"), _l(enunciado, inicio=False)]
+        for letra in letras:
+            linhas.append(_l(f"{letra} Opção {letra}{numero}.", primeiro_span=letra))
+        return linhas
+
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "Texto CB1A1",
+            "Texto CB1A3-II",
+            "Texto 1A3",
+            "Text CB1A2",
+            "Textos CG1A1-I e CG1A1-II",
+        ],
+    )
+    def test_rotulo_de_texto_real_casa(self, texto):
+        assert PADRAO_TEXTO_ROTULO_ME.match(texto)
+
+    @pytest.mark.parametrize(
+        "texto", ["text CB1A2.", "Texto de apoio", "Texto CB1A1 Podemos atribuir"]
+    )
+    def test_linha_que_nao_e_rotulo_de_texto(self, texto):
+        assert not PADRAO_TEXTO_ROTULO_ME.match(texto)
+
+    def test_rotulo_texto_no_meio_da_secao_vira_texto_base(self):
+        # BANRISUL Q19-Q24: "Texto CB1A3-I" depois da alternativa E de Q19.
+        linhas = (
+            [_l("RACIOCÍNIO LÓGICO")]
+            + self._questao(1, "Questão sem texto.")
+            + [
+                _l("Texto XY1A3-I"),
+                _l("Em determinado setor, trabalham 80 pessoas.", inicio=False),
+            ]
+            + self._questao(2, "Considere o texto XY1A3-I e assinale.")
+            + self._questao(3, "Outra questão, sem texto.")
+            + [
+                _l("Texto XY1A3-II"),
+                _l("Uma tabela com 5 colunas.", inicio=False),
+            ]
+            + self._questao(4, "Com base no texto XY1A3-I, assinale.")
+            + self._questao(5, "Questão com enunciado próprio.")
+        )
+        achados = localizar_questoes_me(linhas, [1, 2, 3, 4, 5])
+        seg = _segmentar_me(linhas, achados)
+        assert [tb["texto"] for tb in seg.textos_base] == [
+            "Texto XY1A3-I Em determinado setor, trabalham 80 pessoas.",
+            "Texto XY1A3-II Uma tabela com 5 colunas.",
+        ]
+        assert seg.itens[1]["alternativas"][4]["texto"] == "Opção E1."
+        assert seg.itens[3]["alternativas"][4]["texto"] == "Opção E3."
+        assert {n: i["texto_base_ordem"] for n, i in seg.itens.items()} == {
+            1: None,
+            2: 0,  # logo depois do texto
+            3: None,  # não cita: o texto do meio da seção não vale para ela
+            4: 0,  # cita XY1A3-I, mesmo depois do XY1A3-II
+            5: None,
+        }
+        assert all(i["secao"] == "RACIOCÍNIO LÓGICO" for i in seg.itens.values())
+
+    def test_texto_que_abre_a_secao_vale_ate_a_proxima_secao(self):
+        linhas = (
+            [
+                _l("LÍNGUA PORTUGUESA"),
+                _l("Texto CG1A1"),
+                _l("Onde não houver alimento, não haverá paz.", inicio=False),
+            ]
+            + self._questao(1, "Infere-se do texto CG1A1 que")
+            + self._questao(2, "Com base no Manual de Redação, assinale.")
+            + [_l("LEGISLAÇÃO")]
+            + self._questao(3, "À luz da lei, assinale.")
+        )
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [1, 2, 3]))
+        assert len(seg.textos_base) == 1
+        assert [seg.itens[n]["texto_base_ordem"] for n in (1, 2, 3)] == [0, 0, None]
+        assert seg.itens[2]["alternativas"][4]["texto"] == "Opção E2."
+        assert seg.itens[3]["secao"] == "LEGISLAÇÃO"
+
+    def test_preambulo_so_com_linha_vazia_nao_cria_texto_base(self):
+        assert _processar_preambulo_me([_l("LEGISLAÇÃO"), _l("  ")]) == (
+            "LEGISLAÇÃO",
+            None,
+        )
+        assert _processar_preambulo_me([_l(" ")]) == (None, None)
+
+    def test_artigo_a_no_enunciado_nao_e_alternativa(self):
+        # Reserva (letra no span do texto): "A respeito ..." não é a
+        # alternativa A, mesmo abrindo bloco na margem da coluna.
+        linhas = [
+            _l("Questão 1"),
+            _l("A respeito do tema, assinale a opção correta."),
+            _l("A) Opção A."),
+            _l("B) Opção B."),
+            _l("C) Opção C."),
+            _l("D) Opção D."),
+        ]
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [1]))
+        item = seg.itens[1]
+        assert item["enunciado"] == "A respeito do tema, assinale a opção correta."
+        assert [a["texto"] for a in item["alternativas"]] == [
+            "Opção A.",
+            "Opção B.",
+            "Opção C.",
+            "Opção D.",
+        ]
+        assert not seg.alertas
+
+    def test_linha_quebrada_em_minuscula_nao_e_cabecalho_de_secao(self):
+        linhas = (
+            [_l("LEGISLAÇÃO")]
+            + self._questao(1, "Assinale a opção correta.", letras="ABCD")
+            + [
+                _l("E Os atos administrativos devem observar a", primeiro_span="E"),
+                _l("legislação vigente.", inicio=False, x0=42),
+            ]
+            + self._questao(2, "Assinale a opção correta.", letras="ABC")
+            + [
+                _l("D O cargo exige", primeiro_span="D"),
+                _l("conhecimentos técnicos específicos.", inicio=False, x0=42),
+            ]
+        )
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [1, 2]))
+        assert seg.itens[1]["alternativas"][4]["texto"] == (
+            "Os atos administrativos devem observar a legislação vigente."
+        )
+        assert seg.itens[2]["alternativas"][3]["texto"] == (
+            "O cargo exige conhecimentos técnicos específicos."
+        )
+        assert seg.itens[2]["secao"] == "LEGISLAÇÃO"
+        assert not seg.textos_base
+
+    def test_ruido_tira_codigo_de_controle_me_e_mantem_tag_html(self):
+        linhas = [
+            _l("-- CONHECIMENTOS ESPECÍFICOS --"),
+            _l("<html>"),
+            _l("<SEFAPR177001A01E2977>"),
+            _l("<DIV>"),
+            _l("<SEBRAE_26_PSE_1169CG1A01E1035>"),
+            _l("<sefapr177001a01e2977>"),
+        ]
+        restantes, _ = remover_ruido(linhas)
+        assert [linha.texto for linha in restantes] == [
+            "<html>",
+            "<DIV>",
+            "<sefapr177001a01e2977>",
+        ]
+
+    def test_ce_mantem_retrocompatibilidade_com_tipo_e_alternativas_none(
+        self, grade_pf_cb1
+    ):
+        # Testa se caderno CE mantém tipo='certo_errado' e alternativas=None
+        gabarito = _gabarito(grade_pf_cb1, range(15, 28))
+        resultado, _ = extrair_caderno_objetivo(
+            FIXTURES / "094_PF_CB1_01_pag2.pdf", gabarito, "CE_TEST"
+        )
+        assert resultado["status"] == STATUS_SUCESSO
+        for q in resultado["questoes"]:
+            assert q["tipo"] == "certo_errado"
+            assert q["alternativas"] is None
+
+
+DATA_AMOSTRA = Path(__file__).parent.parent / "data" / "inventario_amostra"
+
+
+class TestCadernosMEReais:
+    """Validação com os 3 PDFs reais de inventario_amostra (Etapa 8.M — Task 3)."""
+
+    def test_banrisul_30_itens_5_alternativas(self):
+        pdf = DATA_AMOSTRA / "BANRISUL_25_077_BANRISUL_CB1_01.pdf"
+        gab = DATA_AMOSTRA / "Gab_BANRISUL_25_CB1.pdf"
+        if not pdf.exists() or not gab.exists():
+            pytest.skip("PDF de amostra BANRISUL não encontrado")
+
+        grade = ler_grade(gab).respostas
+        resultado, auditoria = extrair_caderno_objetivo(pdf, grade, "BANRISUL")
+
+        assert resultado["status"] == STATUS_SUCESSO
+        assert resultado["itens_esperados"] == 30
+        assert resultado["itens_extraidos"] == 30
+        assert resultado["itens_faltando"] == []
+        assert resultado["itens_fora_do_gabarito"] == []
+        assert len(resultado["questoes"]) == 30
+        assert len(resultado["textos_base"]) >= 3
+
+        for q in resultado["questoes"]:
+            assert q["tipo"] == "multipla_escolha"
+            assert len(q["alternativas"]) == 5
+            assert [a["letra"] for a in q["alternativas"]] == ["A", "B", "C", "D", "E"]
+            assert q["enunciado"].strip()
+            assert not q["enunciado"].startswith("Questão")
+            assert q["gabarito"] == grade[q["numero"]]
+            assert q["anulada"] == (grade[q["numero"]] == "X")
+
+    def test_sebrae_15_itens_4_alternativas(self):
+        pdf = (
+            DATA_AMOSTRA
+            / "SEBRAE_26_PSE_1_2F270C9D0984DBDB129163E0C92DDE43057DFC1637D6342D91B41790C26EAB2E.pdf"
+        )
+        gab = DATA_AMOSTRA / "Gab_SEBRAE_26_TIPO2.pdf"
+        if not pdf.exists() or not gab.exists():
+            pytest.skip("PDF de amostra SEBRAE não encontrado")
+
+        grade = ler_grade(gab).respostas
+        resultado, auditoria = extrair_caderno_objetivo(pdf, grade, "SEBRAE")
+
+        assert resultado["status"] == STATUS_SUCESSO
+        assert resultado["itens_esperados"] == 15
+        assert resultado["itens_extraidos"] == 15
+        assert resultado["itens_faltando"] == []
+        assert resultado["itens_fora_do_gabarito"] == []
+        assert len(resultado["questoes"]) == 15
+        assert len(resultado["textos_base"]) >= 1
+
+        for q in resultado["questoes"]:
+            assert q["tipo"] == "multipla_escolha"
+            assert len(q["alternativas"]) == 4
+            assert [a["letra"] for a in q["alternativas"]] == ["A", "B", "C", "D"]
+            assert q["enunciado"].strip()
+            assert not q["enunciado"].startswith("Questão")
+            assert q["gabarito"] == grade[q["numero"]]
+            assert q["anulada"] == (grade[q["numero"]] == "X")
+
+    def test_sefa_pr_50_itens_5_alternativas(self):
+        pdf = (
+            DATA_AMOSTRA
+            / "SEFA_PR_25_90ECB71259732E8F2E4407EDA63B6754CADD1809D7F1A2741FB1422320521691.pdf"
+        )
+        gab = DATA_AMOSTRA / "Gab_SEFA_PR_25_CARGO1.pdf"
+        if not pdf.exists() or not gab.exists():
+            pytest.skip("PDF de amostra SEFA_PR não encontrado")
+
+        grade = ler_grade(gab).respostas
+        resultado, auditoria = extrair_caderno_objetivo(pdf, grade, "SEFA_PR")
+
+        assert resultado["status"] == STATUS_SUCESSO
+        assert resultado["itens_esperados"] == 50
+        assert resultado["itens_extraidos"] == 50
+        assert resultado["itens_faltando"] == []
+        assert resultado["itens_fora_do_gabarito"] == []
+        assert len(resultado["questoes"]) == 50
+        assert len(resultado["textos_base"]) >= 1
+
+        # Item 4 é anulado (gabarito X)
+        assert grade[4] == "X"
+        q4 = next(q for q in resultado["questoes"] if q["numero"] == 4)
+        assert q4["gabarito"] == "X"
+        assert q4["anulada"] is True
+
+        for q in resultado["questoes"]:
+            assert q["tipo"] == "multipla_escolha"
+            assert len(q["alternativas"]) == 5
+            assert [a["letra"] for a in q["alternativas"]] == ["A", "B", "C", "D", "E"]
+            assert q["enunciado"].strip()
+            assert not q["enunciado"].startswith("Questão")
+            assert q["gabarito"] == grade[q["numero"]]
+            assert q["anulada"] == (grade[q["numero"]] == "X")
+
+    # Conferido no PDF: rótulos "Texto ..."/"Text ..." de cada caderno, quais
+    # questões os usam (todas citam o rótulo, salvo BANRISUL Q10, que fica
+    # com o texto que abre a seção de Língua Portuguesa) e as figuras reais
+    # (sem os selos "Questão N" nem a faixa da prova).
+    ESPERADO_ME = {
+        "BANRISUL": {
+            "pdf": "BANRISUL_25_077_BANRISUL_CB1_01.pdf",
+            "gabarito": "Gab_BANRISUL_25_CB1.pdf",
+            "textos": {
+                "CB1A1": set(range(1, 11)),
+                "CB1A2": set(range(11, 16)),
+                "CB1A3-I": {20, 21},
+                "CB1A3-II": {23, 24},
+            },
+            "figuras_por_questao": {16: 1, 26: 1},
+            "figuras_por_texto": {"CB1A3-II": 1},
+        },
+        "SEBRAE": {
+            "pdf": "SEBRAE_26_PSE_1_2F270C9D0984DBDB129163E0C92DDE43057DFC1637D6342D91B41790C26EAB2E.pdf",
+            "gabarito": "Gab_SEBRAE_26_TIPO2.pdf",
+            "textos": {"CG1A1": set(range(1, 11))},
+            "figuras_por_questao": {},
+            "figuras_por_texto": {},
+        },
+        "SEFA_PR": {
+            "pdf": "SEFA_PR_25_90ECB71259732E8F2E4407EDA63B6754CADD1809D7F1A2741FB1422320521691.pdf",
+            "gabarito": "Gab_SEFA_PR_25_CARGO1.pdf",
+            "textos": {"1A3": {26, 27}},
+            "figuras_por_questao": {},
+            "figuras_por_texto": {},
+        },
+    }
+    ROTULO_NO_TEXTO_BASE = re.compile(r"Text(?:os?|s)? (\S+)")
+    CITA_ROTULO = re.compile(
+        r"\b[Tt]ext(?:os?|s)?\s+([A-Z0-9]*\d[A-Z0-9]*(?:-[IVX]+)?)\b"
+    )
+    PROIBIDO_NA_ALTERNATIVA = re.compile(
+        r"(?:^|\s)Text(?:os?|s)?\s+[A-Z0-9]*\d|\bQuest[ãa]o\s+\d+|Espaço livre"
+    )
+
+    @staticmethod
+    @cache
+    def _extrair(nome):
+        esperado = TestCadernosMEReais.ESPERADO_ME[nome]
+        pdf = DATA_AMOSTRA / esperado["pdf"]
+        gab = DATA_AMOSTRA / esperado["gabarito"]
+        if not pdf.exists() or not gab.exists():
+            pytest.skip(f"PDF de amostra {nome} não encontrado")
+        resultado, _ = extrair_caderno_objetivo(pdf, ler_grade(gab).respostas, nome)
+        return resultado
+
+    @pytest.mark.parametrize("nome", sorted(ESPERADO_ME))
+    def test_textos_base_nao_vazios_e_contagem_exata(self, nome):
+        resultado = self._extrair(nome)
+        textos = resultado["textos_base"]
+        assert all(tb["texto"].strip() for tb in textos)
+        rotulos = [self.ROTULO_NO_TEXTO_BASE.match(tb["texto"]) for tb in textos]
+        assert all(rotulos), [tb["texto"][:40] for tb in textos]
+        assert [m.group(1) for m in rotulos] == list(self.ESPERADO_ME[nome]["textos"])
+
+    @pytest.mark.parametrize("nome", sorted(ESPERADO_ME))
+    def test_alternativa_sem_rotulo_de_texto_nem_marcador(self, nome):
+        for q in self._extrair(nome)["questoes"]:
+            for alt in q["alternativas"]:
+                assert not self.PROIBIDO_NA_ALTERNATIVA.search(alt["texto"]), (
+                    q["numero"],
+                    alt["letra"],
+                    alt["texto"][:120],
+                )
+
+    @pytest.mark.parametrize("nome", sorted(ESPERADO_ME))
+    def test_questao_que_cita_texto_aponta_para_ele(self, nome):
+        resultado = self._extrair(nome)
+        rotulo_de = {
+            tb["ordem"]: self.ROTULO_NO_TEXTO_BASE.match(tb["texto"]).group(1)
+            for tb in resultado["textos_base"]
+        }
+        citacoes = 0
+        for q in resultado["questoes"]:
+            citados = self.CITA_ROTULO.findall(q["enunciado"])
+            if not citados:
+                continue
+            citacoes += 1
+            assert q["texto_base_ordem"] is not None, q["numero"]
+            assert rotulo_de[q["texto_base_ordem"]] == citados[0], q["numero"]
+        assert citacoes > 0
+        # Mapa completo: quem não está em nenhum texto fica sem texto-base.
+        usa = {
+            q["numero"]: rotulo_de.get(q["texto_base_ordem"])
+            for q in resultado["questoes"]
+        }
+        esperado = {
+            n: rotulo
+            for rotulo, numeros in self.ESPERADO_ME[nome]["textos"].items()
+            for n in numeros
+        }
+        assert usa == {n: esperado.get(n) for n in usa}
+
+    @pytest.mark.parametrize("nome", sorted(ESPERADO_ME))
+    def test_selo_da_questao_nao_vira_figura(self, nome):
+        resultado = self._extrair(nome)
+        esperado = self.ESPERADO_ME[nome]
+        assert {
+            q["numero"]: len(q["figuras"])
+            for q in resultado["questoes"]
+            if q["figuras"]
+        } == esperado["figuras_por_questao"]
+        assert {
+            self.ROTULO_NO_TEXTO_BASE.match(tb["texto"]).group(1): len(tb["figuras"])
+            for tb in resultado["textos_base"]
+            if tb["figuras"]
+        } == esperado["figuras_por_texto"]
