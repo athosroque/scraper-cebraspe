@@ -8,7 +8,11 @@ from urllib.parse import urljoin
 
 from playwright.sync_api import Page, sync_playwright
 
-from src.inventario import SLUGS_NAVEGACAO, classificar_link_pdf
+from src.inventario import (
+    SLUGS_NAVEGACAO,
+    TIPO_CADERNO_COM_GABARITO,
+    classificar_link_pdf,
+)
 from src.logger import logger
 
 # Import tardio (dentro de run()) para evitar import circular: downloader.py
@@ -370,6 +374,16 @@ class CebraspeSpider:
             if re.search(r"EDITAL.*?\bABERTURA\b", text):
                 pdf_map["editais_abertura"].append(href)
                 logger.info(f"[PROVA-PDF] editais_abertura <- '{text}' ({href})")
+            elif classificar_link_pdf(text)["tipo"] == TIPO_CADERNO_COM_GABARITO:
+                # "PROVA E GABARITO DEFINITIVO", "PROVA OBJETIVA (P1) E GABARITO
+                # PRELIMINAR COM JUSTIFICATIVAS": um PDF só, com as questões e as
+                # respostas (8.M/S3). É caderno: vai para Provas/ com o texto do
+                # link, que diz o tipo e os cargos. Antes do teste de GABARITO,
+                # que o mandaria para Gabaritos/ sem texto.
+                pdf_map["provas"].append({"url": href, "texto": text})
+                logger.info(
+                    f"[PROVA-PDF] provas (caderno com gabarito) <- '{text}' ({href})"
+                )
             elif re.search(r"GABARITO|PADR[ÕOÃA]ES?.*RESPOSTA", text):
                 # "PADRÃO DE RESPOSTA (DEFINITIVO)" é o gabarito da prova
                 # discursiva — o CEBRASPE não usa a palavra "GABARITO" nesse

@@ -50,6 +50,7 @@ from src.downloader import (
     _filename_from_url,
     _load_manifest,
 )
+from src.inventario import TIPO_CADERNO_COM_GABARITO, classificar_link_pdf
 from src.logger import logger
 from src.spider import extract_orgao_from_slug, extract_year_from_slug
 
@@ -84,6 +85,20 @@ PADRAO_ID_BASICA = re.compile(r"_(C[BG]\d*)_\d{2}$", re.IGNORECASE)
 PADRAO_ID_ESPECIFICA = re.compile(r"_(\d{3})_\d{2}$")
 PADRAO_ID_DISCURSIVA = re.compile(r"_(\d{3})_DISC$|_DISC_(\d{3})$", re.IGNORECASE)
 PREFIXO_GABARITO = re.compile(r"^Gab_Definitivo_", re.IGNORECASE)
+# Caderno com gabarito preliminar (8.M/S3): `897_TCDF_CB1_01_COM_JUSTIFICATIVA`,
+# `MATRIZ_039_CAESB_CG1_00_Com Justificativas_atualizado`. Sem o sufixo, o nome
+# é o do caderno, e o definitivo (`GAB_DEFINITIVO_897_TCDF_CB1_01`) liga a ele.
+PADRAO_SUFIXO_JUSTIFICATIVA = re.compile(
+    r"[_ ]?COM[_ ]?JUSTIFICATIVAS?(?:[_ ].*)?$", re.IGNORECASE
+)
+PADRAO_INTERVALO_CARGOS = re.compile(r"\bcargos (?:de )?(\d+) ao? (\d+)\b")
+PADRAO_EXCETO_CARGOS = re.compile(r"\bexceto\b")
+# "CARGO 9 (SEM EFEITO)": versão substituída por outra "(ATUALIZADO)".
+PADRAO_SEM_EFEITO = re.compile(r"\bsem efeito\b")
+# "ESPECIALIDADE 1" (TC_DF_24): não se sabe se é o número do cargo.
+PADRAO_ESPECIALIDADE_N = re.compile(r"\bespecialidade \d")
+# "PROVA OBJETIVA (P2)", já normalizado: P1 é a de conhecimentos básicos.
+PADRAO_NUMERO_PROVA = re.compile(r"\bp(\d)\b")
 
 # TIPO e perfil do caderno no texto já normalizado: "PERFIL I - TIPO 2"
 # (SEBRAE 2026), "PERFIL 1", "PERFIL PROFISSIONAL 1", "TIPO 5_ADAPTADA". O
@@ -224,10 +239,15 @@ def marcas_caderno(texto: str | None) -> dict:
     }
 
 
+def stem_caderno(nome_arquivo: str) -> str:
+    """Nome do caderno sem extensão e sem o sufixo de justificativas."""
+    return PADRAO_SUFIXO_JUSTIFICATIVA.sub("", Path(nome_arquivo).stem)
+
+
 def identificador_prova(nome_arquivo: str) -> str | None:
     """Token do caderno no nome do arquivo (`CB1`, `CG2`, `001`, `DISC_014`).
     None quando o nome não segue o padrão (ex.: arquivo com nome em hash)."""
-    stem = Path(nome_arquivo).stem
+    stem = stem_caderno(nome_arquivo)
     m = PADRAO_ID_DISCURSIVA.search(stem)
     if m:
         return f"DISC_{m.group(1) or m.group(2)}"
@@ -243,8 +263,61 @@ def identificador_prova(nome_arquivo: str) -> str | None:
 def codigo_caderno_do_nome(nome_arquivo: str) -> str | None:
     """`094_PF_CB1_01.pdf` -> `094_PF_CB1_01`; nome em hash ou fora do padrão
     -> None (o código vem do gabarito, ver `ligar_gabarito_por_conteudo`)."""
-    stem = Path(nome_arquivo).stem.upper()
+    stem = stem_caderno(nome_arquivo).upper()
     return stem if gabarito_parser.PADRAO_CODIGO_CADERNO.fullmatch(stem) else None
+
+
+def _tipo_pelo_nome_e_prova(texto_norm: str, nome_arquivo: str) -> str | None:
+    """Básica ou específica quando o token do nome (`CB1`/`CG1` × `001`) e o
+    número da prova no texto (P1 × P2/P3) concordam; None se discordam ou
+    faltam. O token sozinho erra: no TC_DF_24, `CG1` é a P2, de especialidade."""
+    identificador = identificador_prova(nome_arquivo)
+    provas = set(PADRAO_NUMERO_PROVA.findall(texto_norm))
+    if identificador is None or identificador.startswith("DISC") or len(provas) != 1:
+        return None
+    basica = not identificador.isdigit()
+    if basica != (provas == {"1"}):
+        return None
+    return "objetiva_basica" if basica else "objetiva_especifica"
+
+
+def classificar_caderno_com_gabarito(texto: str, nome_arquivo: str) -> dict | None:
+    """Tipo/cargos do caderno com gabarito ("PROVA OBJETIVA (P1) E GABARITO
+    PRELIMINAR COM JUSTIFICATIVAS – CARGO 3"). O texto quase nunca diz
+    "conhecimentos básicos/específicos": aí o tipo sai de
+    `_tipo_pelo_nome_e_prova`. Intervalo sem "de" ("CARGOS 1 AO 18", "CARGOS
+    60 A 70") vira a faixa. None (fora da fila, com log): versão "SEM EFEITO",
+    sem tipo seguro, ou com "EXCETO"/"ESPECIALIDADE N" (a lista de cargos
+    sairia errada)."""
+    texto_norm = normalizar(texto)
+    if (
+        PADRAO_SEM_EFEITO.search(texto_norm)
+        or PADRAO_EXCETO_CARGOS.search(texto_norm)
+        or PADRAO_ESPECIALIDADE_N.search(texto_norm)
+    ):
+        return None
+    classificacao_texto = classificar_prova_por_texto(texto)
+    if classificacao_texto is not None:
+        tipo = classificacao_texto["tipo"]
+    else:
+        tipo = _tipo_pelo_nome_e_prova(texto_norm, nome_arquivo)
+        if tipo is None:
+            return None
+    m = PADRAO_INTERVALO_CARGOS.search(texto_norm)
+    cargos = (
+        list(range(int(m.group(1)), int(m.group(2)) + 1))
+        if m
+        else extrair_cargos_do_texto(texto_norm)
+    )
+    return {"tipo": tipo, "cargos_numeros": cargos}
+
+
+def classificar_prova(texto: str, nome_arquivo: str) -> dict | None:
+    """`classificar_prova_por_texto`, com a regra do caderno com gabarito
+    para o link "PROVA ... E GABARITO ..." (8.M/S3)."""
+    if classificar_link_pdf(texto)["tipo"] == TIPO_CADERNO_COM_GABARITO:
+        return classificar_caderno_com_gabarito(texto, nome_arquivo)
+    return classificar_prova_por_texto(texto)
 
 
 def ligar_gabarito_por_conteudo(
@@ -707,7 +780,7 @@ def gravar_provas_e_fila(
 
         for pdf in pdfs:
             classificacao = (
-                classificar_prova_por_texto(pdf["texto_link"])
+                classificar_prova(pdf["texto_link"], pdf["arquivo"])
                 if pdf["texto_link"]
                 else None
             )
@@ -716,8 +789,14 @@ def gravar_provas_e_fila(
                 and pdf["texto_link"]
                 and classificacao is None
             ):
+                motivo = (
+                    "caderno com gabarito sem tipo/cargos seguros (ou sem efeito)"
+                    if classificar_link_pdf(pdf["texto_link"])["tipo"]
+                    == TIPO_CADERNO_COM_GABARITO
+                    else "texto do link não é caderno de prova"
+                )
                 logger.warning(
-                    f"[STATS] {slug}/{pdf['arquivo']}: texto do link não é caderno de prova "
+                    f"[STATS] {slug}/{pdf['arquivo']}: {motivo} "
                     f"({pdf['texto_link'][:80]!r}), fora da fila."
                 )
                 contagem["pulados"] += 1
@@ -758,7 +837,7 @@ def gravar_provas_e_fila(
                     ),
                 )
                 contagem["provas"] += 1
-                prova_por_stem[Path(pdf["arquivo"]).stem.upper()] = prova_id
+                prova_por_stem[stem_caderno(pdf["arquivo"]).upper()] = prova_id
                 provas_gravadas.append(
                     {
                         "id": prova_id,

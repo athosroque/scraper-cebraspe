@@ -20,6 +20,11 @@ PyMuPDF (com posição e fonte), não sobre o texto corrido:
   PNG e ligadas ao trecho (item, texto-base) cuja linha está logo acima na
   mesma coluna.
 
+**Caderno com gabarito** ("PROVA E GABARITO", 8.M/S3). As respostas vêm
+impressas no próprio caderno (justificativa por item ou por alternativa, ou o
+veredito na linha do item): `separar_gabarito_embutido` as tira antes da
+segmentação e as devolve como grade (`ler_gabarito_embutido`).
+
 **Caderno discursivo.** Uma ou mais questões ("Questão N", "Peça de natureza
 técnica"), cada uma com enunciado, tema e quesitos (`N texto [valor: X
 pontos]`). O padrão de resposta (outro PDF) é ligado depois, por questão.
@@ -31,13 +36,22 @@ alerta com o texto na auditoria.
 
 import re
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import pymupdf
 
+from src.comparacao_texto import normalizar
 from src.edital_parser import extrair_texto_paginas
-from src.gabarito_parser import QUESTAO_MULTIPLA_ESCOLHA
+from src.gabarito_parser import (
+    LETRAS_POR_TIPO,
+    QUESTAO_CERTO_ERRADO,
+    QUESTAO_MULTIPLA_ESCOLHA,
+    TIPO_GRADE,
+    VERSAO_DEFINITIVO,
+    VERSAO_PRELIMINAR,
+    GradeGabarito,
+)
 from src.logger import logger
 
 STATUS_SUCESSO = "sucesso"
@@ -1747,6 +1761,586 @@ def dono_da_figura(
     return dono_acima or dono_abaixo
 
 
+# Caderno com gabarito ---------------------------------------------------------
+
+# "PROVA E GABARITO" no mesmo PDF (`caderno_com_gabarito` do inventário,
+# ADR-037). Não há grade: a resposta vem impressa junto de cada questão. Os
+# formatos abaixo foram conferidos nos PDFs reais da 8.M/S3:
+# - justificativa C/E (TC_DF_23, PC_DF_24): "JUSTIFICATIVA - Certo. ..." até
+#   "<FimJust>", logo depois do item;
+# - justificativa ME (CAESB_24, PM_DF_25, SEPLAD_DF_22): "||JUSTIFICATIVAS||"
+#   (ou "JUSTIFICATIVAS") e uma entrada por alternativa, em ordem,
+#   "||A|| - Incorreta. ... */" (ou "A - Errado. ... */");
+# - código C/E (AGSUS_25_CCE, AGSUS_26_RD): "1 J2418111 - ERRADO | <item>",
+#   com o veredito na linha do item ("4 B0702949 – CORRETO - ANULADO | ..."
+#   na anulada) e "GABARITO DEFINITIVO" no topo da página.
+# As justificativas são do gabarito **preliminar** (o link diz "GABARITO
+# PRELIMINAR COM JUSTIFICATIVAS"); o definitivo, quando ligado, tem preferência.
+# Fora daqui e sem gabarito (falha explícita): a tabela "ITEM N / GABARITO:
+# CERTO" (AGSUS_25_EC) e o rótulo "CORRETA"/"ERRADA" por alternativa (AGU_23).
+FORMATO_JUSTIFICATIVA = "justificativa"
+FORMATO_CODIGO_CE = "codigo_ce"
+# Sensíveis a caixa: "Justificativa" no corpo de uma questão não é marca.
+PADRAO_JUSTIFICATIVA_CE = re.compile(r"^\s*JUSTIFICATIVA(?!S)\b")
+PADRAO_FIM_JUSTIFICATIVA_CE = re.compile(r"<FimJust>")
+PADRAO_JUSTIFICATIVAS_ME = re.compile(r"^\s*(?:\|\|)?JUSTIFICATIVAS(?:\|\|)?\s*$")
+# "||E|| Incorreta." (CAESB_24) vem sem o travessão; "A - Errado." precisa
+# dele, senão casaria a própria alternativa ("A texto").
+PADRAO_ENTRADA_ME = re.compile(
+    r"^\s*(?:\|\|([A-E])\|\|\s*[-–]?|([A-E])\s*[-–])\s*(.*)$"
+)
+# Marca de justificativa que não pode sobrar no texto da questão.
+PADRAO_MARCA_JUSTIFICATIVA = re.compile(r"\bJUSTIFICATIVAS?\b|<FimJust>|\|\|[A-E]\|\|")
+FIM_ENTRADA_ME = "*/"
+PADRAO_CODIGO_ITEM = re.compile(
+    r"^(\s*\d+\s+)[A-Z]{1,3}\d{5,8}\s*[-–]\s*(CORRETO|ERRADO|ANULADO)"
+    r"(\s*[-–]\s*ANULADO)?\s*\|\s*"
+)
+# Início de item no formato código, com ou sem veredito legível.
+PADRAO_CODIGO_ITEM_INICIO = re.compile(r"^\s*\d+\s+[A-Z]{1,3}\d{5,8}\s*[-–]")
+PADRAO_CABECALHO_GABARITO = re.compile(r"^\s*GABARITO\s+(DEFINITIVO|PRELIMINAR)\s*$")
+# Cabeçalho do bloco no formato código, entre a faixa "-- BLOCO 1 | CB1 --" e
+# o comando do item 1: "PROVA DE CONHECIMENTOS ...", "Curso: ...",
+# "<<N. Cargo/>> <<Nome do Cargo/>>" e a linha do cargo ("CB1 CONHECIMENTOS
+# BÁSICOS ...", "21 CARGO 21: ...", "60 A 70 CONHECIMENTOS ...").
+PADRAO_CABECALHO_BLOCO_CODIGO = re.compile(
+    r"^\s*(?:PROVA DE CONHECIMENTOS\b|Curso:|<<N\. Cargo/>>)"
+)
+# Veredito no começo da justificativa, já normalizado: "Certo.", "CERTO,
+# pois", "Incorreta.", "Opção incorreta.", "Errada".
+PADRAO_VEREDITO = re.compile(
+    r"^(?:opcao )?(?:(certo|certa|correto|correta)|(errado|errada|incorreto|incorreta)"
+    r"|(anulado|anulada))\b"
+)
+VEREDITO_CERTO = "certo"
+VEREDITO_ERRADO = "errado"
+VEREDITO_ANULADO = "anulado"
+LETRA_DO_VEREDITO_CE = {
+    VEREDITO_CERTO: "C",
+    VEREDITO_ERRADO: "E",
+    VEREDITO_ANULADO: "X",
+}
+MIN_ALTERNATIVAS_ME = 4
+MAX_LINHAS_ANTES_ENTRADA_ME = 12
+MAX_FRASES_ANTES_VEREDITO = 4
+# Maior número de item nos cadernos do piloto e da amostra: 160 (TC_DF_24).
+MAX_NUMERO_ITEM = 300
+
+
+@dataclass
+class GabaritoEmbutido:
+    """Respostas impressas no próprio caderno (`separar_gabarito_embutido`)."""
+
+    formato: str
+    versao: str
+    respostas: dict[int, str] = field(default_factory=dict)
+    tipos: dict[int, str] = field(default_factory=dict)
+    alertas: list[str] = field(default_factory=list)
+    # Fecho que faltava no PDF e foi presumido (informativo).
+    avisos: list[str] = field(default_factory=list)
+    # Entradas da justificativa ME por questão: tem de bater com as
+    # alternativas que a segmentação acha.
+    alternativas: dict[int, int] = field(default_factory=dict)
+    # Trechos tirados do caderno (cada justificativa, cada cabeçalho): não
+    # são questão nem texto-base.
+    trechos: list[list[Linha]] = field(default_factory=list)
+
+    @property
+    def removidas(self) -> list[Linha]:
+        return [linha for trecho in self.trechos for linha in trecho]
+
+    def grade(self) -> GradeGabarito:
+        return GradeGabarito(
+            codigo_caderno=None,
+            respostas=dict(self.respostas),
+            alertas=list(self.alertas),
+            tipos=dict(self.tipos),
+        )
+
+
+def _veredito(texto: str) -> str | None:
+    """Veredito no começo do texto ou de uma das primeiras frases: há
+    entrada com o tópico antes ("5.1 Relação professor/aluno. Incorreta.",
+    "3 Macroeconomia. 3.1 As contas nacionais;_ERRADA.")."""
+    # "...(artigos 101 a 105-B)_INCORRETA." (PC_PE_23): o "_" separa o tópico.
+    frases = re.split(r"(?<=\.)\s+|_", texto.strip())
+    for frase in frases[:MAX_FRASES_ANTES_VEREDITO]:
+        m = PADRAO_VEREDITO.match(normalizar(frase))
+        if m:
+            if m.group(1):
+                return VEREDITO_CERTO
+            return VEREDITO_ERRADO if m.group(2) else VEREDITO_ANULADO
+    return None
+
+
+def _numero_do_item(linha: Linha) -> int | None:
+    """Número do item C/E quando a linha é o marcador (número num span
+    próprio). Número fora da faixa dos cadernos é célula de tabela."""
+    span = linha.primeiro_span.strip()
+    if (
+        span.isdigit()
+        and 0 < int(span) <= MAX_NUMERO_ITEM
+        and _casa_numero(linha, int(span))
+    ):
+        return int(span)
+    return None
+
+
+def _fim_justificativa_ce(
+    linhas: list[Linha], inicio: int, margens: list[float]
+) -> tuple[int, bool] | None:
+    """`(fim, presumido)` da justificativa de `inicio`: a linha `<FimJust>`;
+    sem ela (TC_DF_23, PC_DF_24 têm itens assim), a linha antes da primeira
+    na margem da coluna (o próximo item ou comando: a justificativa tem o
+    recuo do item). None se outra justificativa começa antes disso."""
+    for k in range(inicio, len(linhas)):
+        if PADRAO_FIM_JUSTIFICATIVA_CE.search(linhas[k].texto):
+            return _absorver_fragmentos(linhas, k), False
+        if k == inicio:
+            continue
+        if PADRAO_JUSTIFICATIVA_CE.match(linhas[k].texto):
+            return None
+        if _na_margem_coluna(linhas[k], margens):
+            return k - 1, True
+    return None
+
+
+def _letra_entrada_me(linha: Linha) -> tuple[str, str] | None:
+    m = PADRAO_ENTRADA_ME.match(linha.texto)
+    return (m.group(1) or m.group(2), m.group(3)) if m else None
+
+
+def _entradas_justificativa_me(
+    linhas: list[Linha], inicio: int
+) -> tuple[int, dict[str, str | None]] | None:
+    """`(fim, {letra: veredito})` das entradas `||A|| - ... */` que seguem o
+    cabeçalho `JUSTIFICATIVAS` em `inicio`, com as letras em ordem a partir
+    de A. A entrada acaba no `*/` (há `*//`) ou, quando ele falta, logo antes
+    da entrada da letra seguinte; a última precisa do `*/`, senão não há como
+    saber onde ela acaba. Antes de cada entrada podem vir pedaços de fórmula
+    dela (a ordem visual os põe antes). None se a sequência não fecha antes
+    de outra questão."""
+
+    def fim_do_bloco(k: int) -> bool:
+        return k >= len(linhas) or bool(PADRAO_QUESTAO_ME.match(linhas[k].texto))
+
+    def fim_presumido(k: int) -> bool:
+        # O que separa uma questão da seguinte no ME: o selo "Questão N", o
+        # rótulo do texto-base ou o cabeçalho de seção.
+        return fim_do_bloco(k) or bool(
+            _eh_rotulo_texto_me(linhas[k].texto)
+            or _eh_cabecalho_secao_me(linhas[k].texto)
+        )
+
+    def proxima_entrada(k: int, letra: str) -> int | None:
+        for j in range(k, min(k + MAX_LINHAS_ANTES_ENTRADA_ME, len(linhas))):
+            if fim_presumido(j):
+                return None
+            entrada = _letra_entrada_me(linhas[j])
+            if entrada:
+                return j if entrada[0] == letra else None
+        return None
+
+    k = inicio + 1
+    vereditos: dict[str, str | None] = {}
+    fim = None
+    presumido = False
+    for i_letra, letra in enumerate(LETRAS_ALT):
+        achada = proxima_entrada(k, letra)
+        if achada is None:
+            break
+        k = inicio_entrada = achada
+        seguinte = LETRAS_ALT[i_letra + 1 : i_letra + 2]
+        while FIM_ENTRADA_ME not in linhas[k].texto:
+            proxima = _letra_entrada_me(linhas[k + 1]) if k + 1 < len(linhas) else None
+            if seguinte and proxima and proxima[0] == seguinte:
+                break
+            if k + 1 >= len(linhas) or fim_presumido(k + 1):
+                # Última entrada sem `*/`: acaba antes do que abre a questão
+                # seguinte. Entrada do meio sem nada disso é irrecuperável.
+                if len(vereditos) + 1 < MIN_ALTERNATIVAS_ME:
+                    return None
+                presumido = True
+                break
+            k += 1
+        texto_entrada = " ".join(
+            linha.texto
+            for linha in linhas[inicio_entrada : min(k, inicio_entrada + 2) + 1]
+        )
+        vereditos[letra] = _veredito(_letra_entrada_me(linhas[inicio_entrada])[1]) or (
+            _veredito(PADRAO_ENTRADA_ME.match(texto_entrada).group(3))
+        )
+        fim = k
+        k += 1
+        if presumido:
+            break
+    if fim is None:
+        return None
+    if not presumido:
+        fim = _absorver_fragmentos(linhas, fim)
+    return fim, vereditos, presumido
+
+
+def _absorver_fragmentos(linhas: list[Linha], fim: int) -> int:
+    """Estende o fim do trecho às linhas seguintes que ficam na mesma página e
+    coluna e não abaixo da linha de fecho: pedaços de fórmula (índice, fração)
+    que a ordem visual põe depois do `*/` ou do `<FimJust>`."""
+    fecho = linhas[fim]
+    coluna = fecho.x0 >= LIMITE_COLUNA_DIREITA
+    while fim + 1 < len(linhas):
+        seguinte = linhas[fim + 1]
+        if (
+            seguinte.pagina != fecho.pagina
+            or (seguinte.x0 >= LIMITE_COLUNA_DIREITA) != coluna
+            or (seguinte.y0 + seguinte.y1) / 2 > fecho.y1 + TOLERANCIA_MESMA_LINHA
+            or PADRAO_QUESTAO_ME.match(seguinte.texto)
+            or PADRAO_JUSTIFICATIVA_CE.match(seguinte.texto)
+            or _eh_rotulo_texto_me(seguinte.texto)
+        ):
+            break
+        fim += 1
+    return fim
+
+
+def _resposta_me(vereditos: dict[str, str | None]) -> str | None:
+    """A única alternativa certa; `X` se todas vêm anuladas; None se ambíguo
+    ou se faltam entradas (o caderno ME tem 4 ou 5 alternativas)."""
+    if len(vereditos) < MIN_ALTERNATIVAS_ME:
+        return None
+    if set(vereditos.values()) == {VEREDITO_ANULADO}:
+        return "X"
+    certas = [letra for letra, v in vereditos.items() if v == VEREDITO_CERTO]
+    if len(certas) == 1 and all(
+        v == VEREDITO_ERRADO for letra, v in vereditos.items() if letra != certas[0]
+    ):
+        return certas[0]
+    return None
+
+
+def _registrar_resposta(
+    embutido: GabaritoEmbutido,
+    vistos: Counter,
+    numero: int | None,
+    letra: str | None,
+    tipo: str,
+    contexto: str,
+) -> None:
+    """Grava a resposta lida, ou um alerta. Número repetido sai da grade (a
+    resposta de um deles foi atribuída ao item errado): o caderno falha na
+    conferência itens × gabarito, nunca com resposta trocada."""
+    if numero is None:
+        embutido.alertas.append(f"resposta sem número de questão: {contexto[:60]!r}")
+        return
+    vistos[numero] += 1
+    if vistos[numero] > 1:
+        embutido.alertas.append(f"questão {numero} com mais de uma resposta")
+        embutido.respostas.pop(numero, None)
+        embutido.tipos.pop(numero, None)
+        return
+    if letra is None or letra not in LETRAS_POR_TIPO[tipo]:
+        embutido.alertas.append(
+            f"questão {numero} sem resposta legível: {contexto[:60]!r}"
+        )
+        return
+    embutido.respostas[numero] = letra
+    embutido.tipos[numero] = tipo
+
+
+def _separar_justificativas(
+    linhas: list[Linha], tem_ce: bool, tem_me: bool
+) -> tuple[list[Linha], GabaritoEmbutido]:
+    """Tira as justificativas C/E (`tem_ce`) e ME (`tem_me`). A resposta de
+    cada uma vai para o último marcador visto depois da justificativa
+    anterior: o número do item (C/E) ou a linha "Questão N" (ME)."""
+    embutido = GabaritoEmbutido(formato=FORMATO_JUSTIFICATIVA, versao=VERSAO_PRELIMINAR)
+    vistos: Counter = Counter()
+    mantidas: list[Linha] = []
+    margens = _detectar_margens_colunas(linhas)
+    item_ce: int | None = None
+    ultimo_ce: int | None = None
+    questao_me: int | None = None
+    i = 0
+    while i < len(linhas):
+        linha = linhas[i]
+        if tem_ce and PADRAO_JUSTIFICATIVA_CE.match(linha.texto):
+            fechada = _fim_justificativa_ce(linhas, i, margens)
+            if fechada is None:
+                # Sem fecho nem margem, não há como saber onde ela acaba.
+                embutido.alertas.append(
+                    f"justificativa sem fim reconhecível: {linha.texto[:60]!r}"
+                )
+                mantidas.append(linha)
+                i += 1
+                continue
+            fim, presumido = fechada
+            if presumido:
+                embutido.avisos.append(
+                    f"item {item_ce}: justificativa sem <FimJust>, fim na margem"
+                )
+            # O veredito pode quebrar de linha ("JUSTIFICATIVA" / "- CERTO").
+            abertura = " ".join(lin.texto for lin in linhas[i : min(fim, i + 2) + 1])
+            veredito = _veredito(re.sub(r"^\s*JUSTIFICATIVA\s*[-–]?\s*", "", abertura))
+            _registrar_resposta(
+                embutido,
+                vistos,
+                item_ce,
+                LETRA_DO_VEREDITO_CE.get(veredito),
+                QUESTAO_CERTO_ERRADO,
+                abertura,
+            )
+            embutido.trechos.append(linhas[i : fim + 1])
+            if item_ce is not None:
+                ultimo_ce = item_ce
+            item_ce = questao_me = None
+            i = fim + 1
+            continue
+        if tem_me and PADRAO_JUSTIFICATIVAS_ME.match(linha.texto):
+            entradas = _entradas_justificativa_me(linhas, i)
+            if entradas is None:
+                embutido.alertas.append(
+                    f"questão {questao_me}: justificativas sem entradas A–E "
+                    "reconhecíveis"
+                )
+                mantidas.append(linha)
+                i += 1
+                continue
+            fim, vereditos, presumido = entradas
+            if presumido:
+                embutido.avisos.append(
+                    f"questão {questao_me}: última justificativa sem */, fim "
+                    "antes da questão seguinte"
+                )
+            if questao_me is not None:
+                embutido.alternativas[questao_me] = len(vereditos)
+            _registrar_resposta(
+                embutido,
+                vistos,
+                questao_me,
+                _resposta_me(vereditos),
+                QUESTAO_MULTIPLA_ESCOLHA,
+                f"{vereditos}",
+            )
+            embutido.trechos.append(linhas[i : fim + 1])
+            item_ce = questao_me = None
+            i = fim + 1
+            continue
+        # Os itens crescem: número menor é linha de tabela dentro do item.
+        numero = _numero_do_item(linha)
+        if numero is not None and (ultimo_ce is None or numero > ultimo_ce):
+            item_ce = numero
+        if m := PADRAO_QUESTAO_ME.match(linha.texto):
+            questao_me = int(m.group(1))
+        mantidas.append(linha)
+        i += 1
+    engolidas = [
+        linha.texto.strip()
+        for linha in embutido.removidas
+        if PADRAO_QUESTAO_ME.match(linha.texto)
+        or _eh_rotulo_texto_me(linha.texto)
+        or _eh_cabecalho_secao_me(linha.texto)
+    ]
+    if engolidas:
+        embutido.alertas.append(
+            f"justificativa engoliu o início de questão: {engolidas}"
+        )
+    return mantidas, embutido
+
+
+def _separar_codigo_ce(linhas: list[Linha]) -> tuple[list[Linha], GabaritoEmbutido]:
+    """Formato código: o veredito sai da linha do item, e o texto fica só com
+    o número e o enunciado. Saem também o cabeçalho "GABARITO ..." das páginas
+    e o do bloco (curso, cargo), que não são texto-base de nenhum item."""
+    versoes = {
+        m.group(1)
+        for linha in linhas
+        if (m := PADRAO_CABECALHO_GABARITO.match(linha.texto))
+    }
+    embutido = GabaritoEmbutido(
+        formato=FORMATO_CODIGO_CE,
+        versao=VERSAO_DEFINITIVO if versoes == {"DEFINITIVO"} else VERSAO_PRELIMINAR,
+    )
+    vistos: Counter = Counter()
+    mantidas: list[Linha] = []
+    no_cabecalho_bloco = False
+    for linha in linhas:
+        if PADRAO_CABECALHO_GABARITO.match(linha.texto):
+            embutido.trechos.append([linha])
+            continue
+        if PADRAO_CABECALHO_BLOCO_CODIGO.match(linha.texto):
+            no_cabecalho_bloco = True
+        if no_cabecalho_bloco:
+            # O cabeçalho do bloco vai até o comando do primeiro item.
+            if not PADRAO_COMANDO_OBJETIVO.search(linha.texto):
+                embutido.trechos.append([linha])
+                continue
+            no_cabecalho_bloco = False
+        m = PADRAO_CODIGO_ITEM.match(linha.texto)
+        if m:
+            veredito = VEREDITO_ANULADO if m.group(3) else _veredito(m.group(2))
+            _registrar_resposta(
+                embutido,
+                vistos,
+                int(m.group(1)),
+                LETRA_DO_VEREDITO_CE[veredito],
+                QUESTAO_CERTO_ERRADO,
+                linha.texto,
+            )
+            linha = replace(linha, texto=m.group(1) + linha.texto[m.end() :])
+        elif PADRAO_CODIGO_ITEM_INICIO.match(linha.texto):
+            embutido.alertas.append(
+                f"item com código sem veredito legível: {linha.texto[:60]!r}"
+            )
+        mantidas.append(linha)
+    return mantidas, embutido
+
+
+def separar_gabarito_embutido(
+    linhas: list[Linha],
+) -> tuple[list[Linha], GabaritoEmbutido | None]:
+    """Tira do caderno as respostas impressas nele e as devolve à parte.
+
+    Caderno sem nenhuma marca (o caso comum: grade em outro PDF) volta
+    intacto, com None. As linhas tiradas ficam em `removidas`; a resposta
+    que não dá para ler sem ambiguidade fica fora da grade, com alerta, e o
+    caderno falha na conferência itens × gabarito.
+    """
+    # Cada formato exige mais que a palavra (veredito, fecho ou item bem
+    # formado), para uma linha "JUSTIFICATIVAS" ou um "*/" de código num
+    # caderno comum não dispararem nada.
+    textos = [linha.texto for linha in linhas]
+    # C/E: "JUSTIFICATIVA - <veredito>" (há caderno sem nenhum <FimJust>).
+    tem_ce = any(
+        (m := PADRAO_JUSTIFICATIVA_CE.match(t))
+        and _veredito(t[m.end() :].lstrip(" -–"))
+        for t in textos
+    )
+    tem_me = any(FIM_ENTRADA_ME in t for t in textos) and any(
+        PADRAO_JUSTIFICATIVAS_ME.match(t) for t in textos
+    )
+    if any(PADRAO_CODIGO_ITEM.match(t) for t in textos):
+        mantidas, embutido = _separar_codigo_ce(linhas)
+    elif tem_ce or tem_me:
+        mantidas, embutido = _separar_justificativas(linhas, tem_ce, tem_me)
+    else:
+        return linhas, None
+    # A conferência itens × gabarito só olha as pontas da faixa (a grade
+    # separada nunca tem buraco): questão sem resposta no meio seria engolida
+    # pela anterior sem aviso.
+    numeros = sorted(embutido.respostas)
+    buracos = [
+        f"{a + 1}" if b - a == 2 else f"{a + 1}–{b - 1}"
+        for a, b in zip(numeros, numeros[1:], strict=False)
+        if b - a > 1
+    ]
+    if buracos:
+        embutido.alertas.append(f"questões sem resposta no caderno: {buracos}")
+    return mantidas, embutido
+
+
+def ler_gabarito_embutido(pdf_path: Path) -> dict | None:
+    """Gabarito impresso no próprio caderno, no formato de
+    `gabarito_parser.ler_documento` (`tipo` = grade). None se o caderno não
+    traz respostas."""
+    with pymupdf.open(pdf_path) as doc:
+        linhas, _ = remover_ruido(extrair_linhas(doc))
+    _, embutido = separar_gabarito_embutido(linhas)
+    if embutido is None:
+        return None
+    return {
+        "tipo": TIPO_GRADE,
+        "codigo_caderno": None,
+        "grade": embutido.grade(),
+        "padrao_resposta": None,
+        "versao": embutido.versao,
+        "formato": embutido.formato,
+    }
+
+
+def _regioes_removidas(
+    trechos: list[list[Linha]],
+) -> list[tuple[int, pymupdf.Rect]]:
+    """Retângulo de cada trecho removido, por página e coluna (a
+    justificativa pode virar de coluna): a figura que cai nele (fórmula de
+    uma justificativa) não é da questão."""
+    regioes: list[tuple[int, pymupdf.Rect]] = []
+    for trecho in trechos:
+        partes: dict[tuple[int, bool], pymupdf.Rect] = {}
+        for linha in trecho:
+            chave = (linha.pagina, linha.x0 >= LIMITE_COLUNA_DIREITA)
+            rect = pymupdf.Rect(linha.x0, linha.y0, linha.x1, linha.y1)
+            if chave in partes:
+                partes[chave].include_rect(rect)
+            else:
+                partes[chave] = rect
+        regioes.extend((pagina, rect) for (pagina, _), rect in partes.items())
+    return regioes
+
+
+def _sem_figuras_removidas(
+    rects: list[pymupdf.Rect],
+    pagina: int,
+    regioes: list[tuple[int, pymupdf.Rect]],
+    auditoria: dict,
+) -> list[pymupdf.Rect]:
+    """Tira as figuras cujo centro cai num trecho removido do caderno."""
+    mantidas = []
+    for rect in rects:
+        centro = pymupdf.Point((rect.x0 + rect.x1) / 2, (rect.y0 + rect.y1) / 2)
+        if any(p == pagina and centro in r for p, r in regioes):
+            auditoria["gabarito_embutido"]["figuras_descartadas"].append(
+                {"pagina": pagina + 1, "bbox": [round(v, 1) for v in rect]}
+            )
+            continue
+        mantidas.append(rect)
+    return mantidas
+
+
+def _conferir_sem_justificativa(seg, embutido: GabaritoEmbutido) -> list[dict]:
+    """Alertas bloqueantes de justificativa que ficou no texto: marca residual
+    (`JUSTIFICATIVA`, `||A||`, `<FimJust>`) em enunciado, alternativa ou
+    texto-base, ou questão ME com número de entradas na justificativa
+    diferente do de alternativas (uma entrada não reconhecida virou texto)."""
+    com_marca = [
+        n
+        for n, item in seg.itens.items()
+        if any(
+            PADRAO_MARCA_JUSTIFICATIVA.search(t)
+            for t in [item["enunciado"]]
+            + [a["texto"] for a in item.get("alternativas") or []]
+        )
+    ]
+    textos_base = [
+        tb["ordem"]
+        for tb in seg.textos_base
+        if PADRAO_MARCA_JUSTIFICATIVA.search(tb["texto"])
+    ]
+    divergentes = {
+        n: (entradas, len(seg.itens[n].get("alternativas") or []))
+        for n, entradas in embutido.alternativas.items()
+        if n in seg.itens and entradas != len(seg.itens[n].get("alternativas") or [])
+    }
+    alertas = []
+    if com_marca or textos_base:
+        alertas.append(
+            {
+                "tipo": "justificativa_no_texto",
+                "severidade": SEVERIDADE_BLOQUEANTE,
+                "itens": com_marca,
+                "textos_base": textos_base,
+            }
+        )
+    if divergentes:
+        alertas.append(
+            {
+                "tipo": "justificativa_incompleta",
+                "severidade": SEVERIDADE_BLOQUEANTE,
+                # {questão: (entradas na justificativa, alternativas)}
+                "questoes": {str(n): list(v) for n, v in sorted(divergentes.items())},
+            }
+        )
+    return alertas
+
+
 # Caderno objetivo -------------------------------------------------------------
 
 
@@ -1836,6 +2430,39 @@ def extrair_caderno_objetivo(
     with pymupdf.open(pdf_path) as doc:
         linhas, removidas = remover_ruido(extrair_linhas(doc))
         auditoria["linhas_removidas"] = removidas
+        # Caderno com gabarito: as respostas impressas nele saem antes da
+        # segmentação, senão viram texto da questão (ou da alternativa E).
+        linhas, embutido = separar_gabarito_embutido(linhas)
+        regioes_embutido = []
+        if embutido is not None:
+            regioes_embutido = _regioes_removidas(embutido.trechos)
+            auditoria["gabarito_embutido"] = {
+                "formato": embutido.formato,
+                "linhas_removidas": [
+                    linha.texto.strip() for linha in embutido.removidas
+                ],
+                "figuras_descartadas": [],
+                "avisos": embutido.avisos,
+            }
+            if embutido.avisos:
+                resultado["alertas"].append(
+                    {
+                        "tipo": "gabarito_embutido_fim_presumido",
+                        "severidade": SEVERIDADE_INFORMATIVO,
+                        "detalhes": embutido.avisos,
+                    }
+                )
+            if embutido.alertas:
+                # Justificativa que não fechou fica no texto da questão, e
+                # resposta ilegível deixa questão fora da grade: o caderno
+                # falha mesmo quando a grade usada é o definitivo à parte.
+                resultado["alertas"].append(
+                    {
+                        "tipo": "gabarito_embutido_irregular",
+                        "severidade": SEVERIDADE_BLOQUEANTE,
+                        "detalhes": embutido.alertas,
+                    }
+                )
         esperados = sorted(gabarito)
         alertas_loc: list[dict] = []
         eh_me = _eh_multipla_escolha(linhas, esperados, gabarito, tipos)
@@ -1853,13 +2480,27 @@ def extrair_caderno_objetivo(
         for num_pagina, page in enumerate(doc):
             raster = figuras_da_pagina(page)
             vetoriais = figuras_vetoriais_da_pagina(page, raster)
+            if regioes_embutido:
+                raster = _sem_figuras_removidas(
+                    raster, num_pagina, regioes_embutido, auditoria
+                )
+                vetoriais = _sem_figuras_removidas(
+                    vetoriais, num_pagina, regioes_embutido, auditoria
+                )
             # Vetoriais depois das raster: o nome das raster não muda.
             if eh_me:
-                raster = [
-                    r
-                    for r in raster
-                    if not _figura_decorativa_me(r, num_pagina, linhas, page.rect.width)
-                ]
+                # No caderno com justificativas (CAESB_24) o selo "Questão N"
+                # é desenhado (vetorial); nos ME da amostra, imagem.
+                raster, vetoriais = (
+                    [
+                        r
+                        for r in rects
+                        if not _figura_decorativa_me(
+                            r, num_pagina, linhas, page.rect.width
+                        )
+                    ]
+                    for rects in (raster, vetoriais)
+                )
             regioes = [(r, None) for r in raster] + [(r, "vetorial") for r in vetoriais]
             for n, (rect, origem) in enumerate(regioes, start=1):
                 dono = dono_da_figura(
@@ -1921,6 +2562,9 @@ def extrair_caderno_objetivo(
                     seg.textos_base[ordem]["figuras"].append(figura)
 
         _remover_texto_das_tabelas(seg, linhas)
+
+    if embutido is not None:
+        resultado["alertas"].extend(_conferir_sem_justificativa(seg, embutido))
 
     for item in seg.itens.values():
         alts = item.get("alternativas") or []

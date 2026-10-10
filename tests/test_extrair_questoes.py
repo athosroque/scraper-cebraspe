@@ -600,3 +600,186 @@ class TestConsumidorPostgres:
                     (extrair_questoes.LOCK_FILA_QUESTOES,),
                 )
             outra_conn.close()
+
+
+AMOSTRA_COM_GABARITO = (
+    Path(__file__).parent.parent
+    / "data"
+    / "inventario_amostra"
+    / "caderno_com_gabarito"
+)
+
+
+@pytest.mark.skipif(
+    not _postgres_disponivel(), reason="scraper-cebraspe-db indisponível"
+)
+class TestConsumidorPostgresCadernoComGabarito:
+    """Layout `caderno_com_gabarito` (8.M/S3) com os PDFs reais da amostra: o
+    caderno entra na fila como prova e, sem grade ligada, liga-se a si mesmo;
+    com o definitivo à parte (ligado pelo nome sem `_Com Justificativas`),
+    vale o definitivo."""
+
+    conn = TestConsumidorPostgres.conn
+
+    # (arquivo no concurso, origem na amostra, texto do link)
+    CADERNOS: ClassVar[list[tuple[str, str, str]]] = [
+        (
+            "MATRIZ_039_XX_CG1_00_Com Justificativas_atualizado.pdf",
+            "CAESB_24_MATRIZ_039_CAESB_CG1_00_Com_Justificativas_atualizado.pdf",
+            "PROVA OBJETIVA (P1) E GABARITO PRELIMINAR COM JUSTIFICATIVAS - "
+            "CARGOS 1 AO 2 (ATUALIZADO)",
+        ),
+        (
+            "MATRIZ_039_XX_CG1_00_Com Justificativas_OK.pdf",
+            "CAESB_24_MATRIZ_039_CAESB_CG1_00_Com_Justificativas_atualizado.pdf",
+            "PROVA OBJETIVA (P1) E GABARITO PRELIMINAR COM JUSTIFICATIVAS - "
+            "CARGOS 1 AO 2 (SEM EFEITO)",
+        ),
+        (
+            "897_XX_CB1_01_COM_JUSTIFICATIVA.PDF",
+            "TC_DF_23_897_TCDF_CB1_01_COM_JUSTIFICATIVA.PDF",
+            "PROVA OBJETIVA (P1) E GABARITO PRELIMINAR COM JUSTIFICATIVAS – CARGO 1",
+        ),
+        (
+            "E630B638.pdf",
+            "AGSUS_26_RD_BASICO_MEDIO_E630B638.pdf",
+            "PROVA E GABARITO DEFINITIVO – CONHECIMENTOS BÁSICOS PARA OS CARGOS DE "
+            "NÍVEL MÉDIO",
+        ),
+    ]
+    DEFINITIVO = (
+        "Gab_Definitivo_MATRIZ_039_XX_CG1_00.pdf",
+        "definitivos/Gab_Definitivo_MATRIZ_039_CAESB_CG1_00.pdf",
+    )
+
+    def _montar(self, tmp_path: Path) -> tuple[Path, list[dict]]:
+        data_dir = tmp_path / "data"
+        orgao = data_dir / "2024" / "CEBRASPE" / "XX"
+        (orgao / "Provas").mkdir(parents=True)
+        (orgao / "Gabaritos").mkdir()
+        pdfs = []
+        entradas = [("Provas", "prova", *c) for c in self.CADERNOS]
+        entradas.append(("Gabaritos", "gabarito", *self.DEFINITIVO, None))
+        for pasta, categoria, nome, origem, texto in entradas:
+            if not (AMOSTRA_COM_GABARITO / origem).exists():
+                pytest.skip(f"PDF de amostra {origem} não encontrado")
+            shutil.copy(AMOSTRA_COM_GABARITO / origem, orgao / pasta / nome)
+            pdfs.append(
+                {
+                    "arquivo": nome,
+                    "categoria": categoria,
+                    "path_relativo": str((orgao / pasta / nome).relative_to(data_dir)),
+                    "url": f"https://cdn.cebraspe.org.br/concursos/XX_24/arquivos/{nome}",
+                    "sha256": f"sha_{nome}",
+                    "texto_link": texto,
+                    "banca": "CEBRASPE",
+                }
+            )
+        return data_dir, pdfs
+
+    def test_caderno_liga_a_si_mesmo_ou_ao_definitivo(self, conn, tmp_path):
+        data_dir, pdfs = self._montar(tmp_path)
+        stats_writer.criar_schema(conn)
+        stats_writer.gravar_concurso(
+            conn, stats_writer.montar_carga_concurso(_resultado("XX_24"))
+        )
+        contagem = stats_writer.gravar_provas_e_fila(conn, "XX_24", pdfs, data_dir)
+        # A versão "SEM EFEITO" fica fora; o definitivo liga ao CG1 pelo nome.
+        assert contagem == {
+            "provas": 3,
+            "fila": 4,
+            "pulados": 1,
+            "gabaritos_sem_prova": 0,
+        }
+
+        saida = tmp_path / "questoes"
+        resumo = processar_fila(conn, data_dir, saida)
+        assert resumo["cadernos"] == 3
+        assert resumo["cadernos_sucesso"] == 3
+        assert resumo["itens_extraidos"] == 30 + 35 + 20
+
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT p.arquivo, p.tipo, p.identificador, count(q.*), "
+                "sum(q.anulada::int), array_agg(DISTINCT q.tipo), "
+                "(SELECT array_agg(ce.numero ORDER BY ce.numero) FROM provas_cargos pc "
+                " JOIN cargos_editais ce ON ce.id = pc.cargo_edital_id "
+                " WHERE pc.prova_id = p.id) "
+                "FROM provas p JOIN questoes q ON q.prova_id = p.id "
+                "GROUP BY p.id ORDER BY p.arquivo"
+            )
+            assert cur.fetchall() == [
+                (
+                    "897_XX_CB1_01_COM_JUSTIFICATIVA.PDF",
+                    "objetiva_basica",
+                    "CB1",
+                    35,
+                    0,
+                    ["certo_errado"],
+                    [1],
+                ),
+                (
+                    "E630B638.pdf",
+                    "objetiva_basica",
+                    None,
+                    20,
+                    1,
+                    ["certo_errado"],
+                    [1, 2],
+                ),
+                (
+                    "MATRIZ_039_XX_CG1_00_Com Justificativas_atualizado.pdf",
+                    "objetiva_basica",
+                    "CG1",
+                    30,
+                    1,
+                    ["multipla_escolha"],
+                    [1, 2],
+                ),
+            ]
+            cur.execute(
+                "SELECT arquivo, status, tipo_documento FROM fila_extracao_questoes "
+                "ORDER BY arquivo"
+            )
+            assert cur.fetchall() == [
+                (
+                    "897_XX_CB1_01_COM_JUSTIFICATIVA.PDF",
+                    "concluido",
+                    "caderno_objetivo",
+                ),
+                ("E630B638.pdf", "concluido", "caderno_objetivo"),
+                ("Gab_Definitivo_MATRIZ_039_XX_CG1_00.pdf", "concluido", "grade"),
+                (
+                    "MATRIZ_039_XX_CG1_00_Com Justificativas_atualizado.pdf",
+                    "concluido",
+                    "caderno_objetivo",
+                ),
+            ]
+
+        def ler(caderno):
+            return json.loads((saida / f"{caderno}.json").read_text(encoding="utf-8"))
+
+        def tipos_alerta(resultado):
+            return {a["tipo"] for a in resultado["alertas"]}
+
+        # Com o definitivo ligado, vale ele: a Q18, "C" no preliminar impresso,
+        # é anulada no definitivo.
+        cg1 = ler("XX_24_CG1")
+        assert cg1["gabarito_arquivo"] == "Gab_Definitivo_MATRIZ_039_XX_CG1_00.pdf"
+        assert cg1["gabarito_versao"] == "definitivo"
+        assert "gabarito_do_proprio_caderno" not in tipos_alerta(cg1)
+        q18 = next(q for q in cg1["questoes"] if q["numero"] == 18)
+        assert (q18["gabarito"], q18["anulada"]) == ("X", True)
+
+        # Sem grade ligada, o caderno usa o que traz impresso.
+        cb1 = ler("897_XX_CB1_01")
+        assert cb1["gabarito_arquivo"] == "897_XX_CB1_01_COM_JUSTIFICATIVA.PDF"
+        assert cb1["gabarito_versao"] == "preliminar"
+        assert {"gabarito_do_proprio_caderno", "gabarito_preliminar"} <= tipos_alerta(
+            cb1
+        )
+
+        agsus = ler("XX_24_E630B638")
+        assert agsus["gabarito_versao"] == "definitivo"
+        assert "gabarito_preliminar" not in tipos_alerta(agsus)
+        assert next(q for q in agsus["questoes"] if q["numero"] == 4)["anulada"]
