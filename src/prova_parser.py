@@ -85,6 +85,11 @@ PADRAO_QUESTAO_ME = re.compile(r"^\s*Quest[ãa]o\s+(\d+)\b", re.IGNORECASE)
 PADRAO_CABECALHO_SECAO_ME = re.compile(
     r"^\s*(?:L[ÍI]NGUA\s+[A-ZÀ-Ú]+|CONHECIMENTOS\b.*|NO[ÇC][ÕO]ES\s+DE\b.*|ADMINISTRA[ÇC][ÃA]O\s*$|RACIOC[ÍI]NIO\s+L[ÓO]GICO\b.*|LEGISLA[ÇC][ÃA]O\b.*|DIREITO\s+[A-ZÀ-Ú]+|INFORM[ÁA]TICA\b.*)"
 )
+# Fim de linha de cabeçalho de seção ME que continua na linha de baixo.
+PADRAO_CONECTIVO_FINAL_SECAO_ME = re.compile(
+    r"(?:\b(?:E|OU|DE|DA|DO|DOS|DAS|AO|AOS|À|ÀS|NA|NO|NAS|NOS|EM|PARA|COM)|,)\s*$"
+)
+TAMANHO_MAXIMO_SECAO_ME = 60
 # Rótulo de texto-base ME, sozinho na linha: "Texto CB1A1", "Texto CB1A3-II",
 # "Texto 1A3", "Text CB1A2" (prova de inglês), "Textos CG1A1-I e CG1A1-II".
 ROTULO_TEXTO_ME = r"[A-Z0-9]*\d[A-Z0-9]*(?:-[A-Z0-9]+)*"
@@ -393,7 +398,12 @@ def extrair_linhas(doc) -> list[Linha]:
                         linha_existente.bloco == bloco_global
                         for linha_existente in linhas[-1:]
                     ),
-                    primeiro_span=sp0["text"]
+                    # Primeiro span com texto: a letra da alternativa pode vir
+                    # depois de um span " " (SEFA_PR_25, CG1 Q65).
+                    primeiro_span=next(
+                        (sp["text"] for sp in linha["spans"] if sp["text"].strip()),
+                        sp0["text"],
+                    )
                     .replace("\xa0", " ")
                     .translate(SIMBOLO_PUA),
                     negrito=is_bold,
@@ -1236,7 +1246,12 @@ def _eh_marcador_alt(linha: Linha, letra: str, margens: list[float]) -> bool:
 
 
 def _sequencia_alternativas(trecho: list[Linha], eh_marcador) -> list[tuple[str, int]]:
-    """Primeira ocorrência de A, depois de B, ... na ordem do trecho."""
+    """Primeira ocorrência de A, depois de B, ... na ordem do trecho.
+
+    Depois, cada letra é reancorada (de trás para a frente) na última
+    ocorrência antes da letra seguinte que está na coluna dela (mesmo x0): o
+    enunciado que começa com o artigo "A" em span próprio, no recuo do
+    parágrafo, não é a alternativa A (SEFA_PR_25, Q24 do cargo 4)."""
     achadas: list[tuple[str, int]] = []
     for i, linha in enumerate(trecho):
         if len(achadas) == len(LETRAS_ALT):
@@ -1244,6 +1259,14 @@ def _sequencia_alternativas(trecho: list[Linha], eh_marcador) -> list[tuple[str,
         letra = LETRAS_ALT[len(achadas)]
         if eh_marcador(linha, letra):
             achadas.append((letra, i))
+    for k in range(len(achadas) - 2, -1, -1):
+        letra, inicio = achadas[k]
+        _, i_seguinte = achadas[k + 1]
+        x0_seguinte = trecho[i_seguinte].x0
+        for i in range(i_seguinte - 1, inicio, -1):
+            if abs(trecho[i].x0 - x0_seguinte) <= 1.5 and eh_marcador(trecho[i], letra):
+                achadas[k] = (letra, i)
+                break
     return achadas
 
 
@@ -1277,6 +1300,12 @@ def _eh_cabecalho_secao_me(texto: str) -> bool:
 
 def _eh_rotulo_texto_me(texto: str) -> bool:
     return PADRAO_TEXTO_ROTULO_ME.match(texto) is not None
+
+
+def _so_maiusculas(texto: str) -> bool:
+    """Tem letra e nenhuma minúscula fora de parênteses."""
+    texto = re.sub(r"\([^)]*\)", "", texto.strip())
+    return bool(re.search(r"[A-ZÀ-Ú]", texto)) and not re.search(r"[a-zà-ÿ]", texto)
 
 
 def localizar_questoes_me(
@@ -1360,7 +1389,30 @@ def _processar_preambulo_me(
     secao = None
     inicio_base = 0
     l0 = linhas_preambulo[0].texto.strip()
+    preenchidas = [l for l in linhas_preambulo if l.texto.strip()]
     if _eh_cabecalho_secao_me(l0):
+        secao = l0
+        inicio_base = 1
+        # Cabeçalho quebrado: "NOÇÕES DE CONTABILIDADE APLICADA AO" + "SETOR
+        # PÚBLICO (CASP)" (SEFA_PR_25). Só junta depois de conectivo.
+        while (
+            inicio_base < len(linhas_preambulo)
+            and PADRAO_CONECTIVO_FINAL_SECAO_ME.search(secao)
+            and _so_maiusculas(linhas_preambulo[inicio_base].texto)
+            and not _eh_rotulo_texto_me(linhas_preambulo[inicio_base].texto)
+        ):
+            secao = f"{secao} {linhas_preambulo[inicio_base].texto.strip()}"
+            inicio_base += 1
+    elif (
+        len(preenchidas) == 1
+        and preenchidas[0] is linhas_preambulo[0]
+        and len(l0) <= TAMANHO_MAXIMO_SECAO_ME
+        and _so_maiusculas(l0)
+        and not _eh_rotulo_texto_me(l0)
+    ):
+        # Preâmbulo de uma linha só, em caixa alta, sem palavra-chave: a área
+        # do caderno específico ("ECONOMIA", "CONTABILIDADE", "ANALISTA
+        # FAZENDÁRIO" no SEFA_PR_25). Antes virava texto-base de toda a seção.
         secao = l0
         inicio_base = 1
 

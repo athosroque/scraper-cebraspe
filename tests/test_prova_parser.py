@@ -28,6 +28,7 @@ from src.prova_parser import (
     dono_da_figura,
     extrair_caderno_discursivo,
     extrair_caderno_objetivo,
+    extrair_linhas,
     figuras_vetoriais_da_pagina,
     juntar_linhas,
     ligar_padrao_resposta,
@@ -1382,6 +1383,49 @@ class TestMultiplaEscolhaSintetico:
         assert item["alternativas"][0]["texto"] == "Brasília."
         assert item["alternativas"][4]["texto"] == "Belo Horizonte."
 
+    def test_enunciado_que_comeca_com_artigo_a_nao_e_alternativa(self):
+        # SEFA_PR_25, Q24 do cargo 4: a 1ª linha justificada sai com "A " num
+        # span próprio, no recuo do parágrafo (56,7 pt); as letras das
+        # alternativas ficam na margem (28,3 pt).
+        linhas = [
+            _l("Questão 24", x0=70.8),
+            _l(
+                "A atuação do Estado na esfera econômica é", primeiro_span="A ", x0=56.7
+            ),
+            _l("operacionalizada por políticas econômicas.", x0=28.3, inicio=False),
+            _l("Acerca desse assunto, é um exemplo de política comercial", x0=28.3),
+            _l("A a redução do IOF", primeiro_span="A", x0=28.3, inicio=False),
+            _l("B a fixação da taxa SELIC", primeiro_span="B", x0=28.3, inicio=False),
+            _l("C o aumento do subsídio", primeiro_span="C", x0=28.3, inicio=False),
+            _l("D a redução do IPI", primeiro_span="D", x0=28.3, inicio=False),
+            _l("E cotas de importação", primeiro_span="E", x0=28.3, inicio=False),
+        ]
+        achados = localizar_questoes_me(linhas, [24])
+        item = _segmentar_me(linhas, achados).itens[24]
+        assert item["enunciado"].startswith("A atuação do Estado")
+        assert item["enunciado"].endswith("política comercial")
+        assert [a["texto"] for a in item["alternativas"]] == [
+            "a redução do IOF",
+            "a fixação da taxa SELIC",
+            "o aumento do subsídio",
+            "a redução do IPI",
+            "cotas de importação",
+        ]
+
+    def test_letra_da_alternativa_depois_de_span_em_branco(self):
+        # SEFA_PR_25, CG1 Q65: a linha "A $A1." vem com um span " " antes da
+        # letra; o primeiro span da linha é o primeiro com texto.
+        doc = pymupdf.open()
+        page = doc.new_page()
+        escritor = pymupdf.TextWriter(page.rect)
+        escritor.append((28, 100), " ", font=pymupdf.Font("helv"), fontsize=11)
+        escritor.append((31, 100), "A", font=pymupdf.Font("tiro"), fontsize=11)
+        escritor.append((42, 100), " $A1.", font=pymupdf.Font("helv"), fontsize=11)
+        escritor.write_text(page)
+        (linha,) = extrair_linhas(doc)
+        assert linha.primeiro_span == "A"
+        assert linha.texto.strip() == "A $A1."
+
     def test_4_alternativas_estilo_parenteses_e_ponto(self):
         linhas = [
             _l("Questão 1"),
@@ -1565,6 +1609,31 @@ class TestMultiplaEscolhaSintetico:
         assert [seg.itens[n]["texto_base_ordem"] for n in (1, 2, 3)] == [0, 0, None]
         assert seg.itens[2]["alternativas"][4]["texto"] == "Opção E2."
         assert seg.itens[3]["secao"] == "LEGISLAÇÃO"
+
+    def test_cabecalho_de_secao_quebrado_depois_de_conectivo(self):
+        # SEFA_PR_25 CG1: a 2ª linha do cabeçalho virava texto-base.
+        assert _processar_preambulo_me(
+            [_l("NOÇÕES DE CONTABILIDADE APLICADA AO"), _l("SETOR PÚBLICO (CASP)")]
+        ) == ("NOÇÕES DE CONTABILIDADE APLICADA AO SETOR PÚBLICO (CASP)", None)
+        # Sem conectivo no fim, a linha de baixo não é continuação.
+        secao, base = _processar_preambulo_me(
+            [_l("LEGISLAÇÃO"), _l("TEXTO EM CAIXA ALTA")]
+        )
+        assert secao == "LEGISLAÇÃO"
+        assert [l.texto for l in base] == ["TEXTO EM CAIXA ALTA"]
+
+    def test_area_do_caderno_especifico_e_secao_nao_texto_base(self):
+        # SEFA_PR_25 P2: "CONTABILIDADE" sozinha antes da 1ª questão virava o
+        # texto-base das 50 questões do caderno.
+        assert _processar_preambulo_me([_l("CONTABILIDADE"), _l(" ")]) == (
+            "CONTABILIDADE",
+            None,
+        )
+        # Linha com minúscula ou rótulo de texto continua texto-base.
+        for texto in ("Texto 1A3", "O secretário afirmou que"):
+            secao, base = _processar_preambulo_me([_l(texto)])
+            assert secao is None
+            assert [l.texto for l in base] == [texto]
 
     def test_preambulo_so_com_linha_vazia_nao_cria_texto_base(self):
         assert _processar_preambulo_me([_l("LEGISLAÇÃO"), _l("  ")]) == (

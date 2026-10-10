@@ -50,7 +50,11 @@ from src.downloader import (
     _filename_from_url,
     _load_manifest,
 )
-from src.inventario import TIPO_CADERNO_COM_GABARITO, classificar_link_pdf
+from src.inventario import (
+    TIPO_ADMINISTRATIVO,
+    TIPO_CADERNO_COM_GABARITO,
+    classificar_link_pdf,
+)
 from src.logger import logger
 from src.spider import extract_orgao_from_slug, extract_year_from_slug
 
@@ -314,8 +318,17 @@ def classificar_caderno_com_gabarito(texto: str, nome_arquivo: str) -> dict | No
 
 def classificar_prova(texto: str, nome_arquivo: str) -> dict | None:
     """`classificar_prova_por_texto`, com a regra do caderno com gabarito
-    para o link "PROVA ... E GABARITO ..." (8.M/S3)."""
-    if classificar_link_pdf(texto)["tipo"] == TIPO_CADERNO_COM_GABARITO:
+    para o link "PROVA ... E GABARITO ..." (8.M/S3).
+
+    Link que o classificador do inventário dá como administrativo fica fora
+    (None): "Movimentação financeira após a etapa: aplicação prova objetiva e
+    discursiva" (SEFA_PR_25) e "Comunicado - Provas discursivas" caem em
+    `Provas/` pelo spider e virariam uma discursiva de todos os cargos (Gate
+    da 8.M)."""
+    tipo_link = classificar_link_pdf(texto)["tipo"]
+    if tipo_link == TIPO_ADMINISTRATIVO:
+        return None
+    if tipo_link == TIPO_CADERNO_COM_GABARITO:
         return classificar_caderno_com_gabarito(texto, nome_arquivo)
     return classificar_prova_por_texto(texto)
 
