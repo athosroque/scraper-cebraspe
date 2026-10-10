@@ -36,7 +36,8 @@ def test_top10_lingua_portuguesa_por_nivel(cliente, nivel):
         """
         SELECT no_id, questoes FROM fn_prova_cobra('subassunto', p_nivel => %s)
         WHERE materia_id = %s
-        ORDER BY questoes DESC, pct_medio_por_concurso DESC, no_nome LIMIT 10
+        ORDER BY pct_do_universo DESC, pct_medio_por_concurso DESC,
+                 questoes DESC, no_nome LIMIT 10
         """,
         (nivel, materia),
     )
@@ -50,6 +51,20 @@ def test_top10_lingua_portuguesa_por_nivel(cliente, nivel):
         "/estatisticas", params={"materia_id": materia, "nivel": nivel}
     ).text
     assert f"no_id={esperado[0][0]}" in html
+
+
+def test_ranking_ordena_pelo_pct_medio_e_nao_pela_contagem(cliente):
+    """Regra de 2026-10-09: o ranking segue o % médio por prova (concurso × cargo)."""
+    for params in ({}, {"nivel": "superior"}, {"nivel_alvo": "materia"}):
+        api = cliente.get(
+            "/api/v1/estatisticas/prova-cobra", params={**params, "limite": 50}
+        ).json()
+        assert api
+        pcts = [r["pct_do_universo"] for r in api]
+        assert pcts == sorted(pcts, reverse=True)
+    materias = cliente.get("/api/v1/materias").json()
+    pcts = [m["pct_incidencia"] for m in materias]
+    assert pcts == sorted(pcts, reverse=True)
 
 
 def test_link_do_ranking_abre_a_lista_filtrada(cliente):

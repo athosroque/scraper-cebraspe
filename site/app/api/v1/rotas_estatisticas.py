@@ -38,8 +38,11 @@ _LIMITE = Query(20, ge=1, le=200, description="Tamanho do ranking (máx. 200).")
     response_model=list[LinhaProvaCobra],
     summary="O que mais cai na prova",
     description=(
-        "Ranking de nós por questões distintas (`fn_prova_cobra`). A questão sobe "
-        "a árvore e a básica aplicada a vários cargos conta uma vez."
+        "Ranking de nós pelo % médio na prova (`fn_prova_cobra`): para cada prova "
+        "(concurso × cargo) do recorte, a fatia das questões dela no nó; a média "
+        "dá peso igual a cada prova (nunca soma bruta entre provas). A questão "
+        "sobe a árvore e a básica aplicada a vários cargos conta uma vez em "
+        "`questoes`."
     ),
 )
 def prova_cobra(

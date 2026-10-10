@@ -480,7 +480,10 @@ def chaves_mesmo_enunciado(chave: str) -> list[str] | None:
 
 
 def ranking_subassuntos() -> list[dict]:
-    """Ranking completo de subassuntos (`fn_prova_cobra`, sem filtros)."""
+    """Ranking completo de subassuntos (`fn_prova_cobra`, sem filtros).
+
+    Ordem: % médio por prova (concurso × cargo), não a contagem bruta.
+    """
     with (
         get_conexao_leitura() as conn,
         conn.cursor(cursor_factory=RealDictCursor) as cur,
@@ -489,7 +492,8 @@ def ranking_subassuntos() -> list[dict]:
             """
             SELECT no_id, materia_id, questoes
             FROM fn_prova_cobra('subassunto')
-            ORDER BY materia_id, questoes DESC, pct_medio_por_concurso DESC, no_nome
+            ORDER BY materia_id, pct_do_universo DESC, pct_medio_por_concurso DESC,
+                     questoes DESC, no_nome
             """
         )
         return cur.fetchall()

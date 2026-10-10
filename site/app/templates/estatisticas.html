@@ -49,14 +49,18 @@
     {% if aba == "prova" and linhas %}{{ c.selo(linhas[0].total_universo|num ~ " questões válidas no universo") }}{% endif %}
 </div>
 <p class="mb-4 text-xs text-slate-500">
-{% if aba == "prova" %}Questões objetivas distintas por nó. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez. Anuladas ficam fora. <strong>% médio</strong>: média entre concursos da fatia do nó dentro da disciplina (ou da prova, no nível disciplina), com o mesmo peso para cada concurso.
+{% if aba == "prova" %}Ordenado pelo <strong>% da prova</strong>: para cada prova (concurso × cargo) do recorte, a fatia das questões dela que caiu no nó; o número mostrado é a média dessas fatias, com o mesmo peso para cada prova (a prova sem questão no nó entra com 0%). <strong>% da disciplina</strong>: a mesma média, mas da fatia do nó dentro da disciplina, entre as provas que têm a disciplina. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez na contagem de questões. Anuladas ficam fora.
 {% else %}Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a disciplina acima dele; o item básico vale para cada cargo do nível.{% endif %}
 </p>
 {% if linhas %}
 <ol class="divide-y divide-slate-100">
     {% for r in linhas %}
-    {% set valor = r.questoes if aba == "prova" else r.ocorrencias %}
-    {% set rotulo_valor = (valor|num ~ " questões · " ~ (r.pct_medio_por_concurso|pct) ~ " médio") if aba == "prova" else (valor|num ~ " itens") %}
+    {% set valor = r.pct_do_universo if aba == "prova" else r.ocorrencias %}
+    {% if aba == "prova" %}
+    {% set rotulo_valor = (r.pct_do_universo|pct) ~ " da prova · " ~ ((r.pct_medio_por_concurso|pct) ~ " da disciplina · " if nivel_alvo != "materia" else "") ~ r.questoes|num ~ " questões" %}
+    {% else %}
+    {% set rotulo_valor = valor|num ~ " itens" %}
+    {% endif %}
     <li class="flex gap-3">
         <span class="w-6 shrink-0 pt-2 text-right text-xs tabular-nums text-slate-400">{{ loop.index }}</span>
         <div class="min-w-0 flex-1">

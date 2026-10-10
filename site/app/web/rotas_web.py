@@ -636,7 +636,8 @@ def _ranking(
     materia_id = materia_id or None
     if aba == "prova":
         linhas = estatisticas_servico.prova_cobra(nivel_alvo, filtros, materia_id, 30)
-        maximo = max((r.questoes for r in linhas), default=0)
+        # A barra segue a ordem do ranking: % médio por prova, não a contagem.
+        maximo = max((r.pct_do_universo for r in linhas), default=0)
     else:
         linhas = estatisticas_servico.edital_cobra(nivel_alvo, filtros, materia_id, 30)
         maximo = max((r.ocorrencias for r in linhas), default=0)
@@ -1093,7 +1094,8 @@ def painel_materia(
         context={
             "materia": materia,
             "linhas": linhas,
-            "maximo": max((r.questoes for r in linhas), default=0),
+            # Barra pela ordem do ranking (% médio por prova), não pela contagem.
+            "maximo": max((r.pct_do_universo for r in linhas), default=0),
             "filtros": filtros,
             "cargos": estatisticas_servico.cargos(),
             "url_resolver": "/questoes?" + urlencode({"no_id": no_id, **filtros_lista}),

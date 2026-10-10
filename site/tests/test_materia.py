@@ -31,7 +31,8 @@ def test_painel_lista_top_igual_fn_prova_cobra(cliente):
         """
         SELECT no_id FROM fn_prova_cobra('subassunto', p_nivel => 'medio')
         WHERE materia_id = %s AND (questoes > 0 OR anuladas > 0)
-        ORDER BY questoes DESC, pct_medio_por_concurso DESC, no_nome LIMIT 15
+        ORDER BY pct_do_universo DESC, pct_medio_por_concurso DESC,
+                 questoes DESC, no_nome LIMIT 15
         """,
         (materia,),
     )
@@ -84,7 +85,8 @@ def test_api_materia_detalhe_bate_com_fn_prova_cobra(cliente):
         """
         SELECT no_id, questoes FROM fn_prova_cobra('subassunto')
         WHERE materia_id = %s AND (questoes > 0 OR anuladas > 0)
-        ORDER BY questoes DESC, pct_medio_por_concurso DESC, no_nome LIMIT 15
+        ORDER BY pct_do_universo DESC, pct_medio_por_concurso DESC,
+                 questoes DESC, no_nome LIMIT 15
         """,
         (materia,),
     )
@@ -113,4 +115,4 @@ def test_api_busca_sem_acento_e_caixa(cliente):
 
 
 def test_inicio_mostra_incidencia(cliente):
-    assert "% das questões" in cliente.get("/").text
+    assert "% da prova, em média" in cliente.get("/").text
