@@ -1069,8 +1069,26 @@ enviar o bloco de uma etapa específica para o agente construir.
     - SEBRAE_26_PSE_1 ligado pelo sufixo `_NN`/TIPO e texto do link;
     - SEFA_PR_25: `discursiva_por_cargo` confere o tipo e evita ligar gabarito objetivo a discursiva;
     - `GradeGabarito.tipos` chega ao `prova_parser`; `PADRAO_CODIGO_CADERNO` aceita `CG` sem dígito.
-  - `[x]` `fn_prova_cobra` (8.M/S2): agregação pela média por concurso × cargo.
+  - `[x]` `fn_prova_cobra` (8.M/S2): agregação pela média por concurso × cargo. **Revista em
+    2026-10-10** (ADR-039): o básico compartilhado entra N vezes na média; ver 8.M.1.
   - `[x]` **Gate aprovado (2026-10-10, S4)**: carga real ME `SEFA_PR_25` no `cebraspe_gate` (380 itens ME), piloto inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), suíte completa verde (1.276 testes passando, `make check` 100%).
+  - `[ ]` Sem registro no Gate (achado da arrumação de 2026-10-10): passada no Chromium headless
+    com questão ME real (responder, corrigir, simulado, filtro "Formato") e conferência, no
+    edital do `SEFA_PR_25`, de que o erro no ME não desconta. Fazer junto da 8.M.1, que já
+    valida o site no navegador.
+  - Plano das sessões arquivado em [`docs/planos/plano-etapa-8m.md`](docs/planos/plano-etapa-8m.md).
+- `[ ]` **8.M.1 Incidência em dois níveis** (prioridade antes da 8.1, ADR-039, plano autocontido
+  em [`plano-etapa-8m1.md`](plano-etapa-8m1.md)). Decisão do dono (2026-10-10): a média por
+  prova (concurso × cargo) da S2 conta o mesmo caderno básico uma vez por cargo, e o concurso
+  com mais cargos domina (no piloto, PF_25_ADM pesa 48% e TCU_25_TEFC 3%). Passa a ser
+  % do nó na prova → média das provas dentro do concurso → média entre concursos (cada edital
+  pesa 1).
+  - `[ ]` `fn_prova_cobra` e `vw_comparativo_nivel` com a regra nova; contagens inalteradas.
+  - `[ ]` Testes: caso 3 cargos com básico compartilhado × 1 cargo (50% cada); as 31 provas
+    filtradas uma a uma sem diferença.
+  - `[ ]` Textos do site (`modelos.py`, rotas, templates) e `site/openapi.json`.
+  - **Pronto quando:** o ranking de matérias sem filtro bate com o ADR-039 (LP 13,81%;
+    Dir. Adm. 10,59%; Ética 4,81%; Adm. Geral 4,20%) e `make test-all` está verde.
 - `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
   `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
   por lote.
@@ -1091,7 +1109,7 @@ enviar o bloco de uma etapa específica para o agente construir.
   Mostrar lado a lado, para cada nó (matéria › assunto › subassunto):
   - % na **prova** (concurso × cargo) — já existe em `vw_prova_cobra_no`;
   - % **geral da banca** (todos os concursos) — já existe em `fn_prova_cobra(p_banca => ...)`,
-    como média de percentuais por concurso; falta expor junto do % da prova no site;
+    como média de percentuais (em dois níveis depois da 8.M.1); falta expor junto do % da prova no site;
   - % de um **assunto/matéria filtrado por banca** (e órgão, ano, cargo, nível).
 
   Filtros novos que faltam em `fn_prova_cobra` e no site:
@@ -1101,5 +1119,6 @@ enviar o bloco de uma etapa específica para o agente construir.
     entre itens de gabarito C (ou E), ou (b) a proporção C × E dentro do nó (hoje em
     `vw_certo_errado_por_no`, só para C/E).
 
-  Regra: agregar entre concursos sempre pela média dos percentuais por concurso × cargo,
-  nunca pela soma bruta (decisão de 2026-10-09).
+  Regra: agregar entre concursos sempre em dois níveis (média das provas dentro do concurso,
+  depois média entre concursos), nunca pela soma bruta (decisões de 2026-10-09 e 2026-10-10,
+  ADR-039).

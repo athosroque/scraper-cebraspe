@@ -80,6 +80,7 @@ Na Etapa 5E, o modelo dimensional e as views analíticas foram desenvolvidos par
    - **129 questões anuladas:** rigorosamente excluídas do total de `questoes` e do denominador de todos os percentuais, sendo computadas em coluna dedicada `anuladas`.
    - **2.657 questões canônicas utilizáveis com nó:** consolidadas na `vw_prova_cobra_base` (2.532 válidas + 125 anuladas), absorvendo as 124 aplicações repetidas entre cadernos do mesmo concurso.
 5. **Média Ponderada por Concurso (`pct_medio_por_concurso`):**
+   - **Revisto:** a unidade passou a concurso × cargo na 8.M/S2 e, em 2026-10-10, à média em dois níveis (prova → concurso), no [ADR-039](ADR-039-incidencia-em-dois-niveis.md). O texto abaixo é o da 5E.
    - Evita distorções de concursos com cadernos básicos gigantescos (ex.: Câmara com 90 questões).
    - Cada concurso possui peso idêntico. Concursos sem questões na matéria ficam fora da média; concursos com a matéria presente mas 0 questões no nó entram na média com 0.00%.
 6. **Interdisciplinaridade:**
