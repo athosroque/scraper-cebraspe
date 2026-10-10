@@ -1,6 +1,6 @@
 # ADR-038: Suporte a Múltipla Escolha Retrocompatível no Pipeline, Banco e Site
 
-- **Status:** Aceito (site e pipeline implementados; Gate da 8.M pendente, ver §3)
+- **Status:** Aceito (implementado; Gate da 8.M aprovado em 2026-10-10, ver §3)
 - **Data:** 2026-10-09
 - **Etapa:** 8.M (Pré-requisito para ingestão em lotes de 2020 a 2026)
 - **Decisores:** Dono do produto e equipe de engenharia
@@ -77,4 +77,6 @@ Para garantir que as 2.800 questões do piloto mantenham exatamente os mesmos ha
 1. **Retrocompatibilidade:** as 2.800 questões do piloto seguem com as mesmas chaves 5D (`tests/test_reconciliacao_inventario.py`).
 2. **Calibração Real:** Os 3 cadernos ME reais da amostra (`BANRISUL_25`, `SEBRAE_26_PSE_1`, `SEFA_PR_25`) foram extraídos com 100% de sucesso (30, 15 e 50 itens respectivamente).
 3. **Testes (2026-10-09):** `make test-all` sobre o `master` com a 8.0 (ADR-037): 1.160 testes (936 em `tests/`, 224 em `site/tests/`), 1.151 passam, 8 pulados, 1 xfail; `ruff check` e `ruff format --check` verdes.
-4. **Pendente para o Gate da 8.M:** o banco ainda não tem questão ME (as 4.075 de `vw_questoes` são `certo_errado`), então o caminho ME do site só foi exercitado em teste, com a questão simulada. Faltam a ligação prova ME ↔ gabarito (`task.md`), 1 concurso ME carregado e validado de ponta a ponta no Chromium headless (responder, corrigir, simulado, filtro) e a confirmação, no edital desse concurso, de que o erro no ME não desconta.
+4. **Gate da 8.M (2026-10-10, sessões S1–S4 em `docs/planos/plano-etapa-8m.md`):** ligação prova ME ↔ gabarito (SEBRAE_26_PSE_1 pelo sufixo `_NN`/TIPO, SEFA_PR_25 com `discursiva_por_cargo` conferindo o tipo), layout `caderno_com_gabarito` e carga real do `SEFA_PR_25` (380 itens ME) numa cópia do banco (`cebraspe_gate`). O piloto ficou inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), e `make test-all` passou com 1.276 testes.
+5. **Sem registro no Gate (levado ao `task.md`):** a passada no Chromium headless com questão ME real (responder, corrigir, simulado, filtro) e a confirmação, no edital do concurso ME, de que o erro não desconta.
+6. **Agregação:** a regra "média por concurso × cargo" (8.M/S2) foi revista pelo [ADR-039](ADR-039-incidencia-em-dois-niveis.md) (dois níveis, prova → concurso).

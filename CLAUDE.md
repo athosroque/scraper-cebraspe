@@ -311,10 +311,16 @@ Datasette continua só como ferramenta de revisão do dono.
       vivo, e o que fica fora do site está em `inventario/exclusoes.json` (16 concursos
       + PDF de curso de formação). Também entraram `caderno_com_gabarito`, a abertura do
       SEBRAE e `aguardando_prova` (26). Relatório com 0 alertas reais.
-- [ ] Etapa 8.M — Múltipla escolha (em andamento, `plano-etapa-8m.md`, ADR-038): `questoes.tipo` +
-      `alternativas`, gabarito A–E, parser ME calibrado com os cadernos reais do inventário, site e
-      simulado por tipo (resposta sempre conferida pelo tipo da questão). Falta o Gate: ligação
-      prova ME ↔ gabarito e 1 concurso ME de ponta a ponta no site.
+- [x] Etapa 8.M — Múltipla escolha (concluída em 2026-10-10, `docs/planos/plano-etapa-8m.md`,
+      ADR-038): `questoes.tipo` + `alternativas`, gabarito A–E, parser ME calibrado com os cadernos
+      reais do inventário, site e simulado por tipo (resposta sempre conferida pelo tipo da
+      questão), ligação prova ME ↔ gabarito (S1), `caderno_com_gabarito` (S3). Gate (S4): carga
+      real do `SEFA_PR_25` (380 itens ME) no `cebraspe_gate`, piloto inalterado (2.800 itens, 129
+      anuladas, 3.029 apontamentos), 1.276 testes verdes. Sem registro no Gate: Chromium headless
+      com ME real e conferência do desconto no edital (no `task.md`, junto da 8.M.1).
+- [ ] Etapa 8.M.1 — Incidência em dois níveis (**próxima**, antes da 8.1; `plano-etapa-8m1.md`,
+      ADR-039): a média por prova da 8.M/S2 conta o básico compartilhado uma vez por cargo (PF_25_ADM
+      pesa 48% da média do piloto). Passa a ser prova → média no concurso → média entre concursos.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -558,7 +564,7 @@ Datasette continua só como ferramenta de revisão do dono.
 - Padrão de resposta ligado preferencialmente por chave de título (`_chave_titulo`), garantindo ordem semântica correta mesmo com seções fora de ordem no PDF (chave ausente ou repetida cai na ligação por ordem); alertas `sem_quesitos` e `quesito_sem_valor`.
 - Figuras: vinculadas à linha logo acima na mesma coluna com sobreposição horizontal (exceção item → preâmbulo).
 - JSONs brutos de questões (`questoes/`) mantidos localmente e no `.gitignore` por volumetria, sendo regeneráveis de forma determinística por `scripts/extrair_questoes.py` (ADR-031).
-- Estatística de prova sobe a árvore e conta questão distinta (`count(DISTINCT questao_canonica_id)`): questão em subassunto soma em subassunto, assunto e matéria; questão em assunto soma em assunto e matéria, nunca descendo. Leitura com filtros agregados no site é feita via `fn_prova_cobra(...)` para garantir cálculo de percentual médio sob os filtros e desduplicação correta de questões básicas aplicadas em múltiplos cargos (ADR-032).
+- Estatística de prova sobe a árvore e conta questão distinta (`count(DISTINCT questao_canonica_id)`): questão em subassunto soma em subassunto, assunto e matéria; questão em assunto soma em assunto e matéria, nunca descendo. Leitura com filtros agregados no site é feita via `fn_prova_cobra(...)` para garantir cálculo de percentual médio sob os filtros e desduplicação correta de questões básicas aplicadas em múltiplos cargos (ADR-032). Percentual entre provas é média em dois níveis: % do nó na prova (concurso × cargo) → média das provas dentro do concurso → média entre concursos, cada edital com peso 1; nunca soma bruta nem média direta por prova, que multiplica o básico compartilhado pelo número de cargos (ADR-039; implementação na 8.M.1).
 - Cobertura descendente edital × prova (`vw_edital_vs_prova`): item de edital em nó X cobre X e todos os descendentes de X. Na prova, o apontamento sobe; na comparação, checa se há ancestral-ou-igual previsto no edital daquele cargo (`cobrado_no_edital`, `no_edital_nunca_cobrado`, `cobrado_fora_do_edital`).
 - Peso por matéria em cargo (`vw_peso_materia_cargo`): proporção de cada matéria dentro do total da prova do cargo (básico + específico); matérias identificadas como nome de cargo (`nome_de_cargo = true`) são formatadas como `"Conhecimentos específicos — <cargo>"`.
 - Discursivas analíticas (`vw_discursivas`): isola estritamente os temas e quesitos das 64 discursivas associadas aos nós da árvore mestre, sem interferir nem computar nas contagens das views de questões objetivas.
@@ -915,7 +921,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-037;
+As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-039;
 o `README.md` de lá é o índice com data e título). Antes de reabrir uma
 escolha de stack, banco, parser ou site, ler o ADR correspondente.
 

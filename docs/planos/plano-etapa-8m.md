@@ -9,11 +9,12 @@ Tornar o pipeline, o banco de dados e a interface web totalmente compatíveis co
 - [x] Task 3: **Parser de Caderno ME** — Implementar segmentação de enunciados e alternativas `(A)–(E)` em `src/prova_parser.py` (multilinha, figuras e tabelas), calibrado com os 3 PDFs reais em `data/inventario_amostra/` (`BANRISUL_25`, `SEBRAE_26_PSE_1`, `SEFA_PR_25`) → Verify: Testes unitários com trechos dos 3 PDFs confirmam 4–5 alternativas por questão e 0 cortes indevidos.
 - [x] Task 4: **Classificação 5D com Alternativas** — Adaptar `src/candidatos_questao.py` e `scripts/classificar_questoes.py` para injetar o texto das alternativas no prompt de classificação para questões do tipo `multipla_escolha` → Verify: Testes unitários de prompt confirmam presença de alternativas para ME e ausência para CE.
 - [x] Task 5: **Serviços do Site e Simulado** — Atualizar `site/app/modelos.py`, `site/sql/app_schema.sql` e serviços (`contas_servico`, `simulados_servico`) para suportar respostas `A–E` conferidas pelo tipo da questão, pontuação por formato (+1/−1 para CE e +1/0 para ME) e reexportar `site/openapi.json` → Verify: `venv/bin/pytest site/tests/` passa sem divergência no contrato OpenAPI.
-- [/] Task 6: **Templates e UI do Site** — Renderizar alternativas como radio buttons em `site/app/templates/_componentes.html`, `_card_questao.html`, `_correcao.html`, atualizar tela de correção e adicionar faceta de filtro por tipo (`certo_errado` / `multipla_escolha`) → Verify: Teste com Chromium headless valida renderização e submissão de questão ME e CE.
-  - Implementado e coberto em `site/tests/test_multipla_escolha.py` (questão ME simulada). Falta o Chromium headless, que depende de questão ME no banco.
-- [ ] Task 7: **Gate da 8.M e ADR-038** — Homologar piloto inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), validar 1 concurso ME de ponta a ponta e formalizar ADR-038 → Verify: `make test-all` verde e relatório de conferência do piloto sem divergências.
+- [x] Task 6: **Templates e UI do Site** — Renderizar alternativas como radio buttons em `site/app/templates/_componentes.html`, `_card_questao.html`, `_correcao.html`, atualizar tela de correção e adicionar faceta de filtro por tipo (`certo_errado` / `multipla_escolha`) → Verify: Teste com Chromium headless valida renderização e submissão de questão ME e CE.
+  - Implementado e coberto em `site/tests/test_multipla_escolha.py` (questão ME simulada). O Gate (S4) carregou o `SEFA_PR_25` no `cebraspe_gate`, mas não ficou registro da passada no Chromium headless com ME real; ela foi para o `task.md` (8.M, pendências).
+- [x] Task 7: **Gate da 8.M e ADR-038** — Homologar piloto inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), validar 1 concurso ME de ponta a ponta e formalizar ADR-038 → Verify: `make test-all` verde e relatório de conferência do piloto sem divergências.
   - Feito: ADR-038 (o ADR-037 é o do escopo do site no inventário), `make test-all` e ruff verdes.
-  - Falta: ligação prova ME ↔ gabarito (`task.md`), carga de 1 concurso ME e a validação dele no site; relatório de conferência do piloto.
+  - Feito nas sessões S1–S4 abaixo (Gate aprovado em 2026-10-10 com o `SEFA_PR_25`).
+  - A regra de agregação da S2 (média por concurso × cargo) foi revista em 2026-10-10: ADR-039 e Etapa 8.M.1.
 
 ## Sessões restantes (plano de 2026-10-10)
 Ordem e paralelismo: S1 ∥ S2 → S3 → S4. S1 e S3 mexem nos mesmos parsers; S4 valida o
@@ -28,7 +29,7 @@ código final, por isso vem por último.
     grade quando houver, e pelas letras só como fallback;
   - `PADRAO_CODIGO_CADERNO` aceita `CG` sem dígito (`059_SEFAZRJANALISTA_CG_01`).
   → Verify: testes com os casos acima; piloto C/E sem diferença nas ligações e nas grades.
-- [x] **S2 — `fn_prova_cobra` com média por concurso × cargo** (`src/sql/schema_estatisticas.sql`,
+- [x] **S2 — `fn_prova_cobra` com média por concurso × cargo** (revista pelo ADR-039: dois níveis, prova → concurso) (`src/sql/schema_estatisticas.sql`,
   serviços de estatística do site): `pct_do_universo` deixa de somar bruto entre concursos;
   `pct_medio_por_concurso` passa a ser por concurso × cargo; o site ordena pela média.
   → Verify: testes de view em schema temporário; exemplos da 5E/5F.4 conferidos.
