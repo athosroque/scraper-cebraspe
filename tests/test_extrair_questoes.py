@@ -96,6 +96,37 @@ class TestLigacaoPorConteudo:
         ]
         assert ligar_gabarito_por_conteudo(pdf, provas, {}) == (20, "167_CDNS_CG9_01")
 
+    def test_tipo_do_caderno_desfaz_a_basica_ambigua(self, tmp_path, caplog):
+        # SEBRAE_26_PSE_1: 4 básicos (TIPO 1 a 4). Sem TIPO no texto do link,
+        # a grade `_02` não tem como escolher: fica sem ligação e com aviso.
+        pdf = gerar_pdf_grade(
+            tmp_path / "h.pdf",
+            "169_SEBRAE_26_PSE_1_CG1_02",
+            {1: "A"},
+            rotulo_item="Questão",
+        )
+        basicas = [
+            {
+                "id": 30 + t,
+                "arquivo": f"B{t}.pdf",
+                "tipo": "objetiva_basica",
+                "identificador": None,
+                "cargos": [],
+                "tipo_caderno": None,
+                "perfil": None,
+            }
+            for t in range(1, 5)
+        ]
+        with caplog.at_level("WARNING"):
+            assert ligar_gabarito_por_conteudo(pdf, basicas, {}) == (None, None)
+        assert "gabarito ambíguo" in caplog.text
+        for p in basicas:
+            p["tipo_caderno"] = p["id"] - 30
+        assert ligar_gabarito_por_conteudo(pdf, basicas, {}) == (
+            32,
+            "169_SEBRAE_26_PSE_1_CG1_02",
+        )
+
     def test_ambiguo_ou_ilegivel_fica_sem_ligacao(self, tmp_path):
         pdf = gerar_pdf_grade(tmp_path / "h.pdf", "167_CDNS_003_01", {91: "C"})
         assert ligar_gabarito_por_conteudo(pdf, self.PROVAS, {}) == (None, None)

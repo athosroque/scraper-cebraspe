@@ -2,6 +2,7 @@ import json
 import uuid
 
 import psycopg2
+import pymupdf
 import pytest
 from psycopg2 import sql
 
@@ -10,8 +11,10 @@ from src.stats_writer import (
     classificar_prova_por_texto,
     extrair_cargos_do_texto,
     identificador_prova,
+    marcas_caderno,
     montar_carga_concurso,
 )
+from tests.test_gabarito_parser import gerar_pdf_grade
 
 
 class TestClassificarProvaPorTexto:
@@ -123,6 +126,7 @@ class TestIdentificadorProva:
         [
             ("094_PF_CB1_01.pdf", "CB1"),
             ("072_STM_CG5_01.pdf", "CG5"),
+            ("059_SEFAZRJANALISTA_CG_01.pdf", "CG"),
             ("057_IBAMA_003_01.pdf", "003"),
             ("094_PF_014_DISC.pdf", "DISC_014"),
             ("094_PF_DISC_015.pdf", "DISC_015"),
@@ -135,6 +139,44 @@ class TestIdentificadorProva:
     )
     def test_nomes_reais(self, nome, esperado):
         assert identificador_prova(nome) == esperado
+
+
+class TestMarcasCaderno:
+    # Textos reais do `inventario/concursos.jsonl`.
+    @pytest.mark.parametrize(
+        ("texto", "tipo_caderno", "perfil"),
+        [
+            (
+                "PROVA OBJETIVA – CONHECIMENTOS ESPECÍFICOS – PERFIL III - TIPO 4",
+                4,
+                3,
+            ),
+            (
+                "PROVA OBJETIVA – CONHECIMENTOS GERAIS PARA TODOS OS PERFIS - TIPO 1",
+                1,
+                None,
+            ),
+            (
+                "PROVA OBJETIVA - CONHECIMENTOS GERAIS PARA O PERFIL DE ASSISTENTE PCD - TIPO 5_ADAPTADA",
+                5,
+                None,
+            ),
+            ("PROVA OBJETIVA - CONHECIMENTOS ESPECÍFICOS - PERFIL 1", None, 1),
+            ("CADERNO DE PROVAS - PERFIL PROFISSIONAL 1: ARQUIVOLOGIA", None, 1),
+            ("QUESTÃO DISCURSIVA – PERFIL II", None, 2),
+            # Cabeçalho do padrão de resposta: o "II" do nome do cargo não conta.
+            ("PERFIL III: ANALISTA TÉCNICO II – ARQUIVOLOGIA", None, 3),
+            # Piloto: nenhuma marca, a ligação continua a de antes.
+            ("PROVA OBJETIVA - CONHECIMENTOS ESPECÍFICOS – CARGO 10", None, None),
+            ("PROVA OBJETIVA – CONHECIMENTOS BÁSICOS", None, None),
+            (None, None, None),
+        ],
+    )
+    def test_textos_reais(self, texto, tipo_caderno, perfil):
+        assert marcas_caderno(texto) == {
+            "tipo_caderno": tipo_caderno,
+            "perfil": perfil,
+        }
 
 
 def _resultado(slug="XX_25", topicos_especificos=("Topico A", "Topico B")) -> dict:
@@ -545,3 +587,189 @@ class TestGravacaoPostgres:
             materias = dict(cur.fetchall())
             assert materias["lingua portuguesa"] is False
             assert materias["medico clinico"] is True
+
+
+# Ligação prova ↔ gabarito de concursos ME (Etapa 8.M, sessão S1). Textos dos
+# links do `inventario/concursos.jsonl`; códigos impressos nas grades reais.
+# Cada gabarito é `(texto do link, código da grade ou cabeçalho do padrão,
+# texto do caderno a que tem de ligar)`. Os arquivos têm nome em hash, como no
+# site, então não há ligação pelo nome.
+SEFA_PR_25 = {
+    "cargos": 6,
+    "cadernos": [
+        "PROVA OBJETIVA (P1) – CONHECIMENTOS GERAIS PARA TODOS OS CARGOS",
+        *(
+            f"PROVA OBJETIVA (P2) – CONHECIMENTOS ESPECÍFICOS – CARGO {n}"
+            for n in range(1, 7)
+        ),
+        "PROVA DISCURSIVA",
+    ],
+    "gabaritos": [
+        (
+            "GABARITO DEFINITIVO – PROVA OBJETIVA (P1) – CONHECIMENTOS GERAIS PARA TODOS OS CARGOS",
+            "135_SEFAPR_CG1_01",
+            "PROVA OBJETIVA (P1) – CONHECIMENTOS GERAIS PARA TODOS OS CARGOS",
+        ),
+        *(
+            (
+                f"GABARITO DEFINITIVO – PROVA OBJETIVA (P2) – CONHECIMENTOS ESPECÍFICOS – CARGO {n}",
+                f"{'177' if n in (1, 3) else '135'}_SEFAPR_{n:03d}_01",
+                f"PROVA OBJETIVA (P2) – CONHECIMENTOS ESPECÍFICOS – CARGO {n}",
+            )
+            for n in range(1, 7)
+        ),
+        (
+            "PADRÃO DEFINITIVO DE RESPOSTA – PROVA DISCURSIVA",
+            "PROVA DISCURSIVA\nPADRÃO DE RESPOSTA DEFINITIVO",
+            "PROVA DISCURSIVA",
+        ),
+    ],
+}
+PERFIS = {1: "I", 2: "II", 3: "III"}
+SEBRAE_26_PSE_1 = {
+    "cargos": 0,
+    "cadernos": [
+        *(
+            f"PROVA OBJETIVA – CONHECIMENTOS GERAIS PARA TODOS OS PERFIS - TIPO {t}"
+            for t in range(1, 5)
+        ),
+        *(
+            f"PROVA OBJETIVA – CONHECIMENTOS ESPECÍFICOS – PERFIL {r} - TIPO {t}"
+            for r in PERFIS.values()
+            for t in range(1, 5)
+        ),
+        *(f"QUESTÃO DISCURSIVA – PERFIL {r}" for r in PERFIS.values()),
+    ],
+    "gabaritos": [
+        *(
+            (
+                f"GABARITO DEFINITIVO – CONHECIMENTOS GERAIS PARA TODOS OS PERFIS - TIPO {t}",
+                f"169_SEBRAE_26_PSE_1_CG1_{t:02d}",
+                f"PROVA OBJETIVA – CONHECIMENTOS GERAIS PARA TODOS OS PERFIS - TIPO {t}",
+            )
+            for t in range(1, 5)
+        ),
+        *(
+            (
+                f"GABARITO DEFINITIVO – CONHECIMENTOS ESPECÍFICOS – PERFIL {r} - TIPO {t}",
+                f"169_SEBRAE_26_PSE_1_{n:03d}_{t:02d}",
+                f"PROVA OBJETIVA – CONHECIMENTOS ESPECÍFICOS – PERFIL {r} - TIPO {t}",
+            )
+            for n, r in PERFIS.items()
+            for t in range(1, 5)
+        ),
+        *(
+            (
+                f"PADRÃO DEFINITIVO DE RESPOSTA - QUESTÃO DISCURSIVA – PERFIL {r}",
+                f"SEBRAE\nPERFIL {r}: ANALISTA TÉCNICO II – EDUCAÇÃO\n"
+                "Questão Discursiva – Estudo de Caso\nPADRÃO DE RESPOSTA DEFINITIVO",
+                f"QUESTÃO DISCURSIVA – PERFIL {r}",
+            )
+            for r in PERFIS.values()
+        ),
+    ],
+}
+
+
+def _pdf_padrao(path, texto: str):
+    doc = pymupdf.open()
+    doc.new_page().insert_text((50, 80), texto + "\nTexto do padrão.", fontsize=10)
+    doc.save(path)
+    return path
+
+
+def _montar_concurso_me(data_dir, slug: str, dados: dict, com_texto_gabarito: bool):
+    """PDFs do concurso em `data_dir` e a lista no formato de `coletar_pdfs_fila`.
+    O caderno não é lido pelo writer: basta um PDF vazio."""
+    orgao = data_dir / "2026" / "CEBRASPE" / slug
+    pdfs = []
+
+    def adicionar(pasta, nome, categoria, texto):
+        rel = orgao / pasta / nome
+        pdfs.append(
+            {
+                "arquivo": nome,
+                "categoria": categoria,
+                "path_relativo": str(rel.relative_to(data_dir)),
+                "url": f"https://cdn.cebraspe.org.br/concursos/{slug}/arquivos/{nome}",
+                "sha256": f"{slug}_{nome}",
+                "texto_link": texto,
+                "banca": "CEBRASPE",
+            }
+        )
+        return rel
+
+    (orgao / "Provas").mkdir(parents=True)
+    (orgao / "Gabaritos").mkdir()
+    for i, texto in enumerate(dados["cadernos"]):
+        adicionar("Provas", f"C{i:03d}.pdf", "prova", texto).write_bytes(
+            b"%PDF-1.4 caderno"
+        )
+    for i, (texto, conteudo, _) in enumerate(dados["gabaritos"]):
+        rel = adicionar(
+            "Gabaritos",
+            f"G{i:03d}.pdf",
+            "gabarito",
+            texto if com_texto_gabarito else None,
+        )
+        if texto.startswith("GABARITO"):
+            gerar_pdf_grade(rel, conteudo, {1: "A", 2: "D"}, rotulo_item="Questão")
+        else:
+            _pdf_padrao(rel, conteudo)
+    return pdfs
+
+
+@pytest.mark.skipif(
+    not _postgres_disponivel(), reason="scraper-cebraspe-db indisponível"
+)
+class TestLigacaoConcursosME:
+    conn = TestGravacaoPostgres.conn
+
+    # Sem texto no gabarito é o que o spider grava hoje (só o caderno tem
+    # texto); com texto é o do inventário, que pôs o gabarito objetivo do
+    # cargo 1 do SEFA_PR_25 na discursiva antes da S1.
+    @pytest.mark.parametrize("com_texto_gabarito", [False, True])
+    @pytest.mark.parametrize(
+        ("slug", "dados"),
+        [("SEFA_PR_25", SEFA_PR_25), ("SEBRAE_26_PSE_1", SEBRAE_26_PSE_1)],
+    )
+    def test_cada_gabarito_liga_ao_seu_caderno(
+        self, conn, tmp_path, slug, dados, com_texto_gabarito
+    ):
+        stats_writer.criar_schema(conn)
+        if dados["cargos"]:
+            resultado = _resultado(slug)
+            resultado["cargos"] = [
+                {"numero": n, "nome": f"CARGO {n}", "nivel": "superior"}
+                for n in range(1, dados["cargos"] + 1)
+            ]
+            stats_writer.gravar_concurso(conn, montar_carga_concurso(resultado))
+        pdfs = _montar_concurso_me(tmp_path, slug, dados, com_texto_gabarito)
+
+        contagem = stats_writer.gravar_provas_e_fila(conn, slug, pdfs, tmp_path)
+
+        assert contagem["gabaritos_sem_prova"] == 0
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT f.arquivo, p.texto_link FROM fila_extracao_questoes f "
+                "LEFT JOIN provas p ON p.id = f.prova_id WHERE f.categoria = 'gabarito'"
+            )
+            ligado = dict(cur.fetchall())
+        assert ligado == {
+            f"G{i:03d}.pdf": caderno
+            for i, (_, _, caderno) in enumerate(dados["gabaritos"])
+        }
+
+    def test_tipo_ausente_fica_sem_ligacao(self, conn, tmp_path):
+        # Grade do TIPO 1 sem o caderno do TIPO 1: não vai para outro TIPO.
+        dados = {
+            "cargos": 0,
+            "cadernos": SEBRAE_26_PSE_1["cadernos"][1:4],
+            "gabaritos": SEBRAE_26_PSE_1["gabaritos"][:1],
+        }
+        stats_writer.criar_schema(conn)
+        pdfs = _montar_concurso_me(tmp_path, "SEBRAE_26_PSE_1", dados, False)
+        contagem = stats_writer.gravar_provas_e_fila(
+            conn, "SEBRAE_26_PSE_1", pdfs, tmp_path
+        )
+        assert contagem["gabaritos_sem_prova"] == 1

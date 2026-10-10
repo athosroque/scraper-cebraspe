@@ -80,10 +80,19 @@ PADRAO_ESPECIFICA = re.compile(r"\bconhecimentos especificos\b")
 
 # Token do caderno no nome do arquivo: 094_PF_CB1_01, 072_STM_CG2_01,
 # 057_IBAMA_001_01, 094_PF_014_DISC, 094_PF_DISC_015.
-PADRAO_ID_BASICA = re.compile(r"_(C[BG]\d+)_\d{2}$", re.IGNORECASE)
+PADRAO_ID_BASICA = re.compile(r"_(C[BG]\d*)_\d{2}$", re.IGNORECASE)
 PADRAO_ID_ESPECIFICA = re.compile(r"_(\d{3})_\d{2}$")
 PADRAO_ID_DISCURSIVA = re.compile(r"_(\d{3})_DISC$|_DISC_(\d{3})$", re.IGNORECASE)
 PREFIXO_GABARITO = re.compile(r"^Gab_Definitivo_", re.IGNORECASE)
+
+# TIPO e perfil do caderno no texto já normalizado: "PERFIL I - TIPO 2"
+# (SEBRAE 2026), "PERFIL 1", "PERFIL PROFISSIONAL 1", "TIPO 5_ADAPTADA". O
+# TIPO casa o sufixo `_NN` do código da grade, e o perfil, o token `001`.
+PADRAO_TIPO_CADERNO = re.compile(r"\btipo (\d+)(?!\d)")
+PADRAO_PERFIL = re.compile(r"\bperfil (?:profissional )?(\d+|[ivx]+)\b")
+VALOR_ROMANO = {"i": 1, "v": 5, "x": 10}
+# Classificação de texto de gabarito que pode ir para a discursiva do cargo.
+TIPOS_LIGAM_DISCURSIVA = {"padrao_resposta", "discursiva"}
 
 # Único valor hoje: o projeto só coleta CEBRASPE. Vem do path
 # `data/<ano>/<BANCA>/<orgao>/` (ver `coletar_pdfs_fila`).
@@ -191,6 +200,30 @@ def classificar_prova_por_texto(texto: str) -> dict | None:
     return {"tipo": tipo, "cargos_numeros": extrair_cargos_do_texto(texto_norm)}
 
 
+def _romano_para_int(romano: str) -> int:
+    total = 0
+    for atual, seguinte in zip(romano, romano[1:] + " ", strict=True):
+        valor = VALOR_ROMANO[atual]
+        total += -valor if VALOR_ROMANO.get(seguinte, 0) > valor else valor
+    return total
+
+
+def marcas_caderno(texto: str | None) -> dict:
+    """`{"tipo_caderno", "perfil"}` do texto (link do caderno ou cabeçalho do
+    padrão de resposta); None no que o texto não traz."""
+    texto_norm = normalizar(texto or "")
+    m_tipo = PADRAO_TIPO_CADERNO.search(texto_norm)
+    m_perfil = PADRAO_PERFIL.search(texto_norm)
+    perfil = None
+    if m_perfil:
+        valor = m_perfil.group(1)
+        perfil = int(valor) if valor.isdigit() else _romano_para_int(valor)
+    return {
+        "tipo_caderno": int(m_tipo.group(1)) if m_tipo else None,
+        "perfil": perfil,
+    }
+
+
 def identificador_prova(nome_arquivo: str) -> str | None:
     """Token do caderno no nome do arquivo (`CB1`, `CG2`, `001`, `DISC_014`).
     None quando o nome não segue o padrão (ex.: arquivo com nome em hash)."""
@@ -223,9 +256,11 @@ def ligar_gabarito_por_conteudo(
 
     - grade: código do caderno impresso na grade (`167_CDNS_001_01`) -> token
       `001`/`CG1` -> prova com esse identificador; senão, específica cujo
-      único cargo é o número do token, ou a única básica do concurso;
+      único cargo (ou perfil) é o número do token, ou a única básica do
+      concurso. Caderno com TIPO no texto do link só recebe a grade cujo
+      sufixo `_NN` é esse TIPO (SEBRAE 2026: 4 cadernos por prova);
     - padrão de resposta: cargo do cabeçalho -> discursiva desse cargo; sem
-      cargo, a única discursiva do concurso;
+      cargo, a única discursiva do concurso, ou a do perfil do cabeçalho;
     - justificativa de alteração (documento do concurso) e PDF ilegível: sem
       ligação.
 
@@ -240,19 +275,26 @@ def ligar_gabarito_por_conteudo(
         )
         return None, None
 
+    candidatos: list[dict] = []
     if doc["tipo"] == gabarito_parser.TIPO_GRADE and doc["codigo_caderno"]:
         token = gabarito_parser.token_caderno(doc["codigo_caderno"])
-        objetivas = [p for p in provas if p["tipo"] != "discursiva"]
+        tipo = gabarito_parser.tipo_do_codigo(doc["codigo_caderno"])
+        objetivas = [
+            p
+            for p in provas
+            if p["tipo"] != "discursiva" and p.get("tipo_caderno") in (None, tipo)
+        ]
         candidatos = [p for p in objetivas if p["identificador"] == token]
         if not candidatos and token and token.isdigit():
+            numero = int(token)
             candidatos = [
                 p
                 for p in objetivas
-                if p["tipo"] == "objetiva_especifica" and p["cargos"] == [int(token)]
+                if p["tipo"] == "objetiva_especifica"
+                and (p["cargos"] == [numero] or p.get("perfil") == numero)
             ]
         if not candidatos and token and not token.isdigit():
-            basicas = [p for p in objetivas if p["tipo"] == "objetiva_basica"]
-            candidatos = basicas if len(basicas) == 1 else []
+            candidatos = [p for p in objetivas if p["tipo"] == "objetiva_basica"]
         if len(candidatos) == 1:
             return candidatos[0]["id"], doc["codigo_caderno"]
     elif doc["tipo"] == gabarito_parser.TIPO_PADRAO_RESPOSTA:
@@ -262,6 +304,17 @@ def ligar_gabarito_por_conteudo(
         discursivas = [p for p in provas if p["tipo"] == "discursiva"]
         if not cargos and len(discursivas) == 1:
             return discursivas[0]["id"], None
+        # Cabeçalho do padrão: "PERFIL I: ANALISTA TÉCNICO I" (SEBRAE 2026).
+        perfil = marcas_caderno(doc["padrao_resposta"].texto[:600])["perfil"]
+        if not cargos and perfil is not None:
+            candidatos = [p for p in discursivas if p.get("perfil") == perfil]
+            if len(candidatos) == 1:
+                return candidatos[0]["id"], None
+    if len(candidatos) > 1:
+        logger.warning(
+            f"[STATS] {pdf_path.name}: gabarito ambíguo entre "
+            f"{sorted(str(p.get('arquivo', p['id'])) for p in candidatos)}, sem ligação."
+        )
     return None, None
 
 
@@ -713,6 +766,7 @@ def gravar_provas_e_fila(
                         "tipo": classificacao["tipo"],
                         "identificador": identificador,
                         "cargos": classificacao["cargos_numeros"],
+                        **marcas_caderno(pdf["texto_link"]),
                     }
                 )
                 cur.execute(
@@ -746,9 +800,12 @@ def gravar_provas_e_fila(
             if categoria == "gabarito" and prova_id is None:
                 stem_prova = _stem_prova_do_gabarito(pdf["arquivo"])
                 prova_id = prova_por_stem.get(stem_prova) if stem_prova else None
+                # O gabarito objetivo "… CARGO 1" não vai para a discursiva:
+                # no SEFA_PR_25 a discursiva única cobre todos os cargos.
                 if (
                     prova_id is None
                     and classificacao
+                    and classificacao["tipo"] in TIPOS_LIGAM_DISCURSIVA
                     and len(classificacao["cargos_numeros"]) == 1
                 ):
                     prova_id = discursiva_por_cargo.get(
