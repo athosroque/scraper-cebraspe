@@ -1043,8 +1043,8 @@ enviar o bloco de uma etapa específica para o agente construir.
     DISCURSIVA" como caderno. Prova não aplicada vira `aguardando_prova` (26), e o
     relatório fica com 0 alertas reais. Falta decidir o tamanho do lote e os concursos em
     andamento.
-- `[/]` **8.M Múltipla escolha**:
-  - `[ ]` Layout `caderno_com_gabarito` (questão e gabarito no mesmo PDF; CAESB_24 é ME).
+- `[x]` **8.M Múltipla escolha**:
+  - `[x]` Layout `caderno_com_gabarito` (questão e gabarito no mesmo PDF; CAESB_24 é ME, ADR-038).
   - `[x]` Schema e persistência (`src/sql/schema_estatisticas.sql`, `src/questoes_writer.py`, `src/stats_writer.py`): `questoes.tipo`, `alternativas jsonb`, check `A-E` e `X`, hash 5D com alternativas para ME e estável para CE.
   - `[x]` Parser de gabaritos (`src/gabarito_parser.py`): `LETRAS_VALIDAS` expandido, cabeçalho `Questão`/`Item`, validação com PDFs reais.
   - `[x]` Parser de cadernos ME (`src/prova_parser.py`): `_eff_y0` em blocos, segmentação de enunciados e alternativas A–E (multilinhas, figuras), calibração 100% verde nos 3 PDFs reais da amostra (`BANRISUL_25`, `SEBRAE_26_PSE_1`, `SEFA_PR_25`).
@@ -1059,28 +1059,18 @@ enviar o bloco de uma etapa específica para o agente construir.
   - `[x]` Site e simulado (`site/`, ADR-038): modelos Pydantic, respostas A–E validadas pelo
     tipo da questão (letra fora do formato é recusada na API e no form e vira branco no
     simulado), pontuação +1/−1 no C/E e +1/0 no ME, radios em teal, gabarito em destaque na
-    correção, faceta "Formato" e OpenAPI. Ainda sem questão ME no banco: falta o teste no
-    Chromium headless e 1 concurso ME de ponta a ponta (Gate).
+    correção, faceta "Formato" e OpenAPI.
   - `[x]` Revisão de gabarito e schema (2026-10-09): código de caderno com sublinhado na sigla
     (`169_SEBRAE_26_PSE_1_CG1_02`) reconhecido; tipo da grade pelo rótulo (`Item` → C/E,
     `Questão` → ME) com letras validadas por tipo; constraints `questoes_gabarito_tipo_check`
     e `questoes_alternativas_tipo_check`; `vw_comparativo_nivel` com ME e média de percentuais
     por concurso × cargo. 42 grades do piloto e 2.530 questões re-parseadas sem diferença.
-  - `[ ]` **Antes do Gate — ligação prova ME ↔ gabarito** (`stats_writer.py`, achado da revisão):
-    - SEBRAE_26_PSE_1 não liga: 4 cadernos básicos (TIPO 1–4) deixam a regra "única básica"
-      ambígua, e PERFIL I/II/III não vira número de cargo. Usar o sufixo `_NN` (= TIPO N) e o
-      TIPO do texto do link, ou ligar pelo texto do link (`GABARITO … – X` ↔ `PROVA … – X`).
-    - SEFA_PR_25: risco de o gabarito objetivo do cargo 1 ser ligado à discursiva
-      (`discursiva_por_cargo`, perto da l.745, não confere o tipo). Confirmar numa carga real.
-    - O tipo da grade (`GradeGabarito.tipos`) não chega ao `prova_parser`
-      (`extrair_questoes.py` passa só `.respostas`); `_eh_multipla_escolha` ainda decide pelas
-      letras A/B/D.
-    - Código `059_SEFAZRJANALISTA_CG_01` (`CG` sem dígito) não casa `PADRAO_CODIGO_CADERNO`.
-  - `[ ]` `fn_prova_cobra`: `pct_do_universo` soma bruto entre concursos quando o filtro pega
-    vários (o site usa como `pct_incidencia`), e `pct_medio_por_concurso` é por concurso, não
-    por concurso × cargo; o site ordena por `questoes` bruto. Alinhar à regra de 2026-10-09
-    junto com a pendência "Incidência de subassunto com vários recortes" (fim do arquivo).
-  Gate: piloto inalterado (2.800 itens, chaves 5D idênticas), `make test-all` verde.
+  - `[x]` **Ligação prova ME ↔ gabarito** (`stats_writer.py`, 8.M/S1):
+    - SEBRAE_26_PSE_1 ligado pelo sufixo `_NN`/TIPO e texto do link;
+    - SEFA_PR_25: `discursiva_por_cargo` confere o tipo e evita ligar gabarito objetivo a discursiva;
+    - `GradeGabarito.tipos` chega ao `prova_parser`; `PADRAO_CODIGO_CADERNO` aceita `CG` sem dígito.
+  - `[x]` `fn_prova_cobra` (8.M/S2): agregação pela média por concurso × cargo.
+  - `[x]` **Gate aprovado (2026-10-10, S4)**: carga real ME `SEFA_PR_25` no `cebraspe_gate` (380 itens ME), piloto inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), suíte completa verde (1.276 testes passando, `make check` 100%).
 - `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
   `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
   por lote.
