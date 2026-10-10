@@ -649,3 +649,37 @@ confere em schema temporário: com as grades reais e os textos do inventário
 para o concurso novo, e com a carga do piloto comparada ao schema público.
 **Custo do aprendizado:** ~1h (reprodução com as 27 grades reais e conferência
 do piloto em schema temporário).
+
+### [tags: prova-parser, gabarito-parser, caderno-com-gabarito, multipla-escolha, falha-silenciosa, cebraspe]
+**Sintoma:** na 8.M/S3, o caderno "PROVA E GABARITO" (`caderno_com_gabarito`)
+saía `sucesso` com 37 de 40 questões (CAESB_24 P2), 86 de 100 (SEPLAD_DF_22) e
+19 de 20 (AGSUS_26_RD), e a Q38 do CAESB_24 014 tinha a justificativa da
+alternativa E no texto. Num lote de 90 PDFs, um processo morreu com
+`MemoryError`.
+**Causa:**
+1. Não há grade: a resposta vem impressa em cada questão, em 5 formatos
+   ("JUSTIFICATIVA - Certo ... <FimJust>", "||A|| - Incorreta ... */",
+   "1 J2418111 - ERRADO | ...", tabela "ITEM N / GABARITO:" e "CORRETA"/"ERRADA"
+   por alternativa), com variações: fecho ausente, `||E|| Incorreta.` sem
+   travessão, veredito depois do tópico ("..._INCORRETA."), pedaço de fórmula
+   fora da ordem de leitura.
+2. A conferência itens × gabarito (`marcadores_fora_do_gabarito*`) só olha as
+   pontas da faixa, porque a grade separada nunca tem buraco. Com a grade lida
+   do caderno, a questão sem resposta no meio era engolida pela anterior.
+3. Uma justificativa ME lida até a D (4 entradas, contagem válida) deixava a
+   entrada E no texto da alternativa sem erro.
+4. Uma linha de tabela com número enorme virou "item", e o cálculo de buracos
+   fez `range(1, 10**N)`.
+**Solução:** `prova_parser.separar_gabarito_embutido` tira as justificativas
+antes da segmentação e devolve a grade; qualquer irregularidade (buraco,
+resposta ilegível ou repetida, justificativa sem fim) vira o alerta bloqueante
+`gabarito_embutido_irregular`, e depois da segmentação há mais duas travas:
+marca residual (`JUSTIFICATIVA`, `||A||`, `<FimJust>`) no texto e entradas ≠
+alternativas (`justificativa_no_texto`, `justificativa_incompleta`). Buraco se
+calcula pela diferença entre vizinhos, e número de item tem teto. O preliminar
+impresso bateu com o definitivo em 2.590 de 2.725 questões (108 anuladas e 27
+alteradas depois): o definitivo à parte tem de prevalecer. Formato novo de
+gabarito embutido se valida num lote de PDFs reais contando "sucesso com marca
+no texto", não só a amostra.
+**Custo do aprendizado:** ~2h (5 formatos, lote de 98 PDFs e comparação com 52
+definitivos).

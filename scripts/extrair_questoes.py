@@ -18,6 +18,10 @@ Gabarito sem caderno: justificativa de alteração (documento do concurso) é
 `concluido` com `tipo_documento = 'justificativa'`; grade/padrão sem caderno
 ligado é `erro`.
 
+Caderno sem grade ligada que traz as respostas impressas ("PROVA E
+GABARITO", 8.M/S3) usa esse gabarito (`prova_parser.ler_gabarito_embutido`),
+com o alerta `gabarito_do_proprio_caderno`.
+
 Gatilhos de processamento:
 - `pendente`: cadernos com linhas em status pendente ou deixadas em processando;
 - `gabaritos_mudaram`: cadernos cuja composição de arquivos/gabaritos mudou
@@ -247,6 +251,23 @@ def processar_caderno(
             escolhida, alertas_grade = _escolher_documento(
                 docs, prova, gabarito_parser.TIPO_GRADE
             )
+            if escolhida is None:
+                # Caderno com gabarito ("PROVA E GABARITO"): sem grade ligada,
+                # liga-se a si mesmo. A grade separada, quando existe, é o
+                # definitivo e vem antes (o impresso nas justificativas é o
+                # preliminar).
+                embutido = prova_parser.ler_gabarito_embutido(pdf)
+                if embutido is not None:
+                    escolhida, alertas_grade = _escolher_documento(
+                        [(linha_prova, embutido)], prova, gabarito_parser.TIPO_GRADE
+                    )
+                    alertas_grade.append(
+                        {
+                            "tipo": "gabarito_do_proprio_caderno",
+                            "severidade": prova_parser.SEVERIDADE_INFORMATIVO,
+                            "formato": embutido["formato"],
+                        }
+                    )
             grade = escolhida[1]["grade"] if escolhida else None
             dir_figuras = pdf.parent / "figuras"
             resultado, auditoria = prova_parser.extrair_caderno_objetivo(

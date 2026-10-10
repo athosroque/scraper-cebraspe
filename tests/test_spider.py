@@ -156,6 +156,37 @@ class TestMapPdfLinks:
         assert len(pdf_map["provas"]) == 1
         assert pdf_map["provas"][0]["texto"] == "PROVA OBJETIVA – CONHECIMENTOS BÁSICOS"
 
+    def test_caderno_com_gabarito_vai_para_provas_com_texto(self, monkeypatch):
+        # "PROVA ... E GABARITO ..." é caderno (8.M/S3): antes caía em
+        # gabaritos, sem texto do link, e ficava fora da fila.
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "PROVA OBJETIVA (P1) E GABARITO PRELIMINAR COM JUSTIFICATIVAS - "
+                    "CARGOS 1 AO 18 (ATUALIZADO)",
+                    "https://cdn.cebraspe.org.br/concursos/CAESB_24/arquivos/cg1.pdf",
+                ),
+                _make_link(
+                    "PROVA E GABARITO DEFINITIVO – CONHECIMENTOS BÁSICOS",
+                    "https://cdn.cebraspe.org.br/concursos/AGSUS_26_RD/arquivos/cb.pdf",
+                ),
+                _make_link(
+                    "GABARITO DEFINITIVO – CONHECIMENTOS GERAIS PARA OS CARGOS 1 A 18",
+                    "https://cdn.cebraspe.org.br/concursos/CAESB_24/arquivos/gab.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert [p["url"].rsplit("/", 1)[1] for p in pdf_map["provas"]] == [
+            "cg1.pdf",
+            "cb.pdf",
+        ]
+        assert pdf_map["provas"][0]["texto"].startswith(
+            "PROVA OBJETIVA (P1) E GABARITO"
+        )
+        assert [u.rsplit("/", 1)[1] for u in pdf_map["gabaritos"]] == ["gab.pdf"]
+
     def test_edital_reabertura_nao_vai_para_editais_abertura(self, monkeypatch):
         spider, page = self._spider_with_page(
             monkeypatch,
