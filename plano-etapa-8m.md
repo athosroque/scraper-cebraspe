@@ -15,6 +15,30 @@ Tornar o pipeline, o banco de dados e a interface web totalmente compatíveis co
   - Feito: ADR-038 (o ADR-037 é o do escopo do site no inventário), `make test-all` e ruff verdes.
   - Falta: ligação prova ME ↔ gabarito (`task.md`), carga de 1 concurso ME e a validação dele no site; relatório de conferência do piloto.
 
+## Sessões restantes (plano de 2026-10-10)
+Ordem e paralelismo: S1 ∥ S2 → S3 → S4. S1 e S3 mexem nos mesmos parsers; S4 valida o
+código final, por isso vem por último.
+
+- [ ] **S1 — Ligação prova ME ↔ gabarito** (`src/stats_writer.py`, `scripts/extrair_questoes.py`,
+  `src/gabarito_parser.py`, `src/prova_parser.py`):
+  - SEBRAE_26_PSE_1: 4 básicos (TIPO 1–4) e PERFIL I/II/III → ligar pelo sufixo `_NN`/TIPO ou
+    pelo texto do link (`GABARITO … – X` ↔ `PROVA … – X`);
+  - SEFA_PR_25: `discursiva_por_cargo` passa a conferir o tipo (objetivo ≠ discursivo);
+  - `GradeGabarito.tipos` chega ao `prova_parser`; `_eh_multipla_escolha` decide pelo tipo da
+    grade quando houver, e pelas letras só como fallback;
+  - `PADRAO_CODIGO_CADERNO` aceita `CG` sem dígito (`059_SEFAZRJANALISTA_CG_01`).
+  → Verify: testes com os casos acima; piloto C/E sem diferença nas ligações e nas grades.
+- [ ] **S2 — `fn_prova_cobra` com média por concurso × cargo** (`src/sql/schema_estatisticas.sql`,
+  serviços de estatística do site): `pct_do_universo` deixa de somar bruto entre concursos;
+  `pct_medio_por_concurso` passa a ser por concurso × cargo; o site ordena pela média.
+  → Verify: testes de view em schema temporário; exemplos da 5E/5F.4 conferidos.
+- [ ] **S3 — Layout `caderno_com_gabarito`** (questão e gabarito no mesmo PDF; CAESB_24 é ME):
+  extrair a grade do próprio caderno e ligar a ele. → Verify: teste com PDF real da amostra.
+- [ ] **S4 — Gate**: carga real de 1 concurso ME (download → extração → banco) numa **cópia do
+  banco** (`cebraspe_gate`), site no Chromium headless (resolver, corrigir, simulado ME),
+  relatório de conferência do piloto (2.800 itens, 129 anuladas, 3.029 apontamentos, chaves 5D).
+  → Verify: `make test-all` verde e relatório sem divergência.
+
 ## Done When
 - [x] Os 3 cadernos ME reais da amostra são parseados com 100% de sucesso (enunciado + alternativas A–E).
 - [ ] O banco e o site suportam responder e pontuar questões tanto de Certo/Errado quanto de Múltipla Escolha (código e testes prontos; falta conferir com um concurso ME real carregado).
