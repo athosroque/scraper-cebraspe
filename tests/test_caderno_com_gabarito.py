@@ -594,6 +594,31 @@ class TestClassificacaoNaFila:
                 "001_XX_CB1_01.pdf",
                 {"tipo": "objetiva_basica", "cargos_numeros": [1, 2]},
             ),
+            # Link administrativo que cita prova cai em Provas/ pelo spider e
+            # viraria uma discursiva de todos os cargos (Gate da 8.M, SEFA_PR_25).
+            (
+                "MOVIMENTAÇÃO FINANCEIRA APÓS A ETAPA: APLICAÇÃO PROVA OBJETIVA E "
+                "DISCURSIVA",
+                "0EB28D50ABE3EE84.pdf",
+                None,
+            ),
+            ("Comunicado - Provas discursivas", "1A2B3C4D.pdf", None),
+            (
+                "Comunicado - Realização da prova objetiva de conhecimentos básicos",
+                "1A2B3C4E.pdf",
+                None,
+            ),
+            # O padrão de resposta e a discursiva seguem como antes.
+            (
+                "PADRÃO DEFINITIVO DE RESPOSTA – PROVA DISCURSIVA",
+                "9DE5A2A0.pdf",
+                {"tipo": "padrao_resposta", "cargos_numeros": []},
+            ),
+            (
+                "PROVA DISCURSIVA",
+                "C755AC0E.pdf",
+                {"tipo": "discursiva", "cargos_numeros": []},
+            ),
         ],
     )
     def test_classificar_prova(self, texto, arquivo, esperado):

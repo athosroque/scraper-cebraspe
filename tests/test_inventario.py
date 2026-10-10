@@ -51,6 +51,9 @@ from src.inventario import (
 
 PROJETO_DIR = Path(__file__).resolve().parent.parent
 PILOTO_DIR = PROJETO_DIR / "data" / "2025" / "CEBRASPE"
+# Órgãos do piloto: outro concurso de 2025 baixado na mesma pasta (SEFA_PR no
+# Gate da 8.M) não entra na regressão do piloto.
+ORGAOS_PILOTO = ("CD", "IBAMA", "PF", "STM", "TCU")
 AMOSTRA_DIR_TESTE = PROJETO_DIR / "data" / "inventario_amostra"
 SEM_DADOS_PILOTO = (
     "data/2025/CEBRASPE ausente (PDFs e manifestos do piloto são gitignored; "
@@ -601,7 +604,11 @@ class TestManifestosPiloto2025:
         return PILOTO_DIR
 
     def test_classificacao_todos_manifestos_piloto(self, pilot_dir):
-        manifest_files = sorted(pilot_dir.glob("*/provas_texto_link.json"))
+        manifest_files = sorted(
+            mf
+            for mf in pilot_dir.glob("*/provas_texto_link.json")
+            if mf.parent.name in ORGAOS_PILOTO
+        )
         assert len(manifest_files) == 5, (
             f"Esperados 5 manifestos, encontrados: {manifest_files}"
         )
@@ -914,6 +921,8 @@ class TestFormatoCadernosReais:
             pytest.skip(SEM_DADOS_PILOTO)
         formatos = {}
         for mf in sorted(PILOTO_DIR.glob("*/provas_texto_link.json")):
+            if mf.parent.name not in ORGAOS_PILOTO:
+                continue
             textos = json.loads(mf.read_text(encoding="utf-8"))
             for arquivo, texto in textos.items():
                 if classificar_link_pdf(texto)["tipo"] == TIPO_CADERNO_OBJETIVO:
