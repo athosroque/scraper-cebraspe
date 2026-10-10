@@ -189,8 +189,9 @@ def prioridades(usuario_id: int, limite: int = 10) -> list[Prioridade]:
     As respostas (role `site_app`) e a incidência (`fn_prova_cobra`, role
     `site_leitura`) são lidas em separado e cruzadas aqui pelo `no_id`:
     nunca um JOIN entre `app.resposta` e as views. A incidência é o
-    `pct_do_universo`: % médio do subassunto na prova, entre as provas
-    (concurso × cargo), comparável entre disciplinas.
+    `pct_do_universo`: % médio do subassunto na prova (média das provas
+    distintas de cada concurso e depois entre os concursos), comparável entre
+    disciplinas.
     """
     candidatos = [
         (no, caminho)

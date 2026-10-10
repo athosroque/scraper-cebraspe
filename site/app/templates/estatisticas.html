@@ -49,7 +49,7 @@
     {% if aba == "prova" and linhas %}{{ c.selo(linhas[0].total_universo|num ~ " questões válidas no universo") }}{% endif %}
 </div>
 <p class="mb-4 text-xs text-slate-500">
-{% if aba == "prova" %}Ordenado pelo <strong>% da prova</strong>: para cada prova (concurso × cargo) do recorte, a fatia das questões dela que caiu no nó; o número mostrado é a média dessas fatias, com o mesmo peso para cada prova (a prova sem questão no nó entra com 0%). <strong>% da disciplina</strong>: a mesma média, mas da fatia do nó dentro da disciplina, entre as provas que têm a disciplina. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez na contagem de questões. Anuladas ficam fora.
+{% if aba == "prova" %}Ordenado pelo <strong>% da prova</strong>: para cada prova do recorte, a fatia das questões dela que caiu no nó; o número mostrado é a média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1 (a prova ou o concurso sem questão no nó entra com 0%). <strong>% da disciplina</strong>: a mesma média, mas da fatia do nó dentro da disciplina, entre as provas que têm a disciplina. A questão conta no nó em que foi classificada e nos nós acima dele; a questão básica aplicada a vários cargos conta uma vez na contagem de questões. Anuladas ficam fora.
 {% else %}Itens de edital distintos por nó, só de concursos com revisão aprovada. O item sobe para o assunto e a disciplina acima dele; o item básico vale para cada cargo do nível.{% endif %}
 </p>
 {% if linhas %}

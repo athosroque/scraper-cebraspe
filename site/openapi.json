@@ -1073,7 +1073,7 @@
           "Conta"
         ],
         "summary": "O que estudar agora",
-        "description": "Subassuntos com pelo menos 2 questões respondidas, ordenados por incidência na prova (`fn_prova_cobra`, % médio na prova por concurso × cargo) × taxa de erro do usuário. Respostas e incidência são lidas em separado e cruzadas no serviço.",
+        "description": "Subassuntos com pelo menos 2 questões respondidas, ordenados por incidência na prova (`fn_prova_cobra`, % médio na prova: média das provas distintas de cada concurso e depois entre os concursos) × taxa de erro do usuário. Respostas e incidência são lidas em separado e cruzadas no serviço.",
         "operationId": "prioridades_api_v1_eu_prioridades_get",
         "security": [
           {
@@ -1509,7 +1509,7 @@
           "Estatísticas"
         ],
         "summary": "O que mais cai na prova",
-        "description": "Ranking de nós pelo % médio na prova (`fn_prova_cobra`): para cada prova (concurso × cargo) do recorte, a fatia das questões dela no nó; a média dá peso igual a cada prova (nunca soma bruta entre provas). A questão sobe a árvore e a básica aplicada a vários cargos conta uma vez em `questoes`.",
+        "description": "Ranking de nós pelo % médio na prova (`fn_prova_cobra`): para cada prova do recorte, a fatia das questões dela no nó; o número é a média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1 (nunca soma bruta entre provas). A questão sobe a árvore e a básica aplicada a vários cargos conta uma vez em `questoes`.",
         "operationId": "prova_cobra_api_v1_estatisticas_prova_cobra_get",
         "parameters": [
           {
@@ -1893,7 +1893,7 @@
           "Disciplinas"
         ],
         "summary": "Lista as disciplinas com o volume de questões",
-        "description": "Disciplinas da árvore mestre ativa que têm questão objetiva utilizável, com o total de questões válidas distintas (a contagem sobe a árvore, anuladas fora) e o % de incidência: média, entre as provas (concurso × cargo), da fatia da prova que é da disciplina. Maior incidência primeiro.",
+        "description": "Disciplinas da árvore mestre ativa que têm questão objetiva utilizável, com o total de questões válidas distintas (a contagem sobe a árvore, anuladas fora) e o % de incidência: média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1, da fatia da prova que é da disciplina. Maior incidência primeiro.",
         "operationId": "listar_materias_api_v1_materias_get",
         "responses": {
           "200": {
@@ -1919,7 +1919,7 @@
           "Disciplinas"
         ],
         "summary": "Resumo de uma disciplina",
-        "description": "Resumo da disciplina e os subassuntos que mais caem (`fn_prova_cobra`, pelo % médio na prova por concurso × cargo) no recorte de concurso, cargo e nível. O cargo só vale junto com o concurso.",
+        "description": "Resumo da disciplina e os subassuntos que mais caem (`fn_prova_cobra`, pelo % médio na prova: média das provas distintas de cada concurso e depois entre os concursos, cada concurso pesando 1) no recorte de concurso, cargo e nível. O cargo só vale junto com o concurso.",
         "operationId": "detalhe_materia_api_v1_materias__materia_id__get",
         "parameters": [
           {
@@ -3229,7 +3229,7 @@
           "posicao": {
             "type": "integer",
             "title": "Posicao",
-            "description": "Posição no ranking da disciplina (1 = o que mais cai), pelo % médio na prova entre as provas (concurso × cargo, `pct_do_universo` de `fn_prova_cobra`, sem filtros); empate desfeito pelo % na disciplina e pelas questões distintas."
+            "description": "Posição no ranking da disciplina (1 = o que mais cai), pelo % médio na prova (média das provas distintas de cada concurso e depois entre os concursos, `pct_do_universo` de `fn_prova_cobra`, sem filtros); empate desfeito pelo % na disciplina e pelas questões distintas."
           },
           "total_subassuntos": {
             "type": "integer",
@@ -3638,12 +3638,12 @@
           "pct_do_universo": {
             "type": "number",
             "title": "Pct Do Universo",
-            "description": "% médio do nó na prova: para cada prova (concurso × cargo) do recorte, questões do nó / questões da prova × 100; média com peso igual por prova, a que não tem questão no nó entra com 0. Nunca soma bruta entre provas. Com filtro de uma prova só, é `questoes` / `total_universo` × 100. É a ordem do ranking."
+            "description": "% médio do nó na prova: para cada prova do recorte, questões do nó / questões da prova × 100; média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1; a prova ou o concurso sem questão no nó entra com 0. Nunca soma bruta entre provas. Com filtro de uma prova só, é `questoes` / `total_universo` × 100. É a ordem do ranking."
           },
           "pct_medio_por_concurso": {
             "type": "number",
             "title": "Pct Medio Por Concurso",
-            "description": "% médio do nó dentro da disciplina (subassunto/assunto) ou da prova (disciplina), por prova (concurso × cargo) e com peso igual por prova; entram as provas que têm a disciplina. O nome é histórico: o grão é concurso × cargo."
+            "description": "% médio do nó dentro da disciplina (subassunto/assunto) ou da prova (disciplina), pela mesma média em dois níveis (provas distintas de cada concurso e depois entre os concursos, cada concurso pesando 1); entram as provas que têm a disciplina e os concursos com ao menos uma delas."
           }
         },
         "type": "object",
@@ -3681,7 +3681,7 @@
           "pct_incidencia": {
             "type": "number",
             "title": "Pct Incidencia",
-            "description": "% médio da disciplina na prova: para cada prova (concurso × cargo), questões da disciplina / questões da prova; média com peso igual por prova (`pct_do_universo` de `fn_prova_cobra`). Ordena a lista. A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
+            "description": "% médio da disciplina na prova: para cada prova, questões da disciplina / questões da prova; média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1 (`pct_do_universo` de `fn_prova_cobra`). Ordena a lista. A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
           },
           "nome_de_cargo": {
             "type": "boolean",
@@ -3701,7 +3701,7 @@
           "pct_do_universo": {
             "type": "number",
             "title": "Pct Do Universo",
-            "description": "% médio da disciplina na prova entre as provas (concurso × cargo) sob os filtros, com peso igual por prova."
+            "description": "% médio da disciplina na prova sob os filtros: média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1."
           },
           "itens_edital": {
             "type": "integer",
@@ -3753,7 +3753,7 @@
           "pct_incidencia": {
             "type": "number",
             "title": "Pct Incidencia",
-            "description": "% médio da disciplina na prova: para cada prova (concurso × cargo), questões da disciplina / questões da prova; média com peso igual por prova (`pct_do_universo` de `fn_prova_cobra`). Ordena a lista. A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
+            "description": "% médio da disciplina na prova: para cada prova, questões da disciplina / questões da prova; média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1 (`pct_do_universo` de `fn_prova_cobra`). Ordena a lista. A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
           },
           "nome_de_cargo": {
             "type": "boolean",
@@ -4232,7 +4232,7 @@
           "incidencia": {
             "type": "number",
             "title": "Incidencia",
-            "description": "% médio do subassunto na prova: para cada prova (concurso × cargo), questões do subassunto / questões da prova; média com peso igual por prova (`pct_do_universo` de `fn_prova_cobra`, sem filtros). 0 se o nó não aparece no ranking."
+            "description": "% médio do subassunto na prova: para cada prova, questões do subassunto / questões da prova; média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1 (`pct_do_universo` de `fn_prova_cobra`, sem filtros). 0 se o nó não aparece no ranking."
           },
           "prioridade": {
             "type": "number",

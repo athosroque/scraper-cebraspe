@@ -54,7 +54,7 @@ def test_top10_lingua_portuguesa_por_nivel(cliente, nivel):
 
 
 def test_ranking_ordena_pelo_pct_medio_e_nao_pela_contagem(cliente):
-    """Regra de 2026-10-09: o ranking segue o % médio por prova (concurso × cargo)."""
+    """Regra de 2026-10-09: o ranking segue o % médio em dois níveis (ADR-039)."""
     for params in ({}, {"nivel": "superior"}, {"nivel_alvo": "materia"}):
         api = cliente.get(
             "/api/v1/estatisticas/prova-cobra", params={**params, "limite": 50}

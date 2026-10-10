@@ -10,9 +10,11 @@ Cobre:
 - Exclusão de anuladas do total/denominadores e presença na coluna `anuladas`.
 - Exclusão de não utilizáveis e concursos pendentes de revisão.
 - Resolução de nós fundidos para o nó efetivo.
-- `fn_prova_cobra`: percentuais como média por prova (concurso × cargo), com
-  peso igual por prova e nunca soma bruta; prova única igual à conta direta.
-- Proporção Certo/Errado e comparativo Médio × Superior.
+- `fn_prova_cobra`: percentuais em dois níveis (ADR-039): média das provas
+  distintas de cada concurso e depois entre os concursos, com cada concurso
+  pesando 1 e nunca soma bruta; cargos com a mesma prova contam uma vez
+  ("prova distinta", 8.M.1); prova única igual à conta direta.
+- Proporção Certo/Errado e comparativo Médio × Superior (mesma regra por nível).
 """
 
 import uuid
@@ -495,15 +497,17 @@ class TestEstatisticasViews:
             assert res.get("A-ORT") == 1
 
     def test_pct_medio_por_concurso_pesos_iguais(self, conn, dados):
-        """pct_medio_por_concurso: média dos % de cada prova (concurso × cargo), peso igual."""
+        """pct_medio_por_concurso: média das provas de cada concurso e depois entre concursos."""
         with conn.cursor() as cur:
             # S-ACENT dentro de Língua Portuguesa, por prova (concurso × cargo):
             # CONC_A cargo 1: LP = q1, q4, q6 (3); S-ACENT = q1, q4 -> 66,67%
             # CONC_A cargo 3: LP = q1 (= q7, canônica), q4 (2); S-ACENT = 2 -> 100%
             # CONC_A cargo 2: LP = q10 (1, nó fundido em A-ORT); S-ACENT = 0 -> 0%
             # CONC_B cargo 1: LP = q8 (1); S-ACENT = 1 -> 100%
-            # Média: (66,67 + 100 + 0 + 100) / 4 = 66,67%.
-            # (Por concurso seria (50 + 100) / 2 = 75%; bruto, 3 / 5 = 60%.)
+            # Os 3 cargos do CONC_A têm provas diferentes (3 provas distintas):
+            # CONC_A = (66,67 + 100 + 0) / 3 = 55,56%; CONC_B = 100%.
+            # Média entre concursos: (55,56 + 100) / 2 = 77,78%.
+            # (Por prova seria 66,67%; bruto, 3 / 5 = 60%.)
             cur.execute(
                 """
                 SELECT DISTINCT no_id, pct_medio_por_concurso
@@ -513,7 +517,7 @@ class TestEstatisticasViews:
             )
             no_id, pct_medio = cur.fetchone()
             assert no_id == "S-ACENT"
-            assert pct_medio == Decimal("66.67")
+            assert pct_medio == Decimal("77.78")
 
     def test_certo_errado_por_no(self, conn, dados):
         """vw_certo_errado_por_no computa proporção C/E sobre válidas e anulações sobre total."""
@@ -687,7 +691,7 @@ class TestEstatisticasViews:
             assert total > 0
 
     def test_fn_prova_cobra_pct_medio_respeita_filtro(self, conn, dados):
-        """Com filtro de concurso, a média usa só as provas daquele concurso."""
+        """Com filtro de concurso, a média usa só as provas distintas daquele concurso."""
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -704,7 +708,7 @@ class TestEstatisticasViews:
                 WHERE no_id = 'S-ACENT'
                 """
             )
-            assert cur.fetchone()[0] == Decimal("66.67")
+            assert cur.fetchone()[0] == Decimal("77.78")  # (55,56 + 100) / 2
             # CONC_A: cargos 1, 2 e 3 -> (66,67 + 0 + 100) / 3.
             cur.execute(
                 """
@@ -716,19 +720,21 @@ class TestEstatisticasViews:
             assert cur.fetchone()[0] == Decimal("55.56")
 
     def test_fn_prova_cobra_pct_do_universo_e_media_por_prova(self, conn, dados):
-        """Entre provas, `pct_do_universo` é a média dos % por concurso × cargo, nunca a soma bruta."""
+        """`pct_do_universo` é a média em dois níveis (provas -> concurso -> concursos), nunca a soma bruta."""
         with conn.cursor() as cur:
             # % de S-ACENT na prova inteira, por concurso × cargo:
             # CONC_A c1: 2 / 3 (q1, q4, q6) = 66,67%; c3: 2 / 2 = 100%;
             # c2: 0 / 1 (q10) = 0%; CONC_B c1: 1 / 2 (q8, q9) = 50%.
-            # Média = 216,67 / 4 = 54,17%. A soma bruta daria 3 / 6 = 50%.
+            # CONC_A = (66,67 + 100 + 0) / 3 = 55,56% (3 provas distintas);
+            # CONC_B = 50%. Média entre concursos = 52,78%. Por prova seria
+            # 54,17%; a soma bruta daria 3 / 6 = 50%.
             cur.execute(
                 """
                 SELECT questoes, total_universo, pct_do_universo
                 FROM fn_prova_cobra('subassunto') WHERE no_id = 'S-ACENT'
                 """
             )
-            assert cur.fetchone() == (3, 6, Decimal("54.17"))
+            assert cur.fetchone() == (3, 6, Decimal("52.78"))
             # Só CONC_A (3 cargos): (66,67 + 0 + 100) / 3; bruto daria 2 / 4.
             cur.execute(
                 """
@@ -739,23 +745,25 @@ class TestEstatisticasViews:
             )
             assert cur.fetchone() == (2, Decimal("55.56"))
             # Matéria: % da prova e % médio coincidem (o escopo é a prova).
-            # LP: c1 3/3, c3 2/2, c2 1/1, CONC_B 1/2 -> 87,50% (bruto: 5/6).
+            # LP: CONC_A (3/3, 2/2, 1/1) = 100%, CONC_B 1/2 = 50% -> 75,00%
+            # (por prova 87,50%; bruto: 5/6).
             cur.execute(
                 """
                 SELECT questoes, pct_do_universo, pct_medio_por_concurso
                 FROM fn_prova_cobra('materia') WHERE no_id = 'M-LP'
                 """
             )
-            assert cur.fetchone() == (5, Decimal("87.50"), Decimal("87.50"))
+            assert cur.fetchone() == (5, Decimal("75.00"), Decimal("75.00"))
             # Nó que só uma prova cobra: as outras entram com 0%.
-            # S-HIFEN: q4 está em CONC_A c1 (1/3) e c3 (1/2) -> (33,33 + 50) / 4.
+            # S-HIFEN: q4 está em CONC_A c1 (1/3) e c3 (1/2), c2 não cobra:
+            # CONC_A = (33,33 + 50 + 0) / 3 = 27,78%; CONC_B 0 -> 13,89%.
             cur.execute(
                 """
                 SELECT pct_do_universo FROM fn_prova_cobra('subassunto')
                 WHERE no_id = 'S-HIFEN'
                 """
             )
-            assert cur.fetchone()[0] == Decimal("20.83")
+            assert cur.fetchone()[0] == Decimal("13.89")
 
     def test_fn_prova_cobra_prova_unica_igual_a_conta_direta(self, conn, dados):
         """Filtro de um só concurso × cargo: média de 1 termo = questões / total."""
@@ -788,6 +796,407 @@ class TestEstatisticasViews:
                 """
             )
             assert cur.fetchone() == (2, 3, Decimal("66.67"), Decimal("66.67"))
+
+    # --- Prova distinta (Etapa 8.M.1, ADR-039) ---------------------------------
+
+    @staticmethod
+    def _cenario(cur, concursos):
+        """Monta concursos mínimos com árvore própria, sem usar a fixture `dados`.
+
+        `concursos` mapeia slug -> {"cargos": {numero: nivel}, "cadernos":
+        [(id, tipo, [cargos], [(enunciado, no_id, anulada), ...]), ...]}.
+        O mesmo enunciado em dois cadernos do concurso é a mesma questão
+        canônica (como o básico repetido do CEBRASPE).
+        """
+        cur.execute("INSERT INTO dim_orgao (sigla) VALUES ('PD') RETURNING id")
+        orgao_id = cur.fetchone()[0]
+        cur.execute("INSERT INTO dim_ano (ano) VALUES (2025)")
+        cur.execute(
+            """
+            INSERT INTO no_arvore (id, nivel, nome, pai_id, origem, status) VALUES
+            ('M-LP', 'materia', 'Língua Portuguesa', NULL, 'humano', 'ativo'),
+            ('A-LP', 'assunto', 'Ortografia', 'M-LP', 'humano', 'ativo'),
+            ('S-LP1', 'subassunto', 'Acentuação', 'A-LP', 'humano', 'ativo'),
+            ('S-LP2', 'subassunto', 'Hífen', 'A-LP', 'humano', 'ativo'),
+            ('M-DIR', 'materia', 'Direito', NULL, 'humano', 'ativo'),
+            ('A-DIR', 'assunto', 'Princípios', 'M-DIR', 'humano', 'ativo'),
+            ('S-DIR1', 'subassunto', 'Legalidade', 'A-DIR', 'humano', 'ativo')
+            """
+        )
+        cur.execute(
+            "INSERT INTO dim_cargo (chave, nome) VALUES ('cargo_pd', 'CARGO') RETURNING id"
+        )
+        dim_cargo_id = cur.fetchone()[0]
+        for slug, spec in concursos.items():
+            cur.execute(
+                """
+                INSERT INTO concursos (slug, orgao_id, ano, banca, status_revisao)
+                VALUES (%s, %s, 2025, 'CEBRASPE', 'aprovado') RETURNING id
+                """,
+                (slug, orgao_id),
+            )
+            concurso_id = cur.fetchone()[0]
+            cargos = {}
+            for numero, nivel in spec["cargos"].items():
+                cur.execute(
+                    """
+                    INSERT INTO cargos_editais (concurso_id, cargo_id, numero, nome, nivel)
+                    VALUES (%s, %s, %s, %s, %s) RETURNING id
+                    """,
+                    (concurso_id, dim_cargo_id, numero, f"CARGO {numero}", nivel),
+                )
+                cargos[numero] = cur.fetchone()[0]
+            for ident, tipo, numeros, itens in spec["cadernos"]:
+                cur.execute(
+                    """
+                    INSERT INTO provas (concurso_id, arquivo, identificador, tipo, codigo_caderno)
+                    VALUES (%s, %s, %s, %s, %s) RETURNING id
+                    """,
+                    (
+                        concurso_id,
+                        f"{slug}_{ident}.pdf",
+                        ident,
+                        tipo,
+                        f"{slug}_{ident}",
+                    ),
+                )
+                prova_id = cur.fetchone()[0]
+                for numero in numeros:
+                    cur.execute(
+                        "INSERT INTO provas_cargos (prova_id, cargo_edital_id) VALUES (%s, %s)",
+                        (prova_id, cargos[numero]),
+                    )
+                for ordem, (enunciado, no_id, anulada) in enumerate(itens, start=1):
+                    cur.execute(
+                        """
+                        INSERT INTO questoes (prova_id, numero, enunciado, gabarito, anulada, utilizavel)
+                        VALUES (%s, %s, %s, %s, %s, true) RETURNING id
+                        """,
+                        (prova_id, ordem, enunciado, "X" if anulada else "C", anulada),
+                    )
+                    cur.execute(
+                        """
+                        INSERT INTO questao_no (questao_id, no_id, papel, confianca, origem, status)
+                        VALUES (%s, %s, 'principal', 'alta', 'humano', 'aprovado')
+                        """,
+                        (cur.fetchone()[0], no_id),
+                    )
+
+    @staticmethod
+    def _pct(cur, nivel_alvo, no_id, **filtros):
+        """(pct_do_universo, pct_medio_por_concurso, questoes, total) de um nó."""
+        parametros = ", ".join(f"{k} => %s" for k in filtros)
+        sep = ", " if parametros else ""
+        cur.execute(
+            f"""
+            SELECT pct_do_universo, pct_medio_por_concurso, questoes, total_universo
+            FROM fn_prova_cobra(%s{sep}{parametros}) WHERE no_id = %s
+            """,
+            (nivel_alvo, *filtros.values(), no_id),
+        )
+        return cur.fetchone()
+
+    def test_concurso_pesa_um_independente_do_numero_de_cargos(self, conn):
+        """Concurso A com 3 cargos no mesmo básico × concurso B com 1 cargo: 50% cada."""
+        with conn.cursor() as cur:
+            self._cenario(
+                cur,
+                {
+                    "CONC_X": {
+                        "cargos": {1: "superior", 2: "superior", 3: "superior"},
+                        "cadernos": [
+                            (
+                                "CB",
+                                "objetiva_basica",
+                                [1, 2, 3],
+                                [("x-b1", "S-LP1", False), ("x-b2", "S-DIR1", False)],
+                            ),
+                            (
+                                "E1",
+                                "objetiva_especifica",
+                                [1],
+                                [("x-e1", "S-DIR1", False)],
+                            ),
+                            (
+                                "E2",
+                                "objetiva_especifica",
+                                [2],
+                                [("x-e2", "S-DIR1", False), ("x-e2b", "S-DIR1", False)],
+                            ),
+                            (
+                                "E3",
+                                "objetiva_especifica",
+                                [3],
+                                [("x-e3", "S-DIR1", False)],
+                            ),
+                        ],
+                    },
+                    "CONC_Y": {
+                        "cargos": {1: "superior"},
+                        "cadernos": [
+                            (
+                                "CB",
+                                "objetiva_basica",
+                                [1],
+                                [("y-b1", "S-LP1", False), ("y-b2", "S-DIR1", False)],
+                            )
+                        ],
+                    },
+                },
+            )
+            conn.commit()
+            # CONC_X: LP = 1/3, 1/4 e 1/3 nos três cargos -> 30,5556; CONC_Y: 50.
+            # Média entre concursos: (30,5556 + 50) / 2 = 40,28. Por prova (regra
+            # antiga) seria (33,33 + 25 + 33,33 + 50) / 4 = 35,42.
+            pct, pct_medio, questoes, total = self._pct(cur, "materia", "M-LP")
+            assert (pct, pct_medio) == (Decimal("40.28"), Decimal("40.28"))
+            assert questoes == 2  # x-b1 (conta 1× nos 3 cargos) e y-b1
+            assert total == 8  # x-b1, x-b2, e1, e2, e2b, e3 + y-b1, y-b2
+            # Dentro de Língua Portuguesa só há o caderno básico, igual nos 3
+            # cargos: S-LP1 vale 100% em cada concurso.
+            pct, pct_medio, _, _ = self._pct(cur, "subassunto", "S-LP1")
+            assert pct == Decimal("40.28")
+            assert pct_medio == Decimal("100.00")
+
+    def test_cargos_com_a_mesma_prova_contam_uma_so(self, conn):
+        """3 cargos com prova idêntica + 1 diferente = 2 provas distintas, não 4."""
+        with conn.cursor() as cur:
+            self._cenario(
+                cur,
+                {
+                    "CONC_X": {
+                        "cargos": {
+                            1: "superior",
+                            2: "superior",
+                            3: "superior",
+                            4: "superior",
+                        },
+                        "cadernos": [
+                            (
+                                "CB",
+                                "objetiva_basica",
+                                [1, 2, 3, 4],
+                                [("b1", "S-LP1", False), ("b2", "S-DIR1", False)],
+                            ),
+                            (
+                                "ES",
+                                "objetiva_especifica",
+                                [1, 2, 3],
+                                [("e1", "S-DIR1", False), ("e2", "S-DIR1", False)],
+                            ),
+                            (
+                                "E4",
+                                "objetiva_especifica",
+                                [4],
+                                [("e4", "S-LP1", False)],
+                            ),
+                        ],
+                    }
+                },
+            )
+            conn.commit()
+            # Prova dos cargos 1 a 3: LP 1/4 = 25%. Cargo 4: LP 2/3 = 66,67%.
+            # Duas provas distintas: (25 + 66,67) / 2 = 45,83. Por cargo seria
+            # (25 × 3 + 66,67) / 4 = 35,42.
+            pct, pct_medio, questoes, total = self._pct(
+                cur, "materia", "M-LP", p_concurso="CONC_X"
+            )
+            assert (pct, pct_medio) == (Decimal("45.83"), Decimal("45.83"))
+            assert (questoes, total) == (2, 5)  # as contagens não mudam
+            # Filtro de um cargo: conta direta, sem média.
+            pct, _, _, _ = self._pct(
+                cur, "materia", "M-LP", p_concurso="CONC_X", p_cargo_numero=4
+            )
+            assert pct == Decimal("66.67")
+
+    def test_anulada_entra_na_assinatura_da_prova(self, conn):
+        """Mesmas questões válidas, mas um cargo tem a mais uma anulada: são 2 provas."""
+        with conn.cursor() as cur:
+            self._cenario(
+                cur,
+                {
+                    "CONC_X": {
+                        "cargos": {1: "superior", 2: "superior", 3: "superior"},
+                        "cadernos": [
+                            (
+                                "CB",
+                                "objetiva_basica",
+                                [1, 2, 3],
+                                [("b1", "S-LP1", False), ("b2", "S-DIR1", False)],
+                            ),
+                            (
+                                "EA",
+                                "objetiva_especifica",
+                                [2],
+                                [("anul", "S-DIR1", True)],
+                            ),
+                            (
+                                "E3",
+                                "objetiva_especifica",
+                                [3],
+                                [("e3", "S-LP1", False)],
+                            ),
+                        ],
+                    }
+                },
+            )
+            conn.commit()
+            # Cargo 1: LP 1/2 = 50%. Cargo 2: as mesmas válidas + 1 anulada, mesmo
+            # 50%, mas é outra prova (a anulada está na assinatura). Cargo 3:
+            # LP 2/3 = 66,67%. Três provas distintas: (50 + 50 + 66,67) / 3 = 55,56.
+            # Se a anulada ficasse fora da assinatura seriam duas: 58,33.
+            pct, _, questoes, total = self._pct(cur, "materia", "M-LP")
+            assert (pct, questoes, total) == (Decimal("55.56"), 2, 3)
+
+    def test_filtro_basico_cadernos_distintos_pesam_igual(self, conn):
+        """Básico: 2 cargos no mesmo caderno × 1 cargo em outro caderno = 50/50."""
+        with conn.cursor() as cur:
+            self._cenario(
+                cur,
+                {
+                    "CONC_X": {
+                        "cargos": {1: "superior", 2: "superior", 3: "superior"},
+                        "cadernos": [
+                            (
+                                "CBA",
+                                "objetiva_basica",
+                                [1, 2],
+                                [("a1", "S-LP1", False), ("a2", "S-DIR1", False)],
+                            ),
+                            (
+                                "CBB",
+                                "objetiva_basica",
+                                [3],
+                                [
+                                    ("c1", "S-LP1", False),
+                                    ("c1b", "S-LP2", False),
+                                    ("c2", "S-DIR1", False),
+                                    ("c3", "S-DIR1", False),
+                                    ("c4", "S-DIR1", False),
+                                ],
+                            ),
+                            (
+                                "E1",
+                                "objetiva_especifica",
+                                [1],
+                                [("e1", "S-DIR1", False)],
+                            ),
+                            (
+                                "E2",
+                                "objetiva_especifica",
+                                [2],
+                                [("e2", "S-LP1", False)],
+                            ),
+                            (
+                                "E3",
+                                "objetiva_especifica",
+                                [3],
+                                [("e3", "S-LP1", False)],
+                            ),
+                        ],
+                    }
+                },
+            )
+            conn.commit()
+            # Só básico: caderno A (cargos 1 e 2) LP 1/2 = 50%; caderno B
+            # (cargo 3) LP 2/5 = 40%. Média 45,00 (por cargo seria 46,67).
+            pct, _, _, _ = self._pct(
+                cur, "materia", "M-LP", p_tipo_conhecimento="basico"
+            )
+            assert pct == Decimal("45.00")
+            # S-LP1 dentro de LP: A 1/1 = 100%, B 1/2 = 50% -> 75,00 (por cargo
+            # seria 83,33).
+            _, pct_medio, _, _ = self._pct(
+                cur, "subassunto", "S-LP1", p_tipo_conhecimento="basico"
+            )
+            assert pct_medio == Decimal("75.00")
+
+    def test_filtro_de_nivel_calcula_assinatura_depois_do_filtro(self, conn):
+        """Níveis nunca se juntam, e o resultado bate com `vw_comparativo_nivel`."""
+        with conn.cursor() as cur:
+            self._cenario(
+                cur,
+                {
+                    "CONC_X": {
+                        "cargos": {
+                            1: "superior",
+                            2: "superior",
+                            3: "superior",
+                            4: "medio",
+                            5: "medio",
+                        },
+                        "cadernos": [
+                            (
+                                "CBS",
+                                "objetiva_basica",
+                                [1, 2, 3],
+                                [("b1", "S-LP1", False), ("b2", "S-DIR1", False)],
+                            ),
+                            (
+                                "ES",
+                                "objetiva_especifica",
+                                [1, 2],
+                                [("e1", "S-DIR1", False)],
+                            ),
+                            (
+                                "E3",
+                                "objetiva_especifica",
+                                [3],
+                                [("e3", "S-LP1", False)],
+                            ),
+                            (
+                                "CBM",
+                                "objetiva_basica",
+                                [4, 5],
+                                [
+                                    ("m1", "S-LP1", False),
+                                    ("m2", "S-DIR1", False),
+                                    ("m3", "S-DIR1", False),
+                                    ("m4", "S-DIR1", False),
+                                ],
+                            ),
+                        ],
+                    },
+                    "CONC_Y": {
+                        "cargos": {1: "superior"},
+                        "cadernos": [
+                            (
+                                "CB",
+                                "objetiva_basica",
+                                [1],
+                                [("y1", "S-LP1", False), ("y2", "S-DIR1", False)],
+                            )
+                        ],
+                    },
+                },
+            )
+            conn.commit()
+            # Superior: CONC_X tem 2 provas distintas (cargos 1-2: LP 1/3; cargo 3:
+            # LP 2/3) -> 50; CONC_Y 50. Média 50,00 (por cargo, 45,83).
+            pct, _, _, _ = self._pct(cur, "materia", "M-LP", p_nivel="superior")
+            assert pct == Decimal("50.00")
+            # Médio: só o CONC_X, uma prova distinta (cargos 4 e 5): LP 1/4.
+            pct, _, _, _ = self._pct(cur, "materia", "M-LP", p_nivel="medio")
+            assert pct == Decimal("25.00")
+            cur.execute(
+                """
+                SELECT pct_medio, pct_superior, cargos_medio, cargos_superior,
+                       concursos_medio, concursos_superior
+                FROM vw_comparativo_nivel WHERE no_id = 'M-LP'
+                """
+            )
+            assert cur.fetchone() == (
+                Decimal("25.00"),
+                Decimal("50.00"),
+                2,
+                4,
+                1,
+                2,
+            )
+            # Sem filtro de nível, as três provas distintas do CONC_X (25; 33,33;
+            # 66,67 -> 41,67) e a do CONC_Y (50) dão (41,67 + 50) / 2 = 45,83.
+            pct, _, _, _ = self._pct(cur, "materia", "M-LP")
+            assert pct == Decimal("45.83")
 
     def test_vw_peso_materia_cargo(self, conn, dados):
         """vw_peso_materia_cargo calcula proporção por matéria no cargo e formata rótulos."""

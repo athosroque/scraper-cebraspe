@@ -441,9 +441,12 @@ CREATE INDEX IF NOT EXISTS idx_discursiva_no_no ON discursiva_no (no_id);
 CREATE INDEX IF NOT EXISTS idx_discursiva_no_status ON discursiva_no (status);
 
 -- Views ----------------------------------------------------------------------
--- Regra das estatísticas de questão (Etapa 8.M): ME e C/E contam igualmente na
--- incidência; agregação entre concursos é média de percentuais por
--- concurso×cargo, nunca soma bruta; estatísticas de gabarito C/E filtram tipo.
+-- Regra das estatísticas de questão (Etapa 8.M e 8.M.1, ADR-039): ME e C/E
+-- contam igualmente na incidência; a agregação é uma média em dois níveis,
+-- nunca soma bruta: média dos % das provas distintas de cada concurso (cargos
+-- com exatamente as mesmas questões contam uma prova só) e depois média entre
+-- os concursos, com cada concurso pesando 1. Estatísticas de gabarito C/E
+-- filtram tipo.
 
 DROP VIEW IF EXISTS vw_discursivas CASCADE;
 DROP VIEW IF EXISTS vw_peso_materia_cargo CASCADE;
@@ -955,30 +958,37 @@ GROUP BY
     cargo_edital_id, cargo_numero, cargo, nivel, tipo_conhecimento,
     anulada, materia_id, assunto_id, nivel_alvo, alvo_id;
 
--- "O que mais cai" com filtros (API do site, Etapa 5F; regra de agregação da
--- Etapa 8.M, decisão do dono de 2026-10-09).
+-- "O que mais cai" com filtros (API do site, Etapa 5F; regra de agregação das
+-- Etapas 8.M e 8.M.1, ADR-039).
 -- Contagens: `questoes`, `anuladas`, `so_principal` e `total_universo` são
 -- `count(DISTINCT questao_canonica_id)` sobre o universo filtrado e NÃO se
 -- somam entre linhas: a mesma questão do caderno básico está em N cargos e
 -- conta 1× (ADR-032). Toda agregação com filtro (vários cargos, um nível, um
 -- órgão...) passa por esta função, que filtra a base primeiro e conta depois.
 -- Parâmetro NULL = sem filtro; `p_nivel_alvo` NULL devolve os três níveis.
--- Percentuais: unidade = prova (concurso × cargo). Entre provas, agrega-se
--- SEMPRE pela média dos percentuais de cada prova, nunca pela soma bruta (a
--- soma faria a prova C/E de ~120 itens pesar o dobro da ME de ~60 questões e
--- o concurso com mais cargos pesar mais). Dentro de cada prova a questão é
--- contada distinta (o básico aplicado ao cargo conta 1× naquele cargo).
--- - `pct_do_universo` = média, entre as provas do universo filtrado, de
---   questões do nó na prova / questões da prova. Entram na média todas as
---   provas com questão válida no universo; a que não tem questão no nó entra
---   com 0%. É a "incidência" do site (`pct_incidencia`).
--- - `pct_medio_por_concurso` (nome mantido; o grão é concurso × cargo) =
---   média, entre as provas, do % do nó dentro da matéria na prova
---   (subassunto/assunto) ou dentro da prova (matéria; aí é igual ao
---   `pct_do_universo`). Entram na média as provas com questão na matéria;
---   quem não tem questão no nó entra com 0%.
+-- Percentuais: média em dois níveis, nunca soma bruta (a soma faria a prova
+-- C/E de ~120 itens pesar o dobro da ME de ~60 e o concurso com mais cargos
+-- pesar mais).
+-- 1. Prova: % do nó = questões válidas distintas do nó / questões válidas
+--    distintas da prova (concurso × cargo, sob os filtros). Cargos com
+--    exatamente as mesmas questões no escopo (a "assinatura": o conjunto de
+--    `questao_canonica_id` do cargo, anuladas incluídas) são UMA prova
+--    distinta dentro do concurso (ex.: o específico único de vários cargos),
+--    e um cargo representante a calcula. A assinatura é calculada depois dos
+--    filtros.
+-- 2. Concurso: média dos % das provas distintas elegíveis dele (quem não
+--    cobrou o nó entra com 0%).
+-- 3. Final: média dos % dos concursos elegíveis (quem não cobrou o nó entra
+--    com 0%). Cada concurso pesa 1.
+-- - `pct_do_universo` = a regra acima com a prova inteira como universo (escopo
+--   ''). Elegíveis: provas com questão válida e concursos com ao menos uma.
+--   É a "incidência" do site (`pct_incidencia`).
+-- - `pct_medio_por_concurso` = a mesma regra com a matéria do nó como universo
+--   (subassunto/assunto; a assinatura também é da matéria) ou a prova inteira
+--   (matéria; aí é igual ao `pct_do_universo`). Elegíveis: as provas distintas
+--   com questão na matéria e os concursos com ao menos uma delas.
 -- - `total_universo` é só informativo (questões válidas distintas sob os
---   filtros); não é mais denominador de nenhum percentual.
+--   filtros); não é denominador de nenhum percentual.
 -- Com o filtro reduzido a uma única prova (concurso + cargo), as médias têm um
 -- termo só e os números coincidem com a conta direta questões / total.
 -- C/E e ME contam igualmente. Anuladas ficam fora de `questoes` e de todo
@@ -1031,25 +1041,38 @@ universo AS (
 alvo AS (
     SELECT * FROM b WHERE p_nivel_alvo IS NULL OR b.nivel_alvo = p_nivel_alvo
 ),
--- Denominadores por prova (concurso × cargo): a matéria (escopo = id da
--- matéria) ou a prova inteira (escopo = '').
-den AS (
+-- Prova por escopo (a matéria, pelo id, ou a prova inteira, ''): total de
+-- válidas e assinatura = hash do conjunto de questões canônicas do cargo no
+-- escopo (anuladas incluídas, para não juntar provas que diferem nelas).
+prova_escopo AS MATERIALIZED (
     SELECT concurso, cargo_edital_id, no_materia_id AS escopo,
-           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total,
+           md5(string_agg(DISTINCT questao_canonica_id::text, ',' ORDER BY questao_canonica_id::text)) AS assinatura
     FROM b
     GROUP BY concurso, cargo_edital_id, no_materia_id
-    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
     UNION ALL
     SELECT concurso, cargo_edital_id, '' AS escopo,
-           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada)
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada),
+           md5(string_agg(DISTINCT questao_canonica_id::text, ',' ORDER BY questao_canonica_id::text))
     FROM b
     GROUP BY concurso, cargo_edital_id
-    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
 ),
--- Quantas provas entram em cada média (o divisor): quem não cobrou o nó
--- entra com 0%.
-elegiveis AS (
-    SELECT escopo, count(*) AS n_provas FROM den GROUP BY escopo
+-- Denominadores por prova distinta: um cargo representante por (concurso,
+-- escopo, assinatura). Só as provas com questão válida são elegíveis.
+den AS MATERIALIZED (
+    SELECT DISTINCT ON (concurso, escopo, assinatura)
+           concurso, cargo_edital_id, escopo, total
+    FROM prova_escopo
+    WHERE total > 0
+    ORDER BY concurso, escopo, assinatura, cargo_edital_id
+),
+-- Divisores: provas distintas elegíveis de cada concurso e concursos
+-- elegíveis, por escopo. Quem não cobrou o nó entra com 0%.
+provas_conc AS (
+    SELECT concurso, escopo, count(*) AS n_provas FROM den GROUP BY concurso, escopo
+),
+concursos_esc AS (
+    SELECT escopo, count(DISTINCT concurso) AS n_concursos FROM den GROUP BY escopo
 ),
 por_prova AS (
     SELECT a.nivel_alvo, a.alvo_id, a.concurso, a.cargo_edital_id, a.no_materia_id,
@@ -1057,29 +1080,41 @@ por_prova AS (
     FROM alvo a
     GROUP BY a.nivel_alvo, a.alvo_id, a.concurso, a.cargo_edital_id, a.no_materia_id
 ),
--- % do nó na prova inteira, em média entre as provas (pct_do_universo).
-media_prova AS (
-    SELECT p.nivel_alvo, p.alvo_id,
-           round(sum(p.questoes * 100.0 / d.total) / e.n_provas, 2) AS pct
+-- Nível 1 → 2: % do nó na prova inteira, em média dentro do concurso.
+conc_prova AS (
+    SELECT p.nivel_alvo, p.alvo_id, p.concurso,
+           sum(p.questoes * 100.0 / d.total) / pc.n_provas AS pct
     FROM por_prova p
     JOIN den d ON d.concurso = p.concurso
               AND d.cargo_edital_id = p.cargo_edital_id
               AND d.escopo = ''
-    JOIN elegiveis e ON e.escopo = ''
-    GROUP BY p.nivel_alvo, p.alvo_id, e.n_provas
+    JOIN provas_conc pc ON pc.concurso = p.concurso AND pc.escopo = ''
+    GROUP BY p.nivel_alvo, p.alvo_id, p.concurso, pc.n_provas
 ),
--- % do nó na matéria da prova (ou na prova, para matéria), em média entre as
--- provas com a matéria (pct_medio_por_concurso).
-media_escopo AS (
-    SELECT p.nivel_alvo, p.alvo_id,
-           round(sum(p.questoes * 100.0 / d.total) / e.n_provas, 2) AS pct
+-- Nível 2: média entre os concursos (pct_do_universo).
+media_prova AS (
+    SELECT c.nivel_alvo, c.alvo_id, round(sum(c.pct) / ce.n_concursos, 2) AS pct
+    FROM conc_prova c
+    JOIN concursos_esc ce ON ce.escopo = ''
+    GROUP BY c.nivel_alvo, c.alvo_id, ce.n_concursos
+),
+-- O mesmo com a matéria do nó como universo (a prova, para matéria).
+conc_escopo AS (
+    SELECT p.nivel_alvo, p.alvo_id, p.concurso, d.escopo,
+           sum(p.questoes * 100.0 / d.total) / pc.n_provas AS pct
     FROM por_prova p
     JOIN den d ON d.concurso = p.concurso
               AND d.cargo_edital_id = p.cargo_edital_id
               AND d.escopo = CASE WHEN p.nivel_alvo = 'materia' THEN ''
                                   ELSE p.no_materia_id END
-    JOIN elegiveis e ON e.escopo = d.escopo
-    GROUP BY p.nivel_alvo, p.alvo_id, e.n_provas
+    JOIN provas_conc pc ON pc.concurso = p.concurso AND pc.escopo = d.escopo
+    GROUP BY p.nivel_alvo, p.alvo_id, p.concurso, d.escopo, pc.n_provas
+),
+media_escopo AS (
+    SELECT c.nivel_alvo, c.alvo_id, round(sum(c.pct) / ce.n_concursos, 2) AS pct
+    FROM conc_escopo c
+    JOIN concursos_esc ce ON ce.escopo = c.escopo
+    GROUP BY c.nivel_alvo, c.alvo_id, ce.n_concursos
 ),
 contagem AS (
     SELECT nivel_alvo, alvo_id,
@@ -1116,7 +1151,7 @@ $$;
 -- com filtro de vários cargos/níveis, use `fn_prova_cobra`.
 -- `pct_do_universo` divide pelo total do cargo naquele tipo de conhecimento
 -- (`total_universo`); `pct_medio_por_concurso` é o global de
--- `fn_prova_cobra` sem filtro (média por concurso × cargo, igual em todas as
+-- `fn_prova_cobra` sem filtro (média em dois níveis, igual em todas as
 -- linhas do nó).
 CREATE OR REPLACE VIEW vw_prova_cobra_no AS
 WITH b AS MATERIALIZED (
@@ -1202,32 +1237,52 @@ WHERE q.tipo = 'certo_errado'
 GROUP BY b.alvo_id, nc.caminho, nc.nivel;
 
 -- Comparativo Médio × Superior por nó, com C/E e ME juntos (incidência
--- independe do formato).
--- `pct_medio`/`pct_superior` são MÉDIAS de percentuais: para cada
--- concurso×cargo do nível, % do nó = questões válidas distintas do nó
--- (`questao_canonica_id`, sem anuladas) / universo do concurso×cargo (as
--- mesmas regras de `vw_prova_cobra_no`, mas com básico + específico juntos,
--- a prova inteira do cargo). Somar contagens brutas faria o concurso C/E
--- (~120 itens) pesar o dobro do ME (~50–60 questões).
--- Entram na média todos os concurso×cargo do nível com universo > 0; quem não
--- tem questão no nó entra com 0% (sem isso a média só veria quem cobrou o nó
--- e ficaria inflada). Nível sem nenhum concurso×cargo dá NULL.
+-- independe do formato). Mesma regra de `fn_prova_cobra` (ADR-039), por nível:
+-- `pct_medio`/`pct_superior` são médias em dois níveis. Para cada concurso do
+-- nível, a média dos % das provas distintas dele (cargos do nível com
+-- exatamente as mesmas questões são uma prova só; % do nó = questões válidas
+-- distintas do nó (`questao_canonica_id`, sem anuladas) / universo da prova,
+-- básico + específico juntos); depois, a média entre os concursos que têm o
+-- nível, cada um pesando 1. Somar contagens brutas faria o concurso C/E
+-- (~120 itens) pesar o dobro do ME (~50–60 questões), e o concurso com mais
+-- cargos dominaria a média.
+-- Entram na média todas as provas distintas do nível com universo > 0 e todos
+-- os concursos com ao menos uma; quem não tem questão no nó entra com 0% (sem
+-- isso a média só veria quem cobrou o nó e ficaria inflada). Nível sem nenhum
+-- concurso dá NULL.
 -- `questoes_medio`/`questoes_superior` seguem como contagem bruta informativa
--- (não use para percentual); `cargos_medio`/`cargos_superior` são os
--- denominadores da média.
+-- (não use para percentual); `cargos_medio`/`cargos_superior` contam os
+-- cargos do nível com prova (informativo) e `concursos_medio`/
+-- `concursos_superior` são os divisores da média final.
 CREATE OR REPLACE VIEW vw_comparativo_nivel AS
 WITH b AS MATERIALIZED (
     SELECT * FROM vw_prova_cobra_base WHERE nivel IN ('medio', 'superior')
 ),
-universo AS (
+cargo_prova AS MATERIALIZED (
     SELECT concurso, cargo_edital_id, nivel,
-           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total
+           count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) AS total,
+           md5(string_agg(DISTINCT questao_canonica_id::text, ',' ORDER BY questao_canonica_id::text)) AS assinatura
     FROM b
     GROUP BY concurso, cargo_edital_id, nivel
-    HAVING count(DISTINCT questao_canonica_id) FILTER (WHERE NOT anulada) > 0
+),
+universo AS MATERIALIZED (
+    -- Uma prova distinta por (concurso, nível, assinatura), com um cargo
+    -- representante.
+    SELECT DISTINCT ON (concurso, nivel, assinatura)
+           concurso, cargo_edital_id, nivel, total
+    FROM cargo_prova
+    WHERE total > 0
+    ORDER BY concurso, nivel, assinatura, cargo_edital_id
 ),
 cargos_nivel AS (
-    SELECT nivel, count(*) AS n_cargos FROM universo GROUP BY nivel
+    SELECT nivel, count(*) AS n_cargos
+    FROM cargo_prova WHERE total > 0 GROUP BY nivel
+),
+provas_conc AS (
+    SELECT concurso, nivel, count(*) AS n_provas FROM universo GROUP BY concurso, nivel
+),
+concursos_nivel AS (
+    SELECT nivel, count(DISTINCT concurso) AS n_concursos FROM universo GROUP BY nivel
 ),
 por_cargo AS (
     SELECT alvo_id, concurso, cargo_edital_id, nivel,
@@ -1235,16 +1290,24 @@ por_cargo AS (
     FROM b
     GROUP BY alvo_id, concurso, cargo_edital_id, nivel
 ),
-media AS (
-    -- Soma dos % de quem cobrou o nó dividida por TODOS os concurso×cargo do
-    -- nível: os que não cobraram entram com 0%.
-    SELECT p.alvo_id, p.nivel, sum(p.questoes * 100.0 / u.total) / cn.n_cargos AS pct
+por_concurso AS (
+    -- Média das provas distintas dentro do concurso (quem não cobrou = 0%).
+    SELECT p.alvo_id, p.concurso, p.nivel,
+           sum(p.questoes * 100.0 / u.total) / pc.n_provas AS pct
     FROM por_cargo p
     JOIN universo u ON u.concurso = p.concurso
                    AND u.cargo_edital_id = p.cargo_edital_id
                    AND u.nivel = p.nivel
-    JOIN cargos_nivel cn ON cn.nivel = p.nivel
-    GROUP BY p.alvo_id, p.nivel, cn.n_cargos
+    JOIN provas_conc pc ON pc.concurso = p.concurso AND pc.nivel = p.nivel
+    GROUP BY p.alvo_id, p.concurso, p.nivel, pc.n_provas
+),
+media AS (
+    -- Soma dos % de quem cobrou o nó dividida por TODOS os concursos do nível:
+    -- os que não cobraram entram com 0%.
+    SELECT c.alvo_id, c.nivel, sum(c.pct) / cn.n_concursos AS pct
+    FROM por_concurso c
+    JOIN concursos_nivel cn ON cn.nivel = c.nivel
+    GROUP BY c.alvo_id, c.nivel, cn.n_concursos
 ),
 contagem AS (
     SELECT alvo_id,
@@ -1259,13 +1322,17 @@ pcts AS (
         c.alvo_id,
         c.questoes_medio,
         c.questoes_superior,
-        CASE WHEN cm.n_cargos IS NULL THEN NULL ELSE COALESCE(mm.pct, 0) END AS pct_medio,
-        CASE WHEN cs.n_cargos IS NULL THEN NULL ELSE COALESCE(ms.pct, 0) END AS pct_superior,
-        COALESCE(cm.n_cargos, 0) AS cargos_medio,
-        COALESCE(cs.n_cargos, 0) AS cargos_superior
+        CASE WHEN cm.n_concursos IS NULL THEN NULL ELSE COALESCE(mm.pct, 0) END AS pct_medio,
+        CASE WHEN cs.n_concursos IS NULL THEN NULL ELSE COALESCE(ms.pct, 0) END AS pct_superior,
+        COALESCE(gm.n_cargos, 0) AS cargos_medio,
+        COALESCE(gs.n_cargos, 0) AS cargos_superior,
+        COALESCE(cm.n_concursos, 0) AS concursos_medio,
+        COALESCE(cs.n_concursos, 0) AS concursos_superior
     FROM contagem c
-    LEFT JOIN cargos_nivel cm ON cm.nivel = 'medio'
-    LEFT JOIN cargos_nivel cs ON cs.nivel = 'superior'
+    LEFT JOIN concursos_nivel cm ON cm.nivel = 'medio'
+    LEFT JOIN concursos_nivel cs ON cs.nivel = 'superior'
+    LEFT JOIN cargos_nivel gm ON gm.nivel = 'medio'
+    LEFT JOIN cargos_nivel gs ON gs.nivel = 'superior'
     LEFT JOIN media mm ON mm.alvo_id = c.alvo_id AND mm.nivel = 'medio'
     LEFT JOIN media ms ON ms.alvo_id = c.alvo_id AND ms.nivel = 'superior'
 )
@@ -1279,7 +1346,9 @@ SELECT
     round(p.pct_superior, 2) AS pct_superior,
     round(COALESCE(p.pct_superior, 0) - COALESCE(p.pct_medio, 0), 2) AS diferenca_pct,
     p.cargos_medio,
-    p.cargos_superior
+    p.cargos_superior,
+    p.concursos_medio,
+    p.concursos_superior
 FROM pcts p
 JOIN vw_no_caminho nc ON nc.id = p.alvo_id;
 

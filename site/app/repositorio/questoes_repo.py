@@ -482,7 +482,8 @@ def chaves_mesmo_enunciado(chave: str) -> list[str] | None:
 def ranking_subassuntos() -> list[dict]:
     """Ranking completo de subassuntos (`fn_prova_cobra`, sem filtros).
 
-    Ordem: % médio por prova (concurso × cargo), não a contagem bruta.
+    Ordem: % médio em dois níveis (provas distintas de cada concurso, depois
+    entre os concursos), não a contagem bruta.
     """
     with (
         get_conexao_leitura() as conn,

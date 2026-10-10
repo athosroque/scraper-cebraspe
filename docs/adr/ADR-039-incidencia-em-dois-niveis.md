@@ -1,6 +1,6 @@
 # ADR-039: Incidência agregada em dois níveis (prova → concurso)
 
-- **Status:** Aceito (implementação pendente: Etapa 8.M.1, `plano-etapa-8m1.md`)
+- **Status:** Aceito (implementado na 8.M.1)
 - **Data:** 2026-10-10
 - **Etapa:** 8.M.1 (corrige a regra da 8.M/S2)
 - **Decisores:** Dono do produto
@@ -125,3 +125,72 @@ Regras:
   deixam de ser dominados pelos editais grandes.
 - A pendência "Incidência de subassunto com vários recortes" (`task.md`) usa
   esta regra para o "% geral da banca".
+
+---
+
+## 4. Atualização (2026-10-10): prova distinta
+
+### 4.1 Regra
+
+O nível 1 deixa de ser "cada cargo" e passa a ser a **prova distinta**: dentro de
+um concurso, cargos com **exatamente as mesmas questões** sob o universo e os
+filtros contam como **uma prova só**. Uma questão igual em mais de um cargo conta
+1× dentro do concurso, e agora o percentual também respeita isso (as contagens já
+respeitavam, por `questao_canonica_id` e `count(DISTINCT)`).
+
+```
+assinatura(concurso, cargo, escopo) = conjunto de questao_canonica_id do cargo no escopo
+                                      (escopo '' = prova inteira; ou o id da matéria)
+                                      — anuladas incluídas na assinatura
+prova distinta = (concurso, escopo, assinatura); um cargo representante a calcula
+pct_prova(p)    = questões válidas do nó em p / total válido de p × 100
+pct_concurso(c) = média de pct_prova entre as provas distintas elegíveis de c
+pct_final       = média de pct_concurso entre os concursos elegíveis
+```
+
+- A assinatura é calculada **depois** dos filtros (a base de `fn_prova_cobra`
+  continua filtrada primeiro). Com `p_nivel`, só entram cargos daquele nível, e
+  `vw_comparativo_nivel` junta provas dentro do nível.
+- `pct_do_universo` usa o escopo da prova inteira; `pct_medio_por_concurso` usa o
+  escopo da matéria do nó para assunto/subassunto (para matéria é igual ao
+  `pct_do_universo`), e a assinatura da matéria é só das questões dela.
+- Anuladas entram na assinatura: dois cargos que diferem só por uma anulada são
+  provas distintas (caderno diferente), mesmo com as mesmas válidas.
+- Contagens (`questoes`, `anuladas`, `so_principal`, `total_universo`) e o filtro
+  de uma prova (concurso + cargo) não mudam. Arredonda-se só no fim.
+- `vw_comparativo_nivel` ganhou `concursos_medio`/`concursos_superior` (divisor da
+  média final); `cargos_*` seguem como contagem informativa.
+
+### 4.2 Por quê
+
+Há concursos em que o cargo não é a unidade da prova: o SEE_PE_22 tem um único
+caderno específico para os cargos 3 a 47, e o IPAAM_25 um único básico para os
+cargos 1 a 19. Pela regra do §2, as provas desses cargos, que são a mesma, entrariam na média
+do concurso 45 vezes (SEE_PE_22) ou 19 vezes (IPAAM_25), e o cargo repetido
+passaria a pesar mais que o cargo de prova própria dentro do edital. A prova
+distinta faz o nível 1 contar provas reais, não números de cargo.
+
+### 4.3 Conferido no banco (piloto 2025, 70 provas, 31 cargos)
+
+- No piloto cada cargo tem um específico próprio: as 31 provas viram 31 provas
+  distintas (PF_25_ADM 15/15, STM_25 10/10, IBAMA_25 3/3, CD_25_NS 2/2,
+  TCU_25_TEFC 1/1). Por isso o ranking de matérias sem filtro continua o do §1:
+  LP 13,81; Direito Administrativo 10,59; Direito Constitucional 6,33; Ética
+  4,81; Administração Geral 4,20; Psicologia 1,55; Comunicação Social 1,92;
+  Informática 1,25. Bate também com a consulta de referência do plano.
+- As 31 provas filtradas uma a uma (`p_concurso` + `p_cargo_numero`), nos 3
+  níveis, saíram idênticas às de antes (`pct_do_universo` e
+  `pct_medio_por_concurso`). O plano de PF_25_ADM cargo 1 segue começando por AOF
+  (17,80%).
+- O que muda: `pct_medio_por_concurso` de assunto/subassunto nas matérias do
+  básico (na PF_25_ADM, o CB1 de 14 cargos e o CB2 de 1 cargo passam a pesar
+  50/50) e qualquer recorte `p_tipo_conhecimento = 'basico'`. Exemplos sem filtro,
+  regra do §2 → prova distinta: LP > Compreensão e interpretação de textos
+  32,44 → 27,73; LP > Reescrita de frases 9,13 → 15,76; Legislação > Resolução TCU
+  nº 155/2002 9,09 → 50,00. Recorte `basico`, `pct_do_universo` de matéria: LP
+  30,33 → 31,66; Ética 16,66 → 11,65; Direito Administrativo 12,68 → 9,66;
+  Informática 7,10 → 3,43.
+- Testes novos em `tests/test_estatisticas_views.py`: concurso com 3 cargos no
+  mesmo básico × concurso de 1 cargo (cada um pesa 50%); 3 cargos com prova
+  idêntica + 1 diferente = 2 provas; anulada na assinatura; filtro `basico`
+  com cadernos distintos; filtro `p_nivel` batendo com `vw_comparativo_nivel`.

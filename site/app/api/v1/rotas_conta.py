@@ -104,8 +104,8 @@ def resumo_conta(usuario_id: int = Depends(exigir_usuario_id)):
     summary="O que estudar agora",
     description=(
         "Subassuntos com pelo menos 2 questões respondidas, ordenados por "
-        "incidência na prova (`fn_prova_cobra`, % médio na prova por concurso × "
-        "cargo) × taxa de "
+        "incidência na prova (`fn_prova_cobra`, % médio na prova: média das provas "
+        "distintas de cada concurso e depois entre os concursos) × taxa de "
         "erro do usuário. Respostas e incidência são lidas em separado e "
         "cruzadas no serviço."
     ),

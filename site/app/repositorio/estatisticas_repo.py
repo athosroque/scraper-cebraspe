@@ -2,8 +2,9 @@
 
 Toda conta de questão vem de `fn_prova_cobra` (nunca soma de
 `vw_prova_cobra_*` entre cargos). Os rankings de prova ordenam pela
-incidência média por prova (concurso × cargo, `pct_do_universo`), nunca pela
-contagem bruta, que faria a prova maior pesar mais. A conta do edital repete a regra da
+incidência média em dois níveis (`pct_do_universo`: média das provas distintas
+de cada concurso e depois entre os concursos, cada concurso pesando 1; ADR-039),
+nunca pela contagem bruta, que faria a prova maior pesar mais. A conta do edital repete a regra da
 `vw_edital_cobra_base` com filtros: ocorrência = item de edital distinto,
 subindo a árvore, só concurso `aprovado`.
 """
@@ -180,8 +181,8 @@ def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
     """Matérias ativas com questões utilizáveis distintas (mesma conta da árvore).
 
     Usa `fn_prova_cobra` para manter a coerência entre a home e o painel:
-    contagem de válidas desduplicadas e % médio por prova (concurso × cargo),
-    que também dá a ordem.
+    contagem de válidas desduplicadas e % médio em dois níveis (provas distintas
+    de cada concurso, depois entre os concursos), que também dá a ordem.
     """
     with (
         get_conexao_leitura() as conn,

@@ -5,7 +5,7 @@
 {% block description %}O que mais cai de {{ rotulo_materia(materia.nome, materia.nome_de_cargo) }} nas provas do CEBRASPE, por subassunto.{% endblock %}
 
 {% block content %}
-{% call c.cabecalho(rotulo_materia(materia.nome, materia.nome_de_cargo), "Subassuntos que mais caem nas provas, pelo % médio da prova (cada concurso × cargo com o mesmo peso).") %}
+{% call c.cabecalho(rotulo_materia(materia.nome, materia.nome_de_cargo), "Subassuntos que mais caem nas provas, pelo % médio da prova (cada concurso com o mesmo peso; dentro dele, a média das provas dos cargos).") %}
 <a href="{{ url_resolver }}" class="btn-primario">Resolver questões desta disciplina</a>
 {% endcall %}
 
@@ -17,7 +17,7 @@
         {% set soma_ranking = linhas|map(attribute='questoes')|sum if linhas else 0 %}
         {% set outros = materia.questoes_recorte - soma_ranking %}
         
-        {# Ordem e barra pelo % médio na prova (concurso × cargo); a contagem fica no rótulo. #}
+        {# Ordem e barra pelo % médio na prova (dois níveis, ADR-039); a contagem fica no rótulo. #}
         {% for r in linhas %}
         {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.pct_do_universo * 100 / maximo) if maximo else 0, (r.pct_do_universo|pct) ~ " da prova · " ~ r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
         {% endfor %}
@@ -36,7 +36,7 @@
             Os subassuntos acima somam {{ soma_ranking|num }} para {{ materia.questoes_recorte|num }} questões da disciplina no recorte: uma questão pode estar em até 2 subassuntos.
             {% endif %}
             Universo sob os filtros: {{ (linhas[0].total_universo if linhas else materia.questoes_recorte)|num }} questões válidas. Anuladas aparecem ao lado do subassunto e não entram na contagem.
-            Ordem pelo % da prova: média, entre as provas (concurso × cargo) do recorte, da fatia de cada prova que caiu no subassunto, com o mesmo peso para cada prova.
+            Ordem pelo % da prova: média das provas distintas de cada concurso (cargos com a mesma prova contam uma vez) e depois entre os concursos, com cada concurso pesando 1, da fatia de cada prova que caiu no subassunto.
         </p>
         {% else %}
         <p class="text-sm text-slate-600">Nenhuma questão desta disciplina para esses filtros.</p>
@@ -91,7 +91,7 @@
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.anuladas_recorte|num }}</dd>
             </div>
             <div>
-                <dt class="text-slate-500" title="Peso médio da disciplina nas provas do recorte: para cada prova (concurso × cargo), a fatia das questões válidas dela que é desta disciplina; o número é a média dessas fatias, com o mesmo peso para cada prova.">Universo de comparação</dt>
+                <dt class="text-slate-500" title="Peso médio da disciplina nas provas do recorte: para cada prova, a fatia das questões válidas dela que é desta disciplina; o número é a média das provas distintas de cada concurso e depois entre os concursos, com cada concurso pesando 1.">Universo de comparação</dt>
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.pct_do_universo|pct }}</dd>
             </div>
         </dl>

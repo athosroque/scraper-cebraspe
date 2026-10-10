@@ -1072,10 +1072,16 @@ enviar o bloco de uma etapa específica para o agente construir.
   - `[x]` `fn_prova_cobra` (8.M/S2): agregação pela média por concurso × cargo. **Revista em
     2026-10-10** (ADR-039): o básico compartilhado entra N vezes na média; ver 8.M.1.
   - `[x]` **Gate aprovado (2026-10-10, S4)**: carga real ME `SEFA_PR_25` no `cebraspe_gate` (380 itens ME), piloto inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), suíte completa verde (1.276 testes passando, `make check` 100%).
-  - `[ ]` Sem registro no Gate (achado da arrumação de 2026-10-10): passada no Chromium headless
-    com questão ME real (responder, corrigir, simulado, filtro "Formato") e conferência, no
-    edital do `SEFA_PR_25`, de que o erro no ME não desconta. Fazer junto da 8.M.1, que já
-    valida o site no navegador.
+  - `[x]` Sem registro no Gate (achado da arrumação de 2026-10-10, KAN-50): passada no
+    Chromium headless com questão ME real do `SEFA_PR_25` (cópia descartável do
+    `cebraspe_gate`, apagada no fim). Filtro "Formato", responder/corrigir e simulado do cargo 1
+    conferidos, com 0 erro de JS (42 certas, 41 erradas e 41 em branco dão 42 de 124). O edital
+    nº 1 (subitem 8.11.2, a e b) dá 0,00 ponto à resposta errada, então o erro no ME não desconta.
+    Achados que ficam para depois:
+    - `[ ]` Peso por prova no simulado ME: o edital do SEFA dá 1,00 ponto por item na P1 e 1,50 na
+      P2 (máximo 155). O simulado dá peso 1 a tudo (máximo 124).
+    - `[ ]` Textos do ME: o KPI "Nota CEBRASPE" mostra "certas − erradas", o subtítulo da lista
+      diz "padrão certo/errado" no filtro ME, e a introdução do simulado só descreve +1/−1.
   - Plano das sessões arquivado em [`docs/planos/plano-etapa-8m.md`](docs/planos/plano-etapa-8m.md).
 - `[ ]` **8.M.1 Incidência em dois níveis** (prioridade antes da 8.1, ADR-039, plano autocontido
   em [`plano-etapa-8m1.md`](plano-etapa-8m1.md)). Decisão do dono (2026-10-10): a média por
@@ -1083,12 +1089,43 @@ enviar o bloco de uma etapa específica para o agente construir.
   com mais cargos domina (no piloto, PF_25_ADM pesa 48% e TCU_25_TEFC 3%). Passa a ser
   % do nó na prova → média das provas dentro do concurso → média entre concursos (cada edital
   pesa 1).
-  - `[ ]` `fn_prova_cobra` e `vw_comparativo_nivel` com a regra nova; contagens inalteradas.
-  - `[ ]` Testes: caso 3 cargos com básico compartilhado × 1 cargo (50% cada); as 31 provas
-    filtradas uma a uma sem diferença.
-  - `[ ]` Textos do site (`modelos.py`, rotas, templates) e `site/openapi.json`.
+  - `[x]` `fn_prova_cobra` e `vw_comparativo_nivel` com a regra nova; contagens inalteradas.
+    **Prova distinta** (brainstorm do dono, 2026-10-10, KAN-28): cargos com o mesmo conjunto de
+    questões canônicas no escopo, sob os filtros, contam como uma prova só (assinatura = `md5`
+    dos `questao_canonica_id`; um cargo representante). Casos dos lotes: SEE_PE_22 (um
+    específico para os cargos 3 a 47) e IPAAM_25 (um básico para os cargos 1 a 19). A
+    `vw_comparativo_nivel` ganhou `concursos_medio`/`concursos_superior`. O banco ainda tinha
+    a `fn_prova_cobra` de antes da S2 e foi atualizado.
+  - `[x]` Testes: caso 3 cargos com básico compartilhado × 1 cargo (50% cada), 3 cargos de
+    prova idêntica + 1, anulada na assinatura, filtro `basico` e filtro `p_nivel`; as 31
+    provas filtradas uma a uma sem diferença (são 31 provas distintas no piloto).
+  - `[x]` Textos do site (`modelos.py`, rotas, templates) e `site/openapi.json`.
+  - Conferido (2026-10-10): ranking sem filtro igual ao ADR-039; PF_25_ADM cargo 1 segue com
+    AOF (17,80%); `make test-all` 1252 passados (+31 pulados, 1 xfail). Muda o % dentro da
+    matéria do básico (LP › Reescrita de frases: 9,13 → 15,76) e o recorte `basico` (Ética
+    16,66 → 11,65; Informática 7,10 → 3,43). Números completos no ADR-039.
   - **Pronto quando:** o ranking de matérias sem filtro bate com o ADR-039 (LP 13,81%;
     Dir. Adm. 10,59%; Ética 4,81%; Adm. Geral 4,20%) e `make test-all` está verde.
+- `[ ]` **8.M.2 Estatísticas por recorte: drill-down e filtros** (pedido do dono, 2026-10-10,
+  KAN-28). Usa a regra de dois níveis da 8.M.1. Usos-alvo: (1) "para Língua Portuguesa, o que a
+  banca X cobra no ano X, no assunto X ou subassunto"; (2) "no concurso X, na matéria X, o que
+  mais caiu no assunto X e em quais subassuntos", podendo listar as questões. No recorte de
+  concurso importam os dois números: % médio (dois níveis) e nº de questões distintas.
+  - `[ ]` Filtros de banca, ano e órgão no `FiltroEstatistica`, em `/estatisticas`,
+    `/materias/{id}` e na API (a `fn_prova_cobra` já aceita `p_banca`, `p_orgao` e `p_ano`).
+  - `[ ]` Nível médio/superior (pedido do dono, 2026-10-10) em todos os recortes e em todos os
+    degraus do drill-down, combinável com banca/ano/órgão/concurso. Já existe em
+    `/estatisticas` e `/materias/{id}`; falta garantir que o link para a lista de questões e
+    cada degrau mantenham o filtro.
+  - `[ ]` Drill-down matéria → assunto → subassuntos do assunto → lista de questões
+    (`/questoes` com os mesmos filtros). Hoje `/materias/{id}` vai direto da matéria para os
+    subassuntos; falta o degrau do assunto. Cada degrau mostra o % (dois níveis, regra da
+    8.M.1) e o nº de questões distintas.
+  - `[ ]` Separação básico × específico no recorte de concurso (filtro ou colunas).
+  - `[ ]` Rótulo "média de N concursos / M provas" ao lado do %. Pede colunas novas na
+    `fn_prova_cobra` e muda o contrato da API e o `site/openapi.json`.
+  - **Pronto quando:** os dois usos-alvo acima são respondidos no site, sem SQL à mão, também
+    com o filtro de nível, e `make test-all` está verde.
 - `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
   `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
   por lote.
@@ -1106,6 +1143,8 @@ enviar o bloco de uma etapa específica para o agente construir.
 ## Pendências posteriores (fora de etapa)
 
 - `[ ]` **Incidência de subassunto com vários recortes** (pedido do dono, 2026-10-09).
+  A parte de filtros e recortes (banca, ano, órgão, nível, drill-down) passou para a **8.M.2**.
+  Aqui fica o que não coube nela: o lado a lado dos recortes, `p_formato` e o gabarito C/E.
   Mostrar lado a lado, para cada nó (matéria › assunto › subassunto):
   - % na **prova** (concurso × cargo) — já existe em `vw_prova_cobra_no`;
   - % **geral da banca** (todos os concursos) — já existe em `fn_prova_cobra(p_banca => ...)`,
@@ -1122,3 +1161,11 @@ enviar o bloco de uma etapa específica para o agente construir.
   Regra: agregar entre concursos sempre em dois níveis (média das provas dentro do concurso,
   depois média entre concursos), nunca pela soma bruta (decisões de 2026-10-09 e 2026-10-10,
   ADR-039).
+- `[ ]` **Comparativo de cargo nas estatísticas** (decisão do dono, 2026-10-10: fica para
+  depois; card KAN-52 no Jira). Três leituras ainda a escolher com o dono:
+  - (a) cargos do mesmo concurso lado a lado (ex.: PF_25_ADM cargo 1 × cargo 5), viável com os
+    dados de hoje;
+  - (b) o mesmo cargo entre editais (ex.: Agente da PF 2021 × 2025), que pede uma "carreira
+    canônica" com regra + curadoria, como a árvore, porque hoje `dim_cargo` tem uma linha por
+    nome de edital;
+  - (c) nível médio × superior, que já existe na `vw_comparativo_nivel` e falta expor no site.
