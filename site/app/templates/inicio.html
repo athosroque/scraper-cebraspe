@@ -27,7 +27,7 @@
             {% call c.card("flex h-full flex-col justify-between gap-4") %}
             <div>
                 <a href="/materias/{{ materia.id|urlencode }}" class="text-base font-semibold text-slate-900 hover:text-destaque-700">{{ "Conhecimentos específicos — " ~ materia.nome if materia.nome_de_cargo else materia.nome }}</a>
-                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes|num }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }} · {{ materia.pct_incidencia|pct }} das questões</p>
+                <p class="mt-1 text-sm tabular-nums text-slate-600">{{ materia.total_questoes|num }} {{ 'questão' if materia.total_questoes == 1 else 'questões' }} · {{ materia.pct_incidencia|pct }} da prova, em média</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="/materias/{{ materia.id|urlencode }}" class="btn-secundario">Ver painel</a>

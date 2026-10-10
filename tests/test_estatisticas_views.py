@@ -10,7 +10,8 @@ Cobre:
 - Exclusão de anuladas do total/denominadores e presença na coluna `anuladas`.
 - Exclusão de não utilizáveis e concursos pendentes de revisão.
 - Resolução de nós fundidos para o nó efetivo.
-- Cálculo de `pct_medio_por_concurso` com pesos iguais por concurso.
+- `fn_prova_cobra`: percentuais como média por prova (concurso × cargo), com
+  peso igual por prova e nunca soma bruta; prova única igual à conta direta.
 - Proporção Certo/Errado e comparativo Médio × Superior.
 """
 
@@ -494,15 +495,15 @@ class TestEstatisticasViews:
             assert res.get("A-ORT") == 1
 
     def test_pct_medio_por_concurso_pesos_iguais(self, conn, dados):
-        """pct_medio_por_concurso calcula a média dos percentuais de cada concurso com peso igual."""
+        """pct_medio_por_concurso: média dos % de cada prova (concurso × cargo), peso igual."""
         with conn.cursor() as cur:
-            # S-ACENT em Língua Portuguesa:
-            # Em CONC_A: válidas em LP = q1(1), q4(1), q6(1), q10(1) = 4 canônicas válidas.
-            # q1 e q4 estão em S-ACENT -> 2 / 4 = 50.00%
-            # Em CONC_B: válidas em LP = q8(1).
-            # q8 está em S-ACENT -> 1 / 1 = 100.00%
-            # Média esperada entre os 2 concursos: (50.00% + 100.00%) / 2 = 75.00%
-            # (Em contagem bruta seria 3 / 5 = 60.00%; pct_medio_por_concurso iguala o peso dos concursos)
+            # S-ACENT dentro de Língua Portuguesa, por prova (concurso × cargo):
+            # CONC_A cargo 1: LP = q1, q4, q6 (3); S-ACENT = q1, q4 -> 66,67%
+            # CONC_A cargo 3: LP = q1 (= q7, canônica), q4 (2); S-ACENT = 2 -> 100%
+            # CONC_A cargo 2: LP = q10 (1, nó fundido em A-ORT); S-ACENT = 0 -> 0%
+            # CONC_B cargo 1: LP = q8 (1); S-ACENT = 1 -> 100%
+            # Média: (66,67 + 100 + 0 + 100) / 4 = 66,67%.
+            # (Por concurso seria (50 + 100) / 2 = 75%; bruto, 3 / 5 = 60%.)
             cur.execute(
                 """
                 SELECT DISTINCT no_id, pct_medio_por_concurso
@@ -512,7 +513,7 @@ class TestEstatisticasViews:
             )
             no_id, pct_medio = cur.fetchone()
             assert no_id == "S-ACENT"
-            assert pct_medio == Decimal("75.00")
+            assert pct_medio == Decimal("66.67")
 
     def test_certo_errado_por_no(self, conn, dados):
         """vw_certo_errado_por_no computa proporção C/E sobre válidas e anulações sobre total."""
@@ -686,7 +687,7 @@ class TestEstatisticasViews:
             assert total > 0
 
     def test_fn_prova_cobra_pct_medio_respeita_filtro(self, conn, dados):
-        """Com filtro de concurso, a média usa só aquele concurso."""
+        """Com filtro de concurso, a média usa só as provas daquele concurso."""
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -703,7 +704,90 @@ class TestEstatisticasViews:
                 WHERE no_id = 'S-ACENT'
                 """
             )
-            assert cur.fetchone()[0] == Decimal("75.00")
+            assert cur.fetchone()[0] == Decimal("66.67")
+            # CONC_A: cargos 1, 2 e 3 -> (66,67 + 0 + 100) / 3.
+            cur.execute(
+                """
+                SELECT pct_medio_por_concurso
+                FROM fn_prova_cobra('subassunto', p_concurso => 'CONC_A')
+                WHERE no_id = 'S-ACENT'
+                """
+            )
+            assert cur.fetchone()[0] == Decimal("55.56")
+
+    def test_fn_prova_cobra_pct_do_universo_e_media_por_prova(self, conn, dados):
+        """Entre provas, `pct_do_universo` é a média dos % por concurso × cargo, nunca a soma bruta."""
+        with conn.cursor() as cur:
+            # % de S-ACENT na prova inteira, por concurso × cargo:
+            # CONC_A c1: 2 / 3 (q1, q4, q6) = 66,67%; c3: 2 / 2 = 100%;
+            # c2: 0 / 1 (q10) = 0%; CONC_B c1: 1 / 2 (q8, q9) = 50%.
+            # Média = 216,67 / 4 = 54,17%. A soma bruta daria 3 / 6 = 50%.
+            cur.execute(
+                """
+                SELECT questoes, total_universo, pct_do_universo
+                FROM fn_prova_cobra('subassunto') WHERE no_id = 'S-ACENT'
+                """
+            )
+            assert cur.fetchone() == (3, 6, Decimal("54.17"))
+            # Só CONC_A (3 cargos): (66,67 + 0 + 100) / 3; bruto daria 2 / 4.
+            cur.execute(
+                """
+                SELECT questoes, pct_do_universo
+                FROM fn_prova_cobra('subassunto', p_concurso => 'CONC_A')
+                WHERE no_id = 'S-ACENT'
+                """
+            )
+            assert cur.fetchone() == (2, Decimal("55.56"))
+            # Matéria: % da prova e % médio coincidem (o escopo é a prova).
+            # LP: c1 3/3, c3 2/2, c2 1/1, CONC_B 1/2 -> 87,50% (bruto: 5/6).
+            cur.execute(
+                """
+                SELECT questoes, pct_do_universo, pct_medio_por_concurso
+                FROM fn_prova_cobra('materia') WHERE no_id = 'M-LP'
+                """
+            )
+            assert cur.fetchone() == (5, Decimal("87.50"), Decimal("87.50"))
+            # Nó que só uma prova cobra: as outras entram com 0%.
+            # S-HIFEN: q4 está em CONC_A c1 (1/3) e c3 (1/2) -> (33,33 + 50) / 4.
+            cur.execute(
+                """
+                SELECT pct_do_universo FROM fn_prova_cobra('subassunto')
+                WHERE no_id = 'S-HIFEN'
+                """
+            )
+            assert cur.fetchone()[0] == Decimal("20.83")
+
+    def test_fn_prova_cobra_prova_unica_igual_a_conta_direta(self, conn, dados):
+        """Filtro de um só concurso × cargo: média de 1 termo = questões / total."""
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT DISTINCT concurso, cargo_numero FROM vw_prova_cobra_base"
+            )
+            provas = cur.fetchall()
+            assert len(provas) == 4
+            for concurso, cargo in provas:
+                for tipo in (None, "basico", "especifico"):
+                    cur.execute(
+                        """
+                        SELECT no_id, questoes, total_universo, pct_do_universo
+                        FROM fn_prova_cobra(p_concurso => %s, p_cargo_numero => %s,
+                                            p_tipo_conhecimento => %s)
+                        """,
+                        (concurso, cargo, tipo),
+                    )
+                    for no_id, questoes, total, pct in cur.fetchall():
+                        esperado = round(Decimal(questoes * 100) / total, 2)
+                        assert pct == esperado, (concurso, cargo, tipo, no_id)
+            # Exemplo: CONC_A cargo 1, S-ACENT = 2 de 3 nas duas medidas.
+            cur.execute(
+                """
+                SELECT questoes, total_universo, pct_do_universo, pct_medio_por_concurso
+                FROM fn_prova_cobra('subassunto', p_concurso => 'CONC_A',
+                                    p_cargo_numero => 1)
+                WHERE no_id = 'S-ACENT'
+                """
+            )
+            assert cur.fetchone() == (2, 3, Decimal("66.67"), Decimal("66.67"))
 
     def test_vw_peso_materia_cargo(self, conn, dados):
         """vw_peso_materia_cargo calcula proporção por matéria no cargo e formata rótulos."""

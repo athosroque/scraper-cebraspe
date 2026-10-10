@@ -19,8 +19,9 @@ _RESPOSTA_422 = {422: {"description": "Parâmetro de consulta inválido."}}
     summary="Lista as disciplinas com o volume de questões",
     description=(
         "Disciplinas da árvore mestre ativa que têm questão objetiva utilizável, com o "
-        "total de questões distintas (a contagem sobe a árvore, anuladas incluídas) "
-        "e o % de incidência sobre o total. Maior volume primeiro."
+        "total de questões válidas distintas (a contagem sobe a árvore, anuladas "
+        "fora) e o % de incidência: média, entre as provas (concurso × cargo), da "
+        "fatia da prova que é da disciplina. Maior incidência primeiro."
     ),
 )
 def listar_materias():
@@ -32,8 +33,9 @@ def listar_materias():
     response_model=MateriaDetalhe,
     summary="Resumo de uma disciplina",
     description=(
-        "Resumo da disciplina e os subassuntos que mais caem (`fn_prova_cobra`) no "
-        "recorte de concurso, cargo e nível. O cargo só vale junto com o concurso."
+        "Resumo da disciplina e os subassuntos que mais caem (`fn_prova_cobra`, "
+        "pelo % médio na prova por concurso × cargo) no recorte de concurso, cargo "
+        "e nível. O cargo só vale junto com o concurso."
     ),
     responses={**_RESPOSTA_404, **_RESPOSTA_422},
 )

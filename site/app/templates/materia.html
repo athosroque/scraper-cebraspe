@@ -5,7 +5,7 @@
 {% block description %}O que mais cai de {{ rotulo_materia(materia.nome, materia.nome_de_cargo) }} nas provas do CEBRASPE, por subassunto.{% endblock %}
 
 {% block content %}
-{% call c.cabecalho(rotulo_materia(materia.nome, materia.nome_de_cargo), "Subassuntos que mais caem nas provas, em questões objetivas distintas.") %}
+{% call c.cabecalho(rotulo_materia(materia.nome, materia.nome_de_cargo), "Subassuntos que mais caem nas provas, pelo % médio da prova (cada concurso × cargo com o mesmo peso).") %}
 <a href="{{ url_resolver }}" class="btn-primario">Resolver questões desta disciplina</a>
 {% endcall %}
 
@@ -16,14 +16,17 @@
         {% if linhas or materia.questoes_recorte > 0 %}
         {% set soma_ranking = linhas|map(attribute='questoes')|sum if linhas else 0 %}
         {% set outros = materia.questoes_recorte - soma_ranking %}
-        {% set max_real = maximo if maximo > outros else (outros if outros > 0 else maximo) %}
         
+        {# Ordem e barra pelo % médio na prova (concurso × cargo); a contagem fica no rótulo. #}
         {% for r in linhas %}
-        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.questoes * 100 / max_real) if max_real else 0, r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
+        {{ c.barra_ranking(loop.index ~ ". " ~ r.no_nome, (r.pct_do_universo * 100 / maximo) if maximo else 0, (r.pct_do_universo|pct) ~ " da prova · " ~ r.questoes ~ (" questão" if r.questoes == 1 else " questões") ~ ((" + " ~ r.anuladas ~ (" anulada" if r.anuladas == 1 else " anuladas")) if r.anuladas else ""), urls_subassunto[r.no_id]) }}
         {% endfor %}
         
         {% if outros > 0 %}
-        {{ c.barra_ranking("Outros / direto no assunto", (outros * 100 / max_real) if max_real else 0, outros ~ (" questão" if outros == 1 else " questões")) }}
+        <div class="flex items-baseline justify-between gap-3 py-2 text-sm text-slate-600">
+            <span class="truncate">Outros / direto no assunto</span>
+            <span class="shrink-0 tabular-nums">{{ outros ~ (" questão" if outros == 1 else " questões") }}</span>
+        </div>
         {% endif %}
         
         <p class="mt-3 text-xs text-slate-500">
@@ -33,6 +36,7 @@
             Os subassuntos acima somam {{ soma_ranking|num }} para {{ materia.questoes_recorte|num }} questões da disciplina no recorte: uma questão pode estar em até 2 subassuntos.
             {% endif %}
             Universo sob os filtros: {{ (linhas[0].total_universo if linhas else materia.questoes_recorte)|num }} questões válidas. Anuladas aparecem ao lado do subassunto e não entram na contagem.
+            Ordem pelo % da prova: média, entre as provas (concurso × cargo) do recorte, da fatia de cada prova que caiu no subassunto, com o mesmo peso para cada prova.
         </p>
         {% else %}
         <p class="text-sm text-slate-600">Nenhuma questão desta disciplina para esses filtros.</p>
@@ -87,7 +91,7 @@
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.anuladas_recorte|num }}</dd>
             </div>
             <div>
-                <dt class="text-slate-500" title="Peso da disciplina no total de questões válidas encontradas pelos filtros.">Universo de comparação</dt>
+                <dt class="text-slate-500" title="Peso médio da disciplina nas provas do recorte: para cada prova (concurso × cargo), a fatia das questões válidas dela que é desta disciplina; o número é a média dessas fatias, com o mesmo peso para cada prova.">Universo de comparação</dt>
                 <dd class="text-xl font-semibold tabular-nums text-slate-900">{{ materia.pct_do_universo|pct }}</dd>
             </div>
         </dl>

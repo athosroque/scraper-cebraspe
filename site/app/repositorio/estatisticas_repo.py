@@ -1,7 +1,9 @@
 """Leituras das estatísticas da 5E para as páginas da 5F.4.
 
 Toda conta de questão vem de `fn_prova_cobra` (nunca soma de
-`vw_prova_cobra_*` entre cargos), e a do edital repete a regra da
+`vw_prova_cobra_*` entre cargos). Os rankings de prova ordenam pela
+incidência média por prova (concurso × cargo, `pct_do_universo`), nunca pela
+contagem bruta, que faria a prova maior pesar mais. A conta do edital repete a regra da
 `vw_edital_cobra_base` com filtros: ocorrência = item de edital distinto,
 subindo a árvore, só concurso `aprovado`.
 """
@@ -31,7 +33,8 @@ def prova_cobra(
                 p_tipo_conhecimento => %(tipo_conhecimento)s
             )
             WHERE (%(materia_id)s::text IS NULL OR materia_id = %(materia_id)s)
-            ORDER BY questoes DESC, pct_medio_por_concurso DESC, no_nome
+            ORDER BY pct_do_universo DESC, pct_medio_por_concurso DESC,
+                     questoes DESC, no_nome
             LIMIT %(limite)s
             """,
             {
@@ -176,8 +179,9 @@ def materia_ativa(no_id: str) -> dict | None:
 def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
     """Matérias ativas com questões utilizáveis distintas (mesma conta da árvore).
 
-    Usa `fn_prova_cobra` para manter a coerência de % (válidas desduplicadas)
-    entre a home e o painel.
+    Usa `fn_prova_cobra` para manter a coerência entre a home e o painel:
+    contagem de válidas desduplicadas e % médio por prova (concurso × cargo),
+    que também dá a ordem.
     """
     with (
         get_conexao_leitura() as conn,
@@ -195,7 +199,7 @@ def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
                 FROM vw_questoes WHERE utilizavel GROUP BY materia_id
             ) nc ON nc.materia_id = f.no_id
             WHERE (%(materia_id)s::text IS NULL OR f.no_id = %(materia_id)s)
-            ORDER BY f.questoes DESC, f.no_nome
+            ORDER BY f.pct_do_universo DESC, f.questoes DESC, f.no_nome
             """,
             {"materia_id": materia_id},
         )

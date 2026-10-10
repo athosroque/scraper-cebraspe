@@ -255,7 +255,11 @@ class Incidencia(BaseModel):
     no_id: str = Field(description="Subassunto principal da questão.")
     materia_id: str | None = Field(None, description="Disciplina do subassunto.")
     posicao: int = Field(
-        description="Posição no ranking da disciplina (1 = o que mais cai), por questões distintas (`fn_prova_cobra`, sem filtros)."
+        description=(
+            "Posição no ranking da disciplina (1 = o que mais cai), pelo % médio na prova "
+            "entre as provas (concurso × cargo, `pct_do_universo` de `fn_prova_cobra`, "
+            "sem filtros); empate desfeito pelo % na disciplina e pelas questões distintas."
+        )
     )
     total_subassuntos: int = Field(
         description="Quantos subassuntos da disciplina têm questão no ranking."
@@ -560,8 +564,10 @@ class Prioridade(BaseModel):
     )
     incidencia: float = Field(
         description=(
-            "% médio por concurso das questões no subassunto (`fn_prova_cobra`, "
-            "sem filtros); 0 se o nó não aparece no ranking."
+            "% médio do subassunto na prova: para cada prova (concurso × cargo), "
+            "questões do subassunto / questões da prova; média com peso igual por "
+            "prova (`pct_do_universo` de `fn_prova_cobra`, sem filtros). "
+            "0 se o nó não aparece no ranking."
         )
     )
     prioridade: float = Field(
@@ -594,13 +600,26 @@ class LinhaProvaCobra(BaseModel):
     )
     anuladas: int = Field(description="Questões anuladas no nó.")
     total_universo: int = Field(
-        description="Questões válidas distintas sob os filtros."
+        description=(
+            "Questões válidas distintas sob os filtros (informativo; não é o "
+            "denominador dos percentuais)."
+        )
     )
-    pct_do_universo: float = Field(description="`questoes` / `total_universo` × 100.")
+    pct_do_universo: float = Field(
+        description=(
+            "% médio do nó na prova: para cada prova (concurso × cargo) do recorte, "
+            "questões do nó / questões da prova × 100; média com peso igual por "
+            "prova, a que não tem questão no nó entra com 0. Nunca soma bruta "
+            "entre provas. Com filtro de uma prova só, é `questoes` / "
+            "`total_universo` × 100. É a ordem do ranking."
+        )
+    )
     pct_medio_por_concurso: float = Field(
         description=(
-            "Média entre concursos do % do nó dentro da disciplina (subassunto/assunto) "
-            "ou da prova (disciplina), com peso igual por concurso."
+            "% médio do nó dentro da disciplina (subassunto/assunto) ou da prova "
+            "(disciplina), por prova (concurso × cargo) e com peso igual por prova; "
+            "entram as provas que têm a disciplina. O nome é histórico: o grão é "
+            "concurso × cargo."
         )
     )
 
@@ -613,13 +632,16 @@ class MateriaResumo(BaseModel):
     nome: str = Field(description="Nome do nó na árvore mestre.")
     total_questoes: int = Field(
         description=(
-            "Questões objetivas utilizáveis distintas (anuladas incluídas) "
-            "classificadas na disciplina ou abaixo dela (a contagem sobe a árvore)."
+            "Questões objetivas válidas distintas (anuladas fora, como em "
+            "`fn_prova_cobra`) classificadas na disciplina ou abaixo dela (a "
+            "contagem sobe a árvore)."
         )
     )
     pct_incidencia: float = Field(
         description=(
-            "`total_questoes` sobre o total de questões utilizáveis distintas, em %. "
+            "% médio da disciplina na prova: para cada prova (concurso × cargo), "
+            "questões da disciplina / questões da prova; média com peso igual por "
+            "prova (`pct_do_universo` de `fn_prova_cobra`). Ordena a lista. "
             "A soma entre disciplinas pode passar de 100 (questão em 2 nós)."
         )
     )
@@ -639,13 +661,19 @@ class MateriaDetalhe(MateriaResumo):
     )
     anuladas_recorte: int = Field(description="Anuladas da disciplina sob os filtros.")
     pct_do_universo: float = Field(
-        description="Participação da disciplina no universo de questões válidas sob os filtros, em %."
+        description=(
+            "% médio da disciplina na prova entre as provas (concurso × cargo) "
+            "sob os filtros, com peso igual por prova."
+        )
     )
     itens_edital: int = Field(
         description="Itens de edital distintos na disciplina sob os filtros (concursos aprovados)."
     )
     top_subassuntos: list[LinhaProvaCobra] = Field(
-        description="Subassuntos que mais caem na disciplina sob os filtros, maior primeiro."
+        description=(
+            "Subassuntos que mais caem na disciplina sob os filtros, pelo % médio "
+            "na prova (`pct_do_universo`), maior primeiro."
+        )
     )
 
 
