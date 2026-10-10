@@ -623,3 +623,29 @@ lista `inventario/exclusoes.json` para o que é verdadeiro e fica fora do site
 contagem de `<a>` da página ao vivo com o inventário.
 **Custo do aprendizado:** ~1h30 (validação ao vivo de 55 páginas e
 reclassificação).
+
+### [tags: gabarito-parser, ligacao, multipla-escolha, falha-silenciosa, cebraspe]
+**Sintoma:** na revisão da 8.M, o SEBRAE_26_PSE_1 ficava com os 19 gabaritos
+sem caderno, e o SEFA_PR_25, carregado com os textos do inventário, ligava os
+6 gabaritos objetivos de "CONHECIMENTOS ESPECÍFICOS – CARGO N" à discursiva.
+Nenhum dos dois dava erro: só aumentava "gabaritos sem prova" ou trocava a
+grade do caderno.
+**Causa:**
+1. O SEBRAE publica 4 cadernos por prova (TIPO 1 a 4), todos com nome em hash
+   e sem o código no corpo do caderno. A regra "a única básica do concurso"
+   ficava ambígua, e o perfil (`PERFIL I`) não vira número de cargo.
+2. A regra "texto do gabarito com 1 cargo → discursiva desse cargo" não
+   conferia o tipo, e a discursiva única do SEFA_PR cobre todos os cargos.
+3. Ligar pelo texto do link do gabarito não funciona no pipeline de hoje: o
+   spider grava texto só para `Provas/` (`provas_texto_link.json`); gabarito e
+   padrão de resposta vêm sem texto. Só o inventário tem o texto de todos.
+**Solução:** o código impresso na grade decide. O sufixo `_NN` do código é o
+TIPO e casa com o `TIPO N` do texto do link do caderno, e o token `001` casa
+com o cargo ou com o perfil (romano ou arábico). Caderno sem TIPO no texto
+(piloto) aceita qualquer sufixo. Ambiguidade continua sem ligação, agora com
+aviso `gabarito ambíguo`. O desvio para a discursiva só vale para o texto
+classificado como padrão de resposta ou discursiva. Regra nova de ligação se
+confere em schema temporário: com as grades reais e os textos do inventário
+para o concurso novo, e com a carga do piloto comparada ao schema público.
+**Custo do aprendizado:** ~1h (reprodução com as 27 grades reais e conferência
+do piloto em schema temporário).

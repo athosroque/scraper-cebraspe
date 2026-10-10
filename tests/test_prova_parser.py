@@ -1317,6 +1317,39 @@ class TestPreambuloDepoisDoItem:
         assert not pp.ALERTAS_ITEM_INUTILIZAVEL.isdisjoint(q[64]["alertas"])
 
 
+class TestTipoDaGrade:
+    """O tipo da grade (`GradeGabarito.tipos`) decide C/E × ME; as letras e a
+    contagem de "Questão N" só valem sem tipo ou com grade mista."""
+
+    LINHAS_ME = (
+        _l("Questão 1"),
+        _l("Enunciado.", inicio=False),
+        _l("Questão 2"),
+        _l("Enunciado.", inicio=False),
+    )
+    CE, ME = "certo_errado", "multipla_escolha"
+
+    def test_grade_me_so_com_c_e_e_continua_me(self):
+        # Prova ME cujas respostas são só C e E: pelas letras seria C/E.
+        gabarito = {1: "C", 2: "E"}
+        assert _eh_multipla_escolha([], [1, 2], gabarito, {1: self.ME, 2: self.ME})
+
+    def test_grade_ce_nunca_vira_me(self):
+        # Caderno C/E com "Questão N" no texto e letra espúria: o rótulo `Item`
+        # da grade manda.
+        tipos = {1: self.CE, 2: self.CE}
+        assert not _eh_multipla_escolha(list(self.LINHAS_ME), [1, 2], {1: "A"}, tipos)
+
+    def test_sem_tipo_ou_mista_cai_nas_letras(self):
+        assert _eh_multipla_escolha([], [1, 2], {1: "A", 2: "C"}, None)
+        assert not _eh_multipla_escolha([], [1, 2], {1: "C", 2: "E"}, {})
+        mista = {1: self.CE, 2: self.ME}
+        assert not _eh_multipla_escolha([], [1, 2], {1: "C", 2: "E"}, mista)
+        assert _eh_multipla_escolha(list(self.LINHAS_ME), [1, 2], {1: "C"}, mista)
+        # Tipo só de parte dos números também não decide.
+        assert _eh_multipla_escolha([], [1, 2], {1: "B", 2: "C"}, {1: self.CE})
+
+
 class TestMultiplaEscolhaSintetico:
     """Testes unitários para cadernos de múltipla escolha sintéticos."""
 
@@ -1628,8 +1661,11 @@ class TestCadernosMEReais:
         if not pdf.exists() or not gab.exists():
             pytest.skip("PDF de amostra BANRISUL não encontrado")
 
-        grade = ler_grade(gab).respostas
-        resultado, auditoria = extrair_caderno_objetivo(pdf, grade, "BANRISUL")
+        lida = ler_grade(gab)
+        grade = lida.respostas
+        resultado, auditoria = extrair_caderno_objetivo(
+            pdf, grade, "BANRISUL", tipos=lida.tipos
+        )
 
         assert resultado["status"] == STATUS_SUCESSO
         assert resultado["itens_esperados"] == 30
@@ -1657,8 +1693,11 @@ class TestCadernosMEReais:
         if not pdf.exists() or not gab.exists():
             pytest.skip("PDF de amostra SEBRAE não encontrado")
 
-        grade = ler_grade(gab).respostas
-        resultado, auditoria = extrair_caderno_objetivo(pdf, grade, "SEBRAE")
+        lida = ler_grade(gab)
+        grade = lida.respostas
+        resultado, auditoria = extrair_caderno_objetivo(
+            pdf, grade, "SEBRAE", tipos=lida.tipos
+        )
 
         assert resultado["status"] == STATUS_SUCESSO
         assert resultado["itens_esperados"] == 15
@@ -1686,8 +1725,11 @@ class TestCadernosMEReais:
         if not pdf.exists() or not gab.exists():
             pytest.skip("PDF de amostra SEFA_PR não encontrado")
 
-        grade = ler_grade(gab).respostas
-        resultado, auditoria = extrair_caderno_objetivo(pdf, grade, "SEFA_PR")
+        lida = ler_grade(gab)
+        grade = lida.respostas
+        resultado, auditoria = extrair_caderno_objetivo(
+            pdf, grade, "SEFA_PR", tipos=lida.tipos
+        )
 
         assert resultado["status"] == STATUS_SUCESSO
         assert resultado["itens_esperados"] == 50

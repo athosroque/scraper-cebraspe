@@ -37,6 +37,7 @@ from pathlib import Path
 import pymupdf
 
 from src.edital_parser import extrair_texto_paginas
+from src.gabarito_parser import QUESTAO_MULTIPLA_ESCOLHA
 from src.logger import logger
 
 STATUS_SUCESSO = "sucesso"
@@ -1162,9 +1163,20 @@ def segmentar(
 
 
 def _eh_multipla_escolha(
-    linhas: list[Linha], esperados: list[int], gabarito: dict[int, str]
+    linhas: list[Linha],
+    esperados: list[int],
+    gabarito: dict[int, str],
+    tipos: dict[int, str] | None = None,
 ) -> bool:
-    """Detecta se o caderno segue o formato de Múltipla Escolha (A-E ou A-D)."""
+    """Detecta se o caderno segue o formato de Múltipla Escolha (A-E ou A-D).
+
+    Decide pelo tipo da grade (`GradeGabarito.tipos`, lido do rótulo `Item` ou
+    `Questão`) quando ele cobre todos os números com um tipo só. As letras e a
+    contagem de "Questão N" no caderno ficam para grade sem tipo ou mista.
+    """
+    tipos_grade = {(tipos or {}).get(n) for n in esperados}
+    if len(tipos_grade) == 1 and None not in tipos_grade:
+        return tipos_grade.pop() == QUESTAO_MULTIPLA_ESCOLHA
     if any(letra in {"A", "B", "D"} for letra in gabarito.values()):
         return True
     achados_me = sum(
@@ -1788,10 +1800,12 @@ def extrair_caderno_objetivo(
     gabarito: dict[int, str] | None,
     caderno: str,
     dir_figuras: Path | None = None,
+    tipos: dict[int, str] | None = None,
 ) -> tuple[dict, dict]:
-    """Devolve `(resultado, auditoria)` de um caderno Certo/Errado.
+    """Devolve `(resultado, auditoria)` de um caderno objetivo (C/E ou ME).
 
-    `gabarito` = `{numero: 'C'|'E'|'X'}` (grade definitiva). Sem gabarito, o
+    `gabarito` = `{numero: letra}` (grade definitiva) e `tipos` =
+    `{numero: tipo}` da mesma grade (`GradeGabarito.tipos`). Sem gabarito, o
     caderno falha com `falha_sem_gabarito` — a faixa de itens não é chutada.
     """
     resultado = {
@@ -1824,7 +1838,7 @@ def extrair_caderno_objetivo(
         auditoria["linhas_removidas"] = removidas
         esperados = sorted(gabarito)
         alertas_loc: list[dict] = []
-        eh_me = _eh_multipla_escolha(linhas, esperados, gabarito)
+        eh_me = _eh_multipla_escolha(linhas, esperados, gabarito, tipos)
         if eh_me:
             achados = localizar_questoes_me(linhas, esperados, alertas=alertas_loc)
             resultado["alertas"].extend(alertas_loc)

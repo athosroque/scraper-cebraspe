@@ -247,10 +247,14 @@ def processar_caderno(
             escolhida, alertas_grade = _escolher_documento(
                 docs, prova, gabarito_parser.TIPO_GRADE
             )
-            respostas = escolhida[1]["grade"].respostas if escolhida else None
+            grade = escolhida[1]["grade"] if escolhida else None
             dir_figuras = pdf.parent / "figuras"
             resultado, auditoria = prova_parser.extrair_caderno_objetivo(
-                pdf, respostas, caderno, dir_figuras
+                pdf,
+                grade.respostas if grade else None,
+                caderno,
+                dir_figuras,
+                tipos=grade.tipos if grade else None,
             )
             rel_figuras = dir_figuras.relative_to(data_dir)
             for item in resultado["questoes"] + resultado["textos_base"]:

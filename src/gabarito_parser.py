@@ -34,9 +34,11 @@ from src.edital_parser import extrair_texto_paginas
 # sublinhado na sigla do concurso, 169_SEBRAE_26_PSE_1_CG1_02 (SEBRAE 2026) e
 # 053_SEBRAE_PSE_CG1_02. A sigla aceita até 4 segmentos extras `_XXX`; como o
 # código termina em fronteira de palavra, um código sem sublinhado na sigla
-# continua casando igual (mesmo trecho, mesmo token).
+# continua casando igual (mesmo trecho, mesmo token). O básico pode vir sem
+# número (059_SEFAZRJANALISTA_CG_01). O sufixo `_NN` é o TIPO do caderno
+# (SEBRAE 2026: `_01` a `_04` = TIPO 1 a 4).
 PADRAO_CODIGO_CADERNO = re.compile(
-    r"\b(\d{3})_([A-Z0-9]+(?:_[A-Z0-9]+){0,4})_(C[BG]\d+|\d{3})_(\d{2})\b"
+    r"\b(\d{3})_([A-Z0-9]+(?:_[A-Z0-9]+){0,4})_(C[BG]\d*|\d{3})_(\d{2})\b"
 )
 PADRAO_JUSTIFICATIVA = re.compile(r"justificativas?\s+de\s+altera", re.IGNORECASE)
 PADRAO_PADRAO_RESPOSTA = re.compile(r"PADR[ÃA]O\s+DE\s+RESPOSTA", re.IGNORECASE)
@@ -141,6 +143,12 @@ def token_caderno(codigo: str | None) -> str | None:
     `169_SEBRAE_26_PSE_1_CG1_02` -> `CG1`."""
     m = PADRAO_CODIGO_CADERNO.fullmatch(codigo or "")
     return m.group(3) if m else None
+
+
+def tipo_do_codigo(codigo: str | None) -> int | None:
+    """Sufixo do código = TIPO do caderno: `169_SEBRAE_26_PSE_1_CG1_02` -> 2."""
+    m = PADRAO_CODIGO_CADERNO.fullmatch(codigo or "")
+    return int(m.group(4)) if m else None
 
 
 def classificar_documento(texto: str) -> str:

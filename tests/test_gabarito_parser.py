@@ -20,6 +20,7 @@ from src.gabarito_parser import (
     ler_grade,
     ler_grade_de_linhas,
     ler_grade_tipada_de_linhas,
+    tipo_do_codigo,
     token_caderno,
 )
 
@@ -339,13 +340,57 @@ class TestClassificacaoECodigo:
             ("169_SEBRAE_26_PSE_1_CG1_02", "CG1"),
             ("053_SEBRAE_PSE_CG1_02", "CG1"),
             ("084_PC_CE_001_01", "001"),
+            # Básico sem número (SEFAZ_RJ_25_ANALISTA, grade real).
+            ("059_SEFAZRJANALISTA_CG_01", "CG"),
+            ("169_SEBRAE_26_PSE_1_001_04", "001"),
             ("077_BANRISUL_CB1", None),
+            ("123_ABC_CGX_01", None),
+            ("123_ABC_C_01", None),
+            ("123_ABC_CG_1", None),
+            ("12_ABC_CG_01", None),
+            ("094_PF_014_DISC", None),
+            ("094_PF_DISC_015", None),
             (None, None),
             ("lixo", None),
         ],
     )
     def test_token_caderno(self, codigo, token):
         assert token_caderno(codigo) == token
+
+    @pytest.mark.parametrize(
+        ("codigo", "tipo"),
+        [
+            ("169_SEBRAE_26_PSE_1_CG1_02", 2),
+            ("169_SEBRAE_26_PSE_1_003_04", 4),
+            ("094_PF_CB1_01", 1),
+            ("059_SEFAZRJANALISTA_CG_01", 1),
+            ("lixo", None),
+            (None, None),
+        ],
+    )
+    def test_tipo_do_codigo_e_o_sufixo(self, codigo, tipo):
+        assert tipo_do_codigo(codigo) == tipo
+
+    def test_codigo_basico_sem_numero_no_texto(self):
+        texto = "Obs.: ( X ) questão anulada.\n059_SEFAZRJANALISTA_CG_01\nQuestão"
+        assert codigo_caderno_do_texto(texto) == "059_SEFAZRJANALISTA_CG_01"
+        # O sublinhado na sigla continua dando o token com número.
+        texto = "0\n169_SEBRAE_26_PSE_1_CG1_02\nQuestão"
+        assert codigo_caderno_do_texto(texto) == "169_SEBRAE_26_PSE_1_CG1_02"
+        assert token_caderno(codigo_caderno_do_texto(texto)) == "CG1"
+
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "processo 2025_ABC_CG_01 arquivado",
+            "ref. 123_ABC_CGX_01",
+            "123_ABC_CG_012",
+            "x094_PF_CG_01",
+            "Lei 123_ABC_C_01",
+        ],
+    )
+    def test_cg_sem_numero_nao_abre_falso_positivo(self, texto):
+        assert codigo_caderno_do_texto(texto) is None
 
     def test_codigo_no_meio_do_texto(self):
         assert codigo_caderno_do_texto("0\n0\n167_CDNS_CG1_01\n0") == "167_CDNS_CG1_01"
