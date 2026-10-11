@@ -1129,6 +1129,11 @@ enviar o bloco de uma etapa específica para o agente construir.
   - `[ ]` Separação básico × específico no recorte de concurso (filtro ou colunas).
   - `[ ]` Rótulo "média de N concursos / M provas" ao lado do %. Pede colunas novas na
     `fn_prova_cobra` e muda o contrato da API e o `site/openapi.json`.
+  - `[ ]` Recorte visível (pedido do dono, 2026-10-11, card KAN-54): o botão "Estatísticas"
+    da questão (`_card_questao.html`) abre `/materias/<id>` sem filtro e perde o contexto.
+    Ele passa a levar banca/concurso/ano/nível/tipo da questão, já selecionados. Também entram
+    uma faixa de recorte com chips removíveis e "média de N concursos", o % principal dentro
+    da disciplina (somando 100% com "Outros") e o "% da prova" como segundo número.
   - **Pronto quando:** os dois usos-alvo acima são respondidos no site, sem SQL à mão, também
     com o filtro de nível, e `make test-all` está verde.
 - `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
