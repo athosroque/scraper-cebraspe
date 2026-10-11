@@ -1083,7 +1083,8 @@ enviar o bloco de uma etapa específica para o agente construir.
       80 + 75 = 155. O simulado dá peso 1 a tudo (130 − 6 anuladas = 124). O peso vem do edital,
       por prova (P1/P2), e não existe no banco; conferir também os editais C/E do piloto.
       Generalizado no card KAN-53 (regra de pontuação por banca, formato e prova, vinda do
-      edital: C/E do CEBRASPE +1/−1, ME sem desconto, discursiva com quesitos e outras bancas).
+      edital: C/E do CEBRASPE +1/−1; ME do CEBRASPE varia por edital, com desconto em alguns e não no
+      SEFA_PR_25; discursiva com quesitos; outras bancas). Tarefa futura (dono, 2026-10-11).
     - `[ ]` Textos do ME: o KPI "Nota CEBRASPE" mostra "certas − erradas", o subtítulo da lista
       diz "padrão certo/errado" no filtro ME, e a introdução do simulado só descreve +1/−1.
   - Plano das sessões arquivado em [`docs/planos/plano-etapa-8m.md`](docs/planos/plano-etapa-8m.md).
