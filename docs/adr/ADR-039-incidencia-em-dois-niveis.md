@@ -151,6 +151,9 @@ pct_final       = média de pct_concurso entre os concursos elegíveis
 - A assinatura é calculada **depois** dos filtros (a base de `fn_prova_cobra`
   continua filtrada primeiro). Com `p_nivel`, só entram cargos daquele nível, e
   `vw_comparativo_nivel` junta provas dentro do nível.
+- Sem filtro de nível, dois cargos de níveis diferentes com exatamente as mesmas
+  questões são **uma prova só** (decisão do dono, 2026-10-11: "é a mesma prova").
+  O nível não entra na chave da prova distinta. No piloto isso não acontece.
 - `pct_do_universo` usa o escopo da prova inteira; `pct_medio_por_concurso` usa o
   escopo da matéria do nó para assunto/subassunto (para matéria é igual ao
   `pct_do_universo`), e a assinatura da matéria é só das questões dela.

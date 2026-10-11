@@ -1078,8 +1078,10 @@ enviar o bloco de uma etapa específica para o agente construir.
     conferidos, com 0 erro de JS (42 certas, 41 erradas e 41 em branco dão 42 de 124). O edital
     nº 1 (subitem 8.11.2, a e b) dá 0,00 ponto à resposta errada, então o erro no ME não desconta.
     Achados que ficam para depois:
-    - `[ ]` Peso por prova no simulado ME: o edital do SEFA dá 1,00 ponto por item na P1 e 1,50 na
-      P2 (máximo 155). O simulado dá peso 1 a tudo (máximo 124).
+    - `[ ]` Peso por prova no simulado: o edital do SEFA (8.11.2) dá 1,00 ponto por item na P1
+      (conhecimentos gerais, 80 questões no cargo 1) e 1,50 na P2 (específicos, 50), máximo
+      80 + 75 = 155. O simulado dá peso 1 a tudo (130 − 6 anuladas = 124). O peso vem do edital,
+      por prova (P1/P2), e não existe no banco; conferir também os editais C/E do piloto.
     - `[ ]` Textos do ME: o KPI "Nota CEBRASPE" mostra "certas − erradas", o subtítulo da lista
       diz "padrão certo/errado" no filtro ME, e a introdução do simulado só descreve +1/−1.
   - Plano das sessões arquivado em [`docs/planos/plano-etapa-8m.md`](docs/planos/plano-etapa-8m.md).
