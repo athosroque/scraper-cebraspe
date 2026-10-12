@@ -1123,25 +1123,25 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     16,66 → 11,65; Informática 7,10 → 3,43). Números completos no ADR-039.
   - **Pronto quando:** o ranking de matérias sem filtro bate com o ADR-039 (LP 13,81%;
     Dir. Adm. 10,59%; Ética 4,81%; Adm. Geral 4,20%) e `make test-all` está verde.
-- `[ ]` **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12; plano
+- `[ ]` **8.C Coleta dos concursos ME de 2025** (KAN-55; prioridade do dono, 2026-10-12; plano
   autocontido em [`plano-etapa-8c.md`](plano-etapa-8c.md), uma sessão por item). Nenhuma
   questão ME está no banco de produção: o Gate da 8.M carregou o `SEFA_PR_25` só na cópia
   `cebraspe_gate`. Alvo: os 11 concursos ME de 2025 encerrados do inventário. Os ME de 2026 e
   os em andamento ficam para decisão do dono.
-  - `[ ]` C0 Download guiado pelo inventário: `map_pdf_links` com o classificador fino,
+  - `[ ]` C0 (KAN-30) Download guiado pelo inventário: `map_pdf_links` com o classificador fino,
     `pdf_vai_para_o_site` e `exclusoes.json`; "PROVA PRÁTICA – OPÇÃO" e o caderno único
     objetivo + discursivo (pendências da 8.0). Piloto inalterado.
-  - `[ ]` C1a Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
+  - `[ ]` C1a (KAN-56) Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
     banco, 3 questões conferidas no PDF e roteiro `docs/runbook-lote.md`. Pausa: editais.
-  - `[ ]` C1b Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.
-  - `[ ]` C2 Orquestrador mínimo `scripts/lote_concursos.py` (núcleo da 8.1), com o alerta
+  - `[ ]` C1b (KAN-57) Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.
+  - `[ ]` C2 (KAN-31, KAN-32) Orquestrador mínimo `scripts/lote_concursos.py` (núcleo da 8.1), com o alerta
     "ME sem texto-base" e `--concurso` no `classificar_questoes`.
-  - `[ ]` C3 `SEBRAE_25_PSE_1` + `UNIVESP_25_PSS`
-  - `[ ]` C4 `IPAAM_25` + `SEMA_AM_25`
-  - `[ ]` C5 `PGE_ES_25_PROCURADOR` + `PGE_PI_25`
-  - `[ ]` C6 `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25`
-  - `[ ]` C7 `SEED_SE_25_PROFESSOR`
-  - `[ ]` C8 Fechamento: views da 5E com 16 concursos, textos ME do site (pendência da 8.M),
+  - `[ ]` C3 (KAN-58) `SEBRAE_25_PSE_1` + `UNIVESP_25_PSS`
+  - `[ ]` C4 (KAN-59) `IPAAM_25` + `SEMA_AM_25`
+  - `[ ]` C5 (KAN-60) `PGE_ES_25_PROCURADOR` + `PGE_PI_25`
+  - `[ ]` C6 (KAN-61) `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25`
+  - `[ ]` C7 (KAN-62) `SEED_SE_25_PROFESSOR`
+  - `[ ]` C8 (KAN-63) Fechamento: views da 5E com 16 concursos, textos ME do site (pendência da 8.M),
     `CLAUDE.md`/`task.md` e arquivar o plano.
   - **Pronto quando:** os 11 concursos ME de 2025 estão `aprovado`, o piloto segue inalterado
     (2.800 itens, 129 anuladas, 3.029 apontamentos) e `make test-all` está verde.

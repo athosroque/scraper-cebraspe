@@ -4,6 +4,8 @@
 > em 2026-10-12: a coleta dos cadernos ME vem antes da 8.M.2 (estatísticas por recorte).
 > Base normativa: ADR-026 (banco próprio), ADR-030 (árvore), ADR-031 (cadernos), ADR-032
 > (classificação), ADR-037 (inventário e exclusões), ADR-038 (ME), ADR-039 (incidência).
+> Jira: KAN-55 (etapa); C0 = KAN-30, C1a = KAN-56, C1b = KAN-57, C2 = KAN-31 + KAN-32,
+> C3–C7 = KAN-58 a KAN-62, C8 = KAN-63.
 > Ao abrir uma sessão, ler só este arquivo e a seção dela. O `task.md` tem o resumo e o
 > checklist.
 
