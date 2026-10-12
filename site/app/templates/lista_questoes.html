@@ -50,7 +50,7 @@ document.addEventListener("alpine:init", () => {
     // Nível do pai de cada faceta em cascata e o texto quando ele falta.
     const PAI = { assunto: "materia", subassunto: "assunto" };
     const LIMITE = 200;
-    const normalizar = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const normalizar = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[º°]/g, "o").replace(/(?<=\d)\.(?=\d)/g, "").replace(/\bn\.?o\.?\s*(?=\d)/g, "");
     const ler = (id) => {
         const el = document.getElementById(id);
         return el ? JSON.parse(el.textContent) : null;
@@ -264,7 +264,7 @@ document.addEventListener("alpine:init", () => {
                 else resto.push(i);
             }
             resto = termo
-                ? resto.filter((i) => normalizar(i.rotulo + " " + (i.caminho || "")).includes(termo))
+                ? resto.filter((i) => normalizar(i.rotulo + " " + (i.caminho || "") + " " + (i.busca || "")).includes(termo))
                 : resto.filter((i) => i.total > 0);
             const itens = topo.concat(resto.slice(0, LIMITE).map((i) => ({ ...i, marcado: false })));
             return {

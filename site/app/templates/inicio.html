@@ -9,7 +9,7 @@
 {# Busca ignora acento e caixa: "lingua" acha "LÍNGUA PORTUGUESA". #}
 <div x-data="{
     busca: '',
-    norm(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim() },
+    norm(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[º°]/g, 'o').replace(/(?<=\d)\.(?=\d)/g, '').replace(/\bn\.?o\.?\s*(?=\d)/g, '').trim() },
     get vazia() {
         if (!this.busca) return false;
         let b = this.norm(this.busca);
@@ -22,7 +22,7 @@
     {# % de incidência vem do mesmo serviço de /api/v1/materias (5F.7). #}
     <ul x-ref="lista" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {% for materia in materias %}
-        <li data-nome="{{ materia.nome }}"
+        <li data-nome="{{ materia.nome }} {{ textos_busca.get(materia.id, '') }}"
             x-show="!busca || norm($el.dataset.nome).includes(norm(busca))">
             {% call c.card("flex h-full flex-col justify-between gap-4") %}
             <div>

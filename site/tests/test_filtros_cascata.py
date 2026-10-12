@@ -183,8 +183,10 @@ def test_rotulo_disciplina_no_painel_e_no_site(cliente, arvore):
         r = cliente.get(url)
         assert r.status_code == 200, url
         # Fora o conteúdo das provas (enunciado, texto-base, nomes de nó em
-        # JSON), que pode citar "matéria" por si.
+        # JSON), que pode citar "matéria" por si. `data-nome` da busca de
+        # disciplina também leva nomes de nó (KAN-64), não rótulo.
         texto = re.sub(r"<(script|article)\b.*?</\1>", "", r.text, flags=re.DOTALL)
+        texto = re.sub(r'data-nome="[^"]*"', "", texto)
         assert "atéria" not in texto and "ATÉRIA" not in texto, url
     resultado = cliente.post(
         "/simulado/corrigir", data={"concurso": "PF_25_ADM", "cargo_numero": "1"}
@@ -247,9 +249,10 @@ def test_opcoes_restritas_aos_pais_marcados(cliente, arvore):
     }
     assert {a["valor"] for a in d["assunto"] if a["total"]} == esperados
     assert d["subassunto"] == []
-    # Só o nome do próprio nó (sem caminho nem nome do pai).
+    # Só o nome do próprio nó (sem caminho nem nome do pai). `busca` é o
+    # texto de pesquisa com apelidos e descendentes (KAN-64), não o rótulo.
     for a in d["assunto"]:
-        assert set(a) == {"valor", "rotulo", "total", "pai"}
+        assert set(a) == {"valor", "rotulo", "total", "pai", "busca"}
         assert a["rotulo"] == nos[a["valor"]].nome
     assert len(d["materia"]) == len(arvore["facetas"]["materias"])
 

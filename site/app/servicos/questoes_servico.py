@@ -343,17 +343,41 @@ def nos_da_consulta(no_ids: list[str] | None) -> list[str] | None:
     return refinar_por_ramo(coerir_nos(no_ids))
 
 
+def textos_busca(apelidos: dict[str, list[str]]) -> dict[str, str]:
+    """Texto de busca de cada nó: nome e apelidos dele e de todos os descendentes.
+
+    Assim "LGPD" acha a disciplina que contém o nó da LGPD (KAN-64). Montado
+    uma vez por requisição, a partir da árvore em cache."""
+    mapa = _mapa_nos()
+    filhos: dict[str, list[str]] = {}
+    for no_id, info in mapa.items():
+        if info.pai is not None:
+            filhos.setdefault(info.pai, []).append(no_id)
+
+    def coletar(no_id: str) -> list[str]:
+        partes = [mapa[no_id].nome, *apelidos.get(no_id, [])]
+        for filho in filhos.get(no_id, []):
+            partes.extend(coletar(filho))
+        return partes
+
+    return {no_id: " | ".join(coletar(no_id)) for no_id in mapa}
+
+
 def opcoes_em_cascata(
-    facetas: FacetasResponse, no_ids: list[str] | None
+    facetas: FacetasResponse,
+    no_ids: list[str] | None,
+    textos: dict[str, str] | None = None,
 ) -> dict[str, list[dict]]:
     """Opções de disciplina, assunto e subassunto do painel do site.
 
     Assunto só das disciplinas marcadas e subassunto só dos assuntos marcados
     (sem pai marcado, a lista vem vazia). Cada opção leva o próprio nome e o
-    `pai`, nunca o caminho: o painel agrupa sob o nome do pai.
+    `pai`, nunca o caminho: o painel agrupa sob o nome do pai. `busca` é o
+    texto de `textos_busca` (nome e apelidos, com os descendentes).
     """
     mapa = _mapa_nos()
     marcados = set(no_ids or [])
+    textos = textos or {}
 
     def opcoes(lista, restringir: bool):
         saida = []
@@ -362,7 +386,13 @@ def opcoes_em_cascata(
             if restringir and pai not in marcados:
                 continue
             saida.append(
-                {"valor": n.valor, "rotulo": n.rotulo, "total": n.total, "pai": pai}
+                {
+                    "valor": n.valor,
+                    "rotulo": n.rotulo,
+                    "total": n.total,
+                    "pai": pai,
+                    "busca": textos.get(n.valor, ""),
+                }
             )
         return saida
 

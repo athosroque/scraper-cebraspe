@@ -148,8 +148,12 @@ def _nao_encontrada(
 def inicio(request: Request):
     # Grade de matérias (5F.9/5F.7): mesma lista de /api/v1/materias.
     materias = estatisticas_servico.listar_materias()
+    # Busca por "LAI" ou "LGPD" acha a disciplina que contém o nó (KAN-64).
+    textos = questoes_servico.textos_busca(estatisticas_servico.apelidos_por_no())
     return templates.TemplateResponse(
-        request=request, name="inicio.html", context={"materias": materias}
+        request=request,
+        name="inicio.html",
+        context={"materias": materias, "textos_busca": textos},
     )
 
 
@@ -350,7 +354,8 @@ def _dados_facetas(facetas, filtros: FiltroQuestoes) -> dict[str, list[dict]]:
             {"valor": str(f.valor), "rotulo": f.rotulo, "total": f.total} for f in lista
         ]
 
-    nos = questoes_servico.opcoes_em_cascata(facetas, filtros.no_id)
+    textos = questoes_servico.textos_busca(estatisticas_servico.apelidos_por_no())
+    nos = questoes_servico.opcoes_em_cascata(facetas, filtros.no_id, textos)
     return {
         "orgao": simples(facetas.orgaos),
         "ano": simples(facetas.anos),

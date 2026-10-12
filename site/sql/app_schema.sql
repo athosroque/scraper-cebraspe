@@ -63,6 +63,7 @@ GRANT USAGE ON SCHEMA public TO site_leitura;
 GRANT SELECT ON vw_questoes TO site_leitura;
 GRANT SELECT ON vw_discursivas TO site_leitura;
 GRANT SELECT ON vw_no_caminho TO site_leitura;
+GRANT SELECT ON vw_no_apelidos TO site_leitura;
 GRANT SELECT ON vw_questao_no TO site_leitura;
 GRANT SELECT ON vw_edital_cobra_materia TO site_leitura;
 GRANT SELECT ON vw_edital_cobra_assunto TO site_leitura;

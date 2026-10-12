@@ -1,5 +1,6 @@
 """Estatísticas do site (5F.4): "o que mais cai", "o que o edital cobra" e edital × prova."""
 
+import re
 import unicodedata
 from collections import Counter
 
@@ -126,19 +127,43 @@ def detalhe_materia(
 
 
 def _normalizar(texto: str) -> str:
+    """Busca sem acento e caixa; ponto de milhar e "nº" de norma saem.
+
+    "7.724", "7724" e "Decreto nº 7.724" caem na mesma chave (KAN-64)."""
     sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore")
-    return " ".join(sem_acento.decode().lower().split())
+    texto = " ".join(sem_acento.decode().lower().split())
+    return _NUMERO_DE_NORMA.sub("", _PONTO_MILHAR.sub("", texto))
+
+
+_PONTO_MILHAR = re.compile(r"(?<=\d)\.(?=\d)")
+# Depois do NFKD, "nº" vira "no" (e "n.º", "n.o"). Vale só antes de dígito.
+_NUMERO_DE_NORMA = re.compile(r"\bn\.?o\.?\s*(?=\d)")
+
+
+def apelidos_por_no() -> dict[str, list[str]]:
+    return estatisticas_repo.apelidos_por_no()
 
 
 def buscar_nos(q: str) -> list[ResultadoBusca]:
+    """Nó que tem o termo no nome ou em algum apelido (KAN-64).
+
+    Nome casando vem antes de apelido casando; dentro disso, a ordem é a de sempre."""
     alvo = _normalizar(q)
     if not alvo:
         return []
+    apelidos = apelidos_por_no()
     achados = []
     for r in estatisticas_repo.nos_ativos():
         nome = _normalizar(r["nome"])
-        if alvo in nome:
-            chave = (not nome.startswith(alvo), _ORDEM_NIVEL.get(r["nivel"], 9), nome)
+        casa_nome = alvo in nome
+        casa_apelido = any(alvo in _normalizar(a) for a in apelidos.get(r["id"], []))
+        if casa_nome or casa_apelido:
+            chave = (
+                not casa_nome,
+                not nome.startswith(alvo),
+                _ORDEM_NIVEL.get(r["nivel"], 9),
+                nome,
+            )
             achados.append((chave, r))
     achados.sort(key=lambda par: par[0])
     return [ResultadoBusca(**r) for _, r in achados[:LIMITE_BUSCA]]

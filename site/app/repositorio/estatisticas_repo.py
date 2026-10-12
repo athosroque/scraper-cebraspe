@@ -215,3 +215,10 @@ def nos_ativos() -> list[dict]:
     ):
         cur.execute("SELECT id, nome, nivel, caminho, materia_id FROM vw_no_caminho")
         return cur.fetchall()
+
+
+def apelidos_por_no() -> dict[str, list[str]]:
+    """Apelidos de busca de cada nó efetivo (KAN-64), da view `vw_no_apelidos`."""
+    with get_conexao_leitura() as conn, conn.cursor() as cur:
+        cur.execute("SELECT no_id, apelidos FROM vw_no_apelidos")
+        return {no_id: list(apelidos) for no_id, apelidos in cur.fetchall()}

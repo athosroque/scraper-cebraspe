@@ -467,6 +467,7 @@ DROP VIEW IF EXISTS vw_taxonomia_detalhe CASCADE;
 DROP VIEW IF EXISTS vw_subtopico_detalhe CASCADE;
 DROP VIEW IF EXISTS vw_questao_no CASCADE;
 DROP VIEW IF EXISTS vw_no_caminho CASCADE;
+DROP VIEW IF EXISTS vw_no_apelidos CASCADE;
 DROP VIEW IF EXISTS vw_arvore_edital_por_cargo CASCADE;
 DROP VIEW IF EXISTS vw_edital_cobra_subassunto CASCADE;
 DROP VIEW IF EXISTS vw_edital_cobra_assunto CASCADE;
@@ -523,6 +524,45 @@ SELECT
     h.assunto_id
 FROM efetivo e
 INNER JOIN hierarquia h ON h.id = e.atual;
+
+-- Apelidos de busca de cada nó efetivo (KAN-64): nomes de nós fundidos nele e
+-- nomes de itens de edital que apontam para um único nó. Item de nome composto
+-- (2+ nós) não vira apelido. Derivado na view, sem coluna nova.
+CREATE OR REPLACE VIEW vw_no_apelidos AS
+WITH item AS (
+    SELECT 'm' || p.materia_id::text AS k, n.nome, c.no_efetivo
+    FROM materia_no p
+    JOIN dim_materia n ON n.id = p.materia_id
+    JOIN vw_no_caminho c ON c.id = p.no_id
+    UNION ALL
+    SELECT 't' || p.topico_id, n.nome, c.no_efetivo
+    FROM topico_no p
+    JOIN dim_topico n ON n.id = p.topico_id
+    JOIN vw_no_caminho c ON c.id = p.no_id
+    UNION ALL
+    SELECT 's' || p.subtopico_id, n.nome, c.no_efetivo
+    FROM subtopico_no p
+    JOIN dim_subtopico n ON n.id = p.subtopico_id
+    JOIN vw_no_caminho c ON c.id = p.no_id
+),
+item_unico AS (
+    SELECT k, min(nome) AS nome, min(no_efetivo) AS no_efetivo
+    FROM item
+    GROUP BY k
+    HAVING count(DISTINCT no_efetivo) = 1
+),
+apelido AS (
+    SELECT c.no_efetivo, a.nome
+    FROM no_arvore a
+    JOIN vw_no_caminho c ON c.id = a.id
+    WHERE a.id <> c.no_efetivo
+    UNION
+    SELECT no_efetivo, nome FROM item_unico
+)
+SELECT no_efetivo AS no_id,
+       array_agg(DISTINCT nome ORDER BY nome) AS apelidos
+FROM apelido
+GROUP BY no_efetivo;
 
 -- View oficial para estatísticas e simulados (apenas registros aprovados, com nó efetivo resolvido)
 CREATE OR REPLACE VIEW vw_questao_no AS

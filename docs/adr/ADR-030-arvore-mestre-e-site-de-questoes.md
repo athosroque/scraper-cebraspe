@@ -325,3 +325,9 @@ Pendências decididas pelo dono (2026-10-07): fundidos os assuntos "Estoques" e 
 **Consequência.** Questão de LAI numa prova de Arquivologia passa a contar em Direito Administrativo, e é esperado. O concurso e o cargo da questão, e a matéria de origem do item de edital, continuam guardados, então a leitura por prova e por cargo não se perde.
 
 **Travas.** `curar_arvore --criar` recusa norma que já existe em outro nó (`[NORMA_JA_EXISTE]`, com `--permitir-norma-repetida` para o caso de ser outro conceito); `--mapear` avisa quando o alvo é norma repetida (`[AVISO NORMA_REPETIDA]`, sem bloquear). O teste `test_normas_consolidadas_em_um_no_so` guarda LGPD, LAI e LRF. O P6 do runbook do lote roda o detector de dispersão depois de cada carga. A curadoria por LLM só propõe fundir e mover, e não cria nó.
+
+## Atualização (2026-10-12, KAN-64 fase 3): apelidos de busca
+
+**Regra.** Na estatística o conceito é um nó só, mas o aluno chega a ele por qualquer nome. Os apelidos de cada nó efetivo saem da view `vw_no_apelidos`, sem coluna nova nem curadoria à parte: os nomes dos nós fundidos nele e os nomes dos itens de edital que apontam **só** para ele. Item de nome composto (2+ nós, como "SWOT; BSC") não vira apelido, senão a busca por uma parte traria a outra.
+
+**Efeito.** `/api/v1/busca` casa nome ou apelido (o nome vem antes na ordem). No painel de `/questoes` e na página inicial, a busca rápida de cada nível casa também os nomes e apelidos dos descendentes: "LGPD" acha DIREITO ADMINISTRATIVO. Ponto de milhar e "nº" saem da comparação ("7.724" = "7724" = "Decreto nº 7.724"). LAI e LGPD ganharam a sigla no nome. Cada fusão aprovada e cada item novo mapeado aumentam os apelidos sem trabalho manual. `site_leitura` lê a view, e o GRANT é reaplicado a cada carga.
