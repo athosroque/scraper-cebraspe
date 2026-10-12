@@ -28,18 +28,34 @@ MARCADOR_FIM_SECAO = "ANEXO I"
 # são reais no PF_25_ADM — o parser trata os dois.
 PADRAO_CARGO = re.compile(r"\nCARGO\s+(\d+):\s*([^\n]+)")
 
+# Cabeçalho de área de conhecimento em caixa alta, linha inteira, ex.
+# "ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS" (BANRISUL_25). Cada área faz prova
+# específica própria, então é tratada como cargo. Só a forma em caixa alta e
+# no início da linha: "áreas de conhecimento" no corpo do texto não casa.
+PADRAO_AREA = re.compile(r"\nÁREA\s+(\d+):\s*([^\n]+)")
+
 # Cabeçalho de matéria, ex: "LÍNGUA PORTUGUESA: 1 Compreensão ...",
 # "ADMINISTRAÇÃO FINANCEIRA, ORÇAMENTÁRIA E ORÇAMENTO PÚBLICO: ...",
 # "ATUALIDADES (SOMENTE PARA A PROVA DISCURSIVA): ...",
 # "LÍNGUA INGLESA (APENAS PARA O CARGO 3: ... E CARGO 6: ...): ...".
 # Suporta especificações entre parênteses que contêm colons sem perder a fronteira da matéria.
 PADRAO_MATERIA = re.compile(
-    r"\n(?!CARGO\s+\d)"
+    r"\n(?!(?:CARGO|ÁREA)\s+\d)"
     r"("
     r"[A-ZÀ-Ú][A-ZÀ-Ú0-9 /,–\-]{2,90}"
     r"(?:(?:,\s*|\s+(?:E|OU|DE|DA|DO|DOS|DAS))\s*\n\s*[A-ZÀ-Ú0-9 /,–\-]{2,90})?"
     r"(?:\s*\([^)]*\))?"
     r"):\s*"
+)
+
+# Sub-matéria numerada em romano dentro de uma matéria composta, ex. (SEFA_PR_25):
+# "DIREITO CONSTITUCIONAL, DIREITO ADMINISTRATIVO E ESTATUTO DA CRIANÇA E DO
+# ADOLESCENTE: I DIREITO CONSTITUCIONAL: 1 Constituição. ... II DIREITO
+# ADMINISTRATIVO: 1 Conceito ..." — o romano fica colado ao texto anterior, na
+# mesma linha, então não passa por `PADRAO_MATERIA` (que exige quebra de linha).
+# Exige romano + nome em caixa alta + ":", para não casar "inciso II do art. 5º".
+PADRAO_SUBMATERIA_ROMANA = re.compile(
+    r"(?<!\S)(?:IX|IV|VI{0,3}|I{1,3}|X)\s+([A-ZÀ-Ú][A-ZÀ-Ú ,–\-/\n]{2,150}?):\s*"
 )
 
 # Cabeçalho de bloco que agrupa matérias por tipo de conhecimento e nível,
@@ -215,17 +231,43 @@ def detectar_cargo_e_nivel_edital(pdf_path: Path) -> dict[str, str | None]:
         cargo_limpo = re.sub(r"\s*[-–]\s*[A-Z0-9/]+\s*$", "", cargo_bruto).strip()
         cargo_unico = cargo_limpo
 
-    # 2. Detecção de nível de escolaridade via bloco de requisitos
+    return {
+        "cargo": cargo_unico,
+        "nivel": detectar_nivel_no_texto(texto),
+    }
+
+
+def detectar_nivel_no_texto(texto: str) -> str | None:
+    """Nível único ("medio"/"superior") declarado nas páginas preliminares.
+    Primeiro pelo bloco de REQUISITOS; sem nenhum trecho de REQUISITOS que
+    diga nível, pela "ESCOLARIDADE EXIGIDA PARA O CARGO" (ex.: BANRISUL_25,
+    que não tem bloco de requisitos). Se os dois níveis aparecem, fica None.
+    """
     requisitos = re.findall(
         r"REQUISITO[S]?:\s*([^\n]+(?:\n[^\n]+){1,3})", texto, re.IGNORECASE
     )
+    tem_medio, tem_superior = _niveis_citados(requisitos)
+    if not tem_medio and not tem_superior:
+        escolaridade = re.findall(
+            r"ESCOLARIDADE\s+EXIGIDA[^:\n]*:\s*([^\n]+(?:\n[^\n]+){0,3})", texto
+        )
+        tem_medio, tem_superior = _niveis_citados(escolaridade)
+
+    if tem_medio and not tem_superior:
+        return "medio"
+    if tem_superior and not tem_medio:
+        return "superior"
+    return None
+
+
+def _niveis_citados(trechos: list[str]) -> tuple[bool, bool]:
     tem_medio = any(
         re.search(
             r"ensino\s+m[ée]dio|n[íi]vel\s+m[ée]dio|intermedi[áa]rio|segundo\s+grau",
             r,
             re.IGNORECASE,
         )
-        for r in requisitos
+        for r in trechos
     )
     tem_superior = any(
         re.search(
@@ -233,19 +275,9 @@ def detectar_cargo_e_nivel_edital(pdf_path: Path) -> dict[str, str | None]:
             r,
             re.IGNORECASE,
         )
-        for r in requisitos
+        for r in trechos
     )
-
-    nivel_detectado = None
-    if tem_medio and not tem_superior:
-        nivel_detectado = "medio"
-    elif tem_superior and not tem_medio:
-        nivel_detectado = "superior"
-
-    return {
-        "cargo": cargo_unico,
-        "nivel": nivel_detectado,
-    }
+    return tem_medio, tem_superior
 
 
 def mapear_cargos(
@@ -503,7 +535,33 @@ def dividir_por_cargo_e_materia(
         marcadores.append(
             (m.start(), m.end(), "cargo", (rotulo_cargo, int(m.group(1))))
         )
+    for m in PADRAO_AREA.finditer(secao_texto):
+        numero = int(m.group(1))
+        nome_area = re.sub(r"\s+", " ", m.group(2).strip())
+        prefixo = f"CARGO {numero}: "
+        if cargo_padrao is not None:
+            prefixo += f"{cargo_padrao} – "
+        rotulo_cargo = f"{prefixo}ÁREA {numero}: {nome_area}"
+        marcadores.append((m.start(), m.end(), "cargo", (rotulo_cargo, numero)))
+    romanos = list(PADRAO_SUBMATERIA_ROMANA.finditer(secao_texto))
+    inicios_romanos = [m.start() for m in romanos]
     for m in PADRAO_MATERIA.finditer(secao_texto):
+        if _conflita_com_submateria_romana(m.start(), m.end(), romanos):
+            continue
+        # Cabeçalho guarda-chuva ("A, B E C:") seguido direto de "I ...": quem
+        # vira chunk são as sub-matérias. Vira só fronteira ("descartada"), senão
+        # o nome do guarda-chuva vazaria para o fim do chunk anterior.
+        proximo_romano = next((i for i in inicios_romanos if i >= m.end()), None)
+        if (
+            proximo_romano is not None
+            and not secao_texto[m.end() : proximo_romano].strip()
+        ):
+            marcadores.append((m.start(), m.end(), "descartada", None))
+            continue
+        marcadores.append(
+            (m.start(), m.end(), "materia", re.sub(r"\s+", " ", m.group(1).strip()))
+        )
+    for m in romanos:
         marcadores.append(
             (m.start(), m.end(), "materia", re.sub(r"\s+", " ", m.group(1).strip()))
         )
@@ -524,6 +582,9 @@ def dividir_por_cargo_e_materia(
         texto_bloco = _limpar_ruido_edital(
             secao_texto[fim_cabecalho:proximo_inicio].strip()
         )
+
+        if tipo == "descartada":
+            continue
 
         if tipo == "bloco":
             tipo_conhecimento_atual, nivel_bloco = rotulo
@@ -612,6 +673,12 @@ def dividir_por_cargo_e_materia(
 
     _logar_restricoes(chunks)
     return chunks
+
+
+def _conflita_com_submateria_romana(
+    inicio: int, fim: int, romanos: list[re.Match]
+) -> bool:
+    return any(inicio < m.end() and m.start() < fim for m in romanos)
 
 
 def _logar_restricoes(chunks: list[ChunkTaxonomia]) -> None:

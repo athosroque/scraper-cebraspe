@@ -773,3 +773,48 @@ class TestLigacaoConcursosME:
             conn, "SEBRAE_26_PSE_1", pdfs, tmp_path
         )
         assert contagem["gabaritos_sem_prova"] == 1
+
+
+class TestAreaComoCargoNoCaderno:
+    # Textos reais dos `provas_texto_link.json` do BANRISUL_25 (cargo único,
+    # 4 áreas). "ÁREA N" cobre só o cargo N; "PARA TODAS AS ÁREAS" cobre todos.
+    @pytest.mark.parametrize(
+        ("texto", "tipo", "cargos"),
+        [
+            (
+                "PROVA OBJETIVA - CONHECIMENTOS ESPECÍFICOS – ÁREA 1",
+                "objetiva_especifica",
+                [1],
+            ),
+            ("PROVA DISCURSIVA – ÁREA 2", "discursiva", [2]),
+            (
+                "PADRÃO DEFINITIVO DE RESPOSTA – PROVA DISCURSIVA – ÁREA 3",
+                "padrao_resposta",
+                [3],
+            ),
+            (
+                "GABARITO DEFINITIVO – CONHECIMENTOS ESPECÍFICOS – ÁREA 4",
+                "objetiva_especifica",
+                [4],
+            ),
+            (
+                "PROVA OBJETIVA - CONHECIMENTOS BÁSICOS PARA TODAS AS ÁREAS",
+                "objetiva_basica",
+                [],
+            ),
+            (
+                "GABARITO DEFINITIVO – CONHECIMENTOS BÁSICOS PARA TODAS AS ÁREAS",
+                "objetiva_basica",
+                [],
+            ),
+        ],
+    )
+    def test_area_vira_cargo(self, texto, tipo, cargos):
+        assert classificar_prova_por_texto(texto) == {
+            "tipo": tipo,
+            "cargos_numeros": cargos,
+        }
+
+    def test_cargo_explicito_tem_prioridade_sobre_area(self):
+        texto = "PROVA OBJETIVA - CONHECIMENTOS ESPECÍFICOS PARA O CARGO 5 – ÁREA 2"
+        assert classificar_prova_por_texto(texto)["cargos_numeros"] == [5]

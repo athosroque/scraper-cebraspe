@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pymupdf
@@ -11,6 +12,7 @@ from src.edital_parser import (
     ChunkTaxonomia,
     _limpar_ruido_edital,
     detectar_cargo_e_nivel_edital,
+    detectar_nivel_no_texto,
     dividir_por_cargo_e_materia,
     extrair_secao_objetos_avaliacao_detalhada,
     mapear_cargos,
@@ -660,6 +662,130 @@ class TestBlocosDeConhecimento:
         assert chunks[0].texto.startswith("1\nConstituição Federal")
 
 
+# Trecho real do SEFA_PR_25 (página de Objetos de Avaliação): matéria composta
+# guarda-chuva seguida de sub-matérias numeradas em romano, algumas coladas no
+# meio da linha de um item anterior.
+SECAO_SUBMATERIAS_ROMANAS = """
+CONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR
+LÍNGUA PORTUGUESA: 1 Compreensão de textos.
+DIREITO CONSTITUCIONAL, DIREITO ADMINISTRATIVO E ESTATUTO DA CRIANÇA E DO ADOLESCENTE: I 
+DIREITO CONSTITUCIONAL: 1 Constituição. 1.1 Conceito, objeto, elementos e classificações. 17 
+Direitos das comunidades remanescentes de quilombos. II DIREITO ADMINISTRATIVO: 1 Conceito e fontes 
+do direito administrativo. 17 Improbidade administrativa. III ESTATUTO DA CRIANÇA E DO ADOLESCENTE: 
+1 Lei nº 8.069/1990.  
+DIREITO TRIBUTÁRIO: 1 Sistema Tributário Nacional.
+"""
+
+SECAO_SUBMATERIAS_ECONOMIA = """
+CONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR
+ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA: 1 Orçamento público.
+NOÇÕES DE ECONOMIA E NOÇÕES DE FINANÇAS PÚBLICAS: I NOÇÕES DE ECONOMIA: 1 Economia do setor 
+público. 2.11 Taxas de juros. II NOÇÕES DE 
+FINANÇAS PÚBLICAS: 1 Finanças públicas: receitas e despesas. 2 Orçamento.
+"""
+
+
+class TestSubmateriasRomanas:
+    def test_guarda_chuva_e_romanos_viram_um_chunk_por_submateria(self):
+        chunks = dividir_por_cargo_e_materia(SECAO_SUBMATERIAS_ROMANAS)
+        assert [c.materia for c in chunks] == [
+            "LÍNGUA PORTUGUESA",
+            "DIREITO CONSTITUCIONAL",
+            "DIREITO ADMINISTRATIVO",
+            "ESTATUTO DA CRIANÇA E DO ADOLESCENTE",
+            "DIREITO TRIBUTÁRIO",
+        ]
+        assert all(
+            c.tipo_conhecimento == "basico" and c.nivel == "superior" for c in chunks
+        )
+
+    def test_romano_e_guarda_chuva_nao_vazam_para_o_texto(self):
+        chunks = dividir_por_cargo_e_materia(SECAO_SUBMATERIAS_ROMANAS)
+        _, constitucional, administrativo, eca, _ = chunks
+        assert constitucional.texto.startswith("1 Constituição.")
+        assert "DIREITO ADMINISTRATIVO" not in constitucional.texto
+        assert administrativo.texto.startswith("1 Conceito e fontes")
+        assert "ESTATUTO" not in administrativo.texto
+        assert eca.texto == "1 Lei nº 8.069/1990."
+        assert all(c.texto.strip() not in {"I", "II", "III"} for c in chunks)
+        assert not any(re.search(r"\b(I|II|III)\b\s+[A-ZÀ-Ú]", c.texto) for c in chunks)
+
+    def test_submateria_com_nome_quebrado_em_duas_linhas(self):
+        chunks = dividir_por_cargo_e_materia(SECAO_SUBMATERIAS_ECONOMIA)
+        assert [c.materia for c in chunks] == [
+            "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+            "NOÇÕES DE ECONOMIA",
+            "NOÇÕES DE FINANÇAS PÚBLICAS",
+        ]
+        assert chunks[1].texto.startswith("1 Economia do setor")
+        assert chunks[2].texto.startswith("1 Finanças públicas: receitas")
+        assert not any("NOÇÕES DE" in c.texto for c in chunks)
+
+    def test_guarda_chuva_nao_vaza_para_o_fim_do_chunk_anterior(self):
+        chunks = dividir_por_cargo_e_materia(SECAO_SUBMATERIAS_ROMANAS)
+        assert chunks[0].materia == "LÍNGUA PORTUGUESA"
+        assert chunks[0].texto == "1 Compreensão de textos."
+        assert "DIREITO CONSTITUCIONAL, DIREITO" not in chunks[0].texto
+        assert "ESTATUTO" not in chunks[0].texto
+
+    def test_guarda_chuva_nao_vaza_quando_o_anterior_e_outra_materia(self):
+        chunks = dividir_por_cargo_e_materia(SECAO_SUBMATERIAS_ECONOMIA)
+        anterior = chunks[0]
+        assert anterior.materia == "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA"
+        assert anterior.texto == "1 Orçamento público."
+        assert "NOÇÕES DE ECONOMIA E" not in anterior.texto
+
+    def test_romano_no_corpo_de_item_nao_vira_materia(self):
+        texto = (
+            "CONHECIMENTOS BÁSICOS PARA OS CARGOS DE NÍVEL SUPERIOR\n"
+            "LEGISLAÇÃO: 1 Lei nº 8.112/1990, conforme o inciso II do art. 5º. "
+            "2 Estatuto, item V da lista. 3 Regime disciplinar.\n"
+        )
+        chunks = dividir_por_cargo_e_materia(texto)
+        assert [c.materia for c in chunks] == ["LEGISLAÇÃO"]
+        assert "inciso II do art. 5º" in chunks[0].texto
+
+
+class TestNivelPelaEscolaridade:
+    # Trecho real do BANRISUL_25 (2.2 ESCOLARIDADE EXIGIDA): não há bloco de
+    # REQUISITOS, então o nível sai da escolaridade exigida.
+    PRELIMINARES_BANRISUL = (
+        "2.1 As atribuições do cargo estão descritas no Anexo I.\n"
+        "2.2 ESCOLARIDADE EXIGIDA PARA O CARGO: diploma, devidamente registrado, de "
+        "conclusão de curso \nde graduação na área de Tecnologia da Informação, reconhecido "
+        "e concluído em instituição de nível \nsuperior credenciada pelo MEC, acrescido de "
+        "curso de pós-graduação.\n"
+        "2.3 As provas poderão ser aplicadas.\n"
+    )
+
+    def test_escolaridade_de_graduacao_define_superior(self):
+        assert detectar_nivel_no_texto(self.PRELIMINARES_BANRISUL) == "superior"
+
+    def test_escolaridade_de_nivel_medio(self):
+        texto = "2.2 ESCOLARIDADE EXIGIDA PARA O CARGO: certificado de conclusão do ensino médio.\n"
+        assert detectar_nivel_no_texto(texto) == "medio"
+
+    def test_requisitos_continuam_com_prioridade(self):
+        texto = (
+            "REQUISITOS: ensino médio completo.\n"
+            "Ser brasileiro nato.\n"
+            "Ter 18 anos completos.\n"
+            "Ter aptidão física.\n"
+            "2.2 ESCOLARIDADE EXIGIDA PARA O CARGO: graduação em direito.\n"
+        )
+        assert detectar_nivel_no_texto(texto) == "medio"
+
+    def test_escolaridade_mista_nao_define_nivel(self):
+        texto = (
+            "2.2 ESCOLARIDADE EXIGIDA PARA O CARGO: graduação em direito.\n"
+            "2.3 ESCOLARIDADE EXIGIDA PARA O CARGO: ensino médio completo.\n"
+        )
+        assert detectar_nivel_no_texto(texto) is None
+
+    def test_sem_escolaridade_nem_requisitos_fica_none(self):
+        assert detectar_nivel_no_texto("Edital sem qualquer requisito.") is None
+
+
 PDF_PILOTO = (
     Path(__file__).resolve().parent.parent
     / "data/2025/CEBRASPE/PF/Editais/Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.pdf"
@@ -734,3 +860,127 @@ def test_edital_tcu_real_cargo_unico_e_nivel_medio():
     assert cargos == [
         {"numero": 1, "nome": "TÉCNICO FEDERAL DE CONTROLE EXTERNO", "nivel": "medio"}
     ]
+
+
+# Reproduz, em miniatura, o BANRISUL_25: um cargo único com 4 áreas, cada uma
+# com prova específica própria. "ÁREA N: <nome>" em linha inteira vira cargo;
+# a área nunca vira matéria, e o ":" dentro do nome da área fica no nome.
+SECAO_AREAS = """OBJETOS DE AVALIAÇÃO
+2.1.1 CONHECIMENTOS BÁSICOS
+LÍNGUA PORTUGUESA: 1 Compreensão de texto.
+2.1.2 CONHECIMENTOS ESPECÍFICOS
+ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS
+CONCEITOS BÁSICOS: 1 Modelagem.
+ÁREA 2: DESENVOLVIMENTO DE SOFTWARE
+ENGENHARIA DE SOFTWARE: 1 Requisitos.
+ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO
+SEGURANÇA DA INFORMAÇÃO: 1 Criptografia.
+ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI
+ESTRATÉGIA: 1 Planejamento das áreas de conhecimento da organização.
+"""
+CARGO_AREAS = "TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II"
+
+
+class TestAreaComoCargo:
+    def test_cada_area_vira_cargo_com_numero_e_rotulo(self):
+        chunks = dividir_por_cargo_e_materia(
+            SECAO_AREAS, cargo_padrao=CARGO_AREAS, nivel_padrao="superior"
+        )
+        especificos = [c for c in chunks if c.tipo_conhecimento == "especifico"]
+        assert [(c.cargo_numero, c.materia) for c in especificos] == [
+            (1, "CONCEITOS BÁSICOS"),
+            (2, "ENGENHARIA DE SOFTWARE"),
+            (3, "SEGURANÇA DA INFORMAÇÃO"),
+            (4, "ESTRATÉGIA"),
+        ]
+        assert especificos[0].cargo == (
+            f"CARGO 1: {CARGO_AREAS} – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS"
+        )
+        assert especificos[2].cargo == (
+            f"CARGO 3: {CARGO_AREAS} – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO"
+        )
+
+    def test_area_nao_vira_materia(self):
+        chunks = dividir_por_cargo_e_materia(
+            SECAO_AREAS, cargo_padrao=CARGO_AREAS, nivel_padrao="superior"
+        )
+        assert not [c for c in chunks if c.materia.startswith("ÁREA")]
+        assert len(chunks) == 5
+
+    def test_basicos_continuam_sem_cargo(self):
+        chunks = dividir_por_cargo_e_materia(
+            SECAO_AREAS, cargo_padrao=CARGO_AREAS, nivel_padrao="superior"
+        )
+        basico = chunks[0]
+        assert basico.materia == "LÍNGUA PORTUGUESA"
+        assert basico.cargo is None and basico.cargo_numero is None
+        assert basico.tipo_conhecimento == "basico"
+
+    def test_mapear_cargos_devolve_as_quatro_areas(self):
+        chunks = dividir_por_cargo_e_materia(
+            SECAO_AREAS, cargo_padrao=CARGO_AREAS, nivel_padrao="superior"
+        )
+        assert mapear_cargos(chunks, CARGO_AREAS, "superior") == [
+            {
+                "numero": 1,
+                "nome": f"{CARGO_AREAS} – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+                "nivel": "superior",
+            },
+            {
+                "numero": 2,
+                "nome": f"{CARGO_AREAS} – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+                "nivel": "superior",
+            },
+            {
+                "numero": 3,
+                "nome": f"{CARGO_AREAS} – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+                "nivel": "superior",
+            },
+            {
+                "numero": 4,
+                "nome": f"{CARGO_AREAS} – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+                "nivel": "superior",
+            },
+        ]
+
+    def test_sem_cargo_padrao_o_rotulo_fica_so_com_a_area(self):
+        chunks = dividir_por_cargo_e_materia(SECAO_AREAS, nivel_padrao="superior")
+        especifico = next(c for c in chunks if c.cargo_numero == 2)
+        assert especifico.cargo == "CARGO 2: ÁREA 2: DESENVOLVIMENTO DE SOFTWARE"
+        assert especifico.materia == "ENGENHARIA DE SOFTWARE"
+
+    def test_area_minuscula_no_corpo_nao_casa(self):
+        secao = "2.1.2 CONHECIMENTOS ESPECÍFICOS\nÁREA 1: ADMIN\nTEMA: 1 texto\nárea 9: não é cabeçalho\n"
+        chunks = dividir_por_cargo_e_materia(secao, nivel_padrao="superior")
+        assert [c.cargo_numero for c in chunks] == [1]
+        assert "área 9" in chunks[0].texto
+
+
+@pytest.mark.skipif(
+    not (
+        Path(__file__).resolve().parent.parent
+        / "data/2025/CEBRASPE/BANRISUL/Editais/Ed_1_2025_Banrisul_Abertura_atualizado_ate_ret_4.pdf"
+    ).exists(),
+    reason="PDF BANRISUL não baixado (data/ é gitignored)",
+)
+def test_edital_banrisul_real_tem_quatro_areas_como_cargos():
+    pdf = (
+        Path(__file__).resolve().parent.parent
+        / "data/2025/CEBRASPE/BANRISUL/Editais/Ed_1_2025_Banrisul_Abertura_atualizado_ate_ret_4.pdf"
+    )
+    secao = extrair_secao_objetos_avaliacao_detalhada(pdf)
+    chunks = dividir_por_cargo_e_materia(
+        secao.texto,
+        cargo_padrao=secao.cargo_detectado,
+        nivel_padrao=secao.nivel_detectado,
+    )
+    cargos = mapear_cargos(chunks, secao.cargo_detectado, secao.nivel_detectado)
+    assert [c["numero"] for c in cargos] == [1, 2, 3, 4]
+    assert [c["nome"].split(" – ")[1] for c in cargos] == [
+        "ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+        "ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+        "ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+        "ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+    ]
+    assert all(c["nivel"] == "superior" for c in cargos)
+    assert not [c for c in chunks if c.materia.startswith("ÁREA")]

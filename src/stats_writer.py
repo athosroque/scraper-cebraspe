@@ -82,6 +82,9 @@ except (ImportError, AttributeError):
 PADRAO_DISCURSIVA = re.compile(r"\bdiscursivas?\b")
 PADRAO_BASICA = re.compile(r"\bconhecimentos (?:basicos|gerais)\b")
 PADRAO_ESPECIFICA = re.compile(r"\bconhecimentos especificos\b")
+# Área de conhecimento no texto normalizado ("prova discursiva area 2"), ver
+# `classificar_prova_por_texto`.
+PADRAO_AREA_CADERNO = re.compile(r"\barea (\d+)\b")
 
 # Token do caderno no nome do arquivo: 094_PF_CB1_01, 072_STM_CG2_01,
 # 057_IBAMA_001_01, 094_PF_014_DISC, 094_PF_DISC_015.
@@ -216,7 +219,14 @@ def classificar_prova_por_texto(texto: str) -> dict | None:
         tipo = "objetiva_especifica"
     else:
         return None
-    return {"tipo": tipo, "cargos_numeros": extrair_cargos_do_texto(texto_norm)}
+    cargos_numeros = extrair_cargos_do_texto(texto_norm)
+    if not cargos_numeros:
+        # Edital com áreas (BANRISUL_25) trata cada área como cargo: o caderno
+        # "ÁREA N" cobre só o cargo N. "PARA TODAS AS ÁREAS" não casa e segue [].
+        cargos_numeros = list(
+            dict.fromkeys(int(n) for n in PADRAO_AREA_CADERNO.findall(texto_norm))
+        )
+    return {"tipo": tipo, "cargos_numeros": cargos_numeros}
 
 
 def _romano_para_int(romano: str) -> int:
