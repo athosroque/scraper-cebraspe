@@ -1088,8 +1088,8 @@ enviar o bloco de uma etapa específica para o agente construir.
     - `[ ]` Textos do ME: o KPI "Nota CEBRASPE" mostra "certas − erradas", o subtítulo da lista
       diz "padrão certo/errado" no filtro ME, e a introdução do simulado só descreve +1/−1.
   - Plano das sessões arquivado em [`docs/planos/plano-etapa-8m.md`](docs/planos/plano-etapa-8m.md).
-- `[ ]` **8.M.1 Incidência em dois níveis** (prioridade antes da 8.1, ADR-039, plano autocontido
-  em [`plano-etapa-8m1.md`](plano-etapa-8m1.md)). Decisão do dono (2026-10-10): a média por
+- `[x]` **8.M.1 Incidência em dois níveis** (concluída em 2026-10-12, KAN-28, ADR-039; plano arquivado
+  em [`docs/planos/plano-etapa-8m1.md`](docs/planos/plano-etapa-8m1.md)). Decisão do dono (2026-10-10): a média por
   prova (concurso × cargo) da S2 conta o mesmo caderno básico uma vez por cargo, e o concurso
   com mais cargos domina (no piloto, PF_25_ADM pesa 48% e TCU_25_TEFC 3%). Passa a ser
   % do nó na prova → média das provas dentro do concurso → média entre concursos (cada edital

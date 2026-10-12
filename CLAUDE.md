@@ -318,9 +318,12 @@ Datasette continua só como ferramenta de revisão do dono.
       real do `SEFA_PR_25` (380 itens ME) no `cebraspe_gate`, piloto inalterado (2.800 itens, 129
       anuladas, 3.029 apontamentos), 1.276 testes verdes. Sem registro no Gate: Chromium headless
       com ME real e conferência do desconto no edital (no `task.md`, junto da 8.M.1).
-- [ ] Etapa 8.M.1 Estatísticas: incidência em dois níveis, prova → concurso (fn_prova_cobra) — cada edital pesa 1 e o básico compartilhado não se multiplica pelos cargos (**próxima**, antes da 8.1; `plano-etapa-8m1.md`,
-      ADR-039): a média por prova da 8.M/S2 conta o básico compartilhado uma vez por cargo (PF_25_ADM
-      pesa 48% da média do piloto). Passa a ser prova → média no concurso → média entre concursos.
+- [x] Etapa 8.M.1 Estatísticas: incidência em dois níveis, prova → concurso (fn_prova_cobra) — cada edital pesa 1 e o básico compartilhado não se multiplica pelos cargos (concluída em
+      2026-10-12, `docs/planos/plano-etapa-8m1.md`, ADR-039, KAN-28): % do nó na prova distinta → média
+      das provas distintas do concurso → média entre concursos. Cargos com as mesmas questões no
+      escopo contam como uma prova só, de qualquer nível. Ranking sem filtro: LP 13,81%, Dir. Adm. 10,59%,
+      Ética 4,81%; as 31 provas sem diferença. KAN-50: ME do SEFA_PR_25 validada no Chromium.
+      1252 testes, ruff verde.
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — os dois usos-alvo do dono
       (banca × ano × assunto; concurso × matéria × assunto) respondidos no site, com % de dois
       níveis e nº de questões distintas; detalhes no `task.md`.
