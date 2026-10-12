@@ -30,6 +30,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 2 | 8.M.2 Estatísticas por recorte (drill-down e filtros, KAN-28/KAN-54) | na fila | seção 8.M.2 abaixo |
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
+| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | planejada, 3 decisões abertas | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5 |
 | — | Pendências sem etapa (KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
 
