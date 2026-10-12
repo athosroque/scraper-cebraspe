@@ -1139,7 +1139,24 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     gabarito A–E, 18 + 5 anuladas) e 5 discursivas no banco. Correções: sub-matéria em romano e
     nível pela escolaridade (edital), área vira cargo (decisão do dono, ADR-038) e cabeçalho
     de matéria ME pelo layout (23 alternativas E traziam o cabeçalho seguinte). Piloto
-    inalterado. **Pausa do dono:** aprovar os 2 editais (`status_revisao_humana`).
+    inalterado. Revisão antes da aprovação (2026-10-12): o LLM descartou 128 subitens de 3º/4º
+    nível no ECONOMIA do SEFA e 6 no CONTABILIDADE, e manteve um tópico excluído por retificação;
+    a validação só olhava o 1º nível (0 alertas). Agora: item "excluído por meio do Edital" sai
+    antes do LLM, `subitem_ausente` bloqueante em todos os níveis (ADR-017) e reinjeção
+    determinística de subitem (ADR-025); SEFA com 0 alertas. A validação nova acha 22 perdas
+    reais no piloto (PF 12, STM 3, IBAMA 7), sem reconciliar: decisão do dono.
+    **Pausa do dono:** aprovar os 2 editais (`status_revisao_humana`).
+  - `[ ]` C1b.0 (KAN-64, **urgente**, dono em 2026-10-12) Árvore: o mesmo conceito espalhado em
+    vários pais. LGPD tem 13 questões em 6 nós de 4 disciplinas; LRF está em 6 disciplinas; o BSC
+    está em 4 nós. A incidência e o filtro do site se dividem entre os pedaços.
+    `detectar_homonimos` só compara irmãos: há 229 grupos de nome igual sob pais diferentes, muitos
+    legítimos ("Conceito", "Disposições gerais"). Fazer: detector de dispersão (regra, com lista de
+    nomes genéricos), relatório para o dono, fusões aprovadas por ele, carga e conferência no site.
+    Antes da C1b, que liga os itens novos do lote aos nós.
+  - `[ ]` C1b.1 (KAN-65, **prioridade alta**, dono em 2026-10-12) Árvore: gestão estratégica (BSC,
+    SWOT, GUT, 5W2H, Canvas, referencial estratégico, indicadores) numa casa só, com um subassunto
+    por ferramenta; nomes compostos ("Ferramentas…: SWOT; BSC…") apontam para as partes (ADR-030).
+    Antes da C1b: a matéria ESTRATÉGIA do BANRISUL_25 cai nesses nós.
   - `[ ]` C1b (KAN-57) Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.
   - `[ ]` C2 (KAN-31, KAN-32) Orquestrador mínimo `scripts/lote_concursos.py` (núcleo da 8.1), com o alerta
     "ME sem texto-base" e `--concurso` no `classificar_questoes`.

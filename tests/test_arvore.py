@@ -957,3 +957,78 @@ def test_arvore_curada_sem_disciplinas_homonimas():
         if no.status == "ativo" and no.nivel == "materia":
             nomes.setdefault(chave_regra(no.nome).chave, []).append(no.id)
     assert {k: v for k, v in nomes.items() if len(v) > 1} == {}
+
+
+def _arv_entre_niveis():
+    arv = ArvoreMestre()
+    m1 = criar_no(arv, "materia", "M1", None)
+    m2 = criar_no(arv, "materia", "M2", None)
+    a1 = criar_no(arv, "assunto", "A1", m1)
+    a2 = criar_no(arv, "assunto", "A2", m2)
+    s1 = criar_no(arv, "subassunto", "S1", a1)
+    return arv, m1, m2, a1, a2, s1
+
+
+def test_fundir_subassunto_sem_filhos_em_assunto_de_outra_materia():
+    arv, _, _, a1, a2, s1 = _arv_entre_niveis()
+    mapear(arv, "item", [s1])
+    fundir_nos(arv, s1, a2)
+    assert arv.nos[s1].status == "fundido"
+    assert arv.nos[s1].fundido_em == a2
+    assert resolver_no(arv, s1) == a2
+    assert arv.nos[a1].status == "ativo"
+
+
+def test_fundir_assunto_sem_filhos_em_subassunto():
+    arv, _, m2, a1, a2, s1 = _arv_entre_niveis()
+    s2 = criar_no(arv, "subassunto", "S2", a2)
+    arv.nos[s1].status = "aposentado"  # a1 fica sem filhos ativos
+    fundir_nos(arv, a1, s2)
+    assert arv.nos[a1].status == "fundido"
+    assert resolver_no(arv, a1) == s2
+
+
+def test_fundir_entre_niveis_com_filho_ativo_falha_sem_gravar():
+    arv, _, _, a1, a2, s1 = _arv_entre_niveis()
+    s2 = criar_no(arv, "subassunto", "S2", a2)
+    with pytest.raises(ArvoreInvalida, match="sem filhos ativos"):
+        fundir_nos(arv, a1, s2)
+    assert arv.nos[a1].status == "ativo" and arv.nos[a1].fundido_em is None
+    assert arv.nos[s1].pai == a1
+
+
+def test_fundir_filho_no_proprio_pai_sem_filhos():
+    arv, _, _, a1, _, s1 = _arv_entre_niveis()
+    fundir_nos(arv, s1, a1)
+    assert arv.nos[s1].status == "fundido"
+    assert resolver_no(arv, s1) == a1
+
+
+def test_fundir_materia_com_outro_nivel_falha():
+    arv, m1, _, a1, _, _ = _arv_entre_niveis()
+    m3 = criar_no(arv, "materia", "M3", None)
+    with pytest.raises(ArvoreInvalida, match="Matéria"):
+        fundir_nos(arv, m3, a1)
+    with pytest.raises(ArvoreInvalida, match="Matéria"):
+        fundir_nos(arv, a1, m1)
+    assert arv.nos[m3].status == "ativo"
+
+
+def test_fundir_entre_niveis_destino_nao_ativo_falha():
+    arv, _, _, _, a2, s1 = _arv_entre_niveis()
+    arv.nos[a2].status = "proposto"
+    with pytest.raises(ArvoreInvalida, match="ativos"):
+        fundir_nos(arv, s1, a2)
+    assert arv.nos[s1].status == "ativo"
+
+
+def test_proposta_fundir_entre_niveis_valida_e_aprova_pela_mesma_regra():
+    arv, _, _, a1, a2, s1 = _arv_entre_niveis()
+    pid = propor(arv, "fundir", {"origem": s1, "destino": a2}, "regra", "x", "")
+    assert arv.nos[s1].status == "ativo"
+    s2 = criar_no(arv, "subassunto", "S2", a2)
+    with pytest.raises(ArvoreInvalida):  # a1 tem filho ativo: nem propõe
+        propor(arv, "fundir", {"origem": a1, "destino": s2}, "regra", "x", "")
+    aprovar_propostas(arv, [pid])
+    assert arv.propostas[pid].status == "aprovado"
+    assert resolver_no(arv, s1) == a2

@@ -340,13 +340,15 @@ DIREITO_ADMINISTRATIVO = "M-6f50f4f1dd"
 @com_banco
 def test_exemplo_do_dono_igual_no_site_e_na_api(cliente):
     """LP + "Domínio da estrutura morfossintática do período" + Direito
-    Administrativo = 205 (63 do assunto + 142 da disciplina), nos dois."""
+    Administrativo = 209 (63 do assunto + 146 da disciplina), nos dois.
+    Direito Administrativo tinha 142; a LGPD consolidada nele (KAN-64,
+    2026-10-12) trouxe 4 questões de TI, Governança de TI e Direito Civil."""
     nos = [LP, LP_MORFOSSINTAXE, DIREITO_ADMINISTRATIVO]
     r = cliente.get("/questoes", params={"no_id": nos})
-    assert _total_html(r.text) == 205
-    assert _total_api(cliente, no_id=nos) == 205
+    assert _total_html(r.text) == 209
+    assert _total_api(cliente, no_id=nos) == 209
     assert _total_api(cliente, no_id=LP_MORFOSSINTAXE) == 63
-    assert _total_api(cliente, no_id=DIREITO_ADMINISTRATIVO) == 142
+    assert _total_api(cliente, no_id=DIREITO_ADMINISTRATIVO) == 146
 
 
 @com_banco

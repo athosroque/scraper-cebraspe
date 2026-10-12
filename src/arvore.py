@@ -177,9 +177,6 @@ def fundir_nos(arvore: ArvoreMestre, origem_id: str, destino_id: str) -> None:
     if not no_orig or not no_dest:
         raise ArvoreInvalida("Nó de origem ou destino não existe")
 
-    if no_orig.nivel != no_dest.nivel:
-        raise ArvoreInvalida("Não é possível fundir nós de níveis diferentes")
-
     if no_orig.status == "aposentado":
         raise ArvoreInvalida(f"Nó aposentado {origem_id} não pode ser fundido")
     if no_dest.status == "aposentado":
@@ -187,13 +184,39 @@ def fundir_nos(arvore: ArvoreMestre, origem_id: str, destino_id: str) -> None:
             f"Nó aposentado {destino_id} não pode ser destino de fusão"
         )
 
+    entre_niveis = no_orig.nivel != no_dest.nivel
+    if entre_niveis:
+        # KAN-64 (ADR-030): nível diferente só para assunto/subassunto e quando a
+        # origem não tem filhos ativos (não há como reposicionar a subárvore).
+        if no_orig.nivel == "materia" or no_dest.nivel == "materia":
+            raise ArvoreInvalida("Matéria não funde com nó de nível diferente")
+        if no_orig.status != "ativo" or no_dest.status != "ativo":
+            raise ArvoreInvalida(
+                "Fusão entre níveis exige origem e destino ativos "
+                f"({origem_id}: {no_orig.status}, {destino_id}: {no_dest.status})"
+            )
+        filhos = sorted(
+            no.id
+            for no in arvore.nos.values()
+            if no.status in ("ativo", "proposto")
+            and no.pai
+            and resolver_no(arvore, no.pai) == origem_id
+        )
+        if filhos:
+            raise ArvoreInvalida(
+                f"Fusão entre níveis exige origem sem filhos ativos; "
+                f"{origem_id} tem {', '.join(filhos)}"
+            )
+
     no_orig.status = "fundido"
     no_orig.fundido_em = destino_id
 
-    # Atualizar pais que apontam para o nó fundido
-    for no in arvore.nos.values():
-        if no.pai == origem_id:
-            no.pai = destino_id
+    # Atualizar pais que apontam para o nó fundido (entre níveis não há filhos
+    # ativos; os fundidos/aposentados resolvem pelo `fundido_em`).
+    if not entre_niveis:
+        for no in arvore.nos.values():
+            if no.pai == origem_id:
+                no.pai = destino_id
 
 
 def aposentar_no(arvore: ArvoreMestre, no_id: str) -> None:
@@ -887,3 +910,584 @@ def detectar_homonimos(arv: ArvoreMestre) -> dict[str, list[str]]:
                 materia=materia_do_no(arv, destino),
             )
     return detectados
+
+
+# ---------------------------------------------------------------------------
+# Detecção de conceitos dispersos em pais diferentes (KAN-64, Fase 1)
+# ---------------------------------------------------------------------------
+
+# Nomes que só fazem sentido com o pai (subassunto "Conceito" de Atos × de
+# Contratos são coisas diferentes). A comparação é pela `chave_regra`, então
+# plural, acento e "noções de" já estão cobertos. Esses nomes NUNCA entram em
+# `mesmo_nome` nem em `nome_contido`.
+_NOMES_GENERICOS_BRUTOS = (
+    # estrutura de exposição
+    "conceito",
+    "conceitos",
+    "conceito e características",
+    "conceito e classificação",
+    "conceitos básicos",
+    "conceitos fundamentais",
+    "conceitos gerais",
+    "conceito geral",
+    "noções gerais",
+    "noções básicas",
+    "noções introdutórias",
+    "introdução",
+    "generalidades",
+    "aspectos gerais",
+    "considerações gerais",
+    "visão geral",
+    "disposições gerais",
+    "disposições preliminares",
+    "disposições finais",
+    "disposições transitórias",
+    "disposições constitucionais",
+    "princípios",
+    "princípios gerais",
+    "princípios básicos",
+    "princípios constitucionais",
+    "fundamentos",
+    "histórico",
+    "evolução histórica",
+    "origem",
+    "natureza jurídica",
+    "natureza",
+    "finalidade",
+    "finalidades",
+    "objetivos",
+    "objeto",
+    "importância",
+    "definição",
+    "definições",
+    "terminologia",
+    "contexto",
+    "tendências",
+    # lista de subtipos
+    "classificação",
+    "classificações",
+    "características",
+    "caracterização",
+    "espécies",
+    "modalidades",
+    "tipos",
+    "tipologia",
+    "formas",
+    "categorias",
+    "elementos",
+    "requisitos",
+    "pressupostos",
+    "efeitos",
+    "consequências",
+    "hipóteses",
+    "exceções",
+    "limites",
+    "limitações",
+    "vícios",
+    "extinção",
+    "atributos",
+    "funções",
+    "competência",
+    "competências",
+    "responsabilidade",
+    "responsabilidades",
+    "controle",
+    "fiscalização",
+    "sanções",
+    "penalidades",
+    "infrações",
+    "crimes",
+    "prazos",
+    "prazo",
+    "recursos",
+    "recurso",
+    "procedimento",
+    "procedimentos",
+    "processo",
+    "fases",
+    "etapas",
+    "regras",
+    "regime jurídico",
+    "legislação",
+    "legislação pertinente",
+    "legislação específica",
+    "legislação aplicável",
+    "legislação especial",
+    "legislação correlata",
+    "normas",
+    "normas gerais",
+    "exemplos",
+    "aplicações",
+    "aplicação",
+    "vantagens e desvantagens",
+    "vantagens",
+    "desvantagens",
+    "vantagens e limitações",
+    # saúde e afins (padrão repetido por patologia)
+    "etiologia, diagnóstico e tratamento",
+    "diagnóstico e tratamento",
+    "etiologia",
+    "diagnóstico",
+    "tratamento",
+    "epidemiologia",
+    "fisiopatologia",
+    "quadro clínico",
+    "prevenção",
+    "profilaxia",
+    "complicações",
+    "sinais e sintomas",
+    "manifestações clínicas",
+    "cuidados de enfermagem",
+    "tratamento e prevenção",
+    # genéricos de TI, estatística e idiomas
+    "segurança",
+    "gestão",
+    "tecnologia",
+    "ferramentas",
+    "técnicas",
+    "métodos",
+    "modelos",
+    "arquitetura",
+    "componentes",
+    "protocolos",
+    "padrões",
+    "estrutura",
+    "interpretação de textos",
+    "compreensão de textos",
+    "reescrita de frases",
+    "significação das palavras",
+    "emprego das classes de palavras",
+    "ortografia",
+    "acentuação",
+    "pontuação",
+    "sintaxe",
+    "morfologia",
+    "semântica",
+)
+
+NOMES_GENERICOS_DISPERSAO: frozenset[str] = frozenset(
+    canonico.chave_regra(n).chave for n in _NOMES_GENERICOS_BRUTOS
+)
+
+# Nome cujas palavras significativas são TODAS destas é genérico, mesmo sem
+# estar na lista acima ("Conceito e objetivos", "Disposições constitucionais
+# aplicáveis", "Jurisprudência aplicada dos tribunais superiores").
+_TOKENS_GENERICOS_BRUTOS = (
+    "conceito objetivos finalidade princípios classificação características "
+    "espécies modalidades tipos geral gerais básico básicos fundamental "
+    "fundamentais disposições histórico definição natureza importância "
+    "evolução introdução noções aspectos elementos requisitos efeitos "
+    "procedimentos legislação normas regras doutrinárias constitucionais "
+    "aplicáveis aplicada aplicado jurisprudência pacificada tribunais "
+    "superiores"
+)
+TOKENS_GENERICOS_DISPERSAO: frozenset[str] = frozenset(
+    canonico.chave_regra(_TOKENS_GENERICOS_BRUTOS).chave.split()
+)
+
+# Matérias de ramos diferentes (Direito Penal × Penal Militar × Processual
+# Penal × Processual Civil) usam o mesmo nome para coisas de normas distintas:
+# `mesmo_nome` entre elas é só média. Compara-se a assinatura de ramo.
+RAMOS_DISPERSAO = frozenset(
+    {
+        "militar",
+        "penal",
+        "civil",
+        "processual",
+        "trabalho",
+        "tributario",
+        "eleitoral",
+        "empresarial",
+        "ambiental",
+        "constitucional",
+        "administrativo",
+        "financeiro",
+        "previdenciario",
+        "internacional",
+    }
+)
+
+# Nome com no máximo este número de palavras significativas (≥ 3 letras, sem
+# stopwords) e menos de CHARS_MIN_NOME_ESPECIFICO caracteres é tratado como
+# curto demais para valer fora do contexto do pai (ex.: "Prescrição",
+# "Princípios", "Agentes públicos"), exceto quando cita norma.
+PALAVRAS_MAX_NOME_CURTO = 1
+CHARS_MIN_NOME_ESPECIFICO = 14
+
+_STOPWORDS_DISPERSAO = frozenset(
+    {
+        "de",
+        "da",
+        "do",
+        "das",
+        "dos",
+        "e",
+        "o",
+        "a",
+        "os",
+        "as",
+        "em",
+        "no",
+        "na",
+        "nos",
+        "nas",
+        "para",
+        "por",
+        "com",
+        "ao",
+        "aos",
+        "um",
+        "uma",
+        "ou",
+        "se",
+    }
+)
+
+# Apelidos de normas que o edital cita sem número. Chave: `chave_regra` do nome.
+APELIDOS_NORMA: dict[str, tuple[str, str]] = {
+    "lei de responsabilidade fiscal": ("lei complementar", "101"),
+    "lrf": ("lei complementar", "101"),
+    "lei geral de protecao de dado": ("lei", "13709"),
+    "lgpd": ("lei", "13709"),
+    "lei de acesso a informacao": ("lei", "12527"),
+    "lai": ("lei", "12527"),
+}
+
+_SIGLAS_NORMA = (
+    (re.compile(r"\blc\b"), "lei complementar"),
+    (re.compile(r"\bdl\b"), "decreto lei"),
+    (re.compile(r"\bmp\b"), "medida provisoria"),
+    (re.compile(r"\bec\b"), "emenda constitucional"),
+)
+
+# Quantas palavras além da norma ainda deixam o nome "essencialmente a norma".
+PALAVRAS_MAX_RESTO_NORMA = 8
+_FOLGA_NORMA = frozenset(
+    {
+        "lei",
+        "complementar",
+        "decreto",
+        "emenda",
+        "constitucional",
+        "medida",
+        "provisoria",
+        "resolucao",
+        "portaria",
+        "no",
+        "n",
+        "nr",
+        "numero",
+        "suas",
+        "alteracoes",
+        "posteriores",
+        "e",
+        "de",
+        "da",
+        "do",
+    }
+)
+
+
+def _normas_do_nome(nome: str) -> set[tuple[str, str]]:
+    """Normas citadas no nome, como {(tipo, número sem pontos)}; o ano é
+    ignorado para "LC 101" e "LC nº 101/2000" caírem no mesmo grupo."""
+    texto = canonico.normalizar(nome)
+    for padrao, longo in _SIGLAS_NORMA:
+        texto = padrao.sub(longo, texto)
+    achadas = {
+        (re.sub(r"\s+", " ", m.group(1)), m.group(2).replace(" ", ""))
+        for m in canonico.PADRAO_NORMA.finditer(texto)
+    }
+    apelido = APELIDOS_NORMA.get(canonico.chave_regra(nome).chave)
+    if apelido:
+        achadas.add(apelido)
+    return achadas
+
+
+# Palavras que indicam recorte do tema da norma ("Crimes ... (Lei X)", "Tipos de
+# penalidades previstas na Lei X"): o nó não é a norma inteira.
+_PALAVRAS_RECORTE_NORMA = frozenset(
+    {
+        "tipo",
+        "crime",
+        "tipificado",
+        "previsto",
+        "prevista",
+        "competencia",
+        "topico",
+        "selecionado",
+        "sancao",
+        "penalidade",
+        "infracao",
+        "dispositivo",
+        "regra",
+        "disposicao",
+        "aplicacao",
+        "principio",
+        "alteracao",
+        "artigo",
+        "art",
+        "capitulo",
+        "titulo",
+        "secao",
+        "legislacao",
+        "aplicavel",
+        "regime",
+    }
+)
+_OUTROS_TIPOS_NORMA = frozenset(
+    {"portaria", "resolucao", "instrucao", "decreto", "emenda", "medida"}
+)
+
+
+def _nome_e_a_norma(nome: str) -> bool:
+    """O nome é essencialmente a norma: cita uma só, e o que há fora do
+    parêntese é só o apelido dela ("Improbidade Administrativa (Lei nº
+    8.429/1992)"), sem recorte do tema ("Crimes ... (Lei X)"), lista de
+    tópicos (":", ";", ",") ou outra norma junto."""
+    normas = _normas_do_nome(nome)
+    if len(normas) != 1:
+        return False
+    tipo = next(iter(normas))[0]
+    fora = canonico.PADRAO_PARENTESES.sub(" ", nome)
+    if re.search(r"[:;,]", fora):
+        return False
+    tokens = canonico.normalizar(nome).split()
+    if (_OUTROS_TIPOS_NORMA - set(tipo.split())) & set(tokens):
+        return False
+    texto = canonico.PADRAO_NORMA.sub(" ", canonico.normalizar(fora))
+    resto = [
+        _singular_simples(t)
+        for t in texto.split()
+        if t not in _FOLGA_NORMA and t not in _STOPWORDS_DISPERSAO
+    ]
+    return len(resto) <= PALAVRAS_MAX_RESTO_NORMA and not (
+        set(resto) & _PALAVRAS_RECORTE_NORMA
+    )
+
+
+def _singular_simples(t: str) -> str:
+    return t[:-1] if t.endswith("s") and len(t) > 3 else t
+
+
+def _nome_generico(nome: str) -> bool:
+    chave = canonico.chave_regra(nome).chave
+    if chave in NOMES_GENERICOS_DISPERSAO:
+        return True
+    if _normas_do_nome(nome):
+        return False
+    palavras = [
+        t for t in chave.split() if len(t) >= 3 and t not in _STOPWORDS_DISPERSAO
+    ]
+    if palavras and all(t in TOKENS_GENERICOS_DISPERSAO for t in palavras):
+        return True
+    return len(palavras) <= PALAVRAS_MAX_NOME_CURTO and len(chave) < (
+        CHARS_MIN_NOME_ESPECIFICO
+    )
+
+
+def _assinatura_ramo(arv: ArvoreMestre, no_id: str) -> frozenset[str]:
+    nome = arv.nos[materia_do_no(arv, no_id)].nome
+    return frozenset(canonico.chave_regra(nome).chave.split()) & frozenset(
+        canonico.chave_regra(" ".join(RAMOS_DISPERSAO)).chave.split()
+    )
+
+
+def _termo_principal(nome: str) -> str:
+    """Chave do trecho antes de ":" ou "(" ("Balanced Scorecard (BSC): ..." →
+    "balanced scorecard")."""
+    corte = re.split(r"[:(]", nome, maxsplit=1)[0]
+    return canonico.chave_regra(corte).chave
+
+
+def _caminho_no(arv: ArvoreMestre, no_id: str) -> str:
+    partes = []
+    atual = resolver_no(arv, no_id)
+    while atual and atual in arv.nos:
+        no = arv.nos[atual]
+        partes.append(no.nome)
+        atual = resolver_no(arv, no.pai) if no.pai else ""
+    return " › ".join(reversed(partes))
+
+
+def _itens_aprovados_por_no(arv: ArvoreMestre) -> dict[str, int]:
+    uso: dict[str, set[str]] = {}
+    for item, maps in arv.mapeamentos.items():
+        for m in maps:
+            if m.status == "aprovado":
+                uso.setdefault(resolver_no(arv, m.no_id), set()).add(item)
+    return {k: len(v) for k, v in uso.items()}
+
+
+_RANK_NIVEL = {"assunto": 0, "subassunto": 1}
+
+
+def _escolher_destino(
+    ids: list[str],
+    arv: ArvoreMestre,
+    questoes: dict[str, int],
+    itens: dict[str, int],
+) -> str:
+    """Mais questões, depois mais itens de edital, depois nível mais alto
+    (assunto > subassunto) e por fim o menor ID."""
+    return min(
+        ids,
+        key=lambda i: (
+            -questoes.get(i, 0),
+            -itens.get(i, 0),
+            _RANK_NIVEL.get(arv.nos[i].nivel, 9),
+            i,
+        ),
+    )
+
+
+def _operacoes_do_grupo(
+    ids: list[str],
+    arv: ArvoreMestre,
+    questoes: dict[str, int],
+    itens: dict[str, int],
+) -> tuple[str, list[dict], list[str]]:
+    """Destino sugerido do grupo, as fusões executáveis e os nós sem operação.
+
+    Todo membro funde no destino do grupo (um conceito, um nó). Nó do mesmo
+    nível funde sempre; nó de nível diferente só quando não tem filhos ativos
+    (regra de `fundir_nos`, KAN-64). Nó de nível diferente com filhos fica em
+    `sem_operacao`, para o dono decidir (mover os filhos antes, por exemplo).
+    """
+    destino = _escolher_destino(ids, arv, questoes, itens)
+    nivel_destino = arv.nos[destino].nivel
+    com_filhos = {
+        resolver_no(arv, n.pai)
+        for n in arv.nos.values()
+        if n.status in ("ativo", "proposto") and n.pai
+    }
+    operacoes: list[dict] = []
+    sem_operacao: list[str] = []
+    for origem in sorted(ids):
+        if origem == destino:
+            continue
+        if arv.nos[origem].nivel != nivel_destino and origem in com_filhos:
+            sem_operacao.append(origem)
+            continue
+        operacoes.append({"origem": origem, "destino": destino})
+    return destino, operacoes, sem_operacao
+
+
+def detectar_dispersos(
+    arv: ArvoreMestre, questoes_por_no: dict[str, int] | None = None
+) -> list[dict]:
+    """Conceitos ativos espalhados em pais diferentes (regra, sem LLM).
+
+    `detectar_homonimos` só compara irmãos. Aqui o mesmo conceito sob pais
+    diferentes (até em disciplinas diferentes) divide a incidência e o filtro.
+    Motivos: `mesma_norma` (cita a mesma lei/LC/decreto/EC; confiança alta
+    quando o nó é essencialmente a norma), `mesmo_nome` (mesma `chave_regra`,
+    exceto genéricos; alta se o nome é específico) e `nome_contido` (o termo
+    principal de um nó é o início do nome de outro; sempre média).
+
+    `questoes_por_no` = questões distintas por `no_id` (já resolvido ou não);
+    sem ele, só os itens de edital desempatam. Devolve grupos ordenados por
+    nº de questões (desc) com: motivo, confianca, chave, nos, caminhos,
+    questoes, itens, destino, operacoes ({origem, destino}) e sem_operacao.
+    Não altera a árvore.
+    """
+    questoes: dict[str, int] = {}
+    for no_id, q in (questoes_por_no or {}).items():
+        alvo = resolver_no(arv, no_id)
+        questoes[alvo] = questoes.get(alvo, 0) + q
+    itens = _itens_aprovados_por_no(arv)
+
+    ativos = [
+        n for n in arv.nos.values() if n.status == "ativo" and n.nivel != "materia"
+    ]
+    pai_de = {n.id: resolver_no(arv, n.pai) for n in ativos if n.pai}
+
+    grupos: list[dict] = []
+    usados_alta: set[frozenset[str]] = set()
+
+    def registrar(motivo: str, confianca: str, chave: str, ids: list[str]) -> None:
+        ids = sorted(set(ids))
+        if len({pai_de.get(i) for i in ids}) < 2:
+            return
+        destino, ops, sem_op = _operacoes_do_grupo(ids, arv, questoes, itens)
+        grupos.append(
+            {
+                "motivo": motivo,
+                "confianca": confianca,
+                "chave": chave,
+                "nos": ids,
+                "caminhos": {i: _caminho_no(arv, i) for i in ids},
+                "questoes": {i: questoes.get(i, 0) for i in ids},
+                "itens": {i: itens.get(i, 0) for i in ids},
+                "destino": destino,
+                "operacoes": ops,
+                "sem_operacao": sem_op,
+            }
+        )
+        if confianca == "alta":
+            usados_alta.add(frozenset(ids))
+
+    # 1) mesma norma
+    por_norma: dict[tuple[str, str], list[str]] = {}
+    for n in ativos:
+        for norma in _normas_do_nome(n.nome):
+            por_norma.setdefault(norma, []).append(n.id)
+    for norma, ids in sorted(por_norma.items()):
+        essenciais = [i for i in ids if _nome_e_a_norma(arv.nos[i].nome)]
+        chave = " ".join(norma)
+        registrar("mesma_norma", "alta", chave, essenciais)
+        resto = [i for i in ids if i not in essenciais]
+        if resto and essenciais:
+            registrar("mesma_norma", "media", chave, ids)
+
+    # 2) mesmo nome (chave_regra), fora os genéricos
+    por_nome: dict[str, list[str]] = {}
+    for n in ativos:
+        por_nome.setdefault(canonico.chave_regra(n.nome).chave, []).append(n.id)
+    for chave, ids in sorted(por_nome.items()):
+        if len(ids) < 2 or not chave or _nome_generico(arv.nos[ids[0]].nome):
+            continue
+        if any(_normas_do_nome(arv.nos[i].nome) for i in ids):
+            continue  # já tratado como mesma_norma
+        ramos = {_assinatura_ramo(arv, i) for i in ids}
+        registrar("mesmo_nome", "alta" if len(ramos) == 1 else "media", chave, ids)
+
+    # 3) nome contido: termo principal de um é o início do nome de outro
+    chaves = {n.id: canonico.chave_regra(n.nome).chave for n in ativos}
+    termos = {n.id: _termo_principal(n.nome) for n in ativos}
+    for n in ativos:
+        termo = termos[n.id]
+        if not termo or _nome_generico(termo) or len(termo) < 10:
+            continue
+        outros = [
+            o.id
+            for o in ativos
+            if o.id != n.id
+            and pai_de.get(o.id) != pai_de.get(n.id)
+            and chaves[o.id] != chaves[n.id]
+            and (termos[o.id] == termo or chaves[o.id].startswith(termo + " "))
+        ]
+        if not outros:
+            continue
+        ids = [n.id, *outros]
+        if any(set(ids) <= g for g in usados_alta):
+            continue
+        registrar("nome_contido", "media", termo, ids)
+
+    # remove repetição: mesmo conjunto por motivos diferentes e nome_contido
+    # cujo conjunto já está inteiro dentro de outro grupo
+    vistos: set[tuple[str, str, frozenset[str]]] = set()
+    unicos = []
+    for g in sorted(grupos, key=lambda g: (g["confianca"] != "alta", -len(g["nos"]))):
+        conjunto = frozenset(g["nos"])
+        k = (g["motivo"], g["confianca"], conjunto)
+        if k in vistos:
+            continue
+        if g["motivo"] == "nome_contido" and any(
+            conjunto <= frozenset(o["nos"]) for o in unicos
+        ):
+            continue
+        vistos.add(k)
+        unicos.append(g)
+    unicos.sort(key=lambda g: (-sum(g["questoes"].values()), g["chave"]))
+    return unicos

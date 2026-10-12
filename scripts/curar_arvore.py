@@ -213,7 +213,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--desmapear", help="ITEM:NO — remove o apontamento")
     parser.add_argument("--aprovar", help="ITEM:NO — aprova um apontamento proposto")
     parser.add_argument("--rejeitar", help="ITEM:NO — rejeita um apontamento proposto")
-    parser.add_argument("--fundir", help="ORIGEM:DESTINO — funde nós do mesmo nível")
+    parser.add_argument("--fundir", help="ORIGEM:DESTINO — funde nós (nível diferente só se a origem não tem filhos ativos)")
     parser.add_argument("--mover", help="NO:PAI — troca o pai (nível de cima)")
     parser.add_argument(
         "--criar", help="NIVEL:PAI=Nome — cria nó (matéria: 'materia:=Nome')"
