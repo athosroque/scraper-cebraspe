@@ -1,0 +1,2001 @@
+{
+  "edital": "819D0DDE5E9D488E1A1CC518CBE4559C4AA14A9C0ADA0C1664F36B9E76433019.pdf",
+  "concurso": {
+    "slug": "SEFA_PR_25",
+    "orgao": "SEFA_PR",
+    "ano": 2025
+  },
+  "cargos": [
+    {
+      "numero": 1,
+      "nome": "AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ADMINISTRADOR",
+      "nivel": "superior"
+    },
+    {
+      "numero": 2,
+      "nome": "AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ANALISTA FAZENDÁRIO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 3,
+      "nome": "AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: CONTADOR",
+      "nivel": "superior"
+    },
+    {
+      "numero": 4,
+      "nome": "AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ECONOMISTA",
+      "nivel": "superior"
+    },
+    {
+      "numero": 5,
+      "nome": "AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ESTATÍSTICO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 6,
+      "nome": "AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: PROFISSIONAL DE TECNOLOGIA DA INFORMAÇÃO",
+      "nivel": "superior"
+    }
+  ],
+  "total_chunks": 22,
+  "extraidos_com_sucesso": 22,
+  "falhas": 0,
+  "chunks_com_falha": [],
+  "resultados": [
+    {
+      "chunk_index": 0,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos de gêneros variados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Reconhecimento de tipos e gêneros textuais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+              "Emprego de tempos e modos verbais"
+            ]
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Emprego das classes de palavras",
+              "Relações de coordenação entre orações e entre termos da oração",
+              "Relações de subordinação entre orações e entre termos da oração",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Regência verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação dos pronomes átonos"
+            ]
+          },
+          {
+            "nome": "Reescrita de frases e parágrafos do texto",
+            "subtopicos": [
+              "Significação das palavras",
+              "Substituição de palavras ou de trechos de texto",
+              "Reorganização da estrutura de orações e de períodos do texto",
+              "Reescrita de textos de diferentes gêneros e níveis de formalidade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 1,
+      "cargo": null,
+      "materia_chunk": "DIREITO CONSTITUCIONAL",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO CONSTITUCIONAL",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Direito Constitucional",
+        "topicos": [
+          {
+            "nome": "Constituição",
+            "subtopicos": [
+              "Conceito, objeto, elementos e classificações",
+              "Supremacia da constituição",
+              "Aplicabilidade das normas constitucionais",
+              "Interpretação das normas constitucionais",
+              "Mutação constitucional"
+            ]
+          },
+          {
+            "nome": "Poder constituinte",
+            "subtopicos": [
+              "Características",
+              "Poder constituinte originário",
+              "Poder constituinte derivado"
+            ]
+          },
+          {
+            "nome": "Princípios fundamentais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direitos e garantias fundamentais",
+            "subtopicos": [
+              "Direitos e deveres individuais e coletivos",
+              "Habeas corpus, mandado de segurança, mandado de injunção e habeas data",
+              "Direitos sociais",
+              "Direitos políticos",
+              "Partidos políticos",
+              "O ente estatal titular de direitos fundamentais"
+            ]
+          },
+          {
+            "nome": "Organização do Estado",
+            "subtopicos": [
+              "Organização político-administrativa",
+              "Estado federal brasileiro",
+              "União",
+              "Estados federados",
+              "Municípios",
+              "Distrito Federal",
+              "Territórios",
+              "Intervenção federal",
+              "Intervenção dos estados nos municípios"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Disposições gerais",
+              "Servidores públicos"
+            ]
+          },
+          {
+            "nome": "Organização dos poderes no Estado",
+            "subtopicos": [
+              "Mecanismos de freios e contrapesos",
+              "Poder Legislativo",
+              "Poder Executivo",
+              "Poder Judiciário"
+            ]
+          },
+          {
+            "nome": "Funções essenciais à justiça",
+            "subtopicos": [
+              "Ministério Público",
+              "Advocacia pública",
+              "Defensoria Pública"
+            ]
+          },
+          {
+            "nome": "Controle de constitucionalidade",
+            "subtopicos": [
+              "Sistemas gerais e sistema brasileiro",
+              "Controle incidental ou concreto",
+              "Controle abstrato de constitucionalidade",
+              "Exame in abstractu da constitucionalidade de proposições legislativas",
+              "Ação declaratória de constitucionalidade",
+              "Ação direta de inconstitucionalidade",
+              "Arguição de descumprimento de preceito fundamental",
+              "Ação direta de inconstitucionalidade por omissão",
+              "Ação direta de inconstitucionalidade interventiva"
+            ]
+          },
+          {
+            "nome": "Defesa do Estado e das instituições democráticas",
+            "subtopicos": [
+              "Estado de defesa e estado de sítio",
+              "Forças armadas",
+              "Segurança pública"
+            ]
+          },
+          {
+            "nome": "Sistema Tributário Nacional",
+            "subtopicos": [
+              "Princípios gerais",
+              "Limitações do poder de tributar",
+              "Impostos da União, dos estados e dos municípios",
+              "Repartição das receitas tributárias"
+            ]
+          },
+          {
+            "nome": "Finanças públicas",
+            "subtopicos": [
+              "Normas gerais",
+              "Orçamentos"
+            ]
+          },
+          {
+            "nome": "Ordem econômica e financeira",
+            "subtopicos": [
+              "Princípios gerais da atividade econômica",
+              "Política urbana, agrícola e fundiária e reforma agrária"
+            ]
+          },
+          {
+            "nome": "Sistema Financeiro Nacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Ordem social",
+            "subtopicos": []
+          },
+          {
+            "nome": "Emenda Constitucional nº 103/2019 (Reforma da Previdência)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direitos e interesses das populações indígenas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Direitos das comunidades remanescentes de quilombos",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia_chunk": "DIREITO ADMINISTRATIVO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO ADMINISTRATIVO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Direito Administrativo",
+        "topicos": [
+          {
+            "nome": "Conceito e fontes do direito administrativo",
+            "subtopicos": [
+              "Regime jurídico-administrativo",
+              "Regime jurídico-administrativo - Conceito",
+              "Regime jurídico-administrativo - Conteúdo: supremacia do interesse público sobre o privado e indisponibilidade, pela administração, dos interesses públicos"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Princípios expressos e implícitos da administração pública",
+              "Organização, descentralização, desconcentração, órgãos públicos",
+              "Administração pública em sentido amplo e em sentido estrito",
+              "Administração pública em sentido objetivo e em sentido subjetivo"
+            ]
+          },
+          {
+            "nome": "Administração indireta e entidades paralelas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Atos administrativos",
+            "subtopicos": [
+              "Conceitos, requisitos, elementos, pressupostos e classificação",
+              "Fato e ato administrativo",
+              "Atos administrativos em espécie",
+              "Formação do ato administrativo: elementos, procedimento administrativo",
+              "O silêncio no direito administrativo",
+              "Validade, eficácia e autoexecutoriedade do ato administrativo",
+              "Atos administrativos simples, complexos e compostos",
+              "Atos administrativos unilaterais, bilaterais e multilaterais",
+              "Atos administrativos gerais e individuais",
+              "Atos administrativos vinculados e discricionários",
+              "Mérito do ato administrativo, discricionariedade",
+              "Ato administrativo inexistente",
+              "Teoria das nulidades no direito administrativo",
+              "Atos administrativos nulos e anuláveis",
+              "Vícios do ato administrativo",
+              "Teoria dos motivos determinantes",
+              "Revogação, anulação e convalidação do ato administrativo",
+              "Cassação"
+            ]
+          },
+          {
+            "nome": "Poderes da administração pública",
+            "subtopicos": [
+              "Hierarquia: poder hierárquico e suas manifestações",
+              "Poder disciplinar",
+              "Poder de polícia",
+              "Liberdades públicas e poder de polícia"
+            ]
+          },
+          {
+            "nome": "Intervenção do Estado sobre a propriedade privada",
+            "subtopicos": [
+              "Intervenção do Estado no domínio econômico"
+            ]
+          },
+          {
+            "nome": "Bens públicos",
+            "subtopicos": [
+              "Regime jurídico",
+              "Aquisição e alienação dos bens públicos",
+              "Formas de utilização dos bens públicos pelos particulares"
+            ]
+          },
+          {
+            "nome": "Licitações: modalidades e procedimentos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Contratos administrativos",
+            "subtopicos": [
+              "Modalidades",
+              "Tipos",
+              "Procedimento",
+              "Anulação e revogação"
+            ]
+          },
+          {
+            "nome": "Contratação direta: dispensa e inexigibilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Convênios e consórcios administrativos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Parceria público-privada",
+            "subtopicos": [
+              "Conceito",
+              "Delegação: concessão, permissão e autorização"
+            ]
+          },
+          {
+            "nome": "Controle e responsabilização da administração: controle administrativo, controle judicial, controle legislativo",
+            "subtopicos": []
+          },
+          {
+            "nome": "Agentes públicos: espécies e classificação",
+            "subtopicos": [
+              "Cargo, emprego e função públicos",
+              "Formas de provimento e vacância dos cargos públicos",
+              "Responsabilidade civil, penal e administrativa",
+              "Títulos III e IV do regime jurídico dos funcionários civis do Poder Executivo do estado do Paraná (Lei estadual nº 6.174/1970)"
+            ]
+          },
+          {
+            "nome": "Processo administrativo",
+            "subtopicos": [
+              "Lei estadual nº 20.656/2021",
+              "Processo administrativo disciplinar"
+            ]
+          },
+          {
+            "nome": "Poderes e deveres da administração pública",
+            "subtopicos": [
+              "Poder regulamentar",
+              "Dever de agir",
+              "Dever de eficiência",
+              "Dever de probidade",
+              "Dever de prestação de contas",
+              "Uso e abuso do poder"
+            ]
+          },
+          {
+            "nome": "Improbidade administrativa",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia_chunk": "ESTATUTO DA CRIANÇA E DO ADOLESCENTE",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ESTATUTO DA CRIANÇA E DO ADOLESCENTE",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "",
+        "topicos": [
+          {
+            "nome": "Lei nº 8.069/1990",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia_chunk": "DIREITO TRIBUTÁRIO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "DIREITO TRIBUTÁRIO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Direito Tributário",
+        "topicos": [
+          {
+            "nome": "Sistema Tributário Nacional",
+            "subtopicos": [
+              "Princípios gerais",
+              "Limitações do poder de tributar"
+            ]
+          },
+          {
+            "nome": "Direito tributário: conceito e princípios",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tributos: conceito e espécies; impostos; taxas; contribuição de melhoria; imunidades; impostos da União; impostos dos estados e do Distrito Federal; impostos dos municípios",
+            "subtopicos": []
+          },
+          {
+            "nome": "Repartição das receitas tributárias",
+            "subtopicos": []
+          },
+          {
+            "nome": "Código Tributário Nacional",
+            "subtopicos": [
+              "Competência tributária e suas limitações",
+              "Normas gerais de direito tributário",
+              "Norma tributária: espécies; vigência e aplicação; interpretação e integração; natureza"
+            ]
+          },
+          {
+            "nome": "Obrigação tributária: conceito; espécies; fato gerador (hipótese de incidência); sujeitos ativo e passivo; solidariedade; capacidade tributária; domicílio tributário",
+            "subtopicos": []
+          },
+          {
+            "nome": "Responsabilidade tributária",
+            "subtopicos": [
+              "Responsabilidade dos sucessores",
+              "Solidariedade e sucessão",
+              "Responsabilidade pessoal e de terceiros",
+              "Responsabilidade por infrações",
+              "Responsabilidade supletiva"
+            ]
+          },
+          {
+            "nome": "Crédito tributário: conceito; natureza; lançamento e suas modalidades; revisão, suspensão, extinção e exclusão; prescrição e decadência; repetição do indébito",
+            "subtopicos": []
+          },
+          {
+            "nome": "Garantias e privilégios do crédito tributário",
+            "subtopicos": []
+          },
+          {
+            "nome": "Administração tributária",
+            "subtopicos": [
+              "Fiscalização",
+              "Sigilo fiscal",
+              "Dívida ativa",
+              "Certidões negativas"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 5,
+      "cargo": null,
+      "materia_chunk": "RACIOCÍNIO LÓGICO E MATEMÁTICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "RACIOCÍNIO LÓGICO E MATEMÁTICO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Raciocínio Lógico",
+        "topicos": [
+          {
+            "nome": "Conjuntos numéricos: números inteiros, racionais e reais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema legal de medidas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Razões e proporções",
+            "subtopicos": [
+              "Divisão proporcional",
+              "Regras de três simples e compostas",
+              "Porcentagens"
+            ]
+          },
+          {
+            "nome": "Equações e inequações de 1º e de 2º graus",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistemas lineares",
+            "subtopicos": []
+          },
+          {
+            "nome": "Funções e gráficos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de contagem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Progressões aritméticas e geométricas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estruturas lógicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lógica de argumentação: analogias, inferências, deduções e conclusões",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lógica sentencial (ou proposicional)",
+            "subtopicos": [
+              "Proposições simples e compostas",
+              "Tabelas-verdade",
+              "Equivalências",
+              "Leis de De Morgan",
+              "Diagramas lógicos"
+            ]
+          },
+          {
+            "nome": "Lógica de primeira ordem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de contagem e probabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Operações com conjuntos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Raciocínio lógico envolvendo problemas aritméticos, geométricos e matriciais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 6,
+      "cargo": null,
+      "materia_chunk": "MATEMÁTICA FINANCEIRA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "MATEMÁTICA FINANCEIRA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Matemática Financeira",
+        "topicos": [
+          {
+            "nome": "Regra de três simples e composta, proporcionalidades e porcentagens",
+            "subtopicos": []
+          },
+          {
+            "nome": "Juros simples e compostos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Capitalização e desconto",
+            "subtopicos": []
+          },
+          {
+            "nome": "Taxas de juros nominal, efetiva, equivalente, real e aparente",
+            "subtopicos": []
+          },
+          {
+            "nome": "Rendas uniformes e variáveis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Planos de amortização de empréstimos e financiamentos",
+            "subtopicos": [
+              "Sistema francês (tabela Price)",
+              "Sistema de amortização constante (SAC)",
+              "Sistema de amortização misto (SAM)"
+            ]
+          },
+          {
+            "nome": "Cálculo financeiro",
+            "subtopicos": [
+              "Custo real e efetivo das operações de financiamento, empréstimo e investimento"
+            ]
+          },
+          {
+            "nome": "Avaliação econômica de projetos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Taxas de retorno e taxas internas de retorno",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 7,
+      "cargo": null,
+      "materia_chunk": "ADMINISTRAÇÃO PÚBLICA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ADMINISTRAÇÃO PÚBLICA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "As reformas administrativas e a redefinição do papel do Estado",
+            "subtopicos": [
+              "Reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
+            ]
+          },
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Do modelo racional-legal ao paradigma pós-burocrático",
+              "Estado oligárquico e patrimonial, Estado autoritário e burocrático, Estado do bem-estar, Estado regulador"
+            ]
+          },
+          {
+            "nome": "Empreendedorismo governamental e novas lideranças no setor público",
+            "subtopicos": [
+              "Processos participativos de gestão pública",
+              "Conselhos de gestão, orçamento participativo, parceria entre governo e sociedade"
+            ]
+          },
+          {
+            "nome": "Governo eletrônico",
+            "subtopicos": [
+              "Transparência da administração pública",
+              "Controle social e cidadania",
+              "Accountability"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": [
+              "Gestão por resultados na produção de serviços públicos",
+              "Gestão de pessoas por competências"
+            ]
+          },
+          {
+            "nome": "Comunicação na gestão pública e gestão de redes organizacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Governabilidade e governança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Intermediação de interesses (clientelismo, corporativismo e neocorporativismo)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mudanças institucionais",
+            "subtopicos": [
+              "Conselhos, organizações sociais (OS), organizações da sociedade civil de interesse público (OSCIP), agências reguladoras, agências executivas"
+            ]
+          },
+          {
+            "nome": "Processo de formulação e desenvolvimento de políticas",
+            "subtopicos": [
+              "Construção de agendas, formulação de políticas, implementação de políticas"
+            ]
+          },
+          {
+            "nome": "Políticas públicas no Estado brasileiro contemporâneo",
+            "subtopicos": [
+              "Descentralização e democracia",
+              "Participação, atores sociais e controle social",
+              "Gestão local, cidadania e equidade social"
+            ]
+          },
+          {
+            "nome": "Planejamento e avaliação nas políticas públicas",
+            "subtopicos": [
+              "Noções de planejamento",
+              "Aspectos administrativos, técnicos, econômicos e financeiros",
+              "Formulação de programas e projetos",
+              "Avaliação de programas e projetos",
+              "Tipos de avaliação",
+              "Análise custo-benefício e análise custo-efetividade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 8,
+      "cargo": null,
+      "materia_chunk": "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Orçamento Público",
+        "topicos": [
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Conceito",
+              "Técnicas orçamentárias",
+              "Princípios orçamentários",
+              "Ciclo orçamentário",
+              "Processo orçamentário"
+            ]
+          },
+          {
+            "nome": "Orçamento público no Brasil",
+            "subtopicos": [
+              "Sistema de planejamento e de orçamento federal",
+              "Plano plurianual",
+              "Diretrizes orçamentárias",
+              "Orçamento anual",
+              "Sistema e processo de orçamentação",
+              "Classificações orçamentárias",
+              "Estrutura programática",
+              "Créditos ordinários e adicionais"
+            ]
+          },
+          {
+            "nome": "Programação e execução orçamentária e financeira",
+            "subtopicos": [
+              "Descentralização orçamentária e financeira",
+              "Acompanhamento da execução",
+              "Sistemas de informações",
+              "Alterações orçamentárias"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Fontes",
+              "Dívida ativa"
+            ]
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito e classificações",
+              "Estágios",
+              "Restos a pagar",
+              "Despesas de exercícios anteriores",
+              "Dívida flutuante e fundada"
+            ]
+          },
+          {
+            "nome": "Lei Complementar nº 101/2000 e suas alterações (Lei de Responsabilidade Fiscal)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 4.320/1964 e suas alterações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Transferências voluntárias",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 10.028/2000 (infrações administrativas contra as leis de finanças públicas)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 9,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE ECONOMIA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE ECONOMIA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Economia do Setor Público e Economia Brasileira",
+        "topicos": [
+          {
+            "nome": "Economia do setor público",
+            "subtopicos": [
+              "O Estado e as funções econômicas governamentais",
+              "Políticas fiscal e monetária; outras políticas econômicas",
+              "Evolução da participação do setor público na atividade econômica",
+              "Financiamento do déficit público a partir dos anos 80 do século XX",
+              "Inflação e crescimento"
+            ]
+          },
+          {
+            "nome": "Economia brasileira",
+            "subtopicos": [
+              "Aspectos gerais do comportamento recente da economia brasileira e das políticas econômicas adotadas pelos últimos governos",
+              "Mudanças estruturais da economia brasileira a partir da aceleração dos processos de industrialização e urbanização",
+              "Planos de desenvolvimento mais importantes desde a segunda metade do século XX",
+              "Indicadores de desenvolvimento econômico e social brasileiro contemporâneo",
+              "Desigualdades pessoais e espaciais de renda e de riqueza",
+              "Estrutura tributária brasileira",
+              "Mercado de trabalho e condições de emprego e renda",
+              "Estrutura orçamentária e evolução do déficit e da dívida pública brasileiros",
+              "Previdência social e suas perspectivas",
+              "Câmbio, reservas e relações comerciais e financeiras do Brasil com o resto do mundo",
+              "Taxas de juros"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 10,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE FINANÇAS PÚBLICAS",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE FINANÇAS PÚBLICAS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Finanças Públicas",
+        "topicos": [
+          {
+            "nome": "Finanças públicas: objetivos, metas, abrangência e definição",
+            "subtopicos": []
+          },
+          {
+            "nome": "Funções do Estado; financiamento dos gastos públicos: tributação e equidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Função do bem-estar; políticas alocativas, distributivas e de estabilização",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tributação: tipos de tributos; progressividade, regressividade e neutralidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Federalismo fiscal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Déficit público",
+            "subtopicos": [
+              "Conceito",
+              "Financiamento do déficit",
+              "Sustentabilidade da política fiscal"
+            ]
+          },
+          {
+            "nome": "Indicadores financeiros: fundamentos e principais índices e taxas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de descentralização fiscal; transferências intergovernamentais: classificação e critérios",
+            "subtopicos": []
+          },
+          {
+            "nome": "Resultado primário e nominal e relação com indicadores da dívida pública",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 11,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE TECNOLOGIA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Informática",
+        "topicos": [
+          {
+            "nome": "Noções de sistema operacional (ambiente Windows 11 Enterprise)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Edição de textos, planilhas e apresentações (pacote Microsoft Office 365)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": [
+              "Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e intranet",
+              "Programas de navegação (Mozilla Firefox e Google Chrome)",
+              "Programa de correio eletrônico (Outlook Express)",
+              "Sítios de busca e pesquisa na Internet",
+              "Grupos de discussão",
+              "Redes sociais",
+              "Computação na nuvem (cloud computing)"
+            ]
+          },
+          {
+            "nome": "Conceitos de organização e de gerenciamento de informações, arquivos, pastas e programas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Procedimentos de segurança",
+              "Noções de vírus, worms e pragas virtuais",
+              "Aplicativos para segurança (antivírus, firewall, anti-spyware etc.)",
+              "Procedimentos de backup",
+              "Armazenamento de dados na nuvem (cloud storage)"
+            ]
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 12.527/2011 (acesso à informação)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Serviços públicos digitais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de data warehouse",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de analytics",
+            "subtopicos": []
+          },
+          {
+            "nome": "Noções de business intelligence",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 12,
+      "cargo": null,
+      "materia_chunk": "NOÇÕES DE CONTABILIDADE APLICADA AO SETOR PÚBLICO (CASP)",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "NOÇÕES DE CONTABILIDADE APLICADA AO SETOR PÚBLICO (CASP)",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Pública",
+        "topicos": [
+          {
+            "nome": "Conceituação, objeto e campo de aplicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios e normas de contabilidade sob a perspectiva do setor público",
+            "subtopicos": [
+              "MCASP 11ª edição"
+            ]
+          },
+          {
+            "nome": "Patrimônio público",
+            "subtopicos": [
+              "Ativo",
+              "Passivo",
+              "Saldo patrimonial"
+            ]
+          },
+          {
+            "nome": "Variações patrimoniais",
+            "subtopicos": [
+              "Qualitativas",
+              "Quantitativas",
+              "Realização da variação patrimonial",
+              "Resultado patrimonial"
+            ]
+          },
+          {
+            "nome": "Receita e despesa sob o enfoque patrimonial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mensuração de ativos",
+            "subtopicos": [
+              "Ativo imobilizado",
+              "Ativo intangível",
+              "Reavaliação e redução ao valor recuperável",
+              "Depreciação, amortização e exaustão"
+            ]
+          },
+          {
+            "nome": "Mensuração de passivos",
+            "subtopicos": [
+              "Provisões",
+              "Passivos contingentes"
+            ]
+          },
+          {
+            "nome": "Tratamento contábil aplicável aos impostos e contribuições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de custos no setor público",
+            "subtopicos": [
+              "Classificação e nomenclatura de custos",
+              "Aspectos legais do sistema de custos",
+              "Ambiente da informação de custos",
+              "Características da informação de custos",
+              "Terminologia de custos"
+            ]
+          },
+          {
+            "nome": "Plano de Contas Aplicado ao Setor Público (PCASP)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Demonstrações contábeis aplicadas ao setor público",
+            "subtopicos": [
+              "Balanço orçamentário",
+              "Balanço financeiro",
+              "Demonstração das variações patrimoniais",
+              "Balanço patrimonial",
+              "Demonstração de fluxos de caixa",
+              "Demonstração das mutações do patrimônio líquido",
+              "Notas explicativas às demonstrações contábeis",
+              "Consolidação das demonstrações contábeis"
+            ]
+          },
+          {
+            "nome": "Transações no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Receita e despesa pública",
+            "subtopicos": [
+              "Conceito, etapas, estágios e categorias econômicas"
+            ]
+          },
+          {
+            "nome": "Execução orçamentária e financeira",
+            "subtopicos": []
+          },
+          {
+            "nome": "Suprimento de fundos",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 13,
+      "cargo": null,
+      "materia_chunk": "GESTÃO PÚBLICA (SOMENTE PARA A PROVA DISCURSIVA)",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "GESTÃO PÚBLICA",
+      "apenas_discursiva": true,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Administração Geral",
+        "topicos": [
+          {
+            "nome": "Processo administrativo",
+            "subtopicos": [
+              "Funções de administração: planejamento, organização, direção e controle",
+              "Processo de planejamento",
+              "Planejamento estratégico: visão, missão e análise SWOT",
+              "Análise competitiva e estratégias genéricas",
+              "Redes e alianças",
+              "Planejamento tático",
+              "Planejamento operacional",
+              "Administração por objetivos",
+              "Balanced scorecard",
+              "Processo decisório",
+              "Planejamento participativo e governança colaborativa",
+              "Gestão de riscos e Compliance no setor público",
+              "Organização",
+              "Estrutura organizacional",
+              "Tipos de departamentalização: características, vantagens e desvantagens de cada tipo",
+              "Governança pública e Accountability"
+            ]
+          },
+          {
+            "nome": "Transformação digital e governo eletrônico: GovTech, dados abertos, inteligência artificial, uso ético e seguro de dados públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Comportamento organizacional: relações indivíduo/organização, motivação, liderança, desempenho",
+            "subtopicos": []
+          },
+          {
+            "nome": "Competência interpessoal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento de conflitos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Inovação e sustentabilidade",
+            "subtopicos": [
+              "Inovação em políticas públicas",
+              "Laboratórios de inovação e Design Thinking",
+              "Agenda ESG e sustentabilidade na administração pública",
+              "Gestão por resultados e valor público"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 14,
+      "cargo": "CARGO 1: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ADMINISTRADOR",
+      "materia_chunk": "ADMINISTRAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Administração",
+        "topicos": [
+          {
+            "nome": "Evolução da administração",
+            "subtopicos": [
+              "Principais abordagens da administração (clássica até contingencial)",
+              "Evolução da administração pública no Brasil (após 1930); reformas administrativas; a nova gestão pública",
+              "Governança, governabilidade e accountability na administração pública",
+              "Transparência na administração pública",
+              "Processos participativos de gestão pública",
+              "Qualidade na administração pública",
+              "Gestão por resultado na produção de serviços públicos",
+              "Plano de Reforma do Aparelho do Estado"
+            ]
+          },
+          {
+            "nome": "Processo administrativo",
+            "subtopicos": [
+              "Funções de administração: planejamento, organização, direção e controle",
+              "Processo de planejamento",
+              "Planejamento estratégico: visão, missão e análise SWOT, matriz GUT e ferramenta 5W2H",
+              "Análise competitiva e estratégias genéricas",
+              "Redes e alianças",
+              "Planejamento tático",
+              "Planejamento operacional",
+              "Administração por objetivos",
+              "Balanced scorecard",
+              "Processo decisório",
+              "Organização",
+              "Estrutura organizacional",
+              "Tipos de departamentalização: características, vantagens e desvantagens de cada tipo",
+              "Organização informal",
+              "Cultura organizacional",
+              "Direção",
+              "Motivação e liderança",
+              "Comunicação",
+              "Descentralização e delegação",
+              "Controle",
+              "Características",
+              "Tipos, vantagens e desvantagens",
+              "Sistema de medição de desempenho organizacional"
+            ]
+          },
+          {
+            "nome": "Gestão de pessoas",
+            "subtopicos": [
+              "Equilíbrio organizacional",
+              "Objetivos, desafios e características da gestão de pessoas",
+              "Recrutamento e seleção de pessoas",
+              "Objetivos e características",
+              "Principais tipos, características, vantagens e desvantagens",
+              "Principais técnicas de seleção de pessoas: características, vantagens e desvantagens",
+              "Análise e descrição de cargos",
+              "Capacitação de pessoas",
+              "Gestão de desempenho",
+              "Gestão por competências",
+              "Carreira"
+            ]
+          },
+          {
+            "nome": "Gestão da qualidade e modelo de excelência gerencial",
+            "subtopicos": [
+              "Principais teóricos e suas contribuições para a gestão da qualidade",
+              "Ferramentas de gestão da qualidade"
+            ]
+          },
+          {
+            "nome": "Gestão de projetos",
+            "subtopicos": [
+              "Elaboração, análise e avaliação de projetos",
+              "Principais características dos modelos de gestão de projetos",
+              "Projetos e suas etapas"
+            ]
+          },
+          {
+            "nome": "Gestão de processos",
+            "subtopicos": [
+              "Conceitos da abordagem por processos",
+              "Técnicas de mapeamento, análise e melhoria de processos",
+              "Noções de estatística aplicada ao controle e à melhoria de processos",
+              "BPM"
+            ]
+          },
+          {
+            "nome": "Administração financeira",
+            "subtopicos": [
+              "Indicadores de desempenho: tipos, variáveis",
+              "Princípios gerais de alavancagem operacional e financeira",
+              "Planejamento financeiro de curto e longo prazo",
+              "Noções de análise de balanços e demonstrações financeiras"
+            ]
+          },
+          {
+            "nome": "Legislação administrativa",
+            "subtopicos": [
+              "Administração direta, indireta e fundacional",
+              "Atos administrativos",
+              "Requisição",
+              "Lei estadual nº 20.656/2021",
+              "Lei estadual nº 20.656/2021"
+            ]
+          },
+          {
+            "nome": "Orçamento público",
+            "subtopicos": [
+              "Princípios orçamentários",
+              "Diretrizes orçamentárias",
+              "Processo orçamentário",
+              "Métodos, técnicas e instrumentos do orçamento público; normas legais aplicáveis",
+              "SIOP e SIAFI",
+              "Receita pública: categorias, fontes, estágios, dívida ativa",
+              "Despesa pública: categorias, estágios",
+              "Suprimento de fundos",
+              "Restos a pagar",
+              "Despesas de exercícios anteriores",
+              "Conta Única do Tesouro"
+            ]
+          },
+          {
+            "nome": "Licitação pública",
+            "subtopicos": [
+              "Modalidades, dispensa e inexigibilidade",
+              "Pregão",
+              "Contratos e compras",
+              "Convênios e termos similares"
+            ]
+          },
+          {
+            "nome": "Noções de execução financeira",
+            "subtopicos": [
+              "Definição",
+              "Importância e objetivos da execução financeira nas organizações"
+            ]
+          },
+          {
+            "nome": "Planejamento financeiro",
+            "subtopicos": [
+              "Conceito de planejamento financeiro",
+              "Etapas do planejamento financeiro",
+              "Ferramentas de planejamento financeiro"
+            ]
+          },
+          {
+            "nome": "Monitoramento e controle financeiro",
+            "subtopicos": [
+              "Métodos de controle financeiro",
+              "Ajustes e correções"
+            ]
+          },
+          {
+            "nome": "Gestão de risco financeiro",
+            "subtopicos": [
+              "Identificação de riscos financeiros",
+              "Estratégias de mitigação",
+              "Monitoramento contínuo de riscos"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 15,
+      "cargo": "CARGO 2: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ANALISTA FAZENDÁRIO",
+      "materia_chunk": "LICITAÇÕES E CONTRATOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "LICITAÇÕES E CONTRATOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Licitações e contratos administrativos",
+        "topicos": [
+          {
+            "nome": "Licitações e contratos administrativos",
+            "subtopicos": [
+              "Legislação pertinente",
+              "Lei nº 14.133/2021",
+              "Decreto estadual nº 10.086/2022 (Título II – Disposições Gerais sobre Compras e Contratação de Prestação de Serviços)",
+              "Lei nº 8.987/1995 e suas alterações (Lei de Concessões)",
+              "Fundamentos constitucionais"
+            ]
+          },
+          {
+            "nome": "Administração de contratos",
+            "subtopicos": [
+              "Características do contrato administrativo",
+              "Formalização e fiscalização do contrato",
+              "Aspectos orçamentários e financeiros da execução do contrato",
+              "Sanção administrativa",
+              "Equilíbrio econômico-financeiro",
+              "Garantia contratual",
+              "Alteração do objeto",
+              "Acréscimos e supressões",
+              "Prorrogação do prazo de vigência e de execução"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 2: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ANALISTA FAZENDÁRIO",
+      "materia_chunk": "EXECUÇÃO FINANCEIRA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "EXECUÇÃO FINANCEIRA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Noções de execução financeira",
+        "topicos": [
+          {
+            "nome": "Noções de execução financeira",
+            "subtopicos": [
+              "Definição",
+              "Importância e objetivos da execução financeira nas organizações"
+            ]
+          },
+          {
+            "nome": "Planejamento financeiro",
+            "subtopicos": [
+              "Conceito de planejamento financeiro",
+              "Etapas do planejamento financeiro",
+              "Ferramentas de planejamento financeiro"
+            ]
+          },
+          {
+            "nome": "Monitoramento e controle financeiro",
+            "subtopicos": [
+              "Métodos de controle financeiro",
+              "Ajustes e correções"
+            ]
+          },
+          {
+            "nome": "Execução de despesas e receitas",
+            "subtopicos": [
+              "Gestão de despesas",
+              "Gestão de receitas"
+            ]
+          },
+          {
+            "nome": "Análise financeira",
+            "subtopicos": [
+              "Métodos de análise",
+              "Ferramentas de análise"
+            ]
+          },
+          {
+            "nome": "Gestão de risco financeiro",
+            "subtopicos": [
+              "Identificação de riscos financeiros",
+              "Estratégias de mitigação",
+              "Monitoramento contínuo de riscos"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 2: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ANALISTA FAZENDÁRIO",
+      "materia_chunk": "ADMINISTRAÇÃO PÚBLICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ADMINISTRAÇÃO PÚBLICA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Administração Pública",
+        "topicos": [
+          {
+            "nome": "Administração pública",
+            "subtopicos": [
+              "Do modelo racional-legal ao paradigma pós-burocrático",
+              "Estado oligárquico e patrimonial, Estado autoritário e burocrático, Estado do bem-estar, Estado regulador"
+            ]
+          },
+          {
+            "nome": "Transparência da administração pública",
+            "subtopicos": [
+              "Controle social e cidadania"
+            ]
+          },
+          {
+            "nome": "Excelência nos serviços públicos",
+            "subtopicos": [
+              "Gestão por resultados na produção de serviços públicos",
+              "Gestão de pessoas por competências"
+            ]
+          },
+          {
+            "nome": "Comunicação na gestão pública e gestão de redes organizacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Governabilidade e governança",
+            "subtopicos": [
+              "Intermediação de interesses: clientelismo, corporativismo e neocorporativismo"
+            ]
+          },
+          {
+            "nome": "Processo de formulação e desenvolvimento de políticas: construção de agendas, formulação de políticas, implementação de políticas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Balanced scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Referencial estratégico das organizações",
+            "subtopicos": [
+              "Análise de ambiente interno e externo",
+              "Ferramentas de análise de ambiente: análise SWOT, análise de cenários, matriz GUT e ferramenta 5W2H",
+              "Negócio, missão, visão de futuro, valores"
+            ]
+          },
+          {
+            "nome": "Indicadores de desempenho",
+            "subtopicos": [
+              "Tipos de indicadores",
+              "Variáveis componentes dos indicadores"
+            ]
+          },
+          {
+            "nome": "As reformas administrativas e a redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado",
+            "subtopicos": []
+          },
+          {
+            "nome": "Governo eletrônico; transparência da administração pública; controle social e cidadania; accountability",
+            "subtopicos": []
+          },
+          {
+            "nome": "Administração de pessoal",
+            "subtopicos": []
+          },
+          {
+            "nome": "Administração de compras e materiais: processos de compras governamentais e gerenciamento de materiais e estoques",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mudanças institucionais: conselhos, organizações sociais, organização da sociedade civil de interesse público (OSCIP), agências reguladoras, agências executivas, consórcios públicos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gestão de projetos",
+            "subtopicos": [
+              "Elaboração, análise e avaliação de projetos"
+            ]
+          },
+          {
+            "nome": "Lei Federal nº 12.527/2011 e suas alterações (Lei de Acesso à Informação)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei Complementar nº 131/2009 (Lei da Transparência)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 18,
+      "cargo": "CARGO 3: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: CONTADOR",
+      "materia_chunk": "CONTABILIDADE",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "CONTABILIDADE",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Contabilidade Pública",
+        "topicos": [
+          {
+            "nome": "Conceituação, objeto e campo de aplicação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Composição do patrimônio público",
+            "subtopicos": [
+              "Patrimônio público",
+              "Ativo",
+              "Passivo",
+              "Saldo patrimonial"
+            ]
+          },
+          {
+            "nome": "Variações patrimoniais",
+            "subtopicos": [
+              "Qualitativas",
+              "Quantitativas: receita e despesa sob o enfoque patrimonial",
+              "Realização da variação patrimonial",
+              "Resultado patrimonial"
+            ]
+          },
+          {
+            "nome": "Regime orçamentário e regime contábil",
+            "subtopicos": []
+          },
+          {
+            "nome": "Mensuração de ativos",
+            "subtopicos": [
+              "Ativo imobilizado",
+              "Ativo intangível",
+              "Reavaliação e redução ao valor recuperável",
+              "Depreciação, amortização e exaustão"
+            ]
+          },
+          {
+            "nome": "Mensuração de passivos",
+            "subtopicos": [
+              "Provisões",
+              "Passivos contingentes"
+            ]
+          },
+          {
+            "nome": "Tratamento contábil aplicável aos impostos e contribuições",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistema de custos",
+            "subtopicos": [
+              "Aspectos legais do sistema de custos",
+              "Ambiente da informação de custos",
+              "Características da informação de custos",
+              "Terminologia de custos"
+            ]
+          },
+          {
+            "nome": "Estrutura do plano de contas aplicado ao setor público (PCASP)",
+            "subtopicos": [
+              "Naturezas da informação contábil",
+              "Código da conta contábil",
+              "Atributos da informação contábil",
+              "Regras de integridade do PCASP"
+            ]
+          },
+          {
+            "nome": "Demonstrações contábeis aplicadas ao setor público",
+            "subtopicos": [
+              "Balanço orçamentário",
+              "Balanço financeiro",
+              "Demonstração das variações patrimoniais",
+              "Balanço patrimonial",
+              "Demonstração de fluxos de caixa",
+              "Demonstração das mutações do patrimônio líquido",
+              "Notas explicativas às demonstrações contábeis",
+              "Consolidação das demonstrações contábeis"
+            ]
+          },
+          {
+            "nome": "Transações no setor público",
+            "subtopicos": []
+          },
+          {
+            "nome": "Despesa pública",
+            "subtopicos": [
+              "Conceito, etapas, estágios e categorias econômicas"
+            ]
+          },
+          {
+            "nome": "Receita pública",
+            "subtopicos": [
+              "Conceito, etapas, estágios e categorias econômicas"
+            ]
+          },
+          {
+            "nome": "Créditos adicionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Execução orçamentária e financeira",
+            "subtopicos": []
+          },
+          {
+            "nome": "Fonte ou destinação de recursos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Suprimento de fundos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Restos a pagar",
+            "subtopicos": []
+          },
+          {
+            "nome": "Despesas com pessoal",
+            "subtopicos": [
+              "Definições e limites",
+              "Controle da despesa total com pessoal"
+            ]
+          },
+          {
+            "nome": "Despesas de exercícios anteriores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Normas Brasileiras de Contabilidade",
+            "subtopicos": [
+              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016",
+              "NBC TSP 03 – provisões, passivos contingentes e ativos contingentes",
+              "NBC TSP 04 – estoques",
+              "NBC TSP 07 – ativo imobilizado",
+              "NBC TSP 08 – ativo intangível",
+              "NBC TSP 09 – redução ao valor recuperável de ativo não gerador de caixa",
+              "NBC TSP 10 – redução ao valor recuperável de ativo gerador de caixa",
+              "NBC TSP 11 – apresentação das demonstrações contábeis",
+              "NBC TSP 12 – demonstração dos fluxos de caixa",
+              "NBC TSP 13 – apresentação de informação orçamentária nas demonstrações contábeis",
+              "NBC TSP 16 – demonstrações contábeis separadas",
+              "NBC TSP 17 – demonstrações contábeis consolidadas",
+              "NBC TSP 23 – políticas contábeis, mudança de estimativa e retificação de erro",
+              "NBC TSP 34 – custos no setor público"
+            ]
+          },
+          {
+            "nome": "Análise das demonstrações contábeis",
+            "subtopicos": [
+              "Análise horizontal e vertical",
+              "Indicadores de estrutura de capital",
+              "Indicadores de liquidez",
+              "Indicadores de endividamento",
+              "Análise de informações extraídas das notas explicativas"
+            ]
+          },
+          {
+            "nome": "MCASP 11ª edição",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei de Responsabilidade Fiscal (Lei nº 101/2000)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 4.320/1964",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 14.113/2020 (novo Fundo de Manutenção e Desenvolvimento da Educação Básica e de Valorização dos Profissionais de Educação – Fundeb)",
+            "subtopicos": [
+              "Composição financeira",
+              "Distribuição de recursos",
+              "Utilização dos recursos"
+            ]
+          },
+          {
+            "nome": "Relatório Resumido da Execução Orçamentária (RREO)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Relatório de Gestão Fiscal",
+            "subtopicos": []
+          },
+          {
+            "nome": "NBCASP (Normas Brasileiras de Contabilidade Aplicada ao Setor Público): NBC T 16.1 a 16.11 do Conselho Federal de Contabilidade",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 19,
+      "cargo": "CARGO 4: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ECONOMISTA",
+      "materia_chunk": "ECONOMIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "ECONOMIA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Economia",
+        "topicos": [
+          {
+            "nome": "Microeconomia",
+            "subtopicos": [
+              "Conceitos fundamentais",
+              "Teoria da demanda",
+              "Teoria da oferta",
+              "Equilíbrio de mercado",
+              "Estruturas de mercado",
+              "Teoria dos jogos",
+              "Equilíbrio geral"
+            ]
+          },
+          {
+            "nome": "Macroeconomia",
+            "subtopicos": [
+              "Contabilidade social",
+              "Balanço de pagamentos",
+              "Agregados monetários",
+              "Teoria keynesiana",
+              "Inflação",
+              "Mercado de trabalho",
+              "Economia internacional e comércio exterior"
+            ]
+          },
+          {
+            "nome": "Economia do setor público",
+            "subtopicos": [
+              "O Estado e as funções econômicas governamentais",
+              "Tributação",
+              "Evolução da participação do setor público na atividade econômica",
+              "Contabilidade fiscal",
+              "Finanças públicas no Brasil a partir dos anos 1980",
+              "Inflação, crescimento e função estabilizadora do Estado"
+            ]
+          },
+          {
+            "nome": "Economia brasileira",
+            "subtopicos": [
+              "Aspectos gerais do comportamento recente da economia brasileira e das políticas econômicas adotadas pelos últimos governos",
+              "Mudanças estruturais da economia brasileira a partir da aceleração dos processos de industrialização e urbanização",
+              "Planos de desenvolvimento mais importantes desde a segunda metade do século XX",
+              "Principais características e resultados dos planos de estabilização a partir da década de 80 do século XX",
+              "Indicadores de desenvolvimento econômico e social brasileiro contemporâneo",
+              "Desigualdades pessoais e espaciais de renda e de riqueza",
+              "Perfil demográfico brasileiro",
+              "Estrutura tributária brasileira",
+              "Mercado de trabalho e condições de emprego e renda",
+              "Estrutura orçamentária e evolução do déficit e da dívida pública brasileiros",
+              "Previdência social e suas perspectivas",
+              "Câmbio, reservas e relações comerciais e financeiras do Brasil com o resto do mundo"
+            ]
+          },
+          {
+            "nome": "Economia do Estado do Paraná",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 5: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ESTATÍSTICO",
+      "materia_chunk": "ESTATÍSTICA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 5,
+      "materia_normalizada": "ESTATÍSTICA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Estatística",
+        "topicos": [
+          {
+            "nome": "Estatística descritiva e análise exploratória de dados",
+            "subtopicos": [
+              "Gráficos, diagramas, tabelas, medidas descritivas (posição, dispersão, assimetria e curtose)"
+            ]
+          },
+          {
+            "nome": "Probabilidade",
+            "subtopicos": [
+              "Definições básicas e axiomas",
+              "Probabilidade condicional e independência",
+              "Variáveis aleatórias discretas e contínuas",
+              "Distribuição de probabilidades",
+              "Função de probabilidade",
+              "Função densidade de probabilidade",
+              "Esperança e momentos",
+              "Distribuições especiais",
+              "Distribuições condicionais e independência",
+              "Transformação de variáveis",
+              "Leis dos grandes números",
+              "Teorema central do limite",
+              "Amostras aleatórias",
+              "Distribuições amostrais"
+            ]
+          },
+          {
+            "nome": "Inferência estatística",
+            "subtopicos": [
+              "Estimação pontual",
+              "Métodos de estimação, propriedades dos estimadores, suficiência",
+              "Estimação intervalar",
+              "Intervalos de confiança, intervalos de credibilidade",
+              "Testes de hipóteses",
+              "Hipóteses simples e compostas, níveis de significância e potência de um teste, teste t de Student, teste qui-quadrado"
+            ]
+          },
+          {
+            "nome": "Análise de regressão linear",
+            "subtopicos": [
+              "Critérios de mínimos quadrados e de máxima verossimilhança",
+              "Modelos de regressão linear",
+              "Inferência sobre os parâmetros do modelo",
+              "Análise de variância",
+              "Análise de resíduos"
+            ]
+          },
+          {
+            "nome": "Técnicas de amostragem",
+            "subtopicos": [
+              "Amostragem aleatória simples, estratificada, sistemática e por conglomerados",
+              "Tamanho amostral"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 21,
+      "cargo": "CARGO 6: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: PROFISSIONAL DE TECNOLOGIA DA INFORMAÇÃO",
+      "materia_chunk": "TECNOLOGIA DA INFORMAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 6,
+      "materia_normalizada": "TECNOLOGIA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Tecnologia da Informação",
+        "topicos": [
+          {
+            "nome": "Banco de dados",
+            "subtopicos": [
+              "Arquitetura de banco de dados: relacional (PostgreSQL, Oracle, SqlServer), não relacional (orientado a documento, chave-valor, grafo, colunar, time series)",
+              "Modelagem de banco de dados: físico, lógico e conceitual",
+              "Álgebra relacional, SQL/ANSI e linguagens procedurais embarcadas",
+              "Gestão de banco de dados: controle de acesso, usuário, cálculo volumétrico, replicação, cluster, particionamento e esquemas"
+            ]
+          },
+          {
+            "nome": "Arquitetura e engenharia de software",
+            "subtopicos": [
+              "Conceitos básicos sobre engenharia de software",
+              "Disciplinas de engenharia de software",
+              "Análise de requisitos funcionais e não-funcionais",
+              "Análise, projeto e modelagem orientada a objetos: UML 2.5.1 (2017)",
+              "Modelagem de dados: modelagem relacional",
+              "Qualidade de software: ISSO/IEC 9126, métricas de qualidade de software",
+              "Análise de pontos de função",
+              "Aplicações cloud native"
+            ]
+          },
+          {
+            "nome": "Programação funcional e orientação a objetos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança da informação",
+            "subtopicos": [
+              "Confiabilidade, integridade, disponibilidade, autenticidade e não repúdio",
+              "Mecanismos de segurança: criptografia (conceitos básicos e aplicações, principais algoritmos de criptografia), assinatura digital, garantia de integridade, controle de acesso, certificação digital",
+              "Tecnologias de segurança: firewalls, sistema de detecção e prevenção de intrusões, antivírus",
+              "Gestão de riscos e continuidade de negócio",
+              "Segurança cibernética"
+            ]
+          },
+          {
+            "nome": "Ciências de dados e inteligência artificial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Contratações, gestão e fiscalização de contratos administrativos especializados em TIC",
+            "subtopicos": [
+              "Decreto estadual nº 10.086/2022 (Título V – Da Tecnologia da Informação e de Comunicação): arts. 646 a 657"
+            ]
+          },
+          {
+            "nome": "Infraestrutura de serviços, servidores, virtualização e serviços em cloud",
+            "subtopicos": []
+          },
+          {
+            "nome": "Infraestrutura de TIC",
+            "subtopicos": [
+              "Redes de computadores",
+              "Endereçamento e protocolos da família TCP/IP",
+              "Classificação de redes: PAN, LAN, MAN, WAN"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de projetos com base nos domínios de desempenho e práticas ágeis",
+            "subtopicos": [
+              "Ciclo de vida de projetos de TI, abordagens preditivas, iterativas, incrementais, ágeis e híbridas",
+              "Metodologias e frameworks de gestão de projetos: PMBOK 7ª edição, Agile, Scrum, Kanban",
+              "Ferramentas de gestão de projetos: MS Project, Jira, Trello"
+            ]
+          },
+          {
+            "nome": "Governança de TI",
+            "subtopicos": [
+              "Conceitos e princípios de governança de TIC",
+              "Frameworks e modelos de governança",
+              "COBIT 2019",
+              "Alinhamento estratégico entre TI e negócios",
+              "Planejamento estratégico de TI"
+            ]
+          },
+          {
+            "nome": "Gerenciamento de serviços de TI",
+            "subtopicos": [
+              "Noções de ITIL v.4 e seus processos",
+              "Gerenciamento de serviços: catálogo de serviços, níveis de serviço, gerenciamento de capacidade e disponibilidade",
+              "Gerenciamento de incidentes e problemas: gestão de mudanças, configurações e liberações"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+}

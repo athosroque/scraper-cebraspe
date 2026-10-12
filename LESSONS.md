@@ -715,3 +715,16 @@ classificados como discursivos e perder os 120 itens objetivos.
 4. Adicionado `\bpratic\w*\s+opca\w*` a `PADRAO_PROVA_OUTRA`, reclassificando os 5 PDFs
    de EMBRAPA_24 sem afetar nenhum outro concurso.
 **Custo do aprendizado:** ~45min (análise de cadernos mistos reais e testes de regressão do piloto).
+
+### [tags: prova-parser, multipla-escolha, falha-silenciosa, validacao, etapa-8c]
+**Sintoma:** as 3 questões ME conferidas na C1a (básica, específica, com figura) bateram
+token a token com o PDF, mas 23 outras tinham o cabeçalho da matéria seguinte colado no fim
+da alternativa E ("...ao final de cada ciclo. BANCO DE DADOS"), e a seção do caderno inteiro
+ficava com o primeiro cabeçalho. Só apareceu ao agrupar `questoes.secao` por caderno.
+**Causa:** o corte depois da última alternativa (`_segmentar_me`) só reconhecia cabeçalho da
+lista fixa de palavras-chave. Questão escolhida para conferência raramente está na troca de
+matéria, então a amostra literal não cruza o defeito.
+**Solução:** cabeçalho pelo layout (`_eh_cabecalho_layout_me`) e, no roteiro do lote, duas
+checagens agregadas obrigatórias: seções por caderno e última alternativa terminando em caixa
+alta depois de pontuação (pegou 20 dos 23 nos dados antigos).
+**Custo do aprendizado:** ~1h (diagnóstico, correção, reextração com comparador antes/depois).

@@ -1298,6 +1298,45 @@ def _eh_cabecalho_secao_me(texto: str) -> bool:
     return not re.search(r"[a-zà-ÿ]", re.sub(r"\([^)]*\)", "", texto))
 
 
+# Cabeçalho de matéria pelo layout: o caderno ME centraliza o título na coluna
+# e deixa alternativa e comando na margem. Sem isso, cabeçalho fora da lista
+# de palavras-chave ("BANCO DE DADOS", BANRISUL) virava o fim da alternativa E.
+# (margem, borda direita) das duas colunas, em pt, medidos nos cadernos reais.
+COLUNAS_ME = ((28.4, 293.6), (304.3, 569.5))
+TOLERANCIA_CENTRO_COLUNA_ME = 12.0
+RECUO_MINIMO_CABECALHO_ME = 8.0
+PADRAO_SIGLA_PARENTESES_ME = re.compile(r"\([A-ZÀ-Ú]+\)")
+PADRAO_CARACTERES_CABECALHO_ME = re.compile(r"^[A-ZÀ-Ú ,\-–—]+$")
+
+
+def _eh_cabecalho_layout_me(linha: Linha) -> bool:
+    """Linha em caixa alta, sem dígito nem caractere de código, centralizada
+    na coluna (ou em negrito) e afastada da margem. Sigla entre parênteses
+    ("(AFO)") é aceita. Alternativa de código ("SUM()", "SELECT ...") fica na
+    margem e não passa."""
+    texto = linha.texto.strip()
+    if not texto or re.search(r"\d", texto):
+        return False
+    sem_sigla = PADRAO_SIGLA_PARENTESES_ME.sub("", texto).strip()
+    if not PADRAO_CARACTERES_CABECALHO_ME.match(sem_sigla):
+        return False
+    if len(re.findall(r"[A-ZÀ-Ú]", texto)) < 4:
+        return False
+    for margem, borda in COLUNAS_ME:
+        if margem <= linha.x0 < borda:
+            # Centro da coluna ou da largura do texto: título que atravessa as
+            # duas colunas ("INOVAÇÃO EM TI NO SISTEMA FINANCEIRO", BANRISUL_004).
+            centros = [(m + b) / 2 for m, b in COLUNAS_ME]
+            centros.append((COLUNAS_ME[0][0] + COLUNAS_ME[-1][1]) / 2)
+            centro_linha = (linha.x0 + linha.x1) / 2
+            centralizada = any(
+                abs(centro_linha - c) <= TOLERANCIA_CENTRO_COLUNA_ME for c in centros
+            )
+            afastada = linha.x0 - margem >= RECUO_MINIMO_CABECALHO_ME
+            return afastada and (centralizada or linha.negrito)
+    return False
+
+
 def _eh_rotulo_texto_me(texto: str) -> bool:
     return PADRAO_TEXTO_ROTULO_ME.match(texto) is not None
 
@@ -1390,7 +1429,7 @@ def _processar_preambulo_me(
     inicio_base = 0
     l0 = linhas_preambulo[0].texto.strip()
     preenchidas = [l for l in linhas_preambulo if l.texto.strip()]
-    if _eh_cabecalho_secao_me(l0):
+    if _eh_cabecalho_secao_me(l0) or _eh_cabecalho_layout_me(linhas_preambulo[0]):
         secao = l0
         inicio_base = 1
         # Cabeçalho quebrado: "NOÇÕES DE CONTABILIDADE APLICADA AO" + "SETOR
@@ -1542,6 +1581,7 @@ def _segmentar_me(
                 l = trecho[k]
                 if (
                     _eh_cabecalho_secao_me(l.texto)
+                    or _eh_cabecalho_layout_me(l)
                     or _eh_rotulo_texto_me(l.texto)
                     or PADRAO_FAIXA_SECAO.match(l.texto.strip())
                 ):

@@ -80,3 +80,27 @@ Para garantir que as 2.800 questões do piloto mantenham exatamente os mesmos ha
 4. **Gate da 8.M (2026-10-10, sessões S1–S4 em `docs/planos/plano-etapa-8m.md`):** ligação prova ME ↔ gabarito (SEBRAE_26_PSE_1 pelo sufixo `_NN`/TIPO, SEFA_PR_25 com `discursiva_por_cargo` conferindo o tipo), layout `caderno_com_gabarito` e carga real do `SEFA_PR_25` (380 itens ME) numa cópia do banco (`cebraspe_gate`). O piloto ficou inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos), e `make test-all` passou com 1.276 testes.
 5. **Sem registro no Gate (levado ao `task.md`):** a passada no Chromium headless com questão ME real (responder, corrigir, simulado, filtro) e a confirmação, no edital do concurso ME, de que o erro não desconta.
 6. **Agregação:** a regra "média por concurso × cargo" (8.M/S2) foi revista pelo [ADR-039](ADR-039-incidencia-em-dois-niveis.md) (dois níveis, prova → concurso).
+
+---
+
+## Atualização (2026-10-12, C1a / KAN-56): área vira cargo e seção ME pelo layout
+
+1. **Área vira cargo (decisão do dono).** O `BANRISUL_25` tem 1 cargo ("Técnico em TI II")
+   com 4 áreas, e cada área faz prova específica e discursiva próprias. `ÁREA N: <nome>` no
+   edital vira o cargo N (`CARGO N: <cargo> – ÁREA N: <nome>`), e o link do caderno que cita
+   `ÁREA N` liga ao cargo N (`classificar_prova_por_texto`, só quando o texto não cita cargo).
+   "PARA TODAS AS ÁREAS" continua valendo para todos os cargos. Assim edital × prova, simulado
+   e incidência por área funcionam como por cargo, e a matéria "BANCO DE DADOS" das áreas 1 e
+   2 não colide na chave. A regra vale para "PERFIL N" (SEBRAE, C3) e "ESPECIALIDADE N"
+   (SEFAZ_SE, C6) quando chegarem, com a mesma conferência.
+2. **Seção ME pelo layout.** O cabeçalho de matéria no meio do caderno ME só virava seção se
+   estivesse na lista de palavras-chave (`PADRAO_CABECALHO_SECAO_ME`); fora dela, ele ficava
+   no fim da alternativa E da questão anterior (23 casos no SEFA_PR e no BANRISUL). Agora
+   também corta numa linha em caixa alta, sem dígito nem caractere de código, afastada da
+   margem e centralizada na coluna (ou em negrito): `_eh_cabecalho_layout_me`. As colunas
+   estão fixas em pt (`COLUNAS_ME`), medidas nesses dois concursos.
+3. **Parser de edital:** sub-matérias em romano dentro de matéria composta (SEFA_PR) viram
+   um chunk cada, e o nível sai da "ESCOLARIDADE EXIGIDA" quando os requisitos não dizem.
+4. **Validação:** chunking dos 5 editais do piloto idêntico; reextração completa (87
+   cadernos) com o piloto idêntico e só os 23 cortes esperados nos ME; roteiro do lote em
+   `docs/runbook-lote.md`.

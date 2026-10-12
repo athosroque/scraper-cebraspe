@@ -330,7 +330,10 @@ Datasette continua só como ferramenta de revisão do dono.
       seleção de edital canônico (`escolher_edital_extracao`), preservação de texto de link
       para editais/gabaritos e suporte a exclusões; 154 provas e 155 gabaritos mapeados para os 11 ME;
       reclassificação de EMBRAPA_24 (5 PDFs); piloto 100% inalterado.
-      Próximas: C1a/C1b lote de calibração `SEFA_PR_25` + `BANRISUL_25` → C2 orquestrador mínimo →
+      C1a (KAN-56, em análise, falta aprovar os 2 editais): `SEFA_PR_25` + `BANRISUL_25` no banco
+      (610 questões ME, 5 discursivas, US$ 0,018), área vira cargo e seção ME pelo layout
+      (ADR-038), roteiro em `docs/runbook-lote.md`.
+      Próximas: C1b árvore/classificação/site do mesmo lote → C2 orquestrador mínimo →
       C3–C7 lotes → C8 fechamento. Pronto quando os 11 concursos ME de 2025 encerrados estão `aprovado`,
       o piloto segue inalterado e `make test-all` está verde.
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — os dois usos-alvo do dono

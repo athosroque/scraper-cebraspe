@@ -215,8 +215,14 @@ def test_reconciliacao_piloto_manifestos_e_banco():
         conn = stats_writer.conectar()
         try:
             with conn.cursor() as cur:
-                # Concursos piloto
-                cur.execute("SELECT slug, status_revisao FROM concursos ORDER BY slug;")
+                # Concursos piloto (a 8.C carrega outros concursos no mesmo banco;
+                # a reconciliação olha só os 5 do piloto)
+                piloto = sorted(CONCURSOS_PILOTO)
+                cur.execute(
+                    "SELECT slug, status_revisao FROM concursos"
+                    " WHERE slug = ANY(%s) ORDER BY slug;",
+                    (piloto,),
+                )
                 concursos_db = cur.fetchall()
                 slugs_db = {row[0] for row in concursos_db}
                 assert slugs_db == CONCURSOS_PILOTO
@@ -224,7 +230,11 @@ def test_reconciliacao_piloto_manifestos_e_banco():
                     assert status == "aprovado"
 
                 # Provas cadernos
-                cur.execute("SELECT count(*) FROM provas;")
+                cur.execute(
+                    "SELECT count(*) FROM provas p JOIN concursos c"
+                    " ON c.id = p.concurso_id WHERE c.slug = ANY(%s);",
+                    (piloto,),
+                )
                 assert cur.fetchone()[0] == 70
 
                 cur.execute(
@@ -244,15 +254,22 @@ def test_reconciliacao_piloto_manifestos_e_banco():
                 assert provas_por_slug["TCU_25_TEFC"] == 3
 
                 # Fila de extração
-                cur.execute("SELECT count(*) FROM fila_extracao_questoes;")
+                cur.execute(
+                    "SELECT count(*) FROM fila_extracao_questoes f JOIN concursos c"
+                    " ON c.id = f.concurso_id WHERE c.slug = ANY(%s);",
+                    (piloto,),
+                )
                 assert cur.fetchone()[0] == 145
 
                 cur.execute(
                     """
-                    SELECT categoria, count(*)
-                    FROM fila_extracao_questoes
-                    GROUP BY categoria;
-                    """
+                    SELECT f.categoria, count(*)
+                    FROM fila_extracao_questoes f
+                    JOIN concursos c ON c.id = f.concurso_id
+                    WHERE c.slug = ANY(%s)
+                    GROUP BY f.categoria;
+                    """,
+                    (piloto,),
                 )
                 fila_categorias = dict(cur.fetchall())
                 assert fila_categorias.get("prova") == 70
@@ -698,7 +715,12 @@ def test_regressao_piloto_chaves_5d_inalteradas():
         conn = stats_writer.conectar()
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT count(*) FROM questoes;")
+                piloto = sorted(CONCURSOS_PILOTO)
+                cur.execute(
+                    "SELECT count(*) FROM questoes q JOIN provas p ON p.id = q.prova_id"
+                    " JOIN concursos c ON c.id = p.concurso_id WHERE c.slug = ANY(%s);",
+                    (piloto,),
+                )
                 total_banco = cur.fetchone()[0]
                 assert total_banco == 2800, (
                     f"Total no banco deve ser 2.800, obtido: {total_banco}"
@@ -710,8 +732,10 @@ def test_regressao_piloto_chaves_5d_inalteradas():
                     SELECT c.slug, coalesce(p.codigo_caderno, p.arquivo), q.numero
                     FROM questoes q
                     JOIN provas p ON p.id = q.prova_id
-                    JOIN concursos c ON c.id = p.concurso_id;
-                    """
+                    JOIN concursos c ON c.id = p.concurso_id
+                    WHERE c.slug = ANY(%s);
+                    """,
+                    (piloto,),
                 )
                 chaves_banco = set()
                 for slug, caderno, numero in cur.fetchall():

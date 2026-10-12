@@ -1,0 +1,1083 @@
+{
+  "edital": "Ed_1_2025_Banrisul_Abertura_atualizado_ate_ret_4.pdf",
+  "concurso": {
+    "slug": "BANRISUL_25",
+    "orgao": "BANRISUL",
+    "ano": 2025
+  },
+  "cargos": [
+    {
+      "numero": 1,
+      "nome": "TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "nivel": "superior"
+    },
+    {
+      "numero": 2,
+      "nome": "TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "nivel": "superior"
+    },
+    {
+      "numero": 3,
+      "nome": "TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "nivel": "superior"
+    },
+    {
+      "numero": 4,
+      "nome": "TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+      "nivel": "superior"
+    }
+  ],
+  "total_chunks": 28,
+  "extraidos_com_sucesso": 28,
+  "falhas": 0,
+  "chunks_com_falha": [],
+  "resultados": [
+    {
+      "chunk_index": 0,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA PORTUGUESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA PORTUGUESA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Língua Portuguesa",
+        "topicos": [
+          {
+            "nome": "Compreensão e interpretação de textos de gêneros variados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Reconhecimento de tipos e gêneros textuais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio da ortografia oficial",
+            "subtopicos": []
+          },
+          {
+            "nome": "Domínio dos mecanismos de coesão textual",
+            "subtopicos": [
+              "Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual",
+              "Emprego de tempos e modos verbais"
+            ]
+          },
+          {
+            "nome": "Domínio da estrutura morfossintática do período",
+            "subtopicos": [
+              "Emprego das classes de palavras",
+              "Relações de coordenação entre orações e entre termos da oração",
+              "Relações de subordinação entre orações e entre termos da oração",
+              "Emprego dos sinais de pontuação",
+              "Concordância verbal e nominal",
+              "Regência verbal e nominal",
+              "Emprego do sinal indicativo de crase",
+              "Colocação dos pronomes átonos"
+            ]
+          },
+          {
+            "nome": "Reescrita de frases e parágrafos do texto",
+            "subtopicos": [
+              "Significação das palavras",
+              "Substituição de palavras ou de trechos de texto",
+              "Reorganização da estrutura de orações e de períodos do texto",
+              "Reescrita de textos de diferentes gêneros e níveis de formalidade"
+            ]
+          },
+          {
+            "nome": "Redação oficial, conforme Manual de Redação da Presidência da República",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 1,
+      "cargo": null,
+      "materia_chunk": "LÍNGUA INGLESA",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LÍNGUA INGLESA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Língua Inglesa",
+        "topicos": [
+          {
+            "nome": "Compreensão de textos escritos em língua inglesa",
+            "subtopicos": []
+          },
+          {
+            "nome": "Itens gramaticais relevantes para o entendimento dos sentidos dos textos",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia_chunk": "RACIOCÍNIO LÓGICO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "RACIOCÍNIO LÓGICO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Raciocínio Lógico",
+        "topicos": [
+          {
+            "nome": "Razões e proporções",
+            "subtopicos": [
+              "Divisão proporcional",
+              "Regras de três simples e compostas"
+            ]
+          },
+          {
+            "nome": "Compreensão de estruturas lógicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lógica de argumentação: analogias, inferências, deduções e conclusões",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lógica sentencial (ou proposicional)",
+            "subtopicos": [
+              "Proposições simples e compostas",
+              "Tabelas-verdade",
+              "Equivalências",
+              "Leis de De Morgan",
+              "Diagramas lógicos"
+            ]
+          },
+          {
+            "nome": "Lógica de primeira ordem",
+            "subtopicos": []
+          },
+          {
+            "nome": "Princípios de contagem e probabilidade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Operações com conjuntos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Raciocínio lógico envolvendo problemas aritméticos, geométricos e matriciais",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia_chunk": "LEGISLAÇÃO",
+      "tipo_conhecimento": "basico",
+      "nivel": "superior",
+      "cargo_numero": null,
+      "materia_normalizada": "LEGISLAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Políticas Públicas e Legislação Social",
+        "topicos": [
+          {
+            "nome": "Política Nacional para as Mulheres",
+            "subtopicos": []
+          },
+          {
+            "nome": "Política Nacional de Enfrentamento à Violência contra as Mulheres",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estatuto Nacional da Igualdade Racial — Lei Federal nº 12.288/2010",
+            "subtopicos": []
+          },
+          {
+            "nome": "Estatuto Estadual da Igualdade Racial — Lei Estadual nº 13.694/2011",
+            "subtopicos": []
+          },
+          {
+            "nome": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 4,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "CONCEITOS BÁSICOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "CONCEITOS BÁSICOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Concorrência (esquemas de sincronização, deadlocks). Redes Locais. Web Services, APIs REST.",
+        "topicos": [
+          {
+            "nome": "Concorrência (esquemas de sincronização, deadlocks)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Redes Locais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Web Services, APIs REST",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 5,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Programação estruturada",
+        "topicos": [
+          {
+            "nome": "Programação estruturada",
+            "subtopicos": []
+          },
+          {
+            "nome": "Componentização",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sub-rotinas",
+            "subtopicos": [
+              "passagem de parâmetros por endereço",
+              "passagem de parâmetros por referência",
+              "passagem de parâmetros por valor"
+            ]
+          },
+          {
+            "nome": "Escopo de Variáveis",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tipos de dados",
+            "subtopicos": [
+              "vinculação",
+              "verificação de tipos",
+              "tipificação forte"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 6,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "MODELAGEM DE DADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "MODELAGEM DE DADOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Fundamentos de administração de dados",
+        "topicos": [
+          {
+            "nome": "Fundamentos de administração de dados",
+            "subtopicos": [
+              "Segurança/Controle de acesso aos dados"
+            ]
+          },
+          {
+            "nome": "Modelagem de dados",
+            "subtopicos": [
+              "Modelo entidade-relacionamento (entidades, atributos, chaves e relacionamentos)",
+              "Normalização"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 7,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "FUNDAMENTOS DE BANCO DE DADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "FUNDAMENTOS DE BANCO DE DADOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Banco de Dados",
+        "topicos": [
+          {
+            "nome": "Conceitos de Banco de Dados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Sistemas de gerência de banco de dados (SGBD)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Arquitetura",
+            "subtopicos": []
+          },
+          {
+            "nome": "Modelos lógicos e representação física",
+            "subtopicos": []
+          },
+          {
+            "nome": "Organização física e métodos de acesso",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conceito de transação",
+            "subtopicos": []
+          },
+          {
+            "nome": "Concorrência, recuperação e integridade",
+            "subtopicos": []
+          },
+          {
+            "nome": "Linguagens de definição (DDL) e manipulação de dados (DML) em SGBDs relacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Procedimentos (stored procedures)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Visões (views)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gatilhos (triggers)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 8,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Banco de Dados",
+        "topicos": [
+          {
+            "nome": "Projeto e implantação de SGBDs relacionais",
+            "subtopicos": []
+          },
+          {
+            "nome": "Administração de usuários e perfis de acesso",
+            "subtopicos": []
+          },
+          {
+            "nome": "Controle de proteção, integridade e concorrência",
+            "subtopicos": []
+          },
+          {
+            "nome": "Backup e restauração de dados",
+            "subtopicos": []
+          },
+          {
+            "nome": "Tolerância a falhas e continuidade de operação",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 9,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "BANCO DE DADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "BANCO DE DADOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Banco de Dados",
+        "topicos": [
+          {
+            "nome": "Banco de Dados: Oracle 19c, MySQL v8 e MS SQL Server 2019",
+            "subtopicos": [
+              "Instalação, configuração e administração",
+              "Replicação de banco de dados",
+              "Suporte ao uso dos bancos de dados para os desenvolvedores"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 1: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 1: ADMINISTRAÇÃO DE BANCO DE DADOS",
+      "materia_chunk": "PERFORMANCE E TUNING",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 1,
+      "materia_normalizada": "PERFORMANCE E TUNING",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Índices e otimização de acesso",
+        "topicos": [
+          {
+            "nome": "Índices e otimização de acesso",
+            "subtopicos": [
+              "Otimização de código SQL ANSI: tuning, uso do join, union, exists e subconsultas",
+              "Uso de variáveis Bind",
+              "Desempenho e detecção de problemas"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 11,
+      "cargo": "CARGO 2: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "materia_chunk": "PROCESSO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "PROCESSO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Ciclos de vida e Metodologias ágeis de desenvolvimento",
+        "topicos": [
+          {
+            "nome": "Ciclos de vida",
+            "subtopicos": [
+              "Modelo cascata",
+              "Modelo ágil"
+            ]
+          },
+          {
+            "nome": "Metodologias ágeis de desenvolvimento",
+            "subtopicos": [
+              "Scrum, TDD, Modelagem Ágil e Kanban"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 12,
+      "cargo": "CARGO 2: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "materia_chunk": "BANCO DE DADOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "BANCO DE DADOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Banco de Dados",
+        "topicos": [
+          {
+            "nome": "Arquitetura de banco de dados relacional",
+            "subtopicos": []
+          },
+          {
+            "nome": "Modelagem de dados: físico, lógico e conceitual",
+            "subtopicos": [
+              "físico",
+              "lógico",
+              "conceitual"
+            ]
+          },
+          {
+            "nome": "SQL/ANSI",
+            "subtopicos": []
+          },
+          {
+            "nome": "Índices e otimização de acesso",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 13,
+      "cargo": "CARGO 2: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "materia_chunk": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Linguagens e Programação",
+        "topicos": [
+          {
+            "nome": "Linguagens",
+            "subtopicos": [
+              "Java, JavaScript, C#",
+              "HTML5, CSS3"
+            ]
+          },
+          {
+            "nome": "Programação orientada à objetos",
+            "subtopicos": [
+              "Classes, Herança, Composição, Interfaces, Polimorfismo"
+            ]
+          },
+          {
+            "nome": "Processamento assíncrono e mensageria",
+            "subtopicos": []
+          },
+          {
+            "nome": "Boas práticas de programação",
+            "subtopicos": [
+              "SOLID",
+              "Design Patterns"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 14,
+      "cargo": "CARGO 2: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "materia_chunk": "ENGENHARIA DE SOFTWARE",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ENGENHARIA DE SOFTWARE",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Engenharia de Software",
+        "topicos": [
+          {
+            "nome": "Engenharia de requisitos",
+            "subtopicos": []
+          },
+          {
+            "nome": "Análise e projeto",
+            "subtopicos": []
+          },
+          {
+            "nome": "Implementação",
+            "subtopicos": [
+              "orientação a objetos",
+              "estrutura de dados e algoritmos"
+            ]
+          },
+          {
+            "nome": "Qualidade",
+            "subtopicos": [
+              "Análise de código",
+              "Teste unitário",
+              "Teste de integração",
+              "Teste de carga, estresse"
+            ]
+          },
+          {
+            "nome": "DevSecOps",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança da Informação",
+            "subtopicos": [
+              "Confiabilidade, integridade e disponibilidade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 15,
+      "cargo": "CARGO 2: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "materia_chunk": "ARQUITETURA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "ARQUITETURA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Tecnologias de integração",
+        "topicos": [
+          {
+            "nome": "Tecnologias de integração",
+            "subtopicos": [
+              "Web services e APIs",
+              "RESTful",
+              "Mensageria"
+            ]
+          },
+          {
+            "nome": "Padrões de arquitetura",
+            "subtopicos": [
+              "Arquitetura em Camadas",
+              "Arquitetura Cliente-servidor",
+              "Arquitetura orientada a serviços",
+              "Arquitetura de microsserviços",
+              "Arquitetura orientada a eventos",
+              "Front end, Back end e Full stack"
+            ]
+          },
+          {
+            "nome": "Transações distribuídas",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 2: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 2: DESENVOLVIMENTO DE SOFTWARE",
+      "materia_chunk": "TECNOLOGIAS EMERGENTES",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 2,
+      "materia_normalizada": "TECNOLOGIAS EMERGENTES",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Inteligência artificial",
+        "topicos": [
+          {
+            "nome": "Inteligência artificial: Fundamentos e aplicações",
+            "subtopicos": []
+          },
+          {
+            "nome": "Aprendizado de máquina",
+            "subtopicos": []
+          },
+          {
+            "nome": "IA generativa",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 3: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "materia_chunk": "SEGURANÇA DA INFORMAÇÃO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "SEGURANÇA DA INFORMAÇÃO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Segurança da Informação",
+        "topicos": [
+          {
+            "nome": "Aspectos da classificação das informações, segurança de ambientes físicos e lógicos, controles de acesso; gestão de políticas de segurança",
+            "subtopicos": []
+          },
+          {
+            "nome": "Algoritmos de Criptografia Simétrica, Assimétrica e Hash; Certificação Digital; infraestrutura de chaves públicas",
+            "subtopicos": []
+          },
+          {
+            "nome": "Segurança em redes de computadores e técnicas de ataque cibernético, resposta a incidentes, resiliência cibernética; firewalls, IDS, IPS, proxies, NAT e VPN; spoofing, flood, DDoS, phishing; malwares; adware, spyware, backdoors, keylogger, worms, ransonware",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 18,
+      "cargo": "CARGO 3: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "materia_chunk": "INFRAESTRUTURA DE REDES",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "INFRAESTRUTURA DE REDES",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Redes de Computadores",
+        "topicos": [
+          {
+            "nome": "Redes de computadores",
+            "subtopicos": []
+          },
+          {
+            "nome": "Gerenciamento de redes TCP/IP",
+            "subtopicos": [
+              "Arquitetura de gerenciamento, SMI, SNMP e MIB"
+            ]
+          },
+          {
+            "nome": "Redes Locais e de longa distância",
+            "subtopicos": [
+              "MPLS. Redes cabeadas, Redes sem fio: padrões 802.11, protocolos 802.1x, EAP, WEP, WPA e WPA2",
+              "Conceitos básicos de routing e switching"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 19,
+      "cargo": "CARGO 3: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "materia_chunk": "SISTEMAS OPERACIONAIS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "SISTEMAS OPERACIONAIS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Sistemas operacionais e Serviços de diretório",
+        "topicos": [
+          {
+            "nome": "Sistemas operacionais",
+            "subtopicos": [
+              "fundamentos",
+              "gestão de processos",
+              "gestão de memória",
+              "gestão de entrada e saída",
+              "instalação, configuração e administração de sistemas operacionais Windows Server 2019 ou superior e RedHat Enterprise Linux versões 8 ou superior"
+            ]
+          },
+          {
+            "nome": "Serviços de diretório",
+            "subtopicos": [
+              "Active Directory e LDAP",
+              "Interoperabilidade"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "materia_chunk": "SERVIDORES",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "SERVIDORES",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Servidores de aplicação",
+        "topicos": [
+          {
+            "nome": "Servidores de aplicação",
+            "subtopicos": [
+              "Conceitos básicos",
+              "Noções de administração",
+              "Topologia típica de ambientes com alta disponibilidade e escalabilidade",
+              "Balanceamento de carga, fail-over e replicação de estado",
+              "Técnicas para detecção de problemas e otimização de desempenho"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 21,
+      "cargo": "CARGO 3: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "materia_chunk": "ARMAZENAMENTO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "ARMAZENAMENTO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Armazenamento",
+        "topicos": [
+          {
+            "nome": "Armazenamento",
+            "subtopicos": [
+              "Serviços de armazenamento, padrões de disco e de interfaces",
+              "RAID",
+              "Tecnologias de armazenamento NAS e SAN",
+              "Tecnologias de backup"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 3: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 3: TECNOLOGIA: SEGURANÇA, INFRA E OPERAÇÃO",
+      "materia_chunk": "COMPUTAÇÃO EM NUVEM",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 3,
+      "materia_normalizada": "COMPUTAÇÃO EM NUVEM",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "",
+        "topicos": [
+          {
+            "nome": "Cloud computing; virtualização.",
+            "subtopicos": []
+          },
+          {
+            "nome": "Conteinerização de aplicações e DeVSecOps.",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 23,
+      "cargo": "CARGO 4: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+      "materia_chunk": "ESTRATÉGIA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "ESTRATÉGIA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Balanced Scorecard e Referencial Estratégico das Organizações",
+        "topicos": [
+          {
+            "nome": "Balanced Scorecard (BSC)",
+            "subtopicos": [
+              "principais conceitos",
+              "aplicações",
+              "mapa estratégico",
+              "perspectivas",
+              "temas estratégicos",
+              "objetivos estratégicos",
+              "relações de causa e efeito",
+              "indicadores",
+              "metas",
+              "iniciativas estratégicas"
+            ]
+          },
+          {
+            "nome": "Referencial Estratégico das Organizações",
+            "subtopicos": [
+              "Análise de ambiente interno e externo",
+              "Ferramentas de análise de ambiente: análise SWOT, análise de cenários, matriz GUT",
+              "Modelo de negócios e quadro de modelo de negócios (Business Model Canvas)",
+              "Negócio, missão, visão de futuro, valores"
+            ]
+          },
+          {
+            "nome": "Indicadores de desempenho",
+            "subtopicos": [
+              "Tipos de indicadores",
+              "Variáveis componentes dos indicadores"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 24,
+      "cargo": "CARGO 4: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+      "materia_chunk": "GESTÃO DE PROJETOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "GESTÃO DE PROJETOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Projetos",
+        "topicos": [
+          {
+            "nome": "Projetos",
+            "subtopicos": [
+              "Ciclo de vida do projeto",
+              "Gerenciamento de projetos: conceitos básicos; áreas de conhecimento, projetos, programas, portfólio"
+            ]
+          },
+          {
+            "nome": "Tipos de Abordagem: tradicional, hibrida e ágil (Framework Scrum, Metodologia Lean e Método Kanban)",
+            "subtopicos": []
+          },
+          {
+            "nome": "Indicadores: Lead Time, Delivery Rate, Net Promoter Score (NPS), Métricas de UX para produtos digitais, Objectives and Key Results (OKR) e Key Performance Indicator (KPI)",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 25,
+      "cargo": "CARGO 4: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+      "materia_chunk": "GESTÃO DE PRODUTOS",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "GESTÃO DE PRODUTOS",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Produtos e User Experience",
+        "topicos": [
+          {
+            "nome": "Produtos",
+            "subtopicos": [
+              "Ciclo de vida do produto",
+              "User Story Map (USM)",
+              "Roadmap de Produto",
+              "User Story (US)",
+              "Técnicas de levantamento de requisitos",
+              "Releases",
+              "Minimum Viable Product (MVP)",
+              "Design de Produto",
+              "Gerenciamento de Backlog",
+              "Processo de Desenvolvimento de Produtos digitais"
+            ]
+          },
+          {
+            "nome": "User Experience (UX)",
+            "subtopicos": [
+              "acessibilidade e usabilidade",
+              "Task Flow",
+              "Metodologias ágeis e experiência do usuário",
+              "Metodologias ágeis e experiência do usuário - Conceitos básicos e aplicações",
+              "Metodologias ágeis e experiência do usuário - Storytelling",
+              "Metodologias ágeis e experiência do usuário - Design thinking",
+              "Metodologias ágeis e experiência do usuário - Research, user interface",
+              "Metodologias ágeis e experiência do usuário - Research, user interface - Lean Concept, Discovery Sprint",
+              "Metodologias ágeis e experiência do usuário - Prototipação",
+              "Técnicas de facilitação e mediação de atividades co-criativas e Design Sprints"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 26,
+      "cargo": "CARGO 4: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+      "materia_chunk": "GESTÃO E GOVERNANÇA",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "GESTÃO E GOVERNANÇA",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Gestão de Contratação de Soluções de TI",
+        "topicos": [
+          {
+            "nome": "Gestão de contratação de soluções de TI",
+            "subtopicos": []
+          },
+          {
+            "nome": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+            "subtopicos": [
+              "Lei nº 13.303/2016",
+              "Elaboração e fiscalização de contratos",
+              "Cláusulas e indicadores de nível de serviço",
+              "Papel do fiscalizador do contrato",
+              "Papel do preposto da contratada",
+              "Acompanhamento da execução contratual",
+              "Registro e notificação de irregularidades",
+              "Definição e aplicação de penalidades e sanções administrativas",
+              "Licenciamento de software"
+            ]
+          },
+          {
+            "nome": "Princípios fundamentais da administração pública",
+            "subtopicos": []
+          }
+        ]
+      }
+    },
+    {
+      "chunk_index": 27,
+      "cargo": "CARGO 4: TÉCNICO EM TECNOLOGIA DA INFORMAÇÃO II – ÁREA 4: TRANSFORMAÇÃO DIGITAL E GESTÃO DE TI",
+      "materia_chunk": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+      "tipo_conhecimento": "especifico",
+      "nivel": "superior",
+      "cargo_numero": 4,
+      "materia_normalizada": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+      "apenas_discursiva": false,
+      "cargos_restritos": null,
+      "materia_origem": "cabecalho",
+      "taxonomia_extraida": {
+        "materia": "Novas Tecnologias, Transformação Digital, Gestão da Inovação e Tendências de Mercado",
+        "topicos": [
+          {
+            "nome": "Novas Tecnologias",
+            "subtopicos": [
+              "Blockchain, IoT, fintechs, inteligência artificial, e machine learning aplicados ao setor financeiro"
+            ]
+          },
+          {
+            "nome": "Transformação Digital",
+            "subtopicos": [
+              "Estratégias e práticas para digitalização de serviços financeiros",
+              "Open finance",
+              "Integração de APIs"
+            ]
+          },
+          {
+            "nome": "Gestão da Inovação",
+            "subtopicos": [
+              "Métodos para fomentar a inovação dentro das instituições financeiras, incluindo laboratórios de inovação, hackathons, e parcerias com startups"
+            ]
+          },
+          {
+            "nome": "Tendências de Mercado",
+            "subtopicos": [
+              "Acompanhamento e identificação de novas tecnologias e oportunidades de negócio no setor financeiro, como criptomoedas, pagamentos digitais, e digital banking"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+}

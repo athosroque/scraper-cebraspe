@@ -1134,6 +1134,12 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     objetivo + discursivo (pendências da 8.0). Reclassificação aplicada (5 PDFs EMBRAPA_24). Piloto inalterado.
   - `[ ]` C1a (KAN-56) Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
     banco, 3 questões conferidas no PDF e roteiro `docs/runbook-lote.md`. Pausa: editais.
+    Feito em 2026-10-12 (falta só a pausa do dono): 18 + 21 PDFs iguais ao inventário; editais
+    com 22 e 28 chunks, 0 falhas, 0 alertas, US$ 0,018; 380 + 230 questões ME (5 alternativas,
+    gabarito A–E, 18 + 5 anuladas) e 5 discursivas no banco. Correções: sub-matéria em romano e
+    nível pela escolaridade (edital), área vira cargo (decisão do dono, ADR-038) e cabeçalho
+    de matéria ME pelo layout (23 alternativas E traziam o cabeçalho seguinte). Piloto
+    inalterado. **Pausa do dono:** aprovar os 2 editais (`status_revisao_humana`).
   - `[ ]` C1b (KAN-57) Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.
   - `[ ]` C2 (KAN-31, KAN-32) Orquestrador mínimo `scripts/lote_concursos.py` (núcleo da 8.1), com o alerta
     "ME sem texto-base" e `--concurso` no `classificar_questoes`.

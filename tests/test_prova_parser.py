@@ -14,6 +14,7 @@ from src.prova_parser import (
     STATUS_SUCESSO,
     Linha,
     _chave_titulo,
+    _eh_cabecalho_layout_me,
     _eh_codigo_ou_tabela,
     _eh_multipla_escolha,
     _extrair_quesitos,
@@ -1719,6 +1720,175 @@ class TestMultiplaEscolhaSintetico:
 
 
 DATA_AMOSTRA = Path(__file__).parent.parent / "data" / "inventario_amostra"
+
+
+def _linha_caderno(texto, x0, x1, negrito=False, primeiro_span=None, inicio=True):
+    """Linha com as coordenadas reais dos cadernos ME (x0/x1 medidos nos PDFs)."""
+    return Linha(
+        pagina=0,
+        bloco=1,
+        texto=texto,
+        x0=x0,
+        y0=0,
+        x1=x1,
+        y1=10,
+        inicio_bloco=inicio,
+        primeiro_span=primeiro_span if primeiro_span is not None else texto,
+        negrito=negrito,
+    )
+
+
+def _questao_coluna_direita(numero, letras="ABCDE"):
+    """Questão na coluna da direita (margem 304.3, como o BANRISUL_002)."""
+    linhas = [
+        _linha_caderno(f"Questão {numero}", 304.3, 500.0),
+        _linha_caderno(f"Enunciado da questão {numero}.", 304.3, 569.5, inicio=False),
+    ]
+    for letra in letras:
+        linhas.append(
+            _linha_caderno(
+                f"{letra} Opção {letra}{numero}.",
+                304.3,
+                420.0,
+                primeiro_span=letra,
+            )
+        )
+    return linhas
+
+
+class TestCabecalhoDeLayoutME:
+    """Cabeçalho de matéria centralizado no meio do caderno ME (8.C, C1a H4c).
+    Coordenadas de linhas reais: BANRISUL_002 (coluna direita, margem 304.3) e
+    SEFA_PR CG1 (coluna esquerda, margem 28.4)."""
+
+    def test_banco_de_dados_no_topo_da_coluna_fecha_a_alternativa_e(self):
+        # BANRISUL_002, Q34 -> Q35: "BANCO DE DADOS" centralizado (391.4-483.9)
+        # sem palavra-chave; antes ficava colado no fim da alternativa E de Q34.
+        linhas = (
+            [_linha_caderno("LÍNGUA PORTUGUESA", 304.3, 480.0, negrito=True)]
+            + _questao_coluna_direita(34)
+            + [_linha_caderno("BANCO DE DADOS", 391.4, 483.9, inicio=True)]
+            + _questao_coluna_direita(35)
+        )
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [34, 35]))
+        assert seg.itens[34]["alternativas"][4]["texto"] == "Opção E34."
+        assert seg.itens[35]["secao"] == "BANCO DE DADOS"
+        assert seg.itens[34]["secao"] == "LÍNGUA PORTUGUESA"
+        assert not seg.textos_base
+        assert not seg.alertas
+
+    def test_materia_em_negrito_na_coluna_esquerda_vira_secao(self):
+        # SEFA_PR CG1, Q30 -> Q31: "MATEMÁTICA FINANCEIRA" (91.8-230.5, negrito).
+        linhas = [
+            _linha_caderno("RACIOCÍNIO LÓGICO E MATEMÁTICO", 340.4, 531.9, negrito=True)
+        ]
+        for n, letras in ((30, "ABCDE"), (31, "ABCDE")):
+            linhas.append(_linha_caderno(f"Questão {n}", 28.4, 290.0))
+            linhas.append(_linha_caderno(f"Enunciado {n}.", 28.4, 293.6, inicio=False))
+            for letra in letras:
+                linhas.append(
+                    _linha_caderno(
+                        f"{letra} Opção {letra}{n}.",
+                        28.4,
+                        200.0,
+                        primeiro_span=letra,
+                    )
+                )
+            if n == 30:
+                linhas.append(
+                    _linha_caderno("MATEMÁTICA FINANCEIRA", 91.8, 230.5, negrito=True)
+                )
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [30, 31]))
+        assert seg.itens[30]["alternativas"][4]["texto"] == "Opção E30."
+        assert seg.itens[31]["secao"] == "MATEMÁTICA FINANCEIRA"
+
+    def test_cabecalho_de_duas_linhas_com_sigla_vira_uma_secao(self):
+        # SEFA_PR CG1, Q40: "ADMINISTRAÇÃO FINANCEIRA E" + "ORÇAMENTÁRIA (AFO)".
+        linhas = [
+            _linha_caderno("ADMINISTRAÇÃO FINANCEIRA E", 354.2, 522.6, negrito=True),
+            _linha_caderno("ORÇAMENTÁRIA (AFO)", 378.2, 494.1, negrito=True),
+            _linha_caderno("Questão 40", 304.3, 500.0),
+            _linha_caderno("Enunciado da questão 40.", 304.3, 569.5, inicio=False),
+        ]
+        linhas += _questao_coluna_direita(40)[2:]
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [40]))
+        assert seg.itens[40]["secao"] == "ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA (AFO)"
+        assert not seg.textos_base
+
+    def test_titulo_que_atravessa_as_colunas_vira_secao(self):
+        # BANRISUL_004, Q76 -> Q77: "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO" fica
+        # centralizado na largura do texto (190.2-411.9), não numa coluna.
+        linhas = [_linha_caderno("GESTÃO E GOVERNANÇA", 340.0, 530.0, negrito=True)]
+        linhas += _questao_coluna_direita(76)
+        linhas.append(
+            _linha_caderno("INOVAÇÃO EM TI NO SISTEMA FINANCEIRO", 190.2, 411.9)
+        )
+        linhas += _questao_coluna_direita(77)
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [76, 77]))
+        assert seg.itens[76]["alternativas"][4]["texto"] == "Opção E76."
+        assert seg.itens[77]["secao"] == "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO"
+
+    def test_processar_preambulo_aceita_cabecalho_de_layout(self):
+        assert _processar_preambulo_me(
+            [
+                _linha_caderno(
+                    "ADMINISTRAÇÃO FINANCEIRA E", 354.2, 522.6, negrito=True
+                ),
+                _linha_caderno("ORÇAMENTÁRIA (AFO)", 378.2, 494.1, negrito=True),
+            ]
+        ) == ("ADMINISTRAÇÃO FINANCEIRA E ORÇAMENTÁRIA (AFO)", None)
+
+    def test_cabecalho_de_layout_precisa_de_centro_ou_negrito_e_afastamento(self):
+        # Centralizada e em caixa alta: vale.
+        assert _eh_cabecalho_layout_me(_linha_caderno("BANCO DE DADOS", 391.4, 483.9))
+        assert (
+            _eh_cabecalho_layout_me(_linha_caderno("CASP (AFO)", 300.0, 340.0)) is False
+        )
+        # Caixa alta na margem, sem negrito, não é cabeçalho.
+        assert not _eh_cabecalho_layout_me(
+            _linha_caderno("SELECT NOME FROM TABELA", 304.3, 480.0)
+        )
+        # Ocupa a coluna inteira (centro na coluna, mas colada na margem).
+        assert not _eh_cabecalho_layout_me(
+            _linha_caderno("ORDER BY NOME, IDADE, CODIGO", 304.3, 569.5)
+        )
+        # Dígito, código ou aspas nunca: nem centralizada nem em negrito.
+        for texto in ("CB1A3 BANCO", "SUM() COUNT()", "SELECT * FROM", "X = Y CASO"):
+            assert not _eh_cabecalho_layout_me(
+                _linha_caderno(texto, 391.4, 483.9, negrito=True)
+            ), texto
+
+    def test_continuacao_de_alternativa_em_caixa_alta_na_margem_nao_corta(self):
+        # Alternativa E com código SQL em caixa alta na margem, ainda antes da
+        # questão seguinte: fica na alternativa E (não vira seção).
+        linhas = (
+            [_linha_caderno("CONHECIMENTOS DE INFORMÁTICA", 304.3, 480.0, negrito=True)]
+            + [_linha_caderno("Questão 1", 304.3, 500.0)]
+            + [_linha_caderno("Enunciado da questão 1.", 304.3, 569.5, inicio=False)]
+            + [
+                _linha_caderno("A SUM()", 304.3, 348.0, primeiro_span="A"),
+                _linha_caderno("B AVG()", 304.3, 348.0, primeiro_span="B"),
+                _linha_caderno("C MIN()", 304.3, 348.0, primeiro_span="C"),
+                _linha_caderno("D MAX()", 304.3, 348.0, primeiro_span="D"),
+                _linha_caderno("E COUNT()", 304.3, 358.8, primeiro_span="E"),
+                _linha_caderno("ORDER BY NOME", 304.3, 380.0, inicio=False),
+                _linha_caderno("SELECT NOME FROM TABELA", 304.3, 480.0, inicio=False),
+            ]
+            + [_linha_caderno("Questão 2", 304.3, 500.0)]
+            + [_linha_caderno("Enunciado da questão 2.", 304.3, 569.5, inicio=False)]
+            + [
+                _linha_caderno(
+                    f"{letra} Opção {letra}2.", 304.3, 420.0, primeiro_span=letra
+                )
+                for letra in "ABCDE"
+            ]
+        )
+        seg = _segmentar_me(linhas, localizar_questoes_me(linhas, [1, 2]))
+        assert seg.itens[1]["alternativas"][4]["texto"] == (
+            "COUNT() ORDER BY NOME\nSELECT NOME FROM TABELA"
+        )
+        assert seg.itens[2]["secao"] == "CONHECIMENTOS DE INFORMÁTICA"
+        assert not seg.alertas
 
 
 class TestCadernosMEReais:
