@@ -6,7 +6,7 @@ decisões estão nos ADRs (`docs/adr/`). Não editar; se algo daqui voltar a
 valer, levar para o `task.md`.
 
 Só o plano da etapa em andamento fica na raiz do projeto (hoje,
-`plano-etapa-8.md`). Ao concluir a etapa, `git mv` para cá.
+`plano-etapa-8.md` e `plano-etapa-8c.md`). Ao concluir a etapa, `git mv` para cá.
 
 | Arquivo | Etapa | ADR |
 |---|---|---|

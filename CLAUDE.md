@@ -324,6 +324,12 @@ Datasette continua só como ferramenta de revisão do dono.
       escopo contam como uma prova só, de qualquer nível. Ranking sem filtro: LP 13,81%, Dir. Adm. 10,59%,
       Ética 4,81%; as 31 provas sem diferença. KAN-50: ME do SEFA_PR_25 validada no Chromium.
       1252 testes, ruff verde.
+- [ ] Etapa 8.C Coleta dos concursos de múltipla escolha (ME) de 2025 — prioridade do dono
+      (2026-10-12), antes da 8.M.2. Plano em `plano-etapa-8c.md`, uma sessão por item: C0
+      download pelo inventário → C1a/C1b lote de calibração `SEFA_PR_25` + `BANRISUL_25` → C2
+      orquestrador mínimo → C3–C7 lotes → C8 fechamento. Hoje nenhuma questão ME está no banco
+      de produção (o Gate da 8.M usou a cópia `cebraspe_gate`). Pronto quando os 11 concursos ME
+      de 2025 encerrados estão `aprovado`, o piloto segue inalterado e `make test-all` está verde.
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — os dois usos-alvo do dono
       (banca × ano × assunto; concurso × matéria × assunto) respondidos no site, com % de dois
       níveis e nº de questões distintas; detalhes no `task.md`.

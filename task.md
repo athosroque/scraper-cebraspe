@@ -19,13 +19,25 @@ enviar o bloco de uma etapa específica para o agente construir.
 > importância: (1) o que mais cai na prova; (2) o que o edital cobra; (3)
 > edital × prova; (4) desempenho pessoal do usuário.
 
-> **⚡ Prioridade atual (2026-09-28):** Etapas **5D → 5E → 5F** (5B.1 e
-> 5B.2 concluídas: árvore mestre curada; próximas: classificação das questões,
-> estatísticas e site). A 5A (ADR-028), a 5B (ADR-029, sinônimos aprovados em
-> 2026-09-27), a 5C e a 5C.1 (ADR-031) estão concluídas. A antiga 5B.1
-> ("divisão de nomes compostos") foi **substituída** pela árvore mestre
-> (ADR-030): num mapeamento N:N, o nome composto é só um item que aponta
-> para dois nós.
+## ⚡ Painel de etapas (atualizado em 2026-10-12)
+
+Ordem de trabalho, uma sessão (conversa) por item. O detalhe de cada sessão está no plano
+indicado; o checklist fica na seção da etapa, mais abaixo.
+
+| # | Etapa | Estado | Onde está o detalhe |
+|---|---|---|---|
+| 1 | **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12) | **próxima** | [`plano-etapa-8c.md`](plano-etapa-8c.md), sessões C0 a C8 |
+| 2 | 8.M.2 Estatísticas por recorte (drill-down e filtros, KAN-28/KAN-54) | na fila | seção 8.M.2 abaixo |
+| 3 | 8.1 Orquestrador de lotes (o que sobrar depois da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
+| 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
+| — | Pendências sem etapa (KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
+| — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
+
+Checklist da 8.C (C0 → C1a → C1b → C2 → C3–C7 → C8): seção **8.C** dentro da Etapa 8,
+abaixo. Marcar só lá.
+
+Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos arquivados em
+`docs/planos/`).
 
 ## Etapa 1: Preparação do Ambiente e Modelos de Dados
 - `[x]` Completar `requirements.txt`: já tem `playwright`, `pymupdf`,
@@ -314,7 +326,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 
 ---
 
-# ⚡ PRIORIDADE (2026-09-22, revista em 2026-09-29): Etapas 5A–5F (5A, 5B, 5B.1, 5B.2, 5C, 5C.1 e 5D concluídas; próximas: 5E estatísticas → 5F site) — questões, árvore de assuntos, estatísticas e site público
+# Etapas 5A–5H (concluídas; histórico): questões, árvore de assuntos, estatísticas e site público
 
 > **Por que existe:** a Etapa 5 entregou o banco com a **taxonomia dos
 > editais**, ou seja, o que o edital lista. O objetivo real do projeto é
@@ -1111,6 +1123,28 @@ enviar o bloco de uma etapa específica para o agente construir.
     16,66 → 11,65; Informática 7,10 → 3,43). Números completos no ADR-039.
   - **Pronto quando:** o ranking de matérias sem filtro bate com o ADR-039 (LP 13,81%;
     Dir. Adm. 10,59%; Ética 4,81%; Adm. Geral 4,20%) e `make test-all` está verde.
+- `[ ]` **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12; plano
+  autocontido em [`plano-etapa-8c.md`](plano-etapa-8c.md), uma sessão por item). Nenhuma
+  questão ME está no banco de produção: o Gate da 8.M carregou o `SEFA_PR_25` só na cópia
+  `cebraspe_gate`. Alvo: os 11 concursos ME de 2025 encerrados do inventário. Os ME de 2026 e
+  os em andamento ficam para decisão do dono.
+  - `[ ]` C0 Download guiado pelo inventário: `map_pdf_links` com o classificador fino,
+    `pdf_vai_para_o_site` e `exclusoes.json`; "PROVA PRÁTICA – OPÇÃO" e o caderno único
+    objetivo + discursivo (pendências da 8.0). Piloto inalterado.
+  - `[ ]` C1a Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
+    banco, 3 questões conferidas no PDF e roteiro `docs/runbook-lote.md`. Pausa: editais.
+  - `[ ]` C1b Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.
+  - `[ ]` C2 Orquestrador mínimo `scripts/lote_concursos.py` (núcleo da 8.1), com o alerta
+    "ME sem texto-base" e `--concurso` no `classificar_questoes`.
+  - `[ ]` C3 `SEBRAE_25_PSE_1` + `UNIVESP_25_PSS`
+  - `[ ]` C4 `IPAAM_25` + `SEMA_AM_25`
+  - `[ ]` C5 `PGE_ES_25_PROCURADOR` + `PGE_PI_25`
+  - `[ ]` C6 `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25`
+  - `[ ]` C7 `SEED_SE_25_PROFESSOR`
+  - `[ ]` C8 Fechamento: views da 5E com 16 concursos, textos ME do site (pendência da 8.M),
+    `CLAUDE.md`/`task.md` e arquivar o plano.
+  - **Pronto quando:** os 11 concursos ME de 2025 estão `aprovado`, o piloto segue inalterado
+    (2.800 itens, 129 anuladas, 3.029 apontamentos) e `make test-all` está verde.
 - `[ ]` **8.M.2 Estatísticas por recorte: drill-down e filtros** (pedido do dono, 2026-10-10,
   KAN-28). Usa a regra de dois níveis da 8.M.1. Usos-alvo: (1) "para Língua Portuguesa, o que a
   banca X cobra no ano X, no assunto X ou subassunto"; (2) "no concurso X, na matéria X, o que
@@ -1136,7 +1170,8 @@ enviar o bloco de uma etapa específica para o agente construir.
     da disciplina (somando 100% com "Outros") e o "% da prova" como segundo número.
   - **Pronto quando:** os dois usos-alvo acima são respondidos no site, sem SQL à mão, também
     com o filtro de nível, e `make test-all` está verde.
-- `[ ]` **8.1 Orquestrador de lotes**: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
+- `[ ]` **8.1 Orquestrador de lotes** (o núcleo sai na 8.C/C2; aqui fica o resto: ordem
+  geral dos anos, `--proximo`, `--tamanho N` e teto de custo): `scripts/lote_concursos.py` (`--proximo`, `--lote`,
   `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
   por lote.
   - `[ ]` Checagem automática (pedido do dono, 2026-10-09): alerta para questão ME cujo
