@@ -4,7 +4,7 @@
 > **Jira Card:** [KAN-30](https://athoslobin.atlassian.net/browse/KAN-30) — `[scraper-cebraspe] Etapa 8.1.1 (8.C/C0) Download: map_pdf_links com o classificador fino do inventário`  
 > **Etapa Pai:** 8.C Coleta dos concursos de múltipla escolha (ME) de 2025 ([KAN-55](https://athoslobin.atlassian.net/browse/KAN-55))  
 > **Base Normativa:** ADR-026, ADR-030, ADR-031, ADR-037 (escopo e exclusões), ADR-038 (ME), ADR-039 (incidência)  
-> **Documento de Referência:** [`plano-etapa-8c.md`](plano-etapa-8c.md)
+> **Documento de Referência:** [`plano-etapa-8c.md`](../../plano-etapa-8c.md)
 
 ---
 
