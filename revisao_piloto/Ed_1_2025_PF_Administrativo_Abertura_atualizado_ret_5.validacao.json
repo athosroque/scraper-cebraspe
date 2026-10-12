@@ -1,9 +1,117 @@
 {
   "edital": "Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.pdf",
   "total_chunks_analisados": 39,
-  "total_alertas": 0,
+  "total_alertas": 12,
   "total_informativos": 1,
   "alertas": [
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "1.6.1",
+      "texto_item_origem": "Planejamento estratégico e \nnormativo.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "3.2.1",
+      "texto_item_origem": "Cuidado de saúde familiar.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "5.1.1",
+      "texto_item_origem": "Ambulatório de saúde \nmental, centro de atenção psicossocial e hospital psiquiátrico.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "5.2.1",
+      "texto_item_origem": "Relacionamento interpessoal, comunicação terapêutica, \npsicopatologias, psicofarmacologia.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "16.6.1",
+      "texto_item_origem": "Insuficiência renal e métodos dialíticos.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "16.6.2",
+      "texto_item_origem": "Insuficiência hepática.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "16.6.3",
+      "texto_item_origem": "Avaliação de consciência no \npaciente em coma.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "16.8.1",
+      "texto_item_origem": "Violência, abuso de drogas, intoxicações, emergências ambientais.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "17.1.1",
+      "texto_item_origem": "Dimensionamento, \nrecrutamento e seleção, educação continuada, avaliação de desempenho, liderança, supervisão, \ncomunicação, relações de trabalho e processo grupal.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "17.2.1",
+      "texto_item_origem": "Custos, auditoria, acreditação.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "23.2.1",
+      "texto_item_origem": "Definição, indicações de uso e recursos materiais.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 22,
+      "cargo": "CARGO 4: ENFERMEIRO",
+      "materia": "ENFERMEIRO",
+      "tipo": "subitem_ausente",
+      "numero_item": "23.2.2",
+      "texto_item_origem": "Medidas de proteção cabíveis nas situações de risco potencial de exposição.",
+      "topico_nome_extraido": null
+    },
     {
       "chunk_index": 31,
       "cargo": "CARGO 13: TÉCNICO EM ASSUNTOS EDUCACIONAIS – ÁREA: PEDAGOGIA",

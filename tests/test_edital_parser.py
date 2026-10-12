@@ -15,9 +15,11 @@ from src.edital_parser import (
     detectar_nivel_no_texto,
     dividir_por_cargo_e_materia,
     extrair_secao_objetos_avaliacao_detalhada,
+    extrair_subitens_numerados,
     mapear_cargos,
     metadados_chunk,
     remover_assinatura_final,
+    remover_topicos_excluidos,
 )
 
 # Reproduz, em miniatura, os padrões reais encontrados no edital
@@ -984,3 +986,178 @@ def test_edital_banrisul_real_tem_quatro_areas_como_cargos():
     ]
     assert all(c["nivel"] == "superior" for c in cargos)
     assert not [c for c in chunks if c.materia.startswith("ÁREA")]
+
+
+def test_remover_topicos_excluidos_trecho_real_sefa_contabilidade():
+    texto = (
+        "... 27 Relatório Resumido da Execução Orçamentária (RREO). 28 Relatório de Gestão Fiscal. "
+        "29 NBCASP (Normas Brasileiras de Contabilidade Aplicada ao Setor Público): NBC T 16.1 a "
+        "16.11 do Conselho Federal de Contabilidade. \n(Tópico 29 excluído por meio do Edital nº 2 "
+        "– SEFA/PR, de 3 de novembro de 2025, divulgado no endereço eletrônico \n"
+        "http://www.cebraspe.org.br/concursos/sefa_pr_25)"
+    )
+    limpo = remover_topicos_excluidos(texto)
+    assert "28 Relatório de Gestão Fiscal." in limpo
+    assert "29 NBCASP" not in limpo
+    assert "Tópico 29 excluído" not in limpo
+    assert limpo == limpo.rstrip()
+    assert limpo.endswith("28 Relatório de Gestão Fiscal.")
+
+
+def test_remover_topicos_excluidos_mantem_nota_de_inclusao():
+    texto = (
+        "5.4 Gestão por resultados. \n(Incluído por meio do Edital nº 2 – SEFA/PR, de 3 de "
+        "novembro de 2025, divulgado no endereço eletrônico \nhttp://www.cebraspe.org.br/concursos/sefa_pr_25)"
+        "\n15.2.3 CONHECIMENTOS ESPECÍFICOS"
+    )
+    assert remover_topicos_excluidos(texto) == texto
+
+
+def test_remover_topicos_excluidos_nota_sem_item_remove_so_a_nota():
+    texto = "1 Conceitos básicos. 2 Ética pública. (Tópico 9 excluído por meio do Edital nº 2)"
+    limpo = remover_topicos_excluidos(texto)
+    assert limpo == "1 Conceitos básicos. 2 Ética pública."
+
+
+def test_remover_topicos_excluidos_plural_remove_os_dois():
+    texto = (
+        "1 Conceitos. 2 Ética. 3 Governança pública. 4 Liderança. 5 Inovação pública. "
+        "(Tópicos 3 e 5 excluídos por meio do Edital nº 3)"
+    )
+    limpo = remover_topicos_excluidos(texto)
+    assert limpo == "1 Conceitos. 2 Ética. 4 Liderança."
+
+
+def test_remover_topicos_excluidos_item_com_subitens_mantem_proximo_item():
+    texto = (
+        "1 Conceitos. 2 Ética pública. 2.1 Princípios. 2.2 Códigos de conduta. "
+        "3 Governança. (Item 2 excluído por meio do Edital nº 4)"
+    )
+    limpo = remover_topicos_excluidos(texto)
+    assert "2 Ética" not in limpo
+    assert "2.1 Princípios" not in limpo
+    assert "2.2 Códigos" not in limpo
+    assert limpo == "1 Conceitos. 3 Governança."
+
+
+def test_remover_topicos_excluidos_subitem_com_pontos_remove_so_o_subitem():
+    texto = (
+        "2 Ética. 2.2 Códigos de conduta. 2.3 Conflito de interesses. "
+        "3 Governança. (Subitem 2.3 excluído por meio do Edital nº 5)"
+    )
+    limpo = remover_topicos_excluidos(texto)
+    assert limpo == "2 Ética. 2.2 Códigos de conduta. 3 Governança."
+
+
+def test_dividir_por_cargo_aplica_remocao_de_topico_excluido():
+    secao = (
+        "CARGO 4: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: CONTADOR\n"
+        "CONTABILIDADE: 1 Balanço. 28 Relatório de Gestão Fiscal. "
+        "29 NBCASP (Normas Brasileiras): NBC T 16.1. \n"
+        "(Tópico 29 excluído por meio do Edital nº 2 – SEFA/PR)\n"
+        "CARGO 5: AGENTE FAZENDÁRIO ESTADUAL – FUNÇÃO: ECONOMISTA\n"
+        "ECONOMIA: 1 Microeconomia."
+    )
+    chunks = dividir_por_cargo_e_materia(secao)
+    contab = [c for c in chunks if c.materia.startswith("CONTABILIDADE")]
+    assert contab, [c.materia for c in chunks]
+    assert "NBCASP" not in contab[0].texto
+    assert "excluído" not in contab[0].texto
+    assert "28 Relatório de Gestão Fiscal." in contab[0].texto
+    assert contab[0].texto == contab[0].texto.rstrip()
+
+
+class TestExtrairSubitensNumerados:
+    def _numeros(self, texto):
+        return [n for n, _ in extrair_subitens_numerados(texto)]
+
+    def test_extrai_todos_os_niveis_com_texto_proprio(self):
+        texto = (
+            "1 Microeconomia. 1.1 Conceitos fundamentais. 1.1.1 Formas de organização "
+            "da atividade econômica. 1.2 Teoria da demanda. 1.2.1 Preferências. 1.2.9 Bens de Giffen. "
+            "1.2.10 Elasticidades. 1.2.10.1 Elasticidade-preço da demanda. "
+            "1.2.10.5 Classificação de bens. "
+            "2 Macroeconomia. 2.3 Agregados. 2.4 Teoria keynesiana. 2.4.2 Modelo IS-LM."
+        )
+        subitens = dict(extrair_subitens_numerados(texto))
+        assert list(subitens) == [
+            "1.1",
+            "1.1.1",
+            "1.2",
+            "1.2.1",
+            "1.2.9",
+            "1.2.10",
+            "1.2.10.1",
+            "1.2.10.5",
+            "2.3",
+            "2.4",
+            "2.4.2",
+        ]
+        # texto próprio vai até o próximo item de QUALQUER nível
+        assert subitens["1.1"] == "Conceitos fundamentais."
+        assert subitens["1.2.10"] == "Elasticidades."
+        assert subitens["1.2.10.5"] == "Classificação de bens."
+
+    def test_numero_dentro_do_texto_nao_vira_subitem(self):
+        texto = (
+            "16 Contabilidade. 16.1 Normas aplicáveis: NBC T 16.1 a 16.11 do Conselho "
+            "Federal de Contabilidade. 16.2 Lei nº 8.069/1990 e Lei nº 14.133/2021."
+        )
+        assert self._numeros(texto) == ["16.1", "16.2"]
+        assert dict(extrair_subitens_numerados(texto))["16.1"].endswith(
+            "Contabilidade."
+        )
+
+    def test_versao_de_software_nao_vira_subitem(self):
+        texto = (
+            "2 Ferramentas. 2.1 Windows Server 2019 ou superior. 2.2 UML 2.5.1 (2017). "
+            "2.3 ISO/IEC 9126 e PMBOK 7ª edição. 2.4 JPA 2.0 Hibernate."
+        )
+        assert self._numeros(texto) == ["2.1", "2.2", "2.3", "2.4"]
+
+    def test_numero_com_pai_invisivel_e_rejeitado(self):
+        # "3.5" não tem item de 1º nível 3 visto; "1.9" pula para outro pai.
+        assert self._numeros("1 Tema. 3.5 Algo solto aqui. 1.1 Filho.") == ["1.1"]
+
+    def test_sequencia_implausivel_e_rejeitada(self):
+        # 1.7 como 1º filho de 1 e 1.1 repetido depois de 1.2 não são sequência.
+        assert self._numeros("1 Tema. 1.7 Solto. 1.1 A. 1.2 B. 1.1 C.") == [
+            "1.1",
+            "1.2",
+        ]
+
+    def test_subitem_com_minuscula_do_banrisul(self):
+        texto = "2 Qualidade. 2.1 acessibilidade e usabilidade. 2.2 testes de software."
+        assert dict(extrair_subitens_numerados(texto)) == {
+            "2.1": "acessibilidade e usabilidade.",
+            "2.2": "testes de software.",
+        }
+
+    def test_item_colado_ao_ponto_do_anterior(self):
+        texto = "4 Doenças. 4.1 Úlcera. 4.8 Cirrose. 4.9 Síndromes disabsortivas.4.10 Abdome agudo."
+        assert dict(extrair_subitens_numerados(texto)) == {
+            "4.1": "Úlcera.",
+            "4.8": "Cirrose.",
+            "4.9": "Síndromes disabsortivas.",
+            "4.10": "Abdome agudo.",
+        }
+
+    def test_item_de_primeiro_nivel_com_ponto_encerra_o_subitem(self):
+        texto = "7 Intervenção. 7.2 Crise e luto. 8. Psicologia social. 8.1 Relação."
+        assert dict(extrair_subitens_numerados(texto)) == {
+            "7.2": "Crise e luto.",
+            "8.1": "Relação.",
+        }
+
+    def test_nota_de_retificacao_nao_entra_no_texto_do_subitem(self):
+        texto = (
+            "5 Gestão. 5.3 Outro. 5.4 Gestão por resultados e valor público. \n\n"
+            "(Incluído por meio do Edital nº 2 – SEFA/PR, de 3 de novembro de 2025)"
+        )
+        assert dict(extrair_subitens_numerados(texto)) == {
+            "5.3": "Outro.",
+            "5.4": "Gestão por resultados e valor público.",
+        }
+
+    def test_sem_item_de_primeiro_nivel_nao_aceita_nada(self):
+        assert extrair_subitens_numerados("1.1 Solto. 1.2 Outro.") == []

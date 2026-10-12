@@ -28,7 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.atualizar_revisao import atualizar_artefatos_revisao
-from src.edital_parser import CAMPOS_CLASSIFICACAO_CHUNK
+from src.edital_parser import CAMPOS_CLASSIFICACAO_CHUNK, remover_topicos_excluidos
 from src.logger import logger
 from src.taxonomia_extractor import extrair_taxonomia_chunk
 
@@ -131,6 +131,12 @@ def reprocessar_falhas(
         cargo = chunk.get("cargo")
         materia = chunk.get("materia")
         texto = chunk["texto_enviado_llm"]
+        # Itens excluídos por retificação saem antes do LLM e o texto limpo fica
+        # na auditoria, para bater com o parser (o backfill exige prefixo igual).
+        texto_limpo = remover_topicos_excluidos(texto)
+        if texto_limpo != texto:
+            texto = texto_limpo
+            chunk["texto_enviado_llm"] = texto
 
         logger.info(
             f"[{idx}/{len(chunks_selecionados)}] Reprocessando chunk #{chunk_index} "

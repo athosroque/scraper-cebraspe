@@ -452,6 +452,171 @@ def extrair_itens_numerados(texto: str) -> list[tuple[str, str]]:
     return itens
 
 
+# Candidato a subitem numerado ("1.2", "1.2.10.1", "21.1.6"): profundidade >= 2,
+# seguido de espaço e de letra (maiúscula OU minúscula: o BANRISUL tem
+# "2.1 acessibilidade e usabilidade") ou "(". Não casa "8.069/1990" (sem
+# espaço depois) nem número colado a outro (`(?<![\d./])`).
+PADRAO_SUBITEM_CANDIDATO = re.compile(
+    r"(?<![\d/])(\d{1,3}(?:\.\d{1,3})+)\.?\s+(?=[A-Za-zÀ-ÿ(])"
+)
+
+# Item de 1º nível escrito com ponto ("8. Psicologia social"), que
+# `PADRAO_ITEM_NUMERADO` não enxerga. Aqui só serve para encerrar o texto do
+# subitem anterior e trocar o item corrente; exige a mesma fronteira.
+PADRAO_ITEM_PRIMEIRO_NIVEL_COM_PONTO = re.compile(
+    r"(?<![\d/.])(\d{1,3})\.\s+(?=[A-ZÀ-Ú])"
+)
+
+# Nota de retificação colada ao subitem, ex.: "(Incluído por meio do Edital
+# nº 2 – SEFA/PR, ...)" — não faz parte do texto do item.
+PADRAO_NOTA_RETIFICACAO = re.compile(
+    r"\(\s*(?:Inclu[íi]d[oa]s?|Alterad[oa]s?|Retificad[oa]s?)\s+por\s+meio\b[^)]*\)?",
+    re.IGNORECASE,
+)
+
+# Pontuação que pode vir logo antes de um subitem verdadeiro ("...texto. 1.2 Foo",
+# "...(PCASP). 9.1 ..."). Número precedido de palavra ("NBC T 16.1 a 16.11",
+# "UML 2.5.1 (2017)", "JPA 2.0 e") é número dentro do texto, não item.
+FRONTEIRA_SUBITEM = ".;:!?)]"
+
+# Tolerância para o 1º filho de um item (normalmente ".1"): retificações do
+# edital podem excluir os primeiros irmãos.
+MAXIMO_PRIMEIRO_FILHO = 3
+
+
+def _fronteira_de_item(texto: str, posicao: int) -> bool:
+    """Antes do número só há espaço/quebra de linha e, antes disso, início do
+    texto ou pontuação de fim de item."""
+    i = posicao - 1
+    while i >= 0 and texto[i].isspace():
+        i -= 1
+    return i < 0 or texto[i] in FRONTEIRA_SUBITEM
+
+
+def extrair_subitens_numerados(texto: str) -> list[tuple[str, str]]:
+    """Retorna [(numero, texto_proprio)] dos subitens (profundidade >= 2:
+    "1.2", "1.2.10.1") do texto-fonte. O texto próprio vai da posição após o
+    número até o início do próximo item de QUALQUER nível (um subitem não
+    inclui os filhos, ao contrário de `extrair_itens_numerados`).
+
+    Um candidato só é aceito como item se passar em três critérios, para não
+    confundir número dentro do texto ("NBC T 16.1 a 16.11", "UML 2.5.1 (2017)",
+    "Lei nº 8.069/1990", "JPA 2.0") com subitem:
+    1. fronteira: antes dele só há início de texto ou pontuação de fim de
+       item (`.`, `;`, `:`, `!`, `?`, `)`, `]`);
+    2. pai visível: o 1º componente é o item de 1º nível corrente (o último
+       visto via `PADRAO_ITEM_NUMERADO`) e o pai imediato ("1.2" para
+       "1.2.10") está no caminho de itens já aceitos;
+    3. sequência plausível: se o pai já tem filho aceito, o número novo é
+       maior que o último irmão; se é o 1º filho, é <= MAXIMO_PRIMEIRO_FILHO.
+    Sem item de 1º nível visto, nada é aceito.
+    """
+    texto = remover_assinatura_final(texto)
+    eventos = [
+        (m.start(), m.end(), (int(m.group(1)),), True)
+        for m in PADRAO_ITEM_NUMERADO.finditer(texto)
+    ]
+    for m in PADRAO_ITEM_PRIMEIRO_NIVEL_COM_PONTO.finditer(texto):
+        if _fronteira_de_item(texto, m.start()):
+            eventos.append((m.start(), m.end(), (int(m.group(1)),), True))
+    for m in PADRAO_SUBITEM_CANDIDATO.finditer(texto):
+        if _fronteira_de_item(texto, m.start()):
+            numero = tuple(int(p) for p in m.group(1).split("."))
+            eventos.append((m.start(), m.end(), numero, False))
+    eventos.sort(key=lambda e: (e[0], not e[3]))
+
+    aceitos: list[tuple[int, int, tuple[int, ...]]] = []
+    caminho: list[tuple[int, ...]] = []
+    for inicio, fim, numero, primeiro_nivel in eventos:
+        if primeiro_nivel:
+            caminho = [numero]
+            aceitos.append((inicio, fim, numero))
+            continue
+        profundidade = len(numero)
+        if len(caminho) < profundidade - 1 or caminho[profundidade - 2] != numero[:-1]:
+            continue
+        if len(caminho) >= profundidade:
+            if numero[-1] <= caminho[profundidade - 1][-1]:
+                continue
+        elif numero[-1] > MAXIMO_PRIMEIRO_FILHO:
+            continue
+        caminho = caminho[: profundidade - 1] + [numero]
+        aceitos.append((inicio, fim, numero))
+
+    subitens = []
+    for i, (_, fim, numero) in enumerate(aceitos):
+        if len(numero) < 2:
+            continue
+        limite = aceitos[i + 1][0] if i + 1 < len(aceitos) else len(texto)
+        proprio = PADRAO_NOTA_RETIFICACAO.sub("", texto[fim:limite]).strip()
+        if proprio:
+            subitens.append((".".join(map(str, numero)), proprio))
+    return subitens
+
+
+# Número de item com subníveis ("2", "2.1", "21.1.6"). Mesma ideia de
+# PADRAO_ITEM_NUMERADO, mas enxerga os descendentes, que precisam ser achados
+# para saber onde termina um item excluído.
+PADRAO_ITEM_HIERARQUICO = re.compile(
+    r"(?<![\d.])(\d{1,3}(?:\.\d{1,3})*)\s+(?=[A-ZÀ-Ú(])"
+)
+
+# Nota de retificação que marca item excluído do edital, ex.:
+# "(Tópico 29 excluído por meio do Edital nº 2 – SEFA/PR, ...)". Só "excluí"
+# casa: a nota "(Incluído por meio do Edital ...)" é conteúdo novo e fica.
+PADRAO_NOTA_EXCLUSAO = re.compile(
+    r"\(\s*(?:T[óo]picos?|Subitens?|Subitem|Itens?|Item)\s+"
+    r"(?P<numeros>\d+(?:\.\d+)*(?:\s*(?:,|e)\s*\d+(?:\.\d+)*)*)\s+"
+    r"exclu[íi]d[oa]s?[^)]*\)"
+)
+
+
+def _inicio_do_item(texto: str, numero: str, ate: int) -> int | None:
+    """Posição do último item `numero` que começa antes de `ate`."""
+    inicio = None
+    for m in PADRAO_ITEM_HIERARQUICO.finditer(texto, 0, ate):
+        if m.group(1) == numero:
+            inicio = m.start()
+    return inicio
+
+
+def remover_topicos_excluidos(texto: str) -> str:
+    """Remove itens excluídos por retificação do edital, antes do LLM.
+
+    Para cada nota "(Tópico N excluído ...)": remove a nota e o item N, que
+    vai do início de "N " até o início do próximo item que não seja
+    descendente de N (ou até a nota). Subitens N.x vão junto. Nota sem o
+    item correspondente no texto remove só a nota e loga aviso. Notas
+    "(Incluído ...)" não são tocadas.
+    """
+    alterado = False
+    while True:
+        nota = PADRAO_NOTA_EXCLUSAO.search(texto)
+        if nota is None:
+            break
+        alterado = True
+        intervalos = [(nota.start(), nota.end())]
+        for numero in re.findall(r"\d+(?:\.\d+)*", nota.group("numeros")):
+            inicio = _inicio_do_item(texto, numero, nota.start())
+            if inicio is None:
+                logger.warning(
+                    f"[TOPICO_EXCLUIDO_SEM_ITEM] nota cita o item {numero}, mas o "
+                    "texto não tem esse item antes dela; só a nota foi removida"
+                )
+                continue
+            fim = nota.start()
+            for m in PADRAO_ITEM_HIERARQUICO.finditer(texto, inicio + 1, nota.start()):
+                n = m.group(1)
+                if n != numero and not n.startswith(f"{numero}."):
+                    fim = m.start()
+                    break
+            intervalos.append((inicio, fim))
+            logger.info(f"[TOPICO_EXCLUIDO] item {numero} removido do texto do chunk")
+        for ini, fim in sorted(intervalos, reverse=True):
+            texto = texto[:ini] + texto[fim:]
+    return texto.rstrip() if alterado else texto
+
+
 def checar_ordem_confiavel(pdf_path: Path, pagina_inicio: int, pagina_fim: int) -> bool:
     """Validação de sanidade contra embaralhamento multi-coluna.
 
@@ -670,6 +835,10 @@ def dividir_por_cargo_e_materia(
                 **classificacao,
             )
         )
+
+    # Itens excluídos por retificação saem antes do LLM (ver remover_topicos_excluidos).
+    for chunk in chunks:
+        chunk.texto = remover_topicos_excluidos(chunk.texto)
 
     _logar_restricoes(chunks)
     return chunks

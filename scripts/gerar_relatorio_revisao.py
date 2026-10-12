@@ -121,6 +121,11 @@ def _renderizar_alertas_chunk(alertas: list[dict]) -> str:
                 f"<span class='alerta topico_ausente'>⚠ item #{alerta.get('numero_item') or '?'} ausente na taxonomia: "
                 f"“{escape(alerta.get('texto_item_origem') or '')}”</span>"
             )
+        elif alerta["tipo"] == "subitem_ausente":
+            linhas.append(
+                f"<span class='alerta topico_ausente'>⚠ subitem {escape(str(alerta.get('numero_item') or '?'))} "
+                f"ausente na taxonomia: “{escape(alerta.get('texto_item_origem') or '')}”</span>"
+            )
         elif alerta["tipo"] == "topico_extra":
             linhas.append(
                 f"<span class='alerta topico_extra'>ℹ tópico extraído sem correspondência literal na fonte: "

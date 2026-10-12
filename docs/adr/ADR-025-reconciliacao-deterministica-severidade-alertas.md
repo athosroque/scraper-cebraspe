@@ -89,3 +89,15 @@ exatamente essa única reinjeção.
 - **Campo `numero` no `Topico`**: vínculo item↔tópico mais robusto, mas exige mudar o schema e reextrair os 150 chunks, e o LLM não preserva a numeração de forma confiável (ADR-017/018).
 - **Lista de alertas aceitos na revisão humana**: não é automática. Pode entrar quando a revisão humana da Fase 4 começar.
 - **Canonicalizar o nome extraído para o texto literal da fonte**: reintroduziria o erro de digitação do STM. Descartado.
+
+## Atualização (2026-10-12, C1a / KAN-56)
+
+O alerta bloqueante `subitem_ausente` (SEFA_PR_25: 128 no chunk 19, ECONOMIA, e 6 no chunk 18, CONTABILIDADE) mostrou o mesmo padrão do item de 1º nível: o LLM guarda só os dois primeiros níveis e descarta os subitens `1.2.6`, `1.2.10.1`, `21.1.1`. Em vez de repetir a chamada, `taxonomia_extractor.reinjetar_subitens_ausentes` repara no dado, sem LLM:
+
+- **Ausente:** `not item_coberto(texto_proprio, tópicos e subtópicos do chunk)`, a mesma regra do validador. A cobertura é recalculada a cada inserção.
+- **Destino:** o tópico que cobre o item de 1º nível do subitem (nome normalizado `contido` no texto do item, preferindo o nome do tópico ao de um subtópico). Sem destino, não reinjeta e o alerta fica.
+- **Nome:** cadeia dos textos próprios do ancestral de 2º nível até o subitem, unida por ` - ` (profundidade 2: só o texto próprio), igual ao formato que o LLM usa em outros chunks. Acima de 300 caracteres não reinjeta e loga.
+- **Posição:** logo depois do subtópico que cobre o subitem anterior mais próximo do mesmo item de 1º nível (ancestral ou irmão); senão, no fim da lista do tópico.
+- **Rastro:** log `[REPARO_SUBITEM_AUSENTE]` e `reparo_subitem_ausente` no metadata da generation, no gancho `_pos_validacao_taxonomia` (extrações novas). `scripts/reconciliar_taxonomia.py` aplica o mesmo reparo a extrações salvas e ganhou `--sem-atualizar` (não chama `atualizar_revisao`).
+
+Aplicado só ao SEFA_PR_25 (backup `.json.pre_reconciliacao.bak`): chunk 18 ganhou 6 subtópicos e chunk 19 ganhou 126; `subitem_ausente` foi de 134 para 0. Nenhum tópico ou subtópico foi removido ou renomeado. Os alertas do PF, STM e IBAMA ficam como estavam, por decisão do dono.

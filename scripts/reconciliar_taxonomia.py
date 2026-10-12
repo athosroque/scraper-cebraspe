@@ -13,7 +13,8 @@ nome próprio pra não sobrescrever o `.json.bak` do `reprocessar_falhas_piloto`
 `.auditoria.json` não é tocado: é o registro do que o LLM recebeu.
 
 Uso:
-    python -m scripts.reconciliar_taxonomia [<edital>.json ...]
+    python -m scripts.reconciliar_taxonomia [--sem-atualizar] [<edital>.json ...]
+    --sem-atualizar: grava só o <edital>.json (não chama atualizar_revisao).
     (sem argumento: todos os <edital>.json de revisao_piloto/)
 """
 
@@ -27,7 +28,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.atualizar_revisao import atualizar_artefatos_revisao
 from src.logger import logger
 from src.models_scraper import TaxonomiaEdital
-from src.taxonomia_extractor import reinjetar_itens_ausentes
+from src.taxonomia_extractor import (
+    reinjetar_itens_ausentes,
+    reinjetar_subitens_ausentes,
+)
 
 REVISAO_DIR_PADRAO = Path(__file__).resolve().parent.parent / "revisao_piloto"
 
@@ -56,6 +60,7 @@ def reconciliar(json_path: Path) -> dict[int, list[str]]:
             continue
         taxonomia = TaxonomiaEdital.model_validate(taxonomia_salva)
         reinjetados = reinjetar_itens_ausentes(taxonomia, texto)
+        reinjetados += reinjetar_subitens_ausentes(taxonomia, texto)
         if reinjetados:
             item["taxonomia_extraida"] = taxonomia.model_dump()
             alterados[item["chunk_index"]] = reinjetados
@@ -84,9 +89,10 @@ def main(
 
 
 if __name__ == "__main__":
-    caminhos = [Path(a) for a in sys.argv[1:]] or sorted(
+    argumentos = [a for a in sys.argv[1:] if a != "--sem-atualizar"]
+    caminhos = [Path(a) for a in argumentos] or sorted(
         p
         for p in REVISAO_DIR_PADRAO.glob("*.json")
         if not p.name.endswith((".auditoria.json", ".validacao.json"))
     )
-    main(caminhos)
+    main(caminhos, atualizar_artefatos="--sem-atualizar" not in sys.argv[1:])

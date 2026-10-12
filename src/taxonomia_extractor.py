@@ -6,6 +6,7 @@ semânticos locais pós-LLM (ADR-021, ADR-025).
 """
 
 import os
+import re
 import time
 from functools import lru_cache
 
@@ -14,8 +15,18 @@ from dotenv import load_dotenv
 from langfuse import Langfuse
 
 from src import llm_openrouter
-from src.comparacao_texto import PADRAO_SUBITEM, contido, divergencia_leve, normalizar
-from src.edital_parser import extrair_itens_numerados, remover_assinatura_final
+from src.comparacao_texto import (
+    PADRAO_SUBITEM,
+    contido,
+    divergencia_leve,
+    item_coberto,
+    normalizar,
+)
+from src.edital_parser import (
+    extrair_itens_numerados,
+    extrair_subitens_numerados,
+    remover_assinatura_final,
+)
 from src.llm_openrouter import (
     STATUS_FALHA_CONEXAO,  # noqa: F401 — reexportados: contrato público do módulo
     STATUS_FALHA_CONTEUDO_VAZIO,  # noqa: F401
@@ -252,6 +263,194 @@ def reinjetar_itens_ausentes(taxonomia: TaxonomiaEdital, chunk_text: str) -> lis
     return sorted(reinjetados, key=int)
 
 
+# Nome de subtópico reinjetado acima disso (cadeia de títulos longa demais)
+# indica subitem mal segmentado: fica como `subitem_ausente` para revisão.
+TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL = 300
+
+
+def _limpar_nome_subitem(texto: str) -> str:
+    return " ".join(texto.split()).rstrip(" .;")
+
+
+def _nome_em_cadeia(numero: str, texto_por_numero: dict[str, str]) -> str | None:
+    """Textos próprios do ancestral de 2º nível até `numero`, unidos por " - ";
+    None se algum elo não tem texto próprio."""
+    partes = numero.split(".")
+    cadeia = [
+        texto_por_numero.get(".".join(partes[:n])) for n in range(2, len(partes) + 1)
+    ]
+    if not all(cadeia):
+        return None
+    return " - ".join(_limpar_nome_subitem(c) for c in cadeia)
+
+
+def _texto_proprio_do_item(
+    texto_item: str, subitens_do_item: list[tuple[str, str]]
+) -> str:
+    """Trecho do item de 1º nível antes do seu primeiro subitem (o item sem
+    os filhos). Sem subitem localizável, devolve o texto inteiro."""
+    for numero, _ in subitens_do_item:
+        achado = re.search(r"(?<![\d.])" + re.escape(numero) + r"(?!\d)", texto_item)
+        if achado:
+            return texto_item[: achado.start()]
+    return texto_item
+
+
+def _casa_por_fronteira(a: str, b: str) -> bool:
+    """Textos normalizados: iguais ou um contido no outro com fronteira de palavra."""
+    if not a or not b:
+        return False
+    return a == b or bool(
+        re.search(r"\b" + re.escape(a) + r"\b", b)
+        or re.search(r"\b" + re.escape(b) + r"\b", a)
+    )
+
+
+def _topico_destino_do_item(
+    taxonomia: TaxonomiaEdital,
+    texto_item_primeiro_nivel: str,
+    subitens_do_item: list[tuple[str, str]],
+    numero_item: str = "",
+) -> Topico | None:
+    """Tópico do item de 1º nível. Compara o nome com o TEXTO PRÓPRIO do item
+    (antes do 1º subitem), não com o item inteiro: o subitem "Mensuração de
+    ativos e passivos..." do item 21 não pode levar ao tópico do item 5.
+    Mais de um casamento: prefere o tópico cujos subtópicos já cobrem subitens
+    do mesmo item e, depois, o de maior proporção do texto próprio. Sem
+    casamento, cai na regra ampla (nome `contido` no item inteiro)."""
+    proprio_norm = normalizar(
+        _texto_proprio_do_item(texto_item_primeiro_nivel, subitens_do_item)
+    )
+    candidatos = []
+    for topico in taxonomia.topicos:
+        nome_norm = normalizar(topico.nome)
+        if not _casa_por_fronteira(nome_norm, proprio_norm):
+            continue
+        tem_subs = any(
+            item_coberto(p, [sub])
+            for sub in topico.subtopicos
+            if sub
+            for _, p in subitens_do_item
+        )
+        proporcao = min(len(nome_norm), len(proprio_norm)) / max(
+            len(nome_norm), len(proprio_norm)
+        )
+        candidatos.append((tem_subs, proporcao, topico))
+    if candidatos:
+        return max(candidatos, key=lambda c: (c[0], c[1]))[2]
+
+    logger.warning(
+        f"[REPARO_SUBITEM_AUSENTE] destino por regra ampla para o item '{numero_item}'."
+    )
+    item_norm = normalizar(texto_item_primeiro_nivel)
+    for topico in taxonomia.topicos:
+        if contido(normalizar(topico.nome), item_norm):
+            return topico
+    for topico in taxonomia.topicos:
+        if any(contido(normalizar(s), item_norm) for s in topico.subtopicos if s):
+            return topico
+    return None
+
+
+def reinjetar_subitens_ausentes(
+    taxonomia: TaxonomiaEdital, chunk_text: str
+) -> list[str]:
+    """Insere, in-place, como subtópico todo subitem (profundidade >= 2) do
+    texto-fonte que o LLM descartou — determinístico, sem LLM (ADR-025,
+    atualização C1a). Achado real: SEFA_PR_25 ECONOMIA, taxonomia só com o
+    1º e o 2º nível e 128 `subitem_ausente`.
+
+    "Ausente" é `not item_coberto(texto_proprio, todos os tópicos e subtópicos
+    do chunk)`, a mesma regra do validador. Destino: o tópico que cobre o item
+    de 1º nível do subitem; sem ele, não reinjeta. Nome: cadeia dos textos
+    próprios do ancestral de 2º nível até o subitem, unida por " - " (só o
+    texto próprio na profundidade 2); acima de
+    `TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL` não reinjeta. Posição: logo depois
+    do subtópico que cobre o subitem de ordem mais próxima (anterior ou o
+    próprio ancestral/irmão) do mesmo item de 1º nível; senão, no fim.
+    Retorna os números reinjetados, na ordem da fonte.
+    """
+    texto = remover_assinatura_final(chunk_text)
+    subitens = extrair_subitens_numerados(texto)
+    if not subitens:
+        return []
+    texto_por_numero = dict(subitens)
+    itens_primeiro_nivel = dict(extrair_itens_numerados(texto))
+
+    reinjetados: list[str] = []
+    for ordem, (numero, proprio) in enumerate(subitens):
+        extraidos = []
+        for t in taxonomia.topicos:
+            extraidos.append(t.nome)
+            extraidos.extend(s for s in t.subtopicos if s)
+        if item_coberto(proprio, extraidos):
+            continue
+
+        partes = numero.split(".")
+        texto_item = itens_primeiro_nivel.get(partes[0])
+        destino = (
+            _topico_destino_do_item(
+                taxonomia,
+                texto_item,
+                [(n, p) for n, p in subitens if n.split(".")[0] == partes[0]],
+                partes[0],
+            )
+            if texto_item
+            else None
+        )
+        if destino is None:
+            logger.warning(
+                f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' sem tópico destino; "
+                "segue como subitem_ausente."
+            )
+            continue
+
+        nome = _nome_em_cadeia(numero, texto_por_numero)
+        if not nome:
+            logger.warning(
+                f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' com ancestral sem "
+                "texto próprio; não reinjetado."
+            )
+            continue
+        if len(nome) > TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL:
+            logger.warning(
+                f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' com nome de "
+                f"{len(nome)} chars (> {TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL}); "
+                "não reinjetado."
+            )
+            continue
+
+        # Posição: ancora pelo nome em cadeia (não pela cobertura textual, que
+        # confunde "Fatores de produção" de 1.1.2 com o de 1.3.1.1). Percorre os
+        # subitens anteriores do mesmo item de 1º nível, do mais próximo ao mais
+        # distante, e insere depois do último subtópico igual à cadeia da âncora
+        # ou descendente dela (cadeia + " - ").
+        posicao = len(destino.subtopicos)
+        for n_anc, _ in reversed(
+            [(n, p) for n, p in subitens[:ordem] if n.split(".")[0] == partes[0]]
+        ):
+            chave = _nome_em_cadeia(n_anc, texto_por_numero)
+            if not chave:
+                continue
+            chave = chave.casefold()
+            achados = [
+                idx
+                for idx, sub in enumerate(destino.subtopicos)
+                if _limpar_nome_subitem(sub).casefold() == chave
+                or _limpar_nome_subitem(sub).casefold().startswith(chave + " - ")
+            ]
+            if achados:
+                posicao = achados[-1] + 1
+                break
+        destino.subtopicos.insert(posicao, nome)
+        reinjetados.append(numero)
+        logger.warning(
+            f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' omitido pelo LLM "
+            f"reinjetado em '{destino.nome[:40]}': '{nome[:80]}'"
+        )
+    return reinjetados
+
+
 def _pos_validacao_taxonomia(chunk_text: str):
     """Gancho semântico do núcleo `chamar_llm_json`: reparo de nome numérico
     (ADR-021) e reinjeção de item omitido (ADR-025), sem nova chamada ao LLM.
@@ -292,6 +491,12 @@ def _pos_validacao_taxonomia(chunk_text: str):
         if itens_reinjetados:
             metadata["reparo_item_ausente"] = {
                 "itens": itens_reinjetados,
+                "status": "reparado",
+            }
+        subitens_reinjetados = reinjetar_subitens_ausentes(taxonomia, chunk_text)
+        if subitens_reinjetados:
+            metadata["reparo_subitem_ausente"] = {
+                "subitens": subitens_reinjetados,
                 "status": "reparado",
             }
         return ResultadoPosValidacao(objeto=taxonomia, metadata=metadata)

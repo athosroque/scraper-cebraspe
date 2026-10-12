@@ -1,9 +1,36 @@
 {
   "edital": "Ed_1_2025_STM_Abertura_atualizado_ret_3.pdf",
   "total_chunks_analisados": 53,
-  "total_alertas": 0,
+  "total_alertas": 3,
   "total_informativos": 1,
   "alertas": [
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "2.11.1",
+      "texto_item_origem": "Educação corporativa.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "2.11.2",
+      "texto_item_origem": "Educação a \ndistância.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "2.11.3",
+      "texto_item_origem": "Planejamento, desenvolvimento e objetivos do ensino.",
+      "topico_nome_extraido": null
+    },
     {
       "chunk_index": 31,
       "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",

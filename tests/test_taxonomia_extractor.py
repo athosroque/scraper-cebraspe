@@ -710,3 +710,176 @@ class TestReasoningPadraoUnico:
         from src import llm_openrouter
 
         assert te.REASONING_PADRAO is llm_openrouter.REASONING_PADRAO
+
+
+class TestReinjetarSubitensAusentes:
+    """Reinjeção determinística de subitens (ADR-025, atualização C1a)."""
+
+    # Trecho real do SEFA_PR_25 (ECONOMIA, chunk 19), cortado no item 1.3.
+    FONTE = (
+        "1 Microeconomia. 1.1 Conceitos fundamentais. 1.1.1 Formas de organização da atividade \n"
+        "econômica: laissez-faire, intervencionismo, economia planificada. 1.1.2 Fatores de produção. "
+        "1.2 Teoria da demanda. 1.2.1 Preferências e função \nutilidade. 1.2.5 \nCurva de demanda. "
+        "1.2.6 Curva de Engel. 1.2.7 Bens substitutos e bens complementares. 1.2.10 Elasticidades. "
+        "1.2.10.1 Elasticidade-preço da demanda e seus \ndeterminantes. 1.2.10.2 Efeito da mudança "
+        "no preço de um bem sobre a receita total. 1.3 Teoria da oferta. "
+        "2 Macroeconomia. 2.1 Contas nacionais."
+    )
+
+    def _tax(self, subs_micro, subs_macro=("Contas nacionais",)):
+        return te.TaxonomiaEdital(
+            materia="ECONOMIA",
+            topicos=[
+                te.Topico(nome="Microeconomia", subtopicos=list(subs_micro)),
+                te.Topico(nome="Macroeconomia", subtopicos=list(subs_macro)),
+            ],
+        )
+
+    def test_subitens_entram_em_cadeia_e_na_ordem_da_fonte(self):
+        tax = self._tax(
+            [
+                "Conceitos fundamentais",
+                "Teoria da demanda",
+                "Teoria da oferta",
+            ]
+        )
+        reinjetados = te.reinjetar_subitens_ausentes(tax, self.FONTE)
+        assert reinjetados == [
+            "1.1.1",
+            "1.1.2",
+            "1.2.1",
+            "1.2.5",
+            "1.2.6",
+            "1.2.7",
+            "1.2.10",
+            "1.2.10.1",
+            "1.2.10.2",
+        ]
+        subs = tax.topicos[0].subtopicos
+        assert subs == [
+            "Conceitos fundamentais",
+            "Conceitos fundamentais - Formas de organização da atividade econômica: "
+            "laissez-faire, intervencionismo, economia planificada",
+            "Conceitos fundamentais - Fatores de produção",
+            "Teoria da demanda",
+            "Teoria da demanda - Preferências e função utilidade",
+            "Teoria da demanda - Curva de demanda",
+            "Teoria da demanda - Curva de Engel",
+            "Teoria da demanda - Bens substitutos e bens complementares",
+            "Teoria da demanda - Elasticidades",
+            "Teoria da demanda - Elasticidades - Elasticidade-preço da demanda e seus determinantes",
+            "Teoria da demanda - Elasticidades - Efeito da mudança no preço de um bem "
+            "sobre a receita total",
+            "Teoria da oferta",
+        ]
+        assert tax.topicos[1].subtopicos == ["Contas nacionais"]
+
+    def test_subitem_ja_coberto_nao_duplica(self):
+        tax = self._tax(["Curva de Engel", "Conceitos fundamentais"])
+        te.reinjetar_subitens_ausentes(tax, self.FONTE)
+        assert sum("Curva de Engel" in s for s in tax.topicos[0].subtopicos) == 1
+        assert te.reinjetar_subitens_ausentes(tax, self.FONTE) == []
+
+    def test_idempotente(self):
+        tax = self._tax(["Teoria da demanda"])
+        assert te.reinjetar_subitens_ausentes(tax, self.FONTE)
+        assert te.reinjetar_subitens_ausentes(tax, self.FONTE) == []
+
+    def test_sem_topico_destino_nao_reinjeta(self):
+        tax = te.TaxonomiaEdital(
+            materia="ECONOMIA", topicos=[te.Topico(nome="Assunto sem relação")]
+        )
+        assert te.reinjetar_subitens_ausentes(tax, self.FONTE) == []
+        assert tax.topicos[0].subtopicos == []
+
+    def test_nome_longo_demais_nao_reinjeta(self):
+        longo = "palavra " * 40
+        fonte = f"1 Microeconomia. 1.1 Conceitos. 1.1.1 {longo.strip()}."
+        tax = te.TaxonomiaEdital(
+            materia="E", topicos=[te.Topico(nome="Microeconomia", subtopicos=[])]
+        )
+        assert te.reinjetar_subitens_ausentes(tax, fonte) == ["1.1"]
+        assert tax.topicos[0].subtopicos == ["Conceitos"]
+
+    def test_validador_nao_acusa_subitem_ausente_apos_reinjecao(self):
+        from scripts.validar_taxonomia import comparar_chunk
+
+        tax = self._tax(["Conceitos fundamentais", "Teoria da demanda"])
+        te.reinjetar_subitens_ausentes(tax, self.FONTE)
+        alertas = comparar_chunk(
+            {"chunk_index": 19, "texto_enviado_llm": self.FONTE},
+            {"taxonomia_extraida": tax.model_dump()},
+        )
+        assert [a for a in alertas if a["tipo"] == "subitem_ausente"] == []
+
+    def test_reinjecao_de_primeiro_nivel_continua_igual(self):
+        tax = te.TaxonomiaEdital(
+            materia="X", topicos=[te.Topico(nome="Ecossistemas brasileiros")]
+        )
+        fonte = "1 IN Ibama 05/2021. 2 Ecossistemas brasileiros."
+        assert te.reinjetar_itens_ausentes(tax, fonte) == ["1"]
+        assert te.reinjetar_subitens_ausentes(tax, fonte) == []
+
+    def test_texto_repetido_em_ramos_diferentes_nao_embaralha_a_ordem(self):
+        # Caso real SEFA: "Fatores de produção" é 1.1.2 e 1.3.1.1.
+        fonte = (
+            "1 Microeconomia. 1.1 Conceitos fundamentais. 1.1.1 Formas de organização. "
+            "1.1.2 Fatores de produção. 1.1.3 Papel dos preços. "
+            "1.3 Teoria da oferta. 1.3.1 Função de produção. 1.3.1.1 Fatores de produção. "
+            "1.3.1.2 Isoquantas. 1.3.1.3 Rendimentos de escala. 1.3.2 Minimização de custos."
+        )
+        tax = te.TaxonomiaEdital(
+            materia="E",
+            topicos=[
+                te.Topico(
+                    nome="Microeconomia",
+                    subtopicos=["Conceitos fundamentais", "Teoria da oferta"],
+                )
+            ],
+        )
+        te.reinjetar_subitens_ausentes(tax, fonte)
+        assert tax.topicos[0].subtopicos == [
+            "Conceitos fundamentais",
+            "Conceitos fundamentais - Formas de organização",
+            "Conceitos fundamentais - Fatores de produção",
+            "Conceitos fundamentais - Papel dos preços",
+            "Teoria da oferta",
+            "Teoria da oferta - Função de produção",
+            "Teoria da oferta - Função de produção - Isoquantas",
+            "Teoria da oferta - Função de produção - Rendimentos de escala",
+            "Teoria da oferta - Minimização de custos",
+        ]
+
+    def test_destino_pelo_texto_proprio_do_item_e_nao_pelo_item_inteiro(self):
+        # Caso real SEFA chunk 18: 21.1.6 cita "Mensuração de ativos", e existe
+        # um tópico com esse nome (item 5) antes do tópico do item 21.
+        fonte = (
+            "5 Mensuração de ativos. "
+            "21 Normas Brasileiras de Contabilidade. 21.1 NBC TSP Estrutura Conceitual. "
+            "21.1.1 Objetivos e usuários da informação contábil. 21.1.2 Características qualitativas. "
+            "21.1.6 Mensuração de ativos e passivos nas demonstrações contábeis. "
+            "21.2 NBC TSP 03 – provisões. 22 Análise das demonstrações contábeis."
+        )
+        tax = te.TaxonomiaEdital(
+            materia="CONTABILIDADE",
+            topicos=[
+                te.Topico(nome="Mensuração de ativos"),
+                te.Topico(
+                    nome="Normas Brasileiras de Contabilidade",
+                    subtopicos=[
+                        "NBC TSP Estrutura Conceitual",
+                        "NBC TSP 03 – provisões",
+                    ],
+                ),
+                te.Topico(nome="Análise das demonstrações contábeis"),
+            ],
+        )
+        te.reinjetar_subitens_ausentes(tax, fonte)
+        assert tax.topicos[0].subtopicos == []
+        assert tax.topicos[1].subtopicos == [
+            "NBC TSP Estrutura Conceitual",
+            "NBC TSP Estrutura Conceitual - Objetivos e usuários da informação contábil",
+            "NBC TSP Estrutura Conceitual - Características qualitativas",
+            "NBC TSP Estrutura Conceitual - Mensuração de ativos e passivos nas demonstrações contábeis",
+            "NBC TSP 03 – provisões",
+        ]

@@ -5,6 +5,7 @@ from scripts.validar_taxonomia import (
     extrair_itens_numerados,
     main,
     normalizar,
+    severidade,
     validar_edital,
 )
 
@@ -263,6 +264,10 @@ class TestSeveridadeDivergenciaLeve:
         resultado = self._resultado(
             ["Educação corporativa", "Educação corporativa (atuação do pedagogo)"]
         )
+        # Os subitens (2º nível) vêm como subtópicos; o foco aqui é o 1º nível.
+        topicos = resultado["taxonomia_extraida"]["topicos"]
+        topicos[0]["subtopicos"] = ["Escolas de governo"]
+        topicos[1]["subtopicos"] = ["Atuação do pedagogo no âmbito corporativo"]
         alertas = comparar_chunk(chunk, resultado)
         assert [a["tipo"] for a in alertas] == ["topico_divergencia_leve"]
         assert alertas[0]["severidade"] == "informativo"
@@ -326,6 +331,9 @@ class TestSeveridadeDivergenciaLeve:
                 }
             ],
         }
+        resultado["resultados"][0]["taxonomia_extraida"]["topicos"][0]["subtopicos"] = [
+            "Histórico"
+        ]
         auditoria = {
             "chunks": [self._chunk("1 Fundamentos. 1.1 Histórico. 2 Aplicações.")]
         }
@@ -496,3 +504,130 @@ class TestValidarArquivosConcurso:
 
         alertas = validar_arquivos_concurso(resultado, data_dir=tmp_path)
         assert alertas == []
+
+
+TEXTO_SEFA_ECONOMIA = (
+    "1 Microeconomia. 1.1 Conceitos fundamentais. 1.1.1 Formas de organização da atividade \n"
+    "econômica: laissez-faire, intervencionismo, economia planificada. 1.1.2 Fatores de produção. "
+    "1.1.3 Curva de \npossibilidades de produção. 1.1.4 Papel dos preços. 1.2 Teoria da demanda. "
+    "1.2.1 Preferências e função \nutilidade. 2 Macroeconomia. 2.1 Contabilidade social."
+)
+
+
+class TestSubitemAusente:
+    def _chunk(self, texto):
+        return {
+            "chunk_index": 19,
+            "cargo": None,
+            "materia": "ECONOMIA",
+            "texto_enviado_llm": texto,
+            "status": "sucesso",
+        }
+
+    def _resultado(self, topicos):
+        return {
+            "taxonomia_extraida": {"materia": "Economia", "topicos": topicos},
+        }
+
+    def _ausentes(self, alertas):
+        return [a for a in alertas if a["tipo"] == "subitem_ausente"]
+
+    def test_taxonomia_so_ate_o_2o_nivel_alerta_nos_subitens_fundos(self):
+        resultado = self._resultado(
+            [
+                {
+                    "nome": "Microeconomia",
+                    "subtopicos": ["Conceitos fundamentais", "Teoria da demanda"],
+                },
+                {"nome": "Macroeconomia", "subtopicos": ["Contabilidade social"]},
+            ]
+        )
+        alertas = comparar_chunk(self._chunk(TEXTO_SEFA_ECONOMIA), resultado)
+        ausentes = self._ausentes(alertas)
+        assert [a["numero_item"] for a in ausentes] == [
+            "1.1.1",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "1.2.1",
+        ]
+        assert ausentes[0]["texto_item_origem"].startswith("Formas de organização")
+        assert severidade(ausentes[0]) == "bloqueante"
+        assert not [a for a in alertas if a["tipo"] == "topico_ausente"]
+
+    def test_subitem_coberto_dentro_de_subtopico_agregado_nao_alerta(self):
+        texto = (
+            "1 Segurança. 1.1 Criptografia. 1.2 Assinatura digital. 1.3 Certificação."
+        )
+        resultado = self._resultado(
+            [
+                {
+                    "nome": "Segurança",
+                    "subtopicos": [
+                        "Mecanismos de segurança: criptografia, assinatura digital, certificação"
+                    ],
+                }
+            ]
+        )
+        assert comparar_chunk(self._chunk(texto), resultado) == []
+
+    def test_subitem_parafraseado_leve_nao_alerta(self):
+        texto = "1 Estatística. 1.1 Medidas. 1.2 Média, moda, mediada e quartis."
+        resultado = self._resultado(
+            [
+                {
+                    "nome": "Estatística",
+                    "subtopicos": [
+                        "Medidas",
+                        "Medidas de posição: média, moda, mediana e quartis",
+                    ],
+                }
+            ]
+        )
+        assert comparar_chunk(self._chunk(texto), resultado) == []
+
+    def test_primeiro_nivel_mantem_comportamento_antigo(self):
+        texto = "1 Fundamentos. 2 Aplicações práticas."
+        resultado = self._resultado([{"nome": "Fundamentos", "subtopicos": []}])
+        tipos = [a["tipo"] for a in comparar_chunk(self._chunk(texto), resultado)]
+        assert tipos == ["topico_ausente"]
+
+    def test_numero_dentro_do_texto_nao_gera_subitem_ausente(self):
+        texto = "1 Contabilidade. 1.1 Normas: NBC T 16.1 a 16.11 e Lei nº 8.069/1990."
+        resultado = self._resultado(
+            [
+                {
+                    "nome": "Contabilidade",
+                    "subtopicos": ["Normas: NBC T 16.1 a 16.11 e Lei nº 8.069/1990"],
+                }
+            ]
+        )
+        assert comparar_chunk(self._chunk(texto), resultado) == []
+
+    def test_validar_edital_conta_subitem_ausente_em_total_alertas(self):
+        resultado = {
+            "edital": "x",
+            "resultados": [
+                {
+                    "chunk_index": 19,
+                    **self._resultado(
+                        [
+                            {
+                                "nome": "Microeconomia",
+                                "subtopicos": ["Conceitos fundamentais"],
+                            }
+                        ]
+                    ),
+                }
+            ],
+        }
+        auditoria = {
+            "chunks": [
+                self._chunk(
+                    "1 Microeconomia. 1.1 Conceitos fundamentais. 1.1.1 Fatores de produção."
+                )
+            ]
+        }
+        validacao = validar_edital(resultado, auditoria)
+        assert validacao["total_alertas"] == 1
+        assert validacao["alertas"][0]["tipo"] == "subitem_ausente"

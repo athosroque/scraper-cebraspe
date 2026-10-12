@@ -1,7 +1,71 @@
 {
   "edital": "Ed_1_IBAMA_24_abertura_atualizado_ret_2.pdf",
   "total_chunks_analisados": 33,
-  "total_alertas": 0,
+  "total_alertas": 7,
   "total_informativos": 0,
-  "alertas": []
+  "alertas": [
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "2.11.1",
+      "texto_item_origem": "Educação corporaƟva.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "2.11.2",
+      "texto_item_origem": "Educação a distância.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "2.11.3",
+      "texto_item_origem": "Planejamento, desenvolvimento e objeƟvos do ensino.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "3.1.1",
+      "texto_item_origem": "Deﬁnições de estratégia.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "3.1.2",
+      "texto_item_origem": "Condições necessárias para \nse  desenvolver  a  estratégia.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "3.1.3",
+      "texto_item_origem": "Questões‐chave  em  estratégia.",
+      "topico_nome_extraido": null
+    },
+    {
+      "chunk_index": 16,
+      "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",
+      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
+      "tipo": "subitem_ausente",
+      "numero_item": "3.1.4",
+      "texto_item_origem": "Metas  estratégicas  e  resultados \npretendidos.",
+      "topico_nome_extraido": null
+    }
+  ]
 }

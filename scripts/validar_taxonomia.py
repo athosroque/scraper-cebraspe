@@ -44,8 +44,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.comparacao_texto import contido, divergencia_leve, normalizar
-from src.edital_parser import extrair_itens_numerados
+from src.comparacao_texto import contido, divergencia_leve, item_coberto, normalizar
+from src.edital_parser import extrair_itens_numerados, extrair_subitens_numerados
 from src.logger import logger
 
 REVISAO_DIR_PADRAO = Path(__file__).resolve().parent.parent / "revisao_piloto"
@@ -191,6 +191,22 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
                     "numero_item": numero,
                     "posicao_item": posicao,
                     "texto_item_origem": item_texto[:200],
+                    "topico_nome_extraido": None,
+                }
+            )
+
+    # Subitens (2º nível em diante): o LLM costuma descartar os níveis mais
+    # fundos sem que o 1º nível acuse nada. Mesma regra de cobertura da
+    # reinjeção (`item_coberto`) sobre todos os tópicos e subtópicos do chunk.
+    textos_extraidos = [el["texto"] for el in todos_extraidos]
+    for numero, subitem_texto in extrair_subitens_numerados(texto_fonte):
+        if not item_coberto(subitem_texto, textos_extraidos):
+            alertas.append(
+                {
+                    **base,
+                    "tipo": "subitem_ausente",
+                    "numero_item": numero,
+                    "texto_item_origem": subitem_texto[:200],
                     "topico_nome_extraido": None,
                 }
             )
