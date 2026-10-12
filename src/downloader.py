@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import requests
 
+from src.inventario import escolher_edital_extracao
 from src.logger import logger
 from src.spider import (
     USER_AGENTS,
@@ -116,6 +117,8 @@ def resolver_concurso_do_pdf(pdf_path: Path) -> dict | None:
     manifest = _load_manifest(pdf_path.parent.parent / MANIFEST_FILENAME)
     slugs = set()
     for url, entry in manifest.items():
+        if not isinstance(entry, dict) or not url.startswith("http"):
+            continue
         if pdf_path.name not in (
             _filename_from_url(url),
             Path(entry.get("path", "")).name,
@@ -243,4 +246,25 @@ def download_concurso_pdfs(
     _save_manifest(manifest_path, manifest)
     if provas_texto:
         _save_manifest(provas_texto_path, provas_texto)
+
+    # Escolha do edital canônico de abertura para extração (decisão C0 / KAN-30)
+    editais_dict = [
+        e
+        if isinstance(e, dict)
+        else {"url": e, "texto": provas_texto.get(_filename_from_url(e), "")}
+        for e in pdf_map.get("editais_abertura", [])
+    ]
+    edital_escolhido = escolher_edital_extracao(editais_dict)
+    if edital_escolhido:
+        url_ed = edital_escolhido["url"]
+        path_ed = manifest.get(url_ed, {}).get("path")
+        if path_ed:
+            manifest["edital_extracao"] = {
+                "url": url_ed,
+                "path": str(path_ed),
+                "arquivo": Path(path_ed).name,
+                "texto": edital_escolhido.get("texto"),
+            }
+            _save_manifest(manifest_path, manifest)
+
     return resultado

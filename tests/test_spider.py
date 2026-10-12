@@ -124,7 +124,8 @@ class TestMapPdfLinks:
         pdf_map = spider.map_pdf_links(page, page.url)
         assert len(pdf_map["gabaritos"]) == 1
         assert len(pdf_map["provas"]) == 0
-        assert "padrao.pdf" in pdf_map["gabaritos"][0]
+        assert "padrao.pdf" in pdf_map["gabaritos"][0]["url"]
+        assert "PADRÕES DEFINITIVOS DE RESPOSTAS" in pdf_map["gabaritos"][0]["texto"]
 
     def test_edital_resultado_de_prova_vai_para_nao_classificados_e_nao_provas(
         self, monkeypatch
@@ -185,7 +186,8 @@ class TestMapPdfLinks:
         assert pdf_map["provas"][0]["texto"].startswith(
             "PROVA OBJETIVA (P1) E GABARITO"
         )
-        assert [u.rsplit("/", 1)[1] for u in pdf_map["gabaritos"]] == ["gab.pdf"]
+        assert [u["url"].rsplit("/", 1)[1] for u in pdf_map["gabaritos"]] == ["gab.pdf"]
+        assert pdf_map["gabaritos"][0]["texto"].startswith("GABARITO DEFINITIVO")
 
     def test_edital_reabertura_nao_vai_para_editais_abertura(self, monkeypatch):
         spider, page = self._spider_with_page(
@@ -203,8 +205,127 @@ class TestMapPdfLinks:
         )
         pdf_map = spider.map_pdf_links(page, page.url)
         assert len(pdf_map["editais_abertura"]) == 1
-        assert "ed1.pdf" in pdf_map["editais_abertura"][0]
+        assert "ed1.pdf" in pdf_map["editais_abertura"][0]["url"]
+        assert "EDITAL Nº 1 – ABERTURA" in pdf_map["editais_abertura"][0]["texto"]
         assert len(pdf_map["nao_classificados"]) == 1
+
+    def test_classifica_links_reais_me_pge_es(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "PROVA PREAMBULAR (OBJETIVA)",
+                    "https://cdn.cebraspe.org.br/concursos/PGE_ES_25_PROCURADOR/arquivos/obj.pdf",
+                ),
+                _make_link(
+                    "GABARITO DEFINITIVO - PROVA PREAMBULAR (OBJETIVA)",
+                    "https://cdn.cebraspe.org.br/concursos/PGE_ES_25_PROCURADOR/arquivos/gab.pdf",
+                ),
+                _make_link(
+                    "PROVAS ESCRITAS – TEÓRICA E PRÁTICA",
+                    "https://cdn.cebraspe.org.br/concursos/PGE_ES_25_PROCURADOR/arquivos/disc.pdf",
+                ),
+                _make_link(
+                    "PROVA ORAL",
+                    "https://cdn.cebraspe.org.br/concursos/PGE_ES_25_PROCURADOR/arquivos/oral.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["provas"]) == 2
+        assert {p["texto"] for p in pdf_map["provas"]} == {
+            "PROVA PREAMBULAR (OBJETIVA)",
+            "PROVAS ESCRITAS – TEÓRICA E PRÁTICA",
+        }
+        assert len(pdf_map["gabaritos"]) == 1
+        assert (
+            pdf_map["gabaritos"][0]["texto"]
+            == "GABARITO DEFINITIVO - PROVA PREAMBULAR (OBJETIVA)"
+        )
+        assert len(pdf_map["nao_classificados"]) == 1
+        assert pdf_map["nao_classificados"][0]["texto"] == "PROVA ORAL"
+
+    def test_classifica_links_reais_me_sefaz_se(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "PROVA OBJETIVA – CONHECIMENTOS ESPECÍFICOS II – ESPECIALIDADE 1 – TARDE",
+                    "https://cdn.cebraspe.org.br/concursos/SEFAZ_SE_25_AUDITOR/arquivos/esp1_tarde.pdf",
+                ),
+                _make_link(
+                    "GABARITO DEFINITIVO – CONHECIMENTOS ESPECÍFICOS II – ESPECIALIDADE 1 – TARDE",
+                    "https://cdn.cebraspe.org.br/concursos/SEFAZ_SE_25_AUDITOR/arquivos/gab_esp1_tarde.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["provas"]) == 1
+        assert len(pdf_map["gabaritos"]) == 1
+        assert "TARDE" in pdf_map["provas"][0]["texto"]
+        assert "TARDE" in pdf_map["gabaritos"][0]["texto"]
+
+    def test_classifica_links_reais_me_sebrae(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "PROVA OBJETIVA – CONHECIMENTOS GERAIS PARA OS PERFIS 1 E 2 – TIPO 2",
+                    "https://cdn.cebraspe.org.br/concursos/SEBRAE_25_PSE_1/arquivos/cg_tipo2.pdf",
+                ),
+                _make_link(
+                    "GABARITO DEFINITIVO – CONHECIMENTOS ESPECÍFICOS – PERFIL 1 – TIPO 4",
+                    "https://cdn.cebraspe.org.br/concursos/SEBRAE_25_PSE_1/arquivos/gab_tipo4.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["provas"]) == 1
+        assert "TIPO 2" in pdf_map["provas"][0]["texto"]
+        assert len(pdf_map["gabaritos"]) == 1
+        assert "TIPO 4" in pdf_map["gabaritos"][0]["texto"]
+
+    def test_documentos_nao_prova_caem_em_nao_classificados(self, monkeypatch):
+        spider, page = self._spider_with_page(
+            monkeypatch,
+            [
+                _make_link(
+                    "Demanda de candidatos por vaga",
+                    "https://cdn.cebraspe.org.br/demanda.pdf",
+                ),
+                _make_link(
+                    "Ficha de Informações Pessoais (FIP)",
+                    "https://cdn.cebraspe.org.br/fip.pdf",
+                ),
+                _make_link(
+                    "Portaria de homologação do concurso",
+                    "https://cdn.cebraspe.org.br/homologa.pdf",
+                ),
+                _make_link(
+                    "Modelo de Currículo Padrão",
+                    "https://cdn.cebraspe.org.br/curriculo.pdf",
+                ),
+            ],
+        )
+        pdf_map = spider.map_pdf_links(page, page.url)
+        assert len(pdf_map["provas"]) == 0
+        assert len(pdf_map["gabaritos"]) == 0
+        assert len(pdf_map["editais_abertura"]) == 0
+        assert len(pdf_map["nao_classificados"]) == 4
+
+    def test_concurso_excluido_retorna_mapa_vazio_sem_excecao(self, monkeypatch):
+        spider = CebraspeSpider()
+        mock_page = MagicMock()
+        url_cancelado = "https://www.cebraspe.org.br/concursos/AGSUS_26_UGP_UAC"
+        pdf_map = spider.map_pdf_links(mock_page, url_cancelado)
+        assert pdf_map == {
+            "editais_abertura": [],
+            "provas": [],
+            "gabaritos": [],
+            "nao_classificados": [],
+        }
+        # Não deve navegar para a página se o concurso estiver excluído
+        mock_page.goto.assert_not_called()
 
 
 class FixtureLinkParser(HTMLParser):

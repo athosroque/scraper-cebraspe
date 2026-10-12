@@ -22,6 +22,7 @@ from src.comparacao_texto import (
     PADRAO_PADRAO_RESPOSTA,
     normalizar,
 )
+from src.logger import logger
 
 SLUGS_NAVEGACAO = {"em-andamento", "encerrado", "inscricoes-abertas", "novos", "main"}
 PROJETO_DIR = Path(__file__).resolve().parent.parent
@@ -81,6 +82,7 @@ PADRAO_ADMINISTRATIVO_INICIO = re.compile(
 # Prova sem caderno a extrair: oral, didática, tribuna, desempenho prático.
 PADRAO_PROVA_OUTRA = re.compile(
     r"\boral\b|\bdidatic|\btribuna\b|\bdesempenho\b|\bsustentacao\b|\bhabilidades\b"
+    r"|\bpratic\w*\s+opca\w*"
 )
 # Prova escrita não objetiva que o link não chama de "discursiva"
 # ("PROVA ESCRITA DE DIREITO – SEGUNDA FASE", "PROVA SUBJETIVA – P2").
@@ -347,6 +349,72 @@ def carregar_exclusoes(
             raise ValueError(f"exclusoes.json: {slug} sem motivo")
         exclusoes[slug] = {"categoria": item["categoria"], "motivo": item["motivo"]}
     return exclusoes
+
+
+def escolher_edital_extracao(editais: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Escolhe o edital de abertura canônico para extração pelo LLM (decisão C0 / KAN-30).
+
+    Critérios:
+    - Lista vazia: devolve None.
+    - 1 único edital: devolve ele mesmo.
+    - Múltiplos editais:
+      - Busca consolidados: texto contendo 'atualizado' ou 'conforme retificac'
+        (normalizado, sem acentos).
+      - Se exatamente 1 consolidado: devolve ele.
+      - Se múltiplos consolidados: desempata pelo maior número de retificação
+        no texto ou na URL. Se empate ou sem número identificável: loga
+        '[EDITAL_AMBIGUO]' e devolve None.
+      - Se nenhum consolidado: loga '[EDITAL_AMBIGUO]' e devolve None.
+    """
+    if not editais:
+        return None
+
+    if len(editais) == 1:
+        return editais[0]
+
+    def _num_ret(item: dict[str, Any]) -> int | None:
+        texto = item.get("texto") or ""
+        url = item.get("url") or ""
+        texto_norm = normalizar(texto)
+        m = re.search(r"\bret(?:ificac\w*)?\s*(?:no?|n[ºo])?\s*(\d+)", texto_norm)
+        if m:
+            return int(m.group(1))
+        if url:
+            m_url = re.search(
+                r"ret(?:ificac\w*)?[_\s-]*n?[ºo]?\s*(\d+)", url, re.IGNORECASE
+            )
+            if m_url:
+                return int(m_url.group(1))
+        return None
+
+    consolidados = [
+        e
+        for e in editais
+        if "atualizado" in normalizar(e.get("texto") or "")
+        or "conforme retificac" in normalizar(e.get("texto") or "")
+    ]
+
+    if len(consolidados) == 1:
+        return consolidados[0]
+
+    if len(consolidados) > 1:
+        com_ret = [(_num_ret(e), e) for e in consolidados]
+        com_ret.sort(key=lambda x: (x[0] is not None, x[0] or 0), reverse=True)
+        if com_ret[0][0] is not None and (
+            com_ret[1][0] is None or com_ret[0][0] > com_ret[1][0]
+        ):
+            return com_ret[0][1]
+        logger.warning(
+            f"[EDITAL_AMBIGUO] Múltiplos editais de abertura consolidados sem desempate: "
+            f"{[e.get('texto') for e in consolidados]}"
+        )
+        return None
+
+    logger.warning(
+        f"[EDITAL_AMBIGUO] Múltiplos editais de abertura sem versão consolidada: "
+        f"{[e.get('texto') for e in editais]}"
+    )
+    return None
 
 
 def aplicar_exclusao(

@@ -39,6 +39,7 @@ from src.inventario import (
     cobertura_por_ano,
     detectar_formato_caderno,
     escolher_cadernos_calibracao_me,
+    escolher_edital_extracao,
     gerar_relatorio_md,
     iterar_concursos_jsonl,
     reclassificar_inventario,
@@ -1307,3 +1308,120 @@ class TestExclusoes:
             assert inventario[slug]["exclusao"] == exclusao, slug
         incluidos = [c for c in inventario.values() if c["slug"] not in exclusoes]
         assert all(c["incluir"] is True for c in incluidos)
+
+
+class TestEscolherEditalExtracao:
+    """Valida a seleção canônica do edital de abertura (C0 / KAN-30)."""
+
+    def test_lista_vazia_retorna_none(self):
+        assert escolher_edital_extracao([]) is None
+
+    def test_edital_unico_retorna_ele_mesmo(self):
+        edital = {
+            "url": "https://cdn.cebraspe.org.br/ed1.pdf",
+            "texto": "Edital nº 5 – Abertura",
+        }
+        assert escolher_edital_extracao([edital]) == edital
+
+    def test_escolhe_atualizado_conforme_retificacoes_banrisul(self):
+        editais = [
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1_atualizado.pdf",
+                "texto": "Edital nº 1 – Abertura, atualizado conforme retificações",
+            },
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1_original.pdf",
+                "texto": "Edital nº 1 – Abertura",
+            },
+        ]
+        escolhido = escolher_edital_extracao(editais)
+        assert escolhido == editais[0]
+
+    def test_escolhe_atualizado_comunicado_sebrae(self):
+        editais = [
+            {
+                "url": "https://cdn.cebraspe.org.br/comunicado1_atualizado.pdf",
+                "texto": "Comunicado nº 1 – Abertura – Atualizado conforme retificações",
+            },
+            {
+                "url": "https://cdn.cebraspe.org.br/comunicado1_original.pdf",
+                "texto": "Comunicado nº 1 - Abertura",
+            },
+        ]
+        escolhido = escolher_edital_extracao(editais)
+        assert escolhido == editais[0]
+
+    def test_desempata_por_maior_numero_de_retificacao(self):
+        editais = [
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1_ret2.pdf",
+                "texto": "Edital nº 1 – Abertura – Atualizado conforme retificação nº 2",
+            },
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1_ret5.pdf",
+                "texto": "Edital nº 1 – Abertura – Atualizado conforme retificação nº 5",
+            },
+        ]
+        escolhido = escolher_edital_extracao(editais)
+        assert escolhido == editais[1]
+
+    def test_empate_sem_desempate_retorna_none_com_log_ambiguo(self, caplog):
+        editais = [
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1_a.pdf",
+                "texto": "Edital nº 1 – Abertura – Atualizado conforme retificações",
+            },
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1_b.pdf",
+                "texto": "Edital nº 1 – Abertura – Atualizado conforme retificações",
+            },
+        ]
+        with caplog.at_level("WARNING"):
+            escolhido = escolher_edital_extracao(editais)
+        assert escolhido is None
+        assert "[EDITAL_AMBIGUO]" in caplog.text
+
+    def test_multiplos_editais_sem_consolidado_retorna_none_com_log_ambiguo(
+        self, caplog
+    ):
+        editais = [
+            {
+                "url": "https://cdn.cebraspe.org.br/ed1.pdf",
+                "texto": "Edital nº 1 - Abertura",
+            },
+            {
+                "url": "https://cdn.cebraspe.org.br/ed2.pdf",
+                "texto": "Edital nº 2 - Abertura",
+            },
+        ]
+        with caplog.at_level("WARNING"):
+            escolhido = escolher_edital_extracao(editais)
+        assert escolhido is None
+        assert "[EDITAL_AMBIGUO]" in caplog.text
+
+
+class TestCorrecoesClassificador8C:
+    """Valida correções mínimas do classificador fino em 8.C/C0."""
+
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "PROVA PRÁTICA - OPÇÃO 40000002: TÉCNICO – ÁREA: LABORATÓRIO E CAMPOS EXPERIMENTAIS – SUBÁREA: MANEJO ANIMAL",
+            "PROVA PRÁTICA - OPÇÃO 40001925: TÉCNICO – ÁREA: LABORATÓRIO E CAMPOS EXPERIMENTAIS – SUBÁREA: MANEJO FLORESTAL",
+            "PROVA PRÁTICA - OPÇÃO 40004381: TÉCNICO – ÁREA: MECÂNICA – SUBÁREA: MECÂNICA DE PRECISÃO",
+            "PROVA PRÁTICA - OPÇÃO 40000007: ASSISTENTE – ÁREA: LABORATÓRIO E CAMPOS EXPERIENCIAIS – SUBÁREA: MANEJO ANIMAL",
+            "PROVA PRÁTICA - OPÇÃO 40000035: ASSISTENTE – ÁREA: SUPRIMENTO, MANUTENÇÃO E SERVIÇOS – SUBÁREA: OPERADOR DE MÁQUINAS AGRÍCOLAS E VEÍCULOS",
+        ],
+    )
+    def test_prova_pratica_opcao_classificada_como_prova_outra(self, texto):
+        classif = classificar_link_pdf(texto)
+        assert classif["tipo"] == TIPO_PROVA_OUTRA
+
+    def test_prova_pratica_p3_juridica_permanece_caderno_discursivo(self):
+        classif = classificar_link_pdf("PROVA PRÁTICA - P3")
+        assert classif["tipo"] == TIPO_CADERNO_DISCURSIVO
+
+    def test_caderno_unico_provas_objetivas_e_discursiva_permanece_objetivo(self):
+        texto = "PROVAS OBJETIVAS E DISCURSIVA – CARGO 1: ANALISTA EM DESENVOLVIMENTO REGIONAL – ÁREA: ADMINISTRAÇÃO"
+        classif = classificar_link_pdf(texto)
+        assert classif["tipo"] == TIPO_CADERNO_OBJETIVO

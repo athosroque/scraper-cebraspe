@@ -224,3 +224,72 @@ class TestResolverConcursoDoPdf:
     def test_pdf_fora_do_manifesto_retorna_none(self, tmp_path):
         editais = self._preparar(tmp_path, [])
         assert downloader.resolver_concurso_do_pdf(editais / "Ed_1.pdf") is None
+
+    def test_ignora_edital_extracao_no_manifesto(self, tmp_path):
+        editais = self._preparar(
+            tmp_path,
+            ["https://cdn.cebraspe.org.br/concursos/PF_25_ADM/arquivos/Ed_1.pdf"],
+        )
+        manifest_path = editais.parent / downloader.MANIFEST_FILENAME
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["edital_extracao"] = {
+            "url": "https://cdn.cebraspe.org.br/concursos/PF_25_ADM/arquivos/Ed_1.pdf",
+            "path": str(editais / "Ed_1.pdf"),
+            "arquivo": "Ed_1.pdf",
+            "texto": "Edital nº 1 - Abertura",
+        }
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        assert downloader.resolver_concurso_do_pdf(editais / "Ed_1.pdf") == {
+            "slug": "PF_25_ADM",
+            "orgao": "PF",
+            "ano": 2025,
+        }
+
+
+def test_download_concurso_pdfs_grava_edital_extracao_no_manifesto(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(downloader, "stealth_wait", lambda: None)
+    with patch("requests.get") as mock_get:
+
+        def _get(url, **kwargs):
+            resp = MagicMock()
+            resp.content = f"%PDF-1.4 conteudo para {url}".encode()
+            resp.headers = {"Content-Type": "application/pdf"}
+            resp.raise_for_status = MagicMock()
+            return resp
+
+        mock_get.side_effect = _get
+
+        pdf_map = {
+            "editais_abertura": [
+                {
+                    "url": "https://cdn.cebraspe.org.br/concursos/ORGAO_25/arquivos/ed_original.pdf",
+                    "texto": "Edital nº 1 - Abertura",
+                },
+                {
+                    "url": "https://cdn.cebraspe.org.br/concursos/ORGAO_25/arquivos/ed_atualizado.pdf",
+                    "texto": "Edital nº 1 – Abertura – Atualizado conforme retificações",
+                },
+            ],
+            "provas": [],
+            "gabaritos": [],
+        }
+
+        downloader.download_concurso_pdfs(
+            "Orgao Teste", 2025, pdf_map, data_dir=tmp_path
+        )
+        manifest_path = (
+            tmp_path
+            / "2025"
+            / "CEBRASPE"
+            / "ORGAO_TESTE"
+            / downloader.MANIFEST_FILENAME
+        )
+        assert manifest_path.exists()
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert "edital_extracao" in manifest
+        assert manifest["edital_extracao"]["arquivo"] == "ed_atualizado.pdf"
+        assert (
+            "Atualizado conforme retificações" in manifest["edital_extracao"]["texto"]
+        )

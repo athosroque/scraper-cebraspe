@@ -10,8 +10,14 @@ from playwright.sync_api import Page, sync_playwright
 
 from src.inventario import (
     SLUGS_NAVEGACAO,
-    TIPO_CADERNO_COM_GABARITO,
+    TIPO_CADERNO_DISCURSIVO,
+    TIPO_EDITAL_ABERTURA,
+    TIPO_GABARITO,
+    TIPO_PADRAO_RESPOSTA,
+    TIPOS_CADERNO_OBJETIVO,
+    carregar_exclusoes,
     classificar_link_pdf,
+    pdf_vai_para_o_site,
 )
 from src.logger import logger
 
@@ -349,8 +355,26 @@ class CebraspeSpider:
         return mapear_links_pdf(page, contest_url)
 
     def map_pdf_links(self, page: Page, contest_url: str) -> dict[str, list]:
-        """Maps PDF links for Edital de Abertura, Provas, and Gabaritos."""
+        """Maps PDF links for Edital de Abertura, Provas, and Gabaritos.
+
+        Classifica cada PDF utilizando classificar_link_pdf e pdf_vai_para_o_site
+        de src.inventario, respeitando exclusoes.json (ADR-037).
+        """
         logger.info(f"Mapping PDFs for {contest_url}")
+        slug = extract_slug(contest_url)
+        exclusoes = carregar_exclusoes()
+        if slug in exclusoes:
+            info = exclusoes[slug]
+            logger.info(
+                f"[SPIDER] Concurso {slug} em exclusoes.json ({info['categoria']}: {info['motivo']}), mapa vazio."
+            )
+            return {
+                "editais_abertura": [],
+                "provas": [],
+                "gabaritos": [],
+                "nao_classificados": [],
+            }
+
         page.goto(contest_url, timeout=60000)
         stealth_wait()
 
@@ -364,53 +388,36 @@ class CebraspeSpider:
         links = page.locator("a").element_handles()
         for link in links:
             raw_href = link.get_attribute("href")
-            text = link.inner_text().strip().upper()
+            text = link.inner_text().strip()
 
             if not raw_href or not raw_href.lower().endswith(".pdf"):
                 continue
 
             href = urljoin(page.url, raw_href)
+            classif = classificar_link_pdf(text)
+            tipo = classif["tipo"]
+            entry = {"url": href, "texto": text}
 
-            if re.search(r"EDITAL.*?\bABERTURA\b", text):
-                pdf_map["editais_abertura"].append(href)
+            if tipo == TIPO_EDITAL_ABERTURA:
+                pdf_map["editais_abertura"].append(entry)
                 logger.info(f"[PROVA-PDF] editais_abertura <- '{text}' ({href})")
-            elif classificar_link_pdf(text)["tipo"] == TIPO_CADERNO_COM_GABARITO:
-                # "PROVA E GABARITO DEFINITIVO", "PROVA OBJETIVA (P1) E GABARITO
-                # PRELIMINAR COM JUSTIFICATIVAS": um PDF só, com as questões e as
-                # respostas (8.M/S3). É caderno: vai para Provas/ com o texto do
-                # link, que diz o tipo e os cargos. Antes do teste de GABARITO,
-                # que o mandaria para Gabaritos/ sem texto.
-                pdf_map["provas"].append({"url": href, "texto": text})
-                logger.info(
-                    f"[PROVA-PDF] provas (caderno com gabarito) <- '{text}' ({href})"
-                )
-            elif re.search(r"GABARITO|PADR[ÕOÃA]ES?.*RESPOSTA", text):
-                # "PADRÃO DE RESPOSTA (DEFINITIVO)" é o gabarito da prova
-                # discursiva — o CEBRASPE não usa a palavra "GABARITO" nesse
-                # caso. Deve ser checado antes de "PROVA" porque títulos como
-                # "PADRÕES DEFINITIVOS DE RESPOSTAS – PROVAS DISCURSIVAS"
-                # contêm a palavra "PROVAS" mas são gabaritos.
-                pdf_map["gabaritos"].append(href)
-                logger.info(f"[PROVA-PDF] gabaritos <- '{text}' ({href})")
-            elif re.search(r"PROVA", text):
-                # Editais administrativos que apenas citam prova (ex: resultados, convocações, locais)
-                # não são cadernos de questões de prova.
-                if re.search(r"EDITAL\s+N[ºO]|RESULTADO|LOCAIS\s+DE\s+APLICA", text):
-                    pdf_map["nao_classificados"].append({"url": href, "texto": text})
-                    logger.info(
-                        f"[PROVA-PDF] nao_classificados (edital administrativo citando prova) <- '{text}' ({href})"
-                    )
+            elif pdf_vai_para_o_site(classif):
+                if tipo in (*TIPOS_CADERNO_OBJETIVO, TIPO_CADERNO_DISCURSIVO):
+                    pdf_map["provas"].append(entry)
+                    logger.info(f"[PROVA-PDF] provas ({tipo}) <- '{text}' ({href})")
+                elif tipo in (TIPO_GABARITO, TIPO_PADRAO_RESPOSTA):
+                    pdf_map["gabaritos"].append(entry)
+                    logger.info(f"[PROVA-PDF] gabaritos ({tipo}) <- '{text}' ({href})")
                 else:
-                    # Guardar o texto do link é essencial: é a única fonte de
-                    # tipo (CB/CE/discursiva), nível e cargo(s) cobertos — esse
-                    # texto não existe dentro do conteúdo do PDF (ver LESSONS.md).
-                    pdf_map["provas"].append({"url": href, "texto": text})
-                    logger.info(f"[PROVA-PDF] provas <- '{text}' ({href})")
+                    pdf_map["nao_classificados"].append(entry)
+                    logger.info(
+                        f"[PROVA-PDF] nao_classificados ({tipo}) <- '{text}' ({href})"
+                    )
             else:
-                # Nunca descartar em silêncio: qualquer PDF que caia aqui é
-                # um tipo de documento que a regex ainda não reconhece.
-                pdf_map["nao_classificados"].append({"url": href, "texto": text})
-                logger.warning(f"[PROVA-PDF] NÃO CLASSIFICADO: '{text}' ({href})")
+                pdf_map["nao_classificados"].append(entry)
+                logger.info(
+                    f"[PROVA-PDF] nao_classificados ({tipo}) <- '{text}' ({href})"
+                )
 
         logger.info(
             f"Classificação em {contest_url}: "
@@ -425,6 +432,16 @@ class CebraspeSpider:
         self, page: Page, contest: dict, processed_slugs: set[str]
     ) -> dict:
         """Mapeia, baixa PDFs de um concurso e registra no índice de processados."""
+        slug = contest.get("slug") or extract_slug(contest["url"])
+        exclusoes = carregar_exclusoes()
+        if slug in exclusoes:
+            info = exclusoes[slug]
+            logger.info(
+                f"[SPIDER] Concurso {slug} em exclusoes.json ({info['categoria']}: {info['motivo']}), pulando processamento."
+            )
+            mark_processed(slug, processed_slugs)
+            return {"editais_abertura": [], "provas": [], "gabaritos": []}
+
         logger.info(f"Processing: {contest['title']} (Priority: {contest['priority']})")
         pdfs = self.map_pdf_links(page, contest["url"])
 

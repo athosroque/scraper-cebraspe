@@ -1,6 +1,6 @@
 # Relatório Analítico de Inventário de Concursos CEBRASPE
 
-- **Data de geração:** 2026-10-09 15:19:58 UTC
+- **Data de geração:** 2026-10-12 13:03:07 UTC
 - **Total de concursos mapeados:** 346 (346 com ano ≥ 2020)
 - **Total de PDFs identificados:** 18248
 
@@ -33,14 +33,14 @@ Cadernos, gabaritos e padrões contam só o que vai para o site (sem curso de fo
 | 2025 | encerrado | 31 | 4 | 379 | 261 | 120 | 13 | 11 | 5 |
 | 2025 | novos | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 2024 | em_andamento | 1 | 0 | 63 | 66 | 29 | 0 | 0 | 0 |
-| 2024 | encerrado | 49 | 2 | 1065 | 799 | 337 | 2 | 1 | 0 |
+| 2024 | encerrado | 49 | 2 | 1060 | 799 | 337 | 2 | 1 | 0 |
 | 2023 | em_andamento | 4 | 0 | 10 | 6 | 4 | 0 | 0 | 0 |
 | 2023 | encerrado | 53 | 1 | 647 | 471 | 198 | 2 | 1 | 0 |
 | 2022 | em_andamento | 2 | 0 | 22 | 14 | 14 | 0 | 0 | 0 |
 | 2022 | encerrado | 47 | 0 | 380 | 284 | 198 | 0 | 3 | 0 |
 | 2021 | encerrado | 60 | 3 | 472 | 386 | 144 | 2 | 1 | 0 |
 | 2020 | encerrado | 26 | 3 | 241 | 234 | 74 | 2 | 1 | 0 |
-| **Total** | - | **346** | **16** | **3780** | **2909** | **1296** | **39** | **40** | **5** |
+| **Total** | - | **346** | **16** | **3775** | **2909** | **1296** | **39** | **40** | **5** |
 
 ## Formato na Amostra (CE × ME)
 

@@ -505,6 +505,8 @@ def coletar_pdfs_fila(data_dir: Path = DATA_DIR) -> dict[str, list[dict]]:
 
         por_nome: dict[str, list[tuple[str, dict]]] = {}
         for url, entry in manifest.items():
+            if not isinstance(entry, dict) or not url.startswith("http"):
+                continue
             for nome in {_filename_from_url(url), Path(entry.get("path", "")).name}:
                 if nome:
                     por_nome.setdefault(nome, []).append((url, entry))

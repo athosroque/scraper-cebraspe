@@ -683,3 +683,35 @@ gabarito embutido se valida num lote de PDFs reais contando "sucesso com marca
 no texto", não só a amostra.
 **Custo do aprendizado:** ~2h (5 formatos, lote de 98 PDFs e comparação com 52
 definitivos).
+
+### [tags: inventario, downloader, spider, edital-abertura, caderno-misto, etapa-8c]
+**Sintoma:** na preparação do download para a expansão ME (Etapa 8.C / KAN-30),
+o spider usava um classificador legado raso que não preservava o texto do link
+para editais e gabaritos, não suportava `exclusoes.json`, e podia baixar múltiplos
+editais de abertura sem indicar qual versão consolidada enviar ao LLM na C1a. Além
+disso, cadernos mistos com itens objetivos e discursiva no mesmo arquivo
+(ex: CODEVASF_20, 120 itens C/E nas p. 1–7 e discursiva nas p. 8–9) arriscavam ser
+classificados como discursivos e perder os 120 itens objetivos.
+**Causa:**
+1. `spider.py` usava regex simplificada própria sem a fineza do inventário
+   (`PADRAO_*`, `pdf_vai_para_o_site`, etc.).
+2. Vários editais de abertura são publicados ao longo do concurso (original,
+   retificado 1, atualizado conforme retificações). Sem seleção canônica,
+   a etapa de extração do edital (C1a) precisaria de heurística ad-hoc ou
+   intervenção manual.
+3. Em `inventario.py`, "PROVA PRÁTICA – OPÇÃO" de EMBRAPA_24 caía em discursiva em vez
+   de prova prática/outra.
+**Solução:**
+1. `spider.map_pdf_links` unificado com o classificador fino canônico de
+   `src/inventario.py`, preservando `{"url": ..., "texto": ...}` para editais e
+   gabaritos, e respeitando `inventario/exclusoes.json` com log informativo e mapa
+   vazio (sem quebrar a execução).
+2. Criada a função `escolher_edital_extracao(editais)`, priorizando editais consolidados
+   ("atualizado conforme retificações" e desempate pelo número da retificação), com log
+   `[EDITAL_AMBIGUO]` se houver empate. O downloader persiste `edital_extracao` no manifesto.
+3. Caderno misto objetivo + discursivo mantido como `caderno_objetivo` pelo classificador
+   para viabilizar a extração dos itens objetivos, deixando a discursiva contida para
+   futura expansão dos cadernos mistos pré-2025.
+4. Adicionado `\bpratic\w*\s+opca\w*` a `PADRAO_PROVA_OUTRA`, reclassificando os 5 PDFs
+   de EMBRAPA_24 sem afetar nenhum outro concurso.
+**Custo do aprendizado:** ~45min (análise de cadernos mistos reais e testes de regressão do piloto).

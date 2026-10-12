@@ -1128,9 +1128,10 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   questão ME está no banco de produção: o Gate da 8.M carregou o `SEFA_PR_25` só na cópia
   `cebraspe_gate`. Alvo: os 11 concursos ME de 2025 encerrados do inventário. Os ME de 2026 e
   os em andamento ficam para decisão do dono.
-  - `[ ]` C0 (KAN-30) Download guiado pelo inventário: `map_pdf_links` com o classificador fino,
-    `pdf_vai_para_o_site` e `exclusoes.json`; "PROVA PRÁTICA – OPÇÃO" e o caderno único
-    objetivo + discursivo (pendências da 8.0). Piloto inalterado.
+  - `[x]` C0 (KAN-30) Download guiado pelo inventário: `map_pdf_links` com o classificador fino,
+    `pdf_vai_para_o_site` e `exclusoes.json`; preservação de texto de links para editais/gabaritos;
+    seleção de edital canônico (`escolher_edital_extracao`); "PROVA PRÁTICA – OPÇÃO" e o caderno único
+    objetivo + discursivo (pendências da 8.0). Reclassificação aplicada (5 PDFs EMBRAPA_24). Piloto inalterado.
   - `[ ]` C1a (KAN-56) Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
     banco, 3 questões conferidas no PDF e roteiro `docs/runbook-lote.md`. Pausa: editais.
   - `[ ]` C1b (KAN-57) Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.

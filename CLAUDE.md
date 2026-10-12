@@ -325,11 +325,14 @@ Datasette continua só como ferramenta de revisão do dono.
       Ética 4,81%; as 31 provas sem diferença. KAN-50: ME do SEFA_PR_25 validada no Chromium.
       1252 testes, ruff verde.
 - [ ] Etapa 8.C Coleta dos concursos de múltipla escolha (ME) de 2025 — prioridade do dono
-      (2026-10-12), antes da 8.M.2. Plano em `plano-etapa-8c.md`, uma sessão por item: C0
-      download pelo inventário → C1a/C1b lote de calibração `SEFA_PR_25` + `BANRISUL_25` → C2
-      orquestrador mínimo → C3–C7 lotes → C8 fechamento. Hoje nenhuma questão ME está no banco
-      de produção (o Gate da 8.M usou a cópia `cebraspe_gate`). Pronto quando os 11 concursos ME
-      de 2025 encerrados estão `aprovado`, o piloto segue inalterado e `make test-all` está verde.
+      (2026-10-12), antes da 8.M.2. Plano em `plano-etapa-8c.md`, uma sessão por item:
+      C0 (KAN-30, concluída): download guiado pelo inventário com classificador fino,
+      seleção de edital canônico (`escolher_edital_extracao`), preservação de texto de link
+      para editais/gabaritos e suporte a exclusões; 154 provas e 155 gabaritos mapeados para os 11 ME;
+      reclassificação de EMBRAPA_24 (5 PDFs); piloto 100% inalterado.
+      Próximas: C1a/C1b lote de calibração `SEFA_PR_25` + `BANRISUL_25` → C2 orquestrador mínimo →
+      C3–C7 lotes → C8 fechamento. Pronto quando os 11 concursos ME de 2025 encerrados estão `aprovado`,
+      o piloto segue inalterado e `make test-all` está verde.
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — os dois usos-alvo do dono
       (banca × ano × assunto; concurso × matéria × assunto) respondidos no site, com % de dois
       níveis e nº de questões distintas; detalhes no `task.md`.
