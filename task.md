@@ -31,7 +31,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
 | 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | planejada, 3 decisões abertas | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5 |
-| — | Pendências sem etapa (KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
+| — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
 
 Checklist da 8.C (C0 → C1a → C1b → C2 → C3–C7 → C8): seção **8.C** dentro da Etapa 8,
@@ -1216,6 +1216,32 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   views da 5E reconciliam e a suíte completa está verde.
 
 ## Pendências posteriores (fora de etapa)
+
+- `[ ]` **Busca do site: palavra-chave com classificação, sugestões, cascata sem trava e
+  normas num lugar só** (pedido do dono, 2026-10-12; card **KAN-66**). Nada executado ainda.
+  1. **Norma consolidada num lugar só, também nas questões.** `STM_25|072_STM_004_01|56`, `57`
+     e `58` são de LAI e estão em `S-d1e73b29ac` (COMUNICAÇÃO SOCIAL › Comunicação pública ›
+     Legislação): mover para `S-256fbea4b7` (LAI) com `curar_classificacao --mapear` (LAI de 8
+     para 11) e conferir a 4ª questão desse nó. Padrão: questão de norma consolidada (LAI,
+     LGPD, LRF…) sempre aponta para o nó da norma, venha do caderno que vier. Teste guarda:
+     questão cujo enunciado cita a norma (sigla como palavra inteira, número com ou sem
+     ponto, nome por extenso) tem o nó da norma entre os apontamentos.
+  2. **Palavra-chave = texto + classificação.** Hoje procura só no enunciado e no comando.
+     Medido (questões no nó / achadas / do nó que ficam de fora): LGPD 13/11/6; LAI 8/5/8;
+     12.527 8/7/6; 12527, 7.724, 7724 8/0/8; LRF 18/4/15. Novo: termo que casa nome ou
+     apelido de nó (regra do `/api/v1/busca`) traz também as questões classificadas no nó e
+     nos descendentes. Sigla curta como palavra inteira ("LAI" não casa "laicização"); ponto
+     de milhar e "nº" fora da comparação, igual à busca rápida.
+  3. **Sugestões ao digitar na palavra-chave:** lista de assuntos que casam, com caminho e
+     total (ex.: "LGPD → Dir. Administrativo › Acesso à informação e proteção de dados (13)");
+     o clique marca o filtro. A lista de questões continua só no Filtrar (ADR-035).
+  4. **Tirar a trava da cascata:** Assunto e Subassunto passam a aceitar busca e marcação sem
+     disciplina marcada (hoje desabilitados até marcar o pai, 5H.3). Com o pai marcado, a
+     lista segue restrita aos filhos. Atualizar ADR-035 e `site/tests/test_filtros_cascata.py`.
+
+  Pronto quando: "LGPD", "LAI", "12527" e "LRF" na palavra-chave trazem todas as questões do
+  nó; conferido no Chromium headless; `make check` verde; piloto inalterado (2.800 itens, 129
+  anuladas).
 
 - `[ ]` **Incidência de subassunto com vários recortes** (pedido do dono, 2026-10-09).
   A parte de filtros e recortes (banca, ano, órgão, nível, drill-down) passou para a **8.M.2**.
