@@ -15,6 +15,7 @@ Uso:
     python -m scripts.curar_arvore --fundir ORIGEM:DESTINO
     python -m scripts.curar_arvore --mover NO:NOVO_PAI
     python -m scripts.curar_arvore --criar 'assunto:PAI=Nome'   # matéria: 'materia:=Nome'
+    python -m scripts.curar_arvore --criar 'assunto:PAI=Nome' --permitir-norma-repetida
     python -m scripts.curar_arvore --renomear 'NO=Novo nome'
     python -m scripts.curar_arvore --html
 """
@@ -152,6 +153,18 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
             raise arvore.ArvoreInvalida(
                 f"Nível {nivel!r} inválido (use {', '.join(arvore.NIVEIS)})"
             )
+        existentes = (
+            [] if args.permitir_norma_repetida else arvore.nos_da_mesma_norma(arv, nome)
+        )
+        if existentes:
+            detalhes = "; ".join(
+                f"{i} ({arvore._caminho_no(arv, i)})" for i in existentes
+            )
+            raise arvore.ArvoreInvalida(
+                f"[NORMA_JA_EXISTE] {nome!r} já existe como norma em {detalhes}. "
+                f"Use --mapear ITEM:{existentes[0]} para apontar o item ao nó "
+                "existente, ou --permitir-norma-repetida se for outro conceito"
+            )
         no_id = arvore.criar_no(arv, nivel, nome, pai.strip() or None)
         feitas.append(f"criado {no_id} ({nivel}) {nome!r}")
     if args.renomear is not None:
@@ -171,6 +184,18 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
         ids = [_exigir_no(arv, n.strip()) for n in nos.split(",") if n.strip()]
         arvore.mapear(arv, item, ids, origem="humano", status="aprovado")
         feitas.append(f"mapeado {item!r} → {', '.join(ids)}")
+        alvos = {arvore.resolver_no(arv, n) for n in ids}
+        for alvo in sorted(alvos):
+            no = arv.nos[alvo]
+            repetidos = arvore.nos_da_mesma_norma(arv, no.nome, ignorar=alvos)
+            if repetidos:
+                detalhes = "; ".join(
+                    f"{i} ({arvore._caminho_no(arv, i)})" for i in repetidos
+                )
+                feitas.append(
+                    f"[AVISO NORMA_REPETIDA] {no.nome!r} ({alvo}) também existe em "
+                    f"{detalhes}: funda com --fundir se for o mesmo conceito"
+                )
     if args.aprovar_proposta is not None:
         ids = [p.strip() for p in args.aprovar_proposta.split(",") if p.strip()]
         if not ids:
@@ -208,15 +233,27 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Curadoria da árvore mestre (ADR-030)")
     parser.add_argument(
-        "--mapear", help="ITEM:NO1,NO2 — aponta o item para os nós (aprovado)"
+        "--mapear",
+        help="ITEM:NO1,NO2 — aponta o item para os nós (aprovado); avisa se o nó "
+        "é uma norma que já existe em outro lugar (aviso, não bloqueia)",
     )
     parser.add_argument("--desmapear", help="ITEM:NO — remove o apontamento")
     parser.add_argument("--aprovar", help="ITEM:NO — aprova um apontamento proposto")
     parser.add_argument("--rejeitar", help="ITEM:NO — rejeita um apontamento proposto")
-    parser.add_argument("--fundir", help="ORIGEM:DESTINO — funde nós (nível diferente só se a origem não tem filhos ativos)")
+    parser.add_argument(
+        "--fundir",
+        help="ORIGEM:DESTINO — funde nós (nível diferente só se a origem não tem filhos ativos)",
+    )
     parser.add_argument("--mover", help="NO:PAI — troca o pai (nível de cima)")
     parser.add_argument(
-        "--criar", help="NIVEL:PAI=Nome — cria nó (matéria: 'materia:=Nome')"
+        "--criar",
+        help="NIVEL:PAI=Nome — cria nó (matéria: 'materia:=Nome'); recusa norma "
+        "que já existe em outro nó ([NORMA_JA_EXISTE])",
+    )
+    parser.add_argument(
+        "--permitir-norma-repetida",
+        action="store_true",
+        help="com --criar: desliga a trava de norma repetida (outro conceito de mesmo nome)",
     )
     parser.add_argument("--renomear", help="NO=Nome — renomeia o nó")
     parser.add_argument(

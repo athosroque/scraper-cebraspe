@@ -315,3 +315,13 @@ Pendências decididas pelo dono (2026-10-07): fundidos os assuntos "Estoques" e 
 **Efeito no banco.** Não exige mudar o SQL. `vw_no_caminho` resolve o fundido pelo `fundido_em` e devolve nível, caminho, `materia_id` e `assunto_id` do **destino**, e `vw_questao_no`, `vw_arvore_edital_por_cargo` e `vw_discursivas` usam esse `no_efetivo`. A questão apontada para um subassunto fundido num assunto passa a contar no assunto e na matéria dele, sem ficar pendurada. As pontes e `questao_no`/`discursiva_no` já gravam o nó resolvido.
 
 **Consolidações aprovadas pelo dono (2026-10-12).** LGPD em `AL-c842e3b083` (2 assuntos e 4 subassuntos fundidos), LRF em `AL-02b4bc3a67` (4 assuntos e 1 subassunto) e suprimento de fundos em `SL-1620382828` (3 subassuntos, incluindo "regime de adiantamento", nome legal do instituto, e 2 assuntos). Um nó por conceito.
+
+## Atualização (2026-10-12, KAN-64 fase 2): um conceito com nome próprio, um lugar
+
+**Regra.** Norma (lei, LC, decreto) ou técnica com nome próprio vive em um nó ativo só da árvore, classificado pelo conceito e não pela disciplina do caderno. Rótulo genérico ("Legislação pertinente") pode repetir sob pais diferentes, porque não é um conceito.
+
+**Exemplo aplicado.** DIREITO ADMINISTRATIVO › Acesso à informação e proteção de dados › {Lei de Acesso à Informação, LGPD}. A LAI de TI e a de Arquivologia (sob "Legislação pertinente") foram fundidas nesse nó, junto com o Decreto nº 7.724/2012, que regulamenta a LAI. A LGPD estava em 6 lugares (2 assuntos e 4 subassuntos) e ficou num nó só.
+
+**Consequência.** Questão de LAI numa prova de Arquivologia passa a contar em Direito Administrativo, e é esperado. O concurso e o cargo da questão, e a matéria de origem do item de edital, continuam guardados, então a leitura por prova e por cargo não se perde.
+
+**Travas.** `curar_arvore --criar` recusa norma que já existe em outro nó (`[NORMA_JA_EXISTE]`, com `--permitir-norma-repetida` para o caso de ser outro conceito); `--mapear` avisa quando o alvo é norma repetida (`[AVISO NORMA_REPETIDA]`, sem bloquear). O teste `test_normas_consolidadas_em_um_no_so` guarda LGPD, LAI e LRF. O P6 do runbook do lote roda o detector de dispersão depois de cada carga. A curadoria por LLM só propõe fundir e mover, e não cria nó.

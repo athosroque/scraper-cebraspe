@@ -41,6 +41,7 @@ Concursos de exemplo: `SEFA_PR_25` e `BANRISUL_25`. Tempos medidos em 2026-10-12
 | P4 Questões | feito pelo P3; repetir com `stats_writer` e `extrair_questoes` | Fila `concluido`; 380 + 230 itens ME | incluído no P3 | incluído no P3 |
 | P4b Correção | `venv/bin/python -m scripts.extrair_questoes --reprocessar` (só se o parser mudar) | snapshot antes/depois: piloto idêntico, só a mudança esperada | 16 s (87 cadernos) | 0 |
 | P5 Conferência | consultas a–e e PDF | Consultas a–e (seção 4.5); 3 questões iguais ao PDF | manual | 0 |
+| P6 Dispersão da árvore | `venv/bin/python -m scripts.detectar_dispersao_arvore --dry-run`, depois `--propor` | Grupos novos com nós do lote; norma em dois lugares vira proposta para o dono | não medido | 0 |
 
 Tempo de P3 e P4 juntos: 912 s para os 2 concursos (sem contar P0 a P2). Custo LLM total do
 lote de calibração: US$ 0,018.
@@ -353,6 +354,25 @@ Defeitos que a conferência de PDF não pega, para a C1b:
 **Se falhar:** qualquer invariante do piloto que mudou sem motivo = pare, não aprove nada.
 Use o backup do P0.
 
+### 4.6 P6 — Árvore: dispersão de conceitos (custo zero)
+
+Roda depois da carga do lote (P3/P4 de todos os editais do lote) e antes da classificação
+das questões na C1b. Não usa LLM. Regra (KAN-64): um conceito com nome próprio fica em um
+nó só; o detector acha o mesmo conceito sob pais diferentes.
+
+```bash
+venv/bin/python -m scripts.detectar_dispersao_arvore --dry-run   # só relatório
+venv/bin/python -m scripts.detectar_dispersao_arvore --propor    # grava as propostas
+```
+
+O que conferir:
+- grupos novos que envolvem nós criados pelos editais do lote;
+- norma (lei, LC, decreto) que aparece em dois lugares da árvore: vira proposta para o dono,
+  e não é fundida pelo agente;
+- o detector erra às vezes (ex.: Receita × Despesa pública), então cada grupo é uma decisão.
+
+Custo: US$ 0.
+
 ## 5. Pausas do dono
 
 1. **Revisão do edital (depois do P3):** abrir `https://datasette.projetoathos.com.br/relatorio/index.html`,
@@ -361,6 +381,9 @@ Use o backup do P0.
    - Antes disso o concurso fica `pendente` e fora da estatística oficial.
    - As questões já entram no banco nesse meio-tempo.
 2. **Figura e texto da tabela (C1b):** conferir no site a Q36 do BANRISUL.
+3. **Dispersão da árvore (P6):** aprovar ou rejeitar as propostas do detector por grupo, nunca
+   em bloco (`python -m scripts.curar_arvore --aprovar-proposta <ids>` ou `--rejeitar-proposta <ids>`).
+   O detector erra (ex.: Receita × Despesa pública), então cada grupo é uma decisão.
 
 ## 6. Armadilhas conhecidas
 
@@ -386,3 +409,5 @@ Use o backup do P0.
 - Custo pelo OpenRouter (`/api/v1/key`), e não só o Langfuse.
 - Consulta (d) e a de alternativa terminando em caixa alta como alerta do lote.
 - Invariante do piloto (consulta e) como checagem automática antes e depois do lote.
+- Rodar `detectar_dispersao_arvore --propor` como passo fixo depois da carga de cada lote e
+  listar as propostas novas no relatório do lote (KAN-64).

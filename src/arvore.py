@@ -1266,6 +1266,32 @@ def _nome_e_a_norma(nome: str) -> bool:
     )
 
 
+def nos_da_mesma_norma(
+    arv: ArvoreMestre, nome: str, ignorar: set[str] | None = None
+) -> list[str]:
+    """IDs (ordenados) dos nós ativos, fora da matéria, que são a mesma norma
+    de `nome` (ADR-030, KAN-64: um conceito com nome próprio, um lugar).
+
+    Vale só quando `nome` e o nó são essencialmente a norma (`_nome_e_a_norma`)
+    e citam o mesmo tipo e número. Recorte do tema ("Crimes ... (Lei X)") não
+    entra, e fundido ou aposentado também não. Se `nome` não é uma norma,
+    devolve [].
+    """
+    if not _nome_e_a_norma(nome):
+        return []
+    normas = _normas_do_nome(nome)
+    ignorar = ignorar or set()
+    return sorted(
+        no.id
+        for no in arv.nos.values()
+        if no.status == "ativo"
+        and no.nivel != "materia"
+        and no.id not in ignorar
+        and _nome_e_a_norma(no.nome)
+        and normas & _normas_do_nome(no.nome)
+    )
+
+
 def _singular_simples(t: str) -> str:
     return t[:-1] if t.endswith("s") and len(t) > 3 else t
 

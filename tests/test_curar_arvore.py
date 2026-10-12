@@ -332,3 +332,48 @@ def test_cli_aprovar_e_rejeitar_proposta_com_ids_duplicados_deduplica_log(
     assert rodar("--rejeitar-proposta", f"{p2},{p2}") == 0
     out_rej = capsys.readouterr().out
     assert out_rej.strip() == f"propostas rejeitadas: {p2}"
+
+
+def _com_norma_no_arquivo(path):
+    """Acrescenta a mesma lei sob duas matérias (ADR-030, KAN-64)."""
+    arv = carregar(path)
+    criar_no(arv, "assunto", "Lei nº 4.320/1964", "M-1", id_override="A-N1")
+    criar_no(arv, "assunto", "Lei nº 4.320/1964", "M-2", id_override="A-N2")
+    salvar(arv, path)
+
+
+def test_criar_norma_ja_existente_e_recusada(ambiente, capsys):
+    path, _, rodar = ambiente
+    _com_norma_no_arquivo(path)
+    antes = path.read_text(encoding="utf-8")
+    assert rodar("--criar", "assunto:M-2=Lei nº 4.320/1964") == 1
+    erro = capsys.readouterr().err
+    assert "[NORMA_JA_EXISTE]" in erro
+    assert "--mapear ITEM:A-N1" in erro
+    assert path.read_text(encoding="utf-8") == antes
+
+
+def test_criar_norma_repetida_com_flag_cria(ambiente):
+    path, _, rodar = ambiente
+    _com_norma_no_arquivo(path)
+    assert (
+        rodar("--criar", "assunto:M-1=Lei nº 4.320/1964", "--permitir-norma-repetida")
+        == 0
+    )
+    nomes = [
+        no.id
+        for no in carregar(path).nos.values()
+        if no.nome == "Lei nº 4.320/1964" and no.status == "ativo"
+    ]
+    assert len(nomes) == 3
+
+
+def test_mapear_no_de_norma_repetida_avisa(ambiente, capsys):
+    path, _, rodar = ambiente
+    _com_norma_no_arquivo(path)
+    assert rodar("--mapear", "direito|lei:A-N1") == 0
+    saida = capsys.readouterr().out
+    assert "[AVISO NORMA_REPETIDA]" in saida
+    assert "A-N2" in saida
+    [m] = carregar(path).mapeamentos["direito|lei"]
+    assert (m.no_id, m.status) == ("A-N1", "aprovado")

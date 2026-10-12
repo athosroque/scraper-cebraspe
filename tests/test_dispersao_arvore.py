@@ -189,3 +189,79 @@ def test_relatorio_lista_grupo_e_proposta():
     texto = script.gerar_relatorio(arv, grupos, propostas, erros, gravou=True)
     assert "Gestão por competências" in texto
     assert next(iter(propostas.values())) in texto
+
+
+def test_nos_da_mesma_norma_acha_a_lei_escrita_de_dois_jeitos():
+    """ADR-030, KAN-64: a mesma norma em matérias diferentes é um só conceito."""
+    arv, ids = _arv(
+        {
+            "Orçamento": {
+                "Lei de Responsabilidade Fiscal (Lei Complementar nº 101/2000)": [],
+            },
+            "Contabilidade": {"Lei Complementar nº 101/2000": []},
+        }
+    )
+    achados = arvore.nos_da_mesma_norma(arv, "Lei Complementar nº 101/2000")
+    assert achados == sorted(
+        [
+            ids[
+                (
+                    "Orçamento",
+                    "Lei de Responsabilidade Fiscal (Lei Complementar nº 101/2000)",
+                )
+            ],
+            ids[("Contabilidade", "Lei Complementar nº 101/2000")],
+        ]
+    )
+
+
+def test_nos_da_mesma_norma_ignora_recorte_do_tema():
+    arv, ids = _arv(
+        {
+            "Direito Penal": {"Crimes previstos na Lei nº 9.605/1998": []},
+            "Direito Ambiental": {"Lei nº 9.605/1998": []},
+        }
+    )
+    assert arvore.nos_da_mesma_norma(arv, "Lei nº 9.605/1998") == [
+        ids[("Direito Ambiental", "Lei nº 9.605/1998")]
+    ]
+    assert arvore.nos_da_mesma_norma(arv, "Crimes previstos na Lei nº 9.605/1998") == []
+
+
+def test_nos_da_mesma_norma_ignora_fundido_e_aposentado():
+    arv, ids = _arv(
+        {
+            "Orçamento": {"Lei nº 4.320/1964": []},
+            "Contabilidade": {"Lei nº 4.320/1964": []},
+            "Auditoria": {"Lei nº 4.320/1964": []},
+        }
+    )
+    fundido = ids[("Orçamento", "Lei nº 4.320/1964")]
+    aposentado = ids[("Contabilidade", "Lei nº 4.320/1964")]
+    ativo = ids[("Auditoria", "Lei nº 4.320/1964")]
+    arv.nos[fundido].status = "fundido"
+    arv.nos[fundido].fundido_em = ativo
+    arv.nos[aposentado].status = "aposentado"
+    assert arvore.nos_da_mesma_norma(arv, "Lei nº 4.320/1964") == [ativo]
+
+
+def test_nos_da_mesma_norma_respeita_ignorar():
+    arv, ids = _arv(
+        {
+            "Orçamento": {"Lei nº 4.320/1964": []},
+            "Contabilidade": {"Lei nº 4.320/1964": []},
+        }
+    )
+    um = ids[("Orçamento", "Lei nº 4.320/1964")]
+    outro = ids[("Contabilidade", "Lei nº 4.320/1964")]
+    assert arvore.nos_da_mesma_norma(arv, "Lei nº 4.320/1964", ignorar={um}) == [outro]
+
+
+def test_nos_da_mesma_norma_vazio_para_nome_sem_norma():
+    arv, _ = _arv(
+        {
+            "Orçamento": {"Balanced Scorecard": []},
+            "Administração": {"Balanced Scorecard": []},
+        }
+    )
+    assert arvore.nos_da_mesma_norma(arv, "Balanced Scorecard") == []

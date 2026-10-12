@@ -1153,6 +1153,11 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     legítimos ("Conceito", "Disposições gerais"). Fazer: detector de dispersão (regra, com lista de
     nomes genéricos), relatório para o dono, fusões aprovadas por ele, carga e conferência no site.
     Antes da C1b, que liga os itens novos do lote aos nós.
+    Fase 2 (dono em 2026-10-12, ADR-030): regra "um conceito com nome próprio, um lugar".
+    DIREITO ADMINISTRATIVO › Acesso à informação e proteção de dados › {LAI 8, LGPD 13} (21
+    questões; LAI de Arquivologia e TI fundida). Travas: `--criar` recusa norma repetida,
+    `--mapear` avisa, `test_normas_consolidadas_em_um_no_so` (LGPD, LAI, LRF) e o P6 do runbook
+    (detector depois de cada lote). Falta: as 184 propostas com o dono (ex.: Lei 8.112 em 3 nós).
   - `[ ]` C1b.1 (KAN-65, **prioridade alta**, dono em 2026-10-12) Árvore: gestão estratégica (BSC,
     SWOT, GUT, 5W2H, Canvas, referencial estratégico, indicadores) numa casa só, com um subassunto
     por ferramenta; nomes compostos ("Ferramentas…: SWOT; BSC…") apontam para as partes (ADR-030).

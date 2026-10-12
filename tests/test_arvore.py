@@ -1,10 +1,14 @@
 import pytest
 
 from src.arvore import (
+    ARVORE_PADRAO,
     ArvoreInvalida,
     ArvoreMestre,
     Mapeamento,
     Proposta,
+    _caminho_no,
+    _nome_e_a_norma,
+    _normas_do_nome,
     _verificar_ciclo,
     aposentar_no,
     aprovar,
@@ -957,6 +961,34 @@ def test_arvore_curada_sem_disciplinas_homonimas():
         if no.status == "ativo" and no.nivel == "materia":
             nomes.setdefault(chave_regra(no.nome).chave, []).append(no.id)
     assert {k: v for k, v in nomes.items() if len(v) > 1} == {}
+
+
+# Normas consolidadas no nó único (KAN-64). A lista só cresce quando o dono
+# consolida uma norma nova; não acrescente norma aqui para "passar" um teste.
+NORMAS_CONSOLIDADAS = {
+    "LGPD": {("lei", "13709")},
+    "LAI": {("lei", "12527")},
+    "LRF": {("lei complementar", "101")},
+}
+
+
+def test_normas_consolidadas_em_um_no_so():
+    """Um conceito com nome próprio, um lugar (ADR-030, KAN-64): cada norma
+    consolidada tem exatamente um nó ativo fora da matéria."""
+    arv = carregar(ARVORE_PADRAO)
+    falhas = {}
+    for sigla, normas in NORMAS_CONSOLIDADAS.items():
+        nos = [
+            no
+            for no in arv.nos.values()
+            if no.status == "ativo"
+            and no.nivel != "materia"
+            and _nome_e_a_norma(no.nome)
+            and _normas_do_nome(no.nome) & normas
+        ]
+        if len(nos) != 1:
+            falhas[sigla] = [f"{no.id} ({_caminho_no(arv, no.id)})" for no in nos]
+    assert not falhas, f"norma em mais de um lugar ou sumida: {falhas}"
 
 
 def _arv_entre_niveis():

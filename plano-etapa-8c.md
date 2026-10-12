@@ -153,6 +153,8 @@ toda pausa do dono e em falha bloqueante.
   BANRISUL Q22, SEFA_PR Q11 e Q50). O alerta não bloqueia.
 - `--concurso` no `classificar_questoes` (hoje só `--caderno`).
 - Testes com etapas mockadas: retomada, parada na pausa, `--aprovar`.
+- Passo fixo: detector de dispersão da árvore (`detectar_dispersao_arvore --propor`) depois da
+  carga de cada lote; as propostas vão para o dono (KAN-64).
 
 **Pronto quando:** rodar o orquestrador sobre o lote da C1 em modo conferência não muda nada
 (idempotente) e o relatório do lote sai com as checagens verdes.
