@@ -18,7 +18,7 @@ Contexto que o dono deu depois (2026-10-12):
 
 - O ambiente de desenvolvimento é o **Orca**, que organiza sessões, branches, agentes e
   worktrees. Os agentes precisam achar esse contexto quando o dono pedir.
-- As tarefas ficam no **Jira** (KAN-N, via `scripts/jira_sync.py`).
+- As tarefas ficam no **Jira** (KAN-N, via MCP do Atlassian; ver `agents/WHEN-TO-USE.md`).
 - Vale combinar mais de uma ferramenta, cada uma na parte em que é melhor. Construir uma
   ferramenta própria só se a customização exigir.
 - A documentação precisa servir também para **vender o projeto como projeto executivo**.
