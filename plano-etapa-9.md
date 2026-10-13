@@ -1,6 +1,6 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
-Criado em 2026-10-12. Estado: **planejado, nenhuma sessão iniciada**.
+Criado em 2026-10-12. Estado: **planejado, nenhuma sessão iniciada**. Card: KAN-67.
 
 ## Pedido do dono
 
