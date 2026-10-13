@@ -1,18 +1,65 @@
 # Visão executiva
 
-Resumo do projeto para quem não acompanha o código: o problema, a solução, os números e o que vem a seguir.
+<a href="scraper-cebraspe-executivo.pdf" class="md-button so-tela">Baixar esta visão em PDF</a>
 
-**Para que serve:** explicar o projeto em poucos minutos, sem precisar de contexto técnico. Desta seção sai o PDF que o dono envia a quem é de fora, já que o site fica atrás do Cloudflare Access.
+Este projeto reúne os editais, as provas e os gabaritos dos concursos do CEBRASPE, organiza o conteúdo cobrado numa árvore de assuntos e transforma tudo isso num site de questões. Esta página resume o problema, a solução e o estágio atual. As outras páginas da seção detalham a arquitetura, os números, as decisões principais e o roadmap.
 
-!!! note "Em preparação"
+## O problema
 
-    O conteúdo desta seção vem na sessão D4 da Etapa 9 (KAN-71):
+Quem estuda para um concurso do CEBRASPE precisa saber o que mais cai na prova. O edital, porém, lista centenas de itens, e a banca não diz quais deles vão cair em cada certame. As questões de provas anteriores ficam em PDFs, sem ligação com o item do edital a que se referem. Na prática, o candidato resolve questões soltas, sem saber se o assunto é recorrente, se o edital o cobra ou quanto da prova ele representa.
 
-    - **Visão:** o problema, a solução e para quem ela serve.
-    - **Arquitetura** em diagrama C4.
-    - **Números atuais:** concursos, questões e custo de LLM.
-    - **Decisões principais**, com o resumo dos ADRs.
-    - **Roadmap** ligado ao Jira.
-    - **Exportação em PDF.**
+## A solução
 
-Enquanto isso, a página [Arquitetura](../guia/arquitetura/index.md) mostra como o sistema é montado, e a aba [Decisões](../adr/README.md) explica por que ele é assim.
+O projeto automatiza essa ligação em etapas:
+
+1. **Coleta.** Um robô percorre a lista de concursos encerrados, baixa os editais, as provas e os gabaritos, e confere se cada arquivo é um PDF válido, sem baixar o mesmo arquivo duas vezes.
+2. **Taxonomia do edital.** Um modelo de linguagem (LLM) lê o conteúdo cobrado no edital e propõe a lista de matérias, assuntos e subassuntos. Um humano revisa o resultado antes de ele entrar no banco.
+3. **Questões e gabarito.** O texto das provas é separado em questões, com o enunciado, as alternativas e o gabarito, por leitura direta do PDF, sem LLM.
+4. **Classificação.** Cada questão é ligada aos nós da árvore de assuntos. O LLM só escolhe entre opções fechadas, e o cálculo de quais assuntos estão ou não no edital é feito por regra.
+5. **Estatísticas.** Com as questões classificadas, o sistema calcula o que mais cai na prova, o que o edital cobra, o cruzamento entre edital e prova e o desempenho de cada candidato.
+6. **Site de questões.** As questões aparecem com filtros por matéria, assunto, banca, ano e órgão. Há contas com login Google, histórico de respostas e simulado. No simulado, as questões certo ou errado seguem a regra do CEBRASPE: uma resposta errada anula uma certa.
+
+## Para quem
+
+- **O estudante** que quer estudar pelo que cai, com o edital como referência.
+- **O curador**, que é o dono do projeto. Ele aprova a taxonomia de cada edital e decide as mudanças na árvore de assuntos que o LLM propõe.
+- **Quem avalia o portfólio** de Data Science e Data Engineering, para ver como o projeto foi construído.
+
+## O que o projeto mostra
+
+- **Engenharia de dados.** Coleta reexecutável, cargas idempotentes (que podem rodar de novo sem duplicar dados) e um banco Postgres próprio com modelagem dimensional (star schema).
+- **LLM com controle de custo e revisão humana.** O modelo só faz tarefas delimitadas, com lista fechada de opções e checagens determinísticas depois. Cada chamada é registrada para auditoria e para medir o custo.
+- **Modelagem de domínio.** Uma árvore de assuntos curada, em que um item do edital e uma questão apontam para os mesmos nós, e as estatísticas somam os resultados subindo na árvore.
+- **Testes e documentação viva.** Testes automatizados e uma documentação gerada a partir do próprio código, que é verificada a cada mudança.
+
+## Onde está hoje
+
+O piloto com cinco concursos de 2025 foi validado do início ao fim, da coleta ao site. A coleta dos concursos de múltipla escolha de 2025 está em andamento. Os números atuais, como concursos, questões e custo de LLM, estão em [Números](numeros.md). O que vem a seguir está em [Roadmap](roadmap.md).
+
+<div class="grid cards so-tela" markdown>
+
+-   :material-sitemap-outline: **[Arquitetura](arquitetura.md)**
+
+    ---
+
+    Como as peças se encaixam, da listagem do CEBRASPE até o site, em diagramas.
+
+-   :material-chart-bar: **[Números](numeros.md)**
+
+    ---
+
+    Concursos, questões, cargos e custo de LLM, lidos do banco e atualizados a cada geração.
+
+-   :material-scale-balance: **[Decisões principais](decisoes.md)**
+
+    ---
+
+    As escolhas que mais pesam no projeto, com o problema, a decisão e o trade-off de cada uma.
+
+-   :material-map-marker-path: **[Roadmap](roadmap.md)**
+
+    ---
+
+    O que já foi entregue, o que está em andamento e os próximos passos.
+
+</div>

@@ -71,6 +71,14 @@ SCRIPTS: tuple[Script, ...] = (
         uso_argv="python -m scripts.experimento_falhas_llm [caminho_auditoria.json]",
     ),
     Script(
+        "scripts.exportar_pdf_executivo",
+        "Exporta a visão executiva do site de documentação para PDF, para quem está "
+        "fora do Cloudflare Access.",
+        "relatorio",
+        "argparse",
+        adrs=("ADR-040",),
+    ),
+    Script(
         "scripts.extrair_questoes",
         "Consumidor da fila de extração: extrai questões, gabaritos e discursivas, sem "
         "LLM.",
@@ -91,6 +99,14 @@ SCRIPTS: tuple[Script, ...] = (
         "Gera as páginas de docs/tecnico/ a partir do registro (Etapa 9/D2).",
         "relatorio",
         "argparse",
+    ),
+    Script(
+        "scripts.gerar_numeros",
+        "Gera a página de números da visão executiva a partir do banco e do custo de "
+        "LLM no OpenRouter.",
+        "relatorio",
+        "argparse",
+        adrs=("ADR-040", "ADR-041"),
     ),
     Script(
         "scripts.gerar_relatorio_arvore",

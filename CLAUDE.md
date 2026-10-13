@@ -124,7 +124,7 @@ fica só o estado resumido. Mantenha o título de cada item (o texto antes do ` 
       depois da 8.C; detalhes no `task.md`.
 - [ ] Etapa 9 Documentação viva (MkDocs executivo + técnico, contexto para agentes) e Dagster como C2 — plano em
       `plano-etapa-9.md` (KAN-67). D1 (KAN-68, ADR-040), D2 (KAN-69, ADR-041) e
-      D3 (KAN-70) concluídas; próximas D4 (KAN-71, executivo e PDF), D5a e
+      D3 (KAN-70) concluídas; D4 (KAN-71, executivo e PDF) em análise; próximas D5a e
       D5b (KAN-31 e KAN-32, Dagster).
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06 (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -187,18 +187,23 @@ vai para cá se for do núcleo (`nucleo=True`).
 Documentação (Etapa 9/D1, ADR-040):
 
 - `make docs-serve`: local em `127.0.0.1:8001`, com recarga ao salvar.
-- `make docs-build`: `mkdocs build --strict` em `build/docs`; também roda no `make check`.
+- `make docs-build`: `mkdocs build --strict` em `build/docs`, mais o PDF da visão executiva
+  (`scripts/exportar_pdf_executivo.py`, Chromium do Playwright) em
+  `build/docs/executivo/scraper-cebraspe-executivo.pdf`; também roda no `make check`.
 - `make docs-build && docker compose up -d scraper-cebraspe-docs`: nginx em
   `127.0.0.1:8013` e `docs.projetoathos.com.br` via Traefik + Cloudflare Access.
 - Página nova em `docs/` entra no `nav` do `mkdocs.yml`, na aba e seção do seu propósito
   (seção nova ganha `index.md` de abertura; ADR-040), senão o `--strict` falha.
 - `make hooks-instalar` (uma vez por clone): instala os hooks `post-commit` e `post-merge` em `.git/hooks`
   (encadeando o que já existir). Depois disso, commit ou merge no checkout principal que toca `docs/`,
-  `mkdocs.yml`, `scripts/gerar_docs.py` ou `src/registro/` roda o `docs-build` sozinho, em segundo
+  `mkdocs.yml`, `scripts/gerar_docs.py`, `scripts/gerar_numeros.py`,
+  `scripts/exportar_pdf_executivo.py` ou `src/registro/` roda o `docs-build` sozinho, em segundo
   plano, com log em `logs/publicar_docs.log`. Worktree não publica (ADR-040).
 - `make docs-gerar` (Etapa 9/D2, ADR-041): regera `docs/tecnico/` (pipeline, comandos,
   regras, checagens e banco) a partir de `src/registro/`; lê o schema do banco. Sem banco:
-  `venv/bin/python -m scripts.gerar_docs --sem-banco`; conferir: `--verificar`.
+  `venv/bin/python -m scripts.gerar_docs --sem-banco`; conferir: `--verificar`. Também regera
+  `docs/executivo/numeros.md` (Etapa 9/D4) com `scripts/gerar_numeros.py`, que lê o banco e o
+  custo acumulado das chaves no OpenRouter; sem rede, `--sem-custo`.
 
 ## 9.2. Revisão via Datasette (Etapa 4 — checkpoint de revisão humana)
 

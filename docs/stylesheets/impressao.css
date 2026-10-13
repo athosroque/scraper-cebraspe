@@ -1,0 +1,126 @@
+/* Estilos de impressão do PDF executivo (D4, KAN-71). Só valem em @media print:
+   o site na tela não muda. O PDF é gerado por scripts/exportar_pdf_executivo.py. */
+
+@media print {
+  /* Chrome do site: cabeçalho, abas, barras laterais, rodapé, "voltar ao topo". */
+  .md-header,
+  .md-tabs,
+  .md-path,
+  .md-sidebar,
+  .md-footer,
+  .md-top,
+  .md-search,
+  .md-skip,
+  .md-dialog,
+  .md-content__button,
+  .md-source-file,
+  .md-clipboard,
+  .so-tela {
+    display: none !important;
+  }
+
+  /* Âncoras de título e botões de copiar código não fazem sentido no papel. */
+  .headerlink {
+    display: none !important;
+  }
+
+  /* Conteúdo a 100% da largura, sem as margens da tela. */
+  .md-main,
+  .md-main__inner,
+  .md-container,
+  .md-content,
+  .md-content__inner,
+  .md-grid {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  body,
+  .md-main {
+    background: #ffffff !important;
+    color: #18181b !important;
+  }
+
+  /* Texto de leitura: ~11pt com entrelinha confortável. */
+  .md-typeset {
+    font-size: 11pt;
+    line-height: 1.55;
+    color: #27272a;
+  }
+
+  .md-typeset pre,
+  .md-typeset code {
+    font-size: 9pt;
+  }
+
+  .md-typeset pre {
+    white-space: pre-wrap;
+    break-inside: avoid;
+  }
+
+  /* Links na cor do texto e sem sublinhado: no papel, a URL é o que importa. */
+  .md-typeset a,
+  .md-typeset a:visited {
+    color: inherit !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Blocos que não podem ser cortados ao meio entre duas páginas. */
+  .md-typeset table,
+  .md-typeset .admonition,
+  .md-typeset details,
+  .md-typeset .tabbed-set,
+  .grid.cards > ul > li,
+  .mermaid,
+  figure,
+  img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Título nunca fica sozinho no fim da página. */
+  .md-typeset h1,
+  .md-typeset h2,
+  .md-typeset h3,
+  .md-typeset h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .md-typeset h2 {
+    margin-top: 1.6em;
+  }
+
+  /* Cartões em grade viram uma coluna, cada um com a largura da folha. */
+  .grid.cards > ul {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid.cards > ul > li {
+    margin: 0 0 0.6em 0 !important;
+  }
+
+  /* Diagramas Mermaid ocupam a largura da folha. */
+  /* Diagrama que cabe numa folha nunca é cortado (break-inside acima). Um que é
+     mais alto que a folha ainda é cortado: o SVG fica num shadow root fechado, e
+     reduzi-lo com zoom deixou o texto ilegível. Diagramas altos devem ser LR. */
+  .mermaid {
+    display: block;
+    margin: 0.8em 0;
+    text-align: center;
+  }
+
+  .mermaid svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Tabelas com cabeçalho repetido em cada página quando passam de uma folha. */
+  .md-typeset thead {
+    display: table-header-group;
+  }
+}

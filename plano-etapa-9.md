@@ -1,7 +1,8 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
 Criado em 2026-10-12. Estado: **D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas e aprovadas (2026-10-13);
-próxima: D4 (KAN-71); decisões do dono fechadas em 2026-10-13**.
+D4 (KAN-71) feita, em análise pelo dono; próximas: D5a e D5b (KAN-31 e KAN-32); decisões do dono
+fechadas em 2026-10-13**.
 
 > Jira: KAN-67 (etapa); D1 = KAN-68, D2 = KAN-69, D3 = KAN-70, D4 = KAN-71; D5a = KAN-31 e
 > D5b = KAN-32 (são a C2 da 8.C, `plano-etapa-8c.md`).
@@ -187,6 +188,20 @@ checagens.
 - Exportação em PDF, para quem é de fora (o site fica atrás do Cloudflare Access).
 - Pronto quando: o dono consegue enviar o PDF a alguém de fora sem precisar explicar o
   projeto antes.
+- Feito (2026-10-13, em análise pelo dono; atualização D4 no ADR-040): a aba "Visão
+  executiva" tem 5 páginas. São elas: `executivo/index.md` (problema, solução, para quem e
+  botão do PDF), `arquitetura.md` (C4 níveis 1 e 2 em `flowchart`), `numeros.md`,
+  `decisoes.md` (12 decisões com link para a ADR) e `roadmap.md` (concluído, em andamento e
+  próximos, com os KAN-N). `numeros.md` é **gerada** por `scripts/gerar_numeros.py` no `make
+  docs-gerar`: lê o banco (schema `public`) e o custo acumulado das chaves no OpenRouter
+  (`/api/v1/key`). A API v2 do Langfuse devolve custo 0, por isso não serve como fonte.
+  `scripts/exportar_pdf_executivo.py` roda dentro do `make docs-build`, antes do rsync, e grava
+  `executivo/scraper-cebraspe-executivo.pdf` (capa, sumário, rodapé numerado e links para o
+  domínio). O CSS de impressão fica em `docs/stylesheets/impressao.css`, e a classe `so-tela`
+  esconde do PDF o que só serve na tela. Testes: `tests/test_gerar_numeros.py` e
+  `tests/test_exportar_pdf_executivo.py` (este com integração `slow` no Chromium).
+  Pendências para o dono: confirmar se o custo de LLM (US$ 0,31 nas chaves atuais) cobre o
+  histórico do projeto ou se houve troca de chave, e ler o PDF antes de enviá-lo.
 
 ### D5a: Dagster, infra e assets (KAN-31; é a C2 da 8.C, parte 1)
 

@@ -252,7 +252,11 @@ TAREFAS: tuple[Tarefa, ...] = (
         ),
         areas=("processo", "infra"),
         regras=("P69",),
-        scripts=("scripts.gerar_docs",),
+        scripts=(
+            "scripts.gerar_docs",
+            "scripts.gerar_numeros",
+            "scripts.exportar_pdf_executivo",
+        ),
         checagens=("K34",),
         adrs=("ADR-040", "ADR-041"),
     ),

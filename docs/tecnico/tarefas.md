@@ -381,7 +381,7 @@ Você vai criar script, etapa, regra ou página de documentação do projeto.
 - [A61](regras.md#a61) Nunca usar o `site_dir` padrão do MkDocs (`site/`): o build apagaria o app FastAPI em `site/`. O build vai …
 - [A62](regras.md#a62) (núcleo) Nunca editar à mão as páginas de `docs/tecnico/`: são geradas de `src/registro/` por `scripts/gerar_docs.py` …
 
-**Comandos:** [`python -m scripts.gerar_docs`](comandos.md#python--m-scriptsgerar_docs)
+**Comandos:** [`python -m scripts.gerar_docs`](comandos.md#python--m-scriptsgerar_docs), [`python -m scripts.gerar_numeros`](comandos.md#python--m-scriptsgerar_numeros), [`python -m scripts.exportar_pdf_executivo`](comandos.md#python--m-scriptsexportar_pdf_executivo)
 
 **Checagens:** [K34](checagens.md#k34-suíte-do-pipeline-verde-make-test-pipeline)
 

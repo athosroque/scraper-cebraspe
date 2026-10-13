@@ -42,6 +42,7 @@ theme:
 
 extra_css:
   - stylesheets/tema.css
+  - stylesheets/impressao.css
 
 plugins:
   - search:
@@ -87,7 +88,12 @@ validation:
 
 nav:
   - Início: index.md
-  - Visão executiva: executivo/index.md
+  - Visão executiva:
+      - executivo/index.md
+      - Arquitetura: executivo/arquitetura.md
+      - Números: executivo/numeros.md
+      - Decisões principais: executivo/decisoes.md
+      - Roadmap: executivo/roadmap.md
   - Guia técnico:
       - guia/index.md
       - Para agentes:

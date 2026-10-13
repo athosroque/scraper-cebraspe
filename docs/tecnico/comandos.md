@@ -214,6 +214,18 @@ Atualiza em sequência os artefatos derivados da revisão humana e reinicia o Da
 python -m scripts.atualizar_revisao [diretorio_revisao]
 ```
 
+### `python -m scripts.exportar_pdf_executivo`
+
+Exporta a visão executiva do site de documentação para PDF, para quem está fora do Cloudflare Access.
+
+**ADRs:** [ADR-040](../adr/ADR-040-site-documentacao-mkdocs.md)
+
+| Argumento | Ajuda | Padrão |
+|---|---|---|
+| `--site` | diretório de um build do MkDocs (padrão: build/docs) | `SITE_PADRAO` |
+| `--saida` | — | `None` |
+| `--url-base` | endereço público que substitui o servidor local nos links do PDF | `URL_BASE_PADRAO` |
+
 ### `python -m scripts.gerar_db_datasette`
 
 Constrói o banco SQLite servido via Datasette para revisão humana.
@@ -232,6 +244,17 @@ Gera as páginas de docs/tecnico/ a partir do registro (Etapa 9/D2).
 |---|---|---|
 | `--sem-banco` | não gera banco.md e não abre conexão com o banco | — |
 | `--verificar` | não grava; compara com o disco e sai com 1 se algum arquivo difere | — |
+
+### `python -m scripts.gerar_numeros`
+
+Gera a página de números da visão executiva a partir do banco e do custo de LLM no OpenRouter.
+
+**ADRs:** [ADR-040](../adr/ADR-040-site-documentacao-mkdocs.md), [ADR-041](../adr/ADR-041-registro-e-paginas-geradas.md)
+
+| Argumento | Ajuda | Padrão |
+|---|---|---|
+| `--sem-custo` | não consulta o OpenRouter; a seção de custo diz que não foi consultada | — |
+| `--saida` | arquivo Markdown a gravar (padrão: docs/executivo/numeros.md) | `DESTINO` |
 
 ### `python -m scripts.gerar_relatorio_arvore`
 

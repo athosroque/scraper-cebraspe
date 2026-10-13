@@ -137,3 +137,41 @@ Alternativas descartadas:
   nginx e duplica dependências, para resolver algo que um hook curto resolve.
 - **CI/deploy:** o site é local; não há pipeline de entrega para acionar.
 
+
+## Atualização (2026-10-13): visão executiva e PDF (D4, KAN-71)
+
+A aba "Visão executiva" era um aviso de "em preparação". **Decisão:** ela passa a ter 5 páginas
+(visão, arquitetura C4, números, decisões principais e roadmap) e sai também como PDF, para
+quem está fora do Cloudflare Access.
+
+- **Números gerados, não digitados.** `docs/executivo/numeros.md` é escrita por
+  `scripts/gerar_numeros.py`, que o `make docs-gerar` roda depois do `gerar_docs`. O script lê o
+  banco (só leitura, schema `public`) e o custo acumulado de cada chave no OpenRouter
+  (`/api/v1/key`). O Langfuse não serve como fonte de custo: a API v2 de métricas devolve custo 0.
+  Sem rede, `--sem-custo` gera a página dizendo que o custo não foi consultado. Uma chave trocada
+  recomeça do zero, então o total é um piso.
+- **C4 em `flowchart`.** Os diagramas `C4Context` e `C4Container` do Mermaid são experimentais, e
+  o tema do Material não se aplica a eles. A notação C4 fica nos rótulos (`[Pessoa]`,
+  `[Contêiner: FastAPI]`) e na fronteira por `subgraph`. Preenchimento translúcido, como no
+  diagrama do pipeline: o Material impõe a cor do texto do Mermaid conforme o tema, e um fundo
+  sólido escuro deixava o rótulo ilegível no tema claro.
+- **PDF no mesmo build.** `scripts/exportar_pdf_executivo.py` roda dentro do `make docs-build`,
+  sobre o `build/docs.novo` e antes do rsync. Assim o PDF nunca fica atrás do site (A13) e é
+  servido em `/executivo/scraper-cebraspe-executivo.pdf`. Para imprimir, o script serve o build por
+  HTTP local e usa o Chromium do Playwright, que já faz parte da stack. Ele espera o Mermaid
+  renderizar, reescreve os links para `https://docs.projetoathos.com.br` e junta capa e páginas
+  com PyMuPDF, com sumário e numeração "página X de N" carimbada depois da junção (o Chromium
+  numera cada página do site isoladamente). Custo da escolha: o `make docs-build` e o `make check`
+  passam a precisar do Chromium e do Mermaid do CDN (unpkg).
+- **CSS de impressão** em `docs/stylesheets/impressao.css`, só em `@media print`: esconde o que
+  é do site (cabeçalho, abas, barras, rodapé) e tudo com a classe `so-tela` (o botão do PDF e os
+  cartões de navegação).
+- O hook de publicação também dispara quando mudam `scripts/gerar_numeros.py` ou
+  `scripts/exportar_pdf_executivo.py`.
+
+Alternativas descartadas:
+
+- **Plugins de PDF do MkDocs (`mkdocs-with-pdf`, `mkdocs-exporter`):** o primeiro usa WeasyPrint,
+  que não executa o JavaScript do Mermaid. O segundo traz outra cópia do Playwright e
+  configuração própria, para algo que um script de ~300 linhas resolve com o que já está no `venv`.
+- **Números escritos à mão:** envelhecem a cada lote, sem sinal nenhum.

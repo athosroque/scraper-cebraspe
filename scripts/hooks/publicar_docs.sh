@@ -8,7 +8,8 @@
 #   - só age no checkout principal: o nginx serve o build/docs dele, e os hooks
 #     são compartilhados com as worktrees;
 #   - só age se o commit (ou o merge, via ORIG_HEAD..HEAD) tocou docs/, mkdocs.yml,
-#     scripts/gerar_docs.py ou src/registro/;
+#     scripts/gerar_docs.py, scripts/gerar_numeros.py, scripts/exportar_pdf_executivo.py
+#     ou src/registro/;
 #   - o build roda em segundo plano, com log em logs/publicar_docs.log;
 #   - nunca falha o commit: qualquer problema vira uma linha no stderr.
 
@@ -37,7 +38,7 @@ else
     arquivos="$(git diff-tree --root --no-commit-id --name-only -r HEAD 2>/dev/null)"
 fi
 
-if ! printf '%s\n' "$arquivos" | grep -Eq '^scraper_cebraspe/(docs/|mkdocs\.yml$|scripts/gerar_docs\.py$|src/registro/)'; then
+if ! printf '%s\n' "$arquivos" | grep -Eq '^scraper_cebraspe/(docs/|mkdocs\.yml$|scripts/(gerar_docs|gerar_numeros|exportar_pdf_executivo)\.py$|src/registro/)'; then
     exit 0
 fi
 

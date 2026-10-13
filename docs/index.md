@@ -60,7 +60,7 @@ Escolha pelo que você precisa fazer.
 ## Como manter esta documentação
 
 - `make docs-serve`: site local em <http://127.0.0.1:8001>, com recarga ao salvar.
-- `make docs-build`: gera `build/docs` com `mkdocs build --strict`. O `make check` roda esse alvo também.
-- `make docs-gerar`: regera as páginas que vêm do código (ver [Como as páginas são geradas](tecnico/index.md)).
+- `make docs-build`: gera `build/docs` com `mkdocs build --strict` e o PDF da [visão executiva](executivo/index.md). O `make check` roda esse alvo também.
+- `make docs-gerar`: regera as páginas que vêm do código (ver [Como as páginas são geradas](tecnico/index.md)) e a página de [números](executivo/numeros.md), que lê o banco e o custo no OpenRouter.
 - Publicação automática: depois de `make hooks-instalar`, commit ou merge que toca os docs roda o `docs-build` sozinho (log em `logs/publicar_docs.log`). Se o CSS parecer antigo, force com Ctrl+Shift+R: o Cloudflare guarda o CSS em cache por 4 h.
 - Página nova entra no `nav` do `mkdocs.yml`, na seção do seu propósito. Fora do `nav`, o `--strict` falha, e é de propósito.
