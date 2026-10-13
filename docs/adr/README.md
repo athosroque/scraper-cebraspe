@@ -10,6 +10,8 @@ Cada ADR (Architecture Decision Record) registra uma escolha do projeto: o conte
     2. Acrescente a linha na tabela do tema, abaixo.
     3. Ponha a ADR no `nav` do `mkdocs.yml`, no grupo do tema, com um título curto. Sem isso, o `--strict` falha.
 
+O teste `tests/test_adr_catalogo.py` confere o passo 2 (e o `nav` dentro da aba Decisões), e o `--strict` confere o passo 3.
+
 Status: **Aceito** está em vigor. **Substituído** é histórico: o texto da ADR diz o que vale no lugar.
 
 ## Coleta e download

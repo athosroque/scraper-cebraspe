@@ -4,7 +4,7 @@ PYTEST := $(VENV)/pytest
 RUFF := $(VENV)/ruff
 MKDOCS := $(VENV)/mkdocs
 
-.PHONY: help lint format-check format test-fast test-unit test-pipeline test-site test-site-fast test-all docs-serve docs-gerar docs-build check
+.PHONY: help lint format-check format test-fast test-unit test-pipeline test-site test-site-fast test-all docs-serve docs-gerar docs-build hooks-instalar check
 
 help:
 	@echo "================================================================="
@@ -27,6 +27,7 @@ help:
 	@echo "  make docs-serve     Site MkDocs local em http://127.0.0.1:8001 (recarga ao salvar)"
 	@echo "  make docs-gerar     Regera docs/tecnico/ a partir de src/registro/ (lê o banco)"
 	@echo "  make docs-build     Gera o site em build/docs com mkdocs build --strict"
+	@echo "  make hooks-instalar Instala os hooks git que publicam o site de docs após commit/merge"
 	@echo ""
 	@echo "  make check          Regressão completa de CI (lint + format + docs-build + test-all)"
 	@echo "================================================================="
@@ -64,7 +65,18 @@ docs-serve:
 docs-gerar:
 	$(PYTHON) -m scripts.gerar_docs
 
+# Gera numa pasta temporária e só copia para build/docs se o --strict passar: o
+# mkdocs limpa o destino antes de validar, e o nginx serve build/docs. Assim um
+# build quebrado não tira o site do ar. rsync (e não mv) porque o bind mount do
+# nginx aponta para o diretório build/docs, que precisa continuar o mesmo.
 docs-build:
-	$(MKDOCS) build --strict
+	rm -rf build/docs.novo
+	$(MKDOCS) build --strict --site-dir build/docs.novo
+	mkdir -p build/docs
+	rsync -a --delete build/docs.novo/ build/docs/
+	rm -rf build/docs.novo
+
+hooks-instalar:
+	bash scripts/hooks/instalar.sh
 
 check: lint format-check docs-build test-all

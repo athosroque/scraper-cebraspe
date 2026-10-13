@@ -192,6 +192,10 @@ Documentação (Etapa 9/D1, ADR-040):
   `127.0.0.1:8013` e `docs.projetoathos.com.br` via Traefik + Cloudflare Access.
 - Página nova em `docs/` entra no `nav` do `mkdocs.yml`, na aba e seção do seu propósito
   (seção nova ganha `index.md` de abertura; ADR-040), senão o `--strict` falha.
+- `make hooks-instalar` (uma vez por clone): instala os hooks `post-commit` e `post-merge` em `.git/hooks`
+  (encadeando o que já existir). Depois disso, commit ou merge no checkout principal que toca `docs/`,
+  `mkdocs.yml`, `scripts/gerar_docs.py` ou `src/registro/` roda o `docs-build` sozinho, em segundo
+  plano, com log em `logs/publicar_docs.log`. Worktree não publica (ADR-040).
 - `make docs-gerar` (Etapa 9/D2, ADR-041): regera `docs/tecnico/` (pipeline, comandos,
   regras, checagens e banco) a partir de `src/registro/`; lê o schema do banco. Sem banco:
   `venv/bin/python -m scripts.gerar_docs --sem-banco`; conferir: `--verificar`.

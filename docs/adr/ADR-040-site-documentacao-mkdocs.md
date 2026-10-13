@@ -109,3 +109,31 @@ Regras novas:
 - Os ajustes visuais (cartões, seção em caixa alta com linha-guia, aba ativa sublinhada,
   breadcrumb com `navigation.path`) ficam em `docs/stylesheets/tema.css`. O tema continua
   sendo o do D2.
+
+## Atualização (2026-10-13): publicação automática
+
+O nginx serve o `build/docs` do checkout principal, e o site só mudava quando alguém rodava
+`make docs-build`, um passo manual que o A13 proíbe. **Decisão:** hooks git `post-commit` e
+`post-merge`, instalados por `make hooks-instalar`, chamam `scripts/hooks/publicar_docs.sh`.
+
+- Só age se o commit (ou `ORIG_HEAD..HEAD`, no merge) tocou `docs/`, `mkdocs.yml`,
+  `scripts/gerar_docs.py` ou `src/registro/`.
+- Só age no checkout principal (`git-dir` igual ao `git-common-dir`): os hooks são
+  compartilhados com as worktrees do Orca, mas o nginx só enxerga o build do principal. O
+  trabalho da worktree publica quando entra no master por merge.
+- O build roda em segundo plano, um por vez (`flock`), com log em `logs/publicar_docs.log`.
+  O hook nunca falha o commit: build quebrado vira linha no log.
+- O `make docs-build` gera em `build/docs.novo` e só sincroniza com `build/docs` (`rsync
+  --delete`) se o `--strict` passar. Sem isso, o `mkdocs` limpa o destino antes de validar,
+  e um build quebrado deixava o site fora do ar. Agora o site fica na última versão boa. É
+  `rsync`, e não `mv`, porque o bind mount do nginx aponta para o diretório `build/docs`.
+- O `.git/hooks` é de todo o monorepo. O instalador é idempotente e, se achar hook de outro
+  projeto, guarda como `<hook>.anterior` e o encadeia.
+
+Alternativas descartadas:
+
+- **Cron:** publica com atraso, roda sem mudança e esconde o erro longe do commit.
+- **Container rodando o build do mkdocs:** põe Python, o tema e o `venv` na imagem do
+  nginx e duplica dependências, para resolver algo que um hook curto resolve.
+- **CI/deploy:** o site é local; não há pipeline de entrega para acionar.
+
