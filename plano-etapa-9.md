@@ -1,7 +1,7 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
-Criado em 2026-10-12. Estado: **D1 (KAN-68) em análise (2026-10-13), aguardando aprovação do
-dono; decisões do dono fechadas em 2026-10-13**.
+Criado em 2026-10-12. Estado: **D1 (KAN-68) concluída e aprovada (2026-10-13); próxima D2
+(KAN-69); decisões do dono fechadas em 2026-10-13**.
 
 > Jira: KAN-67 (etapa); D1 = KAN-68, D2 = KAN-69, D3 = KAN-70, D4 = KAN-71; D5a = KAN-31 e
 > D5b = KAN-32 (são a C2 da 8.C, `plano-etapa-8c.md`).
@@ -123,12 +123,12 @@ checagens.
   manual, como no Datasette).
 - Pronto quando: o site sobe local e no domínio atrás do Access, todos os links internos
   resolvem e o `--strict` passa.
-- Feito (2026-10-13, em análise): `mkdocs.yml` (Material, `nav` explícito, `site_dir:
+- Feito (2026-10-13, aprovado pelo dono): `mkdocs.yml` (Material, `nav` explícito, `site_dir:
   build/docs`), `docs/index.md`, `docs/executivo/index.md`, alvos `docs-serve` e `docs-build`
   no `Makefile`, container nginx `scraper-cebraspe-docs` em `127.0.0.1:8013` e ADR-040.
   Passos manuais do dono: (1) no túnel, Public Hostname `docs.projetoathos.com.br` →
   `http://traefik:80`; (2) no Cloudflare Access, aplicação para esse hostname com a política
-  do Datasette. Depois do merge, no checkout principal: `make docs-build && docker compose up
+  do Datasette (ambos feitos; o domínio redireciona para o login do Access). Depois do merge, no checkout principal: `make docs-build && docker compose up
   -d scraper-cebraspe-docs`.
 
 ### D2: Registro e páginas geradas (KAN-69)
