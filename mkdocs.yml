@@ -1,0 +1,133 @@
+site_name: "Scraper CEBRASPE — Documentação"
+
+# docs_dir e site_dir fora do padrão de propósito: o padrão `site/` apagaria
+# o app FastAPI que vive em `site/` a cada `mkdocs build`. O build vai para
+# `build/docs/` (ignorado pelo git) e é servido pelo nginx do docker-compose.
+docs_dir: docs
+site_dir: build/docs
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Modo escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: pt
+
+markdown_extensions:
+  - toc:
+      permalink: true
+      # Âncora com acento no GitHub: `#atualização--adr-020-2026-09-21`
+      # (ADR-018). O slugify padrão do MkDocs remove o acento e quebra o link.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - tables
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+# Com `mkdocs build --strict` (usado pelo `make docs-build` e pelo `make check`),
+# uma página fora do nav, um link quebrado ou uma âncora inexistente viram erro.
+# Isso é a guarda: um ADR novo sem entrada no nav quebra o check.
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+    absolute_links: warn
+  links:
+    not_found: warn
+    anchors: warn
+    absolute_links: warn
+    unrecognized_links: warn
+
+nav:
+  - Início: index.md
+  - Executivo:
+      - executivo/index.md
+  - Técnico:
+      - Arquitetura: architecture.md
+      - Runbook de lote: runbook-lote.md
+      - Teste no navegador: guia-teste-navegador.md
+      - ADRs:
+          - adr/README.md
+          - adr/ADR-001-filtro-ano-slug-url.md
+          - adr/ADR-002-fonte-primaria-concursos-encerrados.md
+          - adr/ADR-003-tabelas-postgres-study-rag.md
+          - adr/ADR-004-priorizacao-cargo-slug.md
+          - adr/ADR-005-idempotencia-registro-json.md
+          - adr/ADR-006-extracao-orgao-slug.md
+          - adr/ADR-007-dedup-download-dupla-camada.md
+          - adr/ADR-008-resolucao-href-relativo.md
+          - adr/ADR-009-recorte-objetos-avaliacao.md
+          - adr/ADR-010-chunking-cargo-materia.md
+          - adr/ADR-011-extracao-llm-requests-direto.md
+          - adr/ADR-012-virtual-key-litellm.md
+          - adr/ADR-013-ligacao-spider-downloader.md
+          - adr/ADR-014-trilha-auditoria-parser-extractor.md
+          - adr/ADR-015-revisao-datasette-traefik.md
+          - adr/ADR-016-retry-maiores-tokens-llm.md
+          - adr/ADR-017-validacao-heuristica-de-para-taxonomia.md
+          - adr/ADR-018-relatorio-html-e-extensao-schema-revisao.md
+          - adr/ADR-019-pipeline-automatico-artefatos-revisao.md
+          - adr/ADR-020-classificacao-nivel-tipo-conhecimento-concurso.md
+          - adr/ADR-021-reparo-local-nome-topico-numerico.md
+          - adr/ADR-022-classificacao-erros-chamada-openrouter.md
+          - adr/ADR-023-migracao-langfuse-sdk-oficial.md
+          - adr/ADR-024-coleta-camara-deputados-refinamentos-parser.md
+          - adr/ADR-025-reconciliacao-deterministica-severidade-alertas.md
+          - adr/ADR-026-banco-postgres-proprio.md
+          - adr/ADR-027-star-schema-estatisticas.md
+          - adr/ADR-028-cargos-restritos-e-aprovacao-fase4.md
+          - adr/ADR-029-camada-canonica-sinonimos.md
+          - adr/ADR-030-arvore-mestre-e-site-de-questoes.md
+          - adr/ADR-031-extracao-questoes-cadernos.md
+          - adr/ADR-032-classificacao-questoes-arvore.md
+          - adr/ADR-033-site-publico-stack-e-deploy.md
+          - adr/ADR-034-fidelidade-ao-caderno-e-filtros.md
+          - adr/ADR-035-card-e-filtros-formato-gran.md
+          - adr/ADR-036-etapas-testes-e-ruff.md
+          - adr/ADR-037-escopo-do-site-no-inventario.md
+          - adr/ADR-038-suporte-multipla-escolha-retrocompativel.md
+          - adr/ADR-039-incidencia-em-dois-niveis.md
+          - adr/ADR-040-site-documentacao-mkdocs.md
+      - Planos concluídos:
+          - planos/README.md
+          - planos/correcoes-etapa-5c.md
+          - planos/correcoes-interface-5f.md
+          - planos/plano-etapa-5b2.md
+          - planos/plano-etapa-5d.md
+          - planos/plano-etapa-5e.md
+          - planos/plano-etapa-5f.md
+          - planos/plano-etapa-5h.md
+          - planos/plano-etapa-8m.md
+          - planos/plano-etapa-8m1.md
+          - planos/plano-kan-30.md
+      - Relatórios:
+          - relatorios/dispersao_arvore_2026-10-12.md

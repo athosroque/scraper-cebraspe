@@ -47,6 +47,15 @@
 #    X-Forwarded-Proto para http (não confia no cloudflared); o middleware
 #    abaixo força https para o redirect_uri do Google OAuth sair certo.
 #    Mudou Dockerfile.site? `docker compose up -d --build scraper-cebraspe-site`.
+#
+# 5. scraper-cebraspe-docs — site de documentação MkDocs Material (Etapa 9/D1,
+#    ADR-040). nginx servindo ./build/docs (gerado por `make docs-build`, que
+#    roda `mkdocs build --strict`). Exposto em `docs.projetoathos.com.br` via
+#    Traefik + Cloudflare Tunnel, protegido por Cloudflare Access; local em
+#    http://127.0.0.1:8013. ATENÇÃO: rode `make docs-build` ANTES do primeiro
+#    `docker compose up`. Se build/docs não existir, o Docker cria o diretório
+#    como root e o build seguinte falha por permissão.
+#    Depois de regerar o site, não precisa reiniciar: o nginx serve o disco.
 
 services:
   scraper-cebraspe-db:
@@ -143,6 +152,22 @@ services:
       - "traefik.http.routers.scraper-site-dev.middlewares=scraper-site-dev-https"
       - "traefik.http.middlewares.scraper-site-dev-https.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.services.scraper-site-dev.loadbalancer.server.port=8000"
+
+  scraper-cebraspe-docs:
+    image: nginx:alpine
+    container_name: scraper-cebraspe-docs
+    restart: unless-stopped
+    volumes:
+      - ./build/docs:/usr/share/nginx/html:ro
+    ports:
+      - "127.0.0.1:8013:80"
+    networks:
+      - homelab_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scraper-docs.rule=Host(`docs.projetoathos.com.br`)"
+      - "traefik.http.routers.scraper-docs.entrypoints=web"
+      - "traefik.http.services.scraper-docs.loadbalancer.server.port=80"
 
 volumes:
   scraper_cebraspe_pgdata:

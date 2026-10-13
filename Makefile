@@ -2,8 +2,9 @@ VENV := ./venv/bin
 PYTHON := $(VENV)/python
 PYTEST := $(VENV)/pytest
 RUFF := $(VENV)/ruff
+MKDOCS := $(VENV)/mkdocs
 
-.PHONY: help lint format-check format test-fast test-unit test-pipeline test-site test-site-fast test-all check
+.PHONY: help lint format-check format test-fast test-unit test-pipeline test-site test-site-fast test-all docs-serve docs-build check
 
 help:
 	@echo "================================================================="
@@ -21,7 +22,12 @@ help:
 	@echo "  make test-site      [Etapa 2B: ~3m20s] Testes da aplicação web e API"
 	@echo "  make test-site-fast Testes do site pulando os mais lentos (>3s)"
 	@echo "  make test-all       [Etapa 3: ~4m45s] Suíte completa de 840 testes"
-	@echo "  make check          Regressão completa de CI (lint + format + test-all)"
+	@echo ""
+	@echo "Documentação:"
+	@echo "  make docs-serve     Site MkDocs local em http://127.0.0.1:8001 (recarga ao salvar)"
+	@echo "  make docs-build     Gera o site em build/docs com mkdocs build --strict"
+	@echo ""
+	@echo "  make check          Regressão completa de CI (lint + format + docs-build + test-all)"
 	@echo "================================================================="
 
 lint:
@@ -51,4 +57,10 @@ test-site-fast:
 test-all:
 	$(PYTEST)
 
-check: lint format-check test-all
+docs-serve:
+	$(MKDOCS) serve -a 127.0.0.1:8001
+
+docs-build:
+	$(MKDOCS) build --strict
+
+check: lint format-check docs-build test-all

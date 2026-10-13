@@ -78,6 +78,9 @@ Datasette continua só como ferramenta de revisão do dono.
 - sqlite-utils >=3.36 — só pra construir `revisao_piloto/revisao.db` (banco
   de apoio à revisão humana da Etapa 4); Datasette roda via Docker
   (`datasetteproject/datasette`), não é dependência do venv
+- mkdocs-material >=9.6,<10 — site de documentação (Etapa 9/D1, ADR-040):
+  `mkdocs.yml` com `site_dir: build/docs` (o padrão `site/` colide com o app
+  FastAPI) e `nav` explícito guardado pelo `--strict`
 
 ## 5. Progresso
 
@@ -348,7 +351,8 @@ Datasette continua só como ferramenta de revisão do dono.
       (KAN-69), D3 contexto para agentes (KAN-70), D4 executivo e PDF (KAN-71), D5a e D5b
       Dagster (KAN-31, KAN-32). Pronto quando o site gerado do código está no ar com o
       `--strict` no `make check`, o PDF executivo sai sem explicação prévia e o lote da C1
-      roda no Dagster com as checagens verdes.
+      roda no Dagster com as checagens verdes. D1 (KAN-68) em análise: MkDocs Material com
+      `nav` explícito, `--strict` no `make check`, nginx `scraper-cebraspe-docs` e ADR-040.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -608,6 +612,7 @@ Datasette continua só como ferramenta de revisão do dono.
   - Etapa 3 (`make test-all` / `make check`): suíte completa de 840 testes e verificação de formatação.
   - Marcadores registrados no `pytest.ini`: `unit`, `db`, `pipeline`, `site`, `slow`.
   - Configuração central do Ruff em `pyproject.toml` (targets, ignores e exclusões de `scratch/`, `data/`, etc.).
+- Página nova em `docs/` entra no `nav` do `mkdocs.yml`; o `mkdocs build --strict` (no `make check`) recusa página fora do nav, link quebrado e âncora inexistente (ADR-040).
 
 ## 7. Anti-patterns
 
@@ -791,6 +796,7 @@ Datasette continua só como ferramenta de revisão do dono.
   simulados (`x.test`, `XX_25`) em `logs/scraper_cebraspe.log`, e o log de
   produção deixa de servir para auditar execução real.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
+- Nunca usar o `site_dir` padrão do MkDocs (`site/`): o build apagaria o app FastAPI em `site/`. O build vai para `build/docs` (ADR-040).
 
 ## 8. Segurança
 
@@ -818,6 +824,14 @@ Datasette continua só como ferramenta de revisão do dono.
    exige `ALTER USER`, o volume já está inicializado)
 4. `python -m src.spider` — roda a Etapa 2 isolada para validação
 5. `pytest` para validar (spider + downloader)
+
+Documentação (Etapa 9/D1, ADR-040):
+
+- `make docs-serve`: local em `127.0.0.1:8001`, com recarga ao salvar.
+- `make docs-build`: `mkdocs build --strict` em `build/docs`; também roda no `make check`.
+- `make docs-build && docker compose up -d scraper-cebraspe-docs`: nginx em
+  `127.0.0.1:8013` e `docs.projetoathos.com.br` via Traefik + Cloudflare Access.
+- Página nova em `docs/` precisa entrar no `nav` do `mkdocs.yml`, senão o `--strict` falha.
 
 ## 9.2. Revisão via Datasette (Etapa 4 — checkpoint de revisão humana)
 
@@ -949,7 +963,7 @@ resultado = download_concurso_pdfs(
 
 ## 12. Log de decisões
 
-As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-039;
+As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-040;
 o `README.md` de lá é o índice com data e título). Antes de reabrir uma
 escolha de stack, banco, parser ou site, ler o ADR correspondente.
 
