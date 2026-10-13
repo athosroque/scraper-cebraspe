@@ -140,7 +140,8 @@ class Checagem:
 
 @dataclass(frozen=True)
 class Regra:
-    """Um pattern (§6) ou anti-pattern (§7) do `CLAUDE.md`, com o texto literal."""
+    """Um pattern ou anti-pattern do projeto. O registro é a fonte do texto (D3);
+    o `CLAUDE.md` só cita, em uma linha, as regras do núcleo (`nucleo=True`)."""
 
     id: str  # "P01" (§6) ou "A01" (§7)
     tipo: Literal["pattern", "anti-pattern"]
@@ -148,6 +149,7 @@ class Regra:
     texto: str
     adrs: tuple[str, ...] = ()
     testes: tuple[str, ...] = ()  # arquivo ou nodeid do pytest
+    nucleo: bool = False  # quebra dado se esquecida; citada no §6/§7 do CLAUDE.md
 
     def __post_init__(self):
         prefixo = "P" if self.tipo == "pattern" else "A"
@@ -163,8 +165,43 @@ class Regra:
 
 
 @dataclass(frozen=True)
+class Tarefa:
+    """Uma tarefa de agente e o que ler para ela (`docs/tecnico/tarefas.md`, D3).
+
+    O vínculo com as regras é pela área: regra nova da área cai na tarefa sozinha.
+    """
+
+    id: str  # "T01"
+    nome: str
+    quando: str  # uma frase: quando o agente está nesta tarefa
+    leia: tuple[str, ...]  # páginas de docs/ (relativas a docs/), em ordem de leitura
+    areas: tuple[str, ...]  # AREAS_REGRA
+    regras: tuple[str, ...] = ()  # regras extras, de outras áreas
+    etapas: tuple[str, ...] = ()  # ids de Etapa
+    scripts: tuple[str, ...] = ()  # módulos de Script
+    checagens: tuple[str, ...] = ()  # ids de Checagem
+    adrs: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        _exigir(bool(re.match(r"^T\d{2}$", self.id)), f"tarefa {self.id}")
+        _exigir(bool(self.leia), f"tarefa {self.id}: leia vazio")
+        for area in self.areas:
+            _exigir(area in AREAS_REGRA, f"tarefa {self.id}: área {area!r}")
+        for regra in self.regras:
+            _exigir(
+                bool(re.match(r"^[PA]\d{2,3}$", regra)), f"tarefa {self.id}: {regra}"
+            )
+        for checagem in self.checagens:
+            _exigir(
+                bool(re.match(r"^K\d{2}$", checagem)), f"tarefa {self.id}: {checagem}"
+            )
+        _validar_adrs(f"tarefa {self.id}", self.adrs)
+
+
+@dataclass(frozen=True)
 class Registro:
     scripts: tuple[Script, ...] = ()
     etapas: tuple[Etapa, ...] = ()
     checagens: tuple[Checagem, ...] = ()
     regras: tuple[Regra, ...] = ()
+    tarefas: tuple[Tarefa, ...] = ()

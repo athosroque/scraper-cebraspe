@@ -2,7 +2,28 @@
 
 # Regras
 
-Textos literais de `CLAUDE.md`: patterns (§6) e anti-patterns (§7). Cada regra mostra as ADRs que a motivam e o teste que a guarda, quando houver.
+Patterns e anti-patterns do projeto. Fonte: `src/registro/regras_*.py`. Desde a D3 o `CLAUDE.md` cita só o núcleo, as regras que quebram dados se forem esquecidas. Cada regra mostra as ADRs que a motivam e o teste que a guarda, quando houver.
+
+## Núcleo
+
+- [P41](#p41) Aprovação da revisão humana é o `status_revisao_humana` do `<edital>.json` (`APROVADO...`). O writer relê o …
+- [P51](#p51) Decisão do dono na árvore só via `scripts/curar_arvore.py` (ou as funções de `src/arvore.py`): `--mapear` …
+- [P67](#p67) O que fica fora do site é decidido só em `inventario/exclusoes.json` (slug, categoria de …
+- [P70](#p70) Script novo em `scripts/` (ou módulo de `src/` com `__main__`) entra em `src/registro/scripts.py`, e mudança …
+- [P71](#p71) Lote novo (ou qualquer passo que grava no banco) nunca altera o piloto (PF_25_ADM, TCU_25_TEFC, IBAMA_25 …
+- [A06](#a06) Nunca gravar tabelas deste projeto no `study-rag-db` nem criar FK para `itens_estudo` — o `study-rag-db` tem …
+- [A07](#a07) Nunca hardcodar credenciais de API/Postgres no código — usar `.env` (ver Segurança).
+- [A13](#a13) Nunca deixar um passo do pipeline (extração → artefatos derivados) como "rode manualmente depois" — este …
+- [A25](#a25) Nunca aprovar concurso com `UPDATE` direto no banco: a próxima carga do writer reverte a partir do JSON.
+- [A27](#a27) Nunca aprovar sinônimo ou mapeamento da árvore com `UPDATE` no banco nem editando só o banco: a fonte é …
+- [A28](#a28) Nunca ler ou escrever `canonico/arvore.json` com `json.load`/`json.dump` direto: o primeiro código da 5B.1 …
+- [A29](#a29) Nunca rodar `scripts/semear_arvore.py --forcar` depois da curadoria: a semente reescreve a árvore do zero e …
+- [A30](#a30) Nunca deixar o agente aprovar proposta do LLM em nome do dono; só grupo `regra` é aprovado automaticamente.
+- [A42](#a42) Nunca commitar arquivos JSON de questões extraídas (`questoes/`) no git — mantidos localmente e no …
+- [A44](#a44) Nunca pôr senha de role no SQL versionado (`site/sql/app_schema.sql`) nem em teste: a primeira versão da 5F.1 …
+- [A57](#a57) Nunca dar GRANT a role do site esperando que ele sobreviva a uma carga: `schema_estatisticas.sql` recria as …
+- [A59](#a59) Nunca remover o `conftest.py` da raiz: sem ele o pytest grava os erros simulados (`x.test`, `XX_25`) em …
+- [A62](#a62) Nunca editar à mão as páginas de `docs/tecnico/`: são geradas de `src/registro/` por `scripts/gerar_docs.py` …
 
 ## Patterns
 
@@ -624,6 +645,8 @@ de `src/arvore.py`): `--mapear`, `--desmapear`, `--aprovar`, `--rejeitar`,
 `aprovado`/`ativo`; mapear de novo um apontamento proposto o aprova. Erro de
 validação não grava nada.
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: nenhuma
 
 Teste guarda: `tests/test_curar_arvore.py::test_criar_renomear_mover_fundir_desmapear`
@@ -697,6 +720,8 @@ lista não é remapeado, não entra em amostra nem em lote e sai dos alertas. PD
 de formação fica fora por `pdf_vai_para_o_site`. Alerta do inventário vem do texto do
 link: antes de tratar como "sem arquivo", conferir a página ao vivo (ADR-037).
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: [ADR-037](../adr/ADR-037-escopo-do-site-no-inventario.md)
 
 Teste guarda: `tests/test_inventario.py::TestExclusoes::test_carregar_e_aplicar`
@@ -730,6 +755,8 @@ Teste guarda: sem teste guarda
 
 Aprovação da revisão humana é o `status_revisao_humana` do `<edital>.json`
 (`APROVADO...`). O writer relê o JSON a cada carga.
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: nenhuma
 
@@ -768,12 +795,28 @@ Teste guarda: sem teste guarda
 Script novo em `scripts/` (ou módulo de `src/` com `__main__`) entra em
 `src/registro/scripts.py`, e mudança de argparse, etapa, checagem, regra ou schema pede
 `make docs-gerar`: o `tests/test_registro.py` recusa script fora do registro e página
-gerada diferente do código (ADR-041). Até a D3, regra nova no §6 ou §7 entra também em
-`src/registro/regras_*.py`, com o mesmo texto.
+gerada diferente do código (ADR-041). Regra nova entra só em `src/registro/regras_*.py`
+(próximo id, área, ADR e teste guarda), cai numa tarefa de `src/registro/tarefas.py` pela
+área, e só vai para o §6/§7 do `CLAUDE.md` se for do núcleo (`nucleo=True`, com link).
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: [ADR-041](../adr/ADR-041-registro-e-paginas-geradas.md)
 
 Teste guarda: `tests/test_registro.py::test_todo_script_esta_no_registro`
+
+#### P71
+
+Lote novo (ou qualquer passo que grava no banco) nunca altera o piloto
+(PF_25_ADM, TCU_25_TEFC, IBAMA_25, STM_25, CD_25_NS: 2.800 itens, 129 anuladas,
+3.029 apontamentos, chaves da 5D): as checagens K22–K24 rodam antes e depois, e
+diferença bloqueia o lote.
+
+Núcleo: sim (citada no `CLAUDE.md`)
+
+ADRs: nenhuma
+
+Teste guarda: `tests/test_reconciliacao_inventario.py::test_regressao_piloto_chaves_5d_inalteradas`
 
 ## Anti-patterns
 
@@ -1051,6 +1094,8 @@ Nunca gravar tabelas deste projeto no `study-rag-db` nem criar FK para
 reconfiguração próprios, e acoplar os dois quebra um a cada mudança do
 outro. Cruzamento só por chave natural na Etapa 7 (ADR-026).
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: [ADR-026](../adr/ADR-026-banco-postgres-proprio.md)
 
 Teste guarda: sem teste guarda
@@ -1069,6 +1114,8 @@ Nunca dar GRANT a role do site esperando que ele sobreviva a uma carga:
 `schema_estatisticas.sql` recria as views com `DROP ... CASCADE`.
 `stats_writer.criar_schema` guarda e reaplica os GRANTs do schema; não
 remover isso (sem ele, toda reextração derruba o site com 500).
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: nenhuma
 
@@ -1090,6 +1137,8 @@ Nunca aprovar sinônimo ou mapeamento da árvore com `UPDATE` no banco nem
 editando só o banco: a fonte é `canonico/arvore.json` (antes,
 `sinonimos.json`), e a próxima carga reverte.
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: nenhuma
 
 Teste guarda: sem teste guarda
@@ -1102,6 +1151,8 @@ e leu o campo `no` em vez de `no_id`. A regra do pipeline casou 0 de 1259
 assuntos e o relatório pôs os 4050 itens sob `None`, sem erro nenhum. Use
 `src/arvore.py` (`carregar`, `salvar`, `chave_item`).
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: nenhuma
 
 Teste guarda: sem teste guarda
@@ -1110,6 +1161,8 @@ Teste guarda: sem teste guarda
 
 Nunca rodar `scripts/semear_arvore.py --forcar` depois da curadoria: a
 semente reescreve a árvore do zero e apaga toda decisão do dono.
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: nenhuma
 
@@ -1197,6 +1250,8 @@ Teste guarda: `tests/test_classificacao.py::test_mapear_fora_do_edital_por_no`
 Nunca pôr senha de role no SQL versionado (`site/sql/app_schema.sql`) nem em
 teste: a primeira versão da 5F.1 fez isso e as senhas foram trocadas. Senha
 vem do `.env` via `site/scripts/aplicar_schema_app.py`.
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: nenhuma
 
@@ -1332,6 +1387,8 @@ Teste guarda: sem teste guarda
 Nunca aprovar concurso com `UPDATE` direto no banco: a próxima carga do
 writer reverte a partir do JSON.
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: nenhuma
 
 Teste guarda: sem teste guarda
@@ -1340,6 +1397,8 @@ Teste guarda: sem teste guarda
 
 Nunca deixar o agente aprovar proposta do LLM em nome do dono; só grupo
 `regra` é aprovado automaticamente.
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: nenhuma
 
@@ -1362,6 +1421,8 @@ Nunca remover o `conftest.py` da raiz: sem ele o pytest grava os erros
 simulados (`x.test`, `XX_25`) em `logs/scraper_cebraspe.log`, e o log de
 produção deixa de servir para auditar execução real.
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: nenhuma
 
 Teste guarda: sem teste guarda
@@ -1373,6 +1434,8 @@ Teste guarda: sem teste guarda
 Nunca hardcodar credenciais de API/Postgres no código — usar `.env`
 (ver Segurança).
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: nenhuma
 
 Teste guarda: sem teste guarda
@@ -1380,6 +1443,8 @@ Teste guarda: sem teste guarda
 #### A42
 
 Nunca commitar arquivos JSON de questões extraídas (`questoes/`) no git — mantidos localmente e no `.gitignore` por volumetria, sendo 100% regeneráveis sob demanda (ADR-031).
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: [ADR-031](../adr/ADR-031-extracao-questoes-cadernos.md)
 
@@ -1404,6 +1469,8 @@ href relativo silenciosamente descartando 100% dos links, ADR-008): a
 falha de esquecer o passo manual não lança erro, só deixa o artefato
 seguinte desatualizado sem sinal nenhum. Ver ADR-019.
 
+Núcleo: sim (citada no `CLAUDE.md`)
+
 ADRs: [ADR-008](../adr/ADR-008-resolucao-href-relativo.md), [ADR-019](../adr/ADR-019-pipeline-automatico-artefatos-revisao.md)
 
 Teste guarda: sem teste guarda
@@ -1412,6 +1479,8 @@ Teste guarda: sem teste guarda
 
 Nunca editar à mão as páginas de `docs/tecnico/`: são geradas de `src/registro/`
 por `scripts/gerar_docs.py`, e o teste guarda recusa a diferença (ADR-041).
+
+Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: [ADR-041](../adr/ADR-041-registro-e-paginas-geradas.md)
 

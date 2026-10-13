@@ -1,4 +1,4 @@
-"""Patterns do CLAUDE.md §6, bullets 1 a 35, texto literal (Etapa 9/D2)."""
+"""Patterns do projeto, bullets 1 a 35 (fonte desde a D3; o CLAUDE.md cita só o núcleo)."""
 
 from src.registro.modelo import Regra
 

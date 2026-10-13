@@ -65,3 +65,22 @@ KAN-31) precisa de uma lista de etapas para montar os assets.
 - **YAML no lugar de Python:** perde a validação no import e o uso direto pelo Dagster.
 - **Arquivo único `src/registro.py`:** com cerca de 200 entradas, fica grande demais para
   ler e editar em paralelo.
+
+## Atualização (D3, KAN-70, 2026-10-13): o registro é a fonte das regras
+
+- O texto das regras deixa de existir em dois lugares. A fonte é `src/registro/regras_*.py`,
+  e o §6/§7 do `CLAUDE.md` cita só o **núcleo** (`Regra.nucleo=True`): as regras que quebram
+  ou revertem dado se esquecidas (piloto inalterado, `.env`, portões humanos), uma linha
+  cada, com link para `docs/tecnico/regras.md#<id>`. Regra nova entra só no registro; vai
+  para o `CLAUDE.md` se for do núcleo.
+- Nova regra P71 (núcleo): lote novo nunca altera o piloto, conferido pelas K22–K24 antes e
+  depois.
+- `Tarefa` no registro (`src/registro/tarefas.py`) gera `docs/tecnico/tarefas.md`, o índice
+  "para a tarefa X, leia Y" dos agentes. A tarefa liga regras **por área**, então uma regra
+  nova cai na tarefa sem edição.
+- O teste de cópia literal (`test_regras_batem_com_o_claude_md`) saiu. No lugar, guardas de
+  que o núcleo citado no `CLAUDE.md` é igual a `nucleo=True` com o link certo, de que os links
+  relativos do `CLAUDE.md` existem, de que as tarefas só citam ids existentes e de que toda
+  área com regra tem tarefa.
+- O §5 (progresso) e o §10 (entregáveis) do `CLAUDE.md` também foram resumidos: o detalhe
+  fica no `task.md`, em `docs/planos/` e nas páginas geradas (`comandos.md`, `pipeline.md`).

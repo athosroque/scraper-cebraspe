@@ -1,4 +1,4 @@
-"""Anti-patterns do CLAUDE.md §7, texto literal (Etapa 9/D2)."""
+"""Anti-patterns do projeto (fonte desde a D3; o CLAUDE.md cita só o núcleo)."""
 
 from src.registro.modelo import Regra
 
@@ -77,6 +77,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A06",
+        nucleo=True,
         tipo="anti-pattern",
         area="banco",
         texto=(
@@ -94,6 +95,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A07",
+        nucleo=True,
         tipo="anti-pattern",
         area="infra",
         texto=(
@@ -190,6 +192,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A13",
+        nucleo=True,
         tipo="anti-pattern",
         area="processo",
         texto=(
@@ -404,6 +407,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A25",
+        nucleo=True,
         tipo="anti-pattern",
         area="revisao",
         texto=(
@@ -433,6 +437,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A27",
+        nucleo=True,
         tipo="anti-pattern",
         area="arvore",
         texto=(
@@ -448,6 +453,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A28",
+        nucleo=True,
         tipo="anti-pattern",
         area="arvore",
         texto=(
@@ -467,6 +473,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A29",
+        nucleo=True,
         tipo="anti-pattern",
         area="arvore",
         texto=(
@@ -480,6 +487,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A30",
+        nucleo=True,
         tipo="anti-pattern",
         area="revisao",
         texto=(
@@ -667,6 +675,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A42",
+        nucleo=True,
         tipo="anti-pattern",
         area="infra",
         texto=(
@@ -702,6 +711,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A44",
+        nucleo=True,
         tipo="anti-pattern",
         area="site",
         texto=(
@@ -897,6 +907,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A57",
+        nucleo=True,
         tipo="anti-pattern",
         area="banco",
         texto=(
@@ -931,6 +942,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A59",
+        nucleo=True,
         tipo="anti-pattern",
         area="testes",
         texto=(
@@ -976,6 +988,7 @@ REGRAS_ANTIPATTERNS: tuple[Regra, ...] = (
     ),
     Regra(
         id="A62",
+        nucleo=True,
         tipo="anti-pattern",
         area="processo",
         texto="""Nunca editar à mão as páginas de `docs/tecnico/`: são geradas de `src/registro/`

@@ -17,11 +17,13 @@ executa os scripts do projeto.
 
 import argparse
 import ast
+import posixpath
 import re
 import sys
 from pathlib import Path
 
 import psycopg2
+from pymdownx.slugs import slugify as _slugify_mkdocs
 
 from src.registro import REGISTRO
 from src.registro.modelo import (
@@ -210,6 +212,26 @@ def _pagina(corpo: str) -> str:
     return CABECALHO + corpo
 
 
+def _ancora(cabecalho: str) -> str:
+    """Âncora que o MkDocs gera para um cabeçalho (o mesmo slugify do `mkdocs.yml`)."""
+    return _slugify_mkdocs(case="lower")(cabecalho, "-")
+
+
+def _resumo(texto: str, limite: int = 110) -> str:
+    """Início do texto de uma regra numa linha só, cortado numa palavra.
+
+    As crases ficam (sem elas, `<edital>.json` vira tag HTML e some); o corte nunca
+    deixa um trecho de código aberto.
+    """
+    linha = " ".join(texto.split())
+    if len(linha) <= limite:
+        return linha
+    corte = linha[:limite].rsplit(" ", 1)[0]
+    if corte.count("`") % 2:
+        corte = corte[: corte.rindex("`")]
+    return corte.rstrip(" ,;:—(") + " …"
+
+
 # ------------------------------------------------------------------- páginas
 
 
@@ -221,9 +243,11 @@ def pagina_indice(reg: Registro) -> str:
         "Páginas geradas de `src/registro/` por `make docs-gerar`. O teste "
         "`tests/test_registro.py` recusa página diferente do código.",
         "",
+        f"- [Tarefas](tarefas.md): {len(reg.tarefas)} tarefas de agente e o que ler "
+        "para cada uma.",
         f"- [Pipeline](pipeline.md): {len(reg.etapas)} etapas, dependências e portões humanos.",
         f"- [Comandos](comandos.md): {len(reg.scripts)} scripts e seus argumentos.",
-        f"- [Regras](regras.md): {len(reg.regras)} patterns e anti-patterns do `CLAUDE.md`.",
+        f"- [Regras](regras.md): {len(reg.regras)} patterns e anti-patterns do projeto.",
         f"- [Checagens](checagens.md): {len(reg.checagens)} checagens do pipeline.",
         "- [Banco](banco.md): tabelas e views dos schemas `public` e `app`.",
     ]
@@ -358,10 +382,20 @@ def pagina_regras(reg: Registro) -> str:
     linhas = [
         "# Regras",
         "",
-        "Textos literais de `CLAUDE.md`: patterns (§6) e anti-patterns (§7). Cada "
-        "regra mostra as ADRs que a motivam e o teste que a guarda, quando houver.",
+        "Patterns e anti-patterns do projeto. Fonte: `src/registro/regras_*.py`. "
+        "Desde a D3 o `CLAUDE.md` cita só o núcleo, as regras que quebram dados se "
+        "forem esquecidas. Cada regra mostra as ADRs que a motivam e o teste que a "
+        "guarda, quando houver.",
+        "",
+        "## Núcleo",
         "",
     ]
+    nucleo = [r for r in reg.regras if r.nucleo]
+    if nucleo:
+        linhas += [f"- [{r.id}](#{r.id.lower()}) {_resumo(r.texto)}" for r in nucleo]
+    else:
+        linhas.append("Nenhuma regra marcada no núcleo.")
+    linhas.append("")
     for tipo, titulo in (("pattern", "Patterns"), ("anti-pattern", "Anti-patterns")):
         linhas += [f"## {titulo}", ""]
         regras = [r for r in reg.regras if r.tipo == tipo]
@@ -380,11 +414,11 @@ def pagina_regras(reg: Registro) -> str:
 
 def _secao_regra(regra: Regra) -> list[str]:
     guardas = ", ".join(f"`{t}`" for t in regra.testes) or "sem teste guarda"
+    linhas = [f"#### {regra.id}", "", regra.texto.strip(), ""]
+    if regra.nucleo:
+        linhas += ["Núcleo: sim (citada no `CLAUDE.md`)", ""]
     return [
-        f"#### {regra.id}",
-        "",
-        regra.texto.strip(),
-        "",
+        *linhas,
         f"ADRs: {_lista_adrs(regra.adrs)}",
         "",
         f"Teste guarda: {guardas}",
@@ -436,6 +470,71 @@ def _secao_checagem(checagem: Checagem) -> list[str]:
     if checagem.consulta:
         linhas += ["```sql", checagem.consulta.strip(), "```", ""]
     return linhas
+
+
+def pagina_tarefas(reg: Registro) -> str:
+    """Página `tarefas.md`: para cada tarefa de agente, o que ler e o que vale nela.
+
+    Regras entram pela área (`tarefa.areas`) e pelos ids extras (`tarefa.regras`).
+    Cada lista vazia some. Os links são relativos a `docs/tecnico/`.
+    """
+    etapas = {e.id: e for e in reg.etapas}
+    checagens = {c.id: c for c in reg.checagens}
+    linhas = [
+        "# Tarefas",
+        "",
+        "Índice para agentes: para a tarefa X, leia Y. Cada tarefa lista as páginas "
+        "a ler, as regras da área, as etapas, os comandos, as checagens e as ADRs. "
+        "A fonte é `src/registro/tarefas.py`; as regras vêm de `src/registro/regras_*.py`.",
+        "",
+    ]
+    for tarefa in reg.tarefas:
+        linhas += [f"## {tarefa.id} {tarefa.nome}", "", tarefa.quando.strip(), ""]
+        linhas += ["**Leia:**", ""]
+        linhas += [
+            f"- [{pagina}]({posixpath.relpath(pagina, 'tecnico')})"
+            for pagina in tarefa.leia
+        ]
+        linhas.append("")
+
+        regras = [
+            r for r in reg.regras if r.area in tarefa.areas or r.id in tarefa.regras
+        ]
+        if regras:
+            linhas += ["**Regras:**", ""]
+            for regra in regras:
+                nucleo = " (núcleo)" if regra.nucleo else ""
+                linhas.append(
+                    f"- [{regra.id}](regras.md#{regra.id.lower()}){nucleo} "
+                    f"{_resumo(regra.texto)}"
+                )
+            linhas.append("")
+
+        # Ids inexistentes quebram aqui (KeyError) e no teste guarda das tarefas.
+        if tarefa.etapas:
+            itens = [
+                f"[{e.id}](pipeline.md#{_ancora(f'{e.id} {e.nome}')})"
+                for e in (etapas[i] for i in tarefa.etapas)
+            ]
+            linhas += [f"**Etapas:** {', '.join(itens)}", ""]
+
+        if tarefa.scripts:
+            itens = [
+                f"[`python -m {m}`](comandos.md#{_ancora(f'python -m {m}')})"
+                for m in tarefa.scripts
+            ]
+            linhas += [f"**Comandos:** {', '.join(itens)}", ""]
+
+        if tarefa.checagens:
+            itens = []
+            for c in (checagens[i] for i in tarefa.checagens):
+                titulo, _ = _titulo_e_resto(c.descricao)
+                itens.append(f"[{c.id}](checagens.md#{_ancora(f'{c.id} {titulo}')})")
+            linhas += [f"**Checagens:** {', '.join(itens)}", ""]
+
+        if tarefa.adrs:
+            linhas += [f"**ADRs:** {_lista_adrs(tarefa.adrs)}", ""]
+    return _pagina("\n".join(linhas).rstrip() + "\n")
 
 
 def pagina_banco(colunas: list[tuple], views: list[str]) -> str:
@@ -506,6 +605,7 @@ def gerar_paginas(
         DESTINO / "comandos.md": pagina_comandos(reg),
         DESTINO / "regras.md": pagina_regras(reg),
         DESTINO / "checagens.md": pagina_checagens(reg),
+        DESTINO / "tarefas.md": pagina_tarefas(reg),
     }
     if com_banco:
         conn = conectar()

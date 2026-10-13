@@ -1237,6 +1237,9 @@ Trilha A, documentação (em paralelo):
 - `[ ]` D3 (KAN-70) Contexto para agentes: índice por tarefa e `CLAUDE.md` enxuto, com o núcleo
   de regras e links. **Pronto quando:** um agente novo acha a regra e o runbook de uma tarefa a
   partir do `CLAUDE.md`, sem ler o arquivo inteiro.
+  Estado: feita em 2026-10-13, aguardando aprovação do dono. Núcleo de 18 regras no
+  `CLAUDE.md` (992 → 297 linhas), `docs/tecnico/tarefas.md` gerado de `src/registro/tarefas.py`
+  e guardas novos; atualização D3 no ADR-041.
 - `[ ]` D4 (KAN-71) Documentação executiva (visão, C4, números, decisões, roadmap) e PDF.
   **Pronto quando:** o dono envia o PDF a alguém de fora sem explicar o projeto antes.
 

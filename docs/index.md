@@ -7,6 +7,7 @@ O crawler (Playwright) percorre a listagem de concursos encerrados e mapeia os P
 ## Seções
 
 - **[Executivo](executivo/index.md)**: visão para quem não acompanha o código. Em preparação.
+- **Para agentes**: o [índice de tarefas](tecnico/tarefas.md) diz o que ler para cada tarefa (regras, comandos, etapas, runbook).
 - **Técnico**: a [arquitetura](architecture.md), o [runbook de lote](runbook-lote.md), o [guia de teste no navegador](guia-teste-navegador.md), os [ADRs](adr/README.md) (decisões de arquitetura), os [planos concluídos](planos/README.md) e os [relatórios](relatorios/dispersao_arvore_2026-10-12.md).
 
 ## Como manter

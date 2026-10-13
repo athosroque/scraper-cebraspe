@@ -27,6 +27,7 @@ def _adrs_citados() -> list[tuple[str, str]]:
     pares += [(f"etapa {e.id}", a) for e in REGISTRO.etapas for a in e.adrs]
     pares += [(f"checagem {c.id}", a) for c in REGISTRO.checagens for a in c.adrs]
     pares += [(f"regra {r.id}", a) for r in REGISTRO.regras for a in r.adrs]
+    pares += [(f"tarefa {t.id}", a) for t in REGISTRO.tarefas for a in t.adrs]
     return pares
 
 
@@ -117,11 +118,12 @@ def test_depois_de_sem_ciclo_e_ids_existentes():
 
 
 def test_ids_unicos():
-    """Ids de etapas, checagens e regras não se repetem."""
+    """Ids de etapas, checagens, regras e tarefas não se repetem."""
     colecoes = {
         "etapas": [e.id for e in REGISTRO.etapas],
         "checagens": [c.id for c in REGISTRO.checagens],
         "regras": [r.id for r in REGISTRO.regras],
+        "tarefas": [t.id for t in REGISTRO.tarefas],
     }
     for nome, ids in colecoes.items():
         repetidos = sorted({i for i in ids if ids.count(i) > 1})
@@ -158,37 +160,80 @@ def test_testes_citados_existem():
     assert not problemas, f"testes guarda citados e inexistentes: {problemas}"
 
 
-def _bullets_de_topo(secao: str) -> list[str]:
-    """Bullets de coluna 0 de uma seção do CLAUDE.md, sem o `- ` e dedentados."""
+def _secao_do_claude_md(titulo: str) -> str:
+    """Texto de uma seção do CLAUDE.md, do título até o próximo `## `."""
     texto = (RAIZ / "CLAUDE.md").read_text(encoding="utf-8")
-    inicio = texto.index(f"\n{secao}\n")
+    inicio = texto.index(f"\n{titulo}\n")
     fim = texto.index("\n## ", inicio + 1)
-    bullets: list[list[str]] = []
-    for linha in texto[inicio:fim].splitlines():
-        if linha.startswith("- "):
-            bullets.append([linha[2:]])
-        elif bullets and linha.startswith("  "):
-            bullets[-1].append(linha[2:])
-        elif bullets and linha.strip():
-            bullets.append([])  # texto solto encerra o bullet anterior
-    return ["\n".join(b) for b in bullets if b]
+    return texto[inicio:fim]
 
 
-def test_regras_batem_com_o_claude_md():
-    """Até a D3, as regras do registro são os bullets do §6 e §7, na ordem e literais."""
-    for secao, tipo in (
-        ("## 6. Patterns", "pattern"),
-        ("## 7. Anti-patterns", "anti-pattern"),
-    ):
-        esperado = _bullets_de_topo(secao)
-        registrado = [r.texto for r in REGISTRO.regras if r.tipo == tipo]
-        faltam = [b[:80] for b in esperado if b not in registrado]
-        sobram = [t[:80] for t in registrado if t not in esperado]
-        assert not faltam and not sobram, (
-            f"{secao}: o CLAUDE.md e src/registro/regras_*.py divergem; "
-            f"faltam no registro {faltam}, sobram {sobram}"
-        )
-        assert registrado == esperado, f"{secao}: ordem diferente do CLAUDE.md"
+def test_nucleo_do_claude_md_bate_com_o_registro():
+    """As regras citadas em §6 e §7 do CLAUDE.md são o núcleo do registro, com link."""
+    citados: set[str] = set()
+    for titulo in ("## 6. Patterns", "## 7. Anti-patterns"):
+        for linha in _secao_do_claude_md(titulo).splitlines():
+            ids = re.findall(r"\*\*([PA]\d{2,3})\*\*", linha)
+            for id_regra in ids:
+                citados.add(id_regra)
+                assert f"docs/tecnico/regras.md#{id_regra.lower()}" in linha, (
+                    f"{id_regra} citada sem link para docs/tecnico/regras.md"
+                )
+    nucleo = {r.id for r in REGISTRO.regras if r.nucleo}
+    assert citados == nucleo, (
+        f"CLAUDE.md e registro divergem no núcleo: "
+        f"só no CLAUDE.md {sorted(citados - nucleo)}, "
+        f"só no registro {sorted(nucleo - citados)}"
+    )
+
+
+def test_links_relativos_do_claude_md_existem():
+    """Todo link relativo do CLAUDE.md aponta para arquivo ou diretório existente."""
+    texto = (RAIZ / "CLAUDE.md").read_text(encoding="utf-8")
+    problemas = []
+    for alvo in re.findall(r"\]\(([^)\s]+)\)", texto):
+        if alvo.startswith(("http", "#", "mailto:")):
+            continue
+        if not (RAIZ / alvo.split("#", 1)[0]).exists():
+            problemas.append(alvo)
+    assert not problemas, f"links quebrados no CLAUDE.md: {problemas}"
+
+
+def test_claude_md_aponta_para_tarefas():
+    """O CLAUDE.md leva o agente ao índice de tarefas."""
+    texto = (RAIZ / "CLAUDE.md").read_text(encoding="utf-8")
+    assert "docs/tecnico/tarefas.md" in texto
+
+
+def test_tarefas_citam_ids_existentes():
+    """Regras, etapas, scripts, checagens, ADRs e páginas de `leia` citados existem."""
+    ids = {
+        "regras": {r.id for r in REGISTRO.regras},
+        "etapas": {e.id for e in REGISTRO.etapas},
+        "scripts": _modulos_registrados(),
+        "checagens": {c.id for c in REGISTRO.checagens},
+    }
+    problemas = []
+    for tarefa in REGISTRO.tarefas:
+        for campo, existentes in ids.items():
+            for item in getattr(tarefa, campo):
+                if item not in existentes:
+                    problemas.append(f"tarefa {tarefa.id}: {campo} {item} inexistente")
+        for adr in tarefa.adrs:
+            if not list((RAIZ / "docs" / "adr").glob(f"{adr}-*.md")):
+                problemas.append(f"tarefa {tarefa.id}: ADR {adr} sem arquivo")
+        for pagina in tarefa.leia:
+            if not (RAIZ / "docs" / pagina).exists():
+                problemas.append(f"tarefa {tarefa.id}: leia {pagina} inexistente")
+    assert not problemas, f"tarefas citam itens inexistentes: {problemas}"
+
+
+def test_toda_area_com_regra_tem_tarefa():
+    """Toda área usada por uma regra aparece em pelo menos uma tarefa."""
+    usadas = {r.area for r in REGISTRO.regras}
+    cobertas = {a for t in REGISTRO.tarefas for a in t.areas}
+    faltam = sorted(usadas - cobertas)
+    assert not faltam, f"áreas sem tarefa (regras ficariam fora do índice): {faltam}"
 
 
 def test_paginas_geradas_batem_com_o_disco():

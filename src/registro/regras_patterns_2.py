@@ -1,4 +1,4 @@
-"""Patterns do CLAUDE.md §6, bullets 36 a 69, texto literal (Etapa 9/D2)."""
+"""Patterns do projeto, bullets 36 a 71 (fonte desde a D3; o CLAUDE.md cita só o núcleo)."""
 
 from src.registro.modelo import Regra
 
@@ -60,6 +60,7 @@ writer.""",
     ),
     Regra(
         id="P41",
+        nucleo=True,
         tipo="pattern",
         area="revisao",
         texto="""Aprovação da revisão humana é o `status_revisao_humana` do `<edital>.json`
@@ -168,6 +169,7 @@ apontamento é `{no_id, origem, status}`.""",
     ),
     Regra(
         id="P51",
+        nucleo=True,
         tipo="pattern",
         area="arvore",
         texto="""Decisão do dono na árvore só via `scripts/curar_arvore.py` (ou as funções
@@ -334,6 +336,7 @@ com o item básico expandido por cargo (`cargos_restritos` respeitado).
     ),
     Regra(
         id="P67",
+        nucleo=True,
         tipo="pattern",
         area="site",
         texto="""O que fica fora do site é decidido só em `inventario/exclusoes.json` (slug, categoria
@@ -368,14 +371,29 @@ link: antes de tratar como "sem arquivo", conferir a página ao vivo (ADR-037)."
     ),
     Regra(
         id="P70",
+        nucleo=True,
         tipo="pattern",
         area="processo",
         texto="""Script novo em `scripts/` (ou módulo de `src/` com `__main__`) entra em
 `src/registro/scripts.py`, e mudança de argparse, etapa, checagem, regra ou schema pede
 `make docs-gerar`: o `tests/test_registro.py` recusa script fora do registro e página
-gerada diferente do código (ADR-041). Até a D3, regra nova no §6 ou §7 entra também em
-`src/registro/regras_*.py`, com o mesmo texto.""",
+gerada diferente do código (ADR-041). Regra nova entra só em `src/registro/regras_*.py`
+(próximo id, área, ADR e teste guarda), cai numa tarefa de `src/registro/tarefas.py` pela
+área, e só vai para o §6/§7 do `CLAUDE.md` se for do núcleo (`nucleo=True`, com link).""",
         adrs=("ADR-041",),
         testes=("tests/test_registro.py::test_todo_script_esta_no_registro",),
+    ),
+    Regra(
+        id="P71",
+        tipo="pattern",
+        area="processo",
+        texto="""Lote novo (ou qualquer passo que grava no banco) nunca altera o piloto
+(PF_25_ADM, TCU_25_TEFC, IBAMA_25, STM_25, CD_25_NS: 2.800 itens, 129 anuladas,
+3.029 apontamentos, chaves da 5D): as checagens K22–K24 rodam antes e depois, e
+diferença bloqueia o lote.""",
+        testes=(
+            "tests/test_reconciliacao_inventario.py::test_regressao_piloto_chaves_5d_inalteradas",
+        ),
+        nucleo=True,
     ),
 )

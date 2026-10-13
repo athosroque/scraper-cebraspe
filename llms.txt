@@ -1,6 +1,14 @@
 # Scraper CEBRASPE
 > Pipeline automatizado de rastreamento, download, extração de conteúdo programático e estruturação taxonômica de concursos do CEBRASPE.
 
+## Para agentes
+- [CLAUDE.md]: identidade, estado (§5), núcleo de regras (§6 e §7) e convenções. Comece por aqui.
+- [docs/tecnico/tarefas.md]: o que ler para cada tarefa (por área de regra e etapa).
+- [docs/tecnico/regras.md]: texto completo, ADR e teste guarda de cada pattern e anti-pattern (gerado de `src/registro/`).
+- [docs/tecnico/comandos.md]: comandos de cada script, com argumentos (gerado de `src/registro/`).
+- [docs/tecnico/pipeline.md]: as etapas do pipeline, na ordem (gerado de `src/registro/`).
+- [docs/runbook-lote.md]: roteiro operacional de um lote de concursos.
+
 ## Arquivos e Módulos Principais
 - [src/spider.py]: Crawler Playwright para `/concursos/encerrado`, filtrando ano e órgão pelo slug e mapeando editais, provas e gabaritos.
 - [src/downloader.py]: Downloader de PDFs com dupla desduplicação (manifesto `.manifest.json` + hash SHA256) e validação de magic bytes `%PDF-`.
@@ -14,7 +22,7 @@
 - [scripts/atualizar_revisao.py]: Pipeline automatizado de atualização da Etapa 4 (validar -> relatorio -> gerar_db -> restart Datasette).
 - [scripts/backfill_classificacao_chunks.py]: Backfill determinístico de campos de classificação (nível, tipo de conhecimento, concurso) em auditorias e taxonomias existentes sem custo de LLM.
 - [docs/architecture.md]: Arquitetura detalhada do sistema, fluxos de dados e diagramas Mermaid.
-- [docs/adr/]: Registros de decisões de arquitetura (ADR-001 a ADR-023).
+- [docs/adr/]: Registros de decisões de arquitetura (ADR-001 a ADR-041).
 - [CLAUDE.md]: Manual operacional mestre e contexto para agentes e modelos de linguagem.
 - [LESSONS.md]: Registro de incidentes técnicos, post-mortems e soluções adotadas.
 
@@ -27,7 +35,7 @@
 - **Auditoria de Extração:** Todo edital gera `<edital>.json` (taxonomia) e `<edital>.auditoria.json` (offsets e texto bruto exato enviado ao modelo).
 - **Reparo Local Determinístico (ADR-021):** Resolução automática no extrator para nomes de tópicos puramente numéricos ("1", "2", ...) recuperando o texto real do tópico a partir do texto-fonte sem novas chamadas ao LLM (zero token), com tag `[REPARO_NOME_NUMERICO]`.
 - **Classificação de Erros de Chamada (ADR-022):** Status de falha técnicos explícitos (`falha_timeout`, `falha_conexao`, `falha_rate_limit`, `falha_http`, `falha_rede`, `falha_conteudo_vazio`, `falha_parse_json`, `falha_validacao_schema`, `falha_nome_numerico_nao_mapeado`) para separar falhas transitórias de falhas de schema/configuração no chunk e Langfuse.
-- **Telemetria via SDK Oficial Langfuse (ADR-023):** Observabilidade baseada em OpenTelemetry (`langfuse>=3,<4`), com observation iniciada antes da chamada HTTP e flush gerenciado por `atexit`, substituindo a ingestão REST manual legada (`/api/public/ingestion`).
+- **Telemetria via SDK Oficial Langfuse (ADR-023):** Observabilidade baseada em OpenTelemetry (`langfuse>=4.7,<5`), com observation iniciada antes da chamada HTTP e flush gerenciado por `atexit`, substituindo a ingestão REST manual legada (`/api/public/ingestion`).
 - **Validação Heurística e Relatório de Revisão:** Comparação automatizada por substring de texto normalizado gerando alertas de tópicos ausentes/extras e relatório HTML de página única servido pelo Datasette (`--static`).
 - **Classificação por Nível e Tipo de Conhecimento (ADR-020):** Chunks do edital classificados por concurso, nível (médio/superior), básico/específico e cargo a partir dos cabeçalhos de bloco, com backfill sem LLM.
 - **Automação de Revisão (ADR-019):** Acoplamento automático de `atualizar_revisao.py` ao término de extrações e reprocessamentos, garantindo que banco SQLite e relatórios HTML permaneçam sempre em dia sem intervenção manual.
