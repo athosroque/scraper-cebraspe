@@ -1,5 +1,19 @@
 # Lições — scraper-cebraspe
 
+### [tags: mkdocs, mermaid, docs, frontend]
+**Sintoma:** no site de docs, os rótulos do diagrama Mermaid do pipeline saíam
+das caixas no navegador do dono, e no Chromium headless ficavam certos. No modo
+escuro, os nós de LLM (fundo `#bfdbfe` fixo) ficavam com texto claro sobre azul
+claro, ilegíveis.
+**Causa:** o Mermaid mede o rótulo e desenha a caixa assim que a página abre;
+a Roboto do Google Fonts (padrão do Material) chega depois e é mais larga que a
+fonte usada na medida. Depende da rede, por isso não se repete em todo lugar. A
+cor fixa do `classDef` ignora o tema.
+**Solução:** `theme.font: false` no `mkdocs.yml` com a pilha de fontes do sistema
+em `docs/stylesheets/tema.css` (disponível na hora da medida) e `classDef` com
+fundo semitransparente (`#3b82f633`), que deixa o texto na cor do tema.
+**Custo do aprendizado:** ~20min; vale para qualquer página com Mermaid.
+
 ### [tags: arvore-mestre, curadoria, llm, falha-silenciosa]
 **Sintoma:** depois de aprovar as fusões da 5B.2, "Disposições gerais" ficou
 com 7 ocorrências, e não 8, embora cada proposta estivesse correta. A árvore

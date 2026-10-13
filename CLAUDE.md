@@ -354,7 +354,7 @@ Datasette continua só como ferramenta de revisão do dono.
       `--strict` no `make check`, o PDF executivo sai sem explicação prévia e o lote da C1
       roda no Dagster com as checagens verdes. D1 (KAN-68) concluída em 2026-10-13: MkDocs
       Material com `nav` explícito, `--strict` no `make check`, nginx `scraper-cebraspe-docs`
-      em `docs.projetoathos.com.br` atrás do Access e ADR-040. D2 (KAN-69) em análise:
+      em `docs.projetoathos.com.br` atrás do Access e ADR-040. D2 (KAN-69) concluída em 2026-10-13:
       registro `src/registro/` (scripts, etapas P0–P11, checagens e as regras do §6/§7),
       páginas geradas em `docs/tecnico/` por `make docs-gerar`, teste guarda e ADR-041.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06

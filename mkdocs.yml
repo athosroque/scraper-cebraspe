@@ -9,14 +9,22 @@ site_dir: build/docs
 theme:
   name: material
   language: pt-BR
+  # Fonte do sistema em vez da Roboto do Google Fonts: o Mermaid mede o rótulo
+  # antes da fonte web carregar, e o texto saía do quadro. Visual em
+  # `docs/stylesheets/tema.css` (paleta neutra, no estilo da documentação do Orca).
+  font: false
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Modo escuro
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Modo claro
@@ -28,6 +36,9 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+
+extra_css:
+  - stylesheets/tema.css
 
 plugins:
   - search:

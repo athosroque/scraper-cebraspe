@@ -1,0 +1,191 @@
+/* Tema do site de documentação: paleta neutra (zinco), cabeçalho na cor do
+   fundo, título forte e menu com item ativo em pílula, no estilo da
+   documentação do Orca. Fonte do sistema (ver `font: false` no mkdocs.yml). */
+
+:root {
+  --md-text-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --md-code-font: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo,
+    Consolas, monospace;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #ffffff;
+  --md-default-fg-color: #18181b;
+  --md-default-fg-color--light: #52525b;
+  --md-default-fg-color--lighter: #a1a1aa;
+  --md-default-fg-color--lightest: #e4e4e7;
+  --md-primary-fg-color: #ffffff;
+  --md-primary-bg-color: #18181b;
+  --md-accent-fg-color: #2563eb;
+  --md-typeset-color: #27272a;
+  --md-typeset-a-color: #18181b;
+  --md-code-bg-color: #f4f4f5;
+  --md-code-fg-color: #27272a;
+  --tema-borda: #e4e4e7;
+  --tema-ativo: #f4f4f5;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 240;
+  --md-default-bg-color: #0a0a0b;
+  --md-default-fg-color: #fafafa;
+  --md-default-fg-color--light: #a1a1aa;
+  --md-default-fg-color--lighter: #71717a;
+  --md-default-fg-color--lightest: #27272a;
+  --md-primary-fg-color: #0a0a0b;
+  --md-primary-bg-color: #fafafa;
+  --md-accent-fg-color: #60a5fa;
+  --md-typeset-color: #d4d4d8;
+  --md-typeset-a-color: #fafafa;
+  --md-code-bg-color: #111113;
+  --md-code-fg-color: #e4e4e7;
+  --md-footer-bg-color: #0a0a0b;
+  --md-footer-bg-color--dark: #0a0a0b;
+  --tema-borda: #27272a;
+  --tema-ativo: #1c1c1f;
+}
+
+[data-md-color-scheme="default"],
+[data-md-color-scheme="slate"] {
+  --md-mermaid-font-family: var(--md-text-font);
+  --md-mermaid-node-bg-color: var(--md-default-bg-color);
+  --md-mermaid-node-fg-color: var(--md-default-fg-color--lighter);
+  --md-mermaid-label-fg-color: var(--md-default-fg-color);
+  --md-mermaid-edge-color: var(--md-default-fg-color--light);
+}
+
+/* Cabeçalho e abas na cor do fundo, separados por uma linha. */
+.md-header,
+.md-tabs {
+  background-color: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+.md-header {
+  box-shadow: none;
+  border-bottom: 1px solid var(--tema-borda);
+}
+.md-header--shadow {
+  box-shadow: none;
+}
+.md-tabs {
+  border-bottom: 1px solid var(--tema-borda);
+}
+.md-tabs__link {
+  opacity: 1;
+  color: var(--md-default-fg-color--light);
+}
+.md-tabs__item--active .md-tabs__link,
+.md-tabs__link:hover {
+  color: var(--md-default-fg-color);
+}
+.md-header__title {
+  font-weight: 600;
+}
+
+/* Busca neutra no cabeçalho. */
+.md-search__form {
+  background-color: var(--tema-ativo);
+  border: 1px solid var(--tema-borda);
+  border-radius: 0.5rem;
+}
+.md-search__form:hover {
+  background-color: var(--tema-ativo);
+}
+.md-search__input,
+.md-search__icon {
+  color: var(--md-default-fg-color);
+}
+.md-search__input::placeholder {
+  color: var(--md-default-fg-color--light);
+}
+
+/* Barra lateral: seção em destaque, item ativo em pílula. */
+.md-sidebar--primary {
+  border-right: 1px solid var(--tema-borda);
+}
+.md-nav__link {
+  color: var(--md-default-fg-color--light);
+}
+.md-nav__item--section > .md-nav__link {
+  color: var(--md-default-fg-color);
+  font-weight: 600;
+}
+.md-sidebar--primary .md-nav__link--active {
+  color: var(--md-default-fg-color);
+  background-color: var(--tema-ativo);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  margin-left: -0.5rem;
+  margin-right: 0.25rem;
+  font-weight: 500;
+}
+.md-nav__link:hover,
+.md-nav__link:focus {
+  color: var(--md-default-fg-color);
+}
+
+/* Título forte e o primeiro parágrafo como subtítulo. */
+.md-typeset h1 {
+  color: var(--md-default-fg-color);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.6em;
+}
+.md-typeset h1 + p {
+  font-size: 1.1em;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  color: var(--md-default-fg-color);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.md-typeset h2 {
+  border-top: 1px solid var(--tema-borda);
+  padding-top: 1.2em;
+}
+
+/* Links sublinhados, como no Orca. */
+.md-typeset a {
+  text-decoration: underline;
+  text-decoration-color: var(--md-default-fg-color--lighter);
+  text-underline-offset: 0.2em;
+}
+.md-typeset a:hover {
+  color: var(--md-accent-fg-color);
+  text-decoration-color: currentColor;
+}
+.md-typeset .headerlink {
+  text-decoration: none;
+}
+
+/* Código: blocos arredondados com borda, código inline com borda fina. */
+.md-typeset pre > code {
+  border: 1px solid var(--tema-borda);
+  border-radius: 0.75rem;
+}
+.md-typeset :not(pre) > code {
+  border: 1px solid var(--tema-borda);
+  border-radius: 0.3rem;
+}
+
+/* Tabelas e avisos com a mesma borda. */
+.md-typeset table:not([class]) {
+  border: 1px solid var(--tema-borda);
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+
+/* Diagrama Mermaid centralizado e sem passar da coluna. */
+.md-typeset .mermaid {
+  text-align: center;
+  overflow-x: auto;
+}
