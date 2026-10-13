@@ -213,6 +213,23 @@ def _pagina(corpo: str) -> str:
 # ------------------------------------------------------------------- páginas
 
 
+def pagina_indice(reg: Registro) -> str:
+    """Página `index.md`: abre em `/tecnico/` (sem ela, o nginx responde 403)."""
+    linhas = [
+        "# Gerado do código",
+        "",
+        "Páginas geradas de `src/registro/` por `make docs-gerar`. O teste "
+        "`tests/test_registro.py` recusa página diferente do código.",
+        "",
+        f"- [Pipeline](pipeline.md): {len(reg.etapas)} etapas, dependências e portões humanos.",
+        f"- [Comandos](comandos.md): {len(reg.scripts)} scripts e seus argumentos.",
+        f"- [Regras](regras.md): {len(reg.regras)} patterns e anti-patterns do `CLAUDE.md`.",
+        f"- [Checagens](checagens.md): {len(reg.checagens)} checagens do pipeline.",
+        "- [Banco](banco.md): tabelas e views dos schemas `public` e `app`.",
+    ]
+    return _pagina("\n".join(linhas) + "\n")
+
+
 def pagina_pipeline(reg: Registro) -> str:
     """Página `pipeline.md`: grafo Mermaid e uma seção por etapa."""
     linhas = [
@@ -483,6 +500,7 @@ def gerar_paginas(
     """
     reg = REGISTRO if reg is None else reg
     paginas = {
+        DESTINO / "index.md": pagina_indice(reg),
         DESTINO / "pipeline.md": pagina_pipeline(reg),
         DESTINO / "comandos.md": pagina_comandos(reg),
         DESTINO / "regras.md": pagina_regras(reg),

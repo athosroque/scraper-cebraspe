@@ -74,6 +74,7 @@ nav:
   - Técnico:
       - Arquitetura: architecture.md
       - Gerado do código:
+          - tecnico/index.md
           - Pipeline: tecnico/pipeline.md
           - Comandos: tecnico/comandos.md
           - Regras: tecnico/regras.md
