@@ -1,6 +1,7 @@
 # Runbook — levar um lote de concursos ME para o banco
 
-> **C1a, 2026-10-12.** Base do orquestrador `scripts/lote_concursos.py` (C2).
+> **C1a, 2026-10-12.** Base do orquestrador da C2, que será o Dagster
+> (decisão do dono em 2026-10-13, sessões D5a e D5b de `plano-etapa-9.md`).
 > Os números são medidos no lote de calibração `SEFA_PR_25` + `BANRISUL_25`. Onde um passo
 > ainda é manual ou não foi validado, a seção diz isso. Plano: `plano-etapa-8c.md`.
 
@@ -400,7 +401,7 @@ Custo: US$ 0.
 - **Chunking não é só o LLM.** Um chunk ruim vira alerta no `.validacao.json`, mas um
   chunk que engole outro pode passar sem alerta. Confira o P2 sempre.
 
-## 7. Pendências para o orquestrador (C2)
+## 7. Pendências para o orquestrador (C2, Dagster)
 
 - Comando de chunking sem LLM dentro do projeto (`--so-chunking` ou similar), no lugar do
   script avulso do P2.

@@ -1,6 +1,11 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
-Criado em 2026-10-12. Estado: **planejado, nenhuma sessão iniciada**. Card: KAN-67.
+Criado em 2026-10-12. Estado: **planejado, decisões do dono fechadas em 2026-10-13, nenhuma
+sessão iniciada**.
+
+> Jira: KAN-67 (etapa); D1 = KAN-68, D2 = KAN-69, D3 = KAN-70, D4 = KAN-71; D5a = KAN-31 e
+> D5b = KAN-32 (são a C2 da 8.C, `plano-etapa-8c.md`).
+> Ao abrir uma sessão, ler só este arquivo e a seção dela.
 
 ## Pedido do dono
 
@@ -52,7 +57,7 @@ leem o mesmo conteúdo como site.
 | Documentação executiva (problema, solução, arquitetura, números, custos, roadmap) | MkDocs Material, seção "Executivo", exportada em PDF | cliente, dono |
 | Documentação técnica (pipeline, etapas, regras, checagens, ADRs, runbook, banco) | MkDocs, seção "Técnico", com páginas geradas do código | dono, agentes |
 | Contexto para agentes | os mesmos `.md`, um índice "para a tarefa X, leia Y" e um `CLAUDE.md` curto que aponta para lá | agentes do Orca |
-| Execução e acompanhamento do pipeline | Dagster, no papel da C2 (decisão aberta, ver abaixo) | dono |
+| Execução e acompanhamento do pipeline | Dagster, no papel da C2 da 8.C (decidido em 2026-10-13) | dono |
 | Tarefas | Jira, como hoje; a documentação cita o KAN-N | dono, agentes |
 | Tela própria | só se algo não couber nas ferramentas acima (ex.: aprovar em lote) | dono |
 
@@ -77,57 +82,115 @@ Alternativas descartadas como solução única:
 - O site é reconstruído no `make check` (`mkdocs build --strict`). O que é escrito à mão
   (ADRs, textos executivos) segue o fluxo de hoje.
 
+## Decisões do dono (2026-10-13)
+
+1. **Dagster já como C2.** A C2 da 8.C deixa de ser o script `scripts/lote_concursos.py`: o
+   orquestrador mínimo nasce no Dagster (sessões D5a e D5b, cards KAN-31 e KAN-32), e os
+   lotes C3 a C7 já rodam nele. O que sobra da 8.1 (`--proximo` na ordem dos anos, tamanho do
+   lote, teto de custo) entra depois como schedule, sensor e config do Dagster.
+2. **Documentação em paralelo à 8.C.** D1 a D4 não mexem no pipeline nem no banco e rodam
+   numa worktree própria no Orca, sem esperar a coleta ME.
+3. **Site em `docs.projetoathos.com.br`, atrás do Cloudflare Access**, como o Datasette
+   (ADR-015). Para quem é de fora, o PDF da parte executiva (D4).
+4. **D3 aprovado, com núcleo no `CLAUDE.md`:** o detalhe das regras de §6 e §7 vai para as
+   páginas de regras, e o `CLAUDE.md` mantém uma lista curta das regras que quebram dados se
+   forem esquecidas (piloto inalterado, `.env`, portões humanos), cada uma com link para a
+   página.
+
+## Ordem: duas trilhas
+
+| Trilha | Sequência | Onde |
+|---|---|---|
+| A, documentação | D1 → D2 → D3 e D4 (em qualquer ordem depois do D2) | worktree própria, em paralelo |
+| B, coleta ME (8.C) | C1b.0 → C1b.1 → C1b → **D5a → D5b (= C2)** → C3…C7 → C8 | `plano-etapa-8c.md` |
+
+O D5a monta os assets do Dagster a partir do registro do D2. Se o D2 não estiver pronto quando
+a C1b fechar, o D5a cria o registro só com as etapas, e o D2 completa depois com regras e
+checagens.
+
 ## Sessões (uma sessão e um card no Jira por item)
 
-### D1: Esqueleto do MkDocs
+### D1: Esqueleto do MkDocs (KAN-68)
 
 - `mkdocs.yml` com Material, navegação "Executivo" e "Técnico", busca e Mermaid.
 - Os docs atuais (ADRs, runbook, planos, `architecture.md`, relatórios) entram sem ser
   reescritos.
+- `site_dir: build/docs`: o padrão `site/` colide com o app FastAPI em `site/`. `build/` no
+  `.gitignore` e `mkdocs-material` nas dependências.
 - Alvos no `Makefile` (`docs-serve`, `docs-build`) e `mkdocs build --strict` no `make check`.
-- Pronto quando: o site sobe local, todos os links internos resolvem e o `--strict` passa.
+- Container `scraper-cebraspe-docs` (nginx:alpine servindo o build) com rótulos do Traefik
+  para `docs.projetoathos.com.br`. O dono cria a aplicação no Cloudflare Access (passo
+  manual, como no Datasette).
+- Pronto quando: o site sobe local e no domínio atrás do Access, todos os links internos
+  resolvem e o `--strict` passa.
 
-### D2: Registro e páginas geradas
+### D2: Registro e páginas geradas (KAN-69)
 
 - Registro de etapas, checagens e regras, com as páginas e o diagrama Mermaid gerados dele
-  (substitui o diagrama parado na fase 5).
-- Teste guarda de sincronia entre código e registro.
+  (substitui o diagrama parado na fase 5). O mesmo registro é a fonte dos assets do Dagster
+  (D5a): uma fonte só para o pipeline documentado e o executado.
+- Teste guarda de sincronia: registro ↔ `scripts/` e registro ↔ `Definitions` do Dagster,
+  quando existir.
 - Checagens que hoje só aparecem no pytest ou no log passam a ter um resultado consultável
   (arquivo JSON gerado ou query documentada), para a página de validações mostrar o estado.
 - Pronto quando: um script novo sem entrada no registro quebra o teste, e as páginas geradas
   batem com o código.
 
-### D3: Contexto para agentes
+### D3: Contexto para agentes (KAN-70)
 
 - Índice por tarefa (ex.: "rodar um lote", "curar a árvore", "mexer no site") apontando
   para as páginas certas.
-- `CLAUDE.md` mais enxuto: as regras de §6 e §7 passam para as páginas de regras, e o
-  `CLAUDE.md` fica com identidade, estado e ponteiros. **Exige aprovação do dono antes de
-  mexer**, porque muda o que todo agente carrega.
+- `CLAUDE.md` mais enxuto: o detalhe das regras de §6 e §7 passa para as páginas de regras,
+  e o `CLAUDE.md` fica com identidade, estado, ponteiros e o núcleo de regras que quebram
+  dados se forem esquecidas (piloto inalterado, `.env`, portões humanos), cada uma com link.
+  **Aprovado pelo dono em 2026-10-13**, nesse formato.
 - Pronto quando: um agente novo no Orca acha, a partir do `CLAUDE.md`, a regra e o runbook
   de uma tarefa sem ler o arquivo inteiro.
 
-### D4: Documentação executiva
+### D4: Documentação executiva (KAN-71)
 
 - Visão (problema, solução, para quem), arquitetura em diagrama C4, números atuais
   (concursos, questões, custo de LLM), decisões principais (resumo dos ADRs) e roadmap
   ligado ao Jira.
-- Exportação em PDF.
+- Exportação em PDF, para quem é de fora (o site fica atrás do Cloudflare Access).
 - Pronto quando: o dono consegue enviar o PDF a alguém de fora sem precisar explicar o
   projeto antes.
 
-### D5: Dagster como C2 (depende de decisão)
+### D5a: Dagster, infra e assets (KAN-31; é a C2 da 8.C, parte 1)
 
-- Etapas viram assets que chamam as funções atuais (não reescrevem), com partição por
-  concurso, asset checks para as validações e os portões humanos como checagens que travam a
-  etapa seguinte.
-- Containers novos no `docker-compose.yml`, expostos via Traefik + Cloudflare Access.
+- `Dockerfile.dagster` (requirements do projeto + `dagster`, `dagster-webserver`,
+  `dagster-postgres` e o Chromium do Playwright). Serviços webserver e daemon no
+  `docker-compose.yml`, código por bind mount (como o bot), `data/`, `inventario/` e
+  `revisao_piloto/` montados, credenciais do `.env`.
+- Storage do Dagster num banco `dagster` separado dentro do `scraper-cebraspe-db` (nunca no
+  `cebraspe`).
+- Traefik em `dagster.projetoathos.com.br` + Cloudflare Access (o dono cria a aplicação).
+- Assets gerados do registro (D2), particionados por concurso (partições dinâmicas vindas do
+  inventário). Chamam as funções atuais, sem reescrever: `process_contest`,
+  `revisar_edital_piloto`, `processar_fila`/`atualizar_artefatos_revisao`,
+  `classificar_todas_questoes`; `--concurso` no `classificar_questoes` (hoje só `--caderno`).
+- Lote = uma execução com 2 partições. O estado vem do Dagster (materializações) e do banco
+  (`status_revisao_humana`); o `inventario/lotes.json` do plano antigo deixa de ser
+  necessário.
+- Testes: `Definitions` carrega; assets com as funções mockadas (retomada, parada no portão,
+  aprovação).
+- Pronto quando: materializar o lote da C1 (`SEFA_PR_25` + `BANRISUL_25`) em modo conferência
+  não muda nada (idempotente), e a UI abre no domínio com Access.
 
-## Decisões abertas (perguntar ao dono antes da sessão correspondente)
+### D5b: checagens, portões e relatório (KAN-32; é a C2 da 8.C, parte 2)
 
-1. **Ordem:** começar pela documentação (D1 → D4) ou pôr o Dagster antes? O Dagster ocupa o
-   lugar da C2 da 8.C, e hoje a C2 está planejada como script simples, com a coleta ME como
-   prioridade do dono.
-2. **Acesso ao site de documentação:** só local, ou em `docs.projetoathos.com.br` atrás do
-   Cloudflare Access, como o Datasette?
-3. **D3:** aprovar a migração das regras de §6 e §7 do `CLAUDE.md` para as páginas.
+- Asset checks: tabela "Checagens automáticas por lote" do `plano-etapa-8.md` (download,
+  edital, prova, banco, classificação, site), invariante do piloto antes e depois do lote,
+  consultas a–e do `docs/runbook-lote.md`, alternativa terminando em caixa alta, custo pelo
+  OpenRouter (`/api/v1/key`) e o alerta "ME sem texto-base" (questão ME que cita texto,
+  tabela, figura, gráfico ou quadro sem texto-base nem figura; exceções BANRISUL Q22,
+  SEFA_PR Q11 e Q50; não bloqueia).
+- Portões humanos como checks bloqueantes que leem `status_revisao_humana` e as pendências da
+  curadoria: a etapa seguinte não roda até o dono aprovar (Datasette, `curar_arvore.py`).
+- Detector de dispersão (`detectar_dispersao_arvore --propor`) como asset depois da carga; as
+  propostas novas vão para o relatório (KAN-64).
+- Pendências do §7 do runbook: chunking sem LLM (`--so-chunking`) e todos os editais do lote
+  extraídos antes de uma carga só.
+- Relatório `inventario/lotes/lote_NN.md` gerado dos resultados das checks.
+- Pronto quando: o relatório do lote da C1 sai com as checagens verdes e um teste mostra o
+  portão travando a etapa seguinte.

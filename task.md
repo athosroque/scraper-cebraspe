@@ -19,18 +19,18 @@ enviar o bloco de uma etapa específica para o agente construir.
 > importância: (1) o que mais cai na prova; (2) o que o edital cobra; (3)
 > edital × prova; (4) desempenho pessoal do usuário.
 
-## ⚡ Painel de etapas (atualizado em 2026-10-12)
+## ⚡ Painel de etapas (atualizado em 2026-10-13)
 
 Ordem de trabalho, uma sessão (conversa) por item. O detalhe de cada sessão está no plano
 indicado; o checklist fica na seção da etapa, mais abaixo.
 
 | # | Etapa | Estado | Onde está o detalhe |
 |---|---|---|---|
-| 1 | **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12) | **próxima** | [`plano-etapa-8c.md`](plano-etapa-8c.md), sessões C0 a C8 |
+| 1 | **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12) | **próxima** (a C2 é o Dagster, Etapa 9/D5a e D5b) | [`plano-etapa-8c.md`](plano-etapa-8c.md), sessões C0 a C8 |
 | 2 | 8.M.2 Estatísticas por recorte (drill-down e filtros, KAN-28/KAN-54) | na fila | seção 8.M.2 abaixo |
-| 3 | 8.1 Orquestrador de lotes (o que sobrar depois da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
+| 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
-| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | planejada, 3 decisões abertas (KAN-67) | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5 |
+| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67) | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
 
@@ -1164,8 +1164,9 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     por ferramenta; nomes compostos ("Ferramentas…: SWOT; BSC…") apontam para as partes (ADR-030).
     Antes da C1b: a matéria ESTRATÉGIA do BANRISUL_25 cai nesses nós.
   - `[ ]` C1b (KAN-57) Mesmo lote: árvore (pausa: curadoria), classificação, site no Chromium.
-  - `[ ]` C2 (KAN-31, KAN-32) Orquestrador mínimo `scripts/lote_concursos.py` (núcleo da 8.1), com o alerta
-    "ME sem texto-base" e `--concurso` no `classificar_questoes`.
+  - `[ ]` C2 (KAN-31, KAN-32) Orquestrador mínimo no **Dagster** (decisão do dono em 2026-10-13,
+    KAN-67): sessões D5a e D5b da Etapa 9 (`plano-etapa-9.md`), com o alerta "ME sem texto-base"
+    e `--concurso` no `classificar_questoes`. Checklist na seção Etapa 9.
   - `[ ]` C3 (KAN-58) `SEBRAE_25_PSE_1` + `UNIVESP_25_PSS`
   - `[ ]` C4 (KAN-59) `IPAAM_25` + `SEMA_AM_25`
   - `[ ]` C5 (KAN-60) `PGE_ES_25_PROCURADOR` + `PGE_PI_25`
@@ -1200,8 +1201,9 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     da disciplina (somando 100% com "Outros") e o "% da prova" como segundo número.
   - **Pronto quando:** os dois usos-alvo acima são respondidos no site, sem SQL à mão, também
     com o filtro de nível, e `make test-all` está verde.
-- `[ ]` **8.1 Orquestrador de lotes** (o núcleo sai na 8.C/C2; aqui fica o resto: ordem
-  geral dos anos, `--proximo`, `--tamanho N` e teto de custo): `scripts/lote_concursos.py` (`--proximo`, `--lote`,
+- `[ ]` **8.1 Orquestrador de lotes** (o núcleo sai no Dagster, na 8.C/C2 = Etapa 9/D5a e D5b;
+  aqui fica o resto como schedule, sensor e config do Dagster: ordem geral dos anos, próximo
+  lote, tamanho do lote e teto de custo). Texto original, antes da decisão pelo Dagster: `scripts/lote_concursos.py` (`--proximo`, `--lote`,
   `--aprovar`, `--status`), estado em `inventario/lotes.json`, checagens automáticas e relatório
   por lote.
   - `[ ]` Checagem automática (pedido do dono, 2026-10-09): alerta para questão ME cujo
@@ -1214,6 +1216,36 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   de calibração.
 - **Pronto quando:** todos os concursos marcados `incluir` no inventário estão `aprovado`, as
   views da 5E reconciliam e a suíte completa está verde.
+
+## Etapa 9: Documentação viva e Dagster como C2
+
+Plano autocontido em [`plano-etapa-9.md`](plano-etapa-9.md), uma sessão por item. Card da
+etapa: KAN-67. Decisões do dono (2026-10-13): Dagster já como C2 da 8.C; docs em paralelo à
+8.C numa worktree própria; site em `docs.projetoathos.com.br` atrás do Cloudflare Access; D3
+aprovado com um núcleo de regras no `CLAUDE.md`.
+
+Trilha A, documentação (em paralelo):
+
+- `[ ]` D1 (KAN-68) Esqueleto do MkDocs (`site_dir: build/docs`), alvos no `Makefile`,
+  `mkdocs build --strict` no `make check` e container `scraper-cebraspe-docs` no domínio.
+  **Pronto quando:** o site sobe local e no domínio, os links resolvem e o `--strict` passa.
+- `[ ]` D2 (KAN-69) Registro de etapas, checagens e regras (`src/registro.py`, também fonte do
+  Dagster); páginas e Mermaid gerados; teste guarda. **Pronto quando:** um script novo sem
+  entrada no registro quebra o teste e as páginas batem com o código.
+- `[ ]` D3 (KAN-70) Contexto para agentes: índice por tarefa e `CLAUDE.md` enxuto, com o núcleo
+  de regras e links. **Pronto quando:** um agente novo acha a regra e o runbook de uma tarefa a
+  partir do `CLAUDE.md`, sem ler o arquivo inteiro.
+- `[ ]` D4 (KAN-71) Documentação executiva (visão, C4, números, decisões, roadmap) e PDF.
+  **Pronto quando:** o dono envia o PDF a alguém de fora sem explicar o projeto antes.
+
+Trilha B, Dagster (é a C2 da 8.C, depois da C1b):
+
+- `[ ]` D5a (KAN-31) Infra e assets: containers, banco `dagster`, domínio com Access, assets
+  por concurso gerados do registro e `--concurso` no `classificar_questoes`. **Pronto
+  quando:** o lote da C1 em modo conferência não muda nada e a UI abre no domínio.
+- `[ ]` D5b (KAN-32) Asset checks, portões do dono, detector de dispersão e relatório
+  `inventario/lotes/lote_NN.md`. **Pronto quando:** o relatório do lote da C1 sai com as
+  checagens verdes e um teste mostra o portão travando a etapa seguinte.
 
 ## Pendências posteriores (fora de etapa)
 

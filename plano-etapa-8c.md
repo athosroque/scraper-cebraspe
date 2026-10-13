@@ -4,8 +4,8 @@
 > em 2026-10-12: a coleta dos cadernos ME vem antes da 8.M.2 (estatísticas por recorte).
 > Base normativa: ADR-026 (banco próprio), ADR-030 (árvore), ADR-031 (cadernos), ADR-032
 > (classificação), ADR-037 (inventário e exclusões), ADR-038 (ME), ADR-039 (incidência).
-> Jira: KAN-55 (etapa); C0 = KAN-30, C1a = KAN-56, C1b = KAN-57, C2 = KAN-31 + KAN-32,
-> C3–C7 = KAN-58 a KAN-62, C8 = KAN-63.
+> Jira: KAN-55 (etapa); C0 = KAN-30, C1a = KAN-56, C1b = KAN-57, C2 = KAN-31 + KAN-32 (Dagster,
+> sessões D5a e D5b da Etapa 9, `plano-etapa-9.md`), C3–C7 = KAN-58 a KAN-62, C8 = KAN-63.
 > Ao abrir uma sessão, ler só este arquivo e a seção dela. O `task.md` tem o resumo e o
 > checklist.
 
@@ -138,26 +138,21 @@ inalterado e roteiro escrito.
 **Pronto quando:** os 2 concursos `aprovado`, classificação aplicada, site conferido no
 Chromium, piloto inalterado e roteiro completo até o site.
 
-### C2 — Orquestrador mínimo (núcleo da 8.1)
+### C2 — Orquestrador mínimo no Dagster (sessões D5a e D5b da Etapa 9)
 
-`scripts/lote_concursos.py` automatiza o roteiro da C1, com estado em `inventario/lotes.json`
-(por concurso: `mapeado → baixado → edital_extraido → aguardando_revisao_edital →
-questoes_extraidas → aguardando_curadoria → classificado → aprovado`), idempotente e
-retomável: `--lote N --concursos A,B`, `--continuar N`, `--status`, `--aprovar N`. Para em
-toda pausa do dono e em falha bloqueante.
+Decisão do dono em 2026-10-13 (KAN-67): a C2 não é mais o script `scripts/lote_concursos.py`.
+O orquestrador nasce no **Dagster**, com os assets chamando as funções atuais, partição por
+concurso, asset checks e portões humanos. O detalhe está no `plano-etapa-9.md`:
 
-- Checagens automáticas que entram no relatório `inventario/lotes/lote_NN.md` (tabela
-  "Checagens automáticas por lote" do `plano-etapa-8.md`), incluindo o alerta pedido pelo
-  dono em 2026-10-09: questão ME que cita "texto", "tabela", "figura", "gráfico" ou "quadro"
-  e ficou sem texto-base e sem figura (excluir o "texto precedente" no próprio enunciado:
-  BANRISUL Q22, SEFA_PR Q11 e Q50). O alerta não bloqueia.
-- `--concurso` no `classificar_questoes` (hoje só `--caderno`).
-- Testes com etapas mockadas: retomada, parada na pausa, `--aprovar`.
-- Passo fixo: detector de dispersão da árvore (`detectar_dispersao_arvore --propor`) depois da
-  carga de cada lote; as propostas vão para o dono (KAN-64).
+- **D5a (KAN-31):** containers, storage, domínio com Cloudflare Access, assets gerados do
+  registro da Etapa 9/D2, `--concurso` no `classificar_questoes`.
+- **D5b (KAN-32):** checagens automáticas do lote (tabela do `plano-etapa-8.md`, consultas a–e
+  do runbook, invariante do piloto, alerta "ME sem texto-base" sem bloquear), portões do dono
+  como checks bloqueantes, detector de dispersão depois da carga (KAN-64) e relatório
+  `inventario/lotes/lote_NN.md`.
 
-**Pronto quando:** rodar o orquestrador sobre o lote da C1 em modo conferência não muda nada
-(idempotente) e o relatório do lote sai com as checagens verdes.
+**Pronto quando:** materializar o lote da C1 em modo conferência não muda nada (idempotente)
+e o relatório do lote sai com as checagens verdes.
 
 ### C3 a C7 — Lotes ME de 2025 (uma sessão por lote, pausa do dono no meio)
 
@@ -171,7 +166,7 @@ Pares por afinidade (a árvore cresce por área, e a curadoria fica mais curta):
 | C6 | 5 | `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25` (fiscal e controle) |
 | C7 | 6 | `SEED_SE_25_PROFESSOR` (sozinho: 19 objetivos + 17 discursivos) |
 
-Cada lote: `lote_concursos.py` até a pausa do edital → dono aprova → até a pausa da
+Cada lote: materializar no Dagster até o portão do edital → dono aprova → até a pausa da
 curadoria → dono decide → classificação aplicada → relatório do lote → `--aprovar`. Correção
 de parser no meio exige reextrair os lotes anteriores e conferir chaves 5D e contagens.
 

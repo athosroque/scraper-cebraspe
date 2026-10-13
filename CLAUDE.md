@@ -333,12 +333,22 @@ Datasette continua só como ferramenta de revisão do dono.
       C1a (KAN-56, em análise, falta aprovar os 2 editais): `SEFA_PR_25` + `BANRISUL_25` no banco
       (610 questões ME, 5 discursivas, US$ 0,018), área vira cargo e seção ME pelo layout
       (ADR-038), roteiro em `docs/runbook-lote.md`.
-      Próximas: C1b árvore/classificação/site do mesmo lote → C2 orquestrador mínimo →
+      Próximas: C1b árvore/classificação/site do mesmo lote → C2 orquestrador mínimo no
+      Dagster (Etapa 9/D5a + D5b, KAN-31 e KAN-32; decisão do dono em 2026-10-13) →
       C3–C7 lotes → C8 fechamento. Pronto quando os 11 concursos ME de 2025 encerrados estão `aprovado`,
       o piloto segue inalterado e `make test-all` está verde.
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — os dois usos-alvo do dono
       (banca × ano × assunto; concurso × matéria × assunto) respondidos no site, com % de dois
       níveis e nº de questões distintas; detalhes no `task.md`.
+- [ ] Etapa 9 Documentação viva (MkDocs executivo + técnico, contexto para agentes) e Dagster como C2 — plano em
+      `plano-etapa-9.md` (KAN-67). Decisões do dono (2026-10-13): o Dagster é a C2 da 8.C;
+      a documentação roda em paralelo à 8.C numa worktree própria; site em
+      `docs.projetoathos.com.br` atrás do Cloudflare Access; D3 aprovado com um núcleo de
+      regras no `CLAUDE.md`. Sessões: D1 MkDocs (KAN-68), D2 registro e páginas geradas
+      (KAN-69), D3 contexto para agentes (KAN-70), D4 executivo e PDF (KAN-71), D5a e D5b
+      Dagster (KAN-31, KAN-32). Pronto quando o site gerado do código está no ar com o
+      `--strict` no `make check`, o PDF executivo sai sem explicação prévia e o lote da C1
+      roda no Dagster com as checagens verdes.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
