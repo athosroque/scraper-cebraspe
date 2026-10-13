@@ -1,12 +1,15 @@
-# Planos de etapa concluídos (arquivo)
+# Planos concluídos
 
-Planos de execução por sessão das etapas já concluídas. São histórico: o
+Planos de execução, sessão por sessão, das etapas já concluídas.
+
+**Para que serve:** ver como uma etapa foi feita e o que ficou de fora. São histórico: o
 estado atual está no `task.md` (checklist) e no `CLAUDE.md` (§5), e as
 decisões estão nos ADRs (`docs/adr/`). Não editar; se algo daqui voltar a
 valer, levar para o `task.md`.
 
 Só o plano da etapa em andamento fica na raiz do projeto (hoje,
-`plano-etapa-8.md` e `plano-etapa-8c.md`). Ao concluir a etapa, `git mv` para cá.
+`plano-etapa-8.md`, `plano-etapa-8c.md` e `plano-etapa-9.md`). Ao concluir a etapa, `git mv` para cá e
+acrescente o plano na tabela abaixo e no `nav` do `mkdocs.yml` (grupo "Planos concluídos").
 
 | Arquivo | Etapa | ADR |
 |---|---|---|

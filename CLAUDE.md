@@ -123,8 +123,8 @@ fica só o estado resumido. Mantenha o título de cada item (o texto antes do ` 
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — na fila,
       depois da 8.C; detalhes no `task.md`.
 - [ ] Etapa 9 Documentação viva (MkDocs executivo + técnico, contexto para agentes) e Dagster como C2 — plano em
-      `plano-etapa-9.md` (KAN-67). D1 (KAN-68, ADR-040) e D2 (KAN-69, ADR-041) concluídas;
-      D3 (KAN-70) feita, aguardando aprovação; próximas D4 (KAN-71, executivo e PDF), D5a e
+      `plano-etapa-9.md` (KAN-67). D1 (KAN-68, ADR-040), D2 (KAN-69, ADR-041) e
+      D3 (KAN-70) concluídas; próximas D4 (KAN-71, executivo e PDF), D5a e
       D5b (KAN-31 e KAN-32, Dagster).
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06 (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -190,7 +190,8 @@ Documentação (Etapa 9/D1, ADR-040):
 - `make docs-build`: `mkdocs build --strict` em `build/docs`; também roda no `make check`.
 - `make docs-build && docker compose up -d scraper-cebraspe-docs`: nginx em
   `127.0.0.1:8013` e `docs.projetoathos.com.br` via Traefik + Cloudflare Access.
-- Página nova em `docs/` precisa entrar no `nav` do `mkdocs.yml`, senão o `--strict` falha.
+- Página nova em `docs/` entra no `nav` do `mkdocs.yml`, na aba e seção do seu propósito
+  (seção nova ganha `index.md` de abertura; ADR-040), senão o `--strict` falha.
 - `make docs-gerar` (Etapa 9/D2, ADR-041): regera `docs/tecnico/` (pipeline, comandos,
   regras, checagens e banco) a partir de `src/registro/`; lê o schema do banco. Sem banco:
   `venv/bin/python -m scripts.gerar_docs --sem-banco`; conferir: `--verificar`.

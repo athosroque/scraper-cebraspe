@@ -1,7 +1,18 @@
 # Visão executiva
 
-!!! note
+Resumo do projeto para quem não acompanha o código: o problema, a solução, os números e o que vem a seguir.
 
-    O conteúdo executivo (problema, solução, arquitetura C4, números, custos e roadmap) vem na sessão D4 da Etapa 9 (KAN-71). Esta página é o esqueleto da seção.
+**Para que serve:** explicar o projeto em poucos minutos, sem precisar de contexto técnico. Desta seção sai o PDF que o dono envia a quem é de fora, já que o site fica atrás do Cloudflare Access.
 
-Enquanto isso, o contexto técnico está em [Arquitetura](../architecture.md) e o histórico de decisões em [ADRs](../adr/README.md).
+!!! note "Em preparação"
+
+    O conteúdo desta seção vem na sessão D4 da Etapa 9 (KAN-71):
+
+    - **Visão:** o problema, a solução e para quem ela serve.
+    - **Arquitetura** em diagrama C4.
+    - **Números atuais:** concursos, questões e custo de LLM.
+    - **Decisões principais**, com o resumo dos ADRs.
+    - **Roadmap** ligado ao Jira.
+    - **Exportação em PDF.**
+
+Enquanto isso, a página [Arquitetura](../guia/arquitetura/index.md) mostra como o sistema é montado, e a aba [Decisões](../adr/README.md) explica por que ele é assim.

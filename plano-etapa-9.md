@@ -1,8 +1,7 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
-Criado em 2026-10-12. Estado: **D1 (KAN-68) e D2 (KAN-69) concluídas e aprovadas (2026-10-13);
-D3 (KAN-70) feita em 2026-10-13, aguardando aprovação do dono; decisões do dono fechadas em
-2026-10-13**.
+Criado em 2026-10-12. Estado: **D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas e aprovadas (2026-10-13);
+próxima: D4 (KAN-71); decisões do dono fechadas em 2026-10-13**.
 
 > Jira: KAN-67 (etapa); D1 = KAN-68, D2 = KAN-69, D3 = KAN-70, D4 = KAN-71; D5a = KAN-31 e
 > D5b = KAN-32 (são a C2 da 8.C, `plano-etapa-8c.md`).
@@ -165,7 +164,7 @@ checagens.
   **Aprovado pelo dono em 2026-10-13**, nesse formato.
 - Pronto quando: um agente novo no Orca acha, a partir do `CLAUDE.md`, a regra e o runbook
   de uma tarefa sem ler o arquivo inteiro.
-- Feito (2026-10-13, aguardando aprovação; atualização D3 no ADR-041): o registro passou a
+- Feito (2026-10-13, aprovado pelo dono; atualização D3 no ADR-041): o registro passou a
   ser a fonte das regras. `Regra.nucleo` marca 18 regras (P41, P51, P67, P70, a P71 nova do
   piloto inalterado, A06, A07, A13, A25, A27–A30, A42, A44, A57, A59 e A62), e só elas ficam
   no §6/§7 do `CLAUDE.md`, uma linha cada, com link para `docs/tecnico/regras.md#<id>`.
@@ -176,6 +175,9 @@ checagens.
   com o link certo, links relativos do `CLAUDE.md` existem, tarefas só citam ids existentes e
   toda área com regra tem tarefa. Depois, o `llms.txt` foi removido: repetia o `CLAUDE.md`
   e nenhuma ferramenta do projeto o lê (o Claude Code carrega só os `CLAUDE.md`).
+  Antes da aprovação, a pedido do dono, o site foi reorganizado em 5 abas por propósito
+  (Início, Visão executiva, Guia técnico, Decisões e Histórico), com página de abertura em
+  cada seção e ADRs por tema (atualização no ADR-040).
 
 ### D4: Documentação executiva (KAN-71)
 

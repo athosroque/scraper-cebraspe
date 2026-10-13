@@ -82,3 +82,30 @@ Duas restrições pesam na escolha:
   `omitted_files` já garante que nada escape.
 - **Sem gerador (só Markdown no GitHub):** não tem busca, Mermaid com tema
   consistente, nem o alerta de link e âncora quebrados no build.
+
+## Atualização (2026-10-13): navegação por propósito
+
+Antes de aprovar a D3 (KAN-70), o dono achou o site bagunçado. A aba "Técnico" juntava
+tudo, e os 41 ADRs abriam de uma vez na barra lateral, com o título longo do H1. O `nav`
+passou a ter **5 abas por propósito**:
+
+- **Início:** o que é o projeto, cartões "por onde começar" para cada público e como manter
+  o site.
+- **Visão executiva:** a seção da D4 (KAN-71).
+- **Guia técnico**, com três seções: *Para agentes* (tarefas, regras, páginas geradas),
+  *Arquitetura* (componentes, pipeline, banco) e *Operação* (runbook, comandos, checagens,
+  teste do site). Páginas geradas e escritas à mão ficam juntas, pelo propósito.
+- **Decisões:** os ADRs em 6 grupos por tema, com título curto no `nav` (`001 · Ano pelo
+  slug da URL`). O `adr/README.md` traz o catálogo completo nas mesmas 6 tabelas.
+- **Histórico:** os planos concluídos e os relatórios.
+
+Regras novas:
+
+- Toda aba e toda seção têm uma página de abertura (`index.md`) que diz o que a seção é,
+  para que serve e quando ler, e traz uma grade de cartões com uma linha por página.
+- Página nova entra no `nav` na seção do seu propósito. Seção nova ganha a sua página de
+  abertura. Nenhum arquivo muda de caminho por causa da navegação, porque o `CLAUDE.md`, o
+  `task.md` e os ADRs citam esses caminhos.
+- Os ajustes visuais (cartões, seção em caixa alta com linha-guia, aba ativa sublinhada,
+  breadcrumb com `navigation.path`) ficam em `docs/stylesheets/tema.css`. O tema continua
+  sendo o do D2.

@@ -2,7 +2,9 @@
 
 # Tarefas
 
-Índice para agentes: para a tarefa X, leia Y. Cada tarefa lista as páginas a ler, as regras da área, as etapas, os comandos, as checagens e as ADRs. A fonte é `src/registro/tarefas.py`; as regras vêm de `src/registro/regras_*.py`.
+Índice para agentes: para a tarefa X, leia Y. Use no começo de qualquer trabalho: ache a tarefa e siga só o que ela lista.
+
+Cada tarefa lista as páginas a ler, as regras da área, as etapas, os comandos, as checagens e as ADRs. A fonte é `src/registro/tarefas.py`; as regras vêm de `src/registro/regras_*.py`.
 
 ## T01 Rodar um lote de concursos (8.C)
 

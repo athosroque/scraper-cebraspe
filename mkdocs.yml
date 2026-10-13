@@ -32,7 +32,10 @@ theme:
     - navigation.tabs
     - navigation.sections
     - navigation.indexes
+    - navigation.path
+    - navigation.footer
     - navigation.top
+    - toc.follow
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -55,6 +58,10 @@ markdown_extensions:
   - tables
   - admonition
   - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.details
   - pymdownx.highlight
   - pymdownx.inlinehilite
@@ -80,74 +87,88 @@ validation:
 
 nav:
   - Início: index.md
-  - Executivo:
-      - executivo/index.md
-  - Técnico:
-      - Arquitetura: architecture.md
-      - Gerado do código:
-          - tecnico/index.md
-          - Tarefas: tecnico/tarefas.md
-          - Pipeline: tecnico/pipeline.md
+  - Visão executiva: executivo/index.md
+  - Guia técnico:
+      - guia/index.md
+      - Para agentes:
+          - guia/agentes/index.md
+          - Tarefas por tipo de trabalho: tecnico/tarefas.md
+          - Regras do projeto: tecnico/regras.md
+          - Como as páginas são geradas: tecnico/index.md
+      - Arquitetura:
+          - guia/arquitetura/index.md
+          - Componentes: architecture.md
+          - Pipeline e etapas: tecnico/pipeline.md
+          - Banco de dados: tecnico/banco.md
+      - Operação:
+          - guia/operacao/index.md
+          - Runbook de lote: runbook-lote.md
           - Comandos: tecnico/comandos.md
-          - Regras: tecnico/regras.md
           - Checagens: tecnico/checagens.md
-          - Banco: tecnico/banco.md
-      - Runbook de lote: runbook-lote.md
-      - Teste no navegador: guia-teste-navegador.md
-      - ADRs:
-          - adr/README.md
-          - adr/ADR-001-filtro-ano-slug-url.md
-          - adr/ADR-002-fonte-primaria-concursos-encerrados.md
-          - adr/ADR-003-tabelas-postgres-study-rag.md
-          - adr/ADR-004-priorizacao-cargo-slug.md
-          - adr/ADR-005-idempotencia-registro-json.md
-          - adr/ADR-006-extracao-orgao-slug.md
-          - adr/ADR-007-dedup-download-dupla-camada.md
-          - adr/ADR-008-resolucao-href-relativo.md
-          - adr/ADR-009-recorte-objetos-avaliacao.md
-          - adr/ADR-010-chunking-cargo-materia.md
-          - adr/ADR-011-extracao-llm-requests-direto.md
-          - adr/ADR-012-virtual-key-litellm.md
-          - adr/ADR-013-ligacao-spider-downloader.md
-          - adr/ADR-014-trilha-auditoria-parser-extractor.md
-          - adr/ADR-015-revisao-datasette-traefik.md
-          - adr/ADR-016-retry-maiores-tokens-llm.md
-          - adr/ADR-017-validacao-heuristica-de-para-taxonomia.md
-          - adr/ADR-018-relatorio-html-e-extensao-schema-revisao.md
-          - adr/ADR-019-pipeline-automatico-artefatos-revisao.md
-          - adr/ADR-020-classificacao-nivel-tipo-conhecimento-concurso.md
-          - adr/ADR-021-reparo-local-nome-topico-numerico.md
-          - adr/ADR-022-classificacao-erros-chamada-openrouter.md
-          - adr/ADR-023-migracao-langfuse-sdk-oficial.md
-          - adr/ADR-024-coleta-camara-deputados-refinamentos-parser.md
-          - adr/ADR-025-reconciliacao-deterministica-severidade-alertas.md
-          - adr/ADR-026-banco-postgres-proprio.md
-          - adr/ADR-027-star-schema-estatisticas.md
-          - adr/ADR-028-cargos-restritos-e-aprovacao-fase4.md
-          - adr/ADR-029-camada-canonica-sinonimos.md
-          - adr/ADR-030-arvore-mestre-e-site-de-questoes.md
-          - adr/ADR-031-extracao-questoes-cadernos.md
-          - adr/ADR-032-classificacao-questoes-arvore.md
-          - adr/ADR-033-site-publico-stack-e-deploy.md
-          - adr/ADR-034-fidelidade-ao-caderno-e-filtros.md
-          - adr/ADR-035-card-e-filtros-formato-gran.md
-          - adr/ADR-036-etapas-testes-e-ruff.md
-          - adr/ADR-037-escopo-do-site-no-inventario.md
-          - adr/ADR-038-suporte-multipla-escolha-retrocompativel.md
-          - adr/ADR-039-incidencia-em-dois-niveis.md
-          - adr/ADR-040-site-documentacao-mkdocs.md
-          - adr/ADR-041-registro-e-paginas-geradas.md
+          - Teste do site no navegador: guia-teste-navegador.md
+  - Decisões:
+      - adr/README.md
+      - Coleta e download:
+          - "001 · Ano pelo slug da URL": adr/ADR-001-filtro-ano-slug-url.md
+          - "002 · Fonte: concursos encerrados": adr/ADR-002-fonte-primaria-concursos-encerrados.md
+          - "004 · Prioridade de cargo pelo slug": adr/ADR-004-priorizacao-cargo-slug.md
+          - "005 · Idempotência por registro JSON": adr/ADR-005-idempotencia-registro-json.md
+          - "006 · Órgão pelo slug": adr/ADR-006-extracao-orgao-slug.md
+          - "007 · Dedup de download em duas camadas": adr/ADR-007-dedup-download-dupla-camada.md
+          - "008 · Href relativo no crawler": adr/ADR-008-resolucao-href-relativo.md
+          - "013 · Spider chama o downloader": adr/ADR-013-ligacao-spider-downloader.md
+      - Extração do edital e revisão:
+          - "009 · Recorte dos objetos de avaliação": adr/ADR-009-recorte-objetos-avaliacao.md
+          - "010 · Chunking por cargo e matéria": adr/ADR-010-chunking-cargo-materia.md
+          - "011 · LLM por HTTP direto": adr/ADR-011-extracao-llm-requests-direto.md
+          - "012 · Chaves por serviço (substituído)": adr/ADR-012-virtual-key-litellm.md
+          - "014 · Trilha de auditoria": adr/ADR-014-trilha-auditoria-parser-extractor.md
+          - "015 · Revisão no Datasette": adr/ADR-015-revisao-datasette-traefik.md
+          - "016 · Retry e mais tokens no LLM": adr/ADR-016-retry-maiores-tokens-llm.md
+          - "017 · Validação de-para": adr/ADR-017-validacao-heuristica-de-para-taxonomia.md
+          - "018 · Relatório HTML de revisão": adr/ADR-018-relatorio-html-e-extensao-schema-revisao.md
+          - "019 · Artefatos de revisão automáticos": adr/ADR-019-pipeline-automatico-artefatos-revisao.md
+          - "020 · Nível, tipo e concurso do chunk": adr/ADR-020-classificacao-nivel-tipo-conhecimento-concurso.md
+          - "021 · Reparo de tópico numérico": adr/ADR-021-reparo-local-nome-topico-numerico.md
+          - "022 · Erros da chamada ao OpenRouter": adr/ADR-022-classificacao-erros-chamada-openrouter.md
+          - "023 · Langfuse pelo SDK oficial": adr/ADR-023-migracao-langfuse-sdk-oficial.md
+          - "024 · Câmara dos Deputados e parser": adr/ADR-024-coleta-camara-deputados-refinamentos-parser.md
+          - "025 · Reconciliação e severidade de alertas": adr/ADR-025-reconciliacao-deterministica-severidade-alertas.md
+          - "028 · Cargos restritos e aprovação da fase 4": adr/ADR-028-cargos-restritos-e-aprovacao-fase4.md
+      - Banco e árvore mestre:
+          - "003 · Tabelas no Postgres do study-rag (substituído)": adr/ADR-003-tabelas-postgres-study-rag.md
+          - "026 · Banco Postgres próprio": adr/ADR-026-banco-postgres-proprio.md
+          - "027 · Star schema de estatísticas": adr/ADR-027-star-schema-estatisticas.md
+          - "029 · Camada canônica de sinônimos": adr/ADR-029-camada-canonica-sinonimos.md
+          - "030 · Árvore mestre e site de questões": adr/ADR-030-arvore-mestre-e-site-de-questoes.md
+      - Questões e estatísticas:
+          - "031 · Extração de questões dos cadernos": adr/ADR-031-extracao-questoes-cadernos.md
+          - "032 · Classificação na árvore": adr/ADR-032-classificacao-questoes-arvore.md
+          - "038 · Múltipla escolha retrocompatível": adr/ADR-038-suporte-multipla-escolha-retrocompativel.md
+          - "039 · Incidência em dois níveis": adr/ADR-039-incidencia-em-dois-niveis.md
+      - Site público:
+          - "033 · Site: stack, contas e deploy": adr/ADR-033-site-publico-stack-e-deploy.md
+          - "034 · Fidelidade ao caderno e filtros": adr/ADR-034-fidelidade-ao-caderno-e-filtros.md
+          - "035 · Card e filtros no formato Gran": adr/ADR-035-card-e-filtros-formato-gran.md
+          - "037 · Escopo do site no inventário": adr/ADR-037-escopo-do-site-no-inventario.md
+      - Engenharia e documentação:
+          - "036 · Etapas de testes e ruff": adr/ADR-036-etapas-testes-e-ruff.md
+          - "040 · Site de documentação MkDocs": adr/ADR-040-site-documentacao-mkdocs.md
+          - "041 · Registro e páginas geradas": adr/ADR-041-registro-e-paginas-geradas.md
+  - Histórico:
+      - historico/index.md
       - Planos concluídos:
           - planos/README.md
-          - planos/correcoes-etapa-5c.md
-          - planos/correcoes-interface-5f.md
-          - planos/plano-etapa-5b2.md
-          - planos/plano-etapa-5d.md
-          - planos/plano-etapa-5e.md
-          - planos/plano-etapa-5f.md
-          - planos/plano-etapa-5h.md
-          - planos/plano-etapa-8m.md
-          - planos/plano-etapa-8m1.md
-          - planos/plano-kan-30.md
+          - "5B.2 Curadoria da árvore": planos/plano-etapa-5b2.md
+          - "5C.1 Correções da extração": planos/correcoes-etapa-5c.md
+          - "5D Classificação na árvore": planos/plano-etapa-5d.md
+          - "5E Estatísticas": planos/plano-etapa-5e.md
+          - "5F Site público": planos/plano-etapa-5f.md
+          - "5F.11b Correções da interface": planos/correcoes-interface-5f.md
+          - "5H Card e filtros no formato Gran": planos/plano-etapa-5h.md
+          - "8.M Múltipla escolha": planos/plano-etapa-8m.md
+          - "8.M.1 Incidência em dois níveis": planos/plano-etapa-8m1.md
+          - "8.C/C0 Download pelo inventário": planos/plano-kan-30.md
       - Relatórios:
-          - relatorios/dispersao_arvore_2026-10-12.md
+          - relatorios/index.md
+          - "Dispersão da árvore (2026-10-12)": relatorios/dispersao_arvore_2026-10-12.md

@@ -2,7 +2,9 @@
 
 # Checagens
 
-Cada checagem valida uma parte do pipeline. Consulta de banco devolve as linhas problemáticas: zero linhas é verde. Checagens de teste ou de comando apontam para o teste do pytest ou para o comando que mostra o resultado.
+O que confere cada parte do pipeline, por camada. Use depois de rodar um lote ou um passo que grava no banco, para saber se o resultado está verde.
+
+Consulta de banco devolve as linhas problemáticas: zero linhas é verde. Checagens de teste ou de comando apontam para o teste do pytest ou para o comando que mostra o resultado.
 
 ## download
 

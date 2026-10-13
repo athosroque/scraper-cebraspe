@@ -2,7 +2,9 @@
 
 # Banco
 
-Estrutura dos schemas `public` (pipeline) e `app` (site) de `scraper-cebraspe-db`, lida do `information_schema`. Só tabelas base e views; os schemas `test_*` dos testes ficam de fora.
+Tabelas e views do `scraper-cebraspe-db`: o schema `public` (pipeline) e o `app` (usuários e simulados do site). Use para escrever uma consulta ou conferir uma coluna sem abrir o banco.
+
+A estrutura é lida do `information_schema`. Só tabelas base e views; os schemas `test_*` dos testes ficam de fora.
 
 ## cargos_editais
 

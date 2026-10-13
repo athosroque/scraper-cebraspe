@@ -238,10 +238,27 @@ def _resumo(texto: str, limite: int = 110) -> str:
 def pagina_indice(reg: Registro) -> str:
     """Página `index.md`: abre em `/tecnico/` (sem ela, o nginx responde 403)."""
     linhas = [
-        "# Gerado do código",
+        "# Como as páginas são geradas",
         "",
-        "Páginas geradas de `src/registro/` por `make docs-gerar`. O teste "
+        "Parte do Guia técnico não é escrita à mão: sai do registro do pipeline em "
+        "`src/registro/` (scripts, etapas, checagens, regras e tarefas) e do schema do banco.",
+        "",
+        "**Para que serve:** uma fonte só para o pipeline documentado e o executado. "
+        "Página gerada nunca fica desatualizada sem aviso, porque o teste "
         "`tests/test_registro.py` recusa página diferente do código.",
+        "",
+        "## Como regerar",
+        "",
+        "- `make docs-gerar`: regrava as páginas abaixo; lê o schema do banco.",
+        "- `venv/bin/python -m scripts.gerar_docs --sem-banco`: sem banco, mantém a "
+        "página do banco como está.",
+        "- `venv/bin/python -m scripts.gerar_docs --verificar`: só confere; sai 1 se "
+        "alguma página estiver diferente.",
+        "",
+        "Não edite estas páginas à mão (regra [A62](regras.md#a62)): mude o registro e "
+        "regere.",
+        "",
+        "## Páginas geradas",
         "",
         f"- [Tarefas](tarefas.md): {len(reg.tarefas)} tarefas de agente e o que ler "
         "para cada uma.",
@@ -259,9 +276,12 @@ def pagina_pipeline(reg: Registro) -> str:
     linhas = [
         "# Pipeline",
         "",
-        "Etapas do pipeline e suas dependências (`depois_de`), geradas do registro. "
-        "Borda laranja grossa: portão humano, o dono aprova antes da próxima etapa. "
-        "Fundo azul: etapa que usa LLM.",
+        "Etapas do pipeline, na ordem em que dependem umas das outras, com o comando, "
+        "as entradas e as saídas de cada uma. Use para saber o que precisa rodar antes "
+        "de uma etapa e o que fica desatualizado depois dela.",
+        "",
+        "No grafo, borda laranja grossa é portão humano (o dono aprova antes da próxima "
+        "etapa) e fundo azul é etapa que usa LLM.",
         "",
         "```mermaid",
         "flowchart TD",
@@ -327,6 +347,10 @@ def pagina_comandos(reg: Registro) -> str:
     linhas = [
         "# Comandos",
         "",
+        "Todos os scripts do projeto, por categoria, cada um com o resumo e os "
+        "argumentos. Use para achar o comando de uma tarefa e conferir as opções sem "
+        "abrir o código.",
+        "",
         "Cada script é um ponto de entrada `python -m <módulo>`. Os argumentos são "
         "lidos do código-fonte; os ocultos (`argparse.SUPPRESS`) ficam de fora.",
         "",
@@ -382,10 +406,13 @@ def pagina_regras(reg: Registro) -> str:
     linhas = [
         "# Regras",
         "",
-        "Patterns e anti-patterns do projeto. Fonte: `src/registro/regras_*.py`. "
-        "Desde a D3 o `CLAUDE.md` cita só o núcleo, as regras que quebram dados se "
-        "forem esquecidas. Cada regra mostra as ADRs que a motivam e o teste que a "
-        "guarda, quando houver.",
+        "Patterns (o que fazer) e anti-patterns (o que nunca fazer) do projeto, por "
+        "área. Use antes de mexer numa área: a [tarefa](tarefas.md) diz quais regras "
+        "valem nela.",
+        "",
+        "Fonte: `src/registro/regras_*.py`. O `CLAUDE.md` cita só o núcleo, as regras "
+        "que quebram dados se forem esquecidas. Cada regra mostra as ADRs que a motivam "
+        "e o teste que a guarda, quando houver.",
         "",
         "## Núcleo",
         "",
@@ -431,9 +458,12 @@ def pagina_checagens(reg: Registro) -> str:
     linhas = [
         "# Checagens",
         "",
-        "Cada checagem valida uma parte do pipeline. Consulta de banco devolve as "
-        "linhas problemáticas: zero linhas é verde. Checagens de teste ou de comando "
-        "apontam para o teste do pytest ou para o comando que mostra o resultado.",
+        "O que confere cada parte do pipeline, por camada. Use depois de rodar um lote "
+        "ou um passo que grava no banco, para saber se o resultado está verde.",
+        "",
+        "Consulta de banco devolve as linhas problemáticas: zero linhas é verde. "
+        "Checagens de teste ou de comando apontam para o teste do pytest ou para o "
+        "comando que mostra o resultado.",
         "",
     ]
     for camada in CAMADAS_CHECAGEM:
@@ -483,9 +513,12 @@ def pagina_tarefas(reg: Registro) -> str:
     linhas = [
         "# Tarefas",
         "",
-        "Índice para agentes: para a tarefa X, leia Y. Cada tarefa lista as páginas "
-        "a ler, as regras da área, as etapas, os comandos, as checagens e as ADRs. "
-        "A fonte é `src/registro/tarefas.py`; as regras vêm de `src/registro/regras_*.py`.",
+        "Índice para agentes: para a tarefa X, leia Y. Use no começo de qualquer "
+        "trabalho: ache a tarefa e siga só o que ela lista.",
+        "",
+        "Cada tarefa lista as páginas a ler, as regras da área, as etapas, os comandos, "
+        "as checagens e as ADRs. A fonte é `src/registro/tarefas.py`; as regras vêm de "
+        "`src/registro/regras_*.py`.",
         "",
     ]
     for tarefa in reg.tarefas:
@@ -549,9 +582,12 @@ def pagina_banco(colunas: list[tuple], views: list[str]) -> str:
     linhas = [
         "# Banco",
         "",
-        "Estrutura dos schemas `public` (pipeline) e `app` (site) de "
-        "`scraper-cebraspe-db`, lida do `information_schema`. Só tabelas base e "
-        "views; os schemas `test_*` dos testes ficam de fora.",
+        "Tabelas e views do `scraper-cebraspe-db`: o schema `public` (pipeline) e o "
+        "`app` (usuários e simulados do site). Use para escrever uma consulta ou "
+        "conferir uma coluna sem abrir o banco.",
+        "",
+        "A estrutura é lida do `information_schema`. Só tabelas base e views; os "
+        "schemas `test_*` dos testes ficam de fora.",
         "",
     ]
     if not por_tabela:

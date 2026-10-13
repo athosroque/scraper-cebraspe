@@ -2,7 +2,9 @@
 
 # Pipeline
 
-Etapas do pipeline e suas dependências (`depois_de`), geradas do registro. Borda laranja grossa: portão humano, o dono aprova antes da próxima etapa. Fundo azul: etapa que usa LLM.
+Etapas do pipeline, na ordem em que dependem umas das outras, com o comando, as entradas e as saídas de cada uma. Use para saber o que precisa rodar antes de uma etapa e o que fica desatualizado depois dela.
+
+No grafo, borda laranja grossa é portão humano (o dono aprova antes da próxima etapa) e fundo azul é etapa que usa LLM.
 
 ```mermaid
 flowchart TD

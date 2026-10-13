@@ -2,7 +2,9 @@
 
 # Regras
 
-Patterns e anti-patterns do projeto. Fonte: `src/registro/regras_*.py`. Desde a D3 o `CLAUDE.md` cita só o núcleo, as regras que quebram dados se forem esquecidas. Cada regra mostra as ADRs que a motivam e o teste que a guarda, quando houver.
+Patterns (o que fazer) e anti-patterns (o que nunca fazer) do projeto, por área. Use antes de mexer numa área: a [tarefa](tarefas.md) diz quais regras valem nela.
+
+Fonte: `src/registro/regras_*.py`. O `CLAUDE.md` cita só o núcleo, as regras que quebram dados se forem esquecidas. Cada regra mostra as ADRs que a motivam e o teste que a guarda, quando houver.
 
 ## Núcleo
 

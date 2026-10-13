@@ -1,17 +1,65 @@
 # Scraper CEBRASPE
 
-O Scraper CEBRASPE é um pipeline batch que coleta os editais, as provas e os gabaritos de concursos do CEBRASPE, extrai a taxonomia de conteúdo de cada edital com LLM e classifica as questões numa árvore mestre (matéria → assunto → subassunto). O resultado alimenta um site público de questões, começando pelo piloto de 2025.
+Pipeline que coleta editais, provas e gabaritos do CEBRASPE, organiza o conteúdo cobrado numa árvore de assuntos e alimenta um site público de questões, começando pelo piloto de 2025.
 
-O crawler (Playwright) percorre a listagem de concursos encerrados e mapeia os PDFs de Edital, Prova e Gabarito. O downloader baixa e valida os arquivos. O parser (PyMuPDF) recorta as seções dos editais e dos cadernos, e a extração por LLM (OpenRouter, `z-ai/glm-5.3-flash`) produz a taxonomia, com checkpoint de revisão humana. Os dados vão para um Postgres próprio do projeto, em star schema, e a classificação das questões na árvore mestre alimenta o site.
+O crawler (Playwright) percorre os concursos encerrados e baixa os PDFs. O parser (PyMuPDF) recorta os editais e os cadernos de prova, e um LLM (OpenRouter, `z-ai/glm-5.3-flash`) extrai a taxonomia de cada edital, que passa por revisão humana. As questões são classificadas na árvore mestre (matéria → assunto → subassunto) e gravadas num Postgres próprio. Desse banco saem as estatísticas e o site.
 
-## Seções
+## Por onde começar
 
-- **[Executivo](executivo/index.md)**: visão para quem não acompanha o código. Em preparação.
-- **Para agentes**: o [índice de tarefas](tecnico/tarefas.md) diz o que ler para cada tarefa (regras, comandos, etapas, runbook).
-- **Técnico**: a [arquitetura](architecture.md), o [runbook de lote](runbook-lote.md), o [guia de teste no navegador](guia-teste-navegador.md), os [ADRs](adr/README.md) (decisões de arquitetura), os [planos concluídos](planos/README.md) e os [relatórios](relatorios/dispersao_arvore_2026-10-12.md).
+Escolha pelo que você precisa fazer.
 
-## Como manter
+<div class="grid cards" markdown>
 
-- `make docs-serve`: sobe o site local em <http://127.0.0.1:8001>, com recarga ao salvar.
+-   :material-briefcase-outline: **[Visão executiva](executivo/index.md)**
+
+    ---
+
+    Quero entender o projeto sem ler código: problema, solução, números e próximos passos.
+
+-   :material-robot-outline: **[Para agentes](guia/agentes/index.md)**
+
+    ---
+
+    Vou mexer no código, como pessoa ou agente. Comece pelo índice de tarefas e pelas regras que não podem ser esquecidas.
+
+-   :material-cog-play-outline: **[Operação](guia/operacao/index.md)**
+
+    ---
+
+    Vou rodar um lote de concursos, um comando ou conferir se o pipeline está verde.
+
+-   :material-sitemap-outline: **[Arquitetura](guia/arquitetura/index.md)**
+
+    ---
+
+    Quero ver como as peças se encaixam: componentes, etapas do pipeline e banco de dados.
+
+-   :material-scale-balance: **[Decisões](adr/README.md)**
+
+    ---
+
+    Quero saber por que algo é assim antes de mudar. Os ADRs registram cada escolha e o que foi descartado.
+
+-   :material-history: **[Histórico](historico/index.md)**
+
+    ---
+
+    Quero consultar planos de etapas já concluídas e relatórios datados.
+
+</div>
+
+## Como este site está organizado
+
+| Aba | O que tem | Muda quando |
+|---|---|---|
+| **Visão executiva** | Resumo para quem não acompanha o código | Fecha uma etapa importante |
+| **Guia técnico** | Agentes, arquitetura e operação | Muda o código (parte das páginas é gerada) |
+| **Decisões** | ADRs agrupados por tema | Entra uma decisão nova |
+| **Histórico** | Planos concluídos e relatórios | Não muda: é registro do passado |
+
+## Como manter esta documentação
+
+- `make docs-serve`: site local em <http://127.0.0.1:8001>, com recarga ao salvar.
 - `make docs-build`: gera `build/docs` com `mkdocs build --strict`. O `make check` roda esse alvo também.
-- Toda página nova em `docs/` precisa entrar no `nav` do `mkdocs.yml`. Sem isso, o `--strict` falha, e é de propósito.
+- `make docs-gerar`: regera as páginas que vêm do código (ver [Como as páginas são geradas](tecnico/index.md)).
+- Página nova entra no `nav` do `mkdocs.yml`, na seção do seu propósito. Fora do `nav`, o `--strict` falha, e é de propósito.

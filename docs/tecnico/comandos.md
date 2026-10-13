@@ -2,6 +2,8 @@
 
 # Comandos
 
+Todos os scripts do projeto, por categoria, cada um com o resumo e os argumentos. Use para achar o comando de uma tarefa e conferir as opções sem abrir o código.
+
 Cada script é um ponto de entrada `python -m <módulo>`. Os argumentos são lidos do código-fonte; os ocultos (`argparse.SUPPRESS`) ficam de fora.
 
 ## Pipeline
