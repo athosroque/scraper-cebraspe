@@ -174,7 +174,8 @@ checagens.
   `jira_sync.py`, e o §10 aponta para `comandos.md`. Resultado: `CLAUDE.md` de 992 para 297
   linhas. Guardas novos em `tests/test_registro.py`: núcleo do `CLAUDE.md` = `nucleo=True`
   com o link certo, links relativos do `CLAUDE.md` existem, tarefas só citam ids existentes e
-  toda área com regra tem tarefa. `llms.txt` aponta para as páginas novas.
+  toda área com regra tem tarefa. Depois, o `llms.txt` foi removido: repetia o `CLAUDE.md`
+  e nenhuma ferramenta do projeto o lê (o Claude Code carrega só os `CLAUDE.md`).
 
 ### D4: Documentação executiva (KAN-71)
 

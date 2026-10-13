@@ -146,7 +146,6 @@ scraper_cebraspe/
 ├── requirements.txt            # Dependências Python do projeto
 ├── CLAUDE.md                   # Diretrizes operacionais para assistentes de IA
 ├── LESSONS.md                  # Registro de post-mortems e lições aprendidas
-├── llms.txt                    # Manifesto resumido para ferramentas de IA
 └── task.md                     # Roteiro mestre de tarefas e etapas
 ```
 
@@ -175,7 +174,7 @@ pytest tests/test_spider.py
 - [Catálogo de ADRs](docs/adr/README.md): Histórico completo das decisões de arquitetura e trade-offs técnicos (ADR-001 a ADR-022).
 - [Lições Aprendidas](LESSONS.md): Post-mortems detalhados de bugs reais de web scraping e comportamento de modelos de linguagem.
 - [Diretrizes de IA](CLAUDE.md): Padrões de engenharia e contexto operacional do repositório.
-- [Manifesto llms.txt](llms.txt): Visão rápida e indexada para ferramentas e assistentes de IA.
+- [Índice de tarefas](docs/tecnico/tarefas.md): o que ler (regras, comandos, etapas) para cada tipo de tarefa, para agentes de IA.
 
 ---
 
