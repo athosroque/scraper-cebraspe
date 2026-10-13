@@ -1,7 +1,7 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
-Criado em 2026-10-12. Estado: **D1 (KAN-68) concluída e aprovada (2026-10-13); próxima D2
-(KAN-69); decisões do dono fechadas em 2026-10-13**.
+Criado em 2026-10-12. Estado: **D1 (KAN-68) concluída e aprovada (2026-10-13); D2 (KAN-69) em análise
+(2026-10-13), aguardando aprovação do dono; decisões do dono fechadas em 2026-10-13**.
 
 > Jira: KAN-67 (etapa); D1 = KAN-68, D2 = KAN-69, D3 = KAN-70, D4 = KAN-71; D5a = KAN-31 e
 > D5b = KAN-32 (são a C2 da 8.C, `plano-etapa-8c.md`).
@@ -74,7 +74,7 @@ Alternativas descartadas como solução única:
 - As páginas técnicas são **geradas**, nunca escritas à mão: etapas, regras, checagens,
   comandos de cada script (introspecção do `argparse`), schema do banco
   (`information_schema`) e o diagrama Mermaid do pipeline.
-- A fonte é um **registro em Python** (ex.: `src/registro.py`) com etapas (comando, entradas,
+- A fonte é um **registro em Python** (`src/registro/`, um pacote; ADR-041) com etapas (comando, entradas,
   saídas, se usa LLM e qual chave, portão humano), checagens e regras (com o ADR e o teste
   guarda de cada uma).
 - Um **teste guarda** falha se surgir um script em `scripts/` ou uma etapa que não esteja no
@@ -142,6 +142,14 @@ checagens.
   (arquivo JSON gerado ou query documentada), para a página de validações mostrar o estado.
 - Pronto quando: um script novo sem entrada no registro quebra o teste, e as páginas geradas
   batem com o código.
+- Feito (2026-10-13, em análise; ADR-041): pacote `src/registro/` (`modelo.py` com as
+  dataclasses; 26 scripts, 13 etapas P0–P11, 36 checagens K01–K36 e 132 regras P01–P70 e
+  A01–A62, com o texto literal do `CLAUDE.md`), `scripts/gerar_docs.py` (`make docs-gerar`,
+  `--sem-banco`, `--verificar`) e 5 páginas em `docs/tecnico/` (pipeline com Mermaid,
+  comandos por AST, regras, checagens com SQL, banco dos schemas `public` e `app`). Guardas
+  em `tests/test_registro.py` e `tests/test_registro_banco.py` (o do Dagster em `skip` até o
+  D5a). Pendências para o D5b: o motivo do `sem_no` não fica no banco (K30), o número de
+  `desatualizados` só sai no log (K32) e a decisão sobre `nao_classificado` não é gravada.
 
 ### D3: Contexto para agentes (KAN-70)
 

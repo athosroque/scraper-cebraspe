@@ -80,7 +80,8 @@ Datasette continua só como ferramenta de revisão do dono.
   (`datasetteproject/datasette`), não é dependência do venv
 - mkdocs-material >=9.6,<10 — site de documentação (Etapa 9/D1, ADR-040):
   `mkdocs.yml` com `site_dir: build/docs` (o padrão `site/` colide com o app
-  FastAPI) e `nav` explícito guardado pelo `--strict`
+  FastAPI) e `nav` explícito guardado pelo `--strict`; páginas de `docs/tecnico/`
+  geradas de `src/registro/` por `scripts/gerar_docs.py` (Etapa 9/D2, ADR-041)
 
 ## 5. Progresso
 
@@ -353,7 +354,9 @@ Datasette continua só como ferramenta de revisão do dono.
       `--strict` no `make check`, o PDF executivo sai sem explicação prévia e o lote da C1
       roda no Dagster com as checagens verdes. D1 (KAN-68) concluída em 2026-10-13: MkDocs
       Material com `nav` explícito, `--strict` no `make check`, nginx `scraper-cebraspe-docs`
-      em `docs.projetoathos.com.br` atrás do Access e ADR-040. Próxima: D2 (KAN-69).
+      em `docs.projetoathos.com.br` atrás do Access e ADR-040. D2 (KAN-69) em análise:
+      registro `src/registro/` (scripts, etapas P0–P11, checagens e as regras do §6/§7),
+      páginas geradas em `docs/tecnico/` por `make docs-gerar`, teste guarda e ADR-041.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06
   (o site ainda vai mudar muito antes de ir ao ar).
 
@@ -614,6 +617,11 @@ Datasette continua só como ferramenta de revisão do dono.
   - Marcadores registrados no `pytest.ini`: `unit`, `db`, `pipeline`, `site`, `slow`.
   - Configuração central do Ruff em `pyproject.toml` (targets, ignores e exclusões de `scratch/`, `data/`, etc.).
 - Página nova em `docs/` entra no `nav` do `mkdocs.yml`; o `mkdocs build --strict` (no `make check`) recusa página fora do nav, link quebrado e âncora inexistente (ADR-040).
+- Script novo em `scripts/` (ou módulo de `src/` com `__main__`) entra em
+  `src/registro/scripts.py`, e mudança de argparse, etapa, checagem, regra ou schema pede
+  `make docs-gerar`: o `tests/test_registro.py` recusa script fora do registro e página
+  gerada diferente do código (ADR-041). Até a D3, regra nova no §6 ou §7 entra também em
+  `src/registro/regras_*.py`, com o mesmo texto.
 
 ## 7. Anti-patterns
 
@@ -798,6 +806,8 @@ Datasette continua só como ferramenta de revisão do dono.
   produção deixa de servir para auditar execução real.
 - Nunca computar questões discursivas junto com questões objetivas: discursivas possuem grão, tema e dinâmica de pontuação inteiramente distintos e devem ser consumidas estritamente via `vw_discursivas` (ADR-032).
 - Nunca usar o `site_dir` padrão do MkDocs (`site/`): o build apagaria o app FastAPI em `site/`. O build vai para `build/docs` (ADR-040).
+- Nunca editar à mão as páginas de `docs/tecnico/`: são geradas de `src/registro/`
+  por `scripts/gerar_docs.py`, e o teste guarda recusa a diferença (ADR-041).
 
 ## 8. Segurança
 
@@ -833,6 +843,9 @@ Documentação (Etapa 9/D1, ADR-040):
 - `make docs-build && docker compose up -d scraper-cebraspe-docs`: nginx em
   `127.0.0.1:8013` e `docs.projetoathos.com.br` via Traefik + Cloudflare Access.
 - Página nova em `docs/` precisa entrar no `nav` do `mkdocs.yml`, senão o `--strict` falha.
+- `make docs-gerar` (Etapa 9/D2, ADR-041): regera `docs/tecnico/` (pipeline, comandos,
+  regras, checagens e banco) a partir de `src/registro/`; lê o schema do banco. Sem banco:
+  `venv/bin/python -m scripts.gerar_docs --sem-banco`; conferir: `--verificar`.
 
 ## 9.2. Revisão via Datasette (Etapa 4 — checkpoint de revisão humana)
 

@@ -18,6 +18,7 @@ TESTES_COM_BANCO_RAIZ = {
     "test_arvore_views",
     "test_questoes_writer",
     "test_estatisticas_views",
+    "test_registro_banco",
 }
 
 TESTES_SLOW = {

@@ -4,7 +4,7 @@ PYTEST := $(VENV)/pytest
 RUFF := $(VENV)/ruff
 MKDOCS := $(VENV)/mkdocs
 
-.PHONY: help lint format-check format test-fast test-unit test-pipeline test-site test-site-fast test-all docs-serve docs-build check
+.PHONY: help lint format-check format test-fast test-unit test-pipeline test-site test-site-fast test-all docs-serve docs-gerar docs-build check
 
 help:
 	@echo "================================================================="
@@ -25,6 +25,7 @@ help:
 	@echo ""
 	@echo "Documentação:"
 	@echo "  make docs-serve     Site MkDocs local em http://127.0.0.1:8001 (recarga ao salvar)"
+	@echo "  make docs-gerar     Regera docs/tecnico/ a partir de src/registro/ (lê o banco)"
 	@echo "  make docs-build     Gera o site em build/docs com mkdocs build --strict"
 	@echo ""
 	@echo "  make check          Regressão completa de CI (lint + format + docs-build + test-all)"
@@ -59,6 +60,9 @@ test-all:
 
 docs-serve:
 	$(MKDOCS) serve -a 127.0.0.1:8001
+
+docs-gerar:
+	$(PYTHON) -m scripts.gerar_docs
 
 docs-build:
 	$(MKDOCS) build --strict

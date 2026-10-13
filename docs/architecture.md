@@ -15,58 +15,9 @@ O sistema é concebido como um pipeline batch desacoplado em etapas autônomas. 
 
 ## 2. Diagrama do Pipeline
 
-```mermaid
-flowchart TD
-    subgraph Coleta ["1. Descoberta & Rastreamento"]
-        A["CEBRASPE /concursos/encerrado"] --> B["Spider (Playwright)"]
-        B -->|"Filtro por slug _YY & órgão"| C["processed_concursos.json"]
-        B -->|"Links mapeados: Edital / Prova / Gabarito"| D["Mapeamento em Memória"]
-    end
-
-    subgraph Download ["2. Download & Validação"]
-        D --> E["Downloader (requests)"]
-        E -->|"Camada 1: Checa URL em .manifest.json"| F{"URL Nova?"}
-        F -- Sim --> G["Baixa PDF em stream"]
-        F -- Não --> J["Pula requisição (Dedup URL)"]
-        G --> H{"Magic Bytes %PDF- válidos?"}
-        H -- Sim --> I["Camada 2: Checa SHA256"]
-        H -- Não --> K["Descarta arquivo corrompido"]
-        I -- Inédito --> L["data/<ano>/CEBRASPE/<orgao>/{Editais,Provas,Gabaritos}/"]
-        I -- Repetido --> M["Pula gravação (Dedup Hash)"]
-    end
-
-    subgraph Processamento ["3. Processamento & Extração"]
-        L -->|"Edital de Abertura"| N["Parser (PyMuPDF)"]
-        N -->|"Recorte: OBJETOS DE AVALIAÇÃO"| O["Divisor Bloco, Cargo & Matéria\n(ADR-010/020)"]
-        O -->|"Chunks estruturados com offsets"| P["Taxonomia Extractor"]
-        P -->|"POST /chat/completions (glm-5.3-flash)"| Q["OpenRouter API"]
-        Q -->|"Resposta JSON / Exceção"| P
-        P -->|"Reparo local de numerais (ADR-021)\ne classificação de falhas (ADR-022)"| P
-        P --> R["revisao_piloto/<edital>.json"]
-        P --> S["revisao_piloto/<edital>.auditoria.json"]
-    end
-
-    subgraph Revisao ["4. Validação & Revisão Humana (Orquestrada)"]
-        R & S --> AUTO["atualizar_revisao.py\n(automático pós-extração)"]
-        AUTO --> V1["validar_taxonomia.py"]
-        V1 --> VAL["revisao_piloto/<edital>.validacao.json"]
-        AUTO --> HTML["gerar_relatorio_revisao.py"]
-        HTML --> REL["revisao_piloto/relatorio/*.html"]
-        AUTO --> T["gerar_db_datasette.py"]
-        VAL & R & S --> T
-        VAL & R & S --> HTML
-        T --> U[("revisao.db (SQLite + FTS5)")]
-        U --> V["Datasette UI (:8011)"]
-        REL -->|"serviço estático (--static)"| V
-        AUTO -.->|"docker compose restart (best-effort)"| V
-        V --> W["Traefik -> Cloudflare Tunnel (SSO)"]
-    end
-
-    subgraph Persistencia ["5. Armazenamento de Produção (Fase 5)"]
-        R -.->|"Aprovado por humano"| X["DB Writer"]
-        X -.-> Y[("PostgreSQL 16 / scraper-cebraspe-db (Star Schema)")]
-    end
-```
+O diagrama do pipeline é gerado do registro `src/registro/` (Etapa 9/D2, ADR-041) e
+fica em [Pipeline](tecnico/pipeline.md). O diagrama escrito à mão que ficava aqui parou
+na fase 5 e foi retirado para não haver duas versões.
 
 ---
 

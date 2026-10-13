@@ -73,6 +73,12 @@ nav:
       - executivo/index.md
   - Técnico:
       - Arquitetura: architecture.md
+      - Gerado do código:
+          - Pipeline: tecnico/pipeline.md
+          - Comandos: tecnico/comandos.md
+          - Regras: tecnico/regras.md
+          - Checagens: tecnico/checagens.md
+          - Banco: tecnico/banco.md
       - Runbook de lote: runbook-lote.md
       - Teste no navegador: guia-teste-navegador.md
       - ADRs:
@@ -117,6 +123,7 @@ nav:
           - adr/ADR-038-suporte-multipla-escolha-retrocompativel.md
           - adr/ADR-039-incidencia-em-dois-niveis.md
           - adr/ADR-040-site-documentacao-mkdocs.md
+          - adr/ADR-041-registro-e-paginas-geradas.md
       - Planos concluídos:
           - planos/README.md
           - planos/correcoes-etapa-5c.md
