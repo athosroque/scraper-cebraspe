@@ -46,7 +46,7 @@ Fonte: site/app/api/v1/rotas_materias.py:69-83
 O endpoint `GET /api/v1/simulados/prova` constrói a prova de um cargo indicado (`concurso` e `cargo_numero`), devolvendo o modelo `ProvaSimulado` com os itens na ordem canônica de aplicação da prova e as questões discursivas, omitindo estritamente gabaritos e critérios de correção.
 Fonte: site/app/api/v1/rotas_simulados.py:28-46
 
-A correção avulsa e anônima de simulados é executada via `POST /api/v1/simulados/correcao`, que processa o mapa de respostas e devolve o `ResultadoSimulado` com pontuação líquida CEBRASPE (+1 certo, −1 errado, 0 branco) e desempenho por matéria sem gravar dados no banco.
+A correção avulsa e anônima de simulados é executada via `POST /api/v1/simulados/correcao`, que processa o mapa de respostas e devolve o `ResultadoSimulado` com pontuação líquida por formato (certo/errado: +1 certo, −1 errado, 0 branco; múltipla escolha: +1 certo, 0 errado, 0 branco) e desempenho por matéria sem gravar dados no banco.
 Fonte: site/app/api/v1/rotas_simulados.py:48-63
 
 Para usuários autenticados, o ciclo de vida do simulado é gerenciado por `POST /api/v1/simulados` (criação do simulado com registro de início), `GET /api/v1/simulados` (listagem dos simulados realizados pelo usuário), `POST /api/v1/simulados/{simulado_id}/correcao` (finalização atômica, cálculo da nota e persistência de respostas) e `GET /api/v1/simulados/{simulado_id}` (consulta ao resultado consolidado).

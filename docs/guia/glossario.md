@@ -118,7 +118,7 @@ Fonte: src/questoes_writer.py:23-38, site/app/servicos/simulados_servico.py:64-1
 ## Partição / Chunk
 
 Unidade textual autônoma de conteúdo programático delimitada a partir do recorte da seção de `OBJETOS DE AVALIAÇÃO` do edital de abertura, dimensionada e estruturada para servir como unidade atômica de entrada (prompt) ao modelo de linguagem na Etapa 4 de extração.
-Fonte: src/edital_parser.py:660-680, docs/adr/ADR-010-chunking-cargo-materia.md:10-25
+Fonte: src/edital_parser.py:660-680, docs/adr/ADR-010-chunking-cargo-materia.md:10-21
 
 O particionamento é processado pela função `dividir_por_cargo_e_materia` em `src/edital_parser.py`, suportando simultaneamente dois padrões de edital da banca: certames com matérias expressamente nomeadas para determinado cargo (gerando um chunk por disciplina sob o mesmo cargo) e certames com cargos de especialidade técnica ou médica cujo conteúdo é disposto diretamente sob a titulação do cargo (gerando um único chunk cuja matéria herda o nome do cargo). Matérias gerais sem cargo específico recebem `cargo = None`.
 Fonte: src/edital_parser.py:669-680, 779-824
@@ -131,7 +131,7 @@ Fonte: src/edital_parser.py:681-697, docs/adr/ADR-020-classificacao-nivel-tipo-c
 Base de dados histórica de referência congelada, originada na Etapa 6 a partir de 5 concursos emblemáticos realizados pelo CEBRASPE no ano de 2025: `PF_25_ADM` (Polícia Federal — Administrativo), `TCU_25_TEFC` (Tribunal de Contas da União), `IBAMA_25` (Instituto Brasileiro do Meio Ambiente), `STM_25` (Superior Tribunal Militar) e `CD_25_NS` (Câmara dos Deputados — Nível Superior).
 Fonte: src/inventario.py:35, tests/test_reconciliacao_inventario.py:119-122
 
-O piloto atua como a âncora imutável de calibração de todo o pipeline de extração, inferência e modelagem. Ele possui invariantes numéricos estritos e congelados: exatamente 2.800 itens de prova (todos no padrão Certo/Errado), 129 questões anuladas e 3.029 apontamentos taxonômicos homologados na Etapa 5D.
+O piloto atua como a âncora imutável de calibração de todo o pipeline de extração, inferência e modelagem. Ele possui invariantes numéricos estritos e congelados: a contagem de itens, de questões anuladas e de apontamentos da Etapa 5D, fixada na regra [P71](../tecnico/regras.md#p71) e conferida pelas checagens K22 a K24; os totais atuais estão em [docs/executivo/numeros.md](../executivo/numeros.md).
 Fonte: docs/tecnico/regras.md:810-816, docs/executivo/numeros.md:36, tests/test_reconciliacao_inventario.py:14, 814-830
 
 Conforme estipulado na [Regra P71](../tecnico/regras.md#p71), qualquer modificação de código, ingestão de novos lotes históricos (2020 a 2026), refatoração de parsers ou reprocessamento do banco relacional é expressamente proibida de alterar as chaves compostas 5D, hashes ou apontamentos do piloto. Baterias automatizadas de auditoria (checagens K22 a K24) são executadas compulsoriamente antes e depois de qualquer gravação em banco, abortando qualquer operação caso seja detectado delta não planejado nos certames do piloto.
