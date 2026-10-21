@@ -6,6 +6,9 @@ site_name: "Scraper CEBRASPE — Documentação"
 docs_dir: docs
 site_dir: build/docs
 
+not_in_nav: |
+  guia/_contrato.md
+
 theme:
   name: material
   language: pt-BR
@@ -96,6 +99,8 @@ nav:
       - Roadmap: executivo/roadmap.md
   - Guia técnico:
       - guia/index.md
+      - Começando: guia/comecando.md
+      - Glossário: guia/glossario.md
       - Para agentes:
           - guia/agentes/index.md
           - Tarefas por tipo de trabalho: tecnico/tarefas.md
@@ -106,6 +111,12 @@ nav:
           - Componentes: architecture.md
           - Pipeline e etapas: tecnico/pipeline.md
           - Banco de dados: tecnico/banco.md
+          - Coleta e download: guia/coleta.md
+          - Extração por LLM: guia/extracao-llm.md
+          - Revisão humana: guia/revisao-humana.md
+          - Árvore mestre: guia/arvore.md
+          - Site público: guia/site.md
+          - API: guia/api.md
       - Operação:
           - guia/operacao/index.md
           - Runbook de lote: runbook-lote.md

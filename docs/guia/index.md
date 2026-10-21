@@ -6,6 +6,18 @@ Tudo o que é preciso para trabalhar no projeto: o contexto para agentes, a arqu
 
 <div class="grid cards" markdown>
 
+-   :material-compass-outline: **[Começando](comecando.md)**
+
+    ---
+
+    Trilhas de leitura e primeiros passos para cada perfil (dono, agente ou visitante).
+
+-   :material-book-alphabet: **[Glossário](glossario.md)**
+
+    ---
+
+    Vocabulário canônico: termos e definições técnicas do projeto.
+
 -   :material-robot-outline: **[Para agentes](agentes/index.md)**
 
     ---
