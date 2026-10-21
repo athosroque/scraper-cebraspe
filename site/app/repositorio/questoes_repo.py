@@ -66,7 +66,9 @@ def condicoes_conteudo(filtros_dict: dict, params: dict) -> list[str]:
         params["chave_codigo"] = filtros_dict["chave_codigo"]
 
     texto = (filtros_dict.get("texto") or "").strip()
-    texto_limpo = re.sub(r"\bn\.?[º°o]\.?\s*(?=\d)", "", texto, flags=re.IGNORECASE).strip()
+    texto_limpo = re.sub(
+        r"\bn\.?[º°o]\.?\s*(?=\d)", "", texto, flags=re.IGNORECASE
+    ).strip()
     casamentos = []
     for i, palavra in enumerate(texto_limpo.split()):
         nome = f"texto_{i}"

@@ -169,7 +169,9 @@ def buscar_nos(q: str) -> list[ResultadoBusca]:
             )
         else:
             casa_nome = alvo in nome
-            casa_apelido = any(alvo in _normalizar(a) for a in apelidos.get(r["id"], []))
+            casa_apelido = any(
+                alvo in _normalizar(a) for a in apelidos.get(r["id"], [])
+            )
         if casa_nome or casa_apelido:
             chave = (
                 not casa_nome,

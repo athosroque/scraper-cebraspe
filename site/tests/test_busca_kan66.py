@@ -23,7 +23,9 @@ HX = {"HX-Request": "true"}
 def test_busca_traz_questoes_classificadas_no_no(cliente):
     """Palavra-chave traz questões classificadas no nó mesmo quando o texto não cita o termo."""
     # LGPD: 13 no nó, 11 no texto, 17 na união (6 questões do nó não citam LGPD no texto)
-    r_lgpd = cliente.get("/api/v1/questoes", params={"texto": "LGPD", "tamanho_pagina": 50})
+    r_lgpd = cliente.get(
+        "/api/v1/questoes", params={"texto": "LGPD", "tamanho_pagina": 50}
+    )
     assert r_lgpd.status_code == 200
     dados_lgpd = r_lgpd.json()
     assert dados_lgpd["total"] == 17
@@ -55,8 +57,12 @@ def test_sigla_como_palavra_inteira_nao_casa_subpalavra(cliente):
 @com_banco
 def test_variacoes_numero_lei_mesmo_resultado(cliente):
     """'12.527', '12527' e 'nº 12.527' dão o mesmo resultado."""
-    t1 = cliente.get("/api/v1/questoes", params={"texto": "12.527", "tamanho_pagina": 50}).json()
-    t2 = cliente.get("/api/v1/questoes", params={"texto": "12527", "tamanho_pagina": 50}).json()
+    t1 = cliente.get(
+        "/api/v1/questoes", params={"texto": "12.527", "tamanho_pagina": 50}
+    ).json()
+    t2 = cliente.get(
+        "/api/v1/questoes", params={"texto": "12527", "tamanho_pagina": 50}
+    ).json()
     t3 = cliente.get(
         "/api/v1/questoes", params={"texto": "nº 12.527", "tamanho_pagina": 50}
     ).json()
