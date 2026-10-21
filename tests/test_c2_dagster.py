@@ -339,11 +339,162 @@ def test_lote_c1_modo_conferencia_status_honestos(instance):
         )
         assert res.success
         saidas = {n: res.output_for_node(n) for n in ["p0", "p2", "p3", "p4", "p8"]}
-        assert saidas["p0"]["status"] == "nao_implementado"
-        assert saidas["p2"]["status"] == "nao_implementado"
+        assert saidas["p0"]["status"] == "ok"
+        assert saidas["p2"]["status"] == "ok"
         assert saidas["p3"]["status"] == "ok"
         assert saidas["p3"]["aprovado"] is False
         assert saidas["p4"]["status"] == "conferencia_sem_acao"
         assert saidas["p8"]["status"] == "conferencia_dry_run"
-        for n in ["p5", "p6", "p7", "p9", "p11"]:
-            assert res.output_for_node(n)["status"] == "nao_implementado"
+        for n in ["p5", "p6", "p7", "p9", "p10", "p11"]:
+            assert res.output_for_node(n)["status"] == "ok"
+
+
+def test_portao_p3_bloqueia_etapa_seguinte_quando_pendente(instance, revisao_tmp):
+    """Portão P3 bloqueia execução de etapas seguintes quando o concurso está pendente."""
+    _gravar_edital(revisao_tmp, "edital_pendente.json", "CONCURSO_PENDENTE", "PENDENTE")
+    job = defs.get_job_def("lote_concursos")
+    with pytest.raises(Exception):
+        job.execute_in_process(
+            instance=instance,
+            partition_key="CONCURSO_PENDENTE",
+            run_config={
+                "ops": {
+                    "p3": {"config": {"exigir_aprovacao": True, "conferencia": True}},
+                    "p4": {"config": {"conferencia": True}},
+                }
+            },
+            asset_selection=[
+                AssetKey("p0"),
+                AssetKey("p1"),
+                AssetKey("p2"),
+                AssetKey("p3"),
+                AssetKey("p4"),
+            ],
+        )
+
+
+def test_portao_p7_bloqueia_quando_propostas_pendentes(instance):
+    """Portão P7 bloqueia execução quando há propostas de árvore pendentes."""
+    job = defs.get_job_def("lote_concursos")
+    with patch(
+        "src.c2.assets.verificar_portao_arvore",
+        return_value=(False, [{"id": "P-1"}]),
+    ):
+        with pytest.raises(Exception):
+            job.execute_in_process(
+                instance=instance,
+                partition_key="CONCURSO_TESTE",
+                run_config={
+                    "ops": {
+                        "p7": {
+                            "config": {"exigir_aprovacao": True, "conferencia": True}
+                        },
+                    }
+                },
+                asset_selection=[AssetKey("p7")],
+            )
+
+
+def test_invariante_piloto_k22_bloqueia_quando_divergente(instance):
+    """P0 ou P4 bloqueia quando a invariante do piloto K22 diverge."""
+    from src.c2.checks import ViolacaoInvariantePiloto
+
+    divergencia = {
+        "status": "divergente",
+        "valido": False,
+        "divergencias": {"itens": {"esperado": 2800, "obtido": 2799}},
+    }
+    with patch(
+        "src.c2.assets.verificar_invariante_piloto",
+        side_effect=ViolacaoInvariantePiloto(divergencia),
+    ):
+        job = defs.get_job_def("lote_concursos")
+        with pytest.raises(Exception):
+            job.execute_in_process(
+                instance=instance,
+                partition_key="CONCURSO_TESTE",
+                run_config={
+                    "ops": {
+                        "p0": {"config": {"conferencia": False}},
+                    }
+                },
+                asset_selection=[AssetKey("p0")],
+            )
+
+
+def _rodar_p3_p4(instance, partition_key, ops):
+    job = defs.get_job_def("lote_concursos")
+    return job.execute_in_process(
+        instance=instance,
+        partition_key=partition_key,
+        run_config={"ops": ops},
+        asset_selection=[AssetKey("p3"), AssetKey("p4")],
+        raise_on_error=False,
+    )
+
+
+def test_fora_de_conferencia_edital_pendente_bloqueia_p3_por_padrao(
+    instance, revisao_tmp
+):
+    """conferencia=False sem exigir_aprovacao explícito: o portão P3 é exigido e o P4 não roda."""
+    _gravar_edital(revisao_tmp, "ed.json", "CONCURSO_TESTE", "PENDENTE")
+    res = _rodar_p3_p4(
+        instance,
+        "CONCURSO_TESTE",
+        {"p3": {"config": {"conferencia": False}}},
+    )
+    assert not res.success
+    assert "PortaoHumanoBloqueado" in str(
+        [e.event_specific_data for e in res.get_step_failure_events()]
+    )
+    assert not [e for e in res.get_step_success_events() if e.step_key.startswith("p4")]
+
+
+def test_fora_de_conferencia_edital_aprovado_passa_p3(instance, revisao_tmp):
+    _gravar_edital(revisao_tmp, "ed.json", "CONCURSO_TESTE", "APROVADO")
+    job = defs.get_job_def("lote_concursos")
+    res = job.execute_in_process(
+        instance=instance,
+        partition_key="CONCURSO_TESTE",
+        run_config={"ops": {"p3": {"config": {"conferencia": False}}}},
+        asset_selection=[AssetKey("p3")],
+    )
+    assert res.success
+    assert res.output_for_node("p3")["status"] == "ok"
+
+
+def test_conferencia_edital_pendente_nao_bloqueia_por_padrao(instance, revisao_tmp):
+    _gravar_edital(revisao_tmp, "ed.json", "CONCURSO_TESTE", "PENDENTE")
+    job = defs.get_job_def("lote_concursos")
+    res = job.execute_in_process(
+        instance=instance,
+        partition_key="CONCURSO_TESTE",
+        run_config={"ops": {"p3": {"config": {"conferencia": True}}}},
+        asset_selection=[AssetKey("p3")],
+    )
+    assert res.success
+
+
+def test_fora_de_conferencia_p7_bloqueia_por_padrao(instance):
+    job = defs.get_job_def("lote_concursos")
+    with patch(
+        "src.c2.assets.verificar_portao_arvore",
+        return_value=(False, [{"id": "P-1"}]),
+    ):
+        res = job.execute_in_process(
+            instance=instance,
+            partition_key="CONCURSO_TESTE",
+            run_config={"ops": {"p7": {"config": {"conferencia": False}}}},
+            asset_selection=[AssetKey("p7")],
+            raise_on_error=False,
+        )
+    assert not res.success
+    assert "PortaoHumanoBloqueado" in str(
+        [e.event_specific_data for e in res.get_step_failure_events()]
+    )
+
+
+def test_aprovacao_efetiva_regra_central():
+    assert assets_c2.aprovacao_efetiva(False, False) is True
+    assert assets_c2.aprovacao_efetiva(True, False) is False
+    assert assets_c2.aprovacao_efetiva(True, True) is True

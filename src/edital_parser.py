@@ -1,3 +1,4 @@
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -861,3 +862,163 @@ def _logar_restricoes(chunks: list[ChunkTaxonomia]) -> None:
                 f"[RESTRICAO_SEM_CARGO] chunk #{indice} matéria '{chunk.materia}' tem restrição de cargo sem "
                 "número — mantida no nome, cargos_restritos não preenchido."
             )
+
+
+PADRAO_MATERIA_EH_CARGO_OU_AREA = re.compile(r"^\s*(?:CARGO|ÁREA)\s+\d+", re.IGNORECASE)
+PADRAO_CARGO_AREA_NORMALIZADA = re.compile(r"\b(?:CARGO|ÁREA)\s+\d+", re.IGNORECASE)
+
+
+def avaliar_chunking_edital(pdf_path: Path, auditoria_path: Path | None = None) -> dict:
+    """Avalia a qualidade do chunking de um edital sem acionar modelos LLM (custo zero).
+
+    Executa o recorte da seção de objetos de avaliação e a divisão por cargo e matéria,
+    verificando potenciais anomalias no particionamento (chunks muito curtos, gigantescos,
+    sem nível definido ou matérias com padrão de cargo/área).
+    Opcionalmente grava a trilha de auditoria em `auditoria_path`.
+    """
+    pdf_path = Path(pdf_path)
+    secao = extrair_secao_objetos_avaliacao_detalhada(pdf_path)
+    if secao is None:
+        raise ValueError(
+            f"Seção 'OBJETOS DE AVALIAÇÃO' não encontrada em {pdf_path.name}"
+        )
+
+    chunks = dividir_por_cargo_e_materia(
+        secao.texto,
+        cargo_padrao=secao.cargo_detectado,
+        nivel_padrao=secao.nivel_detectado,
+    )
+
+    alertas: list[dict] = []
+    chunks_meta: list[dict] = []
+    auditoria_chunks: list[dict] = []
+
+    for i, chunk in enumerate(chunks):
+        texto_len = len(chunk.texto)
+        itens = extrair_itens_numerados(chunk.texto)
+        total_itens = len(itens)
+        chunk_alertas: list[dict] = []
+
+        if len(chunk.texto.strip()) < 40:
+            alerta = {
+                "chunk_index": i,
+                "cargo": chunk.cargo,
+                "materia": chunk.materia,
+                "tipo": "chunk_vazio_ou_curto",
+                "mensagem": (
+                    f"Chunk {i} ({chunk.materia}): texto vazio ou muito curto "
+                    f"({len(chunk.texto.strip())} caracteres < 40)"
+                ),
+            }
+            alertas.append(alerta)
+            chunk_alertas.append(alerta)
+
+        if texto_len > 15000:
+            alerta = {
+                "chunk_index": i,
+                "cargo": chunk.cargo,
+                "materia": chunk.materia,
+                "tipo": "chunk_gigantesco",
+                "mensagem": (
+                    f"Chunk {i} ({chunk.materia}): chunk gigantesco "
+                    f"({texto_len} caracteres > 15000)"
+                ),
+            }
+            alertas.append(alerta)
+            chunk_alertas.append(alerta)
+
+        if chunk.nivel is None:
+            alerta = {
+                "chunk_index": i,
+                "cargo": chunk.cargo,
+                "materia": chunk.materia,
+                "tipo": "chunk_sem_nivel",
+                "mensagem": f"Chunk {i} ({chunk.materia}): nível indefinido (None)",
+            }
+            alertas.append(alerta)
+            chunk_alertas.append(alerta)
+
+        if bool(
+            PADRAO_MATERIA_EH_CARGO_OU_AREA.search(chunk.materia)
+            or PADRAO_CARGO_AREA_NORMALIZADA.search(chunk.materia_normalizada)
+        ):
+            alerta = {
+                "chunk_index": i,
+                "cargo": chunk.cargo,
+                "materia": chunk.materia,
+                "tipo": "materia_eh_cargo_ou_area",
+                "mensagem": (
+                    f"Chunk {i} ({chunk.materia}): matéria parece ser um cargo "
+                    f"ou área ({chunk.materia})"
+                ),
+            }
+            alertas.append(alerta)
+            chunk_alertas.append(alerta)
+
+        chunks_meta.append(
+            {
+                "chunk_index": i,
+                "cargo": chunk.cargo,
+                "materia": chunk.materia,
+                **metadados_chunk(chunk),
+                "chars": texto_len,
+                "itens_count": total_itens,
+                "total_itens": total_itens,
+                "offset_inicio_secao": chunk.offset_inicio,
+                "offset_fim_secao": chunk.offset_fim,
+                "alertas": chunk_alertas,
+            }
+        )
+
+        auditoria_chunks.append(
+            {
+                "chunk_index": i,
+                "cargo": chunk.cargo,
+                "materia": chunk.materia,
+                **metadados_chunk(chunk),
+                "offset_inicio_secao": chunk.offset_inicio,
+                "offset_fim_secao": chunk.offset_fim,
+                "chars": texto_len,
+                "texto_enviado_llm": chunk.texto,
+                "status": "so_chunking",
+            }
+        )
+
+    cargos = mapear_cargos(
+        chunks,
+        cargo_padrao=secao.cargo_detectado,
+        nivel_padrao=secao.nivel_detectado,
+    )
+
+    auditoria = {
+        "edital": pdf_path.name,
+        "pdf_total_paginas": secao.paginas_pdf_total,
+        "pdf_total_chars": secao.chars_pdf_total,
+        "secao_objetos_avaliacao": {
+            "marcador_inicio": MARCADOR_INICIO_SECAO,
+            "marcador_fim": MARCADOR_FIM_SECAO,
+            "marcador_fim_encontrado": secao.marcador_fim_encontrado,
+            "offset_inicio_char": secao.offset_inicio,
+            "offset_fim_char": secao.offset_fim,
+            "chars_secao": len(secao.texto),
+            "chars_descartados_do_pdf": secao.chars_pdf_total - len(secao.texto),
+        },
+        "chunks": auditoria_chunks,
+    }
+
+    if auditoria_path is not None:
+        auditoria_path = Path(auditoria_path)
+        auditoria_path.parent.mkdir(parents=True, exist_ok=True)
+        auditoria_path.write_text(
+            json.dumps(auditoria, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        logger.info(f"Auditoria de chunking salva em {auditoria_path}")
+
+    return {
+        "edital": pdf_path.name,
+        "total_chunks": len(chunks),
+        "cargos": cargos,
+        "alertas": alertas,
+        "chunks": chunks_meta,
+        "auditoria": auditoria,
+    }

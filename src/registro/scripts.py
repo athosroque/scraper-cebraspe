@@ -191,7 +191,7 @@ SCRIPTS: tuple[Script, ...] = (
         "revisão.",
         "pipeline",
         "argv",
-        uso_argv="python -m scripts.revisar_taxonomia_piloto <edital.pdf> [saida.json]",
+        uso_argv="python -m scripts.revisar_taxonomia_piloto <edital.pdf> [saida.json] [--so-chunking]",
         adrs=("ADR-019", "ADR-020", "ADR-021"),
     ),
     Script(

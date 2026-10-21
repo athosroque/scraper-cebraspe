@@ -47,8 +47,9 @@ Executa o lote de concursos no Dagster (C2).
 | Argumento | Ajuda | Padrão |
 |---|---|---|
 | `--concursos` | Slugs dos concursos a executar no lote (padrão: lote da C1) | `CONCURSOS_PADRAO_C1` |
-| `--conferencia` | Executa em modo conferência (somente leitura/idempotente, sem chamadas externas). NÃO use --no-conferencia antes da D5b | `True` |
-| `--exigir-aprovacao` | Bloqueia no portão humano se o concurso não tiver aprovação formal no edital | `False` |
+| `--conferencia` | Executa em modo conferência (somente leitura/idempotente, sem chamadas externas) | `True` |
+| `--exigir-aprovacao` | Bloqueia nos portões humanos (P3, P7, P9) se não houver aprovação formal. Fora do modo conferência (--no-conferencia) é sempre ativo | `False` |
+| `--lote` | Número do lote (padrão: 1) | `1` |
 | `--sincronizar-apenas` | Apenas sincroniza as partições do inventário com o banco do Dagster | — |
 
 ### `python -m scripts.extrair_questoes`
@@ -94,7 +95,7 @@ Checkpoint de revisão humana: roda o pipeline do edital e salva o JSON para rev
 **ADRs:** [ADR-019](../adr/ADR-019-pipeline-automatico-artefatos-revisao.md), [ADR-020](../adr/ADR-020-classificacao-nivel-tipo-conhecimento-concurso.md), [ADR-021](../adr/ADR-021-reparo-local-nome-topico-numerico.md)
 
 ```bash
-python -m scripts.revisar_taxonomia_piloto <edital.pdf> [saida.json]
+python -m scripts.revisar_taxonomia_piloto <edital.pdf> [saida.json] [--so-chunking]
 ```
 
 ### `python -m scripts.validar_taxonomia`

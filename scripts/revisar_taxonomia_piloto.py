@@ -19,7 +19,7 @@ heurística de-para, relatório HTML e banco Datasette ficam sempre em dia
 com o resultado mais recente, sem passo manual (ver ADR-019).
 
 Uso:
-    python -m scripts.revisar_taxonomia_piloto <caminho_do_pdf> [saida.json]
+    python -m scripts.revisar_taxonomia_piloto <caminho_do_pdf> [saida.json] [--so-chunking]
 """
 
 import json
@@ -33,6 +33,7 @@ from src.downloader import resolver_concurso_do_pdf
 from src.edital_parser import (
     MARCADOR_FIM_SECAO,
     MARCADOR_INICIO_SECAO,
+    avaliar_chunking_edital,
     dividir_por_cargo_e_materia,
     extrair_secao_objetos_avaliacao_detalhada,
     mapear_cargos,
@@ -40,6 +41,8 @@ from src.edital_parser import (
 )
 from src.logger import logger
 from src.taxonomia_extractor import extrair_taxonomia_chunk
+
+__all__ = ["revisar_edital_piloto", "avaliar_chunking_edital", "main"]
 
 STATUS_REVISAO_PENDENTE = (
     "PENDENTE — este resultado ainda NÃO foi revisado por um humano. "
@@ -164,16 +167,50 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
     return saida
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(
-            "Uso: python -m scripts.revisar_taxonomia_piloto <caminho_do_pdf> [saida.json]"
-        )
-        sys.exit(1)
+def exibir_resumo_chunking(resultado: dict, auditoria_path: Path | None = None) -> None:
+    edital = resultado.get("edital", "")
+    total = resultado.get("total_chunks", 0)
+    cargos = resultado.get("cargos", [])
+    alertas = resultado.get("alertas", [])
+    chunks = resultado.get("chunks", [])
 
-    pdf_arg = Path(sys.argv[1])
-    if len(sys.argv) > 2:
-        saida_arg = Path(sys.argv[2])
+    logger.info(
+        f"Chunking de {edital}: {total} chunks, {len(cargos)} cargos, {len(alertas)} alertas"
+    )
+    print(f"=== Chunking: {edital} ({total} chunks) ===")
+    if cargos:
+        nomes = [str(c.get("nome")) for c in cargos if c.get("nome")]
+        print(f"Cargos ({len(cargos)}): {', '.join(nomes)}")
+    for c in chunks:
+        print(
+            f"  [{c['chunk_index']:02d}] {c.get('tipo_conhecimento') or '-'} | "
+            f"{c.get('nivel') or '-'} | cargo {c.get('cargo_numero') or '-'} | "
+            f"{c['materia']} | {c.get('total_itens', 0)} itens | {c['chars']} chars"
+        )
+    if alertas:
+        print(f"\n⚠️  Alertas ({len(alertas)}):")
+        for a in alertas:
+            print(f"  - Chunk {a.get('chunk_index')}: {a.get('mensagem')}")
+    else:
+        print("\n✅ Nenhum alerta encontrado nos chunks.")
+    if auditoria_path and auditoria_path.exists():
+        print(f"\nAuditoria salva em: {auditoria_path}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    raw_args = list(sys.argv[1:] if argv is None else argv)
+    so_chunking = "--so-chunking" in raw_args
+    args = [a for a in raw_args if a != "--so-chunking"]
+
+    if not args:
+        print(
+            "Uso: python -m scripts.revisar_taxonomia_piloto <caminho_do_pdf> [saida.json] [--so-chunking]"
+        )
+        return 1
+
+    pdf_arg = Path(args[0])
+    if len(args) > 1:
+        saida_arg = Path(args[1])
     else:
         saida_arg = (
             Path(__file__).resolve().parent.parent
@@ -181,4 +218,15 @@ if __name__ == "__main__":
             / f"{pdf_arg.stem}.json"
         )
 
+    if so_chunking:
+        auditoria_path = saida_arg.parent / f"{pdf_arg.stem}.auditoria.json"
+        resultado = avaliar_chunking_edital(pdf_arg, auditoria_path=auditoria_path)
+        exibir_resumo_chunking(resultado, auditoria_path)
+        return 0
+
     revisar_edital_piloto(pdf_arg, saida_arg)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
