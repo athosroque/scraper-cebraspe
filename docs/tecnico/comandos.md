@@ -17,6 +17,7 @@ Classifica as questões na árvore mestre pelo LLM, em duas passadas.
 | Argumento | Ajuda | Padrão |
 |---|---|---|
 | `--caderno` | Restringe a execução a um caderno específico (ex: 094_PF_CB1_01) | — |
+| `--concurso` | Restringe a execução a um concurso específico pelo slug (ex: SEFA_PR_25) | — |
 | `--dry-run` | Exibe prompts e candidatos sem efetuar chamadas ao LLM nem gravar | — |
 | `--limite` | Limita a quantidade de lotes a processar | — |
 | `--reclassificar` | Força reavaliação de questões já classificadas com mesmo hash | — |
@@ -36,6 +37,19 @@ Detecta conceitos espalhados em pais diferentes da árvore mestre, por regra.
 | `--relatorio` | — | `RELATORIO_PADRAO` |
 | `--arvore` | — | `arvore.ARVORE_PADRAO` |
 | `--sem-banco` | não consulta questao_no (só itens de edital desempatam) | — |
+
+### `python -m scripts.executar_c2`
+
+Executa o lote de concursos no Dagster (C2).
+
+**ADRs:** [ADR-041](../adr/ADR-041-registro-e-paginas-geradas.md)
+
+| Argumento | Ajuda | Padrão |
+|---|---|---|
+| `--concursos` | Slugs dos concursos a executar no lote (padrão: lote da C1) | `CONCURSOS_PADRAO_C1` |
+| `--conferencia` | Executa em modo conferência (somente leitura/idempotente, sem chamadas externas). NÃO use --no-conferencia antes da D5b | `True` |
+| `--exigir-aprovacao` | Bloqueia no portão humano se o concurso não tiver aprovação formal no edital | `False` |
+| `--sincronizar-apenas` | Apenas sincroniza as partições do inventário com o banco do Dagster | — |
 
 ### `python -m scripts.extrair_questoes`
 

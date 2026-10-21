@@ -63,6 +63,13 @@ SCRIPTS: tuple[Script, ...] = (
         adrs=("ADR-030",),
     ),
     Script(
+        "scripts.executar_c2",
+        "Executa o lote de concursos no Dagster (C2).",
+        "pipeline",
+        "argparse",
+        adrs=("ADR-041",),
+    ),
+    Script(
         "scripts.experimento_falhas_llm",
         "Experimento controlado sobre os chunks que falharam na extração real. Custa "
         "tokens.",

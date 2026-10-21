@@ -17,3 +17,6 @@ site/bin/
 scratch.py
 scratch/
 build/
+dagster_home/storage/
+dagster_home/logs/
+dagster_home/.*

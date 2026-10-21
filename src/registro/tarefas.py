@@ -41,6 +41,7 @@ TAREFAS: tuple[Tarefa, ...] = (
             "src.stats_writer",
             "scripts.extrair_questoes",
             "scripts.detectar_dispersao_arvore",
+            "scripts.executar_c2",
             "scripts.propor_arvore",
             "scripts.curar_arvore",
             "scripts.classificar_questoes",

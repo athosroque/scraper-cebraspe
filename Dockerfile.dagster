@@ -1,0 +1,19 @@
+# Imagem do Dagster (serviços webserver e daemon do docker-compose.yml).
+# Orquestrador C2 do Scraper CEBRASPE (Etapa 9/D5a, KAN-31).
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN playwright install --with-deps chromium
+
+ENV PYTHONUNBUFFERED=1
+ENV DAGSTER_HOME=/app/dagster_home
+
+CMD ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-m", "src.c2.definitions"]

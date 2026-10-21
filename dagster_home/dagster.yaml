@@ -1,0 +1,19 @@
+# Configuração do Dagster como C2 do Scraper CEBRASPE (Etapa 9/D5a, KAN-31)
+# Storage no banco `dagster` separado, dentro do scraper-cebraspe-db (ADR-042)
+storage:
+  postgres:
+    postgres_db:
+      username:
+        env: POSTGRES_USER
+      password:
+        env: POSTGRES_PASSWORD
+      hostname:
+        env: DAGSTER_PG_HOST
+      db_name:
+        env: DAGSTER_PG_DB
+      port:
+        env: DAGSTER_PG_PORT
+      scheme: postgresql+psycopg2
+
+telemetry:
+  enabled: false

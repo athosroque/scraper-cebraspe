@@ -249,7 +249,32 @@ def test_paginas_geradas_batem_com_o_disco():
 
 def test_dagster_definitions_batem_com_o_registro():
     """Assets do Dagster batem com as etapas do registro."""
-    pytest.skip("Dagster ainda não existe (D5a, KAN-31)")
+    from dagster import AssetKey, Definitions
+
+    from src.c2.definitions import defs
+    from src.registro.etapas import ETAPAS
+
+    assert isinstance(defs, Definitions)
+    graph = defs.get_asset_graph()
+
+    all_keys = (
+        graph.get_all_asset_keys()
+        if hasattr(graph, "get_all_asset_keys")
+        else graph.all_asset_keys
+    )
+    asset_keys = {key.path[0] for key in all_keys}
+    etapa_keys = {e.id.lower() for e in ETAPAS}
+    assert asset_keys == etapa_keys, (
+        f"Assets divergentes das etapas: {asset_keys ^ etapa_keys}"
+    )
+
+    for etapa in ETAPAS:
+        key = AssetKey(etapa.id.lower())
+        node = graph.get(key)
+        esperadas = {AssetKey(d.lower()) for d in etapa.depois_de}
+        assert node.parent_keys == esperadas, (
+            f"Dependências de {etapa.id} divergentes: atuais {node.parent_keys} != esperadas {esperadas}"
+        )
 
 
 # ----------------------------------------------------------- testes do gerador

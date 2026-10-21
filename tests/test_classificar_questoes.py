@@ -724,6 +724,31 @@ class TestClassificacaoPipeline:
         assert conta.chamadas == 0
         assert not classif_path.exists()
 
+    def test_classificar_todas_questoes_filtro_concurso(self, tmp_path):
+        arv_path = tmp_path / "arvore.json"
+        classif_path = tmp_path / "classificacao.json"
+        arv_path.write_text('{"versao": 1, "nos": {}}', encoding="utf-8")
+
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [
+            (1, "094_PF_CB1_01", "prova1.pdf", "094_PF_CB1_01", "PF_25_ADM"),
+            (2, "095_TCU_CB1_01", "prova2.pdf", "095_TCU_CB1_01", "TCU_25_TEFC"),
+        ]
+
+        with patch.object(cq_script, "processar_caderno", return_value=0) as mock_proc:
+            cq_script.classificar_todas_questoes(
+                concurso="TCU_25_TEFC",
+                dry_run=True,
+                arvore_path=arv_path,
+                classificacao_path=classif_path,
+                conn=mock_conn,
+            )
+
+        assert mock_proc.call_count == 1
+        assert mock_proc.call_args[0][1] == 2
+
 
 class TestClassificacaoMultiplaEscolha:
     """Testes específicos para suporte a múltipla escolha (Etapa 8.M — Task 4)."""

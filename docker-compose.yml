@@ -169,6 +169,78 @@ services:
       - "traefik.http.routers.scraper-docs.entrypoints=web"
       - "traefik.http.services.scraper-docs.loadbalancer.server.port=80"
 
+  scraper-cebraspe-dagster-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.dagster
+    container_name: scraper-cebraspe-dagster-webserver
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DAGSTER_HOME: /app/dagster_home
+      DAGSTER_PG_HOST: scraper-cebraspe-db
+      DAGSTER_PG_PORT: "5432"
+      DAGSTER_PG_DB: ${DAGSTER_PG_DB:-dagster}
+      POSTGRES_HOST: scraper-cebraspe-db
+      POSTGRES_PORT: "5432"
+    volumes:
+      - ./src:/app/src:ro
+      - ./scripts:/app/scripts:ro
+      - ./data:/app/data
+      - ./inventario:/app/inventario:ro
+      - ./revisao_piloto:/app/revisao_piloto
+      - ./canonico:/app/canonico
+      - ./questoes:/app/questoes
+      - ./logs:/app/logs
+      - ./dagster_home:/app/dagster_home
+      - ./pyproject.toml:/app/pyproject.toml:ro
+    ports:
+      - "127.0.0.1:8014:3000"
+    depends_on:
+      scraper-cebraspe-db:
+        condition: service_healthy
+    networks:
+      - homelab_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scraper-dagster.rule=Host(`dagster.projetoathos.com.br`)"
+      - "traefik.http.routers.scraper-dagster.entrypoints=web"
+      - "traefik.http.services.scraper-dagster.loadbalancer.server.port=3000"
+
+  scraper-cebraspe-dagster-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile.dagster
+    container_name: scraper-cebraspe-dagster-daemon
+    restart: unless-stopped
+    command: ["dagster-daemon", "run", "-m", "src.c2.definitions"]
+    env_file: .env
+    environment:
+      DAGSTER_HOME: /app/dagster_home
+      DAGSTER_PG_HOST: scraper-cebraspe-db
+      DAGSTER_PG_PORT: "5432"
+      DAGSTER_PG_DB: ${DAGSTER_PG_DB:-dagster}
+      POSTGRES_HOST: scraper-cebraspe-db
+      POSTGRES_PORT: "5432"
+    volumes:
+      - ./src:/app/src:ro
+      - ./scripts:/app/scripts:ro
+      - ./data:/app/data
+      - ./inventario:/app/inventario:ro
+      - ./revisao_piloto:/app/revisao_piloto
+      - ./canonico:/app/canonico
+      - ./questoes:/app/questoes
+      - ./logs:/app/logs
+      - ./dagster_home:/app/dagster_home
+      - ./pyproject.toml:/app/pyproject.toml:ro
+    depends_on:
+      scraper-cebraspe-db:
+        condition: service_healthy
+      scraper-cebraspe-dagster-webserver:
+        condition: service_started
+    networks:
+      - homelab_default
+
 volumes:
   scraper_cebraspe_pgdata:
 

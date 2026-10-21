@@ -926,6 +926,7 @@ def processar_caderno(
 
 def classificar_todas_questoes(
     caderno: str | None = None,
+    concurso: str | None = None,
     dry_run: bool = False,
     limite: int | None = None,
     reclassificar: bool = False,
@@ -958,6 +959,8 @@ def classificar_todas_questoes(
 
         cadernos_alvo: list[int] = []
         for pid, cod_cad, arq, ident, slug in provas:
+            if concurso is not None and slug != concurso:
+                continue
             nome = nome_caderno(
                 {
                     "slug": slug,
@@ -1024,6 +1027,10 @@ def main(args_list: list[str] | None = None) -> None:
         help="Restringe a execução a um caderno específico (ex: 094_PF_CB1_01)",
     )
     parser.add_argument(
+        "--concurso",
+        help="Restringe a execução a um concurso específico pelo slug (ex: SEFA_PR_25)",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Exibe prompts e candidatos sem efetuar chamadas ao LLM nem gravar",
@@ -1054,6 +1061,7 @@ def main(args_list: list[str] | None = None) -> None:
 
     conta = classificar_todas_questoes(
         caderno=args.caderno,
+        concurso=args.concurso,
         dry_run=args.dry_run,
         limite=args.limite,
         reclassificar=args.reclassificar,

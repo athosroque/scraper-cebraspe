@@ -23,3 +23,6 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["src", "app"]
+
+[tool.dagster]
+module_name = "src.c2.definitions"
