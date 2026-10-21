@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 from psycopg2.extras import RealDictCursor
 
 from app.cache import cache_ttl
@@ -36,13 +39,26 @@ def _escapar_like(termo: str) -> str:
 _COLUNAS_COM = {"texto_base": "tem_texto_base", "figuras": "tem_figuras"}
 
 
-def condicoes_conteudo(filtros_dict: dict, params: dict) -> list[str]:
-    """Filtros sobre o conteúdo da questão (5H.4): palavra-chave, `com` e o
-    atalho do ID curto (`chave_codigo`, resolvido pelo serviço).
+def _eh_sigla_curta(palavra: str) -> bool:
+    return 1 < len(palavra) <= 5 and " " not in palavra and palavra.isalnum()
 
-    Palavra-chave: cada palavra precisa aparecer (E, em qualquer ordem) no
-    enunciado ou no comando da seção, sem diferenciar maiúsculas nem acentos
-    (`unaccent` + `ILIKE`). O termo vai sempre por parâmetro.
+
+def _padrao_numero_lei(palavra: str) -> str | None:
+    """Variações com ou sem ponto de milhar para números de norma (ex.: 12.527 ou 12527)."""
+    d = palavra.replace(".", "")
+    if d.isdigit() and len(d) >= 4:
+        return rf"{d[:-3]}\.?{d[-3:]}"
+    return None
+
+
+def condicoes_conteudo(filtros_dict: dict, params: dict) -> list[str]:
+    """Filtros sobre o conteúdo da questão (5H.4, KAN-66): palavra-chave, `com`
+    e o atalho do ID curto (`chave_codigo`, resolvido pelo serviço).
+
+    Palavra-chave: casamentos no texto (enunciado e seção) unidos às questões
+    classificadas nos nós casados pelo termo (`nos_termo`, KAN-66).
+    Siglas curtas usam fronteira de palavra `\\y` no Postgres.
+    Números de norma casam com ou sem ponto de milhar.
     """
     condicoes = []
     if filtros_dict.get("chave_codigo") is not None:
@@ -50,22 +66,58 @@ def condicoes_conteudo(filtros_dict: dict, params: dict) -> list[str]:
         params["chave_codigo"] = filtros_dict["chave_codigo"]
 
     texto = (filtros_dict.get("texto") or "").strip()
+    texto_limpo = re.sub(r"\bn\.?[º°o]\.?\s*(?=\d)", "", texto, flags=re.IGNORECASE).strip()
     casamentos = []
-    for i, palavra in enumerate(texto.split()):
+    for i, palavra in enumerate(texto_limpo.split()):
         nome = f"texto_{i}"
-        casamentos.append(
-            f"unaccent(concat_ws(' ', enunciado, secao)) ILIKE unaccent(%({nome})s)"
-        )
-        params[nome] = f"%{_escapar_like(palavra)}%"
+        padrao_num = _padrao_numero_lei(palavra)
+        if padrao_num:
+            casamentos.append(
+                f"unaccent(concat_ws(' ', enunciado, secao)) ~* ('\\y' || %({nome})s || '\\y')"
+            )
+            params[nome] = padrao_num
+        elif _eh_sigla_curta(palavra):
+            casamentos.append(
+                f"unaccent(concat_ws(' ', enunciado, secao)) ~* ('\\y' || %({nome})s || '\\y')"
+            )
+            sem_acento = (
+                unicodedata.normalize("NFKD", palavra)
+                .encode("ascii", "ignore")
+                .decode()
+            )
+            params[nome] = re.escape(sem_acento)
+        else:
+            casamentos.append(
+                f"unaccent(concat_ws(' ', enunciado, secao)) ILIKE unaccent(%({nome})s)"
+            )
+            params[nome] = f"%{_escapar_like(palavra)}%"
+
+    cond_texto = None
     if casamentos:
         # Subconsulta à parte com `OFFSET 0`: sem ela o planejador empurra o
         # ILIKE para dentro da view, estima 1 linha e escolhe laços aninhados
         # (~5 s em vez de ~0,3 s). A role do site só lê as views.
-        condicoes.append(
+        cond_texto = (
             "questao_id IN (SELECT questao_id FROM ("
             "SELECT DISTINCT questao_id, enunciado, secao FROM vw_questoes OFFSET 0"
             f") t WHERE {' AND '.join(casamentos)})"
         )
+
+    nos_termo = filtros_dict.get("nos_termo")
+    cond_nos = None
+    if nos_termo:
+        cond_nos = (
+            "(no_id = ANY(%(nos_termo)s) OR assunto_id = ANY(%(nos_termo)s)"
+            " OR materia_id = ANY(%(nos_termo)s))"
+        )
+        params["nos_termo"] = list(nos_termo)
+
+    if cond_texto and cond_nos:
+        condicoes.append(f"({cond_texto} OR {cond_nos})")
+    elif cond_texto:
+        condicoes.append(cond_texto)
+    elif cond_nos:
+        condicoes.append(cond_nos)
 
     for valor in _lista(filtros_dict.get("com")):
         if valor in _COLUNAS_COM:

@@ -207,26 +207,18 @@ def test_rotulo_disciplina_no_painel_e_no_site(cliente, arvore):
 
 
 @com_banco
-def test_assunto_desabilitado_sem_disciplina(cliente, arvore):
+def test_assunto_e_subassunto_habilitados_sem_disciplina(cliente, arvore):
+    """Cascata sem trava (KAN-66): Assunto e Subassunto aceitam busca e marcação
+    mesmo sem disciplina marcada."""
     sem = cliente.get("/questoes").text
-    for chave, dica in (
-        ("assunto", "Requer disciplina"),
-        ("subassunto", "Requer assunto"),
-    ):
+    for chave in ("assunto", "subassunto", "materia"):
         botao = _botao(sem, chave)
-        assert re.search(r"\sdisabled\s", botao), chave
-        assert ':disabled="!habilitado"' in botao
-        assert dica in botao
-    assert not re.search(r"\sdisabled\s", _botao(sem, "materia"))
-    # A dica curta cabe no botão; a frase inteira fica no title.
-    assert 'title="Escolha uma disciplina para liberar os assuntos dela"' in sem
-    # Sem disciplina marcada não há opção de assunto nem de subassunto.
+        assert not re.search(r"\sdisabled\s", botao), chave
+        assert "Selecionar" in botao
+    # Sem disciplina marcada, há opções em todos os níveis
     dados = _json(sem, "dados-facetas")
-    assert dados["assunto"] == [] and dados["subassunto"] == []
-
-    com = cliente.get("/questoes", params={"no_id": arvore["disciplina"]}).text
-    assert not re.search(r"\sdisabled\s", _botao(com, "assunto"))
-    assert re.search(r"\sdisabled\s", _botao(com, "subassunto"))
+    assert len(dados["assunto"]) > 0
+    assert len(dados["subassunto"]) > 0
 
 
 @com_banco
@@ -248,7 +240,11 @@ def test_opcoes_restritas_aos_pais_marcados(cliente, arvore):
         if a["total"] and nos[a["valor"]].pai == arvore["disciplina"]
     }
     assert {a["valor"] for a in d["assunto"] if a["total"]} == esperados
-    assert d["subassunto"] == []
+    # Subassuntos restritos à disciplina marcada
+    assert all(
+        nos[s["pai"]].pai == arvore["disciplina"] or s["pai"] == arvore["disciplina"]
+        for s in d["subassunto"]
+    )
     # Só o nome do próprio nó (sem caminho nem nome do pai). `busca` é o
     # texto de pesquisa com apelidos e descendentes (KAN-64), não o rótulo.
     for a in d["assunto"]:

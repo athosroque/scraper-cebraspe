@@ -12,9 +12,9 @@ pytestmark = pytest.mark.skipif(
     not _postgres_disponivel(), reason="scraper-cebraspe-db indisponível"
 )
 
-# Termo real: no banco só aparece acentuado ("licitação"), então sem
-# `unaccent` a busca daria 0.
-TERMO = "licitacao"
+# Termo real sem nó correspondente: no banco só aparece acentuado ("exceção"),
+# então sem `unaccent` a busca daria 0.
+TERMO = "excecao"
 
 
 def _total(cliente, params):
@@ -90,8 +90,8 @@ def test_texto_sem_acento_acha_acentuado(cliente, textos):
     assert esperado > 0
     assert _total(cliente, {"texto": TERMO}) == esperado
     # A forma acentuada e em maiúsculas dá o mesmo resultado.
-    assert _total(cliente, {"texto": "LICITAÇÃO"}) == esperado
-    assert _total(cliente, {"texto": "  Licitação  "}) == esperado
+    assert _total(cliente, {"texto": "EXCEÇÃO"}) == esperado
+    assert _total(cliente, {"texto": "  Exceção  "}) == esperado
     itens = cliente.get(
         "/api/v1/questoes", params={"texto": TERMO, "tamanho_pagina": 50}
     ).json()["itens"]

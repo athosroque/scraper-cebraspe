@@ -217,8 +217,19 @@ def nos_ativos() -> list[dict]:
         return cur.fetchall()
 
 
+# Apelidos conhecidos não capturados pelas views do banco (KAN-66)
+_APELIDOS_EXTRAS = {
+    "AL-02b4bc3a67": ["LRF", "Lei de Responsabilidade Fiscal"],
+}
+
+
 def apelidos_por_no() -> dict[str, list[str]]:
     """Apelidos de busca de cada nó efetivo (KAN-64), da view `vw_no_apelidos`."""
     with get_conexao_leitura() as conn, conn.cursor() as cur:
         cur.execute("SELECT no_id, apelidos FROM vw_no_apelidos")
-        return {no_id: list(apelidos) for no_id, apelidos in cur.fetchall()}
+        resultado = {no_id: list(apelidos) for no_id, apelidos in cur.fetchall()}
+        for no_id, extras in _APELIDOS_EXTRAS.items():
+            resultado.setdefault(no_id, []).extend(
+                e for e in extras if e not in resultado.get(no_id, [])
+            )
+        return resultado

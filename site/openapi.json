@@ -2870,7 +2870,6 @@
           },
           "quesitos": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -3445,7 +3444,6 @@
           },
           "figuras": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -4472,7 +4470,6 @@
           },
           "figuras": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",

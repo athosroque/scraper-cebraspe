@@ -140,6 +140,11 @@ _PONTO_MILHAR = re.compile(r"(?<=\d)\.(?=\d)")
 _NUMERO_DE_NORMA = re.compile(r"\bn\.?o\.?\s*(?=\d)")
 
 
+def _eh_sigla_curta(termo: str) -> bool:
+    """Sigla curta sem espaço e com até 5 caracteres (ex.: LAI, LRF, LGPD, STF)."""
+    return 1 < len(termo) <= 5 and " " not in termo and termo.isalnum()
+
+
 def apelidos_por_no() -> dict[str, list[str]]:
     return estatisticas_repo.apelidos_por_no()
 
@@ -147,16 +152,24 @@ def apelidos_por_no() -> dict[str, list[str]]:
 def buscar_nos(q: str) -> list[ResultadoBusca]:
     """Nó que tem o termo no nome ou em algum apelido (KAN-64).
 
-    Nome casando vem antes de apelido casando; dentro disso, a ordem é a de sempre."""
+    Nome casando vem antes de apelido casando; dentro disso, a ordem é a de sempre.
+    Sigla curta vale como palavra inteira (KAN-66)."""
     alvo = _normalizar(q)
     if not alvo:
         return []
     apelidos = apelidos_por_no()
+    padrao = re.compile(rf"\b{re.escape(alvo)}\b") if _eh_sigla_curta(alvo) else None
     achados = []
     for r in estatisticas_repo.nos_ativos():
         nome = _normalizar(r["nome"])
-        casa_nome = alvo in nome
-        casa_apelido = any(alvo in _normalizar(a) for a in apelidos.get(r["id"], []))
+        if padrao:
+            casa_nome = bool(padrao.search(nome))
+            casa_apelido = any(
+                bool(padrao.search(_normalizar(a))) for a in apelidos.get(r["id"], [])
+            )
+        else:
+            casa_nome = alvo in nome
+            casa_apelido = any(alvo in _normalizar(a) for a in apelidos.get(r["id"], []))
         if casa_nome or casa_apelido:
             chave = (
                 not casa_nome,
@@ -167,3 +180,29 @@ def buscar_nos(q: str) -> list[ResultadoBusca]:
             achados.append((chave, r))
     achados.sort(key=lambda par: par[0])
     return [ResultadoBusca(**r) for _, r in achados[:LIMITE_BUSCA]]
+
+
+def nos_que_casam(q: str) -> list[str]:
+    """IDs de todos os nós ativos cujo nome ou apelido casa com a busca (KAN-66).
+
+    Diferente de `buscar_nos`, não limita a 20 resultados para que todas as
+    questões classificadas nos nós casados entrem na consulta."""
+    alvo = _normalizar(q)
+    if not alvo:
+        return []
+    apelidos = apelidos_por_no()
+    padrao = re.compile(rf"\b{re.escape(alvo)}\b") if _eh_sigla_curta(alvo) else None
+    achados = []
+    for r in estatisticas_repo.nos_ativos():
+        nome = _normalizar(r["nome"])
+        if padrao:
+            casa = bool(padrao.search(nome)) or any(
+                bool(padrao.search(_normalizar(a))) for a in apelidos.get(r["id"], [])
+            )
+        else:
+            casa = alvo in nome or any(
+                alvo in _normalizar(a) for a in apelidos.get(r["id"], [])
+            )
+        if casa:
+            achados.append(r["id"])
+    return achados

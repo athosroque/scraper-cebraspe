@@ -117,18 +117,29 @@ document.addEventListener("alpine:init", () => {
             const nos = this.nos;
             return (this.sel.no_id || []).filter((v) => (nos.get(v) || {}).nivel === nivel);
         },
-        // Cascata: assunto sem a disciplina marcada sai, e subassunto sem o
-        // assunto marcado também. Id que não está nas facetas fica (o
-        // servidor resolve).
+        marcarNo(id) {
+            const atual = this.sel.no_id || [];
+            if (!atual.includes(id)) {
+                this.sel.no_id = atual.concat([id]);
+            }
+        },
+        // Cascata: com pai marcado, filhos de outros pais saem.
+        // Sem pai marcado, não poda (KAN-66).
         podar() {
             const nos = this.nos;
             const fica = (nivel, pais) => (v) => {
                 const i = nos.get(v);
                 return !i || i.nivel !== nivel || pais.has(String(i.pai));
             };
-            let sel = (this.sel.no_id || []).filter(fica("assunto", new Set(this.marcadosNivel("materia"))));
+            const disciplinas = new Set(this.marcadosNivel("materia"));
+            let sel = this.sel.no_id || [];
+            if (disciplinas.size > 0) {
+                sel = sel.filter(fica("assunto", disciplinas));
+            }
             const assuntos = new Set(sel.filter((v) => (nos.get(v) || {}).nivel === "assunto"));
-            sel = sel.filter(fica("subassunto", assuntos));
+            if (assuntos.size > 0) {
+                sel = sel.filter(fica("subassunto", assuntos));
+            }
             this.sel.no_id = sel;
         },
         // Nome do nó; com outro marcado de mesmo nome e nível, leva o pai.
@@ -234,18 +245,17 @@ document.addEventListener("alpine:init", () => {
         get aberto() {
             return this.$store.filtros.aberto === this.chave;
         },
-        // Assunto só com disciplina marcada; subassunto só com assunto.
+        // Cascata sem trava (KAN-66): Assunto e Subassunto aceitam busca e marcação.
         get habilitado() {
-            const pai = PAI[this.chave];
-            return !pai || this.$store.filtros.marcadosNivel(pai).length > 0;
+            return true;
         },
-        // Em cascata, só os filhos dos pais marcados (o servidor já manda
-        // assim; aqui vale também entre a marcação e a recontagem).
+        // Em cascata, com pai marcado restringe aos filhos; sem pai marcado mostra todos (KAN-66).
         get itens() {
             const todos = this.$store.facetas[this.chave] || [];
             const pai = PAI[this.chave];
             if (!pai) return todos;
             const pais = new Set(this.$store.filtros.marcadosNivel(pai));
+            if (pais.size === 0) return todos;
             return todos.filter((i) => pais.has(String(i.pai)));
         },
         // no_id serve a 3 facetas (disciplina, assunto, subassunto): cada uma
@@ -336,35 +346,55 @@ document.addEventListener("alpine:init", () => {
             });
         },
     }));
+
+    // Sugestões ao digitar na palavra-chave (KAN-66)
+    Alpine.data("sugestoesPalavraChave", () => ({
+        sugestoes: [],
+        aberto: false,
+        async buscar() {
+            const q = (this.$store.filtros.texto || "").trim();
+            if (q.length < 2) {
+                this.sugestoes = [];
+                this.aberto = false;
+                return;
+            }
+            try {
+                const resp = await fetch("/questoes/sugestoes?q=" + encodeURIComponent(q));
+                if (resp.ok) {
+                    this.sugestoes = await resp.json();
+                    this.aberto = this.sugestoes.length > 0;
+                }
+            } catch (e) {
+                this.sugestoes = [];
+                this.aberto = false;
+            }
+        },
+        fechar() {
+            this.aberto = false;
+        },
+        selecionar(s) {
+            this.$store.filtros.marcarNo(s.id);
+            this.sugestoes = [];
+            this.aberto = false;
+            this.$store.filtros.texto = "";
+            this.$store.filtros.recontar();
+        },
+    }));
 });
 </script>
 
-{# Cascata (5H.3): o servidor já desenha Assunto/Subassunto desabilitados
-   quando falta o pai marcado (sem piscar até o Alpine assumir). #}
-{% set sel_nos = filtros.no_id or [] %}
-{% set dicas = {
-    "assunto": ("Requer disciplina", dados_facetas.materia|selectattr("valor", "in", sel_nos)|list|length == 0),
-    "subassunto": ("Requer assunto", dados_facetas.assunto|selectattr("valor", "in", sel_nos)|list|length == 0),
-} %}
-{# Dica curta (cabe na coluna de 1280 px); a frase inteira vai no title. #}
-{% set explica = {
-    "assunto": "Escolha uma disciplina para liberar os assuntos dela",
-    "subassunto": "Escolha um assunto para liberar os subassuntos dele",
-} %}
+{# Cascata sem trava (KAN-66): Assunto e Subassunto aceitam busca e marcação sem disciplina #}
 {% macro dropdown(chave, nome, titulo) %}
-{% set dica, desabilitado = dicas.get(chave, ("", False)) %}
 <div class="relative" x-data="faceta" data-chave="{{ chave }}" data-nome="{{ nome }}"
-     {% if chave in explica %}data-explica="{{ explica[chave] }}" :title="habilitado ? null : $el.dataset.explica"{% if desabilitado %} title="{{ explica[chave] }}"{% endif %}{% endif %}
      @click.outside="fechar(false)" @keydown.escape.stop="fechar(true)">
     <button type="button" x-ref="botao" id="botao-{{ chave }}"
             class="flex min-h-[3.25rem] w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-sm shadow-sm transition hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:shadow-none"
             :class="aberto && '!border-destaque-600 ring-1 ring-destaque-600'"
-            {% if desabilitado %}disabled {% endif %}:disabled="!habilitado"
             @click="alternar()" aria-haspopup="true" aria-expanded="false" :aria-expanded="aberto.toString()" aria-controls="painel-{{ chave }}">
         <span class="min-w-0">
-            <span class="block truncate font-medium" :class="habilitado ? 'text-slate-800' : 'text-slate-400'">{{ titulo }}</span>
-            <span class="block truncate text-xs" :class="marcados.length ? 'font-medium text-destaque-700' : (habilitado ? 'text-slate-500' : 'text-slate-400')"
-                  data-dica="{{ dica }}" x-text="!habilitado ? $el.dataset.dica : (marcados.length ? resumo : 'Selecionar')">{{ dica if desabilitado else "Selecionar" }}</span>
+            <span class="block truncate font-medium text-slate-800">{{ titulo }}</span>
+            <span class="block truncate text-xs" :class="marcados.length ? 'font-medium text-destaque-700' : 'text-slate-500'"
+                  x-text="marcados.length ? resumo : 'Selecionar'">Selecionar</span>
         </span>
         <span class="text-slate-500 transition" :class="aberto && 'rotate-180'">{{ c.icone("seta", "h-4 w-4") }}</span>
     </button>
@@ -432,14 +462,26 @@ document.addEventListener("alpine:init", () => {
        saía cortado em 1280 px (o input type=search reserva o espaço do botão
        de limpar). A linha avançada usa a mesma grade para alinhar as colunas. #}
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(5,minmax(0,1fr))]">
-        <div class="flex min-h-[3.25rem]">
+        <div class="relative flex min-h-[3.25rem]" x-data="sugestoesPalavraChave"
+             @click.outside="fechar()" @keydown.escape.stop="fechar()">
             <label for="filtro-texto" class="sr-only">Palavra-chave</label>
             <input type="search" id="filtro-texto" name="texto" value="{{ filtros.texto or '' }}" placeholder="Palavra-chave"
                    maxlength="200" autocomplete="off"
                    class="min-w-0 flex-1 rounded-l-lg border border-r-0 border-slate-300 bg-white px-3 text-sm text-slate-900 shadow-sm focus:border-destaque-700 focus:outline-none focus:ring-1 focus:ring-destaque-700"
-                   x-model="$store.filtros.texto" @change="$store.filtros.recontar()">
+                   x-model="$store.filtros.texto" @input.debounce.200ms="buscar()" @change="$store.filtros.recontar()">
             <button type="submit" class="flex items-center rounded-r-lg border border-destaque-200 bg-destaque-100 px-3 text-destaque-800 hover:bg-destaque-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-destaque-500"
                     aria-label="Buscar pela palavra-chave">{{ c.icone("busca", "h-5 w-5") }}</button>
+            <ul id="sugestoes-palavra-chave" x-show="aberto && sugestoes.length > 0" x-cloak
+                class="absolute left-0 right-0 top-full z-30 mt-1 max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 text-sm shadow-lg">
+                <template x-for="s in sugestoes" :key="s.id">
+                    <li>
+                        <button type="button" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-100 focus:bg-slate-100 focus:outline-none text-slate-800"
+                                @click="selecionar(s)">
+                            <span class="block truncate" x-text="s.rotulo"></span>
+                        </button>
+                    </li>
+                </template>
+            </ul>
         </div>
         {% for chave, nome, titulo in facetas_simples %}{{ dropdown(chave, nome, titulo) }}{% endfor %}
     </div>

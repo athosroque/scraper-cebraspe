@@ -179,3 +179,10 @@ Pedido do dono depois da validação da 5H:
 - Recontar devolvendo o fragmento inteiro da lista: troca cards que o usuário
   ainda não pediu para trocar.
 - Biblioteca de dropdown/ícones: Alpine + SVG inline bastam.
+
+## Atualização (2026-10-21, KAN-66)
+
+Na revisão da busca do site e filtros:
+- **Cascata sem trava:** Assunto e Subassunto passam a aceitar busca e marcação mesmo sem disciplina/assunto previamente marcados (removido o bloqueio inicial da 5H.3). Quando o nó pai estiver marcado, a lista de opções segue estritamente restrita aos filhos desse pai. Se nenhum pai estiver marcado, a lista exibe todos os nós do respectivo nível. A coerência de nós (`coerir_nos`) no servidor já completava a cadeia ancestral para links diretos, mantendo total paridade.
+- **Palavra-chave = texto + classificação:** A palavra-chave agora traz a união das questões encontradas no texto (enunciado e comando) com as questões classificadas no nó e descendentes correspondentes ao termo (regras de equivalência do `/api/v1/busca`, abrangendo nome e apelidos da taxonomia). Siglas curtas (como "LAI", "LRF", "LGPD") são casadas com fronteira de palavra inteira (`\b`), garantindo que "LAI" não case falsos positivos como "laicização". Números de normas com ou sem ponto de milhar e com ou sem prefixo "nº" produzem o mesmo resultado normalizado.
+- **Sugestões ao digitar na palavra-chave:** Ao digitar na palavra-chave, sugestões de assuntos/nós correspondentes são exibidas com o caminho do nó e o total de questões. O clique na sugestão marca o filtro correspondente no painel sem disparar a busca de questões na hora, preservando a regra de ouro do ADR-035 (a lista de questões só atualiza ao submeter o botão "Filtrar").

@@ -109,12 +109,13 @@ def chave_do_termo(texto: str | None) -> str | None:
 
 def filtros_para_repo(filtros: FiltroQuestoes, usuario_id: int | None) -> dict:
     """Filtros prontos para o repositório: histórico do usuário (5F.3), o
-    atalho do ID curto, que troca a palavra-chave pela própria questão, e os
-    nós da cascata (`nos_da_consulta`, 5H.3).
+    atalho do ID curto, que troca a palavra-chave pela própria questão, nós que
+    casam com a palavra-chave (KAN-66) e os nós da cascata (`nos_da_consulta`, 5H.3).
 
     Levanta `LoginNecessario` quando o histórico pede login e não há usuário.
     """
     # Import tardio: contas_servico importa este módulo.
+    from app.servicos import estatisticas_servico
     from app.servicos.contas_servico import filtros_com_historico
 
     filtros_dict = filtros_com_historico(filtros, usuario_id)
@@ -122,6 +123,10 @@ def filtros_para_repo(filtros: FiltroQuestoes, usuario_id: int | None) -> dict:
     if chave is not None:
         filtros_dict.pop("texto", None)
         filtros_dict["chave_codigo"] = chave
+    elif filtros.texto:
+        nos_termo = estatisticas_servico.nos_que_casam(filtros.texto)
+        if nos_termo:
+            filtros_dict["nos_termo"] = nos_termo
     if filtros_dict.get("no_id"):
         filtros_dict["no_id"] = nos_da_consulta(filtros_dict["no_id"])
     return filtros_dict
@@ -368,22 +373,38 @@ def opcoes_em_cascata(
     no_ids: list[str] | None,
     textos: dict[str, str] | None = None,
 ) -> dict[str, list[dict]]:
-    """Opções de disciplina, assunto e subassunto do painel do site.
+    """Opções de disciplina, assunto e subassunto do painel do site (KAN-66).
 
-    Assunto só das disciplinas marcadas e subassunto só dos assuntos marcados
-    (sem pai marcado, a lista vem vazia). Cada opção leva o próprio nome e o
-    `pai`, nunca o caminho: o painel agrupa sob o nome do pai. `busca` é o
-    texto de `textos_busca` (nome e apelidos, com os descendentes).
+    Assunto e Subassunto aceitam busca e marcação mesmo sem disciplina marcada.
+    Com o pai marcado, a lista segue restrita aos filhos do pai marcado.
+    Cada opção leva o próprio nome e o `pai`, nunca o caminho: o painel agrupa sob
+    o nome do pai. `busca` é o texto de `textos_busca` (nome e apelidos, com os
+    descendentes).
     """
     mapa = _mapa_nos()
     marcados = set(no_ids or [])
     textos = textos or {}
 
-    def opcoes(lista, restringir: bool):
+    materias_marcadas = {
+        m for m in marcados if m in mapa and mapa[m].nivel == "materia"
+    }
+    assuntos_marcados = {
+        a for a in marcados if a in mapa and mapa[a].nivel == "assunto"
+    }
+
+    def pai_ancestral(no_id: str, nivel: str) -> str | None:
+        atual = mapa[no_id].pai if no_id in mapa else None
+        while atual is not None and atual in mapa:
+            if mapa[atual].nivel == nivel:
+                return atual
+            atual = mapa[atual].pai
+        return None
+
+    def opcoes(lista, restricao_fn=None):
         saida = []
         for n in lista:
             pai = mapa[n.valor].pai if n.valor in mapa else None
-            if restringir and pai not in marcados:
+            if restricao_fn and not restricao_fn(n.valor, pai):
                 continue
             saida.append(
                 {
@@ -396,11 +417,97 @@ def opcoes_em_cascata(
             )
         return saida
 
+    def restr_assunto(valor, pai):
+        if not materias_marcadas:
+            return True
+        return pai in materias_marcadas
+
+    def restr_subassunto(valor, pai):
+        if assuntos_marcados:
+            return pai in assuntos_marcados
+        if materias_marcadas:
+            materia = pai_ancestral(valor, "materia")
+            return materia in materias_marcadas
+        return True
+
     return {
-        "materia": opcoes(facetas.materias, False),
-        "assunto": opcoes(facetas.assuntos, True),
-        "subassunto": opcoes(facetas.subassuntos, True),
+        "materia": opcoes(facetas.materias),
+        "assunto": opcoes(facetas.assuntos, restr_assunto),
+        "subassunto": opcoes(facetas.subassuntos, restr_subassunto),
     }
+
+
+def sugestoes_busca(q: str, limite: int = 10) -> list[dict]:
+    """Sugestões de assuntos/nós ao digitar na palavra-chave (KAN-66).
+
+    Retorna até `limite` nós ativos com total de questões > 0 que casam com
+    o termo no nome ou apelido, formatados com o termo, o caminho do pai e
+    o total de questões."""
+    from app.servicos import estatisticas_servico
+
+    q_norm = estatisticas_servico._normalizar(q)
+    if not q_norm or len(q_norm) < 2:
+        return []
+
+    nos = estatisticas_servico.buscar_nos(q)
+    if not nos:
+        return []
+
+    mapa = info_nos()
+    totais = {
+        r["id"]: r["total_questoes"] for r in questoes_repo.obter_arvore_com_contagens()
+    }
+    apelidos_map = estatisticas_servico.apelidos_por_no()
+    eh_sigla = estatisticas_servico._eh_sigla_curta(q_norm)
+    padrao = re.compile(rf"\b{re.escape(q_norm)}\b") if eh_sigla else None
+
+    sugestoes = []
+    vistos = set()
+    for no in nos:
+        if no.id in vistos:
+            continue
+        total = totais.get(no.id, 0)
+        if total == 0:
+            continue
+
+        info = mapa.get(no.id)
+        pai_info = mapa.get(info.pai) if info and info.pai else None
+        caminho_pai = pai_info.caminho if pai_info else ""
+
+        apelidos = apelidos_map.get(no.id, [])
+        apelido_casado = None
+        for a in apelidos:
+            norm_a = estatisticas_servico._normalizar(a)
+            if (padrao and padrao.search(norm_a)) or (not padrao and q_norm in norm_a):
+                apelido_casado = a
+                break
+
+        if eh_sigla:
+            termo_exibicao = q.strip().upper()
+        elif apelido_casado and len(apelido_casado) < len(no.nome):
+            termo_exibicao = apelido_casado
+        else:
+            termo_exibicao = no.nome
+
+        if caminho_pai and termo_exibicao != caminho_pai:
+            rotulo = f"{termo_exibicao} → {caminho_pai} ({total})"
+        else:
+            rotulo = f"{no.nome} ({total})"
+
+        sugestoes.append(
+            {
+                "id": no.id,
+                "nome": no.nome,
+                "nivel": no.nivel,
+                "rotulo": rotulo,
+                "total": total,
+            }
+        )
+        vistos.add(no.id)
+        if len(sugestoes) >= limite:
+            break
+
+    return sugestoes
 
 
 def obter_facetas(

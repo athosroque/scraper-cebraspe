@@ -301,6 +301,12 @@ def recontar_facetas(
     )
 
 
+@router.get("/questoes/sugestoes")
+def sugestoes_palavra_chave(q: str = Query("", max_length=100)) -> list[dict]:
+    """Sugestões ao digitar na palavra-chave (KAN-66)."""
+    return questoes_servico.sugestoes_busca(q)
+
+
 def _url_pagina(query: list[tuple[str, str]], pagina: int) -> str:
     return "/questoes?" + urlencode([*query, ("pagina", str(pagina))])
 
