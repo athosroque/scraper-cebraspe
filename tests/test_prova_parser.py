@@ -1243,6 +1243,20 @@ class TestFigurasVetoriais:
         page.draw_rect(pymupdf.Rect(27, 46, 568, 63), color=None, fill=(0.85,) * 3)
         assert figuras_vetoriais_da_pagina(page) == []
 
+    def test_separador_curto_da_primeira_pagina_nao_engole_a_tabela(self):
+        # Faixa "PROVA OBJETIVA" encurta o separador (~79% da altura, abaixo
+        # do corte de 80%); o filete do título encostado nele unia a coluna
+        # esquerda inteira numa caixa só e a tabela sumia.
+        _doc, page = self._pagina()
+        page.draw_line((297, 137), (297, 803))
+        page.draw_line((27, 150), (296, 150))
+        page.draw_line((27, 152), (296, 152))
+        self._tabela(page, 105, 189, 214, 292)
+        regioes = figuras_vetoriais_da_pagina(page)
+        assert len(regioes) == 1
+        assert regioes[0].contains(pymupdf.Rect(105, 189, 214, 292))
+        assert regioes[0].x1 < 230 and regioes[0].y1 < 310
+
     def test_regiao_sobre_figura_raster_nao_duplica(self):
         _doc, page = self._pagina()
         self._tabela(page, 310, 380, 560, 460)

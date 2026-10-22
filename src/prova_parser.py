@@ -192,6 +192,11 @@ TAMANHO_MINIMO_FIGURA = 15
 FOLGA_VETORIAL = 3.0
 TAMANHO_MINIMO_FIGURA_VETORIAL = 10
 ESPESSURA_LINHA = 2.0
+# Separador de colunas encurtado pela faixa "PROVA OBJETIVA" da 1ª página
+# (~79% da altura): passa do corte de 80% e, encostado nos filetes, unia a
+# coluna esquerda inteira numa caixa só. Traço vertical fino acima dessa
+# fração da altura também é layout.
+FRACAO_SEPARADOR_COLUNAS = 0.6
 TOLERANCIA_BORDA = 2.0
 LIMIAR_BRANCO = 0.97
 ALTURA_RODAPE = 40
@@ -1744,7 +1749,8 @@ def figuras_vetoriais_da_pagina(
     diagramas): traços visíveis próximos unidos numa caixa.
 
     Fica de fora o layout do caderno: cabeçalho/rodapé, traços de quase a
-    página inteira (separador de colunas), os separadores duplos entre
+    página inteira (separador de colunas, inclusive o curto da 1ª página:
+    traço vertical fino com mais de `FRACAO_SEPARADOR_COLUNAS` da altura), os separadores duplos entre
     grupos (finos demais depois de unidos), molduras sem traço interno e o
     que já é figura raster. A caixa devolvida tem uma folga para a borda da
     tabela sair no recorte."""
@@ -1757,6 +1763,8 @@ def figuras_vetoriais_da_pagina(
         if r.y1 <= ALTURA_CABECALHO or r.y0 >= altura - ALTURA_RODAPE:
             continue
         if r.width > 0.8 * largura or r.height > 0.8 * altura:
+            continue
+        if r.width < ESPESSURA_LINHA and r.height > FRACAO_SEPARADOR_COLUNAS * altura:
             continue
         # Linha traçada (não preenchida) tem retângulo de altura/largura 0,
         # que o PyMuPDF trata como vazio em `intersects`/`include_rect`.
