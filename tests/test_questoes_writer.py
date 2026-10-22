@@ -595,11 +595,14 @@ class TestQuestoesWriter:
 
     def test_views_colunas_e_filtros(self, conn):
         with conn.cursor() as cur:
-            # Garante que vw_questoes expõe tipo e alternativas
-            cur.execute("SELECT tipo, alternativas FROM vw_questoes LIMIT 0")
+            # Garante que vw_questoes expõe tipo, alternativas e texto_tabela
+            cur.execute(
+                "SELECT tipo, alternativas, texto_tabela FROM vw_questoes LIMIT 0"
+            )
             col_names = [desc[0] for desc in cur.description]
             assert "tipo" in col_names
             assert "alternativas" in col_names
+            assert "texto_tabela" in col_names
 
             # Garante que as views de estatística compilam e executam sem erro
             cur.execute("SELECT * FROM vw_certo_errado_por_no LIMIT 0")

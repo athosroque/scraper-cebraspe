@@ -266,6 +266,8 @@ CREATE TABLE IF NOT EXISTS questoes (
     alternativas JSONB DEFAULT NULL,
     anulada BOOLEAN NOT NULL DEFAULT false,
     figuras JSONB NOT NULL DEFAULT '[]'::jsonb,
+    -- Texto achatado de tabelas/gráficos vetoriais extraído para campo próprio (KAN-75).
+    texto_tabela TEXT DEFAULT NULL,
     -- Comando do grupo ("Julgue os itens relativos a X"): pista para a
     -- classificação por assunto (Etapa 5D).
     secao TEXT,
@@ -334,6 +336,9 @@ ALTER TABLE questoes ADD COLUMN IF NOT EXISTS utilizavel BOOLEAN NOT NULL DEFAUL
 -- Etapa 8.M: tipo da questão (certo_errado / multipla_escolha) e alternativas (JSONB)
 ALTER TABLE questoes ADD COLUMN IF NOT EXISTS tipo VARCHAR(20) NOT NULL DEFAULT 'certo_errado';
 ALTER TABLE questoes ADD COLUMN IF NOT EXISTS alternativas JSONB DEFAULT NULL;
+
+-- KAN-75: texto achatado de figuras vetoriais em campo próprio
+ALTER TABLE questoes ADD COLUMN IF NOT EXISTS texto_tabela TEXT DEFAULT NULL;
 
 DO $$
 BEGIN
@@ -910,6 +915,7 @@ SELECT
     ctx.utilizavel,
     ctx.status_revisao,
     q.enunciado,
+    q.texto_tabela,
     q.secao,
     -- Figuras do texto-base (tabelas do grupo) antes das do item: o card só
     -- lê esta coluna, e `tem_figuras` já considerava as duas.

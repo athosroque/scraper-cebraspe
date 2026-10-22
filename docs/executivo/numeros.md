@@ -2,7 +2,7 @@
 
 # Números
 
-Atualizado em 21/10/2026, a partir do banco do projeto.
+Atualizado em 22/10/2026, a partir do banco do projeto.
 
 ## Cobertura
 

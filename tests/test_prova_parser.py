@@ -13,6 +13,7 @@ from src.prova_parser import (
     STATUS_FALHA_SEM_GABARITO,
     STATUS_SUCESSO,
     Linha,
+    ResultadoSegmentacao,
     _chave_titulo,
     _eh_cabecalho_layout_me,
     _eh_codigo_ou_tabela,
@@ -22,6 +23,7 @@ from src.prova_parser import (
     _marcar_borda_direita,
     _processar_preambulo_me,
     _recuo_item,
+    _remover_texto_das_tabelas,
     _segmentar_me,
     _tema,
     _texto_spans,
@@ -1286,6 +1288,59 @@ class TestFigurasVetoriais:
         for tabela in (t1, t2):
             dono = dono_da_figura(tabela, 0, linhas, dono_linha, ignorar=[t1, t2])
             assert dono == ("preambulo", 7)
+
+    def test_figura_vetorial_nao_corta_legenda_acima(self):
+        # KAN-75: a folga superior (-2 pt) não pode invadir a linha de texto
+        # logo acima da tabela (ex.: legenda "Clientes" em BANRISUL Q36).
+        _doc, page = self._pagina()
+        page.insert_text((350, 242), "Clientes", fontsize=10)
+        self._tabela(page, 310, 243.35, 560, 320)
+        regioes = figuras_vetoriais_da_pagina(page)
+        assert len(regioes) == 1
+        words = page.get_text("words")
+        clientes_w = [w for w in words if w[4] == "Clientes"][0]
+        assert regioes[0].y0 >= clientes_w[3]
+
+    def test_remover_texto_das_tabelas_no_enunciado(self):
+        # KAN-75: texto achatado de tabela vetorial vai para texto_tabela
+        linhas = [
+            Linha(0, 0, "1", 30, 100, 40, 112, True),
+            Linha(0, 1, "célula 1 célula 2", 35, 125, 200, 135, True),
+            Linha(0, 2, "célula 3 célula 4", 35, 140, 200, 150, True),
+            Linha(
+                0,
+                3,
+                "Com base na tabela, julgue o item a seguir.",
+                30,
+                170,
+                280,
+                182,
+                True,
+            ),
+        ]
+        seg = ResultadoSegmentacao()
+        seg.itens[1] = {
+            "numero": 1,
+            "enunciado": "célula 1 célula 2 célula 3 célula 4 Com base na tabela, julgue o item a seguir.",
+            "tipo": "certo_errado",
+            "figuras": [
+                {
+                    "arquivo": "tabela.png",
+                    "pagina": 1,
+                    "bbox": [30, 120, 210, 155],
+                    "origem": "vetorial",
+                }
+            ],
+            "texto_tabela": None,
+        }
+        for k in range(len(linhas)):
+            seg.dono_linha[k] = ("item", 1)
+
+        _remover_texto_das_tabelas(seg, linhas)
+        assert seg.itens[1]["texto_tabela"] == "célula 1 célula 2 célula 3 célula 4"
+        assert (
+            seg.itens[1]["enunciado"] == "Com base na tabela, julgue o item a seguir."
+        )
 
 
 GABARITO_STM_005_PAG1 = {

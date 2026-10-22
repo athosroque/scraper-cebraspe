@@ -582,7 +582,8 @@ class TestEstatisticasViews:
                     rotulo_materia,
                     nome_de_cargo,
                     no_caminho,
-                    gabarito
+                    gabarito,
+                    texto_tabela
                 FROM vw_questoes
                 WHERE questao_id = %s AND cargo_numero = 1
                 """,

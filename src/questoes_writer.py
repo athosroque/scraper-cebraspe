@@ -94,8 +94,8 @@ def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
             cur.execute(
                 """
                 INSERT INTO questoes
-                    (prova_id, numero, enunciado, texto_base_id, gabarito, tipo, alternativas, anulada, figuras, secao, alertas, utilizavel)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (prova_id, numero, enunciado, texto_base_id, gabarito, tipo, alternativas, anulada, figuras, secao, alertas, utilizavel, texto_tabela)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     prova_id,
@@ -110,6 +110,7 @@ def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
                     q["secao"],
                     alertas_item,
                     utilizavel,
+                    q.get("texto_tabela"),
                 ),
             )
     return len(resultado["questoes"])

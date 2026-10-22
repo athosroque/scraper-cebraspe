@@ -233,6 +233,7 @@ A estrutura é lida do `information_schema`. Só tabelas base e views; os schema
 | utilizavel | boolean | não |
 | tipo | character varying | não |
 | alternativas | jsonb | sim |
+| texto_tabela | text | sim |
 
 ## subtopico_no
 

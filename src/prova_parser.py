@@ -1770,6 +1770,7 @@ def figuras_vetoriais_da_pagina(
         # que o PyMuPDF trata como vazio em `intersects`/`include_rect`.
         rects.append(r + (-0.5, -0.5, 0.5, 0.5))
     regioes = []
+    words = None
     for membros in _agrupar_proximos(rects, FOLGA_VETORIAL):
         caixa = pymupdf.Rect(membros[0])
         for r in membros[1:]:
@@ -1782,7 +1783,22 @@ def figuras_vetoriais_da_pagina(
             continue
         if any(caixa.intersects(f) for f in figuras_raster or []):
             continue
-        regioes.append((caixa + (-2, -2, 2, 2)) & page.rect)
+        r_final = (caixa + (-2, -2, 2, 2)) & page.rect
+        # Se a folga superior invade texto acima do desenho, começa abaixo dele
+        # para não cortar legenda ou linha de texto ao meio (KAN-75).
+        if words is None:
+            words = page.get_text("words")
+        palavras_acima = [
+            w
+            for w in words
+            if w[0] < r_final.x1
+            and w[2] > r_final.x0
+            and w[1] < caixa.y0
+            and w[3] > r_final.y0
+        ]
+        if palavras_acima:
+            r_final.y0 = max(w[3] for w in palavras_acima) + 0.2
+        regioes.append(r_final)
     return sorted(regioes, key=lambda r: (r.y0, r.x0))
 
 
@@ -2445,12 +2461,13 @@ def _conferir_sem_justificativa(seg, embutido: GabaritoEmbutido) -> list[dict]:
 
 
 def _remover_texto_das_tabelas(seg, linhas: list[Linha]) -> None:
-    """Tira do texto-base as linhas que caem dentro de figura vetorial dele.
+    """Tira do texto-base e dos itens as linhas que caem dentro de figura vetorial.
 
     A tabela desenhada já aparece como imagem; o texto corrido das células
     ("grupo patrimonial 20X1 20X0 ativo circulante $ 154 ...") só repete o
-    conteúdo de forma ilegível. Só o texto-base muda: o enunciado é a chave
-    da 5D e fica intacto.
+    conteúdo de forma ilegível. No texto-base o texto dentro da tabela é
+    descartado; nos itens, é guardado em campo próprio `texto_tabela`
+    (KAN-75) e o enunciado fica limpo.
     """
     for tb in seg.textos_base:
         regioes = [
@@ -2487,6 +2504,56 @@ def _remover_texto_das_tabelas(seg, linhas: list[Linha]) -> None:
             tb["texto"][len(completo) :] if tb["texto"].startswith(completo) else ""
         )
         tb["texto"] = f"{juntar_linhas(fora, paragrafos=True)}{sufixo}".strip()
+
+    for item in seg.itens.values():
+        item["texto_tabela"] = None
+        regioes = [
+            (f["pagina"] - 1, pymupdf.Rect(f["bbox"]))
+            for f in item.get("figuras", [])
+            if f.get("origem") == "vetorial"
+        ]
+        if not regioes or not item.get("enunciado"):
+            continue
+        indices = [
+            i for i, dono in seg.dono_linha.items() if dono == ("item", item["numero"])
+        ]
+        if not indices:
+            continue
+        indices.sort()
+        todas = [linhas[i] for i in indices]
+        if item.get("tipo") == "multipla_escolha" and item.get("alternativas"):
+            alts_loc = _localizar_alternativas_questao(todas)
+            todas_enunc = todas[: alts_loc[0][1]] if alts_loc else todas
+        else:
+            todas_enunc = todas
+
+        def dentro_item(linha: Linha, regioes=regioes) -> bool:
+            cx, cy = (linha.x0 + linha.x1) / 2, (linha.y0 + linha.y1) / 2
+            return any(
+                pagina == linha.pagina and r.contains(pymupdf.Point(cx, cy))
+                for pagina, r in regioes
+            )
+
+        fora = [l for l in todas_enunc if not dentro_item(l)]
+        dentro_linhas = [l for l in todas_enunc if dentro_item(l)]
+        if not dentro_linhas or len(fora) == 0:
+            continue
+
+        item["texto_tabela"] = (
+            juntar_linhas(dentro_linhas, paragrafos=True).strip() or None
+        )
+        novo_enunc = juntar_linhas(fora, paragrafos=True)
+        if item.get("tipo") == "multipla_escolha":
+            novo_enunc = (
+                PADRAO_QUESTAO_ME.sub("", novo_enunc, count=1).lstrip(" -.:\t").strip()
+            )
+        else:
+            novo_enunc = (
+                re.sub(rf"^{item['numero']}\s*", "", novo_enunc, count=1)
+                .lstrip(" -.:\t")
+                .strip()
+            )
+        item["enunciado"] = novo_enunc
 
 
 def extrair_caderno_objetivo(
@@ -2752,6 +2819,7 @@ def extrair_caderno_objetivo(
                 "alertas": item_alertas,
                 "tipo": item.get("tipo", "certo_errado"),
                 "alternativas": item.get("alternativas"),
+                "texto_tabela": item.get("texto_tabela"),
             }
         )
     resultado["textos_base"] = [
