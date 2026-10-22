@@ -1,5 +1,7 @@
 """CLI de curadoria da árvore mestre (Etapa 5B.1, ADR-030)."""
 
+import json
+
 import pytest
 
 from scripts import curar_arvore
@@ -377,3 +379,46 @@ def test_mapear_no_de_norma_repetida_avisa(ambiente, capsys):
     assert "A-N2" in saida
     [m] = carregar(path).mapeamentos["direito|lei"]
     assert (m.no_id, m.status) == ("A-N1", "aprovado")
+
+
+def test_rebaixar_e_lote_com_simular(ambiente, tmp_path, capsys):
+    path, _, rodar = ambiente
+    assert rodar("--criar", "materia:=Legislação") == 0
+    [leg] = [n.id for n in carregar(path).nos.values() if n.nome == "Legislação"]
+    lote = tmp_path / "lote.json"
+    lote.write_text(
+        json.dumps(
+            {
+                "operacoes": [
+                    {
+                        "tipo": "criar",
+                        "apelido": "@normas",
+                        "args": {"nivel": "assunto", "nome": "Normas", "pai": "M-1"},
+                    },
+                    {
+                        "tipo": "rebaixar",
+                        "args": {"materia": leg, "destino": "@normas"},
+                    },
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    antes = path.read_text(encoding="utf-8")
+    assert rodar("--lote", str(lote), "--simular") == 0
+    saida = capsys.readouterr().out
+    assert "Disciplinas ativas: 3 → 2" in saida
+    assert "Simulação: nada foi gravado." in saida
+    assert path.read_text(encoding="utf-8") == antes
+
+    assert rodar("--lote", str(lote)) == 0
+    arv = carregar(path)
+    assert arv.nos[leg].status == "fundido"
+    assert arv.nos[arv.nos[leg].fundido_em].nome == "Normas"
+
+
+def test_rebaixar_com_erro_nao_grava(ambiente):
+    path, _, rodar = ambiente
+    antes = path.read_text(encoding="utf-8")
+    assert rodar("--rebaixar", "M-2:M-1") == 1
+    assert path.read_text(encoding="utf-8") == antes

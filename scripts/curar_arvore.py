@@ -17,17 +17,21 @@ Uso:
     python -m scripts.curar_arvore --criar 'assunto:PAI=Nome'   # matéria: 'materia:=Nome'
     python -m scripts.curar_arvore --criar 'assunto:PAI=Nome' --permitir-norma-repetida
     python -m scripts.curar_arvore --renomear 'NO=Novo nome'
+    python -m scripts.curar_arvore --rebaixar MATERIA:ASSUNTO_DESTINO [--simular]
+    python -m scripts.curar_arvore --lote canonico/lotes/arquivo.json [--simular]
     python -m scripts.curar_arvore --html
 """
 
 import argparse
+import copy
+import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.gerar_relatorio_arvore import REVISAO_DIR_PADRAO, gerar_relatorio_arvore
-from src import arvore, canonico
+from src import arvore, canonico, classificacao
 
 
 def _dividir(valor: str, separador: str, formato: str) -> tuple[str, str]:
@@ -175,6 +179,13 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
         no_id, pai = _dividir(args.mover, ":", "NO:PAI")
         arvore.mover_no(arv, _exigir_no(arv, no_id), _exigir_no(arv, pai))
         feitas.append(f"movido {no_id} → pai {pai}")
+    if args.rebaixar is not None:
+        materia, destino = _dividir(args.rebaixar, ":", "MATERIA:DESTINO")
+        arvore.rebaixar_materia(arv, _exigir_no(arv, materia), _exigir_no(arv, destino))
+        feitas.append(f"rebaixado {materia} → {destino}")
+    if args.lote is not None:
+        operacoes = json.loads(args.lote.read_text(encoding="utf-8"))["operacoes"]
+        feitas.extend(arvore.aplicar_lote(arv, operacoes))
     if args.fundir is not None:
         origem, destino = _dividir(args.fundir, ":", "ORIGEM:DESTINO")
         arvore.fundir_nos(arv, _exigir_no(arv, origem), _exigir_no(arv, destino))
@@ -230,6 +241,66 @@ def aplicar_operacoes(arv: arvore.ArvoreMestre, args: argparse.Namespace) -> lis
     return feitas
 
 
+def chaves_por_no(arv: arvore.ArvoreMestre, path: Path) -> dict[str, set[str]]:
+    """Chaves das questões por nó efetivo (pelo `fundido_em`), sem as rejeitadas."""
+    if not path.exists():
+        return {}
+    por_no: dict[str, set[str]] = {}
+    for chave, reg in classificacao.carregar(path).registros.items():
+        for a in reg.apontamentos:
+            if a.status != "rejeitado":
+                por_no.setdefault(arvore.resolver_no(arv, a.no_id), set()).add(chave)
+    return por_no
+
+
+def _questoes_por_no(arv: arvore.ArvoreMestre, path: Path) -> dict[str, int]:
+    return {no_id: len(c) for no_id, c in chaves_por_no(arv, path).items()}
+
+
+def resumir_efeito(
+    antes: arvore.ArvoreMestre, depois: arvore.ArvoreMestre, path_classificacao: Path
+) -> list[str]:
+    """Prévia do `--simular`: disciplinas que saem/entram e fusões com questão."""
+
+    def materias(arv: arvore.ArvoreMestre) -> dict[str, str]:
+        return {
+            n.id: n.nome
+            for n in arv.nos.values()
+            if n.nivel == "materia" and n.status == "ativo"
+        }
+
+    m_antes, m_depois = materias(antes), materias(depois)
+    linhas = [f"Disciplinas ativas: {len(m_antes)} → {len(m_depois)}"]
+    for no_id in sorted(set(m_antes) - set(m_depois), key=m_antes.get):
+        destino = arvore.resolver_no(depois, no_id)
+        linhas.append(
+            f"  sai   {no_id} {m_antes[no_id]} → {arvore._caminho_no(depois, destino)}"
+        )
+    for no_id in sorted(set(m_depois) - set(m_antes), key=m_depois.get):
+        linhas.append(f"  entra {no_id} {m_depois[no_id]}")
+    for no_id in sorted(set(m_antes) & set(m_depois)):
+        if m_antes[no_id] != m_depois[no_id]:
+            linhas.append(f"  nome  {no_id} {m_antes[no_id]} → {m_depois[no_id]}")
+
+    questoes = _questoes_por_no(antes, path_classificacao)
+    fundidos = [
+        n
+        for n in antes.nos.values()
+        if n.status == "ativo"
+        and n.nivel != "materia"
+        and depois.nos[n.id].status == "fundido"
+        and questoes.get(n.id)
+    ]
+    linhas.append(f"Nós com questão que fundem (perdem detalhe): {len(fundidos)}")
+    for n in sorted(fundidos, key=lambda n: -questoes[n.id]):
+        destino = arvore.resolver_no(depois, n.id)
+        linhas.append(
+            f"  {n.id} {n.nome!r} ({questoes[n.id]} q) → "
+            f"{destino} {arvore._caminho_no(depois, destino)}"
+        )
+    return linhas
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Curadoria da árvore mestre (ADR-030)")
     parser.add_argument(
@@ -257,6 +328,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--renomear", help="NO=Nome — renomeia o nó")
     parser.add_argument(
+        "--rebaixar",
+        help="MATERIA:ASSUNTO — a matéria entra no assunto; os assuntos dela viram "
+        "subassuntos e os subassuntos dela fundem no pai (Etapa 5B.3)",
+    )
+    parser.add_argument(
+        "--lote",
+        type=Path,
+        help="JSON com {'operacoes': [{'tipo', 'args'}]} aplicado em ordem, tudo ou nada",
+    )
+    parser.add_argument(
+        "--simular",
+        action="store_true",
+        help="mostra o efeito (disciplinas e nós fundidos com questão) sem gravar",
+    )
+    parser.add_argument(
         "--aprovar-proposta",
         help="P1,P2... — aprova propostas em lote (tudo ou nada)",
     )
@@ -278,6 +364,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--revisao-dir", type=Path, default=REVISAO_DIR_PADRAO, help=argparse.SUPPRESS
     )
+    parser.add_argument(
+        "--classificacao",
+        type=Path,
+        default=classificacao.CLASSIFICACAO_PADRAO,
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args(argv)
 
     if args.propostas is not None:
@@ -296,6 +388,8 @@ def main(argv: list[str] | None = None) -> int:
         "mover",
         "criar",
         "renomear",
+        "rebaixar",
+        "lote",
         "aprovar_proposta",
         "rejeitar_proposta",
     )
@@ -305,15 +399,21 @@ def main(argv: list[str] | None = None) -> int:
 
     if any(getattr(args, op) is not None for op in operacoes):
         arv = arvore.carregar(args.arvore)
+        antes = copy.deepcopy(arv)
         try:
             feitas = aplicar_operacoes(arv, args)
         except arvore.ArvoreInvalida as e:
             # Nada é gravado: as operações da mesma chamada valem juntas ou nenhuma.
             print(f"Erro: {e}", file=sys.stderr)
             return 1
-        arvore.salvar(arv, args.arvore)
         for linha in feitas:
             print(linha)
+        if args.simular:
+            for linha in resumir_efeito(antes, arv, args.classificacao):
+                print(linha)
+            print("Simulação: nada foi gravado.")
+            return 0
+        arvore.salvar(arv, args.arvore)
 
     gerar_relatorio_arvore(args.revisao_dir, args.arvore)
     return 0

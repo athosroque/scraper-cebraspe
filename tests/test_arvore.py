@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 
 from src.arvore import (
@@ -10,6 +12,7 @@ from src.arvore import (
     _nome_e_a_norma,
     _normas_do_nome,
     _verificar_ciclo,
+    aplicar_lote,
     aposentar_no,
     aprovar,
     aprovar_propostas,
@@ -21,8 +24,10 @@ from src.arvore import (
     detectar_homonimos,
     fundir_nos,
     mapear,
+    materia_do_no,
     mover_no,
     propor,
+    rebaixar_materia,
     rejeitar,
     rejeitar_proposta,
     renomear_no,
@@ -1064,3 +1069,99 @@ def test_proposta_fundir_entre_niveis_valida_e_aprova_pela_mesma_regra():
     aprovar_propostas(arv, [pid])
     assert arv.propostas[pid].status == "aprovado"
     assert resolver_no(arv, s1) == a2
+
+
+def _arvore_rebaixar():
+    arv = ArvoreMestre()
+    criar_no(arv, "materia", "TI", None, id_override="M-TI")
+    criar_no(arv, "assunto", "Desenvolvimento", "M-TI", id_override="A-DEV")
+    criar_no(arv, "subassunto", "Python", "A-DEV", id_override="S-PY")
+    criar_no(arv, "materia", "DevOps", None, id_override="M-OPS")
+    criar_no(arv, "assunto", "Kubernetes", "M-OPS", id_override="A-K8S")
+    criar_no(arv, "subassunto", "Pods", "A-K8S", id_override="S-POD")
+    criar_no(arv, "subassunto", "Python no CI", "A-K8S", id_override="S-PYCI")
+    criar_no(arv, "assunto", "Git", "M-OPS", id_override="A-GIT")
+    mapear(arv, "devops|git", ["A-GIT"])
+    return arv
+
+
+def test_rebaixar_materia_assuntos_viram_subassuntos():
+    arv = _arvore_rebaixar()
+    rebaixar_materia(arv, "M-OPS", "A-DEV", {"S-PYCI": "S-PY"})
+
+    assert (arv.nos["A-K8S"].nivel, arv.nos["A-K8S"].pai) == ("subassunto", "A-DEV")
+    assert (arv.nos["A-GIT"].nivel, arv.nos["A-GIT"].pai) == ("subassunto", "A-DEV")
+    assert arv.nos["S-POD"].fundido_em == "A-K8S"
+    assert arv.nos["S-PYCI"].fundido_em == "S-PY"
+    assert (arv.nos["M-OPS"].status, arv.nos["M-OPS"].fundido_em) == (
+        "fundido",
+        "A-DEV",
+    )
+    assert materia_do_no(arv, "A-GIT") == "M-TI"
+    assert materia_do_no(arv, "S-POD") == "M-TI"
+    assert resolver_no(arv, "M-OPS") == "A-DEV"
+    assert arv.mapeamentos["devops|git"][0].no_id == "A-GIT"
+
+
+def test_rebaixar_materia_erro_nao_altera_nada():
+    arv = _arvore_rebaixar()
+    antes = copy.deepcopy(arv)
+    with pytest.raises(ArvoreInvalida, match="não é subassunto que fica"):
+        rebaixar_materia(arv, "M-OPS", "A-DEV", {"S-PYCI": "S-POD"})
+    assert arv == antes
+    with pytest.raises(ArvoreInvalida, match="não é assunto ativo"):
+        rebaixar_materia(arv, "M-OPS", "M-TI")
+    with pytest.raises(ArvoreInvalida, match="está dentro de"):
+        rebaixar_materia(arv, "M-OPS", "A-K8S")
+    with pytest.raises(ArvoreInvalida, match="não é subassunto ativo de"):
+        rebaixar_materia(arv, "M-OPS", "A-DEV", {"S-PY": "A-GIT"})
+    assert arv == antes
+
+
+def test_rebaixar_materia_recusa_no_proposto():
+    arv = _arvore_rebaixar()
+    criar_no(arv, "subassunto", "Helm", "A-K8S", status="proposto", id_override="S-H")
+    with pytest.raises(ArvoreInvalida, match="nós propostos: S-H"):
+        rebaixar_materia(arv, "M-OPS", "A-DEV")
+
+
+def test_fundir_continua_recusando_materia_entre_niveis():
+    arv = _arvore_rebaixar()
+    with pytest.raises(ArvoreInvalida, match="Matéria não funde"):
+        fundir_nos(arv, "M-OPS", "A-DEV")
+
+
+def test_aplicar_lote_com_apelido_e_tudo_ou_nada():
+    arv = _arvore_rebaixar()
+    feitas = aplicar_lote(
+        arv,
+        [
+            {
+                "tipo": "criar",
+                "apelido": "@infra",
+                "args": {"nivel": "assunto", "nome": "Infraestrutura", "pai": "M-TI"},
+            },
+            {"tipo": "rebaixar", "args": {"materia": "M-OPS", "destino": "@infra"}},
+            {
+                "tipo": "renomear",
+                "args": {"no": "M-TI", "nome": "Tecnologia da Informação"},
+            },
+        ],
+    )
+    assert len(feitas) == 3
+    infra = resolver_no(arv, "M-OPS")
+    assert arv.nos[infra].nome == "Infraestrutura"
+    assert arv.nos["A-GIT"].pai == infra
+    assert arv.nos["M-TI"].nome == "Tecnologia da Informação"
+
+    arv = _arvore_rebaixar()
+    antes = copy.deepcopy(arv)
+    with pytest.raises(ArvoreInvalida, match="Operação 2 .*@nada"):
+        aplicar_lote(
+            arv,
+            [
+                {"tipo": "renomear", "args": {"no": "M-TI", "nome": "X"}},
+                {"tipo": "rebaixar", "args": {"materia": "M-OPS", "destino": "@nada"}},
+            ],
+        )
+    assert arv == antes

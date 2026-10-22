@@ -254,6 +254,91 @@ def aposentar_no(arvore: ArvoreMestre, no_id: str) -> None:
     no.status = "aposentado"
 
 
+def _filhos_ativos(arvore: ArvoreMestre, no_id: str) -> list[NoArvore]:
+    return sorted(
+        (
+            no
+            for no in arvore.nos.values()
+            if no.status in ("ativo", "proposto")
+            and no.pai
+            and resolver_no(arvore, no.pai) == no_id
+        ),
+        key=lambda no: no.id,
+    )
+
+
+def rebaixar_materia(
+    arvore: ArvoreMestre,
+    materia_id: str,
+    destino_id: str,
+    subassuntos: dict[str, str] | None = None,
+) -> None:
+    """Rebaixa uma matéria para dentro do assunto `destino_id` (Etapa 5B.3, D0).
+
+    A árvore tem 3 níveis fixos: os assuntos da matéria viram subassuntos do
+    destino (mesmo ID, então apontamentos e mapeamentos continuam valendo), e os
+    subassuntos deles fundem no próprio pai ou no irmão indicado em `subassuntos`.
+    A matéria termina `fundido` no destino. Tudo ou nada.
+    """
+    materia_id = resolver_no(arvore, materia_id)
+    destino_id = resolver_no(arvore, destino_id)
+    materia = arvore.nos.get(materia_id)
+    destino = arvore.nos.get(destino_id)
+    if not materia or materia.nivel != "materia" or materia.status != "ativo":
+        raise ArvoreInvalida(f"{materia_id} não é matéria ativa")
+    if not destino or destino.nivel != "assunto" or destino.status != "ativo":
+        raise ArvoreInvalida(f"Destino {destino_id} não é assunto ativo")
+    if resolver_no(arvore, destino.pai) == materia_id:
+        raise ArvoreInvalida(f"Destino {destino_id} está dentro de {materia_id}")
+
+    copia = copy.deepcopy(arvore)
+    assuntos = _filhos_ativos(copia, materia_id)
+    propostos = [
+        no.id
+        for a in assuntos
+        for no in [a, *_filhos_ativos(copia, a.id)]
+        if no.status == "proposto"
+    ]
+    if propostos:
+        raise ArvoreInvalida(
+            f"Rebaixar {materia_id} exige decidir antes os nós propostos: "
+            f"{', '.join(propostos)}"
+        )
+    netos = [s for a in assuntos for s in _filhos_ativos(copia, a.id)]
+    ids_netos = {s.id for s in netos}
+    alvos = subassuntos or {}
+    sobrando = sorted(set(alvos) - ids_netos)
+    if sobrando:
+        raise ArvoreInvalida(
+            f"{', '.join(sobrando)} não é subassunto ativo de {materia_id}"
+        )
+
+    for a in assuntos:
+        a.nivel = "subassunto"
+        a.pai = destino_id
+    for s in netos:
+        alvo = resolver_no(copia, alvos.get(s.id, s.pai))
+        no_alvo = copia.nos.get(alvo)
+        if (
+            alvos.get(s.id) in ids_netos
+            or alvo in ids_netos
+            or not no_alvo
+            or no_alvo.nivel != "subassunto"
+        ):
+            raise ArvoreInvalida(
+                f"Alvo {alvo} de {s.id} não é subassunto que fica depois do rebaixamento"
+            )
+        fundir_nos(copia, s.id, alvo)
+
+    no_mat = copia.nos[materia_id]
+    no_mat.status = "fundido"
+    no_mat.fundido_em = destino_id
+
+    arvore.nos = copia.nos
+    arvore.mapeamentos = copia.mapeamentos
+    arvore.propostas = copia.propostas
+
+
 def mapear(
     arvore: ArvoreMestre,
     item: str,
@@ -496,8 +581,70 @@ def _executar_operacao(
         if not no_id:
             raise ArvoreInvalida("Argumento 'no' obrigatório para aposentar")
         aposentar_no(arv, no_id)
+    elif tipo == "renomear":
+        if "no" not in args or "nome" not in args:
+            raise ArvoreInvalida("Argumentos 'no' e 'nome' obrigatórios para renomear")
+        renomear_no(arv, args["no"], args["nome"])
+    elif tipo == "rebaixar":
+        if "materia" not in args or "destino" not in args:
+            raise ArvoreInvalida(
+                "Argumentos 'materia' e 'destino' obrigatórios para rebaixar"
+            )
+        rebaixar_materia(arv, args["materia"], args["destino"], args.get("subassuntos"))
     else:
         raise ArvoreInvalida(f"Tipo de proposta inválido: {tipo!r}")
+
+
+def _trocar_apelidos(valor, apelidos: dict[str, str]):
+    if isinstance(valor, str) and valor.startswith("@"):
+        if valor not in apelidos:
+            raise ArvoreInvalida(f"Apelido {valor} não foi criado antes no lote")
+        return apelidos[valor]
+    if isinstance(valor, list):
+        return [_trocar_apelidos(v, apelidos) for v in valor]
+    if isinstance(valor, dict):
+        return {
+            _trocar_apelidos(k, apelidos): _trocar_apelidos(v, apelidos)
+            for k, v in valor.items()
+        }
+    return valor
+
+
+def aplicar_lote(arv: ArvoreMestre, operacoes: list[dict]) -> list[str]:
+    """Aplica um lote ordenado de operações do dono (Etapa 5B.3). Tudo ou nada.
+
+    Cada operação é `{"tipo", "args"}`, com os tipos de `_executar_operacao`.
+    Um `criar` pode levar `"apelido": "@nome"`: o ID do nó é gerado, e as
+    operações seguintes citam o nó novo pelo apelido. Devolve uma linha por
+    operação.
+    """
+    copia = copy.deepcopy(arv)
+    apelidos: dict[str, str] = {}
+    feitas = []
+    for i, op in enumerate(operacoes, 1):
+        tipo = op.get("tipo", "")
+        try:
+            args = _trocar_apelidos(op.get("args", {}), apelidos)
+            if tipo == "criar":
+                no_id = criar_no(copia, args["nivel"], args["nome"], args.get("pai"))
+                apelido = op.get("apelido")
+                if apelido:
+                    if not apelido.startswith("@") or apelido in apelidos:
+                        raise ArvoreInvalida(
+                            f"Apelido {apelido!r} inválido ou repetido"
+                        )
+                    apelidos[apelido] = no_id
+                feitas.append(f"{i}: criado {no_id} ({args['nivel']}) {args['nome']!r}")
+            else:
+                _executar_operacao(copia, tipo, args, origem="humano")
+                feitas.append(f"{i}: {tipo} {json.dumps(args, ensure_ascii=False)}")
+        except (ArvoreInvalida, KeyError) as e:
+            raise ArvoreInvalida(f"Operação {i} ({tipo}): {e}") from e
+
+    arv.nos = copia.nos
+    arv.mapeamentos = copia.mapeamentos
+    arv.propostas = copia.propostas
+    return feitas
 
 
 def _inferir_materia_proposta(arv: ArvoreMestre, tipo: str, args: dict) -> str:

@@ -24,6 +24,14 @@ SCRIPTS: tuple[Script, ...] = (
         adrs=("ADR-015", "ADR-027", "ADR-029", "ADR-031"),
     ),
     Script(
+        "scripts.auditar_arvore",
+        "Confere as disciplinas da árvore contra a lista fechada e aponta norma "
+        "repetida.",
+        "curadoria",
+        "argparse",
+        adrs=("ADR-030",),
+    ),
+    Script(
         "scripts.backfill_classificacao_chunks",
         "Completa concurso, nível e tipo de conhecimento em extrações já feitas, sem "
         "LLM.",
