@@ -1,3 +1,4 @@
+import json
 import re
 from functools import cache
 from pathlib import Path
@@ -1341,6 +1342,116 @@ class TestFigurasVetoriais:
         assert (
             seg.itens[1]["enunciado"] == "Com base na tabela, julgue o item a seguir."
         )
+
+    def test_figura_vetorial_com_legenda_engloba_titulo_e_subtitulo(self):
+        # KAN-76: tabela com legenda ("Tabela I" + "Clientes") logo acima:
+        # o recorte estende para cima englobando a legenda.
+        _doc, page = self._pagina()
+        page.insert_text((350, 220), "Tabela I", fontsize=10)
+        page.insert_text((350, 235), "Clientes", fontsize=10)
+        self._tabela(page, 310, 243.35, 560, 320)
+        regioes = figuras_vetoriais_da_pagina(page)
+        assert len(regioes) == 1
+        words = page.get_text("words")
+        tabela_w = [w for w in words if w[4] == "Tabela"][0]
+        clientes_w = [w for w in words if w[4] == "Clientes"][0]
+        assert regioes[0].y0 <= tabela_w[1]
+        assert regioes[0].contains(
+            pymupdf.Point(
+                (tabela_w[0] + tabela_w[2]) / 2, (tabela_w[1] + tabela_w[3]) / 2
+            )
+        )
+        assert regioes[0].contains(
+            pymupdf.Point(
+                (clientes_w[0] + clientes_w[2]) / 2, (clientes_w[1] + clientes_w[3]) / 2
+            )
+        )
+
+        linhas = [
+            Linha(0, 0, "1", 30, 100, 40, 112, True),
+            Linha(0, 1, "Tabela I", 350, 210, 400, 222, True),
+            Linha(0, 2, "Clientes", 350, 225, 400, 237, True),
+            Linha(0, 3, "célula 1 célula 2", 320, 250, 450, 260, True),
+            Linha(
+                0,
+                4,
+                "Com base na tabela, julgue o item a seguir.",
+                30,
+                340,
+                280,
+                352,
+                True,
+            ),
+        ]
+        seg = ResultadoSegmentacao()
+        seg.itens[1] = {
+            "numero": 1,
+            "enunciado": "Tabela I Clientes célula 1 célula 2 Com base na tabela, julgue o item a seguir.",
+            "tipo": "certo_errado",
+            "figuras": [
+                {
+                    "arquivo": "tabela.png",
+                    "pagina": 1,
+                    "bbox": [round(v, 1) for v in regioes[0]],
+                    "origem": "vetorial",
+                }
+            ],
+            "texto_tabela": None,
+        }
+        for k in range(len(linhas)):
+            seg.dono_linha[k] = ("item", 1)
+        _remover_texto_das_tabelas(seg, linhas)
+        assert seg.itens[1]["texto_tabela"] == "Tabela I Clientes célula 1 célula 2"
+        assert (
+            seg.itens[1]["enunciado"] == "Com base na tabela, julgue o item a seguir."
+        )
+
+    def test_figura_vetorial_com_paragrafo_acima_nao_engloba(self):
+        # KAN-76: texto acima que não começa com palavra-chave (Tabela, Figura...)
+        # não pode ser englobado no recorte e deve permanecer no enunciado.
+        _doc, page = self._pagina()
+        page.insert_text(
+            (310, 238),
+            "Considerando as informações precedentes, responda:",
+            fontsize=10,
+        )
+        self._tabela(page, 310, 245.0, 560, 320)
+        regioes = figuras_vetoriais_da_pagina(page)
+        assert len(regioes) == 1
+        words = page.get_text("words")
+        texto_w = [w for w in words if w[4] == "Considerando"][0]
+        assert regioes[0].y0 >= texto_w[3]
+
+    def test_extrair_banrisul_q36_tabelas_e_legendas(self):
+        # KAN-76: caso real do BANRISUL (077_BANRISUL_002_01.pdf, Q36).
+        # Três tabelas desenhadas com vetores, cada uma com sua legenda acima:
+        # Tabela I / Clientes, Tabela II / Pedidos, Tabela III / Resultado.
+        # As legendas devem ir para o recorte da imagem e para texto_tabela,
+        # deixando o enunciado limpo.
+        pdf_path = Path("data/2025/CEBRASPE/BANRISUL/Provas/077_BANRISUL_002_01.pdf")
+        if not pdf_path.exists():
+            pytest.skip("PDF do BANRISUL não encontrado no ambiente local")
+        with open("questoes/077_BANRISUL_002_01.json") as f:
+            data = json.load(f)
+        gabarito = {q["numero"]: q["gabarito"] for q in data["questoes"]}
+        resultado, _auditoria = extrair_caderno_objetivo(
+            pdf_path, gabarito, "077_BANRISUL_002_01"
+        )
+        q36 = next(q for q in resultado["questoes"] if q["numero"] == 36)
+        assert q36["enunciado"] == (
+            "Com base nas informações nas tabelas I e II, precedentes, "
+            "assinale a opção em que são apresentados comandos SQL que permitem "
+            "a obtenção do resultado demonstrado na tabela III."
+        )
+        assert "Tabela I Clientes" in q36["texto_tabela"]
+        assert "Tabela II Pedidos" in q36["texto_tabela"]
+        assert "Tabela III Resultado" in q36["texto_tabela"]
+        assert len(q36["figuras"]) == 3
+        # Cada figura teve o topo estendido para englobar a respectiva legenda
+        # (originalmente sem legenda: y0 era ~243.2, ~347.9, ~454.1)
+        assert q36["figuras"][0]["bbox"][1] < 225.0
+        assert q36["figuras"][1]["bbox"][1] < 330.0
+        assert q36["figuras"][2]["bbox"][1] < 435.0
 
 
 GABARITO_STM_005_PAG1 = {

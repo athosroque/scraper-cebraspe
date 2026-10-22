@@ -192,6 +192,11 @@ TAMANHO_MINIMO_FIGURA = 15
 FOLGA_VETORIAL = 3.0
 TAMANHO_MINIMO_FIGURA_VETORIAL = 10
 ESPESSURA_LINHA = 2.0
+# Legenda de figura/tabela vetorial (KAN-76): palavras-chave obrigatórias no início.
+PADRAO_LEGENDA_TABELA = re.compile(
+    r"^\s*(?:Tabela|Figura|Gr[aá]fico|Quadro)\b", re.IGNORECASE
+)
+DISTANCIA_MAX_LEGENDA_TABELA = 15.0
 # Separador de colunas encurtado pela faixa "PROVA OBJETIVA" da 1ª página
 # (~79% da altura): passa do corte de 80% e, encostado nos filetes, unia a
 # coluna esquerda inteira numa caixa só. Traço vertical fino acima dessa
@@ -1742,6 +1747,96 @@ def _so_moldura(membros: list[pymupdf.Rect], caixa: pymupdf.Rect) -> bool:
     return True
 
 
+def _linhas_texto_da_pagina(page) -> list[dict]:
+    """Linhas de texto visuais da página com coordenadas e texto."""
+    linhas = []
+    blocos = page.get_text("dict").get("blocks", [])
+    for b in ordenar_blocos(blocos, page.rect.width):
+        if b.get("type") != 0:
+            continue
+        atual = None
+        for l in b.get("lines", []):
+            texto = _texto_spans(l.get("spans", [])).strip()
+            if not texto:
+                continue
+            x0, y0, x1, y1 = l["bbox"]
+            centro = (y0 + y1) / 2
+            if (
+                atual is not None
+                and abs(centro - (atual["y0"] + atual["y1"]) / 2)
+                <= TOLERANCIA_MESMA_LINHA
+            ):
+                atual["texto"] = f"{atual['texto']} {texto}"
+                atual["x0"] = min(atual["x0"], x0)
+                atual["x1"] = max(atual["x1"], x1)
+                atual["y0"] = min(atual["y0"], y0)
+                atual["y1"] = max(atual["y1"], y1)
+                atual["width"] = atual["x1"] - atual["x0"]
+            else:
+                atual = {
+                    "x0": x0,
+                    "y0": y0,
+                    "x1": x1,
+                    "y1": y1,
+                    "texto": texto,
+                    "width": x1 - x0,
+                }
+                linhas.append(atual)
+    return linhas
+
+
+def _detectar_legenda_figura_vetorial(
+    caixa: pymupdf.Rect, linhas_pagina: list[dict]
+) -> list[dict]:
+    """Detecta estritamente a legenda de uma tabela/figura vetorial (KAN-76).
+
+    Condições estritas do dono:
+    - Linha de texto logo acima da caixa da tabela (distância <= 15 pt).
+    - Linha curta (largura < largura da tabela + 10 pt).
+    - Alinhada ou centrada sobre a tabela (x0 >= caixa.x0 - 10 e x1 <= caixa.x1 + 10).
+    - Título obrigatoriamente começa com: Tabela, Figura, Gráfico ou Quadro.
+    - Se a linha seguinte (entre a linha do título e o início do desenho) for uma
+      linha curta de subtítulo (como 'Clientes', 'Pedidos', 'Resultado'),
+      engloba ambas.
+    - Sem essas regras estritas, não engloba nada.
+    """
+    candidatas = [
+        l
+        for l in linhas_pagina
+        if l["y1"] <= caixa.y0 + 2.0
+        and l["y1"] >= caixa.y0 - 50.0
+        and l["x0"] >= caixa.x0 - 10.0
+        and l["x1"] <= caixa.x1 + 10.0
+    ]
+    candidatas.sort(key=lambda l: l["y1"], reverse=True)
+    if not candidatas:
+        return []
+
+    l1 = candidatas[0]
+    # Linha mais próxima colada ao topo da tabela
+    if not (
+        caixa.y0 - l1["y1"] <= DISTANCIA_MAX_LEGENDA_TABELA
+        and l1["width"] < caixa.width + 10.0
+    ):
+        return []
+
+    # Caso 1: a linha colada já é o título (ex.: "Tabela I - Clientes" ou "Quadro 1")
+    if PADRAO_LEGENDA_TABELA.match(l1["texto"]):
+        return [l1]
+
+    # Caso 2: a linha colada é um subtítulo e a linha imediatamente acima dela é o título
+    if len(candidatas) > 1:
+        l0 = candidatas[1]
+        if (
+            l1["y0"] - l0["y1"] <= DISTANCIA_MAX_LEGENDA_TABELA
+            and l0["width"] < caixa.width + 10.0
+            and PADRAO_LEGENDA_TABELA.match(l0["texto"])
+        ):
+            return [l0, l1]
+
+    return []
+
+
 def figuras_vetoriais_da_pagina(
     page, figuras_raster: list[pymupdf.Rect] | None = None
 ) -> list[pymupdf.Rect]:
@@ -1753,7 +1848,10 @@ def figuras_vetoriais_da_pagina(
     traço vertical fino com mais de `FRACAO_SEPARADOR_COLUNAS` da altura), os separadores duplos entre
     grupos (finos demais depois de unidos), molduras sem traço interno e o
     que já é figura raster. A caixa devolvida tem uma folga para a borda da
-    tabela sair no recorte."""
+    tabela sair no recorte.
+
+    Legenda de tabela/gráfico (KAN-76): se houver legenda estritamente detectada
+    logo acima da tabela, o topo do recorte engloba a legenda."""
     altura, largura = page.rect.height, page.rect.width
     rects = []
     for desenho in page.get_drawings():
@@ -1770,6 +1868,7 @@ def figuras_vetoriais_da_pagina(
         # que o PyMuPDF trata como vazio em `intersects`/`include_rect`.
         rects.append(r + (-0.5, -0.5, 0.5, 0.5))
     regioes = []
+    linhas_texto = None
     words = None
     for membros in _agrupar_proximos(rects, FOLGA_VETORIAL):
         caixa = pymupdf.Rect(membros[0])
@@ -1784,20 +1883,46 @@ def figuras_vetoriais_da_pagina(
         if any(caixa.intersects(f) for f in figuras_raster or []):
             continue
         r_final = (caixa + (-2, -2, 2, 2)) & page.rect
-        # Se a folga superior invade texto acima do desenho, começa abaixo dele
-        # para não cortar legenda ou linha de texto ao meio (KAN-75).
+
+        if linhas_texto is None:
+            linhas_texto = _linhas_texto_da_pagina(page)
+        legenda = _detectar_legenda_figura_vetorial(caixa, linhas_texto)
+
         if words is None:
             words = page.get_text("words")
-        palavras_acima = [
-            w
-            for w in words
-            if w[0] < r_final.x1
-            and w[2] > r_final.x0
-            and w[1] < caixa.y0
-            and w[3] > r_final.y0
-        ]
-        if palavras_acima:
-            r_final.y0 = max(w[3] for w in palavras_acima) + 0.2
+
+        if legenda:
+            topo_legenda_y0 = legenda[0]["y0"]
+            y_pretendido = topo_legenda_y0 - 2.0
+            palavras_acima = [
+                w
+                for w in words
+                if w[0] < r_final.x1
+                and w[2] > r_final.x0
+                and w[1] < topo_legenda_y0
+                and w[3] > y_pretendido
+            ]
+            if palavras_acima:
+                r_final.y0 = max(w[3] for w in palavras_acima) + 0.2
+            else:
+                r_final.y0 = max(0.0, y_pretendido)
+            min_x0 = min(l["x0"] for l in legenda)
+            max_x1 = max(l["x1"] for l in legenda)
+            r_final.x0 = min(r_final.x0, max(0.0, min_x0 - 2.0))
+            r_final.x1 = min(page.rect.width, max(r_final.x1, max_x1 + 2.0))
+        else:
+            # Se a folga superior invade texto acima do desenho, começa abaixo dele
+            # para não cortar texto acima ao meio (KAN-75).
+            palavras_acima = [
+                w
+                for w in words
+                if w[0] < r_final.x1
+                and w[2] > r_final.x0
+                and w[1] < caixa.y0
+                and w[3] > r_final.y0
+            ]
+            if palavras_acima:
+                r_final.y0 = max(w[3] for w in palavras_acima) + 0.2
         regioes.append(r_final)
     return sorted(regioes, key=lambda r: (r.y0, r.x0))
 

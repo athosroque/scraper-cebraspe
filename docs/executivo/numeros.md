@@ -61,7 +61,7 @@ Quanto o projeto gastou com modelo de linguagem, em dólar. Cada valor é o tota
 | Taxonomia do edital | US$ 0,0198 |
 | Sinônimos | US$ 0,0001 |
 | Curadoria da árvore | US$ 0,0002 |
-| Classificação das questões | US$ 0,0001 |
+| Classificação das questões | US$ 0,0007 |
 | Bot do Telegram | US$ 0,0002 |
 | Chave geral (fallback e etapas antigas) | US$ 0,2907 |
-| **Total** | **US$ 0,3111** |
+| **Total** | **US$ 0,3117** |
