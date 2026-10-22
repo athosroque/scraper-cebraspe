@@ -89,6 +89,79 @@ depender da conversa anterior.
   piloto está inalterado, o site exibe a figura na questão certa, e a checagem nova está no
   registro e no relatório.
 
+### 3.3 Resultado da F1 (2026-10-21, só leitura)
+
+**Método.** Os 12 cadernos objetivos da C1 (610 questões, 125 páginas) foram renderizados com
+sobreposição (imagem bruta, traço vetorial bruto, candidata raster e vetorial do parser, figura
+gravada no banco) e conferidos com três varreduras automáticas, mais conferência visual das
+páginas suspeitas:
+
+1. **Tinta fora do texto:** página em 72 dpi, apaga os spans de texto, o cabeçalho, o rodapé e as
+   imagens decorativas, e procura regiões escuras que sobram. Pega figura raster e desenho grosso.
+2. **Tabela de filete:** grupos de traços horizontais finos com a mesma faixa horizontal,
+   empilhados.
+3. **Traços soltos:** traços vetoriais agrupados com folga de 15 pt que nenhuma figura cobre.
+   Pega gráfico e tabela de linha fina que a varredura 1 apaga.
+
+Os scripts ficaram no scratchpad da sessão (não versionados). A lógica das varreduras 1 e 3 é a
+base da checagem da F4.
+
+**Resultado: 1 perda em 610 questões.** Todas as 14 figuras gravadas (9 em questões e 5 em
+textos-base) estão no dono certo, e nenhuma alternativa é imagem.
+
+| Caderno | Págs. | Figuras gravadas (página → dono) | Perda |
+|---|---|---|---|
+| `077_BANRISUL_001_01` | 9 | nenhuma (o caderno não tem figura) | — |
+| `077_BANRISUL_002_01` | 8 | p1 → Q36 (3 tabelas vetoriais) | — |
+| `077_BANRISUL_003_01` | 7 | nenhuma (o caderno não tem figura) | — |
+| `077_BANRISUL_004_01` | 7 | nenhuma (o caderno não tem figura) | — |
+| `077_BANRISUL_CB1_01` | 6 | p4 → Q16 (tabela-verdade); p5 → texto CB1A3-II (grade); p5 → Q26 (diagrama de conjuntos) | — |
+| `135_SEFAPR_002_01` | 12 | nenhuma (o caderno não tem figura) | — |
+| `135_SEFAPR_004_01` | 10 | p2 → texto 4A1-I (gráfico); p2 → Q10 (tabela); p6 → Q27 (imagem IVA/OCDE); p8 → Q38 (tabela) | — |
+| `135_SEFAPR_005_01` | 11 | p3 → texto 5A2-I (tabela); p4 → Q27 (tabela) | **p1, Q1: tabela de frequências não recortada** |
+| `135_SEFAPR_006_01` | 12 | p5 → Q13 (imagem); p7 → textos 6A4 (captura de tela) | — |
+| `135_SEFAPR_CG1_01` | 16 | p13 → texto CG1A11-I (infográfico OCDE) | — |
+| `177_SEFAPR_001_01` | 12 | nenhuma (o caderno não tem figura) | — |
+| `177_SEFAPR_003_01` | 12 | nenhuma (o caderno não tem figura) | — |
+
+- **"9 páginas com imagem e 0 figura" no BANRISUL 001 e 003 não indica perda.** As "imagens" são
+  os selos de cada questão (ícone e tarja, duas por questão), que o `_figura_decorativa_me` já
+  descarta. As tabelas do caderno 001 (Q40, Q43, Q76 a Q78) e do SEFA 006 Q5 existem no PDF só
+  como texto monoespaçado, e o enunciado as preserva linha a linha. Não há figura a recortar.
+- **K19: 61 alertas, 1 verdadeiro (SEFA_PR 005 Q1).** Os outros 60 são ruído da regex:
+  "contexto" casa `texto`, "tabela" aparece no sentido de tabela de banco/SQL, "quadro" no
+  sentido de situação ou de quadro funcional, e há o texto citado dentro do próprio enunciado
+  ("Internet: <…>. Tendo o texto anterior…") e o gráfico só mencionado (005 Q39, "ao examinar o
+  gráfico de resíduos", sem gráfico na página).
+- **Hipóteses do §3.1:** (a) **confirmada, com outra causa** (abaixo); (b) não ocorre na C1;
+  (c) não ocorre (14 de 14 no dono certo); (d) só no SEFA 005 Q1, como efeito de (a). O texto da
+  tabela entrou achatado no enunciado: "X frequência absoluta 0 10 1 7 2 7 3 10 total 34".
+
+**Causa da perda (verificada).** Em `figuras_vetoriais_da_pagina`, o separador vertical de
+colunas só sai se tiver mais de 80% da altura da página. Na 1ª página do caderno, a faixa
+"PROVA OBJETIVA" encurta o separador (629 a 671 pt, contra o limite de 673,5 pt), e ele fica. O
+filete do título de seção e as tarjas dos selos encostam nele (a menos de 3 pt), e o
+`_agrupar_proximos` une pela **caixa do grupo**, não pelos membros. A caixa vira a coluna
+esquerda inteira, `[26, 135, 301, 806]`, e engole a tabela. Depois a região inteira é descartada
+porque cruza os selos raster. Experimento: descartando os traços verticais com menos de 2 pt de
+largura e mais de 60% da altura, a tabela volta (`[105, 189, 214, 292]`) e as outras 7 primeiras
+páginas com separador curto não ganham nenhum falso positivo. **Risco para o piloto:** a regra
+vale também para C/E. Qualquer figura na coluna esquerda de uma página com separador curto pode
+estar perdida lá, e a F2 tem de medir isso antes e depois (P71).
+
+**Achados menores (para F2 e F3):**
+
+- `077_BANRISUL_002_01_1_1.png` corta ao meio a legenda "Clientes" no topo (a caixa vetorial
+  começa na linha da legenda). Ou inclui a legenda inteira, ou começa abaixo dela.
+- Quando há figura vetorial (tabela), o texto da tabela também fica achatado no enunciado
+  (BANRISUL 002 Q36: "Tabela I Clientes IdCliente Nome…"). É de propósito (comentário em `src/prova_parser.py:2608`),
+  mas no site isso duplica a tabela como texto ilegível. Decidir na F3 se o site esconde esse
+  trecho.
+- **F4:** com a regex atual, o K19 como bloqueante travaria todo lote (60 de 61 são falsos). A
+  checagem tem de ser geométrica (varreduras 1 e 3 acima: tinta ou traço sem figura gravada), e
+  o K19 fica informativo ou passa a usar uma regex dêitica ("tabela/figura/gráfico" seguido de
+  "a seguir", "precedente" ou "apresentad…", com limite de palavra).
+
 ## 4. Tema B: como o dono acompanha e valida os portões
 
 ### 4.1 O que existe hoje
@@ -147,8 +220,15 @@ existe) quando um lote parar num portão.
 
 ## 5. Ordem sugerida
 
-1. **F1** (auditoria visual das figuras da C1; só leitura).
-2. **F2 e F3** (correção, reprocessamento da C1 e site), com K22–K24 antes e depois.
+1. ~~**F1**~~ (auditoria visual das figuras da C1; só leitura): **feita em 2026-10-21**, ver §3.3.
+2. **F2 e F3** (correção, reprocessamento da C1 e site), com K22–K24 antes e depois. **F2 feita
+   em 2026-10-22:** `FRACAO_SEPARADOR_COLUNAS = 0.6` em `figuras_vetoriais_da_pagina`, teste
+   `TestFigurasVetoriais::test_separador_curto_da_primeira_pagina_nao_engole_a_tabela`, C1
+   reprocessada sozinha (as funções `carregar_fila`, `processar_caderno` e `aplicar_classificacao`
+   filtradas pelos 2 concursos, porque o `--reprocessar` não filtra concurso e refaria o piloto).
+   Resultado: 15 figuras na C1 (a nova é a da Q1 de `135_SEFAPR_005_01`), as 14 antigas iguais, K19
+   de 61 para 60, K22 igual. Os riscos da F1 ficaram no **KAN-75** (piloto C/E, legenda cortada,
+   tabela duplicada no enunciado). Falta a F3.
 3. **B1** (painel em HTML por lote, já com a galeria de figuras da F1).
 4. **C1a / C1b** (dono): aprovar os dois editais, curar a árvore, classificar e conferir o site.
    Fazer **depois** das figuras, para a revisão do dono partir de dados finais.
@@ -169,7 +249,8 @@ existe) quando um lote parar num portão.
 
 ## 7. O que não foi verificado
 
-- A causa real das figuras ausentes (as quatro hipóteses acima ainda não foram testadas).
+- ~~A causa real das figuras ausentes~~: verificada na F1 (§3.3). Falta medir o efeito da
+  correção no piloto C/E (F2).
 - Se os asset checks aparecem na interface do Dagster (só se sabe que estão em `Definitions`).
 - O modo produção (`--no-conferencia`) nunca foi executado, por segurança.
 - O fluxo do Cloudflare Access depois do login no Dagster (WebSocket da interface).

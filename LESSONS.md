@@ -742,3 +742,22 @@ matéria, então a amostra literal não cruza o defeito.
 checagens agregadas obrigatórias: seções por caderno e última alternativa terminando em caixa
 alta depois de pontuação (pegou 20 dos 23 nos dados antigos).
 **Custo do aprendizado:** ~1h (diagnóstico, correção, reextração com comparador antes/depois).
+
+### [tags: prova-parser, pymupdf, figuras, multipla-escolha, etapa-8c]
+**Sintoma:** a tabela de frequências da Q1 de `135_SEFAPR_005_01` (SEFA_PR_25) não virou figura, e
+o texto dela entrou achatado no enunciado ("X frequência absoluta 0 10 1 7 …"). As outras 14
+figuras da C1 saíram certas, e a contagem de imagens por PDF apontava para o lugar errado (BANRISUL
+001 e 003, onde as "imagens" são só os selos das questões).
+**Causa:** em `figuras_vetoriais_da_pagina`, o separador vertical de colunas só é descartado acima
+de 80% da altura da página. Na 1ª página do caderno, a faixa "PROVA OBJETIVA" encurta o separador
+(629 a 671 pt, contra o limite de 673,5 pt). O filete do título de seção e as tarjas dos selos
+encostam nele, e o `_agrupar_proximos` une pela caixa acumulada do grupo, que vira a coluna inteira
+e engole a tabela. A região cruza os selos raster e é descartada inteira, sem alerta nenhum.
+**Solução:** diagnóstico na F1 (`proximos-passos-c1-figuras-e-painel.md` §3.3). Correção na F2:
+`FRACAO_SEPARADOR_COLUNAS = 0.6` descarta também o traço vertical fino acima de 60% da altura, com
+teste de página sintética. Reprocessada só a C1, a figura volta e as outras 14 ficam idênticas; o
+piloto não foi reprocessado (efeito nele: KAN-75).
+Para achar perda de figura, contar imagens por PDF não serve; o que funciona é procurar tinta ou
+traço fora do texto sem figura gravada. O K19 (regex "texto|tabela|…") deu 60 falsos em 61
+("contexto", tabela SQL).
+**Custo do aprendizado:** ~1h30 (auditoria visual de 125 páginas e depuração do agrupamento).
