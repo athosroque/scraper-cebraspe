@@ -71,7 +71,7 @@ def test_arvore_hierarquica(cliente):
 
     assert len(arvore) > 0
     # Verifica a matéria Língua Portuguesa
-    mat_pt = next(n for n in arvore if n["nome"] == "LÍNGUA PORTUGUESA")
+    mat_pt = next(n for n in arvore if n["nome"] == "Língua Portuguesa")
     assert mat_pt["total_questoes"] == 139
     assert len(mat_pt["filhos"]) > 0
 

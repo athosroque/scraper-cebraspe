@@ -51,7 +51,7 @@ def test_plano_sem_respostas_comeca_por_aof(cliente_logado):
     c, _ = cliente_logado
     plano = c.get("/api/v1/eu/plano", params=ALVO).json()
     primeiro = plano["itens"][0]
-    assert primeiro["rotulo_materia"] == "Administração Orçamentária e Financeira"
+    assert primeiro["rotulo_materia"] == "Administração Financeira e Orçamentária"
     assert primeiro["pct_da_prova"] == pytest.approx(17.80, abs=0.01)
     assert primeiro["acerto"] == 0
     assert primeiro["prioridade"] == primeiro["pct_da_prova"]

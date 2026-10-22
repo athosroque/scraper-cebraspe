@@ -1,0 +1,29 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 1 (KAN-78): complemento do lote da Fase 1. Funde os subassuntos homônimos que ficaram irmãos depois de 5b3_fase1_disciplinas.json (guarda test_arvore_curada_sem_irmaos_homonimos).",
+ "operacoes": [
+  {"tipo": "fundir", "args": {"origem": "S-fda50e8d63", "destino": "S-0be4918914"}, "comentario": "Irmãos homônimos (mesma chave_regra) que a fusão de assunto com assunto juntou sob o mesmo pai; destino = o mais usado (detectar_homonimos)"},
+  {"tipo": "fundir", "args": {"origem": "S-83010aef1a", "destino": "S-0da4ddc89c"}},
+  {"tipo": "fundir", "args": {"origem": "S-f6ad04f9fc", "destino": "S-1316b4abb1"}},
+  {"tipo": "fundir", "args": {"origem": "S-e241375229", "destino": "S-1cf3886726"}},
+  {"tipo": "fundir", "args": {"origem": "S-41376b8be5", "destino": "S-24c2903654"}},
+  {"tipo": "fundir", "args": {"origem": "S-5adcb908e8", "destino": "S-259658ef04"}},
+  {"tipo": "fundir", "args": {"origem": "S-d4b5530f95", "destino": "S-2b4abd0f8c"}},
+  {"tipo": "fundir", "args": {"origem": "S-e47ffe521e", "destino": "S-35ab3a8c71"}},
+  {"tipo": "fundir", "args": {"origem": "S-c44c09add4", "destino": "S-425de8a279"}},
+  {"tipo": "fundir", "args": {"origem": "S-90c20db8d6", "destino": "S-43ed8a5b23"}},
+  {"tipo": "fundir", "args": {"origem": "S-c1d0865c06", "destino": "S-55c93600ca"}},
+  {"tipo": "fundir", "args": {"origem": "S-bb72202a0b", "destino": "S-6d18b39d2a"}},
+  {"tipo": "fundir", "args": {"origem": "S-797608fd46", "destino": "S-7775c4582a"}},
+  {"tipo": "fundir", "args": {"origem": "S-f05c5bf0a8", "destino": "S-77be9f1aaa"}},
+  {"tipo": "fundir", "args": {"origem": "S-8e673810b1", "destino": "S-81d5169c67"}},
+  {"tipo": "fundir", "args": {"origem": "S-7b8cc40dfe", "destino": "S-87dabcd1d9"}},
+  {"tipo": "fundir", "args": {"origem": "S-daa946eba6", "destino": "S-87dabcd1d9"}},
+  {"tipo": "fundir", "args": {"origem": "S-ea1413fe47", "destino": "S-8fbd0d2554"}},
+  {"tipo": "fundir", "args": {"origem": "S-acf7c06d18", "destino": "S-ae05bb9298"}},
+  {"tipo": "fundir", "args": {"origem": "S-4292869e2f", "destino": "S-b1d7bd5120"}},
+  {"tipo": "fundir", "args": {"origem": "S-eb10d36bff", "destino": "S-b1d7bd5120"}},
+  {"tipo": "fundir", "args": {"origem": "S-b01b3e71fd", "destino": "S-b56196a0f2"}},
+  {"tipo": "fundir", "args": {"origem": "S-c7d6f85346", "destino": "S-b56196a0f2"}},
+  {"tipo": "fundir", "args": {"origem": "S-cbbbb3a3ab", "destino": "S-c582d93e13"}}
+ ]
+}

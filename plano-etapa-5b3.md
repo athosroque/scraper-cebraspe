@@ -104,6 +104,12 @@ maiúsculas, metade não).
 
 ### Decisões do dono (Fase 1)
 
+> **Decididas em 2026-10-22 e aplicadas (Sessão 1, KAN-78):** D0 rebaixar, com fusão no irmão
+> quando há equivalente; D1 duas disciplinas; D2 Legislação Específica; D3 dentro de Processo
+> Legislativo; D4 manter as 3; D5 juntar; D6 Serviço Social › Políticas Sociais. As tabelas
+> 1.1 a 1.6 foram aprovadas como estão. O resultado e a mecânica estão no ADR-030 ("Atualização
+> 2026-10-22"). As opções abaixo ficam como registro.
+
 - **D0 — como rebaixar.** A árvore tem 3 níveis fixos. Rebaixar uma matéria para assunto
   transforma os assuntos dela em subassuntos, e os subassuntos dela precisam **fundir no pai**
   (perda de detalhe). Alternativa sem perda: fundir matéria com matéria (já existe hoje), e os
@@ -217,7 +223,15 @@ Script do levantamento (reproduzível, só leitura): ver "Sessão 1" abaixo.
 
 ## Sessões (uma por conversa)
 
-1. **Sessão 1 — Disciplinas.** Dono decide D0–D6 e cada linha da Fase 1. Implementar a
+1. **Sessão 1 — Disciplinas. Feita em 2026-10-22 (KAN-78).** O lote está em
+   `canonico/lotes/5b3_fase1_disciplinas.json` (+ `5b3_fase1b_homonimos.json`). Resultado:
+   74 → 43 disciplinas (lista fechada em `canonico/disciplinas.json`), 772 assuntos, 2.069
+   subassuntos e K22 inalterado. Ficaram para as Fases 2 e 3: os assuntos de TI que ainda
+   repetem os nós novos ("Ciência de Dados", "Inteligência Artificial", "Big Data" e
+   "Visualização de dados" como assuntos soltos ao lado de "Ciência de dados e IA"); as
+   resoluções do CNJ como assuntos soltos em Legislação Específica, fora de "Normativos do
+   CNJ"; e 7 normas ainda em dois nós (`python -m scripts.auditar_arvore --normas`). Texto
+   original do plano: dono decide D0–D6 e cada linha da Fase 1. Implementar a
    operação de rebaixar em `src/arvore.py` (hoje `mover_no` recusa matéria e `fundir_nos`
    recusa matéria entre níveis): permitir fundir matéria sem filhos ativos num nó de outro nível
    e um comando `--rebaixar MATERIA:DESTINO` em `scripts/curar_arvore.py` que faz, em uma

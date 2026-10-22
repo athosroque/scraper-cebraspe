@@ -45,9 +45,9 @@ O conteúdo é organizado em três níveis: a matéria é a disciplina (por exem
 
 | Indicador | Quantidade |
 |---|---:|
-| Matérias ativas | 74 |
-| Assuntos ativos | 1.016 |
-| Subassuntos ativos | 2.255 |
+| Matérias ativas | 43 |
+| Assuntos ativos | 772 |
+| Subassuntos ativos | 2.069 |
 | Itens do edital | 1.812 |
 | Subitens do edital | 3.936 |
 | Apontamentos questão → nó da árvore | 2.965 |

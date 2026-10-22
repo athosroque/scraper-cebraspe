@@ -12,7 +12,7 @@ pytestmark = pytest.mark.skipif(
     not _postgres_disponivel(), reason="scraper-cebraspe-db indisponivel"
 )
 
-LP = "LÍNGUA PORTUGUESA"
+LP = "Língua Portuguesa"
 
 
 def _consulta(sql, params=()):

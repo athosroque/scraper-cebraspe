@@ -145,6 +145,16 @@ Aplica as decisões humanas sobre os sinônimos canônicos.
 | `--revisao-dir` | — | `REVISAO_DIR_PADRAO` |
 | `--sem-banco` | não grava o Postgres ao final | — |
 
+### `python -m scripts.auditar_arvore`
+
+Confere as disciplinas da árvore contra a lista fechada e aponta norma repetida.
+
+**ADRs:** [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+| Argumento | Ajuda | Padrão |
+|---|---|---|
+| `--normas` | lista os grupos de norma repetida | — |
+
 ### `python -m scripts.curar_arvore`
 
 CLI de curadoria da árvore mestre: toda decisão do dono passa por aqui.
@@ -162,6 +172,9 @@ CLI de curadoria da árvore mestre: toda decisão do dono passa por aqui.
 | `--criar` | NIVEL:PAI=Nome — cria nó (matéria: 'materia:=Nome'); recusa norma que já existe em outro nó ([NORMA_JA_EXISTE]) | — |
 | `--permitir-norma-repetida` | com --criar: desliga a trava de norma repetida (outro conceito de mesmo nome) | — |
 | `--renomear` | NO=Nome — renomeia o nó | — |
+| `--rebaixar` | MATERIA:ASSUNTO — a matéria entra no assunto; os assuntos dela viram subassuntos e os subassuntos dela fundem no pai (Etapa 5B.3) | — |
+| `--lote` | JSON com {'operacoes': [{'tipo', 'args'}]} aplicado em ordem, tudo ou nada | — |
+| `--simular` | mostra o efeito (disciplinas e nós fundidos com questão) sem gravar | — |
 | `--aprovar-proposta` | P1,P2... — aprova propostas em lote (tudo ou nada) | — |
 | `--rejeitar-proposta` | P1,P2... — rejeita propostas | — |
 | `--propostas` | Lista propostas pendentes no terminal (opcional: [M-..]) | — |

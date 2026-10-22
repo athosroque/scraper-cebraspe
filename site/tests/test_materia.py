@@ -21,7 +21,7 @@ def _consulta(sql, params=()):
 def _id_lp():
     return _consulta(
         "SELECT id FROM vw_no_caminho WHERE nivel = 'materia' "
-        "AND nome = 'LÍNGUA PORTUGUESA'"
+        "AND nome = 'Língua Portuguesa'"
     )[0][0]
 
 
@@ -38,7 +38,7 @@ def test_painel_lista_top_igual_fn_prova_cobra(cliente):
     )
     r = cliente.get(f"/materias/{materia}?nivel=medio&cargo_numero=")
     assert r.status_code == 200
-    assert "LÍNGUA PORTUGUESA" in r.text
+    assert "Língua Portuguesa" in r.text
     ids = re.findall(r'href="/questoes\?no_id=((?!M-)[^&"]+)&amp;', r.text)
     assert ids == [e[0] for e in esperado]
     assert "anuladas=excluir" not in r.text
@@ -73,7 +73,7 @@ def test_reconciliacao_ranking_com_total_independente_lp(cliente):
 def test_api_materias_lp_com_139_distintas(cliente):
     r = cliente.get("/api/v1/materias")
     assert r.status_code == 200
-    lp = next(m for m in r.json() if m["nome"] == "LÍNGUA PORTUGUESA")
+    lp = next(m for m in r.json() if m["nome"] == "Língua Portuguesa")
     assert lp["total_questoes"] == 139
     assert lp["nome_de_cargo"] is False
     assert 0 < lp["pct_incidencia"] < 100
@@ -109,7 +109,7 @@ def test_api_busca_sem_acento_e_caixa(cliente):
     r = cliente.get("/api/v1/busca", params={"q": "LINGUA portuguesa"})
     assert r.status_code == 200
     corpo = r.json()
-    assert corpo[0]["nome"] == "LÍNGUA PORTUGUESA"
+    assert corpo[0]["nome"] == "Língua Portuguesa"
     assert cliente.get("/api/v1/busca", params={"q": "a"}).status_code == 422
     assert len(cliente.get("/api/v1/busca", params={"q": "de"}).json()) == 20
 

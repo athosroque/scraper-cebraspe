@@ -102,8 +102,8 @@ def test_painel_direito_administrativo_busca_7724(cliente):
     r = cliente.get("/questoes")
     assert r.status_code == 200
     opcoes = _json(r.text, "dados-facetas")["materia"]
-    da = [o for o in opcoes if o["rotulo"] == "DIREITO ADMINISTRATIVO"]
-    assert da, "DIREITO ADMINISTRATIVO fora das facetas"
+    da = [o for o in opcoes if o["rotulo"] == "Direito Administrativo"]
+    assert da, "Direito Administrativo fora das facetas"
     assert "7.724" in da[0]["busca"]
 
 

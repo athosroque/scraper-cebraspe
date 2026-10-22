@@ -289,7 +289,7 @@ def test_disciplina_curada_mostra_area_e_edital_mostra_cargo(cliente):
     # cargo de verdade e por concurso.
     arvore = cliente.get("/api/v1/arvore").json()
     nomes = {m["nome"] for m in arvore}
-    assert {"Estatística", "Psicologia", "Pedagogia", "COMUNICAÇÃO SOCIAL"} <= nomes
+    assert {"Estatística", "Psicologia", "Pedagogia", "Comunicação Social"} <= nomes
     assert (
         not {"ESTATÍSTICO", "PSICÓLOGO CLÍNICO", "TÉCNICO EM COMUNICAÇÃO SOCIAL"}
         & nomes
@@ -306,12 +306,12 @@ def test_disciplina_curada_mostra_area_e_edital_mostra_cargo(cliente):
         api = cliente.get("/api/v1/estatisticas/edital-vs-prova", params=params)
         return {p["rotulo_materia"] for p in api.json()["peso_materias"]}
 
-    # PF cargo 14 e STM cargo 4 caem no mesmo nó (COMUNICAÇÃO SOCIAL).
+    # PF cargo 14 e STM cargo 4 caem no mesmo nó (Comunicação Social).
     assert "Conhecimentos específicos — TÉCNICO EM COMUNICAÇÃO SOCIAL" in rotulos(
         "PF_25_ADM", 14
     )
     stm = rotulos("STM_25", 4)
-    assert "COMUNICAÇÃO SOCIAL" in stm
+    assert "Comunicação Social" in stm
     assert not any(r.startswith("Conhecimentos específicos") for r in stm)
 
 

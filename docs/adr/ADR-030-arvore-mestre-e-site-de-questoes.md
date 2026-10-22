@@ -331,3 +331,22 @@ Pendências decididas pelo dono (2026-10-07): fundidos os assuntos "Estoques" e 
 **Regra.** Na estatística o conceito é um nó só, mas o aluno chega a ele por qualquer nome. Os apelidos de cada nó efetivo saem da view `vw_no_apelidos`, sem coluna nova nem curadoria à parte: os nomes dos nós fundidos nele e os nomes dos itens de edital que apontam **só** para ele. Item de nome composto (2+ nós, como "SWOT; BSC") não vira apelido, senão a busca por uma parte traria a outra.
 
 **Efeito.** `/api/v1/busca` casa nome ou apelido (o nome vem antes na ordem). No painel de `/questoes` e na página inicial, a busca rápida de cada nível casa também os nomes e apelidos dos descendentes: "LGPD" acha DIREITO ADMINISTRATIVO. Ponto de milhar e "nº" saem da comparação ("7.724" = "7724" = "Decreto nº 7.724"). LAI e LGPD ganharam a sigla no nome. Cada fusão aprovada e cada item novo mapeado aumentam os apelidos sem trabalho manual. `site_leitura` lê a view, e o GRANT é reaplicado a cada carga.
+
+## Atualização (2026-10-22, KAN-78): lista fechada de disciplinas (Etapa 5B.3, Fase 1)
+
+**Problema.** A matéria da árvore nasceu do título de bloco do edital (5B/5B.1): os 12 blocos do IBAMA, "Arquitetura da PDPJ-Br", "Legislação" do STM, DevOps, Controle Externo. Eram 74 "disciplinas", 33 delas títulos de edital.
+
+**Regra.** O nível matéria é a **disciplina** e só aceita os nomes da lista fechada `canonico/disciplinas.json` (43, aprovada pelo dono). Disciplina nova só com decisão do dono. `scripts/auditar_arvore.py` falha com matéria ativa fora da lista, disciplina da lista inativa, nome diferente ou nó com pai de nível errado, e avisa sobre norma em mais de um nó.
+
+**Decisões do dono (2026-10-22).**
+- D0: rebaixar. A matéria vira assunto (ou entra num assunto existente), os assuntos dela viram subassuntos, e os subassuntos dela fundem no novo pai, ou num irmão quando há um equivalente (Git → DevOps, PostgreSQL → Administração de SGBD).
+- D1: Meio Ambiente (técnico) e Direito Ambiental (leis, licenciamento, processo sancionador; é a antiga Legislação Ambiental, com o mesmo ID).
+- D2: Legislação Específica só com normas do órgão; lei com casa natural vai para a disciplina jurídica.
+- D3: Regimento da Câmara em Processo Legislativo.
+- D4: Clínica Médica, Ortopedia e Psiquiatria seguem disciplinas.
+- D5: Segurança Institucional, com os assuntos Segurança de dignitários e Segurança orgânica.
+- D6: Estatuto da Pessoa Idosa em Serviço Social › Políticas Sociais.
+
+**Mecânica.** `rebaixar_materia` em `src/arvore.py` (tudo ou nada, mantém os IDs, a matéria fica `fundido` no assunto destino; é o único caso de matéria fundida entre níveis). `curar_arvore --lote` aplica uma lista ordenada de operações (com `@apelido` para nó criado no próprio lote) e `--simular` mostra o efeito sem gravar. Os lotes ficam versionados em `canonico/lotes/` (`5b3_fase1_disciplinas.json`, 192 operações, e `5b3_fase1b_homonimos.json`, 24 fusões de irmãos homônimos que a fusão de assunto com assunto juntou).
+
+**Efeito.** 74 → 43 disciplinas, 1.016 → 772 assuntos, 2.255 → 2.069 subassuntos. Os 3.029 apontamentos do piloto ficam iguais (`questao_no` guarda o ID original e as views resolvem pelo `fundido_em`); 174 nós com questão fundiram, a maioria em TI (86) e Meio Ambiente (38). Seguem em aberto as Fases 2 (assuntos fora do lugar), 3 (subassuntos e 7 normas ainda repetidas) e a Sessão 4 (regra de ingestão: título de edital fora da lista mapeia para assunto), no `plano-etapa-5b3.md`.
