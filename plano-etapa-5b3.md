@@ -248,8 +248,8 @@ Script do levantamento (reproduzível, só leitura): ver "Sessão 1" abaixo.
    retenção de tributos da AFO, nós compostos, assunto com o nome da disciplina.
 4. **Sessão 4 — Banco, site e regra de ingestão.** Regra feita (P72): título de bloco fora da
    lista fechada vira assunto (`canonico.mapear_novos_itens_por_regra`), e `propor` recusa
-   disciplina nova. Falta: recarga do banco, nova linha de base do K22 (apontamentos
-   2.965 → cerca de 2.938, a aprovar pelo dono) e conferência do site no Chromium headless.
+   disciplina nova. Feitas em 2026-10-29: pendências 1 a 4 (lotes `5b3_fase4a`/`4b`), recarga do banco e K22
+   inalterado (sem nova linha de base). Falta só a conferência do site no Chromium headless.
 
 ## Riscos
 
