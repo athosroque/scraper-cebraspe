@@ -115,12 +115,7 @@ fica só o estado resumido. Mantenha o título de cada item (o texto antes do ` 
 - [x] Etapa 8.0 — Inventário 2020+, classificador fino e `inventario/exclusoes.json` (ADR-037).
 - [x] Etapa 8.M — Múltipla escolha: tipo, alternativas, gabarito A–E e site por tipo (ADR-038).
 - [x] Etapa 8.M.1 Estatísticas: incidência em dois níveis, prova → concurso (fn_prova_cobra) — cada edital pesa 1 (ADR-039, KAN-28).
-- [ ] Etapa 5B.3 Auditoria da hierarquia da árvore: disciplina → assunto → subassunto — maior
-      pendência do dono (2026-10-22, KAN-78). Levantamento pronto em `plano-etapa-5b3.md` (74 matérias
-      → 43 disciplinas propostas; TI, ambientais, Controle Externo e legislações deixam de ser
-      disciplina). Sessões: 1 disciplinas → 2 assuntos → 3 subassuntos → 4 banco/site/ingestão.
-      Pronto quando só há disciplinas da lista fechada aprovada, nenhuma norma em dois nós e o
-      piloto confere no K22.
+- [x] Etapa 5B.3 Auditoria da hierarquia da árvore — 74 matérias → 43 disciplinas, um conceito por nó, K22 inalterado (ADR-030, KAN-78, 2026-10-29).
 - [ ] Etapa 8.C Coleta dos concursos de múltipla escolha (ME) de 2025 — prioridade do dono
       (2026-10-12), plano em `plano-etapa-8c.md`. C0 (KAN-30) concluída; C1a (KAN-56) em
       análise, falta aprovar os editais de `SEFA_PR_25` e `BANRISUL_25`. Próximas: C1b →

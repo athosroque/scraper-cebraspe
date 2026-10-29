@@ -349,7 +349,7 @@ Pendências decididas pelo dono (2026-10-07): fundidos os assuntos "Estoques" e 
 
 **Mecânica.** `rebaixar_materia` em `src/arvore.py` (tudo ou nada, mantém os IDs, a matéria fica `fundido` no assunto destino; é o único caso de matéria fundida entre níveis). `curar_arvore --lote` aplica uma lista ordenada de operações (com `@apelido` para nó criado no próprio lote) e `--simular` mostra o efeito sem gravar. Os lotes ficam versionados em `canonico/lotes/` (`5b3_fase1_disciplinas.json`, 192 operações, e `5b3_fase1b_homonimos.json`, 24 fusões de irmãos homônimos que a fusão de assunto com assunto juntou).
 
-**Efeito.** 74 → 43 disciplinas, 1.016 → 772 assuntos, 2.255 → 2.069 subassuntos. Os 3.029 apontamentos do piloto ficam iguais (`questao_no` guarda o ID original e as views resolvem pelo `fundido_em`); 174 nós com questão fundiram, a maioria em TI (86) e Meio Ambiente (38). Seguem em aberto as Fases 2 (assuntos fora do lugar), 3 (subassuntos e 7 normas ainda repetidas) e a Sessão 4 (regra de ingestão: título de edital fora da lista mapeia para assunto), no `plano-etapa-5b3.md`.
+**Efeito.** 74 → 43 disciplinas, 1.016 → 772 assuntos, 2.255 → 2.069 subassuntos. Os 3.029 apontamentos do piloto ficam iguais (`questao_no` guarda o ID original e as views resolvem pelo `fundido_em`); 174 nós com questão fundiram, a maioria em TI (86) e Meio Ambiente (38). Seguem em aberto as Fases 2 (assuntos fora do lugar), 3 (subassuntos e 7 normas ainda repetidas) e a Sessão 4 (regra de ingestão: título de edital fora da lista mapeia para assunto), no `docs/planos/plano-etapa-5b3.md`.
 
 ## Atualização (2026-10-24, KAN-78): assuntos, subassuntos e regra de ingestão (Etapa 5B.3, Fases 2 e 3 e Sessão 4)
 

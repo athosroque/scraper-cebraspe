@@ -22,6 +22,7 @@ acrescente o plano na tabela abaixo e no `nav` do `mkdocs.yml` (grupo "Planos co
 | `plano-etapa-5h.md` | 5H — Card e filtros no formato Gran | ADR-035 |
 | `plano-etapa-8m.md` | 8.M — Múltipla escolha (S1 a S4 e Gate; a regra de agregação da S2 foi revista pelo ADR-039) | ADR-038 |
 | `plano-etapa-8m1.md` | 8.M.1 — Incidência em dois níveis com prova distinta | ADR-039 |
+| `plano-etapa-5b3.md` | 5B.3 — Auditoria da hierarquia da árvore (disciplina → assunto → subassunto) | ADR-030 |
 | `plano-kan-30.md` | 8.C/C0 — Download guiado pelo inventário (KAN-30; a 8.C segue em andamento) | ADR-037 |
 
 Os planos 5B.2, 5C.1, 5D e 5E tinham sido apagados ao concluir a etapa e

@@ -26,7 +26,6 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 
 | # | Etapa | Estado | Onde está o detalhe |
 |---|---|---|---|
-| 0 | **5B.3 Auditoria da hierarquia da árvore** (maior pendência do dono, 2026-10-22, KAN-78) | Sessão 1 feita (74 → 43 disciplinas); próxima: Sessão 2, assuntos | [`plano-etapa-5b3.md`](plano-etapa-5b3.md), sessões 1 a 4 |
 | 1 | **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12) | **próxima** (a C2 é o Dagster, Etapa 9/D5a e D5b) | [`plano-etapa-8c.md`](plano-etapa-8c.md), sessões C0 a C8 |
 | 2 | 8.M.2 Estatísticas por recorte (drill-down e filtros, KAN-28/KAN-54) | na fila | seção 8.M.2 abaixo |
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
@@ -670,7 +669,7 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
 ## Etapa 5B.3: Auditoria da hierarquia da árvore (disciplina → assunto → subassunto)
 > Pedido do dono em 2026-10-22: há matérias que não são disciplina (Controle Externo, DevOps,
 > as matérias de TI, os blocos ambientais do IBAMA). Levantamento e decisões pendentes em
-> [`plano-etapa-5b3.md`](plano-etapa-5b3.md). Aplicação só por `scripts/curar_arvore.py` (P51,
+> [`docs/planos/plano-etapa-5b3.md`](docs/planos/plano-etapa-5b3.md). Aplicação (**concluída em 2026-10-29**) só por `scripts/curar_arvore.py` (P51,
 > A27, A30).
 - `[x]` **Levantamento** (2026-10-22, só leitura): 74 matérias → 43 disciplinas propostas;
   assuntos fora do lugar e repetidos; normas em mais de um nó.
@@ -678,10 +677,11 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   em `src/arvore.py`; `--rebaixar`, `--lote` e `--simular` no `curar_arvore`;
   `scripts/auditar_arvore.py` com a lista fechada `canonico/disciplinas.json`. Lotes em
   `canonico/lotes/`: 74 → 43 disciplinas, K22 inalterado (ADR-030, atualização de 2026-10-22).
-- `[ ]` **Sessão 2 — Assuntos:** Fase 2 do plano.
-- `[ ]` **Sessão 3 — Subassuntos:** levantamento refeito na árvore nova e Fase 3.
-- `[ ]` **Sessão 4 — Banco, site e ingestão:** recarga, views, filtro de disciplina no site;
-  título de edital fora da lista fechada mapeia para assunto (vale para a 8.C).
+- `[x]` **Sessão 2 — Assuntos** (2026-10-24): lotes `5b3_fase2a` a `2i`.
+- `[x]` **Sessão 3 — Subassuntos** (2026-10-24): lotes `5b3_fase3a` a `3f`; 677 assuntos e 1.968 subassuntos.
+- `[x]` **Sessão 4 — Banco, site e ingestão** (2026-10-29): regra P72; pendências do ADR-030
+  fechadas (lotes `5b3_fase4a`/`4b`); recarga do banco com K22 inalterado (sem nova linha de
+  base); site conferido no Chromium headless; `make test-all` verde (1.542 testes).
 - **Pronto quando:** só disciplinas da lista fechada; nenhuma norma consolidada em dois nós;
   piloto com 2.800 itens e 129 anuladas, K22 conferido (ou nova linha de base aprovada pelo
   dono); `make test-all` verde.
