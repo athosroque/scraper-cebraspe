@@ -114,3 +114,13 @@ def test_normalizar_tira_ponto_de_milhar_e_numero_de_norma():
     )
     assert estatisticas_servico._normalizar("7.724") == "7724"
     assert estatisticas_servico._normalizar("Língua Portuguesa") == "lingua portuguesa"
+
+
+@com_banco
+def test_busca_nao_repete_no_fundido(cliente):
+    """`vw_no_caminho` tem uma linha por ID original, inclusive os fundidos; a
+    busca devolve só o nó efetivo (Etapa 5B.3: "Ciclo orçamentário" tinha 3 hits)."""
+    r = cliente.get("/api/v1/busca", params={"q": "Ciclo orçamentário"})
+    assert r.status_code == 200, r.text
+    achados = [no for no in r.json() if no["nome"] == "Ciclo orçamentário"]
+    assert [no["id"] for no in achados] == ["A-e46d2efa1f"]

@@ -208,12 +208,18 @@ def materias_com_contagem(materia_id: str | None = None) -> list[dict]:
 
 
 def nos_ativos() -> list[dict]:
-    """Todos os nós da cadeia ativa (para a busca por nome em Python)."""
+    """Nós efetivos da cadeia ativa (para a busca por nome em Python).
+
+    `vw_no_caminho` tem uma linha por ID original, inclusive os fundidos; sem o
+    filtro a busca devolve o mesmo nó várias vezes."""
     with (
         get_conexao_leitura() as conn,
         conn.cursor(cursor_factory=RealDictCursor) as cur,
     ):
-        cur.execute("SELECT id, nome, nivel, caminho, materia_id FROM vw_no_caminho")
+        cur.execute(
+            "SELECT id, nome, nivel, caminho, materia_id FROM vw_no_caminho "
+            "WHERE id = no_efetivo"
+        )
         return cur.fetchall()
 
 
