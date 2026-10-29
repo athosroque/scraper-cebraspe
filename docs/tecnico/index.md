@@ -19,6 +19,6 @@ Não edite estas páginas à mão (regra [A62](regras.md#a62)): mude o registro 
 - [Tarefas](tarefas.md): 12 tarefas de agente e o que ler para cada uma.
 - [Pipeline](pipeline.md): 13 etapas, dependências e portões humanos.
 - [Comandos](comandos.md): 30 scripts e seus argumentos.
-- [Regras](regras.md): 133 patterns e anti-patterns do projeto.
+- [Regras](regras.md): 134 patterns e anti-patterns do projeto.
 - [Checagens](checagens.md): 36 checagens do pipeline.
 - [Banco](banco.md): tabelas e views dos schemas `public` e `app`.

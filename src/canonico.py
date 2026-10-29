@@ -936,7 +936,9 @@ def mapear_novos_itens_por_regra(
     O item sem mapeamento herda os nós de um item já aprovado com a mesma
     `chave_regra` **no mesmo nó-pai efetivo** (os nós para onde o pai do
     item aponta). Regra ambígua (dois itens com nós diferentes) ou item cujo
-    pai não tem nó ficam pendentes para a curadoria. Nunca cria nó.
+    pai não tem nó ficam pendentes para a curadoria. Título de bloco (matéria)
+    sem item equivalente aponta para o único nó de disciplina ou assunto de
+    mesmo nome, nunca vira disciplina nova. Nunca cria nó.
     Devolve quantos itens foram mapeados.
     """
     from src import arvore as arv_mod
@@ -969,6 +971,13 @@ def mapear_novos_itens_por_regra(
             return None
         return (nivel, pais, regra)
 
+    nos_por_nome: dict[str, set[str]] = {}
+    for no in arvore.nos.values():
+        if no.status == "ativo" and no.nivel in ("materia", "assunto"):
+            regra = chave_regra(no.nome).chave
+            if regra:
+                nos_por_nome.setdefault(regra, set()).add(no.id)
+
     novos = 0
     # Nível a nível: o assunto mapeado agora já serve de pai para o subassunto.
     for nivel in NIVEIS:
@@ -986,6 +995,12 @@ def mapear_novos_itens_por_regra(
                 pendentes.append((chave, sig))
         for chave, sig in pendentes:
             candidatos = indice.get(sig, set())
+            if not candidatos and nivel == "materia":
+                # Título de bloco fora da lista de disciplinas: vira o assunto de
+                # mesmo nome, nunca disciplina nova (Etapa 5B.3, ADR-030).
+                alvo = nos_por_nome.get(sig[2], set())
+                if len(alvo) == 1:
+                    candidatos = {frozenset(alvo)}
             if len(candidatos) != 1:
                 continue
             (nos,) = candidatos

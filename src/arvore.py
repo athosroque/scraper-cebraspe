@@ -691,6 +691,11 @@ def propor(
     args_canonicos = _canonizar_args(args, tipo=tipo)
 
     if tipo == "criar":
+        if args_canonicos.get("nivel") == "materia" and origem != "humano":
+            raise ArvoreInvalida(
+                "Disciplina nova só por decisão do dono (canonico/disciplinas.json): "
+                "proponha um assunto"
+            )
         if args_canonicos.get("nivel") not in NIVEIS:
             raise ArvoreInvalida(
                 f"Nível {args_canonicos.get('nivel')!r} inválido (use {', '.join(NIVEIS)})"

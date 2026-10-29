@@ -146,6 +146,7 @@ vai para cá se for do núcleo (`nucleo=True`).
 - **P67** O que fica fora do site é decidido só em `inventario/exclusoes.json`; alerta do inventário vem do texto do link, e antes de tratar como "sem arquivo" confere-se a página ao vivo (ADR-037). [regra](docs/tecnico/regras.md#p67)
 - **P70** Script novo entra em `src/registro/scripts.py`; mudança de argparse, etapa, checagem, regra ou schema pede `make docs-gerar`; regra nova entra só no registro (ADR-041). [regra](docs/tecnico/regras.md#p70)
 - **P71** Lote novo, ou qualquer passo que grava no banco, nunca altera o piloto (2.800 itens, 129 anuladas, 3.029 apontamentos, chaves da 5D): K22–K24 rodam antes e depois, e diferença bloqueia o lote. [regra](docs/tecnico/regras.md#p71)
+- **P72** Título de bloco de edital fora de `canonico/disciplinas.json` vira assunto, nunca disciplina; proposta automática não cria matéria (ADR-030). [regra](docs/tecnico/regras.md#p72)
 
 ## 7. Anti-patterns
 

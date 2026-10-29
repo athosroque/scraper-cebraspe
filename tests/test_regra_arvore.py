@@ -115,3 +115,61 @@ def test_regra_ambigua_fica_pendente(monkeypatch, tmp_path, arvore_path):
         },
     )
     assert novos == 0
+
+
+def test_titulo_de_bloco_fora_da_lista_vira_assunto(monkeypatch, tmp_path, arvore_path):
+    # "Poder Executivo" não é disciplina da lista fechada, mas é assunto de M-DC.
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"poder executivo": _nome("Poder Executivo")},
+    )
+    assert novos == 1
+    [m] = carregar(arvore_path).mapeamentos["poder executivo"]
+    assert (m.no_id, m.origem, m.status) == ("A-EXE", "regra", "aprovado")
+
+
+def test_titulo_de_bloco_sem_assunto_equivalente_fica_pendente(
+    monkeypatch, tmp_path, arvore_path
+):
+    conteudo = arvore_path.read_text(encoding="utf-8")
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"licenciamento de drones": _nome("Licenciamento de drones")},
+    )
+    assert novos == 0
+    assert arvore_path.read_text(encoding="utf-8") == conteudo
+
+
+def test_titulo_de_bloco_com_dois_assuntos_de_mesmo_nome_fica_pendente(
+    monkeypatch, tmp_path, arvore_path
+):
+    arv = carregar(arvore_path)
+    criar_no(arv, "assunto", "Poder Executivo", "M-DA", id_override="A-EXE2")
+    salvar(arv, arvore_path)
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"poder executivo": _nome("Poder Executivo")},
+    )
+    assert novos == 0
+    assert "poder executivo" not in carregar(arvore_path).mapeamentos
+
+
+def test_proposta_automatica_nao_cria_disciplina():
+    from src.arvore import ArvoreInvalida, propor
+
+    arv = ArvoreMestre()
+    for origem in ("llm", "regra"):
+        with pytest.raises(ArvoreInvalida, match="Disciplina nova"):
+            propor(
+                arv,
+                "criar",
+                {"nivel": "materia", "nome": "Drones"},
+                origem,
+                "teste",
+            )

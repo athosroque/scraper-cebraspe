@@ -396,4 +396,21 @@ diferença bloqueia o lote.""",
         ),
         nucleo=True,
     ),
+    Regra(
+        id="P72",
+        tipo="pattern",
+        area="arvore",
+        texto="""O nível matéria da árvore é a disciplina e só aceita os nomes de
+`canonico/disciplinas.json`. Título de bloco de edital fora da lista vira **assunto**:
+`mapear_novos_itens_por_regra` aponta o item para o único nó de disciplina ou assunto de mesmo
+nome, e sem equivalente ele fica pendente para a curadoria. Proposta de LLM ou de regra
+nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
+do dono. `scripts/auditar_arvore.py` fica verde antes de cada carga.""",
+        adrs=("ADR-030",),
+        testes=(
+            "tests/test_regra_arvore.py::test_titulo_de_bloco_fora_da_lista_vira_assunto",
+            "tests/test_regra_arvore.py::test_proposta_automatica_nao_cria_disciplina",
+        ),
+        nucleo=True,
+    ),
 )

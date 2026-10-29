@@ -13,6 +13,7 @@ Fonte: `src/registro/regras_*.py`. O `CLAUDE.md` cita só o núcleo, as regras q
 - [P67](#p67) O que fica fora do site é decidido só em `inventario/exclusoes.json` (slug, categoria de …
 - [P70](#p70) Script novo em `scripts/` (ou módulo de `src/` com `__main__`) entra em `src/registro/scripts.py`, e mudança …
 - [P71](#p71) Lote novo (ou qualquer passo que grava no banco) nunca altera o piloto (PF_25_ADM, TCU_25_TEFC, IBAMA_25 …
+- [P72](#p72) O nível matéria da árvore é a disciplina e só aceita os nomes de `canonico/disciplinas.json`. Título de bloco …
 - [A06](#a06) Nunca gravar tabelas deste projeto no `study-rag-db` nem criar FK para `itens_estudo` — o `study-rag-db` tem …
 - [A07](#a07) Nunca hardcodar credenciais de API/Postgres no código — usar `.env` (ver Segurança).
 - [A13](#a13) Nunca deixar um passo do pipeline (extração → artefatos derivados) como "rode manualmente depois" — este …
@@ -663,6 +664,21 @@ nó fica pendente no `arvore.html`.
 ADRs: nenhuma
 
 Teste guarda: `tests/test_regra_arvore.py::test_mapeia_dentro_do_mesmo_pai_efetivo`, `tests/test_regra_arvore.py::test_nao_mapeia_sob_outro_pai`, `tests/test_regra_arvore.py::test_regra_ambigua_fica_pendente`
+
+#### P72
+
+O nível matéria da árvore é a disciplina e só aceita os nomes de
+`canonico/disciplinas.json`. Título de bloco de edital fora da lista vira **assunto**:
+`mapear_novos_itens_por_regra` aponta o item para o único nó de disciplina ou assunto de mesmo
+nome, e sem equivalente ele fica pendente para a curadoria. Proposta de LLM ou de regra
+nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
+do dono. `scripts/auditar_arvore.py` fica verde antes de cada carga.
+
+Núcleo: sim (citada no `CLAUDE.md`)
+
+ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_regra_arvore.py::test_titulo_de_bloco_fora_da_lista_vira_assunto`, `tests/test_regra_arvore.py::test_proposta_automatica_nao_cria_disciplina`
 
 ### classificacao
 
