@@ -1,0 +1,133 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 3 (KAN-78): decisões do dono sobre as pendências (assunto com filhos × subassunto homônimo, LDO/LOA na AFO, Código Penal restante, dois pais errados).",
+ "operacoes": [
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "SL-7bc2e81a2b",
+    "destino": "A-68a52d046c"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "SL-deacd8ffdb",
+    "destino": "A-e46d2efa1f"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "SL-26343e233a",
+    "destino": "A-bafe9d9954"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-0b390137b4",
+    "destino": "A-35230b45ff"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-7897996a2f",
+    "destino": "A-ddc2858431"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-7736014b5b",
+    "destino": "A-e02df9d2b4"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-6d70a43c3a",
+    "destino": "NA-7f080e164d"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-d88d6a015e",
+    "destino": "A-b2bf81466d"
+   },
+   "comentario": "Assunto com filhos e subassunto folha de mesmo nome: a folha funde no assunto (decisão do dono)"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-db519f4a53",
+    "pai": "A-261bf0d9cd"
+   },
+   "comentario": "Ajuste a valor presente: o cálculo e contabilização vai para onde estão os demais subassuntos do tema"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-a3d65f4c71",
+    "destino": "S-b7e9764425"
+   },
+   "comentario": "Assunto ficou sem filhos; funde no subassunto de conceito e metodologia do mesmo tema"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-6c5a3e9c3f",
+    "destino": "A-99c9a06d12"
+   },
+   "comentario": "LDO: orçamento fica na AFO (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-24b3b29511",
+    "destino": "A-c38427c027"
+   },
+   "comentario": "LOA: orçamento fica na AFO (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-72b24f8c12",
+    "destino": "S-682269b24c"
+   },
+   "comentario": "Eficácia da sentença: art. 9 do CP, mesmo conceito (decisão do dono)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-36940ebaa3",
+    "destino": "S-492e8fe96c"
+   },
+   "comentario": "Lei penal no tempo: mesmo conceito (decisão do dono)"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-af705f78a3",
+    "pai": "A-351189f1a6"
+   },
+   "comentario": "Tempos e modos verbais é morfossintaxe, não coesão (decisão do dono)"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-ad6c022ecb",
+    "pai": "A-a500308a82"
+   },
+   "comentario": "Entrevista motivacional é técnica psicoterápica (decisão do dono)"
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "descricao": "Etapa 5B.3, Fase 3b (KAN-78), escopo S2: Administração Financeira e Orçamentária, Administração Pública, Administração Geral e Administração de Recursos Materiais. Funde duplicatas do mesmo conceito dentro da disciplina (regra de assunto sem filhos para subassunto, e escolha de um subassunto entre pais diferentes) e as três normas em dois nós (Lei 4.320/1964, Lei 10.180/2001, Decreto 70.235/1972). Pendências ficaram fora do lote.",
+ "operacoes": [
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-7e93595e9c",
+    "destino": "SL-ddc4fce8dd"
+   },
+   "comentario": "Restos a pagar: assunto sem filhos (q=3) vai ao subassunto de Despesa pública (q=7), mesmo conceito, mesma disciplina"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-6f92815025",
+    "destino": "SL-6d3f949b2d"
+   },
+   "comentario": "Plano Plurianual: dois subassuntos do mesmo conceito sob pais diferentes; fica o de maior q (5) sob Orçamento público no Brasil, por não ser óbvio qual pai é o mais adequado"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-49f101efee",
+    "destino": "S-7a0d161260"
+   },
+   "comentario": "Balanced scorecard: assunto sem filhos vai ao subassunto BSC de Gestão estratégica, o pai mais adequado ao tema (ferramenta de estratégia)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-5d901cc3bc",
+    "destino": "S-7a0d161260"
+   },
+   "comentario": "Balanced scorecard: subassunto de Processo administrativo (q=0) vai ao BSC de Gestão estratégica (q=1, nome completo); mesma disciplina, mesmo conceito"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-88802b0275",
+    "destino": "S-317ebe2fda"
+   },
+   "comentario": "Convergências e diferenças entre a gestão pública e a gestão privada: assunto sem filhos vai ao subassunto de mesmo nome"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-bc39d16392",
+    "destino": "S-20a4d5051b"
+   },
+   "comentario": "Empreendedorismo governamental e novas lideranças no setor público: assunto sem filhos vai ao subassunto de mesmo nome (q=5)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-674794e3b4",
+    "destino": "AL-528d504ae8"
+   },
+   "comentario": "Norma Lei 4.320/1964: subassunto folha de Contabilidade Pública vai ao nó único da norma na AFO (assunto AL-528d504ae8)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-7eb8abf86d",
+    "destino": "AL-528d504ae8"
+   },
+   "comentario": "Norma Lei 4.320/1964: subassunto folha da AFO vai ao assunto AL-528d504ae8 (nó único da norma)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-c60607b2f3",
+    "destino": "AL-528d504ae8"
+   },
+   "comentario": "Norma Lei 4.320/1964: subassunto folha de Direito Financeiro e Tributário vai ao assunto AL-528d504ae8 (nó único da norma)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-eabcd3fa3e",
+    "destino": "S-779cf1610f"
+   },
+   "comentario": "Norma Lei 10.180/2001: assunto folha de Contabilidade Pública vai ao subassunto S-779cf1610f na AFO (nó único da norma)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-a16b2491b7",
+    "destino": "S-e1f995cd41"
+   },
+   "comentario": "Norma Decreto 70.235/1972 (processo administrativo fiscal, não ambiental): subassunto de Direito Ambiental vai ao nó único na AFO"
+  }
+ ]
+}

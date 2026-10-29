@@ -1,0 +1,105 @@
+{
+ "descricao": "Etapa 5B.3, Fase 2C (KAN-78, H3): duplicidades entre Gestão de Pessoas, Psicologia, Pedagogia, Legislação Específica e Direito Administrativo. Psicologia cria 'Psicologia organizacional e do trabalho' e absorve os temas duplicados; Educação corporativa e Treinamento e desenvolvimento ficam em Gestão de Pessoas; Lei 8.112 e Lei 9.784 consolidadas em Direito Administrativo; cria 'Assédio moral e sexual' em Gestão de Pessoas.",
+ "operacoes": [
+  {
+   "tipo": "criar",
+   "apelido": "@psico_org",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Psicologia organizacional e do trabalho",
+    "pai": "M-df20e3b736"
+   },
+   "comentario": "Política (a): Psicologia mantém o assunto que recebe as duplicatas com q>0 e as de enfoque psicológico"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-024bdafe23",
+    "destino": "@psico_org"
+   },
+   "comentario": "Qualidade de vida no trabalho (Psicologia, q=1) entra no assunto de Psicologia; Gestão de Pessoas mantém A-564f15a1ae"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-252bd3d3fe",
+    "destino": "@psico_org"
+   },
+   "comentario": "Recrutamento e seleção de pessoas (Psicologia, q=0): não é exceção de GP porque os subassuntos têm enfoque psicológico (avaliação psicológica em concurso)"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-85e7dd27de",
+    "pai": "@psico_org"
+   },
+   "comentario": "Gerenciamento de conflitos (Psicologia, q=1) vira subassunto de Psicologia organizacional e do trabalho; GP mantém A-26490d5751"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-18731e453a",
+    "destino": "A-c3f41ab58f"
+   },
+   "comentario": "Gestão por competências (Psicologia, q=0, sem filhos, sem enfoque psicológico no nome): funde em Gestão de Pessoas"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "A-a5fe133e1c",
+    "pai": "M-c9624ca219"
+   },
+   "comentario": "Educação corporativa (assunto de Pedagogia, com 5 subassuntos) muda para Gestão de Pessoas. A fusão direta com S-ff6da2f639 não é possível porque a origem tem filhos (regra de fundir_nos entre níveis)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-ff6da2f639",
+    "destino": "A-a5fe133e1c"
+   },
+   "comentario": "Subassunto Educação corporativa (GP, folha) funde no assunto Educação corporativa já em GP, eliminando a duplicidade dentro de GP"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-b5c315a585",
+    "destino": "S-a4eeb7ac63"
+   },
+   "comentario": "Treinamento e Desenvolvimento (folha de Pedagogia) funde no subassunto homônimo de Gestão de Pessoas (Processos de gestão de pessoas)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@assedio_gp",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Assédio moral e sexual",
+    "pai": "M-c9624ca219"
+   },
+   "comentario": "Política (c)(iii): novo assunto em Gestão de Pessoas; os nós de Psicologia, Serviço Social e Ética não são fundidos nele"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-5a7e2f3f47",
+    "pai": "AL-fe35b41dc5"
+   },
+   "comentario": "Lei n.º 9.784/1999 (subassunto de Processo administrativo, q=0) passa para o assunto Processo Administrativo Federal (Lei nº 9.784/1999) em Direito Administrativo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-e2c3b292d2",
+    "destino": "A-a975086630"
+   },
+   "comentario": "Os dois assédios de Psicologia empatam em q=1; fica o de nome mais completo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-a978f3ed66",
+    "destino": "AL-fe35b41dc5"
+   },
+   "comentario": "Assunto 'Processo administrativo' ficou sem filhos após a op 10; funde no Processo Administrativo Federal"
+  }
+ ]
+}

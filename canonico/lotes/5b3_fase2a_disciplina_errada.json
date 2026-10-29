@@ -1,0 +1,133 @@
+{
+ "descricao": "Etapa 5B.3, Fase 2a (KAN-78), H1: assuntos na disciplina errada. Mover para a disciplina correta; fundir só quando o destino é o mesmo conceito e de nível igual ou assunto com assunto; renomear o subassunto de segurança da informação. Itens com dúvida ficaram fora do lote.",
+ "operacoes": [
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-7e8ffad663",
+    "destino": "NA-870524a5bf"
+   },
+   "comentario": "Python é desenvolvimento de sistemas (decisão do orquestrador)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-35db77563d",
+    "destino": "A-e02df9d2b4"
+   },
+   "comentario": "SQL é banco de dados (decisão do orquestrador)"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "A-b09e8402bb",
+    "pai": "M-cbbbf8f182"
+   },
+   "comentario": "Estatística e probabilidade básicas: estava em TI. Vai para a disciplina Estatística. Pode se sobrepor a Probabilidade (A-c91614a9ef) e Estatística descritiva (A-6fe50ec934), mas não é o mesmo conceito, então só move."
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "A-d8c9b18de0",
+    "pai": "M-41f37f57d8"
+   },
+   "comentario": "Certificação digital: estava em Arquivologia. Sem assunto equivalente em TI. ICP-Brasil (A-4e29084c17) é subassunto e o conceito é mais amplo, então não funde; só move."
+  },
+  {
+   "tipo": "renomear",
+   "args": {
+    "no": "A-2356bc9bf9",
+    "nome": "Sigilo e segurança da informação institucional"
+   },
+   "comentario": "Subassunto Segurança da informação: renomeado, sem mover, conforme a decisão de 5B.3 para segurança institucional."
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-2ad18c5e46",
+    "destino": "A-2261b82645"
+   },
+   "comentario": "Licitações e contratos (Contabilidade Geral) funde em Licitação (Direito Administrativo). Mesmo conceito; ambos q=0, decisão já tomada na tabela."
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-15f28c0ed0",
+    "destino": "A-2261b82645"
+   },
+   "comentario": "licitação, pregão e registro de preços (AFO) funde em Licitação (Direito Administrativo). Sem filhos ativos."
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "A-9a585c0013",
+    "pai": "ML-2379de85f7"
+   },
+   "comentario": "Conceito e instrumentos de execução financeira: estava em Direito Constitucional. Vai para Administração Financeira e Orçamentária."
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-2247a0ee91",
+    "destino": "A-807d3737d2"
+   },
+   "comentario": "Constituição Federal de 1988, art. 70 a 74 (Contabilidade Pública) funde em Fiscalização Contábil, Financeira e Orçamentária (Direito Constitucional), que trata do mesmo conteúdo. Destino com mais questões (q=2 contra q=0)."
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "A-07f0442a79",
+    "pai": "M-f58e98ba3f"
+   },
+   "comentario": "Dos crimes contra as finanças públicas: estava em AFO. Vai para Direito Penal."
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-6492133c08",
+    "destino": "A-3699f9a8aa"
+   },
+   "comentario": "Direitos e garantias (decisão do orquestrador)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-e3710b2743",
+    "destino": "AL-02b4bc3a67"
+   },
+   "comentario": "Despesas com Pessoal (Contabilidade Pública) funde em Lei de Responsabilidade Fiscal (AFO, q=4). Destino com mais questões."
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-98c597bbfc",
+    "destino": "AL-02b4bc3a67"
+   },
+   "comentario": "Tópicos selecionados da LC 101/2000 (Contabilidade Pública) funde em Lei de Responsabilidade Fiscal (AFO, q=4). Mesmo conceito; destino com mais questões."
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-ca68c34731",
+    "destino": "A-6fe50ec934"
+   },
+   "comentario": "Destino = Estatística descritiva, pela política (a regra de q maior vale para duplicata na mesma disciplina); as 3 questões acompanham"
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-fb86d821e7",
+    "pai": "A-c1f695d9ea"
+   },
+   "comentario": "Regime disciplinar da 8.112 vai para Agentes públicos"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-b756f76410",
+    "destino": "SL-42e925ffc4"
+   },
+   "comentario": "Lei 8.112 num nó só (assunto sem filhos funde no subassunto)"
+  }
+ ]
+}

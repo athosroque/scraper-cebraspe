@@ -1,0 +1,12 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 3 (KAN-78), rodada R3: duplicatas de subassunto sob o mesmo pai e de assunto dentro da mesma disciplina (GP, Língua Portuguesa, Língua Inglesa). Operações de alta confiança; dúvidas de nível cruzado ou pais diferentes ficam fora do lote.",
+ "operacoes": [
+  {"tipo": "fundir", "args": {"origem": "S-e6306bc6e3", "destino": "S-15b4e945c7"}, "comentario": "GP: 'Clima e cultura organizacional' (q1) é parte de 'Comportamento, clima e cultura organizacional' (q2), mesmo pai A-4af1eec8dc"},
+  {"tipo": "fundir", "args": {"origem": "S-d07ed7604f", "destino": "S-a26b3a7b47"}, "comentario": "GP: 'Recrutamento e seleção' e 'Recrutamento e seleção de pessoas' (ambos q0), mesmo pai A-4af1eec8dc; empate de q, nome mais completo"},
+  {"tipo": "fundir", "args": {"origem": "S-8d204f5a8c", "destino": "S-70c016a556"}, "comentario": "GP: mesma 'Comportamento organizacional: relações indivíduo/organização...' com lista de termos diferente; destino com maior q (3 vs 2), mesmo pai A-4af1eec8dc"},
+  {"tipo": "fundir", "args": {"origem": "S-43005656d8", "destino": "S-e02c45cebe"}, "comentario": "GP: 'Gestão por competências: abordagens e ferramentas...' é a mesma 'Gestão por competências' com detalhe (q5 > q1), mesmo pai A-4af1eec8dc"},
+  {"tipo": "fundir", "args": {"origem": "S-f213236199", "destino": "S-27d807fd67"}, "comentario": "GP: 'Motivação e liderança' (q0) é o mesmo tema de 'Liderança, motivação e satisfação no trabalho' (q7), mesmo pai A-4af1eec8dc"},
+  {"tipo": "fundir", "args": {"origem": "S-940b22cf58", "destino": "S-af705f78a3"}, "comentario": "Língua Portuguesa: 'Emprego/correlação de tempos e modos verbais' (q0) e 'Emprego de tempos e modos verbais' (q3), mesmo pai A-56b9b718fa"},
+  {"tipo": "fundir", "args": {"origem": "A-24f6586fef", "destino": "A-fa6c96c627"}, "comentario": "Língua Inglesa: 'Compreensão e interpretação de textos variados' (q1) e 'Compreensão de texto escrito em língua inglesa' (q9), mesma disciplina e mesmo conceito"}
+ ]
+}

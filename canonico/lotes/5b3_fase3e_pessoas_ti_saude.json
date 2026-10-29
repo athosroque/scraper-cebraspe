@@ -1,0 +1,22 @@
+{
+  "descricao": "Etapa 5B.3, Fase 3e (S5, KAN-78): duplicatas de mesmo conceito dentro da mesma disciplina (Gestão de Pessoas, Psicologia, Comunicação Social, Estatística, Língua Portuguesa, TI, Gestão de Pessoas). Assunto sem filhos funde no subassunto de mesmo conceito; dois subassuntos de mesmo conceito funden no que está sob o assunto mais adequado. Entre disciplinas e genéricos ficam em pendências.",
+  "operacoes": [
+    {"tipo": "fundir", "args": {"origem": "A-23d24a4b4c", "destino": "S-20f9afec3d"}, "comentario": "Comunicação: assunto sem filhos (GP) no subassunto de mesmo nome em Gestão de pessoas (GP)"},
+    {"tipo": "fundir", "args": {"origem": "A-26490d5751", "destino": "S-f06ff8a230"}, "comentario": "Gerenciamento de conflitos: assunto sem filhos (GP) no subassunto de mesmo nome na mesma disciplina"},
+    {"tipo": "fundir", "args": {"origem": "A-35757d0cdf", "destino": "S-8123798742"}, "comentario": "Competência interpessoal: assunto sem filhos (GP) no subassunto de mesmo nome na mesma disciplina"},
+    {"tipo": "fundir", "args": {"origem": "A-4c006b192d", "destino": "S-15b4e945c7"}, "comentario": "Comportamento, clima e cultura organizacional: assunto sem filhos (GP) no subassunto de mesmo nome"},
+    {"tipo": "fundir", "args": {"origem": "A-564f15a1ae", "destino": "S-31051a8057"}, "comentario": "Qualidade de vida no trabalho: assunto sem filhos (GP) no subassunto de mesmo nome na mesma disciplina"},
+    {"tipo": "fundir", "args": {"origem": "A-c3f41ab58f", "destino": "S-e02c45cebe"}, "comentario": "Gestão por competências: assunto sem filhos (GP) no subassunto de mesmo nome na mesma disciplina"},
+    {"tipo": "fundir", "args": {"origem": "A-f63bbab19f", "destino": "S-f918993828"}, "comentario": "Gestão do conhecimento: assunto sem filhos (GP) no subassunto de mesmo nome na mesma disciplina"},
+    {"tipo": "fundir", "args": {"origem": "S-a26b3a7b47", "destino": "S-28e27fcd34"}, "comentario": "Recrutamento e seleção de pessoas: dois subassuntos de GP; fica o sob Processos de gestão de pessoas (processo seletivo, mais adequado e q maior)"},
+    {"tipo": "fundir", "args": {"origem": "A-36cf1b7c35", "destino": "S-af705f78a3"}, "comentario": "Emprego de tempos e modos verbais: assunto sem filhos (LP) no subassunto de mesmo nome. O pai do destino (Domínio dos mecanismos de coesão textual) parece pouco adequado: vide pendências"},
+    {"tipo": "fundir", "args": {"origem": "A-9a42c2cc99", "destino": "S-ab219b410b"}, "comentario": "Emprego das classes de palavras: assunto sem filhos (LP) no subassunto de mesmo nome"},
+    {"tipo": "fundir", "args": {"origem": "S-8a531032e3", "destino": "S-e2784e35fc"}, "comentario": "Comunicação interna e endomarketing: dois subassuntos de Comunicação Social; fica o sob Comunicação nas organizações (mais adequado ao tema)"},
+    {"tipo": "fundir", "args": {"origem": "S-73b1f667cc", "destino": "S-9d7cd4e680"}, "comentario": "Distribuição de probabilidade: dois subassuntos de Estatística; fica o sob Probabilidade (mais adequado ao tema)"},
+    {"tipo": "fundir", "args": {"origem": "S-9748bdccef", "destino": "S-3fc78aabd9"}, "comentario": "Diagnóstico diferencial: dois subassuntos de Psicologia; fica o de maior q (sob Psicopatologia, q=2)"},
+    {"tipo": "fundir", "args": {"origem": "S-d11e9900d1", "destino": "S-566fcc1fba"}, "comentario": "Fundamentos e etapas da medida psicológica: dois subassuntos de Psicologia; fica o sob psicometria (adequado ao tema)"},
+    {"tipo": "fundir", "args": {"origem": "S-aba3b71611", "destino": "S-87ee90c4fe"}, "comentario": "Avaliação psicológica dos fatores psicossociais do trabalho: dois subassuntos de Psicologia; fica o de maior q (sob Psicologia social e aplicação no trabalho)"},
+    {"tipo": "fundir", "args": {"origem": "A-1d0eda9b64", "destino": "S-ad6c022ecb"}, "comentario": "Entrevista motivacional: assunto sem filhos (Psicologia) no subassunto de mesmo nome. O pai do destino (Avaliação psicológica) parece pouco adequado: vide pendências"},
+    {"tipo": "fundir", "args": {"origem": "S-37df583de2", "destino": "S-fe253f32ca"}, "comentario": "Conceitos básicos de inteligência artificial: dois subassuntos de TI; fica o sob Ciência de dados e inteligência artificial (assunto específico de IA)"}
+  ]
+}

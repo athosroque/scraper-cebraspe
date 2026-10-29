@@ -1,0 +1,6 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 2 (KAN-78): decisão do dono, 'Educação corporativa' (assunto, com os 4 subassuntos) volta para Pedagogia. Treinamento e Desenvolvimento continua em Gestão de Pessoas.",
+ "operacoes": [
+  {"tipo": "mover", "args": {"no": "A-a5fe133e1c", "pai": "M-3d812a93de"}, "comentario": "Decisão do dono: vai tudo para Pedagogia"}
+ ]
+}

@@ -1,0 +1,237 @@
+{
+ "descricao": "Etapa 5B.3, Fase 2h (KAN-78, R2): quase duplicatas de assunto e subassunto (sob o mesmo pai) em TI, Direito Administrativo, Direito Constitucional e Direito Penal. Só alta confiança; pares ambíguos ficam de fora.",
+ "operacoes": [
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-9dbfe15626",
+    "destino": "A-62cc2b0c63"
+   },
+   "comentario": "TI, Governança e gestão de TI: 'Governança de TIC' (q=8) e 'Governança e Gestão de TIC' (q=9) são o mesmo conceito sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-0e391a692d",
+    "destino": "S-35ab3a8c71"
+   },
+   "comentario": "TI, Segurança da informação: 'Ataques de malwares' (q=1) repete 'malware' (q=2) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-e31f3a89ce",
+    "destino": "A-805590e68b"
+   },
+   "comentario": "TI, Segurança da informação: 'Criptografia e proteção de dados' (q=1) é quase igual a 'Criptografia' (q=2) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-77b2b224ae",
+    "destino": "S-ae05bb9298"
+   },
+   "comentario": "Dir. Administrativo: 'Decreto nº 11.462/2023' está como assunto solto (q=0, sem filhos) e como subassunto de Licitação (q=1); o de maior q fica"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "SL-7433040fba",
+    "destino": "S-0be4918914"
+   },
+   "comentario": "Dir. Administrativo, Contratos: 'Acompanhamento e fiscalização da execução contratual' é quase igual a 'Acompanhamento da execução contratual' (q=4) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-20e5406a0c",
+    "destino": "S-15117e3672"
+   },
+   "comentario": "Dir. Administrativo, Contratos: 'Conceitos e características' (q=0) está contido em 'Conceito, principais características e espécies' (q=1)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-ea3145d537",
+    "destino": "S-b02401c9bd"
+   },
+   "comentario": "Dir. Administrativo, Contratos: 'Penalidades e sanções administrativas' (q=2) é o mesmo conceito de 'Definição e aplicação de penalidades e sanções administrativas' (q=3)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-eef744c9ce",
+    "destino": "S-262b01a1f7"
+   },
+   "comentario": "Dir. Administrativo, Licitação: 'Anulação e revogação' (q=0) é o mesmo conceito de 'Anulação, revogação e recursos administrativos' (q=0); empate de q, fica o nome mais completo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-b893c30f18",
+    "destino": "SL-1f7207ac54"
+   },
+   "comentario": "Dir. Administrativo, Licitação: 'Contratação direta' (q=0) está contida em 'Contratação direta: dispensa e inexigibilidade' (q=4)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-612473bde3",
+    "destino": "S-e96c1c3a65"
+   },
+   "comentario": "Dir. Administrativo, Controle: 'Controle parlamentar' (q=2) é o mesmo conceito de 'Controle legislativo' (q=6) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-704ae8beb7",
+    "destino": "S-2744fa5ed4"
+   },
+   "comentario": "Dir. Administrativo, Controle: 'Controle administrativo' (q=2) é o mesmo conceito de 'Controle exercido pela administração pública' (q=3)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-adb7564452",
+    "destino": "S-3cf946c3cf"
+   },
+   "comentario": "Dir. Administrativo, Controle: 'Sistemas de controle jurisdicional da administração pública' (q=2) é o mesmo conceito de 'Controle judicial' (q=5) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-9c062b423a",
+    "destino": "SL-82efecbf00"
+   },
+   "comentario": "Dir. Administrativo, Poderes: 'Abuso do poder' (q=0) está contido em 'Uso e abuso do poder' (q=1) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-66eca7322c",
+    "destino": "S-e6f4da2cd5"
+   },
+   "comentario": "Dir. Administrativo, Responsabilidade civil do Estado: 'Responsabilidade civil do Estado no direito brasileiro: ...' (q=1) repete o nó de q=2 com o mesmo título base"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-cecaa5a1ee",
+    "destino": "S-f6debd0962"
+   },
+   "comentario": "Dir. Administrativo, Introdução: 'Fontes' (q=0) é o mesmo nó que 'Fontes do direito administrativo' (q=0); empate de q, fica o nome mais completo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-906acf45e5",
+    "destino": "A-3699f9a8aa"
+   },
+   "comentario": "Dir. Constitucional: 'Princípios Fundamentais. Direitos e garantias fundamentais' (q=0) repete 'Direitos e garantias fundamentais' (q=1), com os mesmos subassuntos; os filhos vão ao destino"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-bed6cebe50",
+    "destino": "S-329ac8e3a2"
+   },
+   "comentario": "Dir. Constitucional, após o passo acima: 'direitos e deveres individuais e coletivos' repete o nó de q=4 sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-426e838f92",
+    "destino": "S-1054529bc2"
+   },
+   "comentario": "Dir. Constitucional, após o passo acima: 'Direitos sociais' (q=0) e 'direitos sociais' (q=2) são o mesmo nó (caixa ignorada)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-713f894c5e",
+    "destino": "S-d2a774b8d9"
+   },
+   "comentario": "Dir. Constitucional, após o passo acima: 'nacionalidade' (q=0) e 'Nacionalidade' (q=1) são o mesmo nó (caixa ignorada)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-402b99af6f",
+    "destino": "SL-2a563462b9"
+   },
+   "comentario": "Dir. Constitucional: o subassunto longo com ponto final (q=0) repete 'Direitos e deveres individuais e coletivos, direitos sociais, ...' (q=9) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-a1c767ce87",
+    "destino": "S-c8fcc6cdb8"
+   },
+   "comentario": "Dir. Constitucional, CF 1988: 'Conceito, classificações, princípios fundamentais, emendas constitucionais.' (q=0) repete 'Conceito, classificações, princípios fundamentais' (q=1) sob o mesmo pai"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-e82f38b48e",
+    "destino": "S-3a953b43dc"
+   },
+   "comentario": "Dir. Constitucional, Organização político-administrativa: 'estados' (q=0) é o mesmo nó que 'Estados federados' (q=1)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-9a16463fab",
+    "destino": "S-8afa373906"
+   },
+   "comentario": "Dir. Constitucional, Poder Executivo: 'Atribuições e responsabilidades do presidente da República' (q=1) repete 'Atribuições do presidente da República e dos ministros de Estado' (q=1); empate de q, fica o nome mais completo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-c5bfcf21b2",
+    "destino": "S-c3596a7de3"
+   },
+   "comentario": "Dir. Constitucional, Poder Legislativo: 'Congresso Nacional, Câmara dos Deputados, ...' (q=0) é o trecho inicial de 'Congresso Nacional, ..., atribuições, competências, reuniões e comissões' (q=6)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-1ad4bda043",
+    "destino": "S-c3596a7de3"
+   },
+   "comentario": "Dir. Constitucional, Poder Legislativo: 'o Congresso Nacional e suas Casas (atribuições, competências, reuniões e comissões)' (q=3) repete o nó de q=6"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-1bb4378a46",
+    "destino": "A-807d3737d2"
+   },
+   "comentario": "Dir. Constitucional: 'Fiscalização contábil, financeira e orçamentária' (subassunto, q=0, sem filhos) repete o assunto 'Fiscalização Contábil, Financeira e Orçamentária' (q=2)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-fd4cac0e9b",
+    "destino": "A-564f19e124"
+   },
+   "comentario": "Dir. Penal: 'Crimes contra a administração pública' (subassunto de Crimes em espécie, q=0, sem filhos) repete o assunto de mesmo nome (q=2)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-14a65c5811",
+    "destino": "A-6913a5d111"
+   },
+   "comentario": "Dir. Penal: 'Crimes contra a fé pública' (subassunto, q=0, sem filhos) repete o assunto de mesmo nome (q=1)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-dabdb2c144",
+    "destino": "A-ee140fcf09"
+   },
+   "comentario": "Dir. Penal: 'Crimes contra o patrimônio' (subassunto, q=1, sem filhos) repete o assunto de mesmo nome (q=2)"
+  }
+ ]
+}

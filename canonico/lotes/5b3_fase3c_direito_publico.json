@@ -1,0 +1,93 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 3 (KAN-78): direito público (Dir. Administrativo, Dir. Constitucional, Legislação Específica, Processo Legislativo, Ética, Ciência Política, Atualidades). Fusões de homônimos (mesmo conceito, mesma disciplina ou norma em nó único), assunto sem filhos em subassunto de mesmo conceito, subassuntos folha com nome de assunto (Dir. Constitucional, regra 7) e a norma Lei 9.784/1999 em nó único. Pendências ficam fora do lote.",
+ "operacoes": [
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-4a556c269d",
+    "destino": "S-48e6b961bb"
+   },
+   "comentario": "IN/MPOG 5/2017 e IN/SEGES 98/2022 em Licitação (q=1) e Contratos (q=0), mesma disciplina: fica o de maior q"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-f591ab620e",
+    "destino": "S-492515805c"
+   },
+   "comentario": "Legislação pertinente Lei 14.133/2021 em Licitação (q=0) e Contratos (q=12), mesma disciplina: fica o de maior q"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-74107682cc",
+    "destino": "S-7bd4d204e8"
+   },
+   "comentario": "Decreto 11.531/2023 (convênios) em Contratos (q=0) e Licitação (q=1), mesma disciplina: fica o de maior q. Curador: há irmão Convênios e instrumentos congêneres (S-74f299e438) em Contratos; a escolha do pai não é óbvia"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-523600c0df",
+    "destino": "A-21377c6c46"
+   },
+   "comentario": "Regra 7 (Dir. Constitucional): subassunto folha Poder Judiciário sob Organização dos poderes vai ao assunto Poder Judiciário"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-9031f712ff",
+    "destino": "A-8099862644"
+   },
+   "comentario": "Regra 7 (Dir. Constitucional): subassunto folha Poder Executivo vai ao assunto Poder Executivo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-b08d8a7140",
+    "destino": "A-ec54223f0c"
+   },
+   "comentario": "Regra 7 (Dir. Constitucional): subassunto folha Poder Legislativo vai ao assunto Poder Legislativo"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-b4b44b6568",
+    "destino": "A-5ebac8ab8e"
+   },
+   "comentario": "Regra 7 (Dir. Constitucional): subassunto folha Aplicabilidade das normas constitucionais vai ao assunto de mesmo nome (que tem filhos; a origem não tem)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-58a2ea0f4f",
+    "destino": "S-b37a322e5a"
+   },
+   "comentario": "Regra 1: assunto Sistema Financeiro Nacional sem filhos vai ao subassunto de mesmo conceito em Ordem econômica e financeira (mesma disciplina)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-064141b0b0",
+    "destino": "A-aed23dfa13"
+   },
+   "comentario": "Norma Lei 8.429/1992 (nó único em Dir. Administrativo): folha em Ética vai ao assunto Improbidade (que tem filhos)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-7518929608",
+    "destino": "A-aed23dfa13"
+   },
+   "comentario": "Norma Lei 8.429/1992 (nó único em Dir. Administrativo): segundo nó da mesma norma dentro de Improbidade (folha), vai ao assunto Improbidade. Extra além da lista do lote; curador pode retirar"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-5a7e2f3f47",
+    "destino": "AL-fe35b41dc5"
+   },
+   "comentario": "Norma Lei 9.784/1999 (nó único): subassunto folha Lei n.º 9.784/1999 vai ao assunto Processo Administrativo Federal (Lei 9.784/1999)"
+  }
+ ]
+}

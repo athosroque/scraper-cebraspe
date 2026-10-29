@@ -239,13 +239,17 @@ Script do levantamento (reproduzível, só leitura): ver "Sessão 1" abaixo.
    → destino. Criar as disciplinas novas. Script de auditoria versionado
    (`scripts/auditar_arvore.py`, registrar em `src/registro/scripts.py`, P70) que gera esta
    tabela e falha se aparecer matéria fora da lista fechada.
-2. **Sessão 2 — Assuntos.** Dono decide a Fase 2; aplicar fusões e movimentos como propostas
-   (`P-…`) aprovadas em lote.
-3. **Sessão 3 — Subassuntos.** Rodar o levantamento de novo na árvore nova e fazer a Fase 3.
-4. **Sessão 4 — Banco, site e regra de ingestão.** Recarga, views e site; lista fechada de
-   disciplinas canônicas (`canonico/`), e título de bloco de edital fora da lista passa a mapear
-   para assunto (o `materia_no` aceita qualquer nó; conferir `vw_edital_cobra_materia` e o
-   filtro "Disciplina" do site). Vale para os concursos novos da 8.C.
+2. **Sessão 2 — Assuntos. Feita em 2026-10-24 (KAN-78).** Lotes `5b3_fase2a` a `2i` em
+   `canonico/lotes/`: assunto na disciplina errada, duplicatas entre e dentro de disciplinas,
+   sobras de TI e resoluções do CNJ. Decisões do dono no ADR-030 (Atualização 2026-10-24).
+3. **Sessão 3 — Subassuntos. Feita em 2026-10-24 (KAN-78).** Lotes `5b3_fase3a` a `3f`: um
+   conceito, um nó; as 7 normas em dois nós resolvidas. A árvore ficou com 677 assuntos e
+   1.968 subassuntos (43 disciplinas). Pendências com sugestão no ADR-030: Lei 6.404,
+   retenção de tributos da AFO, nós compostos, assunto com o nome da disciplina.
+4. **Sessão 4 — Banco, site e regra de ingestão.** Regra feita (P72): título de bloco fora da
+   lista fechada vira assunto (`canonico.mapear_novos_itens_por_regra`), e `propor` recusa
+   disciplina nova. Falta: recarga do banco, nova linha de base do K22 (apontamentos
+   2.965 → cerca de 2.938, a aprovar pelo dono) e conferência do site no Chromium headless.
 
 ## Riscos
 

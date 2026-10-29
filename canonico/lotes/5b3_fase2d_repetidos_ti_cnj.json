@@ -1,0 +1,189 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 2 (KAN-78), H4: assuntos repetidos dentro da mesma disciplina (Partes A), TI com Ciência de dados e IA (Parte B). Rascunho para revisão do dono; NÃO aplicado. Destino de cada fusão = nó com mais questões (q); empate = nome mais completo.",
+ "operacoes": [
+  {
+   "comentario": "CGS: Ativo Intangível (q1) funde em Ativos intangíveis (q5)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-d738e3771b",
+    "destino": "A-2abfffb0f2"
+   }
+  },
+  {
+   "comentario": "CGS: empréstimos, 2 variações com q0; destino = nome mais completo (com Patrimônio Líquido)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-6bc1c3dec9",
+    "destino": "A-89a46c189f"
+   }
+  },
+  {
+   "comentario": "CGS: Mensuração do valor justo, 2 variações com q0; destino = nome mais completo",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-49a4585d99",
+    "destino": "A-a50edd7988"
+   }
+  },
+  {
+   "comentario": "CGS: Receita de vendas (q0) em Receitas de vendas de produtos e serviços (q0, nome mais completo)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-aefefae47c",
+    "destino": "A-4575d784fe"
+   }
+  },
+  {
+   "comentario": "CGS: Consolidação (q0) e Demonstrações Consolidadas (q0); destino = nome mais completo",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-01b26feadf",
+    "destino": "A-4a2df0effe"
+   }
+  },
+  {
+   "comentario": "CGS: NBC TG Estrutura Conceitual (q0) em Estrutura Conceitual (q1)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-eff517d483",
+    "destino": "A-281d69ae74"
+   }
+  },
+  {
+   "comentario": "DA: Poderes e deveres (q0) em Poderes da administração pública (q1)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-70f8e987f2",
+    "destino": "AL-f8109e8249"
+   }
+  },
+  {
+   "comentario": "DA: Direito administrativo (q0) em Introdução ao direito administrativo (q0, nome mais completo)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-a42c866eb6",
+    "destino": "A-9761f0d86a"
+   }
+  },
+  {
+   "comentario": "DA: Contrato administrativo para compras (q0) em Contratos administrativos (q1)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-c3921a1df9",
+    "destino": "A-91e52e6c2e"
+   }
+  },
+  {
+   "comentario": "DC: Constituição (q0) em CRFB de 1988 (q0; nó com mais filhos)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-891c22a5f2",
+    "destino": "AL-efc5bfb214"
+   }
+  },
+  {
+   "comentario": "DC: CRFB de 1988 e emendas (q0) em CRFB de 1988",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-a3a5007f7e",
+    "destino": "AL-efc5bfb214"
+   }
+  },
+  {
+   "comentario": "DC: nome único dos três genéricos fundidos",
+   "tipo": "renomear",
+   "args": {
+    "no": "AL-efc5bfb214",
+    "nome": "Constituição Federal de 1988"
+   }
+  },
+  {
+   "comentario": "DC: Princípios fundamentais (q0) em Princípios Fundamentais. Direitos e garantias fundamentais (q0, nome mais completo)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-2d19eb425e",
+    "destino": "A-906acf45e5"
+   }
+  },
+  {
+   "comentario": "DC: Organização do Estado (q0) em Organização político-administrativa do Estado (q1)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-4cf0c94f25",
+    "destino": "AL-74a8d407db"
+   }
+  },
+  {
+   "comentario": "LP: Redação Oficial (q0) em Redação oficial: Manual de Redação da Presidência da República (q9)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-6526fcc5de",
+    "destino": "AL-d25ac0285d"
+   }
+  },
+  {
+   "comentario": "PSI: Ética profissional (q3) em Ética profissional do psicólogo (q4)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-8b95459a7c",
+    "destino": "A-bf77a504c2"
+   }
+  },
+  {
+   "comentario": "TI: par Office (Aplicativos Office 365 q0 e Edição de textos q3)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-db9d9e794c",
+    "destino": "A-c94346bfdf"
+   }
+  },
+  {
+   "comentario": "TI: par sistema operacional (Windows q5 e Windows 10/11 + MSOffice q2)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-5b2d07610c",
+    "destino": "A-4ff1e02efb"
+   }
+  },
+  {
+   "comentario": "TI parte B: Ciência de Dados (q0) em Ciência de dados e inteligência artificial (NA)",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-064b407242",
+    "destino": "NA-07a7c2b773"
+   }
+  },
+  {
+   "comentario": "TI parte B: Big Data (sem filhos) em Ciência de dados e IA; o conteúdo já existe como subassunto Conceitos de big data e analytics",
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-e93da13346",
+    "destino": "NA-07a7c2b773"
+   }
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-4201d32812",
+    "destino": "A-afd93a8ce2"
+   },
+   "comentario": "Empate em q; fica o título oficial do CPC 32 (decisão do orquestrador)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-35d753a1f0",
+    "destino": "NA-07a7c2b773"
+   },
+   "comentario": "IA solta em TI; os 4 subassuntos vão para Ciência de dados e IA"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-b1f1e312ec",
+    "destino": "NA-07a7c2b773"
+   },
+   "comentario": "Visualização de dados solta em TI; os 4 subassuntos vão para Ciência de dados e IA"
+  }
+ ]
+}

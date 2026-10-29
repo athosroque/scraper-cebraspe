@@ -1,0 +1,13 @@
+{
+ "descricao": "Etapa 5B.3, H2 (KAN-78): duplicidades entre AFO, Contabilidade Pública e Contabilidade Tributária. Destino = nó da AFO (enfoque orçamentário/fiscal); Contab. Pública mantém só o enfoque patrimonial. Tratamento contábil dos tributos vai para Contabilidade Tributária.",
+ "operacoes": [
+  {"tipo": "fundir", "args": {"origem": "A-1d5569887f", "destino": "A-6046b68747"}, "comentario": "Créditos adicionais: CP -> AFO (enfoque orçamentário)"},
+  {"tipo": "fundir", "args": {"origem": "A-d8dc49fd7b", "destino": "A-99661a58c5"}, "comentario": "Conta única do Tesouro Nacional: CP -> AFO"},
+  {"tipo": "fundir", "args": {"origem": "A-56cb844488", "destino": "AL-baa42ce1dc"}, "comentario": "Despesa pública: CP -> AFO; subassunto 'Conceito, etapas, estágios e categorias econômicas' vai junto"},
+  {"tipo": "fundir", "args": {"origem": "A-8d3ef86100", "destino": "AL-49fc7bbd0b"}, "comentario": "Receita pública: CP -> AFO; subassunto 'Conceito, etapas, estágios e categorias econômicas' vai junto"},
+  {"tipo": "fundir", "args": {"origem": "A-c4940b4cdd", "destino": "A-7e93595e9c"}, "comentario": "Restos a pagar: CP -> AFO"},
+  {"tipo": "fundir", "args": {"origem": "AL-d92ca18389", "destino": "AL-528d504ae8"}, "comentario": "Lei nº 4.320/1964: CP -> AFO"},
+  {"tipo": "fundir", "args": {"origem": "A-8e9ed56866", "destino": "A-f4cc228836"}, "comentario": "Manual de Demonstrativos Fiscais, 14ª edição: CP -> AFO (subassuntos são fiscais: RGF e RREO)"},
+  {"tipo": "fundir", "args": {"origem": "AL-eaef011f6c", "destino": "A-79802a31bc"}, "comentario": "Tratamento contábil aplicável aos impostos e contribuições: CP -> Contabilidade Tributária"}
+ ]
+}

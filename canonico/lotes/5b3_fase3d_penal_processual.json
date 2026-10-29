@@ -1,0 +1,53 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 3d (KAN-78), escopo S4: Direito Penal, Penal Militar, Processual Civil, Processual Penal, Processual Penal Militar, Civil e Ambiental. Funde só mesmo conceito: Código Penal -> Aplicação da lei penal (regra 7), e ADI/ADC/ADPF de Direito Processual Civil no nó natural de Direito Constitucional. Homônimos Penal x Penal Militar e Processual Penal x Processual Penal Militar não são duplicata (regra 3). Pendências em task de revisão do dono, sem operação.",
+ "operacoes": [
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-b6303f2e84",
+    "destino": "S-c37c92a5f2"
+   },
+   "comentario": "Anterioridade da lei: Código Penal -> Aplicação da lei penal (mesmo conceito, nome exato, q0 x q0)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-397e736766",
+    "destino": "S-d9a5ebfeb3"
+   },
+   "comentario": "Contagem de prazo: Código Penal (q1) -> Aplicação da lei penal (q0)"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-c4f4e4cdce",
+    "destino": "S-97625189b3"
+   },
+   "comentario": "Territorialidade (Código Penal) -> Territorialidade e extraterritorialidade da lei penal; par exato do nó composto com Extraterritorialidade"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-8505b221c6",
+    "destino": "S-97625189b3"
+   },
+   "comentario": "Extraterritorialidade (Código Penal) -> Territorialidade e extraterritorialidade da lei penal"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-26dd9af97d",
+    "destino": "S-8c9df90a4d"
+   },
+   "comentario": "Tempo do crime (Código Penal) -> Tempo e lugar do crime; par exato com Lugar do crime"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "S-f559461c0e",
+    "destino": "S-8c9df90a4d"
+   },
+   "comentario": "Lugar do crime (Código Penal) -> Tempo e lugar do crime"
+  }
+ ]
+}

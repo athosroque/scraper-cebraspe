@@ -1,0 +1,131 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 2 (KAN-78): resoluções do CNJ soltas em Legislação Específica viram subassuntos de Normativos do CNJ.",
+ "operacoes": [
+  {
+   "tipo": "criar",
+   "apelido": "@r0",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resolução CNJ nº 344/2020",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-6437432504",
+    "destino": "@r0"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@r1",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resolução CNJ nº 435/2021",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-db1b39885d",
+    "destino": "@r1"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@r2",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resolução CNJ nº 383/2021",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-e675c5ad12",
+    "destino": "@r2"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@r3",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resolução do CNJ nº 401/2021",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-78f2017f55",
+    "destino": "@r3"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@r4",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resolução do CNJ nº 351/2020",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-dc49021eb1",
+    "destino": "@r4"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@r5",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resolução do CNJ nº 400/2021",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-f784a6ff5a",
+    "destino": "@r5"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@r6",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Resoluções CNJ nº 467/2022 e 566/2024",
+    "pai": "NA-63ef57468a"
+   },
+   "comentario": "Subassunto novo sob Normativos do CNJ"
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "A-11de92af33",
+    "destino": "@r6"
+   },
+   "comentario": "Assunto solto (sem filhos) funde no subassunto"
+  }
+ ]
+}
