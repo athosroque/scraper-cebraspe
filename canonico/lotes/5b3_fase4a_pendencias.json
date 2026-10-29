@@ -1,0 +1,9 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 4 (KAN-78): pendências do ADR-030 decididas pela recomendação (uma norma, um nó; um conceito, um nó): Lei 6.404, retenção de tributos e Disposições doutrinárias.",
+ "operacoes": [
+  {"tipo": "fundir", "args": {"origem": "S-f6fce110c0", "destino": "S-84f666cfe8"}, "comentario": "Lei 6.404 em dois nós da Contabilidade Geral: a escrituração funde na norma"},
+  {"tipo": "fundir", "args": {"origem": "A-709c7502bc", "destino": "A-6580fd8ec8"}, "comentario": "Retenção de tributos da AFO funde no assunto de retenções da Contabilidade Tributária"},
+  {"tipo": "fundir", "args": {"origem": "S-581c4c71a9", "destino": "S-feeadd1fb7"}, "comentario": "Licitação: variantes de Disposições doutrinárias em um subassunto"},
+  {"tipo": "fundir", "args": {"origem": "S-696fc92030", "destino": "S-999aea9912"}, "comentario": "Agentes públicos: variantes de Disposições doutrinárias em um subassunto"}
+ ]
+}
