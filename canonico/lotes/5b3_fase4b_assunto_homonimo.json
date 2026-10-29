@@ -1,0 +1,181 @@
+{
+ "descricao": "Etapa 5B.3, Sessão 4 (KAN-78): pendência 4, assunto com o nome da disciplina em Gestão de Pessoas e Comércio Exterior ganha assuntos intermediários; o homônimo é renomeado para um dos grupos.",
+ "operacoes": [
+  {
+   "tipo": "renomear",
+   "args": {
+    "no": "A-4af1eec8dc",
+    "nome": "Funções e instrumentos da gestão de pessoas"
+   }
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@gp_lid",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Liderança, equipes e conflitos",
+    "pai": "M-c9624ca219"
+   }
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@gp_cul",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Comportamento, clima e cultura organizacional",
+    "pai": "M-c9624ca219"
+   }
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@gp_td",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Educação, treinamento e desenvolvimento",
+    "pai": "M-c9624ca219"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-213629421a",
+    "pai": "@gp_lid"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-27d807fd67",
+    "pai": "@gp_lid"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-75e2f3d426",
+    "pai": "@gp_lid"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-93ef321903",
+    "pai": "@gp_lid"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-f6cf9a40fe",
+    "pai": "@gp_lid"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-15b4e945c7",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-70c016a556",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-a8f7669e42",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-f8fa829de5",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-31051a8057",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-70b00d731d",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-20f9afec3d",
+    "pai": "@gp_cul"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-229d36685f",
+    "pai": "@gp_td"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-4c0be3eaa4",
+    "pai": "@gp_td"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-b28a2f1b72",
+    "pai": "@gp_td"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-4d7807ac01",
+    "pai": "@gp_td"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-5404b942d2",
+    "pai": "@gp_td"
+   }
+  },
+  {
+   "tipo": "renomear",
+   "args": {
+    "no": "A-b018c262aa",
+    "nome": "Controle e regimes aduaneiros"
+   }
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@ce_ac",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Acordos e convenções internacionais",
+    "pai": "M-81d0763230"
+   }
+  },
+  {
+   "tipo": "mover",
+   "args": {
+    "no": "S-316149413f",
+    "pai": "@ce_ac"
+   }
+  }
+ ]
+}
