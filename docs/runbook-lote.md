@@ -388,8 +388,17 @@ venv/bin/python -m scripts.mapear_itens_novos --dry-run --concurso <SLUG>  # pen
 venv/bin/python -m scripts.mapear_itens_novos --concurso <SLUG>            # paga o LLM e grava propostas
 ```
 
+Ordem do passo (P73): (1) a **memória** resolve sem LLM o item que repete decisão aprovada
+(mesma `chave_regra`, mesmo pai) ou é apelido exato de nó, gravando `regra`/`aprovado`;
+(2) o LLM recebe, por item, o caminho do edital e os subitens (até 8 e ~300 caracteres, do
+`<edital>.json`), exemplos que o dono já aprovou na mesma disciplina e os pares que ele
+rejeitou. Par rejeitado nunca é reproposto. A proposta do LLM que o dono aprova passa a valer
+como memória nas execuções seguintes. O resumo mostra `resolvidos_por_memoria`,
+`propostos_por_llm` e `sem_no`; o dry-run não conta os itens da memória.
+
 O que conferir:
 - K22–K24 antes e depois (P71): o piloto não pode mudar; item já mapeado não é reavaliado;
+- o contexto de subitens entra no hash do cache: item cujo contexto mudou volta ao modelo;
 - o "nenhum" não grava nada e fica em cache (`canonico/.mapear_itens_novos_cache.json`); `--reavaliar` pergunta de novo;
 - o dry-run subestima o custo dos subtópicos cuja matéria ainda não tem nó (a disciplina só
   se resolve depois que o nível de cima é proposto), então o valor dele é um teto.

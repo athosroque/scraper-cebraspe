@@ -102,7 +102,7 @@ TAREFAS: tuple[Tarefa, ...] = (
             "adr/ADR-030-arvore-mestre-e-site-de-questoes.md",
         ),
         areas=("arvore",),
-        regras=("A30",),
+        regras=("A30", "P73"),
         etapas=("P6", "P7"),
         scripts=(
             "scripts.curar_arvore",

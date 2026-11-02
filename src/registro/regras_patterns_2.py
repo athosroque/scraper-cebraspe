@@ -413,4 +413,23 @@ do dono. `scripts/auditar_arvore.py` fica verde antes de cada carga.""",
         ),
         nucleo=True,
     ),
+    Regra(
+        id="P73",
+        tipo="pattern",
+        area="arvore",
+        texto="""O mapeamento de item novo aprende com o dono (`src/memoria_mapeamento.py`,
+funções puras sobre a árvore). Ordem: (1) memória, sem LLM: item de mesma `chave_regra` e
+mesmo pai efetivo de uma decisão **aprovada**, ou apelido exato de nó (nome de nó fundido,
+ou de nó ativo `semente`/`humano`) na disciplina do pai, com candidato único, vira
+`regra`/`aprovado`; (2) o LLM recebe contexto de subitens extraído do `<edital>.json`
+(entra no hash do cache), exemplos aprovados do dono e os pares rejeitados. Proposta
+`proposto` nunca é fonte da memória (só vira fonte depois que o dono a aprova), par
+rejeitado nunca é reproposto, e a memória não muda status existente (A30).""",
+        adrs=("ADR-030", "ADR-032"),
+        testes=(
+            "tests/test_memoria_mapeamento.py::test_proposta_nao_aprovada_nao_e_fonte",
+            "tests/test_mapeamento_llm.py::test_par_rejeitado_nao_e_reproposto_e_vai_no_prompt",
+            "tests/test_mapeamento_llm.py::test_memoria_resolve_item_repetido_entre_dois_editais",
+        ),
+    ),
 )

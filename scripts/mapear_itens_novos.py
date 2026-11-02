@@ -10,6 +10,11 @@ proposta de nó EXISTENTE da disciplina dele ou "nenhum". O resultado é gravado
 como `origem="llm"`, `status="proposto"` (A30): o dono aprova com
 `scripts/curar_arvore.py`. O modelo nunca cria nó nem disciplina (P72).
 
+Antes do LLM, `src/memoria_mapeamento.py` resolve sem custo o item que repete uma
+decisão já aprovada pelo dono (`regra`/`aprovado`, P73). O prompt leva o contexto dos
+subitens, exemplos aprovados e os pares rejeitados; o resumo mostra quantos itens saíram
+da memória, do LLM e quantos ficaram sem nó.
+
 `--dry-run` não chama o LLM nem grava: mostra quantos itens estão pendentes e uma
 estimativa de custo. Chamada via `chamar_llm_json` com `REASONING_PADRAO`
 (P16) e `nome_trace="mapear_itens_novos"`. A lógica fica em `src/mapeamento_llm.py`.
@@ -84,12 +89,16 @@ def main(args_list: list[str] | None = None) -> None:
         "pulados_cache_nenhum": conta.pulados_cache,
     }
     if args.dry_run:
-        saida.update(estimar(conta, conta.pendentes - conta.pulados_cache))
+        saida["resolvidos_por_memoria"] = conta.resolvidos_memoria
+        saida.update(estimar(conta, conta.itens_previstos))
     else:
         saida.update(
             {
-                "propostos": conta.propostos,
+                "resolvidos_por_memoria": conta.resolvidos_memoria,
+                "propostos_por_llm": conta.propostos,
+                "sem_no": conta.pendentes - conta.resolvidos_memoria - conta.propostos,
                 "nenhum": conta.nenhum,
+                "descartados_par_rejeitado": conta.descartados_rejeitados,
                 "recusados_na_gravacao": conta.rejeitados_gravacao,
                 "chamadas": conta.chamadas,
                 "lotes_ok": conta.lotes_ok,

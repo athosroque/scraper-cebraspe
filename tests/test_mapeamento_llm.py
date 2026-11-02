@@ -301,3 +301,242 @@ def test_arvore_inexistente_nao_quebra(tmp_path):
     conta = mapeamento_llm.mapear_itens_novos(tmp_path, tmp_path / "nao.json")
     assert conta.pendentes == 0
     assert isinstance(Path(tmp_path), Path)
+
+
+# Contexto dos subitens ---------------------------------------------------------------
+
+
+def _com_filhos(monkeypatch, filhos):
+    monkeypatch.setattr(mapeamento_llm, "coletar_filhos", lambda _d: filhos)
+
+
+def test_subitens_entram_no_prompt(cenario, monkeypatch):
+    _com_filhos(
+        monkeypatch,
+        {
+            "direito administrativo|invalidacao dos atos": [
+                "Anulação",
+                "Revogação",
+                "Convalidação",
+            ],
+            "direito penal": ["Homicídio", "Lesão corporal"],
+        },
+    )
+    _, falso, _ = _rodar(cenario, monkeypatch, lambda p, _n: _itens_por_nome(p, {}))
+    prompts = "\n".join(c["prompt"] for c in falso.chamadas)
+    assert "contém: Anulação; Revogação; Convalidação" in prompts
+    # Título de bloco (matéria): "principais tópicos" no lugar de "contém".
+    bloco = mapeamento_llm.Pendente(
+        "bloco", "materia", "Bloco", [], [], set(), "bloco", ["Homicídio", "Lesão"]
+    )
+    texto = mapeamento_llm.montar_prompt([bloco], "", {}, arvore.ArvoreMestre())
+    assert "principais tópicos: Homicídio; Lesão" in texto
+    # O caminho do edital (matéria › tópico) já vem em "dentro de".
+    assert "dentro de: DIREITO ADMINISTRATIVO" in prompts
+
+
+def test_formatar_subitens_limita_itens_e_caracteres():
+    nomes = [f"Subitem {i}" for i in range(12)]
+    texto = mapeamento_llm.formatar_subitens(nomes)
+    assert texto.count(";") == 7 and texto.endswith("…")
+    longo = mapeamento_llm.formatar_subitens(["x" * 200, "y" * 200])
+    assert len(longo) <= mapeamento_llm.MAX_CARACTERES_SUBITENS and longo.endswith("…")
+    assert mapeamento_llm.formatar_subitens([]) == ""
+
+
+def test_contexto_dos_subitens_entra_no_hash_e_reavalia(cenario, monkeypatch):
+    base = mapeamento_llm.hash_candidatos("k", {"A"})
+    assert base == mapeamento_llm.hash_candidatos("k", {"A"}, "")
+    assert base != mapeamento_llm.hash_candidatos("k", {"A"}, "Anulação")
+    nenhum = lambda p, _n: _itens_por_nome(p, {})  # noqa: E731
+    _com_filhos(monkeypatch, {})
+    _, f1, _ = _rodar(cenario, monkeypatch, nenhum)
+    assert f1.chamadas
+    _, f2, _ = _rodar(cenario, monkeypatch, nenhum)
+    assert f2.chamadas == []  # nada mudou: o "nenhum" fica em cache
+    _com_filhos(monkeypatch, {"direito penal|homicidio": ["Doloso", "Culposo"]})
+    _, f3, _ = _rodar(cenario, monkeypatch, nenhum)
+    # Só o item cujo contexto mudou volta ao modelo.
+    assert len(f3.chamadas) == 1
+    assert "Homicídio" in f3.chamadas[0]["prompt"].split("ITENS:")[1]
+    assert "Invalidação" not in f3.chamadas[0]["prompt"].split("ITENS:")[1]
+
+
+def test_prompt_de_sistema_explica_contexto():
+    assert "DESAMBIGUAR" in mapeamento_llm.PROMPT_SISTEMA
+    assert '"nenhum"' in mapeamento_llm.PROMPT_SISTEMA
+
+
+# Memória -----------------------------------------------------------------------------
+
+
+def _mexer_arvore(cenario, fn):
+    _, caminho = cenario
+    arv = arvore.carregar(caminho)
+    fn(arv)
+    arvore.salvar(arv, caminho)
+
+
+def test_memoria_resolve_item_repetido_entre_dois_editais(cenario, monkeypatch):
+    # "Licitações" (edital 1) já está aprovado; o edital 2 traz a mesma expressão
+    # com outra grafia sob a mesma matéria, e o pai é o mesmo nó aprovado.
+    _, caminho = cenario
+    nomes = canonico.NomesOrigem()
+    oc = {("OUTRO_25", "superior")}
+    nomes.materia = {
+        "direito administrativo": {"nome": "DIREITO ADMINISTRATIVO", "ocorrencias": oc}
+    }
+    nomes.assunto = {
+        ("direito administrativo", "licitacoes (lei 14.133)"): {
+            "nome": "Licitações (Lei 14.133)",
+            "ocorrencias": oc,
+        }
+    }
+    nomes.subassunto = {}
+    monkeypatch.setattr(mapeamento_llm.canonico, "coletar_nomes", lambda _d: nomes)
+    conta, falso, arv = _rodar(
+        cenario, monkeypatch, lambda p, _n: _itens_por_nome(p, {})
+    )
+    assert falso.chamadas == []
+    assert conta.resolvidos_memoria == 1 and conta.propostos == 0
+    m = arv.mapeamentos["direito administrativo|licitacoes (lei 14.133)"]
+    assert [(x.no_id, x.origem, x.status) for x in m] == [
+        ("A-LIC", "regra", "aprovado")
+    ]
+
+
+def test_memoria_nao_promove_proposta_nao_aprovada(cenario, monkeypatch):
+    # Só existe proposta LLM (não aprovada) para "Invalidação dos atos".
+    _mexer_arvore(
+        cenario,
+        lambda a: arvore.mapear(
+            a, "direito administrativo|outro nome", ["S-ANUL"], "llm", "proposto"
+        ),
+    )
+    escolhas = {"Invalidação dos atos": None, "Homicídio": None, "Algo inédito": None}
+    conta, _, arv = _rodar(
+        cenario, monkeypatch, lambda p, _n: _itens_por_nome(p, escolhas)
+    )
+    assert conta.resolvidos_memoria == 0
+    assert "direito administrativo|invalidacao dos atos" not in arv.mapeamentos
+    m = arv.mapeamentos["direito administrativo|outro nome"]
+    assert [(x.origem, x.status) for x in m] == [("llm", "proposto")]
+
+
+def test_ciclo_de_aprendizagem_llm_aprovada_resolve_na_proxima(cenario, monkeypatch):
+    escolhas = {
+        "Invalidação dos atos": "Anulação e revogação",
+        "Homicídio": None,
+        "Algo inédito": None,
+    }
+    _rodar(cenario, monkeypatch, lambda p, _n: _itens_por_nome(p, escolhas))
+    chave = "direito administrativo|invalidacao dos atos"
+    # Enquanto é só proposta, nada é copiado.
+    nomes = canonico.coletar_nomes(cenario[0])
+    oc = {("OUTRO_25", "superior")}
+    nomes.assunto = {
+        ("direito administrativo", "invalidacao dos atos (nova lei)"): {
+            "nome": "Invalidação dos atos (nova lei)",
+            "ocorrencias": oc,
+        }
+    }
+    nomes.subassunto = {}
+    nomes.materia = {
+        "direito administrativo": {"nome": "DIREITO ADMINISTRATIVO", "ocorrencias": oc}
+    }
+    monkeypatch.setattr(mapeamento_llm.canonico, "coletar_nomes", lambda _d: nomes)
+    nenhum = lambda p, _n: _itens_por_nome(p, {})  # noqa: E731
+    conta, _, _ = _rodar(cenario, monkeypatch, nenhum)
+    assert conta.resolvidos_memoria == 0
+    # O dono aprova a proposta; a próxima execução já resolve sem LLM.
+    _mexer_arvore(cenario, lambda a: arvore.aprovar(a, chave, "S-ANUL"))
+    conta, falso, arv = _rodar(cenario, monkeypatch, nenhum)
+    assert falso.chamadas == [] and conta.resolvidos_memoria == 1
+    m = arv.mapeamentos["direito administrativo|invalidacao dos atos (nova lei)"]
+    assert [(x.no_id, x.origem, x.status) for x in m] == [
+        ("S-ANUL", "regra", "aprovado")
+    ]
+    # A decisão original do dono continua como estava.
+    assert [(x.origem, x.status) for x in arv.mapeamentos[chave]] == [
+        ("llm", "aprovado")
+    ]
+
+
+def test_par_rejeitado_nao_e_reproposto_e_vai_no_prompt(cenario, monkeypatch):
+    _mexer_arvore(
+        cenario,
+        lambda a: (
+            arvore.mapear(
+                a, "direito civil|invalidacao dos atos", ["S-ANUL"], "llm", "proposto"
+            ),
+            arvore.rejeitar(a, "direito civil|invalidacao dos atos", "S-ANUL"),
+        ),
+    )
+    escolhas = {
+        "Invalidação dos atos": "Anulação e revogação",
+        "Homicídio": None,
+        "Algo inédito": None,
+    }
+    conta, falso, arv = _rodar(
+        cenario, monkeypatch, lambda p, _n: _itens_por_nome(p, escolhas)
+    )
+    prompt = falso.chamadas[0]["prompt"]
+    assert "PARES REJEITADOS" in prompt and "NÃO é [" in prompt
+    assert conta.descartados_rejeitados == 1 and conta.propostos == 0
+    assert "direito administrativo|invalidacao dos atos" not in arv.mapeamentos
+
+
+def test_exemplos_aprovados_aparecem_no_prompt(cenario, monkeypatch):
+    _mexer_arvore(
+        cenario,
+        lambda a: arvore.mapear(
+            a, "direito administrativo|revogacao do ato", ["S-ANUL"], "humano"
+        ),
+    )
+    _, falso, _ = _rodar(cenario, monkeypatch, lambda p, _n: _itens_por_nome(p, {}))
+    prompt = "\n".join(c["prompt"] for c in falso.chamadas)
+    assert "O DONO JÁ DECIDIU ASSIM" in prompt
+    assert (
+        "Direito Administrativo › Atos administrativos › Anulação e revogação" in prompt
+    )
+
+
+def test_dry_run_estima_sem_os_itens_da_memoria(cenario, monkeypatch):
+    nomes = canonico.NomesOrigem()
+    oc = {("OUTRO_25", "superior")}
+    nomes.materia = {
+        "direito administrativo": {"nome": "DIREITO ADMINISTRATIVO", "ocorrencias": oc}
+    }
+    nomes.assunto = {
+        ("direito administrativo", "licitacoes (lei 14.133)"): {
+            "nome": "Licitações (Lei 14.133)",
+            "ocorrencias": oc,
+        }
+    }
+    nomes.subassunto = {}
+    monkeypatch.setattr(mapeamento_llm.canonico, "coletar_nomes", lambda _d: nomes)
+    antes = cenario[1].read_text(encoding="utf-8")
+    conta, falso, _ = _rodar(cenario, monkeypatch, lambda p, _n: [], dry_run=True)
+    assert falso.chamadas == []
+    assert conta.resolvidos_memoria == 1 and conta.itens_previstos == 0
+    assert conta.chamadas_previstas == 0
+    assert cenario[1].read_text(encoding="utf-8") == antes
+
+
+def test_script_resumo_mostra_memoria_llm_e_sem_no(cenario, monkeypatch, capsys):
+    revisao, caminho = cenario
+    escolhas = {
+        "Invalidação dos atos": "Anulação e revogação",
+        "Homicídio": None,
+        "Algo inédito": None,
+    }
+    monkeypatch.setattr(
+        mapeamento_llm,
+        "chamar_llm_json",
+        LLMFalso(lambda p, _n: _itens_por_nome(p, escolhas)),
+    )
+    script.main([str(revisao), "--arvore", str(caminho)])
+    saida = json.loads(capsys.readouterr().out)
+    assert saida["resolvidos_por_memoria"] == 0
+    assert saida["propostos_por_llm"] == 1
+    assert saida["sem_no"] == 2

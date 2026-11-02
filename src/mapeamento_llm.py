@@ -24,7 +24,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from src import arvore, canonico, llm_openrouter
+from src import arvore, canonico, llm_openrouter, memoria_mapeamento
 from src.comparacao_texto import normalizar
 from src.llm_openrouter import (
     REASONING_PADRAO,
@@ -41,6 +41,12 @@ TIMEOUT = 180
 TENTATIVAS = 2
 BACKOFF_SEGUNDOS = 5
 ITENS_POR_LOTE = 25
+# Contexto dos subitens no prompt (extraído do `<edital>.json`, sem texto do PDF).
+MAX_SUBITENS = 8
+MAX_CARACTERES_SUBITENS = 300
+# Few-shot do dono e pares rejeitados no prompt.
+MAX_EXEMPLOS = 8
+MAX_VETADOS = 15
 # Teto de nós candidatos quando a disciplina do item não está resolvida: o
 # modelo vê só os nós de mesmo tema (sobreposição de palavras), nunca a árvore toda.
 LIMITE_CANDIDATOS_LIVRE = 120
@@ -66,6 +72,8 @@ REGRAS ESTRITAS:
 - Use APENAS os IDs locais listados em CANDIDATOS (ex: N1, N2...). NUNCA invente IDs e NUNCA proponha criar nó, renomear ou mover nada.
 - Escolha o nó que trata do MESMO conceito do item. Se o item for mais específico que todos os candidatos, escolha o candidato mais próximo apenas quando ele realmente cobrir o item; se for um conceito que a lista não cobre, responda "nenhum".
 - Na dúvida entre apontar para um nó duvidoso e responder "nenhum", responda "nenhum": um item sem nó vai para o dono decidir, um nó errado esconde o erro.
+- Cada item traz CONTEXTO tirado do próprio edital: "dentro de" (o último elemento é o pai imediato) e "contém" (subitens ou principais tópicos). Use-o só para DESAMBIGUAR o sentido do item (ex: "Arquitetura" de software, de computadores ou de edificações). Se, mesmo com o contexto, o sentido continuar ambíguo, responda "nenhum".
+- Se houver "O DONO JÁ DECIDIU ASSIM", siga o mesmo critério nos itens parecidos. Se houver "PARES REJEITADOS", NUNCA proponha esses pares.
 - Cada item recebe no máximo UM nó.
 - Forneça uma resposta para CADA item listado.
 - "confianca": "alta" (mesmo conceito), "media" (conceito abrangente ou fronteiriço), "baixa" (enquadramento duvidoso).
@@ -97,6 +105,10 @@ class Contabilidade:
     custo_usd: float = 0.0
     pendentes: int = 0
     pulados_cache: int = 0
+    resolvidos_memoria: int = 0
+    descartados_rejeitados: int = 0
+    # Só no dry-run: itens que iriam ao LLM.
+    itens_previstos: int = 0
     propostos: int = 0
     nenhum: int = 0
     rejeitados_gravacao: int = 0
@@ -126,20 +138,70 @@ class Pendente:
     contexto: list[str]
     concursos: set[str]
     materia_chave: str
+    # Nomes dos filhos diretos no edital (tópicos da matéria; subtópicos do tópico).
+    subitens: list[str] = field(default_factory=list)
 
 
 # Levantamento ---------------------------------------------------------------------
+
+
+def coletar_filhos(revisao_dir: Path) -> dict[str, list[str]]:
+    """Chave do item -> nomes dos filhos diretos nos `<edital>.json` (ordem do
+    edital, sem repetir): tópicos de uma matéria e subtópicos de um tópico."""
+    from src.stats_writer import listar_jsons_edital, montar_carga_concurso
+
+    filhos: dict[str, dict[str, str]] = {}
+
+    def somar(chave: str, nome: str) -> None:
+        if nome and nome.strip():
+            filhos.setdefault(chave, {}).setdefault(normalizar(nome), nome.strip())
+
+    if not revisao_dir.exists():
+        return {}
+    for json_path in listar_jsons_edital(revisao_dir):
+        try:
+            carga = montar_carga_concurso(
+                json.loads(json_path.read_text(encoding="utf-8"))
+            )
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            # Contexto é só ajuda de prompt; o erro de fato aparece em `coletar_nomes`.
+            logger.warning(
+                f"[MAPEAR] Sem contexto de subitens de {json_path.name}: {e}"
+            )
+            continue
+        for item in carga["itens"]:
+            m, t = item["materia_chave"], item["topico_chave"]
+            somar(arvore.chave_item(m), item["topico_nome"])
+            for sub in item["subtopicos"]:
+                somar(arvore.chave_item((m, t)), sub if isinstance(sub, str) else "")
+    return {k: list(v.values()) for k, v in filhos.items()}
+
+
+def formatar_subitens(
+    nomes: list[str],
+    max_itens: int = MAX_SUBITENS,
+    max_caracteres: int = MAX_CARACTERES_SUBITENS,
+) -> str:
+    """`a; b; c…` com no máximo `max_itens` nomes e `max_caracteres` caracteres."""
+    if not nomes:
+        return ""
+    texto = "; ".join(" ".join(n.split()) for n in nomes[:max_itens])
+    if len(texto) > max_caracteres:
+        return texto[: max_caracteres - 1].rstrip(" ;,") + "…"
+    return texto + ("…" if len(nomes) > max_itens else "")
 
 
 def levantar_pendentes(
     revisao_dir: Path,
     arv: arvore.ArvoreMestre,
     concurso: str | None = None,
+    nomes: canonico.NomesOrigem | None = None,
 ) -> list[Pendente]:
     """Itens dos `<edital>.json` sem entrada em `arv.mapeamentos` (mesma
     chave natural de `canonico.mapear_novos_itens_por_regra`). Item com
     mapeamento rejeitado também conta como já decidido: não é reavaliado."""
-    nomes = canonico.coletar_nomes(revisao_dir)
+    nomes = nomes or canonico.coletar_nomes(revisao_dir)
+    filhos = coletar_filhos(revisao_dir)
     pendentes: list[Pendente] = []
     for nivel in arvore.NIVEIS:
         for chave_origem, info in getattr(nomes, nivel).items():
@@ -170,6 +232,7 @@ def levantar_pendentes(
                     contexto=contexto,
                     concursos=concursos,
                     materia_chave=arvore.chave_item(m),
+                    subitens=filhos.get(chave, []),
                 )
             )
     return pendentes
@@ -297,8 +360,19 @@ def montar_prompt(
     texto_candidatos: str,
     dicas: dict[str, list[str]],
     arv: arvore.ArvoreMestre,
+    exemplos: list[str] | None = None,
+    vetados: list[str] | None = None,
 ) -> str:
-    linhas = ["CANDIDATOS:", texto_candidatos, "", "ITENS:"]
+    linhas = ["CANDIDATOS:", texto_candidatos, ""]
+    if exemplos:
+        linhas += ["O DONO JÁ DECIDIU ASSIM (siga o mesmo critério):", *exemplos, ""]
+    if vetados:
+        linhas += [
+            "PARES REJEITADOS PELO DONO (NÃO proponha estes pares):",
+            *vetados,
+            "",
+        ]
+    linhas.append("ITENS:")
     for i, it in enumerate(itens, start=1):
         trilha = " › ".join(it.contexto) if it.contexto else "(sem pai)"
         linha = f'{i}. [{ROTULO_ITEM[it.nivel]}] "{it.nome}" | dentro de: {trilha}'
@@ -308,6 +382,10 @@ def montar_prompt(
                 f"{arv.nos[n].nome} ({arv.nos[n].nivel})" for n in nos_pai
             )
             linha += f" | o pai foi mapeado para: {nomes}"
+        rotulo_filhos = "principais tópicos" if it.nivel == "materia" else "contém"
+        filhos = formatar_subitens(it.subitens)
+        if filhos:
+            linha += f" | {rotulo_filhos}: {filhos}"
         linhas.append(linha)
     linhas.append("")
     linhas.append("Responda um objeto para cada número de item acima.")
@@ -447,9 +525,12 @@ def _salvar_cache(cache: dict, path: Path) -> None:
         logger.warning(f"[MAPEAR] Falha ao salvar cache {path}: {e}")
 
 
-def hash_candidatos(chave: str, ids: set[str]) -> str:
-    """Muda se o item ou o conjunto de candidatos mudar (árvore curada depois)."""
+def hash_candidatos(chave: str, ids: set[str], contexto: str = "") -> str:
+    """Muda se o item, os candidatos (árvore curada depois) ou o contexto dos
+    subitens mudar. Sem contexto, o hash é o mesmo de antes (cache antigo vale)."""
     base = chave + "\n" + "\n".join(sorted(ids))
+    if contexto:
+        base += "\n#" + contexto
     return hashlib.sha1(base.encode("utf-8")).hexdigest()[:16]
 
 
@@ -496,6 +577,77 @@ def _grupos(
     return grupos
 
 
+def _rotulos(nomes: canonico.NomesOrigem) -> dict[str, str]:
+    """Chave de item -> nome original no edital (para exemplos legíveis)."""
+    saida = {}
+    for nivel in arvore.NIVEIS:
+        for chave, info in getattr(nomes, nivel).items():
+            saida[arvore.chave_item(chave)] = info["nome"]
+    return saida
+
+
+def aplicar_memoria(
+    arv: arvore.ArvoreMestre,
+    pendentes: list[Pendente],
+    indice: memoria_mapeamento.Indice,
+) -> int:
+    """Resolve pela memória (sem LLM) os itens que repetem decisão aprovada do dono.
+
+    Grava `origem="regra"`, `status="aprovado"` só quando há decisão aprovada por trás
+    (`memoria_mapeamento` nunca usa proposta não aprovada; A30). Devolve quantos."""
+    resolvidos = 0
+    for p in pendentes:
+        if p.chave in arv.mapeamentos:
+            continue
+        pais = (
+            memoria_mapeamento.nos_aprovados_do_pai(arv, p.chave)
+            if p.pais
+            else frozenset()
+        )
+        nos = memoria_mapeamento.resolver_por_memoria(
+            arv, canonico.chave_regra(p.nome).chave, p.nivel, pais, indice
+        )
+        if not nos:
+            continue
+        try:
+            arvore.mapear(arv, p.chave, sorted(nos), origem="regra", status="aprovado")
+        except arvore.ArvoreInvalida as e:
+            logger.warning(f"[MAPEAR] Memória recusada para {p.chave}: {e}")
+            continue
+        resolvidos += 1
+    return resolvidos
+
+
+def _linhas_exemplos(exemplos: list[memoria_mapeamento.Exemplo]) -> list[str]:
+    linhas = []
+    for e in exemplos:
+        pai = f' (dentro de "{e.pai}")' if e.pai else ""
+        linhas.append(f'- "{e.item}"{pai} -> {e.caminho}')
+    return linhas
+
+
+def _linhas_vetados(
+    arv: arvore.ArvoreMestre,
+    indice: memoria_mapeamento.Indice,
+    itens: list[Pendente],
+    local_para_id: dict[str, str],
+) -> list[str]:
+    """Pares rejeitados que dizem respeito ao lote e a nós oferecidos nele."""
+    id_para_local = {v: k for k, v in local_para_id.items()}
+    regras = {canonico.chave_regra(it.nome).chave for it in itens}
+    tokens = set()
+    for it in itens:
+        tokens |= _tokens(it.nome)
+    linhas = []
+    for (regra, no_id), nome in sorted(indice.vetados.items()):
+        local = id_para_local.get(no_id)
+        if not local:
+            continue
+        if regra in regras or (_tokens(nome) & tokens):
+            linhas.append(f'- "{nome}" NÃO é [{local}] {arv.nos[no_id].nome}')
+    return linhas[:MAX_VETADOS]
+
+
 def mapear_itens_novos(
     revisao_dir: Path,
     arvore_path: Path | None = None,
@@ -524,8 +676,11 @@ def mapear_itens_novos(
     nenhum_cache: dict = cache.setdefault("nenhum", {})
     lotes_feitos = 0
 
-    todos = levantar_pendentes(revisao_dir, arv, concurso)
+    nomes = canonico.coletar_nomes(revisao_dir)
+    rotulos = _rotulos(nomes)
+    todos = levantar_pendentes(revisao_dir, arv, concurso, nomes=nomes)
     conta.pendentes = len(todos)
+    indice = memoria_mapeamento.construir_indice(arv)
     logger.info(f"[MAPEAR] {len(todos)} item(ns) pendente(s) sem nó na árvore.")
 
     for nivel in arvore.NIVEIS:
@@ -533,6 +688,14 @@ def mapear_itens_novos(
         pend_nivel = [
             p for p in todos if p.nivel == nivel and p.chave not in arv.mapeamentos
         ]
+        # Memória primeiro (sem LLM). No dry-run altera só a árvore em memória, que
+        # nunca é salva, para que o nível seguinte já enxergue o pai resolvido.
+        n_memoria = aplicar_memoria(arv, pend_nivel, indice)
+        if n_memoria:
+            conta.resolvidos_memoria += n_memoria
+            if not dry_run:
+                arvore.salvar(arv, arvore_path)
+            pend_nivel = [p for p in pend_nivel if p.chave not in arv.mapeamentos]
         for rotulo, _nivel, disciplinas, itens, dicas in _grupos(arv, pend_nivel):
             if disciplinas:
                 sel = selecionaveis_da_disciplina(arv, disciplinas, nivel)
@@ -540,7 +703,10 @@ def mapear_itens_novos(
                 sel = selecionaveis_por_tema(arv, itens, nivel)
             if not sel:
                 continue
-            hashes = {it.chave: hash_candidatos(it.chave, sel) for it in itens}
+            hashes = {
+                it.chave: hash_candidatos(it.chave, sel, formatar_subitens(it.subitens))
+                for it in itens
+            }
             if not reavaliar:
                 restantes = [
                     it
@@ -554,10 +720,18 @@ def mapear_itens_novos(
             if limite is not None and lotes_feitos >= limite:
                 return conta
             texto, local_para_id = formatar_candidatos(arv, sel)
-            prompt = montar_prompt(itens, texto, dicas, arv)
+            referencia = " ".join(" ".join([it.nome, *it.contexto]) for it in itens)
+            exemplos = _linhas_exemplos(
+                memoria_mapeamento.exemplos_aprovados(
+                    arv, nivel, disciplinas, MAX_EXEMPLOS, referencia, rotulos
+                )
+            )
+            vetados = _linhas_vetados(arv, indice, itens, local_para_id)
+            prompt = montar_prompt(itens, texto, dicas, arv, exemplos, vetados)
             numeros = list(range(1, len(itens) + 1))
             if dry_run:
                 conta.chamadas_previstas += 1
+                conta.itens_previstos += len(itens)
                 conta.caracteres_previstos += len(PROMPT_SISTEMA) + len(prompt)
                 logger.info(
                     f"[MAPEAR] (dry-run) {ROTULO_ITEM[nivel]} | {rotulo}: "
@@ -587,6 +761,16 @@ def mapear_itens_novos(
                     }
                     continue
                 if it.chave in arv.mapeamentos:
+                    continue
+                final = arvore.resolver_no(arv, local_para_id[r.no])
+                if (canonico.chave_regra(it.nome).chave, final) in indice.vetados:
+                    # Par que o dono já rejeitou: nunca é reproposto.
+                    conta.descartados_rejeitados += 1
+                    conta.nenhum += 1
+                    nenhum_cache[it.chave] = {
+                        "hash": hashes[it.chave],
+                        "justificativa": "par rejeitado pelo dono",
+                    }
                     continue
                 try:
                     arvore.mapear(

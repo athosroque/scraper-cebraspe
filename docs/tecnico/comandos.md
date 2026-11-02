@@ -203,7 +203,7 @@ CLI de curadoria e deliberação humana da classificação das questões.
 
 ### `python -m scripts.mapear_itens_novos`
 
-Propõe nó da árvore para item novo de edital sem mapeamento, pelo LLM, sobre lista fechada. Grava só proposto. Custa tokens.
+Mapeia item novo de edital: primeiro pela memória das decisões do dono (sem LLM, P73), depois pelo LLM sobre lista fechada, com contexto de subitens. O LLM grava só proposto. Custa tokens.
 
 **ADRs:** [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
 
