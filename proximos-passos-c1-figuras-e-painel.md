@@ -4,7 +4,7 @@ Criado em 2026-10-21, ao fim da sessão que fechou a D5a e a D5b. Para abrir uma
 depender da conversa anterior.
 
 > Ao abrir a sessão, ler só este arquivo. O contexto do Dagster está em
-> `proximos-passos-dagster.md` (D5a/D5b já entregues; o arquivo ainda cita a D5b como "a seguir").
+> `docs/planos/prompts/proximos-passos-dagster.md` (D5a/D5b já entregues; o arquivo ainda cita a D5b como "a seguir").
 
 ## 1. Estado de partida (commitado em `master`)
 

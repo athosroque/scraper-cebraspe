@@ -28,3 +28,16 @@ acrescente o plano na tabela abaixo e no `nav` do `mkdocs.yml` (grupo "Planos co
 Os planos 5B.2, 5C.1, 5D e 5E tinham sido apagados ao concluir a etapa e
 foram recuperados do histórico do git em 2026-10-08, porque o `task.md` e
 os ADRs ainda os citam.
+
+## Prompts e passagens de bastão arquivados
+
+Prompts de sessão e passagens de bastão do Dagster (Etapa 9/D5a e D5b) e do KAN-66, já
+cumpridos. Ficam em `docs/planos/prompts/` como histórico (não editar) e fora do `nav`.
+
+| Arquivo | Para que serviu |
+|---|---|
+| `prompts/prompt-dagster-d5.md` | Prompt das rodadas 1 e 2 do Dagster (D5a e D5b) |
+| `prompts/prompt-dagster-d5a-correcoes.md` | Correções da rodada 1 (D5a) |
+| `prompts/prompt-dagster-d5b-correcoes.md` | Correções da rodada 2 (D5b) |
+| `prompts/prompt-kan-66-busca.md` | Prompt da busca do site (KAN-66) |
+| `prompts/proximos-passos-dagster.md` | Passagem de bastão do Dagster |

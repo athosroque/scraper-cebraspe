@@ -8,6 +8,7 @@ site_dir: build/docs
 
 not_in_nav: |
   guia/_contrato.md
+  planos/prompts/*.md
 
 theme:
   name: material

@@ -1,7 +1,8 @@
 # Plano da Etapa 9: documentação viva e acompanhamento do pipeline
 
 Criado em 2026-10-12. Estado: **D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas e aprovadas (2026-10-13);
-D4 (KAN-71) feita, em análise pelo dono; próximas: D5a e D5b (KAN-31 e KAN-32); decisões do dono
+D4 (KAN-71) feita, em análise pelo dono; D5a (KAN-31) e D5b (KAN-32) entregues e validadas em
+2026-10-21 (falta ADR-042, página do Dagster no guia e mover os cards no Jira); decisões do dono
 fechadas em 2026-10-13**.
 
 > Jira: KAN-67 (etapa); D1 = KAN-68, D2 = KAN-69, D3 = KAN-70, D4 = KAN-71; D5a = KAN-31 e

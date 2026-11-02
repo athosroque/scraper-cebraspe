@@ -125,8 +125,8 @@ fica só o estado resumido. Mantenha o título de cada item (o texto antes do ` 
       depois da 8.C; detalhes no `task.md`.
 - [ ] Etapa 9 Documentação viva (MkDocs executivo + técnico, contexto para agentes) e Dagster como C2 — plano em
       `plano-etapa-9.md` (KAN-67). D1 (KAN-68, ADR-040), D2 (KAN-69, ADR-041) e
-      D3 (KAN-70) concluídas; D4 (KAN-71, executivo e PDF) em análise; próximas D5a e
-      D5b (KAN-31 e KAN-32, Dagster).
+      D3 (KAN-70) concluídas; D4 (KAN-71, executivo e PDF) em análise; D5a e D5b (KAN-31 e
+      KAN-32, Dagster) entregues e validadas em 2026-10-21; falta ADR-042.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06 (o site ainda vai mudar muito antes de ir ao ar).
 
 ## 6. Patterns

@@ -30,7 +30,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 2 | 8.M.2 Estatísticas por recorte (drill-down e filtros, KAN-28/KAN-54) | na fila | seção 8.M.2 abaixo |
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
-| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; próximas: D5a e D5b (KAN-31, KAN-32) | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
+| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, falta ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
 
@@ -1269,12 +1269,15 @@ Trilha A, documentação (em paralelo):
 
 Trilha B, Dagster (é a C2 da 8.C, depois da C1b):
 
-- `[ ]` D5a (KAN-31) Infra e assets: containers, banco `dagster`, domínio com Access, assets
+- `[x]` D5a (KAN-31) Infra e assets: containers, banco `dagster`, domínio com Access, assets
   por concurso gerados do registro e `--concurso` no `classificar_questoes`. **Pronto
   quando:** o lote da C1 em modo conferência não muda nada e a UI abre no domínio.
-- `[ ]` D5b (KAN-32) Asset checks, portões do dono, detector de dispersão e relatório
+  Estado: entregue e validada (2026-10-21); falta ADR-042 (commit c3a6eb9).
+- `[x]` D5b (KAN-32) Asset checks, portões do dono, detector de dispersão e relatório
   `inventario/lotes/lote_NN.md`. **Pronto quando:** o relatório do lote da C1 sai com as
   checagens verdes e um teste mostra o portão travando a etapa seguinte.
+  Estado: entregue e validada (2026-10-21); falta ADR-042 (commits c2d7719 e 3a6120c).
+  Faltam também a página do Dagster no guia e a movimentação dos cards no Jira.
 
 ## Pendências posteriores (fora de etapa)
 
