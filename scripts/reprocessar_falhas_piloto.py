@@ -143,7 +143,9 @@ def reprocessar_falhas(
             f"({cargo or 'sem cargo'} — {materia}) [{len(texto)} chars]..."
         )
 
-        taxonomia, motivo_falha = extrair_taxonomia_chunk(texto)
+        taxonomia, motivo_falha = extrair_taxonomia_chunk(
+            texto, materia_chunk=chunk.get("materia_normalizada") or materia
+        )
         if taxonomia is None:
             status_falha = motivo_falha or "falha"
             logger.error(

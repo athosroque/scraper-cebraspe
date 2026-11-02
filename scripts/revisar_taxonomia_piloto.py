@@ -71,7 +71,9 @@ def revisar_edital_piloto(pdf_path: Path, saida_path: Path) -> dict:
             f"[{chunk_index + 1}/{total}] enviando ao LLM: "
             f"{chunk.cargo or 'sem cargo'} — {chunk.materia}"
         )
-        taxonomia, motivo_falha = extrair_taxonomia_chunk(chunk.texto)
+        taxonomia, motivo_falha = extrair_taxonomia_chunk(
+            chunk.texto, materia_chunk=chunk.materia_normalizada
+        )
         # `motivo_falha` distingue falha semântica identificada (ex.: nome de
         # tópico numérico sem correspondência na fonte, ver ADR-021) de falha
         # técnica genérica (rede/timeout/parse) — só a última vira "falha".

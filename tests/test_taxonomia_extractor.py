@@ -883,3 +883,81 @@ class TestReinjetarSubitensAusentes:
             "NBC TSP Estrutura Conceitual - Mensuração de ativos e passivos nas demonstrações contábeis",
             "NBC TSP 03 – provisões",
         ]
+
+
+class TestReparosDeForma:
+    """Matéria inutilizável e hífen de quebra de linha (KAN-56, C1a)."""
+
+    def test_materia_vazia_vira_o_cabecalho(self):
+        tax = te.TaxonomiaEdital(
+            materia="", topicos=[te.Topico(nome="Lei nº 8.069/1990")]
+        )
+        assert te.reparar_materia_extraida(tax, "ESTATUTO DA CRIANÇA") == "vazia"
+        assert tax.materia == "ESTATUTO DA CRIANÇA"
+
+    def test_materia_que_copia_a_lista_de_topicos(self):
+        tax = te.TaxonomiaEdital(
+            materia="Concorrência (sincronização). Redes Locais. Web Services, APIs REST.",
+            topicos=[
+                te.Topico(nome="Concorrência (sincronização)"),
+                te.Topico(nome="Redes Locais"),
+                te.Topico(nome="Web Services, APIs REST"),
+            ],
+        )
+        assert (
+            te.reparar_materia_extraida(tax, "CONCEITOS BÁSICOS") == "lista_de_topicos"
+        )
+        assert tax.materia == "CONCEITOS BÁSICOS"
+
+    def test_materia_normal_ou_sem_cabecalho_nao_muda(self):
+        tax = te.TaxonomiaEdital(
+            materia="Programação estruturada",
+            topicos=[te.Topico(nome="Programação estruturada")],
+        )
+        assert te.reparar_materia_extraida(tax, "TÉCNICAS") is None
+        assert tax.materia == "Programação estruturada"
+        vazia = te.TaxonomiaEdital(materia="", topicos=[te.Topico(nome="A")])
+        assert te.reparar_materia_extraida(vazia, None) is None
+        assert vazia.materia == ""
+
+    def test_hifen_de_quebra_de_linha_sem_espaco(self):
+        fonte = "1.2.10.3 Elasticidade-\nrenda da demanda. 1.2.10.4 Outra"
+        tax = te.TaxonomiaEdital(
+            materia="Economia",
+            topicos=[
+                te.Topico(
+                    nome="Demanda",
+                    subtopicos=[
+                        "Demanda - Elasticidades - Elasticidade- renda da demanda",
+                        "A - B",
+                    ],
+                )
+            ],
+        )
+        corrigidos = te.corrigir_hifen_quebra_de_linha(tax, fonte)
+        assert corrigidos == ["Demanda - Elasticidades - Elasticidade-renda da demanda"]
+        assert tax.topicos[0].subtopicos[1] == "A - B"
+
+    def test_hifen_com_espaco_que_a_fonte_nao_confirma_fica(self):
+        tax = te.TaxonomiaEdital(
+            materia="X", topicos=[te.Topico(nome="T", subtopicos=["médio- marginal"])]
+        )
+        assert te.corrigir_hifen_quebra_de_linha(tax, "médio e marginal") == []
+        assert tax.topicos[0].subtopicos == ["médio- marginal"]
+
+    def test_nome_em_cadeia_junta_hifen_de_fim_de_linha(self):
+        assert te._limpar_nome_subitem("Elasticidade-\nrenda da demanda.") == (
+            "Elasticidade-renda da demanda"
+        )
+
+    def test_materia_composta_que_so_cita_topicos_nao_e_trocada(self):
+        tax = te.TaxonomiaEdital(
+            materia="Ciclos de vida e Metodologias ágeis",
+            topicos=[
+                te.Topico(nome="Ciclos de vida"),
+                te.Topico(nome="Metodologias ágeis"),
+                te.Topico(nome="Kanban"),
+            ],
+        )
+        assert te.reparar_materia_extraida(tax, "PROCESSO") is None
+        assert tax.materia == "Ciclos de vida e Metodologias ágeis"

@@ -269,6 +269,9 @@ TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL = 300
 
 
 def _limpar_nome_subitem(texto: str) -> str:
+    # Hífen no fim da linha do PDF ("Elasticidade-\nrenda") é do próprio nome:
+    # juntar sem espaço, senão sai "Elasticidade- renda".
+    texto = re.sub(r"-[ \t]*\n[ \t]*", "-", texto)
     return " ".join(texto.split()).rstrip(" .;")
 
 
@@ -451,7 +454,72 @@ def reinjetar_subitens_ausentes(
     return reinjetados
 
 
-def _pos_validacao_taxonomia(chunk_text: str):
+def reparar_materia_extraida(
+    taxonomia: TaxonomiaEdital, materia_chunk: str | None
+) -> str | None:
+    """Troca, in-place, o `materia` devolvido pelo LLM pelo nome da matéria do
+    cabeçalho do edital (`materia_chunk`) quando ele é inutilizável: vazio, ou a
+    concatenação dos próprios tópicos (o LLM copiou a lista de itens no lugar do
+    título). Determinístico, sem LLM. Devolve o motivo (`vazia` ou
+    `lista_de_topicos`) ou None se nada mudou. O banco já grava a matéria pelo
+    cabeçalho; isto só mantém `taxonomia_extraida.materia` (exibido na revisão
+    como `materia_extraida`) coerente com o edital."""
+    cabecalho = " ".join((materia_chunk or "").split())
+    if not cabecalho:
+        return None
+    atual = taxonomia.materia.strip()
+    if not atual:
+        taxonomia.materia = cabecalho
+        return "vazia"
+    nomes = [normalizar(t.nome) for t in taxonomia.topicos]
+    atual_norm = normalizar(atual)
+    # Só "lista de tópicos" quando o texto inteiro é feito dos nomes dos tópicos:
+    # um nome próprio do LLM que apenas cita tópicos ("A e B") não é defeito.
+    resto = atual_norm
+    for nome in sorted(nomes, key=len, reverse=True):
+        resto = resto.replace(nome, " ") if nome else resto
+    if (
+        len(nomes) >= 2
+        and all(n and n in atual_norm for n in nomes)
+        and not resto.strip()
+    ):
+        taxonomia.materia = cabecalho
+        return "lista_de_topicos"
+    return None
+
+
+def corrigir_hifen_quebra_de_linha(
+    taxonomia: TaxonomiaEdital, chunk_text: str
+) -> list[str]:
+    """Remove, in-place, o espaço espúrio depois de hífen em nomes cujo texto
+    na fonte tem o hífen no fim da linha ("Elasticidade- renda" quando a fonte
+    é "Elasticidade-\nrenda"). Só mexe no trecho (entre " - " das cadeias) que
+    a fonte confirma; "A - B" legítimo fica como está. Devolve os nomes
+    corrigidos (já com a correção)."""
+    fonte = " ".join(re.sub(r"-[ \t]*\n[ \t]*", "-", chunk_text).split())
+    corrigidos: list[str] = []
+
+    def corrigir(nome: str) -> str:
+        if not re.search(r"\S- \S", nome):
+            return nome
+        trechos = []
+        for trecho in nome.split(" - "):
+            juntado = re.sub(r"(\S)- (?=\S)", r"\1-", trecho)
+            trechos.append(
+                juntado if juntado != trecho and juntado in fonte else trecho
+            )
+        novo = " - ".join(trechos)
+        if novo != nome:
+            corrigidos.append(novo)
+        return novo
+
+    for topico in taxonomia.topicos:
+        topico.nome = corrigir(topico.nome)
+        topico.subtopicos = [corrigir(s) if s else s for s in topico.subtopicos]
+    return corrigidos
+
+
+def _pos_validacao_taxonomia(chunk_text: str, materia_chunk: str | None = None):
     """Gancho semântico do núcleo `chamar_llm_json`: reparo de nome numérico
     (ADR-021) e reinjeção de item omitido (ADR-025), sem nova chamada ao LLM.
     O desfecho dos dois vai para o metadata da mesma generation."""
@@ -499,6 +567,16 @@ def _pos_validacao_taxonomia(chunk_text: str):
                 "subitens": subitens_reinjetados,
                 "status": "reparado",
             }
+        hifens = corrigir_hifen_quebra_de_linha(taxonomia, chunk_text)
+        if hifens:
+            metadata["reparo_hifen_quebra_linha"] = {"nomes": hifens}
+        motivo_materia = reparar_materia_extraida(taxonomia, materia_chunk)
+        if motivo_materia:
+            logger.warning(
+                f"[REPARO_MATERIA] matéria do LLM ({motivo_materia}) trocada pelo "
+                f"cabeçalho do edital: '{materia_chunk}'"
+            )
+            metadata["reparo_materia"] = {"motivo": motivo_materia}
         return ResultadoPosValidacao(objeto=taxonomia, metadata=metadata)
 
     return pos_validacao
@@ -510,6 +588,7 @@ def _chamar_llm_uma_vez(
     timeout: int,
     reasoning: dict | None,
     metadata: dict | None = None,
+    materia_chunk: str | None = None,
 ) -> tuple[TaxonomiaEdital | None, str | None]:
     """Uma única tentativa de extração via núcleo `llm_openrouter.chamar_llm_json`.
 
@@ -526,7 +605,7 @@ def _chamar_llm_uma_vez(
         timeout=timeout,
         reasoning=reasoning,
         metadata=metadata,
-        pos_validacao=_pos_validacao_taxonomia(chunk_text),
+        pos_validacao=_pos_validacao_taxonomia(chunk_text, materia_chunk),
         # Ganchos resolvidos na hora da chamada: os testes fazem patch de
         # `te._registrar_langfuse`/`te._abrir_generation`.
         abrir=lambda: _abrir_generation(chunk_text, max_tokens, timeout),
@@ -546,6 +625,7 @@ def extrair_taxonomia_chunk(
     tentativas: int = TENTATIVAS_PADRAO,
     backoff_segundos: tuple[int, ...] = BACKOFF_SEGUNDOS,
     metadata: dict | None = None,
+    materia_chunk: str | None = None,
 ) -> tuple[TaxonomiaEdital | None, str | None]:
     """Envia um chunk (conteúdo programático de 1 matéria) diretamente ao OpenRouter
     e valida a resposta contra `TaxonomiaEdital`, tentando novamente em caso de falha.
@@ -563,7 +643,12 @@ def extrair_taxonomia_chunk(
         meta_tentativa = dict(metadata or {})
         meta_tentativa["tentativa"] = tentativa
         resultado, motivo_falha = _chamar_llm_uma_vez(
-            chunk_text, max_tokens, timeout, reasoning, metadata=meta_tentativa
+            chunk_text,
+            max_tokens,
+            timeout,
+            reasoning,
+            metadata=meta_tentativa,
+            materia_chunk=materia_chunk,
         )
         if resultado is not None:
             return resultado, None

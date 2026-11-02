@@ -1,4 +1,5 @@
-"""Aplica o reparo local de item ausente (ADR-025) a extrações já salvas,
+"""Aplica os reparos locais (item/subitem ausente, hífen de quebra de linha e
+matéria do LLM inutilizável; ADR-025) a extrações já salvas,
 sem chamar o LLM.
 
 `reinjetar_itens_ausentes` roda automaticamente dentro de
@@ -29,8 +30,10 @@ from scripts.atualizar_revisao import atualizar_artefatos_revisao
 from src.logger import logger
 from src.models_scraper import TaxonomiaEdital
 from src.taxonomia_extractor import (
+    corrigir_hifen_quebra_de_linha,
     reinjetar_itens_ausentes,
     reinjetar_subitens_ausentes,
+    reparar_materia_extraida,
 )
 
 REVISAO_DIR_PADRAO = Path(__file__).resolve().parent.parent / "revisao_piloto"
@@ -61,6 +64,16 @@ def reconciliar(json_path: Path) -> dict[int, list[str]]:
         taxonomia = TaxonomiaEdital.model_validate(taxonomia_salva)
         reinjetados = reinjetar_itens_ausentes(taxonomia, texto)
         reinjetados += reinjetar_subitens_ausentes(taxonomia, texto)
+        # Reparos de forma (sem mudar o conjunto de itens): hífen de quebra de
+        # linha e matéria vazia/lista de tópicos.
+        reinjetados += [
+            f"hifen:{n}" for n in corrigir_hifen_quebra_de_linha(taxonomia, texto)
+        ]
+        motivo = reparar_materia_extraida(
+            taxonomia, item.get("materia_normalizada") or item.get("materia_chunk")
+        )
+        if motivo:
+            reinjetados.append(f"materia:{motivo}")
         if reinjetados:
             item["taxonomia_extraida"] = taxonomia.model_dump()
             alterados[item["chunk_index"]] = reinjetados
