@@ -1,0 +1,4182 @@
+{
+ "ids_novos": {
+  "@gestao_produtos": "NA-e4ab58963f",
+  "@inovacao_financeira": "NA-6e1171de9d",
+  "@poo": "NS-ee97a45438",
+  "@padroes_projeto": "NS-7658f2bc38",
+  "@solid": "NS-5a7ae88c4e",
+  "@estruturas_dados": "NS-525402b8a4",
+  "@org_fisica": "NS-7a537f09a6",
+  "@tuning": "NS-839d3b0755",
+  "@concorrencia": "NS-84742764b0",
+  "@recuperacao": "NS-56d6ecb70c",
+  "@diretorio": "NS-f4b3c0cf4b",
+  "@licenciamento": "NS-6add27d99d",
+  "@lei_13303": "NS-7b822710b6",
+  "@pol_mulheres": "NS-4dbc364e45",
+  "@pol_violencia": "NS-6893f32e2a",
+  "@estatuto_racial": "NS-f6dcebd7b0",
+  "@lei_rs_13694": "NA-9993a2c5d3",
+  "@modelo_negocios": "NS-ae746b6bf4",
+  "@ciclo_produto": "NS-91f271365d",
+  "@roadmap": "NS-7207b23a2b",
+  "@releases": "NS-9ed794912d",
+  "@metricas": "NS-94de5d3b25",
+  "@ux": "NS-8646654fd2",
+  "@acess_usab": "NS-1443abd08a",
+  "@task_flow": "NS-ff5734059f",
+  "@pesquisa_ui": "NS-d5580e802e",
+  "@prototipacao": "NS-efd10cc0ac",
+  "@design_sprint": "NS-8204a47f30",
+  "@storytelling": "NS-49a5087cf0",
+  "@transf_digital": "NS-5574f8fe8f",
+  "@open_finance": "NS-69ea62a7ae",
+  "@fintechs": "NS-9ac3b019f5",
+  "@pagamentos": "NS-df52f4afb3",
+  "@cripto": "NS-f7a6982126",
+  "@gestao_inovacao": "NS-d21876b429"
+ },
+ "itens": [
+  {
+   "idx": 0,
+   "nivel": "assunto",
+   "bloco": "LÍNGUA PORTUGUESA",
+   "assunto": null,
+   "item": "Redação oficial, conforme Manual de Redação da Presidência da República",
+   "chave": "lingua portuguesa|redacao oficial conforme manual de redacao da presidencia da republica",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "AL-d25ac0285d"
+   ],
+   "alvo_id": [
+    "AL-d25ac0285d"
+   ],
+   "alvo_caminho": [
+    "Língua Portuguesa › Redação oficial: Manual de Redação da Presidência da República"
+   ]
+  },
+  {
+   "idx": 1,
+   "nivel": "assunto",
+   "bloco": "LÍNGUA INGLESA",
+   "assunto": null,
+   "item": "Itens gramaticais relevantes para o entendimento dos sentidos dos textos",
+   "chave": "lingua inglesa|itens gramaticais relevantes para o entendimento dos sentidos dos textos",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "AL-f7d4935fd3"
+   ],
+   "alvo_id": [
+    "AL-f7d4935fd3"
+   ],
+   "alvo_caminho": [
+    "Língua Inglesa › Itens gramaticais relevantes para a compreensão dos conteúdos semânticos"
+   ]
+  },
+  {
+   "idx": 2,
+   "nivel": "assunto",
+   "bloco": "RACIOCÍNIO LÓGICO",
+   "assunto": null,
+   "item": "Razões e proporções",
+   "chave": "raciocinio logico|razoes e proporcoes",
+   "categoria": "d3",
+   "julgamento": "A",
+   "alvo": [
+    "A-d4f5c80605"
+   ],
+   "alvo_id": [
+    "A-d4f5c80605"
+   ],
+   "alvo_caminho": [
+    "Matemática Financeira › Regra de três simples e composta, proporcionalidades e porcentagens"
+   ]
+  },
+  {
+   "idx": 3,
+   "nivel": "subassunto",
+   "bloco": "RACIOCÍNIO LÓGICO",
+   "assunto": "Razões e proporções",
+   "item": "Divisão proporcional",
+   "chave": "raciocinio logico|razoes e proporcoes|divisao proporcional",
+   "categoria": "d3",
+   "julgamento": "A",
+   "alvo": [
+    "A-d4f5c80605"
+   ],
+   "alvo_id": [
+    "A-d4f5c80605"
+   ],
+   "alvo_caminho": [
+    "Matemática Financeira › Regra de três simples e composta, proporcionalidades e porcentagens"
+   ]
+  },
+  {
+   "idx": 4,
+   "nivel": "subassunto",
+   "bloco": "RACIOCÍNIO LÓGICO",
+   "assunto": "Razões e proporções",
+   "item": "Regras de três simples e compostas",
+   "chave": "raciocinio logico|razoes e proporcoes|regras de tres simples e compostas",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "A-d4f5c80605"
+   ],
+   "alvo_id": [
+    "A-d4f5c80605"
+   ],
+   "alvo_caminho": [
+    "Matemática Financeira › Regra de três simples e composta, proporcionalidades e porcentagens"
+   ]
+  },
+  {
+   "idx": 5,
+   "nivel": "assunto",
+   "bloco": "RACIOCÍNIO LÓGICO",
+   "assunto": null,
+   "item": "Compreensão de estruturas lógicas",
+   "chave": "raciocinio logico|compreensao de estruturas logicas",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-05d3a2c440"
+   ],
+   "alvo_id": [
+    "A-05d3a2c440"
+   ],
+   "alvo_caminho": [
+    "Raciocínio Lógico › Estruturas lógicas"
+   ]
+  },
+  {
+   "idx": 6,
+   "nivel": "assunto",
+   "bloco": "RACIOCÍNIO LÓGICO",
+   "assunto": null,
+   "item": "Lógica de argumentação: analogias, inferências, deduções e conclusões",
+   "chave": "raciocinio logico|logica de argumentacao analogias inferencias deducoes e conclusoes",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-acff47b763"
+   ],
+   "alvo_id": [
+    "A-acff47b763"
+   ],
+   "alvo_caminho": [
+    "Raciocínio Lógico › Lógica de argumentação"
+   ]
+  },
+  {
+   "idx": 7,
+   "nivel": "assunto",
+   "bloco": "LEGISLAÇÃO",
+   "assunto": null,
+   "item": "Política Nacional para as Mulheres",
+   "chave": "legislacao|politica nacional para as mulheres",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@pol_mulheres"
+   ],
+   "alvo_id": [
+    "NS-4dbc364e45"
+   ],
+   "alvo_caminho": [
+    "Serviço Social › Políticas Sociais › Política Nacional para as Mulheres"
+   ]
+  },
+  {
+   "idx": 8,
+   "nivel": "assunto",
+   "bloco": "LEGISLAÇÃO",
+   "assunto": null,
+   "item": "Política Nacional de Enfrentamento à Violência contra as Mulheres",
+   "chave": "legislacao|politica nacional de enfrentamento a violencia contra as mulheres",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@pol_violencia"
+   ],
+   "alvo_id": [
+    "NS-6893f32e2a"
+   ],
+   "alvo_caminho": [
+    "Serviço Social › Políticas Sociais › Política Nacional de Enfrentamento à Violência contra as Mulheres"
+   ]
+  },
+  {
+   "idx": 9,
+   "nivel": "assunto",
+   "bloco": "LEGISLAÇÃO",
+   "assunto": null,
+   "item": "Estatuto Nacional da Igualdade Racial — Lei Federal nº 12.288/2010",
+   "chave": "legislacao|estatuto nacional da igualdade racial lei federal no 12 288 2010",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@estatuto_racial"
+   ],
+   "alvo_id": [
+    "NS-f6dcebd7b0"
+   ],
+   "alvo_caminho": [
+    "Serviço Social › Políticas Sociais › Estatuto da Igualdade Racial (Lei nº 12.288/2010)"
+   ]
+  },
+  {
+   "idx": 10,
+   "nivel": "assunto",
+   "bloco": "LEGISLAÇÃO",
+   "assunto": null,
+   "item": "Estatuto Estadual da Igualdade Racial — Lei Estadual nº 13.694/2011",
+   "chave": "legislacao|estatuto estadual da igualdade racial lei estadual no 13 694 2011",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@lei_rs_13694"
+   ],
+   "alvo_id": [
+    "NA-9993a2c5d3"
+   ],
+   "alvo_caminho": [
+    "Legislação Específica › Lei estadual nº 13.694/2011 (Estatuto Estadual da Igualdade Racial do RS)"
+   ]
+  },
+  {
+   "idx": 11,
+   "nivel": "assunto",
+   "bloco": "LEGISLAÇÃO",
+   "assunto": null,
+   "item": "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais)",
+   "chave": "legislacao|lei no 13 709 2018 lei geral de protecao de dados pessoais",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "NS-11c10a8ea6"
+   ],
+   "alvo_id": [
+    "NS-11c10a8ea6"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Acesso à informação e proteção de dados › Lei Geral de Proteção de Dados – LGPD (Lei nº 13.709/2018)"
+   ]
+  },
+  {
+   "idx": 12,
+   "nivel": "disciplina",
+   "bloco": "CONCEITOS BÁSICOS",
+   "assunto": null,
+   "item": "CONCEITOS BÁSICOS",
+   "chave": "conceitos basicos",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "M-41f37f57d8"
+   ],
+   "alvo_id": [
+    "M-41f37f57d8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação"
+   ]
+  },
+  {
+   "idx": 13,
+   "nivel": "assunto",
+   "bloco": "CONCEITOS BÁSICOS",
+   "assunto": null,
+   "item": "Concorrência (esquemas de sincronização, deadlocks)",
+   "chave": "conceitos basicos|concorrencia esquemas de sincronizacao deadlocks",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 14,
+   "nivel": "assunto",
+   "bloco": "CONCEITOS BÁSICOS",
+   "assunto": null,
+   "item": "Redes Locais",
+   "chave": "conceitos basicos|redes locais",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-5cc2d6e82a"
+   ],
+   "alvo_id": [
+    "A-5cc2d6e82a"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores › Tecnologias, protocolos e elementos de redes locais e de longa distância (PAN, LAN, MAN, WAN, WPAN, WLAN, WMAN e WWAN)"
+   ]
+  },
+  {
+   "idx": 15,
+   "nivel": "assunto",
+   "bloco": "CONCEITOS BÁSICOS",
+   "assunto": null,
+   "item": "Web Services, APIs REST",
+   "chave": "conceitos basicos|web services apis rest",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 16,
+   "nivel": "disciplina",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "chave": "tecnicas e linguagens de programacao",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-870524a5bf"
+   ],
+   "alvo_id": [
+    "NA-870524a5bf"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas"
+   ]
+  },
+  {
+   "idx": 17,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Programação estruturada",
+   "chave": "tecnicas e linguagens de programacao|programacao estruturada",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 18,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Componentização",
+   "chave": "tecnicas e linguagens de programacao|componentizacao",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-f57e5aa487"
+   ],
+   "alvo_id": [
+    "A-f57e5aa487"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura de software"
+   ]
+  },
+  {
+   "idx": 19,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Sub-rotinas",
+   "chave": "tecnicas e linguagens de programacao|sub rotinas",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 20,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Sub-rotinas",
+   "item": "passagem de parâmetros por endereço",
+   "chave": "tecnicas e linguagens de programacao|sub rotinas|passagem de parametros por endereco",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 21,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Sub-rotinas",
+   "item": "passagem de parâmetros por referência",
+   "chave": "tecnicas e linguagens de programacao|sub rotinas|passagem de parametros por referencia",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 22,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Sub-rotinas",
+   "item": "passagem de parâmetros por valor",
+   "chave": "tecnicas e linguagens de programacao|sub rotinas|passagem de parametros por valor",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 23,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Escopo de Variáveis",
+   "chave": "tecnicas e linguagens de programacao|escopo de variaveis",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 24,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Tipos de dados",
+   "chave": "tecnicas e linguagens de programacao|tipos de dados",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 25,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Tipos de dados",
+   "item": "vinculação",
+   "chave": "tecnicas e linguagens de programacao|tipos de dados|vinculacao",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 26,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Tipos de dados",
+   "item": "verificação de tipos",
+   "chave": "tecnicas e linguagens de programacao|tipos de dados|verificacao de tipos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 27,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Tipos de dados",
+   "item": "tipificação forte",
+   "chave": "tecnicas e linguagens de programacao|tipos de dados|tipificacao forte",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 28,
+   "nivel": "disciplina",
+   "bloco": "MODELAGEM DE DADOS",
+   "assunto": null,
+   "item": "MODELAGEM DE DADOS",
+   "chave": "modelagem de dados",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "A-e02df9d2b4"
+   ],
+   "alvo_id": [
+    "A-e02df9d2b4"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados"
+   ]
+  },
+  {
+   "idx": 29,
+   "nivel": "assunto",
+   "bloco": "MODELAGEM DE DADOS",
+   "assunto": null,
+   "item": "Fundamentos de administração de dados",
+   "chave": "modelagem de dados|fundamentos de administracao de dados",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-abaaaebdfc"
+   ],
+   "alvo_id": [
+    "S-abaaaebdfc"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e fundamentos"
+   ]
+  },
+  {
+   "idx": 30,
+   "nivel": "subassunto",
+   "bloco": "MODELAGEM DE DADOS",
+   "assunto": "Fundamentos de administração de dados",
+   "item": "Segurança/Controle de acesso aos dados",
+   "chave": "modelagem de dados|fundamentos de administracao de dados|seguranca controle de acesso aos dados",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-8763b26044"
+   ],
+   "alvo_id": [
+    "A-8763b26044"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Segurança da informação › Controle de acesso"
+   ]
+  },
+  {
+   "idx": 31,
+   "nivel": "assunto",
+   "bloco": "MODELAGEM DE DADOS",
+   "assunto": null,
+   "item": "Modelagem de dados",
+   "chave": "modelagem de dados|modelagem de dados",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 32,
+   "nivel": "subassunto",
+   "bloco": "MODELAGEM DE DADOS",
+   "assunto": "Modelagem de dados",
+   "item": "Modelo entidade-relacionamento (entidades, atributos, chaves e relacionamentos)",
+   "chave": "modelagem de dados|modelagem de dados|modelo entidade relacionamento entidades atributos chaves e relacionamentos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 33,
+   "nivel": "subassunto",
+   "bloco": "MODELAGEM DE DADOS",
+   "assunto": "Modelagem de dados",
+   "item": "Normalização",
+   "chave": "modelagem de dados|modelagem de dados|normalizacao",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 36,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Sistemas de gerência de banco de dados (SGBD)",
+   "chave": "fundamentos de banco de dados|sistemas de gerencia de banco de dados sgbd",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57"
+   ],
+   "alvo_id": [
+    "A-2777136b57"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD"
+   ]
+  },
+  {
+   "idx": 37,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Arquitetura",
+   "chave": "fundamentos de banco de dados|arquitetura",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-abaaaebdfc"
+   ],
+   "alvo_id": [
+    "S-abaaaebdfc"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e fundamentos"
+   ]
+  },
+  {
+   "idx": 38,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Modelos lógicos e representação física",
+   "chave": "fundamentos de banco de dados|modelos logicos e representacao fisica",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 39,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Organização física e métodos de acesso",
+   "chave": "fundamentos de banco de dados|organizacao fisica e metodos de acesso",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@org_fisica"
+   ],
+   "alvo_id": [
+    "NS-7a537f09a6"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Organização física e índices"
+   ]
+  },
+  {
+   "idx": 40,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Conceito de transação",
+   "chave": "fundamentos de banco de dados|conceito de transacao",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 41,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Concorrência, recuperação e integridade",
+   "chave": "fundamentos de banco de dados|concorrencia recuperacao e integridade",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@concorrencia",
+    "@recuperacao"
+   ],
+   "alvo_id": [
+    "NS-84742764b0",
+    "NS-56d6ecb70c"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Controle de concorrência",
+    "Tecnologia da Informação › Banco de dados › Recuperação após falhas"
+   ]
+  },
+  {
+   "idx": 42,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Linguagens de definição (DDL) e manipulação de dados (DML) em SGBDs relacionais",
+   "chave": "fundamentos de banco de dados|linguagens de definicao ddl e manipulacao de dados dml em sgbds relacionais",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 43,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Procedimentos (stored procedures)",
+   "chave": "fundamentos de banco de dados|procedimentos stored procedures",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 44,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Visões (views)",
+   "chave": "fundamentos de banco de dados|visoes views",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 45,
+   "nivel": "assunto",
+   "bloco": "FUNDAMENTOS DE BANCO DE DADOS",
+   "assunto": null,
+   "item": "Gatilhos (triggers)",
+   "chave": "fundamentos de banco de dados|gatilhos triggers",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 46,
+   "nivel": "disciplina",
+   "bloco": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "assunto": null,
+   "item": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "chave": "administracao de banco de dados relacionais",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "A-e02df9d2b4"
+   ],
+   "alvo_id": [
+    "A-e02df9d2b4"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados"
+   ]
+  },
+  {
+   "idx": 47,
+   "nivel": "assunto",
+   "bloco": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "assunto": null,
+   "item": "Projeto e implantação de SGBDs relacionais",
+   "chave": "administracao de banco de dados relacionais|projeto e implantacao de sgbds relacionais",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57"
+   ],
+   "alvo_id": [
+    "A-2777136b57"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD"
+   ]
+  },
+  {
+   "idx": 48,
+   "nivel": "assunto",
+   "bloco": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "assunto": null,
+   "item": "Administração de usuários e perfis de acesso",
+   "chave": "administracao de banco de dados relacionais|administracao de usuarios e perfis de acesso",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57"
+   ],
+   "alvo_id": [
+    "A-2777136b57"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD"
+   ]
+  },
+  {
+   "idx": 49,
+   "nivel": "assunto",
+   "bloco": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "assunto": null,
+   "item": "Controle de proteção, integridade e concorrência",
+   "chave": "administracao de banco de dados relacionais|controle de protecao integridade e concorrencia",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57",
+    "@concorrencia"
+   ],
+   "alvo_id": [
+    "A-2777136b57",
+    "NS-84742764b0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD",
+    "Tecnologia da Informação › Banco de dados › Controle de concorrência"
+   ]
+  },
+  {
+   "idx": 50,
+   "nivel": "assunto",
+   "bloco": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "assunto": null,
+   "item": "Backup e restauração de dados",
+   "chave": "administracao de banco de dados relacionais|backup e restauracao de dados",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-268e85e223"
+   ],
+   "alvo_id": [
+    "A-268e85e223"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Backup"
+   ]
+  },
+  {
+   "idx": 51,
+   "nivel": "assunto",
+   "bloco": "ADMINISTRAÇÃO DE BANCO DE DADOS RELACIONAIS",
+   "assunto": null,
+   "item": "Tolerância a falhas e continuidade de operação",
+   "chave": "administracao de banco de dados relacionais|tolerancia a falhas e continuidade de operacao",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-d831972bed"
+   ],
+   "alvo_id": [
+    "A-d831972bed"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › alta disponibilidade e tolerância a falhas"
+   ]
+  },
+  {
+   "idx": 52,
+   "nivel": "assunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": null,
+   "item": "Banco de Dados: Oracle 19c, MySQL v8 e MS SQL Server 2019",
+   "chave": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-fed7e2d779"
+   ],
+   "alvo_id": [
+    "S-fed7e2d779"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › SGBD Oracle, MySQL e PostgreSQL"
+   ]
+  },
+  {
+   "idx": 53,
+   "nivel": "subassunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": "Banco de Dados: Oracle 19c, MySQL v8 e MS SQL Server 2019",
+   "item": "Instalação, configuração e administração",
+   "chave": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|instalacao configuracao e administracao",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57"
+   ],
+   "alvo_id": [
+    "A-2777136b57"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD"
+   ]
+  },
+  {
+   "idx": 54,
+   "nivel": "subassunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": "Banco de Dados: Oracle 19c, MySQL v8 e MS SQL Server 2019",
+   "item": "Replicação de banco de dados",
+   "chave": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|replicacao de banco de dados",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57"
+   ],
+   "alvo_id": [
+    "A-2777136b57"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD"
+   ]
+  },
+  {
+   "idx": 55,
+   "nivel": "subassunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": "Banco de Dados: Oracle 19c, MySQL v8 e MS SQL Server 2019",
+   "item": "Suporte ao uso dos bancos de dados para os desenvolvedores",
+   "chave": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|suporte ao uso dos bancos de dados para os desenvolvedores",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-2777136b57"
+   ],
+   "alvo_id": [
+    "A-2777136b57"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Administração de SGBD"
+   ]
+  },
+  {
+   "idx": 56,
+   "nivel": "disciplina",
+   "bloco": "PERFORMANCE E TUNING",
+   "assunto": null,
+   "item": "PERFORMANCE E TUNING",
+   "chave": "performance e tuning",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "A-e02df9d2b4"
+   ],
+   "alvo_id": [
+    "A-e02df9d2b4"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados"
+   ]
+  },
+  {
+   "idx": 57,
+   "nivel": "assunto",
+   "bloco": "PERFORMANCE E TUNING",
+   "assunto": null,
+   "item": "Índices e otimização de acesso",
+   "chave": "performance e tuning|indices e otimizacao de acesso",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@org_fisica",
+    "@tuning"
+   ],
+   "alvo_id": [
+    "NS-7a537f09a6",
+    "NS-839d3b0755"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Organização física e índices",
+    "Tecnologia da Informação › Banco de dados › Otimização de consultas e tuning"
+   ]
+  },
+  {
+   "idx": 58,
+   "nivel": "subassunto",
+   "bloco": "PERFORMANCE E TUNING",
+   "assunto": "Índices e otimização de acesso",
+   "item": "Otimização de código SQL ANSI: tuning, uso do join, union, exists e subconsultas",
+   "chave": "performance e tuning|indices e otimizacao de acesso|otimizacao de codigo sql ansi tuning uso do join union exists e subconsultas",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@tuning",
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "NS-839d3b0755",
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Otimização de consultas e tuning",
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 59,
+   "nivel": "subassunto",
+   "bloco": "PERFORMANCE E TUNING",
+   "assunto": "Índices e otimização de acesso",
+   "item": "Uso de variáveis Bind",
+   "chave": "performance e tuning|indices e otimizacao de acesso|uso de variaveis bind",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@tuning"
+   ],
+   "alvo_id": [
+    "NS-839d3b0755"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Otimização de consultas e tuning"
+   ]
+  },
+  {
+   "idx": 60,
+   "nivel": "subassunto",
+   "bloco": "PERFORMANCE E TUNING",
+   "assunto": "Índices e otimização de acesso",
+   "item": "Desempenho e detecção de problemas",
+   "chave": "performance e tuning|indices e otimizacao de acesso|desempenho e deteccao de problemas",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@tuning"
+   ],
+   "alvo_id": [
+    "NS-839d3b0755"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Otimização de consultas e tuning"
+   ]
+  },
+  {
+   "idx": 61,
+   "nivel": "assunto",
+   "bloco": "PROCESSO",
+   "assunto": null,
+   "item": "Ciclos de vida",
+   "chave": "processo|ciclos de vida",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-1a727febee"
+   ],
+   "alvo_id": [
+    "A-1a727febee"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Processos de software, gestão de projetos e produtos de software"
+   ]
+  },
+  {
+   "idx": 62,
+   "nivel": "subassunto",
+   "bloco": "PROCESSO",
+   "assunto": "Ciclos de vida",
+   "item": "Modelo cascata",
+   "chave": "processo|ciclos de vida|modelo cascata",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-1a727febee"
+   ],
+   "alvo_id": [
+    "A-1a727febee"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Processos de software, gestão de projetos e produtos de software"
+   ]
+  },
+  {
+   "idx": 63,
+   "nivel": "subassunto",
+   "bloco": "PROCESSO",
+   "assunto": "Ciclos de vida",
+   "item": "Modelo ágil",
+   "chave": "processo|ciclos de vida|modelo agil",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-441ecdfb0c"
+   ],
+   "alvo_id": [
+    "A-441ecdfb0c"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Metodologias ágeis para o desenvolvimento de software"
+   ]
+  },
+  {
+   "idx": 64,
+   "nivel": "assunto",
+   "bloco": "PROCESSO",
+   "assunto": null,
+   "item": "Metodologias ágeis de desenvolvimento",
+   "chave": "processo|metodologias ageis de desenvolvimento",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-441ecdfb0c"
+   ],
+   "alvo_id": [
+    "A-441ecdfb0c"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Metodologias ágeis para o desenvolvimento de software"
+   ]
+  },
+  {
+   "idx": 65,
+   "nivel": "subassunto",
+   "bloco": "PROCESSO",
+   "assunto": "Metodologias ágeis de desenvolvimento",
+   "item": "Scrum, TDD, Modelagem Ágil e Kanban",
+   "chave": "processo|metodologias ageis de desenvolvimento|scrum tdd modelagem agil e kanban",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-441ecdfb0c"
+   ],
+   "alvo_id": [
+    "A-441ecdfb0c"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Metodologias ágeis para o desenvolvimento de software"
+   ]
+  },
+  {
+   "idx": 66,
+   "nivel": "assunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": null,
+   "item": "Arquitetura de banco de dados relacional",
+   "chave": "banco de dados|arquitetura de banco de dados relacional",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-abaaaebdfc"
+   ],
+   "alvo_id": [
+    "S-abaaaebdfc"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e fundamentos"
+   ]
+  },
+  {
+   "idx": 67,
+   "nivel": "assunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": null,
+   "item": "Modelagem de dados: físico, lógico e conceitual",
+   "chave": "banco de dados|modelagem de dados fisico logico e conceitual",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 68,
+   "nivel": "subassunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": "Modelagem de dados: físico, lógico e conceitual",
+   "item": "físico",
+   "chave": "banco de dados|modelagem de dados fisico logico e conceitual|fisico",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 69,
+   "nivel": "subassunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": "Modelagem de dados: físico, lógico e conceitual",
+   "item": "lógico",
+   "chave": "banco de dados|modelagem de dados fisico logico e conceitual|logico",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 70,
+   "nivel": "subassunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": "Modelagem de dados: físico, lógico e conceitual",
+   "item": "conceitual",
+   "chave": "banco de dados|modelagem de dados fisico logico e conceitual|conceitual",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_id": [
+    "A-48c7cb56b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Modelagens de dados"
+   ]
+  },
+  {
+   "idx": 71,
+   "nivel": "assunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": null,
+   "item": "SQL/ANSI",
+   "chave": "banco de dados|sql ansi",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-551a90e864"
+   ],
+   "alvo_id": [
+    "S-551a90e864"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Conceitos e propriedades das transações (ACID); linguagem SQL (padrão ANSI) e PL/SQL: consultas e subconsultas; triggers, views, functions e stored procedures, packages; tratamento de erros; cursores; arrays"
+   ]
+  },
+  {
+   "idx": 72,
+   "nivel": "assunto",
+   "bloco": "BANCO DE DADOS",
+   "assunto": null,
+   "item": "Índices e otimização de acesso",
+   "chave": "banco de dados|indices e otimizacao de acesso",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@org_fisica",
+    "@tuning"
+   ],
+   "alvo_id": [
+    "NS-7a537f09a6",
+    "NS-839d3b0755"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Banco de dados › Organização física e índices",
+    "Tecnologia da Informação › Banco de dados › Otimização de consultas e tuning"
+   ]
+  },
+  {
+   "idx": 73,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Linguagens",
+   "chave": "tecnicas e linguagens de programacao|linguagens",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 74,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Linguagens",
+   "item": "Java, JavaScript, C#",
+   "chave": "tecnicas e linguagens de programacao|linguagens|java javascript c",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-3408fede43"
+   ],
+   "alvo_id": [
+    "A-3408fede43"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Linguagens de programação"
+   ]
+  },
+  {
+   "idx": 75,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Linguagens",
+   "item": "HTML5, CSS3",
+   "chave": "tecnicas e linguagens de programacao|linguagens|html5 css3",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-75c9ae985d"
+   ],
+   "alvo_id": [
+    "A-75c9ae985d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Desenvolvimento web e mobile"
+   ]
+  },
+  {
+   "idx": 76,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Programação orientada à objetos",
+   "chave": "tecnicas e linguagens de programacao|programacao orientada a objetos",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@poo"
+   ],
+   "alvo_id": [
+    "NS-ee97a45438"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Programação orientada a objetos"
+   ]
+  },
+  {
+   "idx": 77,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Programação orientada à objetos",
+   "item": "Classes, Herança, Composição, Interfaces, Polimorfismo",
+   "chave": "tecnicas e linguagens de programacao|programacao orientada a objetos|classes heranca composicao interfaces polimorfismo",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@poo"
+   ],
+   "alvo_id": [
+    "NS-ee97a45438"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Programação orientada a objetos"
+   ]
+  },
+  {
+   "idx": 78,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Processamento assíncrono e mensageria",
+   "chave": "tecnicas e linguagens de programacao|processamento assincrono e mensageria",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 79,
+   "nivel": "assunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": null,
+   "item": "Boas práticas de programação",
+   "chave": "tecnicas e linguagens de programacao|boas praticas de programacao",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@solid",
+    "@padroes_projeto"
+   ],
+   "alvo_id": [
+    "NS-5a7ae88c4e",
+    "NS-7658f2bc38"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Princípios SOLID",
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Padrões de projeto (design patterns)"
+   ]
+  },
+  {
+   "idx": 80,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Boas práticas de programação",
+   "item": "SOLID",
+   "chave": "tecnicas e linguagens de programacao|boas praticas de programacao|solid",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@solid"
+   ],
+   "alvo_id": [
+    "NS-5a7ae88c4e"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Princípios SOLID"
+   ]
+  },
+  {
+   "idx": 81,
+   "nivel": "subassunto",
+   "bloco": "TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO",
+   "assunto": "Boas práticas de programação",
+   "item": "Design Patterns",
+   "chave": "tecnicas e linguagens de programacao|boas praticas de programacao|design patterns",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@padroes_projeto"
+   ],
+   "alvo_id": [
+    "NS-7658f2bc38"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Padrões de projeto (design patterns)"
+   ]
+  },
+  {
+   "idx": 82,
+   "nivel": "assunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": null,
+   "item": "Análise e projeto",
+   "chave": "engenharia de software|analise e projeto",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-1a727febee"
+   ],
+   "alvo_id": [
+    "A-1a727febee"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Processos de software, gestão de projetos e produtos de software"
+   ]
+  },
+  {
+   "idx": 83,
+   "nivel": "assunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": null,
+   "item": "Implementação",
+   "chave": "engenharia de software|implementacao",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-5ea6287326"
+   ],
+   "alvo_id": [
+    "NA-5ea6287326"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software"
+   ]
+  },
+  {
+   "idx": 84,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Implementação",
+   "item": "orientação a objetos",
+   "chave": "engenharia de software|implementacao|orientacao a objetos",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@poo"
+   ],
+   "alvo_id": [
+    "NS-ee97a45438"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Programação orientada a objetos"
+   ]
+  },
+  {
+   "idx": 85,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Implementação",
+   "item": "estrutura de dados e algoritmos",
+   "chave": "engenharia de software|implementacao|estrutura de dados e algoritmos",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@estruturas_dados"
+   ],
+   "alvo_id": [
+    "NS-525402b8a4"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Estruturas de dados e algoritmos"
+   ]
+  },
+  {
+   "idx": 86,
+   "nivel": "assunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": null,
+   "item": "Qualidade",
+   "chave": "engenharia de software|qualidade",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-afc6a31091"
+   ],
+   "alvo_id": [
+    "S-afc6a31091"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Testes de unidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD"
+   ]
+  },
+  {
+   "idx": 87,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Qualidade",
+   "item": "Análise de código",
+   "chave": "engenharia de software|qualidade|analise de codigo",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-afc6a31091"
+   ],
+   "alvo_id": [
+    "S-afc6a31091"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Testes de unidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD"
+   ]
+  },
+  {
+   "idx": 88,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Qualidade",
+   "item": "Teste unitário",
+   "chave": "engenharia de software|qualidade|teste unitario",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-afc6a31091"
+   ],
+   "alvo_id": [
+    "S-afc6a31091"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Testes de unidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD"
+   ]
+  },
+  {
+   "idx": 89,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Qualidade",
+   "item": "Teste de integração",
+   "chave": "engenharia de software|qualidade|teste de integracao",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-afc6a31091"
+   ],
+   "alvo_id": [
+    "S-afc6a31091"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Testes de unidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD"
+   ]
+  },
+  {
+   "idx": 90,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Qualidade",
+   "item": "Teste de carga, estresse",
+   "chave": "engenharia de software|qualidade|teste de carga estresse",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-afc6a31091"
+   ],
+   "alvo_id": [
+    "S-afc6a31091"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Testes de unidade, integração, sistema; testes automatizados (xUnit, Selenium), TDD"
+   ]
+  },
+  {
+   "idx": 91,
+   "nivel": "assunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": null,
+   "item": "DevSecOps",
+   "chave": "engenharia de software|devsecops",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-7704ba4ec9"
+   ],
+   "alvo_id": [
+    "A-7704ba4ec9"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › DevOps"
+   ]
+  },
+  {
+   "idx": 92,
+   "nivel": "subassunto",
+   "bloco": "ENGENHARIA DE SOFTWARE",
+   "assunto": "Segurança da Informação",
+   "item": "Confiabilidade, integridade e disponibilidade",
+   "chave": "engenharia de software|seguranca da informacao|confiabilidade integridade e disponibilidade",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-e82b500a76"
+   ],
+   "alvo_id": [
+    "A-e82b500a76"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Segurança da informação › Princípios de segurança da informação"
+   ]
+  },
+  {
+   "idx": 93,
+   "nivel": "disciplina",
+   "bloco": "ARQUITETURA",
+   "assunto": null,
+   "item": "ARQUITETURA",
+   "chave": "arquitetura",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-870524a5bf"
+   ],
+   "alvo_id": [
+    "NA-870524a5bf"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas"
+   ]
+  },
+  {
+   "idx": 94,
+   "nivel": "assunto",
+   "bloco": "ARQUITETURA",
+   "assunto": null,
+   "item": "Tecnologias de integração",
+   "chave": "arquitetura|tecnologias de integracao",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 95,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Tecnologias de integração",
+   "item": "Web services e APIs",
+   "chave": "arquitetura|tecnologias de integracao|web services e apis",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 96,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Tecnologias de integração",
+   "item": "RESTful",
+   "chave": "arquitetura|tecnologias de integracao|restful",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 97,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Tecnologias de integração",
+   "item": "Mensageria",
+   "chave": "arquitetura|tecnologias de integracao|mensageria",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 98,
+   "nivel": "assunto",
+   "bloco": "ARQUITETURA",
+   "assunto": null,
+   "item": "Padrões de arquitetura",
+   "chave": "arquitetura|padroes de arquitetura",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-f57e5aa487"
+   ],
+   "alvo_id": [
+    "A-f57e5aa487"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura de software"
+   ]
+  },
+  {
+   "idx": 99,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Padrões de arquitetura",
+   "item": "Arquitetura em Camadas",
+   "chave": "arquitetura|padroes de arquitetura|arquitetura em camadas",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-f57e5aa487"
+   ],
+   "alvo_id": [
+    "A-f57e5aa487"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura de software"
+   ]
+  },
+  {
+   "idx": 100,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Padrões de arquitetura",
+   "item": "Arquitetura Cliente-servidor",
+   "chave": "arquitetura|padroes de arquitetura|arquitetura cliente servidor",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-f57e5aa487"
+   ],
+   "alvo_id": [
+    "A-f57e5aa487"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura de software"
+   ]
+  },
+  {
+   "idx": 101,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Padrões de arquitetura",
+   "item": "Arquitetura orientada a serviços",
+   "chave": "arquitetura|padroes de arquitetura|arquitetura orientada a servicos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-f57e5aa487"
+   ],
+   "alvo_id": [
+    "A-f57e5aa487"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura de software"
+   ]
+  },
+  {
+   "idx": 102,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Padrões de arquitetura",
+   "item": "Arquitetura de microsserviços",
+   "chave": "arquitetura|padroes de arquitetura|arquitetura de microsservicos",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-505e7be779"
+   ],
+   "alvo_id": [
+    "A-505e7be779"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura distribuída de microsserviços"
+   ]
+  },
+  {
+   "idx": 103,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Padrões de arquitetura",
+   "item": "Arquitetura orientada a eventos",
+   "chave": "arquitetura|padroes de arquitetura|arquitetura orientada a eventos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-f57e5aa487"
+   ],
+   "alvo_id": [
+    "A-f57e5aa487"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura de software"
+   ]
+  },
+  {
+   "idx": 104,
+   "nivel": "subassunto",
+   "bloco": "ARQUITETURA",
+   "assunto": "Padrões de arquitetura",
+   "item": "Front end, Back end e Full stack",
+   "chave": "arquitetura|padroes de arquitetura|front end back end e full stack",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-75c9ae985d"
+   ],
+   "alvo_id": [
+    "A-75c9ae985d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Desenvolvimento web e mobile"
+   ]
+  },
+  {
+   "idx": 105,
+   "nivel": "assunto",
+   "bloco": "ARQUITETURA",
+   "assunto": null,
+   "item": "Transações distribuídas",
+   "chave": "arquitetura|transacoes distribuidas",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-505e7be779"
+   ],
+   "alvo_id": [
+    "A-505e7be779"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Arquitetura distribuída de microsserviços"
+   ]
+  },
+  {
+   "idx": 106,
+   "nivel": "disciplina",
+   "bloco": "TECNOLOGIAS EMERGENTES",
+   "assunto": null,
+   "item": "TECNOLOGIAS EMERGENTES",
+   "chave": "tecnologias emergentes",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-07a7c2b773"
+   ],
+   "alvo_id": [
+    "NA-07a7c2b773"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial"
+   ]
+  },
+  {
+   "idx": 107,
+   "nivel": "assunto",
+   "bloco": "TECNOLOGIAS EMERGENTES",
+   "assunto": null,
+   "item": "Inteligência artificial: Fundamentos e aplicações",
+   "chave": "tecnologias emergentes|inteligencia artificial fundamentos e aplicacoes",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-fe253f32ca"
+   ],
+   "alvo_id": [
+    "S-fe253f32ca"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Conceitos Básicos de Inteligência Artificial"
+   ]
+  },
+  {
+   "idx": 108,
+   "nivel": "assunto",
+   "bloco": "TECNOLOGIAS EMERGENTES",
+   "assunto": null,
+   "item": "Aprendizado de máquina",
+   "chave": "tecnologias emergentes|aprendizado de maquina",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-bfc314b10d"
+   ],
+   "alvo_id": [
+    "A-bfc314b10d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Conceitos e tecnologias de IA, redes neurais, aprendizado de máquina, processamento de linguagem natural (PLN), deep learning, chatbots"
+   ]
+  },
+  {
+   "idx": 109,
+   "nivel": "assunto",
+   "bloco": "TECNOLOGIAS EMERGENTES",
+   "assunto": null,
+   "item": "IA generativa",
+   "chave": "tecnologias emergentes|ia generativa",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-048ceace24"
+   ],
+   "alvo_id": [
+    "A-048ceace24"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Grandes modelos de linguagem (LLM), IA generativa"
+   ]
+  },
+  {
+   "idx": 110,
+   "nivel": "assunto",
+   "bloco": "SEGURANÇA DA INFORMAÇÃO",
+   "assunto": null,
+   "item": "Aspectos da classificação das informações, segurança de ambientes físicos e lógicos, controles de acesso; gestão de políticas de segurança",
+   "chave": "seguranca da informacao|aspectos da classificacao das informacoes seguranca de ambientes fisicos e logicos controles de acesso gestao de politicas de seguranca",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "A-3fc8e1543c",
+    "A-8763b26044",
+    "A-bf492b5cfb"
+   ],
+   "alvo_id": [
+    "A-3fc8e1543c",
+    "A-8763b26044",
+    "A-bf492b5cfb"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Segurança da informação › Gestão de segurança da informação",
+    "Tecnologia da Informação › Segurança da informação › Controle de acesso",
+    "Tecnologia da Informação › Segurança da informação › Políticas de segurança da informação"
+   ]
+  },
+  {
+   "idx": 111,
+   "nivel": "assunto",
+   "bloco": "SEGURANÇA DA INFORMAÇÃO",
+   "assunto": null,
+   "item": "Algoritmos de Criptografia Simétrica, Assimétrica e Hash; Certificação Digital; infraestrutura de chaves públicas",
+   "chave": "seguranca da informacao|algoritmos de criptografia simetrica assimetrica e hash certificacao digital infraestrutura de chaves publicas",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "A-805590e68b",
+    "A-4e29084c17"
+   ],
+   "alvo_id": [
+    "A-805590e68b",
+    "A-4e29084c17"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Segurança da informação › Criptografia",
+    "Tecnologia da Informação › Segurança da informação › Infraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP-Brasil"
+   ]
+  },
+  {
+   "idx": 112,
+   "nivel": "assunto",
+   "bloco": "SEGURANÇA DA INFORMAÇÃO",
+   "assunto": null,
+   "item": "Segurança em redes de computadores e técnicas de ataque cibernético, resposta a incidentes, resiliência cibernética; firewalls, IDS, IPS, proxies, NAT e VPN; spoofing, flood, DDoS, phishing; malwares; adware, spyware, backdoors, keylogger, worms, ransonware",
+   "chave": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica firewalls ids ips proxies nat e vpn spoofing flood ddos phishing malwares adware spyware backdoors keylogger worms ransonware",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "A-f2edc4437f",
+    "A-addef0af06",
+    "A-a72164a20c",
+    "S-35ab3a8c71"
+   ],
+   "alvo_id": [
+    "A-f2edc4437f",
+    "A-addef0af06",
+    "A-a72164a20c",
+    "S-35ab3a8c71"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Segurança da informação › Prevenção e combate a ataques a redes de computadores",
+    "Tecnologia da Informação › Segurança da informação › Ameaças e ataques em redes de computadores e redes wireless",
+    "Tecnologia da Informação › Segurança da informação › Gerenciamento de incidentes de segurança da informação",
+    "Tecnologia da Informação › Segurança da informação › malware"
+   ]
+  },
+  {
+   "idx": 113,
+   "nivel": "disciplina",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": null,
+   "item": "INFRAESTRUTURA DE REDES",
+   "chave": "infraestrutura de redes",
+   "categoria": "titulo",
+   "julgamento": "E",
+   "alvo": [
+    "A-4b13bcdab5"
+   ],
+   "alvo_id": [
+    "A-4b13bcdab5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores"
+   ]
+  },
+  {
+   "idx": 114,
+   "nivel": "assunto",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": null,
+   "item": "Redes de computadores",
+   "chave": "infraestrutura de redes|redes de computadores",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-4b13bcdab5"
+   ],
+   "alvo_id": [
+    "A-4b13bcdab5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores"
+   ]
+  },
+  {
+   "idx": 115,
+   "nivel": "assunto",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": null,
+   "item": "Gerenciamento de redes TCP/IP",
+   "chave": "infraestrutura de redes|gerenciamento de redes tcp ip",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-a67f9900ba"
+   ],
+   "alvo_id": [
+    "A-a67f9900ba"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores › Gerenciamento de redes"
+   ]
+  },
+  {
+   "idx": 116,
+   "nivel": "subassunto",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": "Gerenciamento de redes TCP/IP",
+   "item": "Arquitetura de gerenciamento, SMI, SNMP e MIB",
+   "chave": "infraestrutura de redes|gerenciamento de redes tcp ip|arquitetura de gerenciamento smi snmp e mib",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-a67f9900ba"
+   ],
+   "alvo_id": [
+    "A-a67f9900ba"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores › Gerenciamento de redes"
+   ]
+  },
+  {
+   "idx": 117,
+   "nivel": "assunto",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": null,
+   "item": "Redes Locais e de longa distância",
+   "chave": "infraestrutura de redes|redes locais e de longa distancia",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-5cc2d6e82a"
+   ],
+   "alvo_id": [
+    "A-5cc2d6e82a"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores › Tecnologias, protocolos e elementos de redes locais e de longa distância (PAN, LAN, MAN, WAN, WPAN, WLAN, WMAN e WWAN)"
+   ]
+  },
+  {
+   "idx": 118,
+   "nivel": "subassunto",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": "Redes Locais e de longa distância",
+   "item": "MPLS. Redes cabeadas, Redes sem fio: padrões 802.11, protocolos 802.1x, EAP, WEP, WPA e WPA2",
+   "chave": "infraestrutura de redes|redes locais e de longa distancia|mpls redes cabeadas redes sem fio padroes 802 11 protocolos 802 1x eap wep wpa e wpa2",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-7060542510"
+   ],
+   "alvo_id": [
+    "A-7060542510"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores › Redes sem fio (wireless)"
+   ]
+  },
+  {
+   "idx": 119,
+   "nivel": "subassunto",
+   "bloco": "INFRAESTRUTURA DE REDES",
+   "assunto": "Redes Locais e de longa distância",
+   "item": "Conceitos básicos de routing e switching",
+   "chave": "infraestrutura de redes|redes locais e de longa distancia|conceitos basicos de routing e switching",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-4391a841ed"
+   ],
+   "alvo_id": [
+    "A-4391a841ed"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Redes de computadores › Protocolos de roteamento"
+   ]
+  },
+  {
+   "idx": 120,
+   "nivel": "disciplina",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": null,
+   "item": "SISTEMAS OPERACIONAIS",
+   "chave": "sistemas operacionais",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_id": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI"
+   ]
+  },
+  {
+   "idx": 121,
+   "nivel": "assunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": null,
+   "item": "Sistemas operacionais",
+   "chave": "sistemas operacionais|sistemas operacionais",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 122,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Sistemas operacionais",
+   "item": "fundamentos",
+   "chave": "sistemas operacionais|sistemas operacionais|fundamentos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 123,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Sistemas operacionais",
+   "item": "gestão de processos",
+   "chave": "sistemas operacionais|sistemas operacionais|gestao de processos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 124,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Sistemas operacionais",
+   "item": "gestão de memória",
+   "chave": "sistemas operacionais|sistemas operacionais|gestao de memoria",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 125,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Sistemas operacionais",
+   "item": "gestão de entrada e saída",
+   "chave": "sistemas operacionais|sistemas operacionais|gestao de entrada e saida",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 126,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Sistemas operacionais",
+   "item": "instalação, configuração e administração de sistemas operacionais Windows Server 2019 ou superior e RedHat Enterprise Linux versões 8 ou superior",
+   "chave": "sistemas operacionais|sistemas operacionais|instalacao configuracao e administracao de sistemas operacionais windows server 2019 ou superior e redhat enterprise linux versoes 8 ou superior",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_id": [
+    "A-b7f5d728c0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Sistemas operacionais"
+   ]
+  },
+  {
+   "idx": 127,
+   "nivel": "assunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": null,
+   "item": "Serviços de diretório",
+   "chave": "sistemas operacionais|servicos de diretorio",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@diretorio"
+   ],
+   "alvo_id": [
+    "NS-f4b3c0cf4b"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Serviços de diretório (LDAP e Active Directory)"
+   ]
+  },
+  {
+   "idx": 128,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Serviços de diretório",
+   "item": "Active Directory e LDAP",
+   "chave": "sistemas operacionais|servicos de diretorio|active directory e ldap",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@diretorio"
+   ],
+   "alvo_id": [
+    "NS-f4b3c0cf4b"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Serviços de diretório (LDAP e Active Directory)"
+   ]
+  },
+  {
+   "idx": 129,
+   "nivel": "subassunto",
+   "bloco": "SISTEMAS OPERACIONAIS",
+   "assunto": "Serviços de diretório",
+   "item": "Interoperabilidade",
+   "chave": "sistemas operacionais|servicos de diretorio|interoperabilidade",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@diretorio"
+   ],
+   "alvo_id": [
+    "NS-f4b3c0cf4b"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Serviços de diretório (LDAP e Active Directory)"
+   ]
+  },
+  {
+   "idx": 130,
+   "nivel": "disciplina",
+   "bloco": "SERVIDORES",
+   "assunto": null,
+   "item": "SERVIDORES",
+   "chave": "servidores",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_id": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI"
+   ]
+  },
+  {
+   "idx": 131,
+   "nivel": "assunto",
+   "bloco": "SERVIDORES",
+   "assunto": null,
+   "item": "Servidores de aplicação",
+   "chave": "servidores|servidores de aplicacao",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-32f00392f2"
+   ],
+   "alvo_id": [
+    "A-32f00392f2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Servidores de aplicação (JBoss, Apache HTTP Server, IIS)"
+   ]
+  },
+  {
+   "idx": 132,
+   "nivel": "subassunto",
+   "bloco": "SERVIDORES",
+   "assunto": "Servidores de aplicação",
+   "item": "Conceitos básicos",
+   "chave": "servidores|servidores de aplicacao|conceitos basicos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-32f00392f2"
+   ],
+   "alvo_id": [
+    "A-32f00392f2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Servidores de aplicação (JBoss, Apache HTTP Server, IIS)"
+   ]
+  },
+  {
+   "idx": 133,
+   "nivel": "subassunto",
+   "bloco": "SERVIDORES",
+   "assunto": "Servidores de aplicação",
+   "item": "Noções de administração",
+   "chave": "servidores|servidores de aplicacao|nocoes de administracao",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-32f00392f2"
+   ],
+   "alvo_id": [
+    "A-32f00392f2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Servidores de aplicação (JBoss, Apache HTTP Server, IIS)"
+   ]
+  },
+  {
+   "idx": 134,
+   "nivel": "subassunto",
+   "bloco": "SERVIDORES",
+   "assunto": "Servidores de aplicação",
+   "item": "Topologia típica de ambientes com alta disponibilidade e escalabilidade",
+   "chave": "servidores|servidores de aplicacao|topologia tipica de ambientes com alta disponibilidade e escalabilidade",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-d831972bed"
+   ],
+   "alvo_id": [
+    "A-d831972bed"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › alta disponibilidade e tolerância a falhas"
+   ]
+  },
+  {
+   "idx": 135,
+   "nivel": "subassunto",
+   "bloco": "SERVIDORES",
+   "assunto": "Servidores de aplicação",
+   "item": "Balanceamento de carga, fail-over e replicação de estado",
+   "chave": "servidores|servidores de aplicacao|balanceamento de carga fail over e replicacao de estado",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-d831972bed"
+   ],
+   "alvo_id": [
+    "A-d831972bed"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › alta disponibilidade e tolerância a falhas"
+   ]
+  },
+  {
+   "idx": 136,
+   "nivel": "subassunto",
+   "bloco": "SERVIDORES",
+   "assunto": "Servidores de aplicação",
+   "item": "Técnicas para detecção de problemas e otimização de desempenho",
+   "chave": "servidores|servidores de aplicacao|tecnicas para deteccao de problemas e otimizacao de desempenho",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-32f00392f2"
+   ],
+   "alvo_id": [
+    "A-32f00392f2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Servidores de aplicação (JBoss, Apache HTTP Server, IIS)"
+   ]
+  },
+  {
+   "idx": 137,
+   "nivel": "disciplina",
+   "bloco": "ARMAZENAMENTO",
+   "assunto": null,
+   "item": "ARMAZENAMENTO",
+   "chave": "armazenamento",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_id": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI"
+   ]
+  },
+  {
+   "idx": 138,
+   "nivel": "assunto",
+   "bloco": "ARMAZENAMENTO",
+   "assunto": null,
+   "item": "Armazenamento",
+   "chave": "armazenamento|armazenamento",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-27cb1a6971"
+   ],
+   "alvo_id": [
+    "A-27cb1a6971"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Armazenamento de dados em rede"
+   ]
+  },
+  {
+   "idx": 139,
+   "nivel": "subassunto",
+   "bloco": "ARMAZENAMENTO",
+   "assunto": "Armazenamento",
+   "item": "Serviços de armazenamento, padrões de disco e de interfaces",
+   "chave": "armazenamento|armazenamento|servicos de armazenamento padroes de disco e de interfaces",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-27cb1a6971"
+   ],
+   "alvo_id": [
+    "A-27cb1a6971"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Armazenamento de dados em rede"
+   ]
+  },
+  {
+   "idx": 140,
+   "nivel": "subassunto",
+   "bloco": "ARMAZENAMENTO",
+   "assunto": "Armazenamento",
+   "item": "RAID",
+   "chave": "armazenamento|armazenamento|raid",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-27cb1a6971"
+   ],
+   "alvo_id": [
+    "A-27cb1a6971"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Armazenamento de dados em rede"
+   ]
+  },
+  {
+   "idx": 141,
+   "nivel": "subassunto",
+   "bloco": "ARMAZENAMENTO",
+   "assunto": "Armazenamento",
+   "item": "Tecnologias de armazenamento NAS e SAN",
+   "chave": "armazenamento|armazenamento|tecnologias de armazenamento nas e san",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-27cb1a6971"
+   ],
+   "alvo_id": [
+    "A-27cb1a6971"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Armazenamento de dados em rede"
+   ]
+  },
+  {
+   "idx": 142,
+   "nivel": "subassunto",
+   "bloco": "ARMAZENAMENTO",
+   "assunto": "Armazenamento",
+   "item": "Tecnologias de backup",
+   "chave": "armazenamento|armazenamento|tecnologias de backup",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-268e85e223"
+   ],
+   "alvo_id": [
+    "A-268e85e223"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Backup"
+   ]
+  },
+  {
+   "idx": 143,
+   "nivel": "disciplina",
+   "bloco": "COMPUTAÇÃO EM NUVEM",
+   "assunto": null,
+   "item": "COMPUTAÇÃO EM NUVEM",
+   "chave": "computacao em nuvem",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_id": [
+    "NA-e8ea9374ad"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI"
+   ]
+  },
+  {
+   "idx": 144,
+   "nivel": "assunto",
+   "bloco": "COMPUTAÇÃO EM NUVEM",
+   "assunto": null,
+   "item": "Cloud computing; virtualização.",
+   "chave": "computacao em nuvem|cloud computing virtualizacao",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5ca71b92",
+    "A-8dfc6f53da"
+   ],
+   "alvo_id": [
+    "A-0d5ca71b92",
+    "A-8dfc6f53da"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Infraestrutura de TI › Serviços de nuvem (IaaS, PaaS e SaaS)",
+    "Tecnologia da Informação › Infraestrutura de TI › Virtualização"
+   ]
+  },
+  {
+   "idx": 145,
+   "nivel": "assunto",
+   "bloco": "COMPUTAÇÃO EM NUVEM",
+   "assunto": null,
+   "item": "Conteinerização de aplicações e DeVSecOps.",
+   "chave": "computacao em nuvem|conteinerizacao de aplicacoes e devsecops",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "A-2d664f1470",
+    "A-7704ba4ec9"
+   ],
+   "alvo_id": [
+    "A-2d664f1470",
+    "A-7704ba4ec9"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Desenvolvimento com contêineres",
+    "Tecnologia da Informação › Desenvolvimento de sistemas › DevOps"
+   ]
+  },
+  {
+   "idx": 146,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "principais conceitos",
+   "chave": "estrategia|balanced scorecard bsc|principais conceitos",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 147,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "aplicações",
+   "chave": "estrategia|balanced scorecard bsc|aplicacoes",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 148,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "mapa estratégico",
+   "chave": "estrategia|balanced scorecard bsc|mapa estrategico",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 149,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "perspectivas",
+   "chave": "estrategia|balanced scorecard bsc|perspectivas",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 150,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "temas estratégicos",
+   "chave": "estrategia|balanced scorecard bsc|temas estrategicos",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 151,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "objetivos estratégicos",
+   "chave": "estrategia|balanced scorecard bsc|objetivos estrategicos",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 152,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "relações de causa e efeito",
+   "chave": "estrategia|balanced scorecard bsc|relacoes de causa e efeito",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 153,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "indicadores",
+   "chave": "estrategia|balanced scorecard bsc|indicadores",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 154,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "metas",
+   "chave": "estrategia|balanced scorecard bsc|metas",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 155,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Balanced Scorecard (BSC)",
+   "item": "iniciativas estratégicas",
+   "chave": "estrategia|balanced scorecard bsc|iniciativas estrategicas",
+   "categoria": "existente",
+   "julgamento": "AR",
+   "alvo": [
+    "S-7a0d161260"
+   ],
+   "alvo_id": [
+    "S-7a0d161260"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Balanced Scorecard (BSC): principais conceitos, aplicações, mapa estratégico, perspectivas, temas estratégicos, objetivos estratégicos, relações de causa e efeito, indicadores, metas, iniciativas estratégicas"
+   ]
+  },
+  {
+   "idx": 156,
+   "nivel": "assunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": null,
+   "item": "Referencial Estratégico das Organizações",
+   "chave": "estrategia|referencial estrategico das organizacoes",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-aedc8bb2b0"
+   ],
+   "alvo_id": [
+    "S-aedc8bb2b0"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Planejamento estratégico"
+   ]
+  },
+  {
+   "idx": 157,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Referencial Estratégico das Organizações",
+   "item": "Análise de ambiente interno e externo",
+   "chave": "estrategia|referencial estrategico das organizacoes|analise de ambiente interno e externo",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-7e84a0b377"
+   ],
+   "alvo_id": [
+    "A-7e84a0b377"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Ferramentas de análise de cenário interno e externo"
+   ]
+  },
+  {
+   "idx": 158,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Referencial Estratégico das Organizações",
+   "item": "Ferramentas de análise de ambiente: análise SWOT, análise de cenários, matriz GUT",
+   "chave": "estrategia|referencial estrategico das organizacoes|ferramentas de analise de ambiente analise swot analise de cenarios matriz gut",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "S-bcd5e45306",
+    "A-7e84a0b377"
+   ],
+   "alvo_id": [
+    "S-bcd5e45306",
+    "A-7e84a0b377"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Análise SWOT",
+    "Administração Geral › Ferramentas de análise de cenário interno e externo"
+   ]
+  },
+  {
+   "idx": 159,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Referencial Estratégico das Organizações",
+   "item": "Modelo de negócios e quadro de modelo de negócios (Business Model Canvas)",
+   "chave": "estrategia|referencial estrategico das organizacoes|modelo de negocios e quadro de modelo de negocios business model canvas",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@modelo_negocios"
+   ],
+   "alvo_id": [
+    "NS-ae746b6bf4"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Modelo de negócios (Business Model Canvas)"
+   ]
+  },
+  {
+   "idx": 160,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Referencial Estratégico das Organizações",
+   "item": "Negócio, missão, visão de futuro, valores",
+   "chave": "estrategia|referencial estrategico das organizacoes|negocio missao visao de futuro valores",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-4fbb5eef47"
+   ],
+   "alvo_id": [
+    "S-4fbb5eef47"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Planejamento estratégico: visão, missão e análise SWOT"
+   ]
+  },
+  {
+   "idx": 161,
+   "nivel": "assunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": null,
+   "item": "Indicadores de desempenho",
+   "chave": "estrategia|indicadores de desempenho",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-b34798e56a"
+   ],
+   "alvo_id": [
+    "A-b34798e56a"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Indicadores de desempenho"
+   ]
+  },
+  {
+   "idx": 162,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Indicadores de desempenho",
+   "item": "Tipos de indicadores",
+   "chave": "estrategia|indicadores de desempenho|tipos de indicadores",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-def3f14b7c"
+   ],
+   "alvo_id": [
+    "S-def3f14b7c"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Tipos de indicadores"
+   ]
+  },
+  {
+   "idx": 163,
+   "nivel": "subassunto",
+   "bloco": "ESTRATÉGIA",
+   "assunto": "Indicadores de desempenho",
+   "item": "Variáveis componentes dos indicadores",
+   "chave": "estrategia|indicadores de desempenho|variaveis componentes dos indicadores",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-1af6ddeb5c"
+   ],
+   "alvo_id": [
+    "S-1af6ddeb5c"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão estratégica › Variáveis componentes dos indicadores"
+   ]
+  },
+  {
+   "idx": 164,
+   "nivel": "assunto",
+   "bloco": "GESTÃO DE PROJETOS",
+   "assunto": null,
+   "item": "Projetos",
+   "chave": "gestao de projetos|projetos",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "S-4edb6e0be3"
+   ],
+   "alvo_id": [
+    "S-4edb6e0be3"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão de Projetos › Projetos e suas etapas"
+   ]
+  },
+  {
+   "idx": 165,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PROJETOS",
+   "assunto": "Projetos",
+   "item": "Ciclo de vida do projeto",
+   "chave": "gestao de projetos|projetos|ciclo de vida do projeto",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "S-a36d8a0434"
+   ],
+   "alvo_id": [
+    "S-a36d8a0434"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão de Projetos › Ciclo de vida e organização do projeto"
+   ]
+  },
+  {
+   "idx": 166,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PROJETOS",
+   "assunto": "Projetos",
+   "item": "Gerenciamento de projetos: conceitos básicos; áreas de conhecimento, projetos, programas, portfólio",
+   "chave": "gestao de projetos|projetos|gerenciamento de projetos conceitos basicos areas de conhecimento projetos programas portfolio",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "S-66e4a7f6e3",
+    "S-0d78a6b816"
+   ],
+   "alvo_id": [
+    "S-66e4a7f6e3",
+    "S-0d78a6b816"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão de Projetos › Áreas de conhecimento em gerenciamento de projeto",
+    "Administração Geral › Gestão de Projetos › Conceitos de gestão de programas e de gestão de portfólio de projetos"
+   ]
+  },
+  {
+   "idx": 167,
+   "nivel": "assunto",
+   "bloco": "GESTÃO DE PROJETOS",
+   "assunto": null,
+   "item": "Tipos de Abordagem: tradicional, hibrida e ágil (Framework Scrum, Metodologia Lean e Método Kanban)",
+   "chave": "gestao de projetos|tipos de abordagem tradicional hibrida e agil framework scrum metodologia lean e metodo kanban",
+   "categoria": "composto",
+   "julgamento": "A",
+   "alvo": [
+    "S-2eda8c5abd",
+    "S-774833cfc8"
+   ],
+   "alvo_id": [
+    "S-2eda8c5abd",
+    "S-774833cfc8"
+   ],
+   "alvo_caminho": [
+    "Administração Geral › Gestão de Projetos › Principais características dos modelos de gestão de projetos",
+    "Administração Geral › Gestão de Projetos › Metodologia ágil"
+   ]
+  },
+  {
+   "idx": 168,
+   "nivel": "assunto",
+   "bloco": "GESTÃO DE PROJETOS",
+   "assunto": null,
+   "item": "Indicadores: Lead Time, Delivery Rate, Net Promoter Score (NPS), Métricas de UX para produtos digitais, Objectives and Key Results (OKR) e Key Performance Indicator (KPI)",
+   "chave": "gestao de projetos|indicadores lead time delivery rate net promoter score nps metricas de ux para produtos digitais objectives and key results okr e key performance indicator kpi",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@metricas",
+    "A-834a863292",
+    "A-b34798e56a"
+   ],
+   "alvo_id": [
+    "NS-94de5d3b25",
+    "A-834a863292",
+    "A-b34798e56a"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Métricas de produtos digitais",
+    "Administração Geral › OKR (objective and key results)",
+    "Administração Geral › Indicadores de desempenho"
+   ]
+  },
+  {
+   "idx": 169,
+   "nivel": "disciplina",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": null,
+   "item": "GESTÃO DE PRODUTOS",
+   "chave": "gestao de produtos",
+   "categoria": "titulo",
+   "julgamento": "AR",
+   "alvo": [
+    "@gestao_produtos"
+   ],
+   "alvo_id": [
+    "NA-e4ab58963f"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos"
+   ]
+  },
+  {
+   "idx": 170,
+   "nivel": "assunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": null,
+   "item": "Produtos",
+   "chave": "gestao de produtos|produtos",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@gestao_produtos"
+   ],
+   "alvo_id": [
+    "NA-e4ab58963f"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos"
+   ]
+  },
+  {
+   "idx": 171,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Ciclo de vida do produto",
+   "chave": "gestao de produtos|produtos|ciclo de vida do produto",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@ciclo_produto"
+   ],
+   "alvo_id": [
+    "NS-91f271365d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Ciclo de vida do produto"
+   ]
+  },
+  {
+   "idx": 172,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "User Story Map (USM)",
+   "chave": "gestao de produtos|produtos|user story map usm",
+   "categoria": "duvida",
+   "julgamento": "A",
+   "alvo": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_id": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Engenharia de requisitos"
+   ]
+  },
+  {
+   "idx": 173,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Roadmap de Produto",
+   "chave": "gestao de produtos|produtos|roadmap de produto",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@roadmap"
+   ],
+   "alvo_id": [
+    "NS-7207b23a2b"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Roadmap de produto"
+   ]
+  },
+  {
+   "idx": 174,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "User Story (US)",
+   "chave": "gestao de produtos|produtos|user story us",
+   "categoria": "duvida",
+   "julgamento": "A",
+   "alvo": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_id": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Engenharia de requisitos"
+   ]
+  },
+  {
+   "idx": 175,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Técnicas de levantamento de requisitos",
+   "chave": "gestao de produtos|produtos|tecnicas de levantamento de requisitos",
+   "categoria": "existente",
+   "julgamento": "E",
+   "alvo": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_id": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Engenharia de requisitos"
+   ]
+  },
+  {
+   "idx": 176,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Releases",
+   "chave": "gestao de produtos|produtos|releases",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@releases"
+   ],
+   "alvo_id": [
+    "NS-9ed794912d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Planejamento de releases"
+   ]
+  },
+  {
+   "idx": 177,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Minimum Viable Product (MVP)",
+   "chave": "gestao de produtos|produtos|minimum viable product mvp",
+   "categoria": "duvida",
+   "julgamento": "E",
+   "alvo": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_id": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Engenharia de requisitos"
+   ]
+  },
+  {
+   "idx": 178,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Design de Produto",
+   "chave": "gestao de produtos|produtos|design de produto",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@ux"
+   ],
+   "alvo_id": [
+    "NS-8646654fd2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Experiência do usuário (UX)"
+   ]
+  },
+  {
+   "idx": 179,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Gerenciamento de Backlog",
+   "chave": "gestao de produtos|produtos|gerenciamento de backlog",
+   "categoria": "duvida",
+   "julgamento": "E",
+   "alvo": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_id": [
+    "A-6a5ad94fa5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Engenharia de software › Engenharia de requisitos"
+   ]
+  },
+  {
+   "idx": 180,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "Produtos",
+   "item": "Processo de Desenvolvimento de Produtos digitais",
+   "chave": "gestao de produtos|produtos|processo de desenvolvimento de produtos digitais",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@gestao_produtos"
+   ],
+   "alvo_id": [
+    "NA-e4ab58963f"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos"
+   ]
+  },
+  {
+   "idx": 181,
+   "nivel": "assunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": null,
+   "item": "User Experience (UX)",
+   "chave": "gestao de produtos|user experience ux",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@ux"
+   ],
+   "alvo_id": [
+    "NS-8646654fd2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Experiência do usuário (UX)"
+   ]
+  },
+  {
+   "idx": 182,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "acessibilidade e usabilidade",
+   "chave": "gestao de produtos|user experience ux|acessibilidade e usabilidade",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@acess_usab"
+   ],
+   "alvo_id": [
+    "NS-1443abd08a"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Acessibilidade e usabilidade"
+   ]
+  },
+  {
+   "idx": 183,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Task Flow",
+   "chave": "gestao de produtos|user experience ux|task flow",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@task_flow"
+   ],
+   "alvo_id": [
+    "NS-ff5734059f"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Task flow"
+   ]
+  },
+  {
+   "idx": 184,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@ux",
+    "A-441ecdfb0c"
+   ],
+   "alvo_id": [
+    "NS-8646654fd2",
+    "A-441ecdfb0c"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Experiência do usuário (UX)",
+    "Tecnologia da Informação › Engenharia de software › Metodologias ágeis para o desenvolvimento de software"
+   ]
+  },
+  {
+   "idx": 185,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário - Conceitos básicos e aplicações",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario conceitos basicos e aplicacoes",
+   "categoria": "novo",
+   "julgamento": "NR",
+   "alvo": [
+    "@ux"
+   ],
+   "alvo_id": [
+    "NS-8646654fd2"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Experiência do usuário (UX)"
+   ]
+  },
+  {
+   "idx": 186,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário - Storytelling",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario storytelling",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@storytelling"
+   ],
+   "alvo_id": [
+    "NS-49a5087cf0"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Storytelling em UX"
+   ]
+  },
+  {
+   "idx": 187,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário - Design thinking",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario design thinking",
+   "categoria": "dt",
+   "julgamento": "N",
+   "alvo": [
+    "S-eb23e19ae9"
+   ],
+   "alvo_id": [
+    "S-eb23e19ae9"
+   ],
+   "alvo_caminho": [
+    "Administração Pública › Inovação na gestão pública › Design Thinking"
+   ]
+  },
+  {
+   "idx": 188,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário - Research, user interface",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario research user interface",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@pesquisa_ui"
+   ],
+   "alvo_id": [
+    "NS-d5580e802e"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Pesquisa com usuários e interface (UI)"
+   ]
+  },
+  {
+   "idx": 189,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário - Research, user interface - Lean Concept, Discovery Sprint",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario research user interface lean concept discovery sprint",
+   "categoria": "novo",
+   "julgamento": "NR",
+   "alvo": [
+    "@design_sprint",
+    "@pesquisa_ui"
+   ],
+   "alvo_id": [
+    "NS-8204a47f30",
+    "NS-d5580e802e"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Design sprint",
+    "Tecnologia da Informação › Gestão de produtos › Pesquisa com usuários e interface (UI)"
+   ]
+  },
+  {
+   "idx": 190,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Metodologias ágeis e experiência do usuário - Prototipação",
+   "chave": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario prototipacao",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@prototipacao"
+   ],
+   "alvo_id": [
+    "NS-efd10cc0ac"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Prototipação"
+   ]
+  },
+  {
+   "idx": 191,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO DE PRODUTOS",
+   "assunto": "User Experience (UX)",
+   "item": "Técnicas de facilitação e mediação de atividades co-criativas e Design Sprints",
+   "chave": "gestao de produtos|user experience ux|tecnicas de facilitacao e mediacao de atividades co criativas e design sprints",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@design_sprint"
+   ],
+   "alvo_id": [
+    "NS-8204a47f30"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Gestão de produtos › Design sprint"
+   ]
+  },
+  {
+   "idx": 192,
+   "nivel": "disciplina",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": null,
+   "item": "GESTÃO E GOVERNANÇA",
+   "chave": "gestao e governanca",
+   "categoria": "titulo",
+   "julgamento": "E",
+   "alvo": [
+    "NA-8a2987f6b8"
+   ],
+   "alvo_id": [
+    "NA-8a2987f6b8"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Governança e gestão de TI"
+   ]
+  },
+  {
+   "idx": 193,
+   "nivel": "assunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": null,
+   "item": "Gestão de contratação de soluções de TI",
+   "chave": "gestao e governanca|gestao de contratacao de solucoes de ti",
+   "categoria": "d3",
+   "julgamento": "A",
+   "alvo": [
+    "A-424f65c051"
+   ],
+   "alvo_id": [
+    "A-424f65c051"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Legislação aplicável à contratação de bens e serviços"
+   ]
+  },
+  {
+   "idx": 194,
+   "nivel": "assunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": null,
+   "item": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "A-424f65c051"
+   ],
+   "alvo_id": [
+    "A-424f65c051"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Legislação aplicável à contratação de bens e serviços"
+   ]
+  },
+  {
+   "idx": 195,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Lei nº 13.303/2016",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|lei no 13 303 2016",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@lei_13303"
+   ],
+   "alvo_id": [
+    "NS-7b822710b6"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Legislação aplicável à contratação de bens e serviços › Lei nº 13.303/2016 (Lei das Estatais)"
+   ]
+  },
+  {
+   "idx": 196,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Elaboração e fiscalização de contratos",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|elaboracao e fiscalizacao de contratos",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-43918fdbe8"
+   ],
+   "alvo_id": [
+    "S-43918fdbe8"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Elaboração e fiscalização de contratos"
+   ]
+  },
+  {
+   "idx": 197,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Cláusulas e indicadores de nível de serviço",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|clausulas e indicadores de nivel de servico",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-87dabcd1d9"
+   ],
+   "alvo_id": [
+    "S-87dabcd1d9"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Cláusulas e indicadores de nível de serviço"
+   ]
+  },
+  {
+   "idx": 198,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Papel do fiscalizador do contrato",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|papel do fiscalizador do contrato",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-81d5169c67"
+   ],
+   "alvo_id": [
+    "S-81d5169c67"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Papel do fiscalizador do contrato"
+   ]
+  },
+  {
+   "idx": 199,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Papel do preposto da contratada",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|papel do preposto da contratada",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-b1d7bd5120"
+   ],
+   "alvo_id": [
+    "S-b1d7bd5120"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Papel do preposto da contratada"
+   ]
+  },
+  {
+   "idx": 200,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Acompanhamento da execução contratual",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|acompanhamento da execucao contratual",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-0be4918914"
+   ],
+   "alvo_id": [
+    "S-0be4918914"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Acompanhamento da execução contratual"
+   ]
+  },
+  {
+   "idx": 201,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Registro e notificação de irregularidades",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|registro e notificacao de irregularidades",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-b56196a0f2"
+   ],
+   "alvo_id": [
+    "S-b56196a0f2"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Registro e notificação de irregularidades"
+   ]
+  },
+  {
+   "idx": 202,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Definição e aplicação de penalidades e sanções administrativas",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|definicao e aplicacao de penalidades e sancoes administrativas",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-b02401c9bd"
+   ],
+   "alvo_id": [
+    "S-b02401c9bd"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Contratos administrativos › Definição e aplicação de penalidades e sanções administrativas"
+   ]
+  },
+  {
+   "idx": 203,
+   "nivel": "subassunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": "Legislação aplicável à contratação de bens e serviços de TI e suas alterações",
+   "item": "Licenciamento de software",
+   "chave": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes|licenciamento de software",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@licenciamento"
+   ],
+   "alvo_id": [
+    "NS-6add27d99d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Governança e gestão de TI › Licenciamento de software"
+   ]
+  },
+  {
+   "idx": 204,
+   "nivel": "assunto",
+   "bloco": "GESTÃO E GOVERNANÇA",
+   "assunto": null,
+   "item": "Princípios fundamentais da administração pública",
+   "chave": "gestao e governanca|principios fundamentais da administracao publica",
+   "categoria": "d3",
+   "julgamento": "E",
+   "alvo": [
+    "S-20e16b751f"
+   ],
+   "alvo_id": [
+    "S-20e16b751f"
+   ],
+   "alvo_caminho": [
+    "Direito Administrativo › Regime jurídico-administrativo › Princípios expressos e implícitos da Administração Pública"
+   ]
+  },
+  {
+   "idx": 205,
+   "nivel": "disciplina",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": null,
+   "item": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "chave": "inovacao em ti no sistema financeiro",
+   "categoria": "titulo",
+   "julgamento": "N",
+   "alvo": [
+    "@inovacao_financeira"
+   ],
+   "alvo_id": [
+    "NA-6e1171de9d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro"
+   ]
+  },
+  {
+   "idx": 206,
+   "nivel": "assunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": null,
+   "item": "Novas Tecnologias",
+   "chave": "inovacao em ti no sistema financeiro|novas tecnologias",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-067cc93992"
+   ],
+   "alvo_id": [
+    "A-067cc93992"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Tecnologias emergentes e tendências"
+   ]
+  },
+  {
+   "idx": 207,
+   "nivel": "subassunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": "Novas Tecnologias",
+   "item": "Blockchain, IoT, fintechs, inteligência artificial, e machine learning aplicados ao setor financeiro",
+   "chave": "inovacao em ti no sistema financeiro|novas tecnologias|blockchain iot fintechs inteligencia artificial e machine learning aplicados ao setor financeiro",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@fintechs",
+    "A-067cc93992",
+    "A-bfc314b10d"
+   ],
+   "alvo_id": [
+    "NS-9ac3b019f5",
+    "A-067cc93992",
+    "A-bfc314b10d"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Fintechs e bancos digitais",
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Tecnologias emergentes e tendências",
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Conceitos e tecnologias de IA, redes neurais, aprendizado de máquina, processamento de linguagem natural (PLN), deep learning, chatbots"
+   ]
+  },
+  {
+   "idx": 208,
+   "nivel": "assunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": null,
+   "item": "Transformação Digital",
+   "chave": "inovacao em ti no sistema financeiro|transformacao digital",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@transf_digital"
+   ],
+   "alvo_id": [
+    "NS-5574f8fe8f"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Transformação digital de serviços financeiros"
+   ]
+  },
+  {
+   "idx": 209,
+   "nivel": "subassunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": "Transformação Digital",
+   "item": "Estratégias e práticas para digitalização de serviços financeiros",
+   "chave": "inovacao em ti no sistema financeiro|transformacao digital|estrategias e praticas para digitalizacao de servicos financeiros",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@transf_digital"
+   ],
+   "alvo_id": [
+    "NS-5574f8fe8f"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Transformação digital de serviços financeiros"
+   ]
+  },
+  {
+   "idx": 210,
+   "nivel": "subassunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": "Transformação Digital",
+   "item": "Open finance",
+   "chave": "inovacao em ti no sistema financeiro|transformacao digital|open finance",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@open_finance"
+   ],
+   "alvo_id": [
+    "NS-69ea62a7ae"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Open finance"
+   ]
+  },
+  {
+   "idx": 211,
+   "nivel": "subassunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": "Transformação Digital",
+   "item": "Integração de APIs",
+   "chave": "inovacao em ti no sistema financeiro|transformacao digital|integracao de apis",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-0d5791ace5"
+   ],
+   "alvo_id": [
+    "A-0d5791ace5"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Desenvolvimento de sistemas › Integração de sistemas"
+   ]
+  },
+  {
+   "idx": 212,
+   "nivel": "assunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": null,
+   "item": "Gestão da Inovação",
+   "chave": "inovacao em ti no sistema financeiro|gestao da inovacao",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@gestao_inovacao"
+   ],
+   "alvo_id": [
+    "NS-d21876b429"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Gestão da inovação"
+   ]
+  },
+  {
+   "idx": 213,
+   "nivel": "subassunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": "Gestão da Inovação",
+   "item": "Métodos para fomentar a inovação dentro das instituições financeiras, incluindo laboratórios de inovação, hackathons, e parcerias com startups",
+   "chave": "inovacao em ti no sistema financeiro|gestao da inovacao|metodos para fomentar a inovacao dentro das instituicoes financeiras incluindo laboratorios de inovacao hackathons e parcerias com startups",
+   "categoria": "novo",
+   "julgamento": "A",
+   "alvo": [
+    "@gestao_inovacao"
+   ],
+   "alvo_id": [
+    "NS-d21876b429"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Gestão da inovação"
+   ]
+  },
+  {
+   "idx": 214,
+   "nivel": "assunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": null,
+   "item": "Tendências de Mercado",
+   "chave": "inovacao em ti no sistema financeiro|tendencias de mercado",
+   "categoria": "existente",
+   "julgamento": "A",
+   "alvo": [
+    "A-067cc93992"
+   ],
+   "alvo_id": [
+    "A-067cc93992"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Ciência de dados e inteligência artificial › Tecnologias emergentes e tendências"
+   ]
+  },
+  {
+   "idx": 215,
+   "nivel": "subassunto",
+   "bloco": "INOVAÇÃO EM TI NO SISTEMA FINANCEIRO",
+   "assunto": "Tendências de Mercado",
+   "item": "Acompanhamento e identificação de novas tecnologias e oportunidades de negócio no setor financeiro, como criptomoedas, pagamentos digitais, e digital banking",
+   "chave": "inovacao em ti no sistema financeiro|tendencias de mercado|acompanhamento e identificacao de novas tecnologias e oportunidades de negocio no setor financeiro como criptomoedas pagamentos digitais e digital banking",
+   "categoria": "novo",
+   "julgamento": "N",
+   "alvo": [
+    "@fintechs",
+    "@pagamentos",
+    "@cripto"
+   ],
+   "alvo_id": [
+    "NS-9ac3b019f5",
+    "NS-df52f4afb3",
+    "NS-f7a6982126"
+   ],
+   "alvo_caminho": [
+    "Tecnologia da Informação › Inovação no sistema financeiro › Fintechs e bancos digitais",
+    "Tecnologia da Informação › Inovação no sistema financeiro › Pagamentos digitais",
+    "Tecnologia da Informação › Inovação no sistema financeiro › Criptomoedas"
+   ]
+  }
+ ]
+}

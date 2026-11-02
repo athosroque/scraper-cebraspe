@@ -726,7 +726,14 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     - `[ ]` M7 (KAN-93) Nome em cadeia "Pai - Filho" (6 no BANRISUL, 134 no SEFA).
     - `[ ]` M8 (KAN-94) Divisão de listas por ";" e facetas soltas como subassunto.
   - Onda 6, curadoria (decisão D5):
-    - `[ ]` C1 (KAN-95) Criar os ~14 conceitos novos por `curar_arvore` e aprovar o `BANRISUL_25` (P41).
+    - `[ ]` C1 (KAN-95) Criar os ~14 conceitos novos por `curar_arvore` e aprovar o `BANRISUL_25` (P41). Proposta em
+      [`plano-etapa-5b4-kan95.md`](plano-etapa-5b4-kan95.md), recomendações Q1 a Q12 aceitas pelo dono em 2026-11-02.
+      - `[x]` Parte 1: 35 nós novos criados (3 assuntos e 32 subassuntos, nenhuma disciplina; 2.688 → 2.723 nós
+        ativos), K22–K24 e `auditar_arvore` inalterados.
+      - `[ ]` Parte 2 (depois da M7/M8, KAN-93/94): 214 mapeamentos de itens, inclusive os 15 títulos sem destino
+        (`--mapear`; rascunho em `docs/planos/kan95/mapear_itens.sh`, não executado, e lote aplicado em
+        `docs/planos/kan95/lote_nos_novos.json`; acrescentar a operação "mapear" ao lote do `curar_arvore`).
+      - `[ ]` Parte 3: classificação das questões (5D) só depois dos nós e dos mapeamentos, e aprovação do edital.
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como
     `regra/aprovado`, com candidato único, sem veto e fora de `TITULOS_GENERICOS` (muda P52/P73).

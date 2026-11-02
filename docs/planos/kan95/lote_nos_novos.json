@@ -1,0 +1,355 @@
+{
+ "descricao": "RASCUNHO NÃO APLICADO, Etapa 5B.4/C1 (KAN-95): nós novos do BANRISUL_25 (D5: sem disciplina nova; Gestão de produtos e Inovação no sistema financeiro como assuntos de TI). Operações com [DÚVIDA Qn] dependem do dono (proposta_kan95.md). Os mapeamentos de itens não cabem no lote (aplicar_lote não tem 'mapear'): ver proposta_kan95_mapear.sh.",
+ "operacoes": [
+  {
+   "tipo": "criar",
+   "apelido": "@gestao_produtos",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-41f37f57d8",
+    "nome": "Gestão de produtos"
+   },
+   "comentario": "D5: assunto novo em TI; título GESTÃO DE PRODUTOS do BANRISUL_25"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@inovacao_financeira",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-41f37f57d8",
+    "nome": "Inovação no sistema financeiro"
+   },
+   "comentario": "D5: assunto novo em TI; título INOVAÇÃO EM TI NO SISTEMA FINANCEIRO"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@poo",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-870524a5bf",
+    "nome": "Programação orientada a objetos"
+   },
+   "comentario": "Conceito novo; Linguagens de programação (A-3408fede43) é linguagem, não paradigma"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@padroes_projeto",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-870524a5bf",
+    "nome": "Padrões de projeto (design patterns)"
+   },
+   "comentario": "Conceito novo; Arquitetura de software (A-f57e5aa487) cobre padrões de arquitetura, não GoF"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@solid",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-870524a5bf",
+    "nome": "Princípios SOLID"
+   },
+   "comentario": "[DÚVIDA Q9] separado de padrões de projeto (um conceito, um nó)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@estruturas_dados",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-870524a5bf",
+    "nome": "Estruturas de dados e algoritmos"
+   },
+   "comentario": "Conceito novo; S-9748b0df89 é Python básico, A-5e1328dca4 é algoritmo de ML"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@org_fisica",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-e02df9d2b4",
+    "nome": "Organização física e índices"
+   },
+   "comentario": "Conceito novo (arquivos, métodos de acesso, índices B+ e hash)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@tuning",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-e02df9d2b4",
+    "nome": "Otimização de consultas e tuning"
+   },
+   "comentario": "Conceito novo (planos de execução, bind, detecção de problemas)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@concorrencia",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-e02df9d2b4",
+    "nome": "Controle de concorrência"
+   },
+   "comentario": "[DÚVIDA Q10] conceito novo; S-551a90e864 cobre ACID, não bloqueio/escalonamento"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@recuperacao",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-e02df9d2b4",
+    "nome": "Recuperação após falhas"
+   },
+   "comentario": "[DÚVIDA Q10] conceito novo (log, checkpoint); Backup A-268e85e223 é infraestrutura"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@diretorio",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-e8ea9374ad",
+    "nome": "Serviços de diretório (LDAP e Active Directory)"
+   },
+   "comentario": "Conceito novo; A-25c805b189 (identidades e autenticação) é enfoque de segurança"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@licenciamento",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-8a2987f6b8",
+    "nome": "Licenciamento de software"
+   },
+   "comentario": "[DÚVIDA Q6] conceito novo; sem nó jurídico equivalente (D3 não se aplica)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@lei_13303",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-424f65c051",
+    "nome": "Lei nº 13.303/2016 (Lei das Estatais)"
+   },
+   "comentario": "D3: norma nova, ao lado da Lei nº 14.133/2021 (S-bf1fb476cd)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@pol_mulheres",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-ea208d484c",
+    "nome": "Política Nacional para as Mulheres"
+   },
+   "comentario": "[DÚVIDA Q7] precedente D6 da 5B.3 (Estatuto da Pessoa Idosa em Políticas Sociais)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@pol_violencia",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-ea208d484c",
+    "nome": "Política Nacional de Enfrentamento à Violência contra as Mulheres"
+   },
+   "comentario": "[DÚVIDA Q7]"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@estatuto_racial",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-ea208d484c",
+    "nome": "Estatuto da Igualdade Racial (Lei nº 12.288/2010)"
+   },
+   "comentario": "[DÚVIDA Q7] mesmo padrão de nome do ECA e do Estatuto da Pessoa Idosa"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@lei_rs_13694",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-90dd4ae301",
+    "nome": "Lei estadual nº 13.694/2011 (Estatuto Estadual da Igualdade Racial do RS)"
+   },
+   "comentario": "[DÚVIDA Q8] norma local; mesmo padrão dos assuntos de Legislação Específica"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@modelo_negocios",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-fdd929e9b9",
+    "nome": "Modelo de negócios (Business Model Canvas)"
+   },
+   "comentario": "Conceito novo; S-655449dbb0 (ferramentas de planejamento estratégico) é agregador amplo"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@ciclo_produto",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Ciclo de vida do produto"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@roadmap",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Roadmap de produto"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@releases",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Planejamento de releases"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@metricas",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Métricas de produtos digitais"
+   },
+   "comentario": "[DÚVIDA Q4] lead time, delivery rate, NPS, métricas de UX"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@ux",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Experiência do usuário (UX)"
+   },
+   "comentario": "D5 (faceta UX)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@acess_usab",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Acessibilidade e usabilidade"
+   },
+   "comentario": "D5 (faceta UX)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@task_flow",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Task flow"
+   },
+   "comentario": "D5 (faceta UX)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@pesquisa_ui",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Pesquisa com usuários e interface (UI)"
+   },
+   "comentario": "D5 (faceta UX: research, user interface)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@prototipacao",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Prototipação"
+   },
+   "comentario": "D5 (faceta UX)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@design_sprint",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Design sprint"
+   },
+   "comentario": "D5 (faceta UX)"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@storytelling",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@gestao_produtos",
+    "nome": "Storytelling em UX"
+   },
+   "comentario": "[DÚVIDA Q2] S-a67331fcbe é storytelling para visualização de dados"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@transf_digital",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@inovacao_financeira",
+    "nome": "Transformação digital de serviços financeiros"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@open_finance",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@inovacao_financeira",
+    "nome": "Open finance"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@fintechs",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@inovacao_financeira",
+    "nome": "Fintechs e bancos digitais"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@pagamentos",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@inovacao_financeira",
+    "nome": "Pagamentos digitais"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@cripto",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@inovacao_financeira",
+    "nome": "Criptomoedas"
+   },
+   "comentario": "D5"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@gestao_inovacao",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@inovacao_financeira",
+    "nome": "Gestão da inovação"
+   },
+   "comentario": "[DÚVIDA Q5] alternativa: A-51c66be0c2 (Administração Pública › Inovação na gestão pública)"
+  }
+ ]
+}
