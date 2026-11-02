@@ -727,19 +727,16 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     - `[ ]` M8 (KAN-94) Divisão de listas por ";" e facetas soltas como subassunto.
   - Onda 6, curadoria (decisão D5):
     - `[ ]` C1 (KAN-95) Criar os ~14 conceitos novos por `curar_arvore` e aprovar o `BANRISUL_25` (P41).
-- **Pendências (decisões do dono, KAN-96):**
-  - `[ ]` D2 Herança do nó do tópico (M5) e disciplina inferida pelo cargo (M4): `regra/aprovado` ou só `proposto`?
-  - `[ ]` D3 Subitens de contratos num bloco de TI contam em Direito Administrativo (M6)?
-  - `[ ]` D4 Títulos genéricos (`Legislação`, `Processo`) deixam de herdar decisão de outros editais (M11)?
-  - `[ ]` D5 Destino dos conceitos novos ("Design thinking" nó próprio ou funde; inovação financeira assunto de TI).
-  - `[ ]` D6 Pode mexer em `src/taxonomia_extractor.py` e no JSON do BANRISUL (alterações não commitadas)? Exige
-    reprocessar SEFA e BANRISUL antes de aprovar.
-- **Exigência de validação (2026-11-02):** cada melhoria (M1 a M13) só fecha depois de medida em pelo
-  menos um edital que **não seja de TI** (por exemplo, `PF_25_ADM`, `STM_25` ou `TCU_25_TEFC`), além do
-  BANRISUL e do SEFA, com os números antes/depois no comentário do card e K22–K24 inalterados. A M4
-  (disciplina pelo cargo) foi medida só em cargos de TI.
-- **P0 (KAN-80), estado:** par `processo → A-ad3fa21488` rejeitado e bloco `PROCESSO` apontado para
-  `NA-5ea6287326` (TI › Engenharia de software), `humano/aprovado`, K22 inalterado; em análise do dono.
+- **Decisões do dono (KAN-96, 2026-11-02):**
+  - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como
+    `regra/aprovado`, com candidato único, sem veto e fora de `TITULOS_GENERICOS` (muda P52/P73).
+  - `[x]` D3 O subitem vai para a disciplina do conceito (subitem jurídico em bloco de TI vai para o nó de
+    Direito Administrativo que já existe, não para TI); libera a M6 só para nome específico e candidato único.
+  - `[x]` D4 Não herdar: título genérico não reaproveita decisão de outro edital sem confirmação (M11).
+  - `[ ]` D5 Em aberto: nenhuma disciplina nova por ora (P72, lista fechada de 43); "Gestão de produtos"
+    seria assunto de TI. Destino dos ~14 conceitos novos na C1 (KAN-95).
+  - `[x]` D6 Liberada: trabalho pendente do extrator commitado (`bb791e1`, `0eb6b81`); M7/M8 podem mexer em
+    `src/taxonomia_extractor.py` e reprocessar SEFA e BANRISUL antes de aprovar.
 - **Pronto quando:** o relatório mostra só o que o dono precisa decidir, com sugestão de nó; relatório,
   passo determinístico e Datasette usam uma só função de equivalência; nenhum par errado é aprovado
   automaticamente; o `BANRISUL_25` chega com ≤ ~50 itens para decisão humana; piloto inalterado
