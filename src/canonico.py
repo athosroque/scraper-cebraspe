@@ -267,6 +267,10 @@ class NomesOrigem:
     )  # chave -> {nome, ocorrencias}
     assunto: dict[tuple[str, str], dict] = field(default_factory=dict)
     subassunto: dict[tuple[str, str, str], dict] = field(default_factory=dict)
+    # Chave da matéria -> nomes dos cargos dos chunks em que o título aparece (KAN-86,
+    # M4). `None` marca ocorrência sem cargo (chunk de conhecimentos básicos ou
+    # específico sem cargo): basta uma para o título não inferir disciplina pelo cargo.
+    cargos_materia: dict[str, set[str | None]] = field(default_factory=dict)
 
 
 def _registrar_nome(
@@ -286,10 +290,18 @@ def coletar_nomes(revisao_dir: Path) -> NomesOrigem:
     for json_path in listar_jsons_edital(revisao_dir):
         carga = montar_carga_concurso(json.loads(json_path.read_text(encoding="utf-8")))
         niveis_cargo = {c["numero"]: c.get("nivel") for c in carga["cargos"]}
+        nomes_cargo = {c["numero"]: c["nome"] for c in carga["cargos"]}
         for item in carga["itens"]:
             nivel = item["nivel"] or niveis_cargo.get(item["cargo_numero"])
             oc = (carga["slug"], nivel)
             m, t = item["materia_chave"], item["topico_chave"]
+            # Só chunk específico de um cargo diz algo sobre a disciplina do título.
+            cargo = (
+                nomes_cargo.get(item["cargo_numero"])
+                if item.get("tipo_conhecimento") == "especifico"
+                else None
+            )
+            nomes.cargos_materia.setdefault(m, set()).add(cargo)
             _registrar_nome(nomes.materia, m, item["materia_nome"], oc)
             _registrar_nome(nomes.assunto, (m, t), item["topico_nome"], oc)
             for sub in item["subtopicos"]:
@@ -1118,6 +1130,164 @@ def no_e_folha(arvore, no_id: str, nivel: str | None = None) -> bool:
     return sem_filhos_ativos(arvore, no_id)
 
 
+# Pai provisório pelo cargo (KAN-86, M4) --------------------------------------------
+
+DISCIPLINAS_PADRAO = PROJETO_DIR / "canonico" / "disciplinas.json"
+
+
+def carregar_disciplinas_fechadas(path: Path = DISCIPLINAS_PADRAO) -> dict[str, str]:
+    """`{id: nome}` da lista fechada `canonico/disciplinas.json` (vazio sem arquivo)."""
+    if not path.exists():
+        return {}
+    dados = json.loads(path.read_text(encoding="utf-8"))
+    return {d["id"]: d["nome"] for d in dados.get("disciplinas", [])}
+
+
+def _tokens_nome(nome: str) -> frozenset[str]:
+    return frozenset(
+        t for t in normalizar(nome).split() if t not in _PALAVRAS_VAZIAS_TITULO
+    )
+
+
+def disciplina_do_cargo(nome_cargo: str, disciplinas: dict[str, str]) -> str | None:
+    """Id da disciplina que o nome do cargo nomeia, ou None (função pura).
+
+    Casa quando TODAS as palavras relevantes do nome da disciplina estão no nome do
+    cargo ("Técnico em Tecnologia da Informação II" nomeia Tecnologia da Informação).
+    Só vale se exatamente 1 disciplina casa: sem match, ou com 2+ (ambíguo), não há
+    disciplina inferida. Nunca cria disciplina (P72)."""
+    tokens_cargo = _tokens_nome(nome_cargo)
+    achadas = [
+        i
+        for i, nome in disciplinas.items()
+        if (t := _tokens_nome(nome)) and t <= tokens_cargo
+    ]
+    return achadas[0] if len(achadas) == 1 else None
+
+
+def disciplinas_provisorias(
+    arvore, nomes: "NomesOrigem", disciplinas: dict[str, str] | None = None
+) -> dict[str, str]:
+    """Chave do título de bloco -> id da disciplina inferida pelo cargo (KAN-86).
+
+    Só entra título que aparece apenas em chunks `especifico` de cargo e cujos cargos
+    nomeiam, todos, a mesma disciplina (ativa na árvore). Ocorrência em chunk básico
+    ou sem cargo, cargo sem disciplina ou 2 disciplinas diferentes: sem inferência."""
+    from src import arvore as arv_mod
+
+    if disciplinas is None:
+        disciplinas = carregar_disciplinas_fechadas()
+    saida: dict[str, str] = {}
+    for chave, cargos in nomes.cargos_materia.items():
+        if not cargos or None in cargos:
+            continue
+        ids = {disciplina_do_cargo(c, disciplinas) for c in cargos}
+        if len(ids) != 1 or None in ids:
+            continue
+        (disc,) = ids
+        disc = arv_mod.resolver_no(arvore, disc)
+        no = arvore.nos.get(disc)
+        if no is not None and no.status == "ativo" and no.nivel == "materia":
+            saida[chave] = disc
+    return saida
+
+
+def filhos_por_materia(nomes: "NomesOrigem") -> dict[str, list[str]]:
+    """Chave da matéria -> chaves dos itens (assunto e subassunto) abaixo dela."""
+    from src import arvore as arv_mod
+
+    filhos: dict[str, list[str]] = {}
+    for nivel_filho in ("assunto", "subassunto"):
+        for chave_filho in getattr(nomes, nivel_filho):
+            filhos.setdefault(chave_filho[0], []).append(
+                arv_mod.chave_item(chave_filho)
+            )
+    return filhos
+
+
+def disciplina_provisoria_do_bloco(
+    arvore,
+    chave_materia: str,
+    provisorias: dict[str, str],
+    filhos: dict[str, list[str]],
+) -> str | None:
+    """Disciplina inferida pelo cargo para o bloco, ou None.
+
+    Recua se os itens do bloco já aprovados apontam para outra disciplina: o dado
+    aprovado vale mais que o nome do cargo."""
+    disc = provisorias.get(chave_materia)
+    if not disc:
+        return None
+    ja_aprovadas = disciplinas_inferidas_do_bloco(arvore, chave_materia, filhos)
+    return disc if ja_aprovadas <= {disc} else None
+
+
+def pais_efetivos(
+    nos_do_titulo: frozenset[str], disciplina_provisoria: str | None
+) -> frozenset[str]:
+    """Nós que servem de pai a um item abaixo do título (função pura).
+
+    Os nós aprovados do título, se ele está mapeado; senão a disciplina inferida pelo
+    cargo (pai provisório, sem gravar o título); senão vazio (item não comparável)."""
+    if nos_do_titulo:
+        return nos_do_titulo
+    return frozenset({disciplina_provisoria}) if disciplina_provisoria else frozenset()
+
+
+def indice_subarvore(arvore) -> dict[tuple[str, str], list]:
+    """(disciplina, `chave_regra`) -> nós ativos de assunto e subassunto dela."""
+    from src import arvore as arv_mod
+
+    indice: dict[tuple[str, str], list] = {}
+    for no in arvore.nos.values():
+        if no.status == "ativo" and no.nivel in ("assunto", "subassunto"):
+            regra = chave_regra(no.nome).chave
+            if regra:
+                chave = (arv_mod.materia_do_no(arvore, no.id), regra)
+                indice.setdefault(chave, []).append(no)
+    return indice
+
+
+def no_do_pai_provisorio(
+    arvore,
+    nivel: str,
+    disc: str,
+    nome: str,
+    regra: str,
+    vetados,
+    candidatos: frozenset[str] | None = None,
+    indice: dict | None = None,
+) -> str | None:
+    """Nó de destino de um item cujo pai é a disciplina inferida, ou None (D2).
+
+    Travas: candidato único dentro da subárvore da disciplina (`candidatos` vindos da
+    regra de nome ou da memória, ou, sem eles, o único nó ativo de mesma `chave_regra`
+    e nível compatível na subárvore), nome fora de `TITULOS_GENERICOS` e par (regra,
+    nó) não vetado pelo dono. Nunca cria nó."""
+    from src import arvore as arv_mod
+
+    niveis = _NIVEIS_FILHO.get(nivel)
+    if not niveis or not regra or titulo_generico(nome):
+        return None
+    if candidatos is None:
+        achados = {n.id for n in (indice or {}).get((disc, regra), ())}
+    else:
+        achados = set(candidatos)
+    if len(achados) != 1:
+        return None
+    (no_id,) = achados
+    no = arvore.nos.get(no_id)
+    if (
+        no is None
+        or no.status != "ativo"
+        or no.nivel not in niveis
+        or arv_mod.materia_do_no(arvore, no_id) != disc
+        or (regra, no_id) in vetados
+    ):
+        return None
+    return no_id
+
+
 @dataclass
 class ResultadoRegra:
     """Contagem do passo determinístico (nome + memória + filho único + herança)."""
@@ -1127,6 +1297,15 @@ class ResultadoRegra:
     por_heranca: int = 0
     por_filho: int = 0
     pendentes: int = 0
+    # Pai provisório pelo cargo (KAN-86, M4): quantos itens sem pai mapeado foram
+    # comparados com a árvore só por causa dele, e quantos desses ele mapeou
+    # (já contados em `por_*`). `comparados` é o total de itens que chegaram à
+    # comparação (tinham como achar o pai), com ou sem pai provisório.
+    comparados: int = 0
+    com_pai_provisorio: int = 0
+    por_pai_provisorio: int = 0
+    chaves_pai_provisorio: list[str] = field(default_factory=list)
+    chaves_mapeadas_pai_provisorio: list[str] = field(default_factory=list)
     # Chaves dos itens que o passo tentou e não mapeou (sem nó equivalente, regra
     # ambígua, pai sem nó). Item que já tinha entrada (aprovada, proposta ou
     # rejeitada) não passa pelo passo e não entra aqui.
@@ -1188,6 +1367,37 @@ def _no_de_heranca(
     return no_id
 
 
+def _resolver_pai_provisorio(
+    arvore, nivel, disc, nome, sig, candidatos, memoria, subarvore
+) -> tuple[str | None, str]:
+    """Destino de item cujo pai é a disciplina inferida (KAN-86, D2) e a origem
+    (`nome`, `memoria` ou `filho`). Mesma ordem dos ramos 1, 2 e 4, mas todo
+    candidato passa pelas travas de `no_do_pai_provisorio`; candidato que falha a
+    trava, ou ambíguo, deixa o item pendente sem tentar o ramo seguinte."""
+    regra = sig[2]
+    trava = dict(vetados=memoria.vetados, indice=subarvore)
+    if candidatos:
+        unico = next(iter(candidatos)) if len(candidatos) == 1 else None
+        if unico is None:
+            return None, "nome"
+        return no_do_pai_provisorio(
+            arvore, nivel, disc, nome, regra, candidatos=unico, **trava
+        ), "nome"
+    # Memória: só decisão aprovada de item de mesma regra e mesmo pai (a disciplina).
+    # O apelido de nó fundido fica de fora: sem o pai real, o nome solto do item perde
+    # o contexto em que o dono fundiu o nó ("Instalação, configuração e administração"
+    # de banco de dados não é o de sistemas operacionais).
+    decisoes = memoria.decisoes.get((nivel, sig[1], regra), set())
+    if len(decisoes) > 1:
+        return None, "memoria"
+    if decisoes:
+        (nos_mem,) = decisoes
+        return no_do_pai_provisorio(
+            arvore, nivel, disc, nome, regra, candidatos=nos_mem, **trava
+        ), "memoria"
+    return no_do_pai_provisorio(arvore, nivel, disc, nome, regra, **trava), "filho"
+
+
 def mapear_novos_itens_por_regra(
     revisao_dir: Path, arvore_path: Path | None = None, *, gravar: bool = True
 ) -> int:
@@ -1202,6 +1412,8 @@ def mapear_novos_itens(
     *,
     gravar: bool = True,
     arvore_mem=None,
+    pai_provisorio: bool = True,
+    disciplinas: dict[str, str] | None = None,
 ) -> ResultadoRegra:
     """Mapeia item novo de edital para a árvore mestre sem LLM (ADR-030).
 
@@ -1228,7 +1440,14 @@ def mapear_novos_itens(
        nenhum filho ativo (folha), o subtópico aponta para esse mesmo nó, como
        faceta dele (`regra`/`aprovado`, contado em `por_heranca`). Não herda se o
        nome é título genérico ou se o par (chave de regra, nó) foi vetado pelo dono.
-    Item cujo pai não tem nó fica pendente. Nunca cria nó. O assunto mapeado
+    Pai provisório (KAN-86, M4, `pai_provisorio=True`): assunto ou subassunto cujo
+    título de bloco não tem nó aprovado usa como pai a disciplina que o cargo do
+    chunk nomeia (`disciplina_do_cargo`, só chunk `especifico` e só quando o título
+    infere uma única disciplina; recua se o bloco já tem itens aprovados em outra).
+    O título continua sem mapeamento. O que o pai provisório resolve entra como
+    `regra`/`aprovado` com as travas de `no_do_pai_provisorio` (candidato único na
+    subárvore da disciplina, sem veto do dono, fora de `TITULOS_GENERICOS`).
+    Item cujo pai não tem nó (nem provisório) fica pendente. Nunca cria nó. O assunto mapeado
     agora serve de pai do subassunto. Com `gravar=False` (dry-run) a árvore em
     memória muda, mas nada é salvo. `arvore_mem` (opcional) é uma árvore já
     carregada, alterada no lugar, para o chamador enxergar o resultado.
@@ -1251,20 +1470,34 @@ def mapear_novos_itens(
             if m.status == "aprovado"
         )
 
+    provisorias = (
+        disciplinas_provisorias(arvore, nomes, disciplinas) if pai_provisorio else {}
+    )
+    # Itens abaixo de cada título de bloco, para inferir a disciplina (M2, M4).
+    filhos_bloco = filhos_por_materia(nomes)
+    subarvore = indice_subarvore(arvore) if provisorias else {}
+
     def assinatura(nivel: str, chave_origem, nome: str):
-        """(nível, nós do pai, chave de regra), ou None se não dá para comparar."""
+        """((nível, nós do pai, chave de regra), disciplina provisória usada), ou
+        (None, None) se não dá para comparar."""
         regra = chave_regra(nome).chave
         if not regra:
-            return None
+            return None, None
         partes = (chave_origem,) if isinstance(chave_origem, str) else chave_origem
         pais = (
             nos_aprovados(arv_mod.chave_item(partes[:-1]))
             if len(partes) > 1
             else frozenset()
         )
+        usada = None
         if len(partes) > 1 and not pais:
-            return None
-        return (nivel, pais, regra)
+            usada = disciplina_provisoria_do_bloco(
+                arvore, partes[0], provisorias, filhos_bloco
+            )
+            pais = pais_efetivos(pais, usada)
+            if not pais:
+                return None, None
+        return (nivel, pais, regra), usada
 
     nos_por_nome: dict[str, set[str]] = {}
     for no in arvore.nos.values():
@@ -1273,84 +1506,98 @@ def mapear_novos_itens(
             if regra:
                 nos_por_nome.setdefault(regra, set()).add(no.id)
 
-    # Itens abaixo de cada título de bloco, para inferir a disciplina (M2).
-    filhos_por_materia: dict[str, list[str]] = {}
-    for nivel_filho in ("assunto", "subassunto"):
-        for chave_filho in getattr(nomes, nivel_filho):
-            filhos_por_materia.setdefault(chave_filho[0], []).append(
-                arv_mod.chave_item(chave_filho)
-            )
-
     # Nível a nível: o assunto mapeado agora já serve de pai para o subassunto.
     for nivel in NIVEIS:
         fonte = getattr(nomes, nivel)
         chave_orig_por_chave = {arv_mod.chave_item(k): k for k in fonte}
         indice: dict[tuple, set[frozenset[str]]] = {}
         pendentes = []
+        usada_por_chave: dict[str, str] = {}
         for chave_origem, info in fonte.items():
             chave = arv_mod.chave_item(chave_origem)
-            sig = assinatura(nivel, chave_origem, info["nome"])
+            sig, usada = assinatura(nivel, chave_origem, info["nome"])
             if chave in arvore.mapeamentos:
                 nos = nos_aprovados(chave)
                 if sig and nos:
                     indice.setdefault(sig, set()).add(nos)
             elif sig:
                 pendentes.append((chave, sig))
+                if usada:
+                    usada_por_chave[chave] = usada
+                    res.com_pai_provisorio += 1
+                    res.chaves_pai_provisorio.append(chave)
             else:
                 res.pendentes += 1
                 res.chaves_pendentes.append(chave)
+        res.comparados += len(pendentes)
         memoria = memoria_mapeamento.construir_indice(arvore) if pendentes else None
         for chave, sig in pendentes:
             candidatos = indice.get(sig, set())
             origem_memoria = False
             origem_heranca = False
             origem_filho = False
-            if not candidatos:
-                nos_mem = memoria_mapeamento.resolver_por_memoria(
-                    arvore, sig[2], nivel, sig[1], memoria
-                )
-                if nos_mem:
-                    candidatos = {nos_mem}
-                    origem_memoria = True
-            if not candidatos and nivel != "materia":
-                no_filho = _no_de_filho_unico(
+            nome_item = fonte[chave_orig_por_chave[chave]]["nome"]
+            if chave in usada_por_chave:
+                # Pai provisório: só resolve com as travas de D2 (KAN-86).
+                no_prov, origem = _resolver_pai_provisorio(
                     arvore,
                     nivel,
-                    sig[1],
-                    fonte[chave_orig_por_chave[chave]]["nome"],
-                    sig[2],
-                    memoria.vetados,
-                )
-                if no_filho:
-                    candidatos = {frozenset({no_filho})}
-                    origem_filho = True
-            if not candidatos and nivel == "subassunto":
-                no_herdado = _no_de_heranca(
-                    arvore,
-                    arv_mod.chave_item(chave_orig_por_chave[chave][:-1]),
-                    fonte[chave_orig_por_chave[chave]]["nome"],
-                    sig[2],
-                    nos_aprovados,
-                    memoria.vetados,
-                )
-                if no_herdado:
-                    candidatos = {frozenset({no_herdado})}
-                    origem_heranca = True
-            if not candidatos and nivel == "materia":
-                # Título de bloco fora da lista de disciplinas: vira o assunto de
-                # mesmo nome, nunca disciplina nova (Etapa 5B.3, ADR-030).
-                # Só com disciplina compatível ou nome específico, sem veto (M2).
-                nome_item = fonte[chave_orig_por_chave[chave]]["nome"]
-                nos_titulo = alvo_de_titulo_por_nome(
-                    arvore,
-                    sig[2],
+                    usada_por_chave[chave],
                     nome_item,
-                    nos_por_nome.get(sig[2], set()),
-                    disciplinas_inferidas_do_bloco(arvore, chave, filhos_por_materia),
-                    memoria.vetados,
+                    sig,
+                    candidatos,
+                    memoria,
+                    subarvore,
                 )
-                if nos_titulo:
-                    candidatos = {nos_titulo}
+                candidatos = {frozenset({no_prov})} if no_prov else set()
+                origem_memoria = origem == "memoria"
+                origem_filho = origem == "filho"
+            else:
+                if not candidatos:
+                    nos_mem = memoria_mapeamento.resolver_por_memoria(
+                        arvore, sig[2], nivel, sig[1], memoria
+                    )
+                    if nos_mem:
+                        candidatos = {nos_mem}
+                        origem_memoria = True
+                if not candidatos and nivel != "materia":
+                    no_filho = _no_de_filho_unico(
+                        arvore,
+                        nivel,
+                        sig[1],
+                        nome_item,
+                        sig[2],
+                        memoria.vetados,
+                    )
+                    if no_filho:
+                        candidatos = {frozenset({no_filho})}
+                        origem_filho = True
+                if not candidatos and nivel == "subassunto":
+                    no_herdado = _no_de_heranca(
+                        arvore,
+                        arv_mod.chave_item(chave_orig_por_chave[chave][:-1]),
+                        nome_item,
+                        sig[2],
+                        nos_aprovados,
+                        memoria.vetados,
+                    )
+                    if no_herdado:
+                        candidatos = {frozenset({no_herdado})}
+                        origem_heranca = True
+                if not candidatos and nivel == "materia":
+                    # Título de bloco fora da lista de disciplinas: vira o assunto de
+                    # mesmo nome, nunca disciplina nova (Etapa 5B.3, ADR-030).
+                    # Só com disciplina compatível ou nome específico, sem veto (M2).
+                    nos_titulo = alvo_de_titulo_por_nome(
+                        arvore,
+                        sig[2],
+                        nome_item,
+                        nos_por_nome.get(sig[2], set()),
+                        disciplinas_inferidas_do_bloco(arvore, chave, filhos_bloco),
+                        memoria.vetados,
+                    )
+                    if nos_titulo:
+                        candidatos = {nos_titulo}
             if len(candidatos) != 1:
                 res.pendentes += 1
                 res.chaves_pendentes.append(chave)
@@ -1365,6 +1612,9 @@ def mapear_novos_itens(
                 res.pendentes += 1
                 res.chaves_pendentes.append(chave)
                 continue
+            if chave in usada_por_chave:
+                res.por_pai_provisorio += 1
+                res.chaves_mapeadas_pai_provisorio.append(chave)
             if origem_filho:
                 res.por_filho += 1
             elif origem_heranca:

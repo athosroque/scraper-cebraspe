@@ -142,6 +142,10 @@ class Pendente:
     materia_chave: str
     # Nomes dos filhos diretos no edital (tópicos da matéria; subtópicos do tópico).
     subitens: list[str] = field(default_factory=list)
+    # Disciplina inferida pelo cargo do chunk (KAN-86, M4), usada como pai provisório
+    # quando nenhum ancestral tem nó. Só restringe os candidatos do prompt; o título
+    # continua sem mapeamento e nada é gravado por causa dela.
+    disciplina_provisoria: str | None = None
 
 
 # Levantamento ---------------------------------------------------------------------
@@ -204,6 +208,8 @@ def levantar_pendentes(
     mapeamento rejeitado também conta como já decidido: não é reavaliado."""
     nomes = nomes or canonico.coletar_nomes(revisao_dir)
     filhos = coletar_filhos(revisao_dir)
+    provisorias = canonico.disciplinas_provisorias(arv, nomes)
+    filhos_bloco = canonico.filhos_por_materia(nomes)
     pendentes: list[Pendente] = []
     for nivel in arvore.NIVEIS:
         for chave_origem, info in getattr(nomes, nivel).items():
@@ -235,6 +241,9 @@ def levantar_pendentes(
                     concursos=concursos,
                     materia_chave=arvore.chave_item(m),
                     subitens=filhos.get(chave, []),
+                    disciplina_provisoria=canonico.disciplina_provisoria_do_bloco(
+                        arv, m, provisorias, filhos_bloco
+                    ),
                 )
             )
     return pendentes
@@ -271,9 +280,14 @@ def _nos_do_pai(arv: arvore.ArvoreMestre, pendente: Pendente) -> list[str]:
 def disciplinas_do_pendente(
     arv: arvore.ArvoreMestre, pendente: Pendente
 ) -> tuple[frozenset[str], list[str]]:
-    """Disciplinas (nós de matéria) do pai já resolvido e os nós de onde saíram."""
+    """Disciplinas (nós de matéria) do pai já resolvido e os nós de onde saíram.
+
+    Sem nenhum ancestral com nó, vale a disciplina inferida pelo cargo (pai
+    provisório, KAN-86): `(frozenset({disciplina}), [])`, sem nós de origem."""
     nos = _nos_do_pai(arv, pendente)
     disciplinas = {arvore.materia_do_no(arv, n) for n in nos} - {""}
+    if not disciplinas and pendente.disciplina_provisoria:
+        disciplinas = {pendente.disciplina_provisoria}
     return frozenset(disciplinas), nos
 
 

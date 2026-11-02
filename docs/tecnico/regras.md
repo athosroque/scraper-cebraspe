@@ -670,7 +670,19 @@ candidato ainda, o subtópico herda o nó do tópico-pai quando ele é
 folha (KAN-85): o pai tem exatamente 1 nó aprovado, ativo, de nível subassunto e sem
 filho ativo, o nome não é título genérico e o par (chave de regra, nó) não foi vetado
 pelo dono; entra como `regra`/`aprovado` e conta em `por_heranca`. Regra ambígua ou pai
-sem nó fica pendente no `arvore.html`.
+sem nó fica pendente no `arvore.html`. **Pai provisório (KAN-86)**: assunto ou subassunto
+cujo título de bloco não tem nó usa como pai a disciplina que o **cargo** do chunk nomeia
+(`canonico.disciplina_do_cargo`: todas as palavras relevantes da disciplina de
+`canonico/disciplinas.json` estão no nome do cargo, e exatamente 1 casa), só em chunk
+`especifico` de cargo; chunk básico, cargo sem disciplina, 2 disciplinas ou cargos que
+inferem disciplinas diferentes não inferem nada, e o bloco recua se já tem item aprovado em
+outra disciplina. O título continua sem mapeamento. O que o pai provisório resolve (regra de
+nome, decisão aprovada da memória, ou o único nó ativo de mesma `chave_regra` e nível
+compatível na **subárvore** da disciplina) entra como `regra`/`aprovado` com as travas de
+`canonico.no_do_pai_provisorio`: candidato único, par não vetado pelo dono, nome fora de
+`TITULOS_GENERICOS`; o apelido de nó fundido não vale aqui, porque sem o pai real o nome solto
+perde o contexto da fusão. `ResultadoRegra` traz `comparados`, `com_pai_provisorio` e
+`por_pai_provisorio`.
 O log traz a contagem por regra de nome, por memória, por filho único, por herança de folha e pendentes. A `chave_regra` ignora os
 prefixos "noções de", "fundamentos de" e "conceitos (básicos|gerais) de" (só "noções" liga
 `nocoes`) e unifica gestão e gerenciamento; administração não entra, e a sigla entre
@@ -680,7 +692,7 @@ título genérico (`canonico.TITULOS_GENERICOS`) nunca casa sozinho por nome (KA
 
 ADRs: nenhuma
 
-Teste guarda: `tests/test_regra_arvore.py::test_mapeia_dentro_do_mesmo_pai_efetivo`, `tests/test_regra_arvore.py::test_nao_mapeia_sob_outro_pai`, `tests/test_regra_arvore.py::test_regra_ambigua_fica_pendente`, `tests/test_canonico.py::TestChaveRegraPrefixosESinonimos`, `tests/test_regra_arvore.py::test_filho_unico_resolve_os_casos_do_sefa`
+Teste guarda: `tests/test_regra_arvore.py::test_mapeia_dentro_do_mesmo_pai_efetivo`, `tests/test_regra_arvore.py::test_nao_mapeia_sob_outro_pai`, `tests/test_regra_arvore.py::test_regra_ambigua_fica_pendente`, `tests/test_canonico.py::TestChaveRegraPrefixosESinonimos`, `tests/test_regra_arvore.py::test_filho_unico_resolve_os_casos_do_sefa`, `tests/test_regra_arvore.py::test_filho_resolve_pela_disciplina_inferida_sem_gravar_o_titulo`, `tests/test_regra_arvore.py::test_cargo_de_ti_infere_ti`, `tests/test_regra_arvore.py::test_chunk_basico_ou_sem_cargo_nao_infere`, `tests/test_regra_arvore.py::test_banrisul_ganha_mais_de_100_itens_comparados`
 
 #### P72
 
@@ -694,7 +706,9 @@ par vetado pelo dono (por `chave_regra`) nunca é regravado, e fora disso o item
 nunca `aprovado` (KAN-82). Proposta de LLM ou de regra
 nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
 do dono. O ramo do filho único (KAN-97, P52) é só de assunto e subassunto, que têm pai: o
-título de bloco (matéria) continua neste ramo de nome e nunca passa por lá.
+título de bloco (matéria) continua neste ramo de nome e nunca passa por lá. A disciplina
+inferida pelo **cargo** (P52, KAN-86) é só pai provisório dos filhos: nunca é gravada para o
+título, que continua sem mapeamento, e jamais cria disciplina.
 `scripts/auditar_arvore.py` fica verde antes de cada carga.
 
 Núcleo: sim (citada no `CLAUDE.md`)
@@ -715,7 +729,9 @@ nunca) na disciplina do pai, com candidato único, vira `regra`/`aprovado`; ambi
 fica pendente; (3) filho único (KAN-97), só assunto e subassunto com pai mapeado: o item vai
 para o único filho ativo de mesma `chave_regra` e nível compatível entre os filhos dos nós do
 pai (`por_filho`, `regra`/`aprovado`), salvo ambiguidade, título genérico ou par vetado;
-(4) herança de folha, só para subtópico: aponta para o nó único do
+(3b) sem nó no título de bloco, o filho usa a disciplina inferida pelo cargo como pai
+provisório (P52, KAN-86), com candidato único na subárvore, sem veto e fora dos títulos
+genéricos, e sem apelido de nó fundido; (4) herança de folha, só para subtópico: aponta para o nó único do
 tópico-pai se ele é subassunto ativo sem filhos, salvo título genérico ou par vetado
 (KAN-85, `regra`/`aprovado`); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
 reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
@@ -732,7 +748,7 @@ Teste guarda: `tests/test_memoria_mapeamento.py::test_proposta_nao_aprovada_nao_
 O relatório de revisão e a tabela `mapeamento_itens` do `revisao.db` leem a árvore já
 passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
 equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia (nome,
-memória, filho único ou herança de folha), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
+memória, filho único, herança de folha ou pai provisório pelo cargo), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
 antes de `gerar_relatorios` e `gerar_db` (KAN-81).
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)

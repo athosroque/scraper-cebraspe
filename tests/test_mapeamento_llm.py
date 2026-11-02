@@ -540,3 +540,45 @@ def test_script_resumo_mostra_memoria_llm_e_sem_no(cenario, monkeypatch, capsys)
     assert saida["resolvidos_antes_do_llm_por_memoria"] == 0
     assert saida["propostos_por_llm"] == 1
     assert saida["sem_no"] == 2
+
+
+def test_disciplina_provisoria_vira_o_grupo_do_pendente_sem_pai_mapeado():
+    # KAN-86: sem nó em nenhum ancestral, vale a disciplina inferida pelo cargo; com
+    # nó no pai, o pai real prevalece. Nada é gravado (só restringe candidatos).
+    arv = arvore.ArvoreMestre()
+    arvore.criar_no(
+        arv, "materia", "Tecnologia da Informação", None, id_override="M-TI"
+    )
+    arvore.criar_no(arv, "materia", "Direito Administrativo", None, id_override="M-DA")
+    arvore.criar_no(arv, "assunto", "Atos", "M-DA", id_override="A-ATO")
+    arvore.mapear(arv, "bloco", ["A-ATO"])
+    item = mapeamento_llm.Pendente(
+        "bloco|redes", "assunto", "Redes", ["bloco"], ["Bloco"], set(), "bloco"
+    )
+    # pai com nó: o real vence
+    item.disciplina_provisoria = "M-TI"
+    assert mapeamento_llm.disciplinas_do_pendente(arv, item)[0] == {"M-DA"}
+    # pai sem nó: a provisória
+    sem_no = mapeamento_llm.Pendente(
+        "outro|redes",
+        "assunto",
+        "Redes",
+        ["outro"],
+        ["Outro"],
+        set(),
+        "outro",
+        disciplina_provisoria="M-TI",
+    )
+    assert mapeamento_llm.disciplinas_do_pendente(arv, sem_no) == (
+        frozenset({"M-TI"}),
+        [],
+    )
+    grupos = mapeamento_llm._grupos(arv, [sem_no])
+    assert (
+        grupos[0][2] == frozenset({"M-TI"})
+        and grupos[0][0] == "Tecnologia da Informação"
+    )
+    # sem cargo que infira: continua "sem disciplina"
+    sem_no.disciplina_provisoria = None
+    assert mapeamento_llm.disciplinas_do_pendente(arv, sem_no)[0] == frozenset()
+    assert "outro" not in arv.mapeamentos
