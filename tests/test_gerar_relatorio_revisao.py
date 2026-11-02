@@ -1,6 +1,6 @@
 import json
 
-from scripts.gerar_relatorio_revisao import gerar_relatorios
+from scripts.gerar_relatorio_revisao import gerar_relatorios, renderizar_index
 
 
 def _escrever_json(path, dados):
@@ -185,3 +185,162 @@ class TestGerarRelatorios:
         )
 
         assert "só cargos 1, 8" in html
+
+
+def _novidades_fake(resultado):
+    return {
+        "disciplinas_novas": ["Matéria A"],
+        "assuntos_novos": [
+            {
+                "disciplina": "Matéria A",
+                "assunto": "1 Tópico um",
+                "subassuntos": ["1.1 Subtópico"],
+            }
+        ],
+        "total_disciplinas": 1,
+        "total_assuntos": 1,
+        "total_itens_novos": 2,
+    }
+
+
+def _gravar(tmp_path, nome, status, alertas=True):
+    resultado, auditoria, validacao = _fixture_basica()
+    resultado["edital"] = f"{nome}.pdf"
+    resultado["status_revisao_humana"] = status
+    if not alertas:
+        validacao.update(total_alertas=0, alertas=[])
+        resultado["falhas"] = 0
+    _escrever_json(tmp_path / f"{nome}.json", resultado)
+    _escrever_json(tmp_path / f"{nome}.auditoria.json", auditoria)
+    _escrever_json(tmp_path / f"{nome}.validacao.json", validacao)
+
+
+class TestIndexSecoes:
+    def test_pendentes_e_aprovados_em_secoes_separadas(self, tmp_path):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+        _gravar(tmp_path, "Aprov", "APROVADO — revisão concluída.", alertas=False)
+
+        index = (
+            gerar_relatorios(tmp_path, novidades_fn=_novidades_fake) / "index.html"
+        ).read_text(encoding="utf-8")
+
+        pend = index.index("Aguardando aprovação (1)")
+        aprov = index.index("Aprovados (1)")
+        assert pend < aprov
+        assert pend < index.index("Pend.pdf") < aprov
+        assert aprov < index.index("Aprov.pdf")
+        assert '<details class="secao">' in index
+        assert '<details class="secao" open' not in index
+
+    def test_badges_de_problema_e_novidade(self, tmp_path):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+
+        index = (
+            gerar_relatorios(tmp_path, novidades_fn=_novidades_fake) / "index.html"
+        ).read_text(encoding="utf-8")
+
+        assert "1 alertas bloqueantes" in index
+        assert "1 falhas" in index
+        assert "1 disciplinas novas" in index
+        assert "1 assuntos novos" in index
+        assert "1 disciplinas · 1 assuntos" in index
+        assert "data-problema='1'" in index
+        assert "data-novidade='1'" in index
+        assert "data-filtro='problema'" in index
+
+    def test_pendentes_com_problema_ou_novidade_vem_primeiro(self):
+        base = {
+            "arquivo_html": "x.html",
+            "situacao": "pendente",
+            "total_chunks": 1,
+            "falhas": 0,
+            "total_alertas": 0,
+        }
+        limpo = {**base, "edital": "A_limpo"}
+        problema = {**base, "edital": "Z_problema", "total_alertas": 2}
+        novo = {**base, "edital": "M_novo", "assuntos_novos": 1}
+
+        html = renderizar_index([limpo, novo, problema])
+
+        assert html.index("Z_problema") < html.index("M_novo") < html.index("A_limpo")
+
+    def test_index_escapa_html_do_nome(self):
+        e = {
+            "edital": "<script>alert(1)</script>",
+            "arquivo_html": "x.html",
+            "situacao": "pendente",
+            "total_chunks": 1,
+        }
+
+        html = renderizar_index([e])
+
+        assert "<script>alert(1)</script>" not in html
+        assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
+
+    def test_situacao_desconhecida_vai_para_outros(self):
+        e = {
+            "edital": "Estranho",
+            "arquivo_html": "x.html",
+            "situacao": "outro",
+            "total_chunks": 1,
+        }
+
+        assert "Outros (1)" in renderizar_index([e])
+
+
+class TestPaginaEdital:
+    def test_bloco_o_que_revisar_com_ancoras_e_badge_novo(self, tmp_path):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+
+        html = (
+            gerar_relatorios(tmp_path, novidades_fn=_novidades_fake) / "Pend.html"
+        ).read_text(encoding="utf-8")
+
+        assert "O que revisar" in html
+        assert html.index("O que revisar") < html.index("class='chunk'")
+        assert "Alertas bloqueantes e falhas (2)" in html
+        assert "Disciplinas novas (1)" in html
+        assert "Assuntos novos (1)" in html
+        assert "href='#chunk-0'" in html
+        assert "id='chunk-0'" in html
+        assert "novo-tag'>NOVO" in html
+
+    def test_sem_novidades_mostra_mensagem_vazia(self, tmp_path):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+
+        html = (
+            gerar_relatorios(tmp_path, novidades_fn=lambda r: {}) / "Pend.html"
+        ).read_text(encoding="utf-8")
+
+        assert "Nenhuma disciplina nova." in html
+        assert "Nenhum assunto novo." in html
+        assert "<span class='novo-tag'>" not in html
+
+    def test_falha_na_funcao_de_novidades_nao_derruba_o_relatorio(self, tmp_path):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+
+        def quebrada(resultado):
+            raise RuntimeError("boom")
+
+        saida = gerar_relatorios(tmp_path, novidades_fn=quebrada)
+
+        assert (saida / "Pend.html").exists()
+
+    def test_novidades_sao_escapadas(self, tmp_path):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+
+        def hostil(resultado):
+            return {
+                "disciplinas_novas": ["<b>x</b>"],
+                "assuntos_novos": [
+                    {"disciplina": "<i>d</i>", "assunto": "<u>a</u>", "subassuntos": []}
+                ],
+            }
+
+        html = (
+            gerar_relatorios(tmp_path, novidades_fn=hostil) / "Pend.html"
+        ).read_text(encoding="utf-8")
+
+        assert "<b>x</b>" not in html
+        assert "&lt;b&gt;x&lt;/b&gt;" in html
+        assert "<u>a</u>" not in html
