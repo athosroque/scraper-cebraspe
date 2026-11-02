@@ -731,6 +731,12 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   - `[ ]` D5 Destino dos conceitos novos ("Design thinking" nó próprio ou funde; inovação financeira assunto de TI).
   - `[ ]` D6 Pode mexer em `src/taxonomia_extractor.py` e no JSON do BANRISUL (alterações não commitadas)? Exige
     reprocessar SEFA e BANRISUL antes de aprovar.
+- **Exigência de validação (2026-11-02):** cada melhoria (M1 a M13) só fecha depois de medida em pelo
+  menos um edital que **não seja de TI** (por exemplo, `PF_25_ADM`, `STM_25` ou `TCU_25_TEFC`), além do
+  BANRISUL e do SEFA, com os números antes/depois no comentário do card e K22–K24 inalterados. A M4
+  (disciplina pelo cargo) foi medida só em cargos de TI.
+- **P0 (KAN-80), estado:** par `processo → A-ad3fa21488` rejeitado e bloco `PROCESSO` apontado para
+  `NA-5ea6287326` (TI › Engenharia de software), `humano/aprovado`, K22 inalterado; em análise do dono.
 - **Pronto quando:** o relatório mostra só o que o dono precisa decidir, com sugestão de nó; relatório,
   passo determinístico e Datasette usam uma só função de equivalência; nenhum par errado é aprovado
   automaticamente; o `BANRISUL_25` chega com ≤ ~50 itens para decisão humana; piloto inalterado
