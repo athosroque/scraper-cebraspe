@@ -1122,9 +1122,61 @@ class TestFormaDeListasEFacetas:
         feito = te.normalizar_listas_e_facetas(tax)
         topico = tax.topicos[0]
         assert feito["listas"] == ["Cloud computing; virtualização."]
-        assert topico.nome == "Cloud computing; virtualização"
-        assert topico.subtopicos == ["Cloud computing", "virtualização"]
-        assert topico.nome_origem is None  # a chave do tópico não mudou
+        assert topico.nome == "Cloud computing"
+        assert topico.subtopicos == ["virtualização"]
+        assert topico.nome_origem == "Cloud computing; virtualização."
+
+    def test_primeiro_pedaco_vira_o_nome_e_os_demais_subtopicos(self):
+        tax = self._tax(
+            te.Topico(
+                nome="Governo eletrônico; transparência da administração pública; "
+                "accountability"
+            )
+        )
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[0].nome == "Governo eletrônico"
+        assert tax.topicos[0].subtopicos == [
+            "transparência da administração pública",
+            "accountability",
+        ]
+
+    def test_pedacos_com_a_mesma_primeira_palavra_mantem_o_nome_inteiro(self):
+        tax = self._tax(te.Topico(nome="Lei nº 8.112/1990; Lei nº 9.784/1999"))
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[0].nome == "Lei nº 8.112/1990; Lei nº 9.784/1999"
+        assert tax.topicos[0].subtopicos == ["Lei nº 8.112/1990", "Lei nº 9.784/1999"]
+        assert tax.topicos[0].nome_origem is None
+
+    def test_primeiro_pedaco_de_frase_longa_mantem_o_nome_inteiro(self):
+        longa = "Conceito muito extenso " * 8
+        assert len(longa.strip()) > 150
+        tax = self._tax(te.Topico(nome=f"{longa.strip()}; outro assunto"))
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[0].nome == f"{longa.strip()}; outro assunto"
+        assert tax.topicos[0].subtopicos == [longa.strip(), "outro assunto"]
+
+    def test_cabeca_do_primeiro_pedaco_que_colide_mantem_o_nome_inteiro(self):
+        tax = self._tax(te.Topico(nome="Redes"), te.Topico(nome="Redes; wifi"))
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[1].nome == "Redes; wifi"
+        assert tax.topicos[1].subtopicos == ["Redes", "wifi"]
+
+    def test_ponto_e_virgula_final_nao_impede_a_divisao(self):
+        tax = self._tax(te.Topico(nome="Alfa; Beta; Gama;"))
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[0].nome == "Alfa"
+        assert tax.topicos[0].subtopicos == ["Beta", "Gama"]
+
+    def test_fragmento_numerico_sem_palavra_nao_divide(self):
+        tax = self._tax(te.Topico(nome="Notas de 70 a 75; 80 a 85"))
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+
+    def test_divisao_por_primeiro_pedaco_e_idempotente(self):
+        tax = self._tax(te.Topico(nome="Cloud computing; virtualização; containers"))
+        te.normalizar_listas_e_facetas(tax)
+        antes = tax.model_dump()
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+        assert tax.model_dump() == antes
 
     def test_cabeca_antes_dos_dois_pontos_vira_o_nome_e_guarda_a_origem(self):
         original = "Tributos: conceito e espécies; impostos; taxas"
@@ -1162,11 +1214,14 @@ class TestFormaDeListasEFacetas:
         assert te.normalizar_listas_e_facetas(repetido)["listas"] == []
 
     def test_cabeca_que_colide_com_outro_topico_do_chunk_fica_inteira(self):
-        tax = self._tax(te.Topico(nome="Tributos"), te.Topico(nome="Tributos: a; b"))
+        tax = self._tax(
+            te.Topico(nome="Tributos"), te.Topico(nome="Tributos: conceito; impostos")
+        )
         te.normalizar_listas_e_facetas(tax)
-        assert tax.topicos[1].nome == "Tributos: a; b"
-        assert tax.topicos[1].subtopicos == ["Tributos: a", "b"]
-        assert tax.topicos[1].nome_origem is None
+        # a cabeça "Tributos" colide; cai na regra do 1º pedaço (variante C)
+        assert tax.topicos[1].nome == "Tributos: conceito"
+        assert tax.topicos[1].subtopicos == ["impostos"]
+        assert tax.topicos[1].nome_origem == "Tributos: conceito; impostos"
 
     def test_ponto_final_sai_do_topico_e_do_subtopico_menos_abreviatura(self):
         tax = self._tax(
@@ -1277,10 +1332,8 @@ class TestFormaDeListasEFacetas:
         resultado = te._pos_validacao_taxonomia("Cloud computing; virtualização.")(
             tax, ""
         )
-        assert resultado.objeto.topicos[0].subtopicos == [
-            "Cloud computing",
-            "virtualização",
-        ]
+        assert resultado.objeto.topicos[0].nome == "Cloud computing"
+        assert resultado.objeto.topicos[0].subtopicos == ["virtualização"]
         assert "reparo_forma_m8" in resultado.metadata
 
     def test_prompt_diz_que_aspectos_de_um_conceito_nao_viram_subtopicos(self):

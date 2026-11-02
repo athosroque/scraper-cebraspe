@@ -42,8 +42,9 @@ def test_divide_a_lista_preserva_a_revisao_e_cria_backup(tmp_path):
     gravado = json.loads(json_path.read_text(encoding="utf-8"))
     topico = gravado["resultados"][0]["taxonomia_extraida"]["topicos"][0]
     assert topico == {
-        "nome": "Cloud computing; virtualização",
-        "subtopicos": ["Cloud computing", "virtualização"],
+        "nome": "Cloud computing",
+        "subtopicos": ["virtualização"],
+        "nome_origem": "Cloud computing; virtualização.",
     }
     assert gravado["status_revisao_humana"] == "APROVADO — teste"
     assert (tmp_path / "x.json.pre_reconciliacao.bak").exists()

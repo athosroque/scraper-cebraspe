@@ -308,9 +308,9 @@ def partes_por_ponto_e_virgula(nome: str) -> list[str]:
 
 
 def parte_de_lista_valida(parte: str) -> bool:
-    """Pedaço de lista com sentido isolado: tem letra/dígito e não abre com
+    """Pedaço de lista com sentido isolado: tem palavra de 3+ letras ("70 a 75" não) e não abre com
     palavra de continuação ("e", "ou", "que", "com"...)."""
-    if not re.search(r"\w", parte):
+    if not re.search(r"[^\W\d_]{3,}", parte):  # ao menos uma palavra de 3+ letras
         return False
     return parte.split()[0] not in _ABRE_CONTINUACAO
 

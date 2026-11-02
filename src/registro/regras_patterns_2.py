@@ -531,9 +531,12 @@ de nós nunca é decidido pelo script.""",
         texto="""A forma das listas é consertada por `normalizar_listas_e_facetas` (KAN-94, M8), sem LLM,
 dentro do pós-LLM do extrator e de `scripts.reconciliar_taxonomia`: (1) tópico com ";" fora de
 parênteses e **sem subtópicos** vira subtópicos, um por elemento, sem ponto final; se o 1º
-elemento é "Cabeça: resto" a cabeça vira o nome do tópico (a chave muda, e o nome antigo vai em
-`Topico.nome_origem`), senão o nome fica inteiro; elemento que abre com "e"/"ou"/"com",
-elementos repetidos ou cabeça que colide com outro tópico do chunk impedem a divisão; vírgula e
+elemento é "Cabeça: resto" a cabeça vira o nome do tópico; senão o **1º elemento vira o nome** e
+os demais subtópicos (a chave muda, e o nome antigo vai em `Topico.nome_origem`), salvo quando todos
+os elementos abrem com a mesma palavra ("Lei nº…; Lei nº…") ou o 1º passa de `TAMANHO_FRASE_LONGA`,
+casos em que o nome fica inteiro e todos viram subtópicos; elemento que abre com "e"/"ou"/"com" ou
+sem palavra de 3+ letras ("70 a 75"), elementos repetidos ou cabeça que colide com outro tópico do
+chunk impedem a divisão (";" final e pedaço vazio são descartados antes de validar); vírgula e
 "e" nunca dividem; (2) facetas voltam ao pai (`Topico.subtopicos_absorvidos`) só em dois casos:
 todos os subtópicos são uma palavra minúscula que está no nome do pai ("Modelagem de dados:
 físico, lógico e conceitual"), ou o pai tem sigla entre parênteses e pelo menos 3 subtópicos

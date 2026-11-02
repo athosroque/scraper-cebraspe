@@ -250,6 +250,28 @@ def test_topico_com_cabeca_move_o_apontamento_para_a_chave_nova(tmp_path):
     assert antiga not in arv.mapeamentos
 
 
+def test_primeiro_pedaco_vira_nome_e_a_chave_do_topico_acompanha(tmp_path):
+    arv = ArvoreMestre()
+    criar_no(arv, "materia", "Informática", None, id_override="M-I")
+    criar_no(arv, "assunto", "Cloud computing", "M-I", id_override="A-C")
+    antiga = "informatica|cloud computing virtualizacao"
+    mapear(arv, antiga, ["A-C"], origem="humano", status="aprovado")
+    topico = {
+        "nome": "Cloud computing",
+        "subtopicos": ["virtualização"],
+        "nome_origem": "Cloud computing; virtualização",
+    }
+    edital = _edital_m8(topico)
+    edital["resultados"][0]["materia_chunk"] = "Informática"
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    plano = mig.planejar(arv, tmp_path)
+    assert plano.movidos == [(antiga, "informatica|cloud computing")]
+    mig.aplicar_plano(arv, plano)
+    (m,) = arv.mapeamentos["informatica|cloud computing"]
+    assert (m.no_id, m.origem, m.status) == ("A-C", "humano", "aprovado")
+    assert antiga not in arv.mapeamentos
+
+
 def test_topico_com_cabeca_em_conflito_nao_altera_nada(tmp_path):
     arv = ArvoreMestre()
     criar_no(arv, "materia", "Direito", None, id_override="M-D")

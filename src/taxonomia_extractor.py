@@ -18,6 +18,7 @@ from src import llm_openrouter
 from src.comparacao_texto import (
     PADRAO_SIGLA_ENTRE_PARENTESES,
     PADRAO_SUBITEM,
+    TAMANHO_FRASE_LONGA,
     cabeca_e_resto,
     contido,
     divergencia_leve,
@@ -678,28 +679,41 @@ def _dividir_lista_com_ponto_e_virgula(
     """Quebra, in-place, o tópico que é uma lista com ";" e não tem subtópico:
     cada elemento vira subtópico (sem ponto final). Se o primeiro elemento é
     "Cabeça: resto" (como o LLM já faz nos chunks que acertam), a cabeça vira o
-    nome do tópico e `resto` o primeiro subtópico; senão o nome fica inteiro.
+    nome do tópico e `resto` o primeiro subtópico; senão o 1º pedaço vira o nome
+    e os demais subtópicos (variante C), exceto se todos abrem com a mesma
+    palavra ou o 1º passa de `TAMANHO_FRASE_LONGA`: aí o nome fica inteiro.
     Não divide: ";" só dentro de parênteses, elemento sem sentido isolado (abre
     com "e"/"ou"/"com"...), elementos repetidos, tópico que acabou de devolver
     facetas ao pai, ou cabeça que colidiria com outro tópico do chunk."""
     if topico.subtopicos or topico.subtopicos_absorvidos:
         return False
     partes = [sem_pontuacao_final(p) for p in partes_por_ponto_e_virgula(topico.nome)]
+    partes = [p for p in partes if p]  # ";" final ou duplo deixa pedaço vazio
     if len(partes) < 2 or not all(parte_de_lista_valida(p) for p in partes):
         return False
     nome = sem_pontuacao_final(topico.nome)
+    outros = {normalizar(t.nome) for t in taxonomia.topicos if t is not topico}
     primeira = cabeca_e_resto(partes[0])
+    if primeira and normalizar(primeira[0]) in outros:
+        primeira = None
     if primeira:
-        outros = {normalizar(t.nome) for t in taxonomia.topicos if t is not topico}
-        if normalizar(primeira[0]) in outros:
-            primeira = None
-    subs = [primeira[1] if primeira else partes[0], *partes[1:]]
+        nome, subs = primeira[0], [primeira[1], *partes[1:]]
+    else:
+        subs = partes
+        # Variante C (M8): o 1º pedaço é a cabeça, salvo lista de pares
+        # ("Lei nº…; Lei nº…", mesma 1ª palavra), 1º pedaço de frase longa ou
+        # cabeça que colidiria com outro tópico do chunk.
+        iniciais = {p.split()[0].casefold() for p in partes}
+        if (
+            len(iniciais) > 1
+            and len(partes[0]) <= TAMANHO_FRASE_LONGA
+            and normalizar(partes[0]) not in outros
+        ):
+            nome, subs = partes[0], partes[1:]
     if len({normalizar(x) for x in subs}) != len(subs):
         return False
-    if primeira:
-        nome = primeira[0]
-        if normalizar(nome) != normalizar(topico.nome):
-            topico.nome_origem = topico.nome_origem or topico.nome
+    if normalizar(nome) != normalizar(topico.nome):
+        topico.nome_origem = topico.nome_origem or topico.nome
     topico.nome = nome
     topico.subtopicos = subs
     return True
