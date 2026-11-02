@@ -537,6 +537,6 @@ def test_script_resumo_mostra_memoria_llm_e_sem_no(cenario, monkeypatch, capsys)
     )
     script.main([str(revisao), "--arvore", str(caminho)])
     saida = json.loads(capsys.readouterr().out)
-    assert saida["resolvidos_por_memoria"] == 0
+    assert saida["resolvidos_antes_do_llm_por_memoria"] == 0
     assert saida["propostos_por_llm"] == 1
     assert saida["sem_no"] == 2

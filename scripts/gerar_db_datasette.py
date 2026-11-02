@@ -22,6 +22,8 @@ import sqlite_utils
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src import arvore as arv_mod
+from src import mapeamento_revisao
 from src.edital_parser import CAMPOS_CLASSIFICACAO_CHUNK
 from src.logger import logger
 
@@ -283,6 +285,26 @@ def _inserir_alertas_validacao(
         )
 
 
+def _carregar_contexto_mapeamento():
+    # Árvore ou cache ausente/corrompido não derruba o build: a tabela
+    # `mapeamento_itens` só fica mais pobre (ou vazia).
+    try:
+        arvore = arv_mod.carregar()
+    except Exception as erro:  # noqa: BLE001
+        logger.warning(f"Árvore indisponível para mapeamento_itens: {erro}")
+        arvore = None
+    return arvore, mapeamento_revisao.carregar_cache_propostos()
+
+
+def _inserir_mapeamento(db, resultado: dict, arvore, propostos: dict) -> None:
+    if arvore is None:
+        return
+    linhas = mapeamento_revisao.classificar_seguro(
+        resultado, arvore=arvore, propostos=propostos
+    )
+    mapeamento_revisao.inserir_mapeamento_itens(db, linhas)
+
+
 def gerar_db(revisao_dir: Path = REVISAO_DIR_PADRAO) -> Path:
     db_path = revisao_dir / DB_NOME
     db_path.unlink(missing_ok=True)
@@ -298,6 +320,8 @@ def gerar_db(revisao_dir: Path = REVISAO_DIR_PADRAO) -> Path:
         logger.warning(
             f"Nenhum <edital>.json encontrado em {revisao_dir} — banco gerado vazio."
         )
+
+    arvore, propostos = _carregar_contexto_mapeamento()
 
     for json_path in jsons:
         resultado, auditoria, auditoria_path, validacao = _carregar_par(json_path)
@@ -316,9 +340,13 @@ def gerar_db(revisao_dir: Path = REVISAO_DIR_PADRAO) -> Path:
         if validacao is not None:
             _inserir_alertas_validacao(db, edital, validacao, chunk_id_by_index)
 
+        _inserir_mapeamento(db, resultado, arvore, propostos)
+
         logger.info(
             f"{edital}: {resultado['total_chunks']} chunks carregados no banco de revisão."
         )
+
+    mapeamento_revisao.criar_tabela_vazia(db)
 
     for tabela, colunas in (
         ("chunks", ["texto_enviado_llm", "materia", "cargo"]),

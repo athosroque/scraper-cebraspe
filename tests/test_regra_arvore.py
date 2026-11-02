@@ -3,7 +3,15 @@
 import pytest
 
 from src import canonico
-from src.arvore import ArvoreMestre, carregar, criar_no, mapear, salvar
+from src.arvore import (
+    ArvoreMestre,
+    carregar,
+    criar_no,
+    fundir_nos,
+    mapear,
+    rejeitar,
+    salvar,
+)
 
 
 def _nome(nome):
@@ -173,3 +181,151 @@ def test_proposta_automatica_nao_cria_disciplina():
                 origem,
                 "teste",
             )
+
+
+# Memória das decisões do dono no passo determinístico (P73) -----------------------
+
+
+def _mexer(arvore_path, fn):
+    arv = carregar(arvore_path)
+    fn(arv)
+    salvar(arv, arvore_path)
+
+
+def test_memoria_no_passo_deterministico(monkeypatch, tmp_path, arvore_path):
+    # Decisão humana de outro edital: grafia diferente não casa por nome no edital
+    # atual, mas a memória (mesma chave_regra, mesmo pai) resolve sem LLM.
+    _mexer(
+        arvore_path,
+        lambda a: mapear(
+            a, "direito administrativo|controle externo", ["A-ATO"], "humano"
+        ),
+    )
+    antes = carregar(arvore_path).mapeamentos
+    res = canonico.mapear_novos_itens
+    nomes = canonico.NomesOrigem(
+        assunto={
+            ("nocoes de direito administrativo", "controles externos"): _nome(
+                "Controles externos"
+            ),
+        }
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    r = res(tmp_path, arvore_path)
+    assert (r.por_nome, r.por_memoria, r.pendentes) == (0, 1, 0)
+    arv = carregar(arvore_path)
+    [m] = arv.mapeamentos["nocoes de direito administrativo|controles externos"]
+    assert (m.no_id, m.origem, m.status) == ("A-ATO", "regra", "aprovado")
+    # Piloto/itens já mapeados não mudam.
+    for chave, lista in antes.items():
+        assert arv.mapeamentos[chave] == lista
+    # Idempotente.
+    assert res(tmp_path, arvore_path).total == 0
+
+
+def test_no_ativo_semente_nao_vira_apelido_no_passo(monkeypatch, tmp_path, arvore_path):
+    # "Atos administrativos" é nó ativo: item com o mesmo nome em outra grafia
+    # (sem decisão aprovada) não é mapeado por apelido.
+    nomes = canonico.NomesOrigem(
+        assunto={("direito administrativo", "atos admin"): _nome("Atos admin")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    r = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert r.total == 0 and r.pendentes == 1
+
+
+def test_no_fundido_vira_apelido_no_passo(monkeypatch, tmp_path, arvore_path):
+    def ajusta(a):
+        criar_no(a, "assunto", "Probidade", "M-DA", "humano", id_override="A-PRO")
+        fundir_nos(a, "A-PRO", "A-ATO")
+
+    _mexer(arvore_path, ajusta)
+    nomes = canonico.NomesOrigem(
+        assunto={("direito administrativo", "probidade"): _nome("Probidade")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    r = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert r.por_memoria == 1
+    [m] = carregar(arvore_path).mapeamentos["direito administrativo|probidade"]
+    assert m.no_id == "A-ATO"
+
+
+def test_proposta_nao_aprovada_nunca_promove(monkeypatch, tmp_path, arvore_path):
+    _mexer(
+        arvore_path,
+        lambda a: mapear(
+            a, "direito administrativo|controle", ["A-ATO"], "llm", "proposto"
+        ),
+    )
+    nomes = canonico.NomesOrigem(
+        assunto={("direito administrativo", "controles"): _nome("Controle")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    r = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert r.total == 0
+    assert "direito administrativo|controles" not in carregar(arvore_path).mapeamentos
+
+
+def test_par_rejeitado_nunca_e_devolvido_no_passo(monkeypatch, tmp_path, arvore_path):
+    def ajusta(a):
+        mapear(a, "direito administrativo|controle", ["A-ATO"], "humano")
+        mapear(a, "direito constitucional|controle", ["A-EXE"], "humano")
+        mapear(a, "x|controle", ["A-ATO"], "llm", "proposto")
+        rejeitar(a, "x|controle", "A-ATO")
+
+    _mexer(arvore_path, ajusta)
+    nomes = canonico.NomesOrigem(
+        assunto={("nocoes de direito administrativo", "controle"): _nome("Controle")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    assert canonico.mapear_novos_itens(tmp_path, arvore_path).total == 0
+
+
+def test_memoria_encadeia_materia_assunto_subassunto(
+    monkeypatch, tmp_path, arvore_path
+):
+    def ajusta(a):
+        criar_no(a, "subassunto", "Anulação", "A-ATO", id_override="S-ANU")
+        criar_no(a, "materia", "Direito Adm. Geral", None, id_override="M-OLD")
+        fundir_nos(a, "M-OLD", "M-DA")
+        mapear(a, "direito administrativo|atos administrativos|anulacao", ["S-ANU"])
+
+    _mexer(arvore_path, ajusta)
+    nomes = canonico.NomesOrigem(
+        materia={"direito adm. geral": _nome("Direito Adm. Geral")},
+        assunto={
+            ("direito adm. geral", "atos administrativos"): _nome(
+                "Atos administrativos"
+            )
+        },
+        subassunto={
+            ("direito adm. geral", "atos administrativos", "anulacao"): _nome(
+                "Anulação"
+            )
+        },
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    r = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert (r.total, r.pendentes) == (3, 0)
+    arv = carregar(arvore_path)
+    chave = "direito adm. geral|atos administrativos|anulacao"
+    assert [m.no_id for m in arv.mapeamentos[chave]] == ["S-ANU"]
+
+
+def test_sem_gravar_nao_salva_mas_altera_arvore_em_memoria(
+    monkeypatch, tmp_path, arvore_path
+):
+    _mexer(
+        arvore_path,
+        lambda a: mapear(a, "direito administrativo|controle", ["A-ATO"], "humano"),
+    )
+    nomes = canonico.NomesOrigem(
+        assunto={("nocoes de direito administrativo", "controle"): _nome("Controle")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    conteudo = arvore_path.read_text(encoding="utf-8")
+    mem = carregar(arvore_path)
+    r = canonico.mapear_novos_itens(tmp_path, arvore_path, gravar=False, arvore_mem=mem)
+    assert r.por_memoria == 1
+    assert "nocoes de direito administrativo|controle" in mem.mapeamentos
+    assert arvore_path.read_text(encoding="utf-8") == conteudo

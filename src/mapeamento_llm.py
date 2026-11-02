@@ -105,6 +105,8 @@ class Contabilidade:
     custo_usd: float = 0.0
     pendentes: int = 0
     pulados_cache: int = 0
+    # Resolvidos antes do LLM pelo passo determinístico (regra de nome / memória).
+    resolvidos_regra: int = 0
     resolvidos_memoria: int = 0
     descartados_rejeitados: int = 0
     # Só no dry-run: itens que iriam ao LLM.
@@ -586,38 +588,6 @@ def _rotulos(nomes: canonico.NomesOrigem) -> dict[str, str]:
     return saida
 
 
-def aplicar_memoria(
-    arv: arvore.ArvoreMestre,
-    pendentes: list[Pendente],
-    indice: memoria_mapeamento.Indice,
-) -> int:
-    """Resolve pela memória (sem LLM) os itens que repetem decisão aprovada do dono.
-
-    Grava `origem="regra"`, `status="aprovado"` só quando há decisão aprovada por trás
-    (`memoria_mapeamento` nunca usa proposta não aprovada; A30). Devolve quantos."""
-    resolvidos = 0
-    for p in pendentes:
-        if p.chave in arv.mapeamentos:
-            continue
-        pais = (
-            memoria_mapeamento.nos_aprovados_do_pai(arv, p.chave)
-            if p.pais
-            else frozenset()
-        )
-        nos = memoria_mapeamento.resolver_por_memoria(
-            arv, canonico.chave_regra(p.nome).chave, p.nivel, pais, indice
-        )
-        if not nos:
-            continue
-        try:
-            arvore.mapear(arv, p.chave, sorted(nos), origem="regra", status="aprovado")
-        except arvore.ArvoreInvalida as e:
-            logger.warning(f"[MAPEAR] Memória recusada para {p.chave}: {e}")
-            continue
-        resolvidos += 1
-    return resolvidos
-
-
 def _linhas_exemplos(exemplos: list[memoria_mapeamento.Exemplo]) -> list[str]:
     linhas = []
     for e in exemplos:
@@ -676,6 +646,14 @@ def mapear_itens_novos(
     nenhum_cache: dict = cache.setdefault("nenhum", {})
     lotes_feitos = 0
 
+    # A memória do dono faz parte do passo determinístico (P73): aqui só se garante
+    # que ele já rodou (idempotente) e o LLM trata o que sobrar. No dry-run nada é
+    # salvo, mas a árvore em memória enxerga o resultado.
+    pre = canonico.mapear_novos_itens(
+        revisao_dir, arvore_path, gravar=not dry_run, arvore_mem=arv
+    )
+    conta.resolvidos_regra = pre.por_nome
+    conta.resolvidos_memoria = pre.por_memoria
     nomes = canonico.coletar_nomes(revisao_dir)
     rotulos = _rotulos(nomes)
     todos = levantar_pendentes(revisao_dir, arv, concurso, nomes=nomes)
@@ -688,14 +666,6 @@ def mapear_itens_novos(
         pend_nivel = [
             p for p in todos if p.nivel == nivel and p.chave not in arv.mapeamentos
         ]
-        # Memória primeiro (sem LLM). No dry-run altera só a árvore em memória, que
-        # nunca é salva, para que o nível seguinte já enxergue o pai resolvido.
-        n_memoria = aplicar_memoria(arv, pend_nivel, indice)
-        if n_memoria:
-            conta.resolvidos_memoria += n_memoria
-            if not dry_run:
-                arvore.salvar(arv, arvore_path)
-            pend_nivel = [p for p in pend_nivel if p.chave not in arv.mapeamentos]
         for rotulo, _nivel, disciplinas, itens, dicas in _grupos(arv, pend_nivel):
             if disciplinas:
                 sel = selecionaveis_da_disciplina(arv, disciplinas, nivel)

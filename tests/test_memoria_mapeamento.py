@@ -92,12 +92,23 @@ def test_apelido_de_no_fundido(arv):
     ) == {"A-ATO"}
 
 
-def test_apelido_por_nome_de_no_ativo_respeita_disciplina_e_nivel(arv):
-    pais_da_ = pais_da(arv, "direito administrativo|x")
-    # origem "humano" do nó: vale; mas só dentro da disciplina do pai.
+def test_no_ativo_semente_ou_humano_nao_vira_apelido(arv):
+    pais = pais_da(arv, "direito administrativo|x")
     arvore.criar_no(arv, "assunto", "Probidade", "M-DA", "humano", id_override="A-PRO")
+    arvore.criar_no(
+        arv, "assunto", "Improbidade", "M-DA", "semente", id_override="A-IMP"
+    )
+    assert mem.resolver_por_memoria(arv, regra("Probidade"), "assunto", pais) is None
+    assert mem.resolver_por_memoria(arv, regra("Improbidade"), "assunto", pais) is None
+    assert mem.construir_indice(arv).apelidos.get(regra("Probidade")) is None
+
+
+def test_apelido_de_fundido_respeita_disciplina_e_nivel(arv):
+    pais_da_ = pais_da(arv, "direito administrativo|x")
+    arvore.criar_no(arv, "assunto", "Probidade", "M-DA", "humano", id_override="A-PRO")
+    arvore.fundir_nos(arv, "A-PRO", "A-LIC")
     assert mem.resolver_por_memoria(arv, regra("Probidade"), "assunto", pais_da_) == {
-        "A-PRO"
+        "A-LIC"
     }
     pais_pen = pais_da(arv, "direito penal|x")
     assert (

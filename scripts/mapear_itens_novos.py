@@ -10,10 +10,11 @@ proposta de nó EXISTENTE da disciplina dele ou "nenhum". O resultado é gravado
 como `origem="llm"`, `status="proposto"` (A30): o dono aprova com
 `scripts/curar_arvore.py`. O modelo nunca cria nó nem disciplina (P72).
 
-Antes do LLM, `src/memoria_mapeamento.py` resolve sem custo o item que repete uma
-decisão já aprovada pelo dono (`regra`/`aprovado`, P73). O prompt leva o contexto dos
-subitens, exemplos aprovados e os pares rejeitados; o resumo mostra quantos itens saíram
-da memória, do LLM e quantos ficaram sem nó.
+A memória das decisões do dono (`src/memoria_mapeamento.py`, P73) já faz parte do passo
+determinístico: este script só garante que ele rodou (idempotente) e trata o que sobrar.
+O prompt leva o contexto dos subitens, exemplos aprovados e os pares rejeitados; o resumo
+mostra quantos itens saíram antes do LLM (regra de nome e memória), quantos o LLM propôs e
+quantos ficaram sem nó.
 
 `--dry-run` não chama o LLM nem grava: mostra quantos itens estão pendentes e uma
 estimativa de custo. Chamada via `chamar_llm_json` com `REASONING_PADRAO`
@@ -89,14 +90,16 @@ def main(args_list: list[str] | None = None) -> None:
         "pulados_cache_nenhum": conta.pulados_cache,
     }
     if args.dry_run:
-        saida["resolvidos_por_memoria"] = conta.resolvidos_memoria
+        saida["resolvidos_antes_do_llm_por_regra"] = conta.resolvidos_regra
+        saida["resolvidos_antes_do_llm_por_memoria"] = conta.resolvidos_memoria
         saida.update(estimar(conta, conta.itens_previstos))
     else:
         saida.update(
             {
-                "resolvidos_por_memoria": conta.resolvidos_memoria,
+                "resolvidos_antes_do_llm_por_regra": conta.resolvidos_regra,
+                "resolvidos_antes_do_llm_por_memoria": conta.resolvidos_memoria,
                 "propostos_por_llm": conta.propostos,
-                "sem_no": conta.pendentes - conta.resolvidos_memoria - conta.propostos,
+                "sem_no": conta.pendentes - conta.propostos,
                 "nenhum": conta.nenhum,
                 "descartados_par_rejeitado": conta.descartados_rejeitados,
                 "recusados_na_gravacao": conta.rejeitados_gravacao,

@@ -928,25 +928,59 @@ def _rotulo_grupo(estado: dict, nivel: str, gid: str) -> str:
     return g["nome"]
 
 
+@dataclass
+class ResultadoRegra:
+    """Contagem do passo determinístico (regra de nome + memória do dono)."""
+
+    por_nome: int = 0
+    por_memoria: int = 0
+    pendentes: int = 0
+
+    @property
+    def total(self) -> int:
+        return self.por_nome + self.por_memoria
+
+
 def mapear_novos_itens_por_regra(
-    revisao_dir: Path, arvore_path: Path | None = None
+    revisao_dir: Path, arvore_path: Path | None = None, *, gravar: bool = True
 ) -> int:
-    """Mapeia item novo de edital para a árvore mestre por regra (ADR-030).
+    """Passo determinístico (sem LLM). Devolve quantos itens foram mapeados;
+    o detalhe (nome vs. memória vs. pendentes) está em `mapear_novos_itens`."""
+    return mapear_novos_itens(revisao_dir, arvore_path, gravar=gravar).total
 
-    O item sem mapeamento herda os nós de um item já aprovado com a mesma
-    `chave_regra` **no mesmo nó-pai efetivo** (os nós para onde o pai do
-    item aponta). Regra ambígua (dois itens com nós diferentes) ou item cujo
-    pai não tem nó ficam pendentes para a curadoria. Título de bloco (matéria)
-    sem item equivalente aponta para o único nó de disciplina ou assunto de
-    mesmo nome, nunca vira disciplina nova. Nunca cria nó.
-    Devolve quantos itens foram mapeados.
+
+def mapear_novos_itens(
+    revisao_dir: Path,
+    arvore_path: Path | None = None,
+    *,
+    gravar: bool = True,
+    arvore_mem=None,
+) -> ResultadoRegra:
+    """Mapeia item novo de edital para a árvore mestre sem LLM (ADR-030).
+
+    Por nível (matéria, tópico, subtópico), nesta ordem:
+    1. regra de nome: o item sem mapeamento herda os nós de um item já aprovado
+       com a mesma `chave_regra` **no mesmo nó-pai efetivo**; regra ambígua
+       (dois itens com nós diferentes) fica pendente;
+    2. memória das decisões do dono (`memoria_mapeamento`, P73): decisão aprovada
+       repetida em outro edital ou apelido de nó fundido; nunca usa proposta não
+       aprovada nem devolve par rejeitado;
+    3. título de bloco (matéria) sem equivalente aponta para o único nó de
+       disciplina ou assunto de mesmo nome, nunca vira disciplina nova.
+    Item cujo pai não tem nó fica pendente. Nunca cria nó. O assunto mapeado
+    agora serve de pai do subassunto. Com `gravar=False` (dry-run) a árvore em
+    memória muda, mas nada é salvo. `arvore_mem` (opcional) é uma árvore já
+    carregada, alterada no lugar, para o chamador enxergar o resultado.
     """
+    # Import local: memoria_mapeamento importa este módulo.
     from src import arvore as arv_mod
+    from src import memoria_mapeamento
 
+    res = ResultadoRegra()
     arvore_path = arvore_path or arv_mod.ARVORE_PADRAO
-    if not arvore_path.exists():
-        return 0
-    arvore = arv_mod.carregar(arvore_path)
+    if arvore_mem is None and not arvore_path.exists():
+        return res
+    arvore = arvore_mem if arvore_mem is not None else arv_mod.carregar(arvore_path)
     nomes = coletar_nomes(revisao_dir)
 
     def nos_aprovados(chave: str) -> frozenset[str]:
@@ -978,7 +1012,6 @@ def mapear_novos_itens_por_regra(
             if regra:
                 nos_por_nome.setdefault(regra, set()).add(no.id)
 
-    novos = 0
     # Nível a nível: o assunto mapeado agora já serve de pai para o subassunto.
     for nivel in NIVEIS:
         fonte = getattr(nomes, nivel)
@@ -993,8 +1026,19 @@ def mapear_novos_itens_por_regra(
                     indice.setdefault(sig, set()).add(nos)
             elif sig:
                 pendentes.append((chave, sig))
+            else:
+                res.pendentes += 1
+        memoria = memoria_mapeamento.construir_indice(arvore) if pendentes else None
         for chave, sig in pendentes:
             candidatos = indice.get(sig, set())
+            origem_memoria = False
+            if not candidatos:
+                nos_mem = memoria_mapeamento.resolver_por_memoria(
+                    arvore, sig[2], nivel, sig[1], memoria
+                )
+                if nos_mem:
+                    candidatos = {nos_mem}
+                    origem_memoria = True
             if not candidatos and nivel == "materia":
                 # Título de bloco fora da lista de disciplinas: vira o assunto de
                 # mesmo nome, nunca disciplina nova (Etapa 5B.3, ADR-030).
@@ -1002,14 +1046,26 @@ def mapear_novos_itens_por_regra(
                 if len(alvo) == 1:
                     candidatos = {frozenset(alvo)}
             if len(candidatos) != 1:
+                res.pendentes += 1
                 continue
             (nos,) = candidatos
-            arv_mod.mapear(
-                arvore, chave, sorted(nos), origem="regra", status="aprovado"
-            )
-            novos += 1
+            try:
+                arv_mod.mapear(
+                    arvore, chave, sorted(nos), origem="regra", status="aprovado"
+                )
+            except arv_mod.ArvoreInvalida as e:
+                logger.warning(f"[ARVORE] Mapeamento recusado para {chave}: {e}")
+                res.pendentes += 1
+                continue
+            if origem_memoria:
+                res.por_memoria += 1
+            else:
+                res.por_nome += 1
 
-    if novos:
+    if res.total and gravar:
         arv_mod.salvar(arvore, arvore_path)
-        logger.info(f"[ARVORE] {novos} item(ns) novo(s) mapeado(s) por regra.")
-    return novos
+    logger.info(
+        f"[ARVORE] Passo determinístico: {res.por_nome} por regra de nome, "
+        f"{res.por_memoria} por memória do dono, {res.pendentes} pendente(s)."
+    )
+    return res

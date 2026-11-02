@@ -5,7 +5,8 @@ A28; nada de rede, nada de LLM). Elas transformam o que o dono já decidiu em:
 
 a) `resolver_por_memoria`: resposta determinística para item novo que repete uma
    decisão aprovada (mesma `chave_regra`, mesmo pai efetivo) ou cujo nome é um
-   apelido exato de nó (nome de nó fundido, ou de nó ativo de origem humana/semente);
+   apelido exato de nó (só o nome de nó FUNDIDO, apontando para o destino ativo;
+   nó ativo nunca gera apelido, para a memória não adivinhar por nome);
 b) `exemplos_aprovados`: pares item -> caminho do nó, para o few-shot do prompt;
 c) `rejeicoes`: pares (item, nó) que o dono rejeitou, para o prompt avisar e a
    pós-validação descartar a repetição.
@@ -34,9 +35,6 @@ NIVEIS_ALVO = {
 }
 _NIVEL_POR_PROFUNDIDADE = {1: "materia", 2: "assunto", 3: "subassunto"}
 
-# Origens cujo nome de nó ativo vale como apelido: curadas pelo dono (ou semeadas
-# dos grupos que ele aprovou na 5B). Nó ativo de origem `llm` fica de fora.
-_ORIGENS_APELIDO = frozenset({"semente", "humano"})
 # Origens de mapeamento aprovado que servem de exemplo no prompt: decisões
 # não triviais. `regra` e `semente` são cópias por nome e não ensinam nada.
 _ORIGENS_EXEMPLO = frozenset({"humano", "llm"})
@@ -118,7 +116,7 @@ class Indice:
 
     # (nível, nós do pai, chave_regra) -> conjuntos de nós aprovados distintos
     decisoes: dict[tuple, set[frozenset[str]]] = field(default_factory=dict)
-    # chave_regra -> nós ativos que têm esse nome (atual ou histórico de fundido)
+    # chave_regra -> destinos ativos de nós fundidos que tinham esse nome
     apelidos: dict[str, set[str]] = field(default_factory=dict)
     vetados: dict[tuple[str, str], str] = field(default_factory=dict)
 
@@ -140,9 +138,7 @@ def construir_indice(arv: arvore.ArvoreMestre) -> Indice:
         if regra:
             ind.decisoes.setdefault((nivel, pais, regra), set()).add(nos)
     for no in arv.nos.values():
-        if no.status == "fundido" or (
-            no.status == "ativo" and no.origem in _ORIGENS_APELIDO
-        ):
+        if no.status == "fundido":
             regra = chave_regra(no.nome).chave
             final = arvore.resolver_no(arv, no.id)
             alvo = arv.nos.get(final)

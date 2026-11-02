@@ -659,8 +659,9 @@ Teste guarda: `tests/test_curar_arvore.py::test_criar_renomear_mover_fundir_desm
 
 Item novo de edital (pipeline, `atualizar_revisao.atualizar_arvore`):
 `canonico.mapear_novos_itens_por_regra` copia os nós de um item aprovado com
-a mesma `chave_regra` **no mesmo nó-pai efetivo**. Regra ambígua ou pai sem
-nó fica pendente no `arvore.html`.
+a mesma `chave_regra` **no mesmo nó-pai efetivo**; sem candidato, tenta a memória das
+decisões do dono (P73). Regra ambígua ou pai sem nó fica pendente no `arvore.html`.
+O log traz a contagem por regra de nome, por memória e pendentes.
 
 ADRs: nenhuma
 
@@ -684,17 +685,21 @@ Teste guarda: `tests/test_regra_arvore.py::test_titulo_de_bloco_fora_da_lista_vi
 #### P73
 
 O mapeamento de item novo aprende com o dono (`src/memoria_mapeamento.py`,
-funções puras sobre a árvore). Ordem: (1) memória, sem LLM: item de mesma `chave_regra` e
-mesmo pai efetivo de uma decisão **aprovada**, ou apelido exato de nó (nome de nó fundido,
-ou de nó ativo `semente`/`humano`) na disciplina do pai, com candidato único, vira
-`regra`/`aprovado`; (2) o LLM recebe contexto de subitens extraído do `<edital>.json`
+funções puras sobre a árvore) e a memória é parte do **passo determinístico**
+(`canonico.mapear_novos_itens_por_regra`, rodado a cada extração, sem LLM). Ordem, nível a
+nível (o assunto mapeado agora serve de pai do subassunto): (1) regra de nome; (2) memória:
+item de mesma `chave_regra` e mesmo pai efetivo de uma decisão **aprovada**, ou apelido
+exato de nó **fundido** (só nó fundido gera apelido, apontando ao destino ativo; nó ativo
+nunca) na disciplina do pai, com candidato único, vira `regra`/`aprovado`; ambiguidade
+fica pendente; nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
+reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
 (entra no hash do cache), exemplos aprovados do dono e os pares rejeitados. Proposta
 `proposto` nunca é fonte da memória (só vira fonte depois que o dono a aprova), par
-rejeitado nunca é reproposto, e a memória não muda status existente (A30).
+rejeitado nunca é devolvido nem reproposto, e a memória não muda status existente (A30).
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
 
-Teste guarda: `tests/test_memoria_mapeamento.py::test_proposta_nao_aprovada_nao_e_fonte`, `tests/test_mapeamento_llm.py::test_par_rejeitado_nao_e_reproposto_e_vai_no_prompt`, `tests/test_mapeamento_llm.py::test_memoria_resolve_item_repetido_entre_dois_editais`
+Teste guarda: `tests/test_memoria_mapeamento.py::test_proposta_nao_aprovada_nao_e_fonte`, `tests/test_mapeamento_llm.py::test_par_rejeitado_nao_e_reproposto_e_vai_no_prompt`, `tests/test_mapeamento_llm.py::test_memoria_resolve_item_repetido_entre_dois_editais`, `tests/test_regra_arvore.py::test_memoria_no_passo_deterministico`
 
 ### classificacao
 

@@ -25,6 +25,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src import arvore as arv_mod
+from src import mapeamento_revisao
 from src.edital_parser import PADRAO_ITEM_NUMERADO
 from src.logger import logger
 
@@ -110,6 +112,19 @@ details.secao > summary { cursor: pointer; font-size: 1.2rem; font-weight: 600; 
 .revisar-box th, .revisar-box td { text-align: left; padding: 0.25rem 0.5rem; vertical-align: top;
         border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); }
 .badge.proposta { background: color-mix(in srgb, #0d9488 25%, Canvas); }
+.origem-box { margin-bottom: 1.5rem; padding: 0.75rem 1.25rem; border-radius: 8px;
+              border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); }
+.origem-box h2 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.origem-box .cards { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.origem-box .card { border-radius: 8px; padding: 0.4rem 0.9rem; min-width: 9rem;
+                    background: color-mix(in srgb, CanvasText 6%, Canvas); font-size: 0.85rem; }
+.origem-box .card strong { display: block; font-size: 1.4rem; }
+.origem-box .card.auto { background: color-mix(in srgb, #16a34a 16%, Canvas); }
+.origem-box .card.proposta { background: color-mix(in srgb, #0d9488 22%, Canvas); }
+.origem-box .card.sem { background: color-mix(in srgb, #7c3aed 22%, Canvas); }
+.nada-a-decidir { margin-bottom: 1rem; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 700;
+                  color: #14532d; background: color-mix(in srgb, #16a34a 22%, Canvas);
+                  border: 2px solid #16a34a; }
 .chunk:target { outline: 3px solid #7c3aed; }
 """
 
@@ -374,8 +389,39 @@ def _link_chunk(indices: list, rotulo: str | None = None) -> str:
     )
 
 
+def _bloco_origem_mapeamento(linhas: list[dict] | None) -> str:
+    """Quadro "De onde veio cada mapeamento", em contagens por categoria."""
+    if not linhas:
+        return ""
+    c = mapeamento_revisao.contar_por_categoria(linhas)
+    auto = c["auto"] + c["regra_nome"] + c["dono"]
+    cards = [
+        ("auto", c["regra_nome"], mapeamento_revisao.ROTULOS["regra_nome"]),
+        ("auto", c["auto"], mapeamento_revisao.ROTULOS["auto"]),
+        ("auto", c["dono"], mapeamento_revisao.ROTULOS["dono"]),
+        ("proposta", c["proposta"], mapeamento_revisao.ROTULOS["proposta"]),
+        ("sem", c["sem_equivalente"], mapeamento_revisao.ROTULOS["sem_equivalente"]),
+    ]
+    html = "".join(
+        f"<div class='card {cls}'><strong>{n}</strong>{escape(rotulo)}</div>"
+        for cls, n, rotulo in cards
+    )
+    return (
+        "<section class='origem-box' aria-label='De onde veio cada mapeamento'>"
+        f"<h2>De onde veio cada mapeamento ({len(linhas)} itens, {auto} já resolvidos)</h2>"
+        f"<div class='cards'>{html}</div>"
+        "<p class='legenda'>Regra de nome e memória das suas decisões gravam com a mesma "
+        "origem (<code>regra</code>); por isso aparecem juntas em "
+        "&quot;automático (regra/memória)&quot;.</p></section>"
+    )
+
+
 def _bloco_o_que_revisar(
-    resultado: dict, auditoria: dict, validacao: dict | None, novidades: dict
+    resultado: dict,
+    auditoria: dict,
+    validacao: dict | None,
+    novidades: dict,
+    mapeamento: list[dict] | None = None,
 ) -> str:
     # (a) alertas bloqueantes e chunks com falha
     itens_a = []
@@ -416,6 +462,11 @@ def _bloco_o_que_revisar(
         )
     # (c) propostas do LLM a conferir
     linhas_c = []
+    detalhe_mapeamento = {
+        (m["nivel"], m["item"]): m
+        for m in (mapeamento or [])
+        if m.get("categoria") == "proposta"
+    }
     for p in novidades.get("propostas", []):
         nivel = p.get("nivel")
         if nivel == "disciplina":
@@ -423,12 +474,15 @@ def _bloco_o_que_revisar(
         else:
             alvo = p.get("assunto") if nivel == "subassunto" else p.get("item")
             indices = _chunks_do_assunto(resultado, alvo or "")
-        conf = p.get("confianca")
+        extra = detalhe_mapeamento.get((nivel, p.get("item"))) or {}
+        conf = p.get("confianca") or extra.get("confianca")
+        just = extra.get("justificativa")
         linhas_c.append(
             f"<tr><td>{escape(str(p.get('item')))}"
             f"<div class='sub'>{escape(str(nivel))} · {escape(str(p.get('disciplina') or ''))}</div></td>"
             f"<td>{escape(str(p.get('no_caminho') or p.get('no_id')))}</td>"
             f"<td>{escape(str(conf)) if conf is not None else '—'}</td>"
+            f"<td>{escape(str(just)) if just else '—'}</td>"
             f"<td>{_link_chunk(indices)}</td></tr>"
         )
 
@@ -443,7 +497,7 @@ def _bloco_o_que_revisar(
         propostas_html = (
             f"<h3>Propostas da IA a conferir ({len(linhas_c)})</h3>"
             "<table><thead><tr><th>Item do edital</th><th>Nó sugerido (caminho)</th>"
-            f"<th>Confiança</th><th>Onde</th></tr></thead><tbody>{''.join(linhas_c)}</tbody></table>"
+            f"<th>Confiança</th><th>Justificativa da IA</th><th>Onde</th></tr></thead><tbody>{''.join(linhas_c)}</tbody></table>"
         )
     else:
         propostas_html = "<h3>Propostas da IA a conferir (0)</h3><p class='ok'>Nenhuma proposta pendente.</p>"
@@ -453,9 +507,18 @@ def _bloco_o_que_revisar(
         if itens_a
         else "<p class='ok'>Nenhum alerta bloqueante.</p>"
     )
+    nada = not (itens_a or itens_b or linhas_c)
+    nada_html = (
+        "<p class='nada-a-decidir'>✔ Nada a decidir neste edital: sem alertas "
+        "bloqueantes, sem itens novos e sem propostas pendentes. Pode aprovar.</p>"
+        if nada
+        else ""
+    )
     return (
-        "<section class='revisar-box' aria-label='O que revisar'><h2>O que revisar</h2>"
-        "<p class='legenda'>Novo = nenhum nó equivalente na árvore; será preciso criar ou mapear "
+        _bloco_origem_mapeamento(mapeamento)
+        + "<section class='revisar-box' aria-label='O que revisar'><h2>O que revisar</h2>"
+        + nada_html
+        + "<p class='legenda'>Novo = nenhum nó equivalente na árvore; será preciso criar ou mapear "
         "na curadoria. Proposta = a IA achou este nó existente; aprovar via curar_arvore.</p>"
         + alertas_html
         + novos_html
@@ -469,6 +532,7 @@ def renderizar_edital(
     auditoria: dict,
     validacao: dict | None,
     novidades: dict | None = None,
+    mapeamento: list[dict] | None = None,
 ) -> str:
     novidades = {**NOVIDADES_VAZIAS, **(novidades or {})}
     disciplinas_novas, assuntos_novos = _novos_do_edital(novidades)
@@ -513,7 +577,9 @@ def renderizar_edital(
     total_alertas = validacao["total_alertas"] if validacao else "—"
     total_informativos = validacao.get("total_informativos", 0) if validacao else "—"
     edital = escape(_rotulo_concurso(resultado) + resultado["edital"])
-    revisar_html = _bloco_o_que_revisar(resultado, auditoria, validacao, novidades)
+    revisar_html = _bloco_o_que_revisar(
+        resultado, auditoria, validacao, novidades, mapeamento
+    )
     return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -714,6 +780,15 @@ def _carregar_trio(json_path: Path) -> tuple[dict, dict | None, dict | None]:
     return resultado, auditoria, validacao
 
 
+def _contexto_mapeamento():
+    try:
+        arvore = arv_mod.carregar()
+    except Exception as erro:  # noqa: BLE001
+        logger.warning(f"Árvore indisponível; sem quadro de origem: {erro}")
+        arvore = None
+    return arvore, mapeamento_revisao.carregar_cache_propostos()
+
+
 def gerar_relatorios(
     revisao_dir: Path = REVISAO_DIR_PADRAO,
     novidades_fn: FuncaoNovidades | None = None,
@@ -732,6 +807,7 @@ def gerar_relatorios(
         and not p.name.endswith(".validacao.json")
     )
 
+    arvore, propostos = _contexto_mapeamento()
     editais_index = []
     for json_path in jsons:
         resultado, auditoria, validacao = _carregar_trio(json_path)
@@ -742,7 +818,14 @@ def gerar_relatorios(
             continue
 
         novidades = _novidades_seguras(resultado, novidades_fn)
-        html = renderizar_edital(resultado, auditoria, validacao, novidades)
+        mapeamento = (
+            mapeamento_revisao.classificar_seguro(
+                resultado, arvore=arvore, propostos=propostos
+            )
+            if arvore is not None
+            else []
+        )
+        html = renderizar_edital(resultado, auditoria, validacao, novidades, mapeamento)
         arquivo_html = f"{json_path.stem}.html"
         (saida_dir / arquivo_html).write_text(html, encoding="utf-8")
         editais_index.append(

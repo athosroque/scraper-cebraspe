@@ -79,6 +79,7 @@ def atualizar_arvore(revisao_dir: Path) -> None:
         logger.info(f"[CANONICO] {revisao_dir}: nenhum edital, árvore não atualizada.")
         return
     try:
+        # Regra de nome + memória do dono (P52/P73); o log traz a contagem.
         canonico.mapear_novos_itens_por_regra(revisao_dir)
         relatorio_arvore.gerar_relatorio_arvore()
     except Exception as e:  # noqa: BLE001

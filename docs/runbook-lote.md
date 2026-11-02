@@ -388,13 +388,17 @@ venv/bin/python -m scripts.mapear_itens_novos --dry-run --concurso <SLUG>  # pen
 venv/bin/python -m scripts.mapear_itens_novos --concurso <SLUG>            # paga o LLM e grava propostas
 ```
 
-Ordem do passo (P73): (1) a **memória** resolve sem LLM o item que repete decisão aprovada
-(mesma `chave_regra`, mesmo pai) ou é apelido exato de nó, gravando `regra`/`aprovado`;
-(2) o LLM recebe, por item, o caminho do edital e os subitens (até 8 e ~300 caracteres, do
-`<edital>.json`), exemplos que o dono já aprovou na mesma disciplina e os pares que ele
-rejeitou. Par rejeitado nunca é reproposto. A proposta do LLM que o dono aprova passa a valer
-como memória nas execuções seguintes. O resumo mostra `resolvidos_por_memoria`,
-`propostos_por_llm` e `sem_no`; o dry-run não conta os itens da memória.
+Ordem do passo (P73): a **memória** das decisões do dono faz parte do passo determinístico
+(`canonico.mapear_novos_itens_por_regra`, que roda sozinho a cada extração, sem LLM): item
+que repete decisão aprovada (mesma `chave_regra`, mesmo pai) ou é apelido exato de nó
+**fundido** vira `regra`/`aprovado`; nó ativo não gera apelido. O log mostra quantos itens
+saíram por regra de nome, por memória e quantos seguem pendentes. Só então o LLM roda
+(`mapear_itens_novos` reexecuta o passo antes, idempotente) e recebe, por item, o caminho do
+edital e os subitens (até 8 e ~300 caracteres, do `<edital>.json`), exemplos que o dono já
+aprovou na mesma disciplina e os pares que ele rejeitou. Par rejeitado nunca é reproposto. A
+proposta do LLM que o dono aprova passa a valer como memória nas execuções seguintes. O
+resumo mostra `resolvidos_antes_do_llm_por_regra`, `resolvidos_antes_do_llm_por_memoria`,
+`propostos_por_llm` e `sem_no`; o dry-run mostra os dois primeiros.
 
 O que conferir:
 - K22–K24 antes e depois (P71): o piloto não pode mudar; item já mapeado não é reavaliado;
