@@ -208,7 +208,8 @@ REGRAS_PATTERNS_1: tuple[Regra, ...] = (
         texto=(
             "Chaves do OpenRouter são dedicadas por etapa (`llm_openrouter.ETAPA_*` +\n"
             "`chave_openrouter`): `OPENROUTER_KEY_TAXONOMIA_EDITAL`, `_SINONIMOS`,\n"
-            "`_CURADORIA_ARVORE`, `_CLASSIFICACAO_QUESTOES` e `_TELEGRAM`. O nome da chave\n"
+            "`_CURADORIA_ARVORE`, `_MAPEAMENTO_ITENS` (cai na da curadoria),\n"
+            "`_CLASSIFICACAO_QUESTOES` e `_TELEGRAM`. O nome da chave\n"
             "no OpenRouter é igual ao nome do trace no Langfuse\n"
             "(`cebraspe-<etapa>-<função>`). Chave vazia cai na `OPENROUTER_API_KEY`\n"
             "com aviso `[CHAVE_FALLBACK]` no log."

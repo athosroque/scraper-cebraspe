@@ -103,6 +103,13 @@ details.secao > summary { cursor: pointer; font-size: 1.2rem; font-weight: 600; 
 .revisar-box ul { margin: 0.2rem 0; padding-left: 1.3rem; }
 .revisar-box .ok { color: #15803d; font-weight: 600; }
 .revisar-box .sub { font-size: 0.85rem; opacity: 0.8; }
+.revisar-box .legenda { font-size: 0.85rem; opacity: 0.85; margin: 0 0 0.5rem; }
+.revisar-box .novos { border: 2px solid #7c3aed; border-radius: 8px; padding: 0.2rem 0.9rem 0.6rem;
+                      background: color-mix(in srgb, #7c3aed 18%, Canvas); }
+.revisar-box table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.revisar-box th, .revisar-box td { text-align: left; padding: 0.25rem 0.5rem; vertical-align: top;
+        border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); }
+.badge.proposta { background: color-mix(in srgb, #0d9488 25%, Canvas); }
 .chunk:target { outline: 3px solid #7c3aed; }
 """
 
@@ -276,6 +283,8 @@ NOVIDADES_VAZIAS = {
     "total_disciplinas": 0,
     "total_assuntos": 0,
     "total_itens_novos": 0,
+    "propostas": [],
+    "total_propostas": 0,
 }
 
 FuncaoNovidades = Callable[[dict], dict]
@@ -387,14 +396,12 @@ def _bloco_o_que_revisar(
                 f"<li><span class='badge bloq'>falha</span> {_link_chunk([c.get('chunk_index')])}"
                 f" — {escape(str(status))}</li>"
             )
-    # (b) disciplinas novas
+    # (b) realmente novos: sem nó equivalente, aprovado ou proposto
     itens_b = [
-        f"<li><strong>{escape(str(d))}</strong> "
+        f"<li><span class='novo-tag'>DISCIPLINA</span> <strong>{escape(str(d))}</strong> "
         f"{_link_chunk(_chunks_da_disciplina(resultado, auditoria, d))}</li>"
         for d in novidades.get("disciplinas_novas", [])
     ]
-    # (c) assuntos novos
-    itens_c = []
     for a in novidades.get("assuntos_novos", []):
         subs = a.get("subassuntos") or []
         sub_html = (
@@ -402,21 +409,57 @@ def _bloco_o_que_revisar(
             if subs
             else ""
         )
-        itens_c.append(
-            f"<li><strong>{escape(str(a.get('assunto')))}</strong> "
+        itens_b.append(
+            f"<li><span class='novo-tag'>ASSUNTO</span> <strong>{escape(str(a.get('assunto')))}</strong> "
             f"<span class='sub'>em {escape(str(a.get('disciplina')))}</span> "
             f"{_link_chunk(_chunks_do_assunto(resultado, a.get('assunto') or ''))}{sub_html}</li>"
         )
+    # (c) propostas do LLM a conferir
+    linhas_c = []
+    for p in novidades.get("propostas", []):
+        nivel = p.get("nivel")
+        if nivel == "disciplina":
+            indices = _chunks_da_disciplina(resultado, auditoria, p.get("item") or "")
+        else:
+            alvo = p.get("assunto") if nivel == "subassunto" else p.get("item")
+            indices = _chunks_do_assunto(resultado, alvo or "")
+        conf = p.get("confianca")
+        linhas_c.append(
+            f"<tr><td>{escape(str(p.get('item')))}"
+            f"<div class='sub'>{escape(str(nivel))} · {escape(str(p.get('disciplina') or ''))}</div></td>"
+            f"<td>{escape(str(p.get('no_caminho') or p.get('no_id')))}</td>"
+            f"<td>{escape(str(conf)) if conf is not None else '—'}</td>"
+            f"<td>{_link_chunk(indices)}</td></tr>"
+        )
 
-    def secao(titulo: str, itens: list[str], vazio: str) -> str:
-        corpo = f"<ul>{''.join(itens)}</ul>" if itens else f"<p class='ok'>{vazio}</p>"
-        return f"<h3>{titulo} ({len(itens)})</h3>{corpo}"
+    if itens_b:
+        novos_html = (
+            f"<div class='novos'><h3>Realmente novos — sem nó equivalente ({len(itens_b)})</h3>"
+            f"<ul>{''.join(itens_b)}</ul></div>"
+        )
+    else:
+        novos_html = "<h3>Realmente novos — sem nó equivalente (0)</h3><p class='ok'>Nenhum item novo sem equivalente.</p>"
+    if linhas_c:
+        propostas_html = (
+            f"<h3>Propostas da IA a conferir ({len(linhas_c)})</h3>"
+            "<table><thead><tr><th>Item do edital</th><th>Nó sugerido (caminho)</th>"
+            f"<th>Confiança</th><th>Onde</th></tr></thead><tbody>{''.join(linhas_c)}</tbody></table>"
+        )
+    else:
+        propostas_html = "<h3>Propostas da IA a conferir (0)</h3><p class='ok'>Nenhuma proposta pendente.</p>"
 
+    alertas_html = f"<h3>Alertas bloqueantes e falhas ({len(itens_a)})</h3>" + (
+        f"<ul>{''.join(itens_a)}</ul>"
+        if itens_a
+        else "<p class='ok'>Nenhum alerta bloqueante.</p>"
+    )
     return (
         "<section class='revisar-box' aria-label='O que revisar'><h2>O que revisar</h2>"
-        + secao("Alertas bloqueantes e falhas", itens_a, "Nenhum alerta bloqueante.")
-        + secao("Disciplinas novas", itens_b, "Nenhuma disciplina nova.")
-        + secao("Assuntos novos", itens_c, "Nenhum assunto novo.")
+        "<p class='legenda'>Novo = nenhum nó equivalente na árvore; será preciso criar ou mapear "
+        "na curadoria. Proposta = a IA achou este nó existente; aprovar via curar_arvore.</p>"
+        + alertas_html
+        + novos_html
+        + propostas_html
         + "</section>"
     )
 
@@ -511,6 +554,7 @@ def _resumo_edital(
         "total_assuntos": novidades.get("total_assuntos", 0),
         "disciplinas_novas": len(disciplinas_novas),
         "assuntos_novos": len(assuntos_novos),
+        "propostas": len(novidades.get("propostas", [])),
     }
 
 
@@ -520,6 +564,10 @@ def _tem_problema(e: dict) -> bool:
 
 def _tem_novidade(e: dict) -> bool:
     return bool(e.get("disciplinas_novas") or e.get("assuntos_novos"))
+
+
+def _tem_proposta(e: dict) -> bool:
+    return bool(e.get("propostas"))
 
 
 def _badge(texto: str, classe: str = "") -> str:
@@ -542,12 +590,14 @@ def _linha_edital(e: dict) -> str:
     badges.append(_badge(f"{bloq} alertas bloqueantes", "bloq" if bloq else "ok"))
     if e.get("total_informativos"):
         badges.append(_badge(f"{e['total_informativos']} informativos", "info"))
-    if e.get("disciplinas_novas"):
-        badges.append(_badge(f"{e['disciplinas_novas']} disciplinas novas", "novo"))
-    if e.get("assuntos_novos"):
-        badges.append(_badge(f"{e['assuntos_novos']} assuntos novos", "novo"))
+    if e.get("propostas"):
+        badges.append(_badge(f"{e['propostas']} propostas a conferir", "proposta"))
+    novos = (e.get("disciplinas_novas") or 0) + (e.get("assuntos_novos") or 0)
+    if novos:
+        badges.append(_badge(f"{novos} novos sem equivalente", "novo"))
     return (
-        f"<li data-problema='{int(_tem_problema(e))}' data-novidade='{int(_tem_novidade(e))}'>"
+        f"<li data-problema='{int(_tem_problema(e))}' data-novidade='{int(_tem_novidade(e))}' "
+        f"data-proposta='{int(_tem_proposta(e))}'>"
         f"<a href='{escape(e['arquivo_html'])}'>{escape(e['edital'])}</a>{''.join(badges)}</li>"
     )
 
@@ -555,7 +605,12 @@ def _linha_edital(e: dict) -> str:
 def _ordenar_pendentes(editais: list[dict]) -> list[dict]:
     return sorted(
         editais,
-        key=lambda e: (not _tem_problema(e), not _tem_novidade(e), e["edital"]),
+        key=lambda e: (
+            not _tem_problema(e),
+            not _tem_novidade(e),
+            not _tem_proposta(e),
+            e["edital"],
+        ),
     )
 
 
@@ -575,7 +630,8 @@ FILTRO_JS = """
     document.querySelectorAll('.index-lista li[data-problema]').forEach(function (li) {
       var mostrar = filtro === 'todos' ||
         (filtro === 'problema' && li.dataset.problema === '1') ||
-        (filtro === 'novidade' && li.dataset.novidade === '1');
+        (filtro === 'novidade' && li.dataset.novidade === '1') ||
+        (filtro === 'proposta' && li.dataset.proposta === '1');
       li.hidden = !mostrar;
     });
   }
@@ -594,19 +650,22 @@ def renderizar_index(editais: list[dict]) -> str:
     outros = [e for e in editais if e.get("situacao") not in ("pendente", "aprovado")]
     com_alertas = sum(1 for e in editais if _tem_problema(e))
     com_novidades = sum(1 for e in editais if _tem_novidade(e))
+    com_propostas = sum(1 for e in editais if _tem_proposta(e))
     resumo = (
         "<div class='resumo-topo'>"
         f"<div class='item pend'><strong>{len(pendentes)}</strong>aguardando aprovação</div>"
         f"<div class='item'><strong>{len(aprovados)}</strong>aprovados</div>"
         f"<div class='item prob'><strong>{com_alertas}</strong>com problema</div>"
-        f"<div class='item nov'><strong>{com_novidades}</strong>com novidade</div>"
+        f"<div class='item nov'><strong>{com_novidades}</strong>com novo sem equivalente</div>"
+        f"<div class='item'><strong>{com_propostas}</strong>com proposta a conferir</div>"
         "</div>"
     )
     filtros = (
         "<div class='filtros' role='group' aria-label='Filtrar editais'><span>Mostrar:</span>"
         "<button type='button' data-filtro='todos' aria-pressed='true'>Todos</button>"
         "<button type='button' data-filtro='problema' aria-pressed='false'>Com problema</button>"
-        "<button type='button' data-filtro='novidade' aria-pressed='false'>Com novidade</button>"
+        "<button type='button' data-filtro='novidade' aria-pressed='false'>Com novo sem equivalente</button>"
+        "<button type='button' data-filtro='proposta' aria-pressed='false'>Com proposta</button>"
         "</div>"
     )
     secao_outros = f"<h2>Outros ({len(outros)})</h2>{_lista(outros)}" if outros else ""

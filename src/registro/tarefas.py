@@ -43,6 +43,7 @@ TAREFAS: tuple[Tarefa, ...] = (
             "scripts.detectar_dispersao_arvore",
             "scripts.executar_c2",
             "scripts.propor_arvore",
+            "scripts.mapear_itens_novos",
             "scripts.curar_arvore",
             "scripts.classificar_questoes",
             "scripts.curar_classificacao",
@@ -106,6 +107,7 @@ TAREFAS: tuple[Tarefa, ...] = (
         scripts=(
             "scripts.curar_arvore",
             "scripts.propor_arvore",
+            "scripts.mapear_itens_novos",
             "scripts.detectar_dispersao_arvore",
             "scripts.gerar_relatorio_arvore",
         ),
@@ -191,6 +193,7 @@ TAREFAS: tuple[Tarefa, ...] = (
         scripts=(
             "scripts.revisar_taxonomia_piloto",
             "scripts.propor_arvore",
+            "scripts.mapear_itens_novos",
             "scripts.classificar_questoes",
         ),
         checagens=("K08",),

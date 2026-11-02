@@ -162,6 +162,14 @@ SCRIPTS: tuple[Script, ...] = (
         "argparse",
     ),
     Script(
+        "scripts.mapear_itens_novos",
+        "Propõe nó da árvore para item novo de edital sem mapeamento, pelo LLM, sobre "
+        "lista fechada. Grava só proposto. Custa tokens.",
+        "curadoria",
+        "argparse",
+        adrs=("ADR-030", "ADR-032"),
+    ),
+    Script(
         "scripts.propor_arvore",
         "Propõe operações na árvore mestre pelo LLM, por matéria, sobre lista fechada.",
         "curadoria",

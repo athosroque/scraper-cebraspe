@@ -43,6 +43,7 @@ Concursos de exemplo: `SEFA_PR_25` e `BANRISUL_25`. Tempos medidos em 2026-10-12
 | P4b Correção | `venv/bin/python -m scripts.extrair_questoes --reprocessar` (só se o parser mudar) | snapshot antes/depois: piloto idêntico, só a mudança esperada | 16 s (87 cadernos) | 0 |
 | P5 Conferência | consultas a–e e PDF | Consultas a–e (seção 4.5); 3 questões iguais ao PDF | manual | 0 |
 | P6 Dispersão da árvore | `venv/bin/python -m scripts.detectar_dispersao_arvore --dry-run`, depois `--propor` | Grupos novos com nós do lote; norma em dois lugares vira proposta para o dono | não medido | 0 |
+| P7 Mapeamento de item novo (1º passo) | `venv/bin/python -m scripts.mapear_itens_novos --dry-run`, depois sem `--dry-run` | Itens pendentes e custo estimado; propostas `proposto/llm`, nunca aprovadas | não medido | estimado em dry-run (US$ 0,3 no máximo para ~880 itens) |
 
 Tempo de P3 e P4 juntos: 912 s para os 2 concursos (sem contar P0 a P2). Custo LLM total do
 lote de calibração: US$ 0,018.
@@ -374,6 +375,28 @@ O que conferir:
 
 Custo: US$ 0.
 
+### 4.6b P7 (1º passo) — Árvore: item novo de edital (LLM, lista fechada)
+
+Roda depois do P3 (a regra `mapear_novos_itens_por_regra` já rodou sozinha no
+`atualizar_revisao`) e antes da revisão do dono (P7). O item de edital que a regra não resolveu
+fica sem nó; este passo pede ao modelo um nó **existente** da disciplina dele, ou "nenhum".
+O modelo nunca cria nó nem disciplina (P72) e nunca aprova (A30): a proposta entra como
+`proposto/llm`, e o dono aprova em `scripts/curar_arvore.py`.
+
+```bash
+venv/bin/python -m scripts.mapear_itens_novos --dry-run --concurso <SLUG>  # pendentes e custo, sem chamar o LLM
+venv/bin/python -m scripts.mapear_itens_novos --concurso <SLUG>            # paga o LLM e grava propostas
+```
+
+O que conferir:
+- K22–K24 antes e depois (P71): o piloto não pode mudar; item já mapeado não é reavaliado;
+- o "nenhum" não grava nada e fica em cache (`canonico/.mapear_itens_novos_cache.json`); `--reavaliar` pergunta de novo;
+- o dry-run subestima o custo dos subtópicos cuja matéria ainda não tem nó (a disciplina só
+  se resolve depois que o nível de cima é proposto), então o valor dele é um teto.
+
+Chave: `OPENROUTER_KEY_MAPEAMENTO_ITENS` (cai na da curadoria da árvore). Trace
+`mapear_itens_novos`, reasoning `REASONING_PADRAO`.
+
 ## 5. Pausas do dono
 
 1. **Revisão do edital (depois do P3):** abrir `https://datasette.projetoathos.com.br/relatorio/index.html`,
@@ -385,6 +408,9 @@ Custo: US$ 0.
 3. **Dispersão da árvore (P6):** aprovar ou rejeitar as propostas do detector por grupo, nunca
    em bloco (`python -m scripts.curar_arvore --aprovar-proposta <ids>` ou `--rejeitar-proposta <ids>`).
    O detector erra (ex.: Receita × Despesa pública), então cada grupo é uma decisão.
+4. **Propostas do LLM para item novo de edital (P7):** aprovar ou rejeitar cada mapeamento
+   `proposto/llm` com `scripts/curar_arvore.py`; o que o modelo respondeu "nenhum" continua
+   sem nó, esperando a decisão do dono.
 
 ## 6. Armadilhas conhecidas
 

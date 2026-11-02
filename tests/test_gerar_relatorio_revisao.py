@@ -200,6 +200,17 @@ def _novidades_fake(resultado):
         "total_disciplinas": 1,
         "total_assuntos": 1,
         "total_itens_novos": 2,
+        "propostas": [
+            {
+                "nivel": "assunto",
+                "item": "2 Tópico dois",
+                "disciplina": "Matéria A",
+                "no_id": "NA-X",
+                "no_caminho": "Matéria B › Assunto <X>",
+                "confianca": 0.9,
+            }
+        ],
+        "total_propostas": 1,
     }
 
 
@@ -241,8 +252,9 @@ class TestIndexSecoes:
 
         assert "1 alertas bloqueantes" in index
         assert "1 falhas" in index
-        assert "1 disciplinas novas" in index
-        assert "1 assuntos novos" in index
+        assert "2 novos sem equivalente" in index
+        assert "1 propostas a conferir" in index
+        assert "data-proposta='1'" in index
         assert "1 disciplinas · 1 assuntos" in index
         assert "data-problema='1'" in index
         assert "data-novidade='1'" in index
@@ -260,9 +272,16 @@ class TestIndexSecoes:
         problema = {**base, "edital": "Z_problema", "total_alertas": 2}
         novo = {**base, "edital": "M_novo", "assuntos_novos": 1}
 
-        html = renderizar_index([limpo, novo, problema])
+        prop = {**base, "edital": "B_proposta", "propostas": 3}
 
-        assert html.index("Z_problema") < html.index("M_novo") < html.index("A_limpo")
+        html = renderizar_index([limpo, prop, novo, problema])
+
+        assert (
+            html.index("Z_problema")
+            < html.index("M_novo")
+            < html.index("B_proposta")
+            < html.index("A_limpo")
+        )
 
     def test_index_escapa_html_do_nome(self):
         e = {
@@ -299,8 +318,15 @@ class TestPaginaEdital:
         assert "O que revisar" in html
         assert html.index("O que revisar") < html.index("class='chunk'")
         assert "Alertas bloqueantes e falhas (2)" in html
-        assert "Disciplinas novas (1)" in html
-        assert "Assuntos novos (1)" in html
+        assert "Realmente novos — sem nó equivalente (2)" in html
+        assert "Propostas da IA a conferir (1)" in html
+        assert "Matéria B › Assunto &lt;X&gt;" in html
+        assert "aprovar via curar_arvore" in html
+        assert (
+            html.index("Alertas bloqueantes")
+            < html.index("Realmente novos")
+            < html.index("Propostas da IA")
+        )
         assert "href='#chunk-0'" in html
         assert "id='chunk-0'" in html
         assert "novo-tag'>NOVO" in html
@@ -312,8 +338,8 @@ class TestPaginaEdital:
             gerar_relatorios(tmp_path, novidades_fn=lambda r: {}) / "Pend.html"
         ).read_text(encoding="utf-8")
 
-        assert "Nenhuma disciplina nova." in html
-        assert "Nenhum assunto novo." in html
+        assert "Nenhum item novo sem equivalente." in html
+        assert "Nenhuma proposta pendente." in html
         assert "<span class='novo-tag'>" not in html
 
     def test_falha_na_funcao_de_novidades_nao_derruba_o_relatorio(self, tmp_path):

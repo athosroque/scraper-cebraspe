@@ -420,7 +420,8 @@ Teste guarda: `tests/test_taxonomia_extractor.py::TestReasoningPadraoUnico::test
 
 Chaves do OpenRouter são dedicadas por etapa (`llm_openrouter.ETAPA_*` +
 `chave_openrouter`): `OPENROUTER_KEY_TAXONOMIA_EDITAL`, `_SINONIMOS`,
-`_CURADORIA_ARVORE`, `_CLASSIFICACAO_QUESTOES` e `_TELEGRAM`. O nome da chave
+`_CURADORIA_ARVORE`, `_MAPEAMENTO_ITENS` (cai na da curadoria),
+`_CLASSIFICACAO_QUESTOES` e `_TELEGRAM`. O nome da chave
 no OpenRouter é igual ao nome do trace no Langfuse
 (`cebraspe-<etapa>-<função>`). Chave vazia cai na `OPENROUTER_API_KEY`
 com aviso `[CHAVE_FALLBACK]` no log.

@@ -201,6 +201,21 @@ CLI de curadoria e deliberação humana da classificação das questões.
 | `--html` | Regenera o relatório visual classificacao.html | — |
 | `--aplicar-banco` | Aplica as classificações do arquivo canônico no PostgreSQL | — |
 
+### `python -m scripts.mapear_itens_novos`
+
+Propõe nó da árvore para item novo de edital sem mapeamento, pelo LLM, sobre lista fechada. Grava só proposto. Custa tokens.
+
+**ADRs:** [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
+
+| Argumento | Ajuda | Padrão |
+|---|---|---|
+| `revisao_dir` | — | `REVISAO_DIR_PADRAO` |
+| `--concurso` | Só itens que aparecem neste concurso (ex: SEFA_PR_25) | — |
+| `--dry-run` | Sem chamada ao LLM e sem gravar: conta pendentes e estima o custo | — |
+| `--reavaliar` | Pergunta de novo os itens que o modelo já respondeu "nenhum" | — |
+| `--limite` | Máximo de lotes (chamadas) a rodar | — |
+| `--arvore` | — | `ARVORE_PATH_PADRAO` |
+
 ### `python -m scripts.propor_arvore`
 
 Propõe operações na árvore mestre pelo LLM, por matéria, sobre lista fechada.

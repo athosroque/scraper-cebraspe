@@ -278,6 +278,8 @@ venv/bin/python -m scripts.detectar_dispersao_arvore --propor
 ## P7 Curadoria da árvore mestre (portão humano)
 
 ```bash
+venv/bin/python -m scripts.mapear_itens_novos --dry-run [--concurso <SLUG>]
+venv/bin/python -m scripts.mapear_itens_novos [--concurso <SLUG>]
 venv/bin/python -m scripts.propor_arvore --dry-run
 venv/bin/python -m scripts.propor_arvore
 venv/bin/python -m scripts.curar_arvore --html
@@ -285,11 +287,11 @@ venv/bin/python -m scripts.curar_arvore --aprovar-proposta <ids>
 venv/bin/python -m scripts.curar_arvore --rejeitar-proposta <ids>
 ```
 
-**Scripts:** `scripts.propor_arvore`, `scripts.curar_arvore`
+**Scripts:** `scripts.mapear_itens_novos`, `scripts.propor_arvore`, `scripts.curar_arvore`
 
 **Depende de:** P6
 
-**LLM:** `OpenRouter, modelo z-ai/glm-5.3-flash, chave OPENROUTER_KEY_CURADORIA_ARVORE (trace cebraspe-5b2-curadoria-arvore; só o propor_arvore chama o LLM)`
+**LLM:** `OpenRouter, modelo z-ai/glm-5.3-flash, chave OPENROUTER_KEY_CURADORIA_ARVORE (trace cebraspe-5b2-curadoria-arvore; propor_arvore) e, no mapeamento de item novo, OPENROUTER_KEY_MAPEAMENTO_ITENS (cai na da curadoria; trace mapear_itens_novos). Ambos com REASONING_PADRAO`
 
 **Portão humano:** Pendências da árvore resolvidas pelo dono: itens de edital sem nó, mapeamentos e nós propostos. Só depois disso a classificação roda.
 
@@ -304,7 +306,7 @@ venv/bin/python -m scripts.curar_arvore --rejeitar-proposta <ids>
 - canonico/arvore.json
 - revisao_piloto/relatorio/arvore.html
 
-**Notas:** task.md, Etapa 8.C, C1b (KAN-57): 'árvore (pausa: curadoria)'. Aprovação sempre humana.
+**Notas:** task.md, Etapa 8.C, C1b (KAN-57): 'árvore (pausa: curadoria)'. Aprovação sempre humana. O mapeamento de item novo de edital (mapear_itens_novos, runbook §4.6b) é o 1º passo: depois da extração do edital (P3) e da regra `mapear_novos_itens_por_regra`, antes da revisão do dono. O modelo escolhe só entre nós ativos da disciplina do item, grava `proposto/llm`, nunca cria nó nem disciplina (P72) nem aprova (A30). Rode o --dry-run e as checagens K22–K24 (P71) antes e depois.
 
 ## P8 Classificação das questões na árvore (LLM)
 

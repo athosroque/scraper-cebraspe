@@ -58,6 +58,8 @@ def test_tudo_conhecido(arvore):
         "total_disciplinas": 0,
         "total_assuntos": 0,
         "total_itens_novos": 0,
+        "propostas": [],
+        "total_propostas": 0,
     }
 
 
@@ -125,3 +127,104 @@ def test_titulo_de_bloco_que_e_assunto_nao_e_disciplina(arvore):
         _edital("Atos Administrativos", "Anulação", []), DISCIPLINAS, arvore
     )
     assert r["disciplinas_novas"] == []
+
+
+@pytest.fixture
+def arvore_com_propostas(arvore):
+    criar_no(arvore, "assunto", "Licitação pública", "M-DA", id_override="A-LIC")
+    criar_no(
+        arvore, "subassunto", "Dispensa de licitação", "A-LIC", id_override="S-DIS"
+    )
+    mapear(
+        arvore,
+        "direito administrativo|licitacoes",
+        ["A-LIC"],
+        origem="llm",
+        status="proposto",
+    )
+    mapear(
+        arvore,
+        "direito administrativo|atos administrativos|convalidacao",
+        ["S-DIS"],
+        origem="llm",
+        status="proposto",
+    )
+    mapear(arvore, "fisica", ["M-DA"], origem="llm", status="proposto")
+    return arvore
+
+
+def test_assunto_proposto_nao_e_novo(arvore_com_propostas):
+    r = novidades_do_edital(
+        _edital("Direito Administrativo", "Licitações", ["Dispensa"]),
+        DISCIPLINAS,
+        arvore_com_propostas,
+    )
+    assert r["total_itens_novos"] == 1  # só o subassunto; o assunto não é novo
+    assert r["total_propostas"] == 1
+    p = r["propostas"][0]
+    assert (p["nivel"], p["item"], p["no_id"]) == ("assunto", "Licitações", "A-LIC")
+    assert p["no_caminho"] == "Direito Administrativo › Licitação pública"
+    assert "confianca" not in p
+
+
+def test_assunto_proposto_so_conta_subassunto_realmente_novo(arvore_com_propostas):
+    r = novidades_do_edital(
+        _edital("Direito Administrativo", "Licitações", ["Dispensa"]),
+        DISCIPLINAS,
+        arvore_com_propostas,
+    )
+    assert r["total_disciplinas"] == 0
+    assert r["total_itens_novos"] == 1  # só o subassunto "Dispensa"
+    assert r["assuntos_novos"][0]["subassuntos"] == ["Dispensa"]
+
+
+def test_subassunto_proposto(arvore_com_propostas):
+    r = novidades_do_edital(
+        _edital("Direito Administrativo", "Atos administrativos", ["Convalidação"]),
+        DISCIPLINAS,
+        arvore_com_propostas,
+    )
+    assert r["assuntos_novos"] == []
+    assert r["total_itens_novos"] == 0
+    assert r["propostas"] == [
+        {
+            "nivel": "subassunto",
+            "item": "Convalidação",
+            "disciplina": "Direito Administrativo",
+            "assunto": "Atos administrativos",
+            "no_id": "S-DIS",
+            "no_caminho": "Direito Administrativo › Licitação pública › Dispensa de licitação",
+        }
+    ]
+
+
+def test_disciplina_proposta_nao_e_nova(arvore_com_propostas):
+    r = novidades_do_edital(
+        _edital("Física", "Átomos", []), DISCIPLINAS, arvore_com_propostas
+    )
+    assert r["disciplinas_novas"] == []
+    assert r["propostas"][0]["nivel"] == "disciplina"
+    assert r["propostas"][0]["no_caminho"] == "Direito Administrativo"
+
+
+def test_proposta_rejeitada_continua_nova(arvore):
+    mapear(arvore, "fisica", ["M-DA"], origem="llm", status="rejeitado")
+    r = novidades_do_edital(_edital("Física", "Átomos", []), DISCIPLINAS, arvore)
+    assert r["disciplinas_novas"] == ["Física"]
+    assert r["propostas"] == []
+
+
+def test_aprovado_prevalece_sobre_proposto(arvore):
+    mapear(arvore, "direito administrativo|licitacoes", ["A-ATO"], status="aprovado")
+    mapear(
+        arvore,
+        "direito administrativo|licitacoes",
+        ["M-DA"],
+        origem="llm",
+        status="proposto",
+    )
+    r = novidades_do_edital(
+        _edital("Direito Administrativo", "Licitações", []), DISCIPLINAS, arvore
+    )
+    assert r["propostas"] == []
+    assert r["total_itens_novos"] == 0

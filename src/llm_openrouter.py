@@ -56,6 +56,12 @@ ETAPA_CLASSIFICACAO_QUESTOES = (
     "OPENROUTER_KEY_CLASSIFICACAO_QUESTOES",
     "cebraspe-5d-classificacao-questoes",
 )
+# Mapeamento de item novo de edital para a árvore (`scripts/mapear_itens_novos.py`);
+# chave vazia cai na da curadoria da árvore e por fim na `OPENROUTER_API_KEY`.
+ETAPA_MAPEAMENTO_ITENS = (
+    "OPENROUTER_KEY_MAPEAMENTO_ITENS",
+    "cebraspe-mapeamento-itens-edital",
+)
 ETAPA_TELEGRAM = ("OPENROUTER_KEY_TELEGRAM", "cebraspe-telegram-bot")
 
 
