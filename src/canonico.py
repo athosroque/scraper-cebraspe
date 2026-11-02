@@ -79,6 +79,17 @@ STATUS_FALHA_GRUPO_ENTRE_BLOCOS = "falha_grupo_entre_blocos"
 PADRAO_NOCOES = re.compile(
     r"^nocoes\s+(?:basicas\s+|gerais\s+)?(?:de|sobre|do|da|dos|das)\s+"
 )
+# "Fundamentos de", "conceitos (básicos|gerais) de": prefixo ignorado como "noções
+# de", mas sem ligar o sinalizador `nocoes` (KAN-84, M12). Exige o que vem depois.
+PADRAO_PREFIXO_CONCEITUAL = re.compile(
+    r"^(?:fundamentos|conceitos(?:\s+(?:basicos|gerais))?)\s+"
+    r"(?:de|sobre|do|da|dos|das)\s+(?=\S)"
+)
+# Sinônimos de palavra inteira que a chave unifica. Só gestão e gerenciamento:
+# "administração" fica de fora (é matéria própria: administração pública etc.).
+SINONIMOS_TOKEN = {"gerenciamento": "gestao"}
+# Sigla: último parêntese com 2 a 8 letras/dígitos e ao menos 2 maiúsculas no texto cru.
+PADRAO_SIGLA_PAREN = re.compile(r"\(\s*([A-Za-z0-9]{2,8})\s*\)\s*$")
 # Mesmo padrão sobre o texto cru, só para o nome de exibição do canônico.
 PADRAO_NOCOES_CRU = re.compile(
     r"^\s*no[çc][õo]es\s+(?:b[áa]sicas\s+|gerais\s+)?(?:de|sobre|do|da|dos|das)\s+",
@@ -161,6 +172,34 @@ def _forma_norma(m: re.Match) -> str:
 class ChaveRegra:
     chave: str
     nocoes: bool
+    # Sigla do nome (entre parênteses, ou o próprio nome se for só a sigla). Não
+    # entra na igualdade nem na chave: só serve ao casamento por sigla única.
+    sigla: str = field(default="", compare=False)
+
+
+def sigla_do_nome(nome: str) -> str:
+    """Sigla em minúsculas ("Minimum Viable Product (MVP)" -> "mvp"; "MVP" -> "mvp"),
+    ou "" se o nome não tem. Exige 2+ maiúsculas, para não tomar "(rede)" por sigla."""
+    bruto = (nome or "").strip()
+    m = PADRAO_SIGLA_PAREN.search(bruto)
+    cand = (
+        m.group(1) if m else (bruto if re.fullmatch(r"[A-Za-z0-9]{2,8}", bruto) else "")
+    )
+    if sum(c.isupper() for c in cand) < 2:
+        return ""
+    return normalizar(cand).replace(" ", "")
+
+
+def candidato_unico_por_sigla(sigla: str, candidatos: dict[str, str]):
+    """Chave do único candidato cuja sigla é `sigla`, ou None.
+
+    `candidatos` mapeia uma chave qualquer (nó, regra, item) à sigla dela. Sem
+    sigla, sem candidato ou com 2+ chaves de mesma sigla, não equivale (a sigla
+    "CI" serve a Integração Contínua e a Controle Interno)."""
+    if not sigla:
+        return None
+    achados = [k for k, s in candidatos.items() if s == sigla]
+    return achados[0] if len(achados) == 1 else None
 
 
 def chave_regra(nome: str) -> ChaveRegra:
@@ -180,9 +219,12 @@ def chave_regra(nome: str) -> ChaveRegra:
     for _ in range(2):  # "a noções de ..." / "noções de o ..."
         texto, n = PADRAO_NOCOES.subn("", texto)
         nocoes = nocoes or bool(n)
+        texto = PADRAO_PREFIXO_CONCEITUAL.sub("", texto)
         texto = PADRAO_ARTIGO.sub("", texto)
-    texto = " ".join(_singular(t) for t in texto.split())
-    return ChaveRegra(texto.strip(), nocoes)
+    texto = " ".join(
+        SINONIMOS_TOKEN.get(t, t) for t in (_singular(t) for t in texto.split())
+    )
+    return ChaveRegra(texto.strip(), nocoes, sigla_do_nome(nome))
 
 
 def nome_sem_nocoes(nome: str) -> str:
@@ -928,6 +970,133 @@ def _rotulo_grupo(estado: dict, nivel: str, gid: str) -> str:
     return g["nome"]
 
 
+# Títulos de bloco genéricos demais para casar sozinhos, por nome, com um assunto
+# de outra disciplina (KAN-82, M2): "Processo" não é Direito Processual Civil e
+# "Arquitetura" não é Direito. Guardados pela `chave_regra`; reutilizável por quem
+# mapeia título de bloco por nome (KAN-87, KAN-88).
+TITULOS_GENERICOS_NOMES = (
+    "Processo",
+    "Processos",
+    "Legislação",
+    "Arquitetura",
+    "Conceitos básicos",
+    "Conceitos gerais",
+    "Conceitos",
+    "Projeto",
+    "Projetos",
+    "Produto",
+    "Produtos",
+    "Fundamentos",
+    "Introdução",
+    "Noções gerais",
+    "Noções básicas",
+    "Noções introdutórias",
+    "Estratégia",
+    "Gestão",
+    "Gerenciamento",
+    "Planejamento",
+    "Controle",
+    "Controles",
+    "Segurança",
+    "Sistemas",
+    "Sistema",
+    "Serviços",
+    "Servidores",
+    "Redes",
+    "Dados",
+    "Governança",
+    "Tópicos especiais",
+    "Outros",
+    "Geral",
+    "Gerais",
+)
+TITULOS_GENERICOS = frozenset(chave_regra(n).chave for n in TITULOS_GENERICOS_NOMES)
+
+_PALAVRAS_VAZIAS_TITULO = frozenset(
+    "de da do das dos e em no na nos nas a o as os ao aos um uma uns umas para por "
+    "com sem sobre entre ou ante ate desde pelo pela pelos pelas".split()
+)
+
+
+def titulo_generico(nome_ou_chave: str) -> bool:
+    """True se o nome (ou a `chave_regra` dele) é um título genérico."""
+    return chave_regra(nome_ou_chave).chave in TITULOS_GENERICOS
+
+
+def palavras_relevantes(nome: str) -> list[str]:
+    """Palavras do nome sem palavras vazias (artigos, preposições, conjunções)."""
+    return [
+        t
+        for t in chave_regra(nome).chave.split()
+        if len(t) >= 3 and t not in _PALAVRAS_VAZIAS_TITULO
+    ]
+
+
+def nome_especifico(nome: str) -> bool:
+    """Nome com 2 ou mais palavras relevantes e que não é título genérico: pode
+    casar por nome sozinho com um nó único (M2)."""
+    return len(palavras_relevantes(nome)) >= 2 and not titulo_generico(nome)
+
+
+def _disciplina_do_no(arvore, no_id: str) -> str | None:
+    """Matéria (disciplina) ativa à qual o nó pertence, ou ele mesmo se for matéria."""
+    from src import arvore as arv_mod
+
+    atual = arv_mod.resolver_no(arvore, no_id)
+    for _ in range(6):
+        no = arvore.nos.get(atual)
+        if no is None:
+            return None
+        if no.nivel == "materia":
+            return no.id
+        if not no.pai:
+            return None
+        atual = arv_mod.resolver_no(arvore, no.pai)
+    return None
+
+
+def disciplinas_inferidas_do_bloco(
+    arvore, chave_materia: str, filhos: dict[str, list[str]]
+) -> frozenset[str]:
+    """Disciplinas dos itens (assunto/subassunto) já aprovados do mesmo bloco.
+
+    `filhos` mapeia a chave da matéria às chaves dos itens abaixo dela. Vazio
+    quando nada foi mapeado: sem como inferir, o título não casa por nome."""
+    discs = set()
+    for chave in filhos.get(chave_materia, ()):
+        for m in arvore.mapeamentos.get(chave, []):
+            if m.status == "aprovado":
+                d = _disciplina_do_no(arvore, m.no_id)
+                if d:
+                    discs.add(d)
+    return frozenset(discs)
+
+
+def alvo_de_titulo_por_nome(
+    arvore,
+    regra: str,
+    nome: str,
+    alvo: set[str],
+    discs_bloco: frozenset[str],
+    vetados: dict[tuple[str, str], str],
+) -> frozenset[str] | None:
+    """Ramo 3 do passo determinístico: nó único de mesmo nome para um título de
+    bloco, ou None. Recusa par vetado pelo dono; só casa se o nó está numa
+    disciplina compatível com a inferida do bloco, ou se o nome é específico
+    (2+ palavras relevantes, não genérico) e o candidato é único."""
+    if len(alvo) != 1 or any((regra, n) in vetados for n in alvo):
+        return None
+    (no_id,) = alvo
+    # Título igual ao nome da própria disciplina não é homônimo de outra (M2).
+    if (
+        arvore.nos[no_id].nivel == "materia"
+        or _disciplina_do_no(arvore, no_id) in discs_bloco
+        or nome_especifico(nome)
+    ):
+        return frozenset(alvo)
+    return None
+
+
 @dataclass
 class ResultadoRegra:
     """Contagem do passo determinístico (regra de nome + memória do dono)."""
@@ -966,7 +1135,10 @@ def mapear_novos_itens(
        repetida em outro edital ou apelido de nó fundido; nunca usa proposta não
        aprovada nem devolve par rejeitado;
     3. título de bloco (matéria) sem equivalente aponta para o único nó de
-       disciplina ou assunto de mesmo nome, nunca vira disciplina nova.
+       disciplina ou assunto de mesmo nome, nunca vira disciplina nova. Só se o
+       nó está numa disciplina compatível com a inferida dos itens do bloco (ou é a
+       própria disciplina de mesmo nome), ou se o nome tem 2+ palavras relevantes e não é título genérico
+       (`TITULOS_GENERICOS`); par vetado pelo dono nunca é regravado (M2).
     Item cujo pai não tem nó fica pendente. Nunca cria nó. O assunto mapeado
     agora serve de pai do subassunto. Com `gravar=False` (dry-run) a árvore em
     memória muda, mas nada é salvo. `arvore_mem` (opcional) é uma árvore já
@@ -1012,9 +1184,18 @@ def mapear_novos_itens(
             if regra:
                 nos_por_nome.setdefault(regra, set()).add(no.id)
 
+    # Itens abaixo de cada título de bloco, para inferir a disciplina (M2).
+    filhos_por_materia: dict[str, list[str]] = {}
+    for nivel_filho in ("assunto", "subassunto"):
+        for chave_filho in getattr(nomes, nivel_filho):
+            filhos_por_materia.setdefault(chave_filho[0], []).append(
+                arv_mod.chave_item(chave_filho)
+            )
+
     # Nível a nível: o assunto mapeado agora já serve de pai para o subassunto.
     for nivel in NIVEIS:
         fonte = getattr(nomes, nivel)
+        chave_orig_por_chave = {arv_mod.chave_item(k): k for k in fonte}
         indice: dict[tuple, set[frozenset[str]]] = {}
         pendentes = []
         for chave_origem, info in fonte.items():
@@ -1042,9 +1223,18 @@ def mapear_novos_itens(
             if not candidatos and nivel == "materia":
                 # Título de bloco fora da lista de disciplinas: vira o assunto de
                 # mesmo nome, nunca disciplina nova (Etapa 5B.3, ADR-030).
-                alvo = nos_por_nome.get(sig[2], set())
-                if len(alvo) == 1:
-                    candidatos = {frozenset(alvo)}
+                # Só com disciplina compatível ou nome específico, sem veto (M2).
+                nome_item = fonte[chave_orig_por_chave[chave]]["nome"]
+                nos_titulo = alvo_de_titulo_por_nome(
+                    arvore,
+                    sig[2],
+                    nome_item,
+                    nos_por_nome.get(sig[2], set()),
+                    disciplinas_inferidas_do_bloco(arvore, chave, filhos_por_materia),
+                    memoria.vetados,
+                )
+                if nos_titulo:
+                    candidatos = {nos_titulo}
             if len(candidatos) != 1:
                 res.pendentes += 1
                 continue

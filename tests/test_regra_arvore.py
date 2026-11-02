@@ -353,3 +353,145 @@ def test_sem_gravar_nao_salva_mas_altera_arvore_em_memoria(
     assert r.por_memoria == 1
     assert "nocoes de direito administrativo|controle" in mem.mapeamentos
     assert arvore_path.read_text(encoding="utf-8") == conteudo
+
+
+# --- KAN-82 (M2): título de bloco genérico x assunto homônimo de outra disciplina ---
+
+
+@pytest.fixture
+def arvore_processo(arvore_path):
+    arv = carregar(arvore_path)
+    criar_no(arv, "materia", "Direito Processual Civil", None, id_override="M-DPC")
+    criar_no(arv, "materia", "Tecnologia da Informação", None, id_override="M-TI")
+    criar_no(arv, "assunto", "Processo", "M-DPC", id_override="A-PROC")
+    criar_no(arv, "assunto", "Engenharia de software", "M-TI", id_override="A-ES")
+    criar_no(
+        arv, "assunto", "Ciclo de vida do processo", "M-DPC", id_override="A-CICLO"
+    )
+    salvar(arv, arvore_path)
+    return arvore_path
+
+
+def test_titulo_generico_nao_casa_com_assunto_de_outra_disciplina(
+    monkeypatch, tmp_path, arvore_processo
+):
+    # Filhos do bloco já mapeados em TI: "Processo" não pode virar Direito Processual.
+    _mexer(
+        arvore_processo,
+        lambda a: mapear(a, "processo|ciclos de vida", ["A-ES"], "humano"),
+    )
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_processo,
+        materia={"processo": _nome("PROCESSO")},
+        assunto={("processo", "ciclos de vida"): _nome("Ciclos de vida")},
+    )
+    assert novos == 0
+    assert "processo" not in carregar(arvore_processo).mapeamentos
+
+
+def test_titulo_generico_sem_como_inferir_disciplina_fica_pendente(
+    monkeypatch, tmp_path, arvore_processo
+):
+    novos = _rodar(
+        monkeypatch, tmp_path, arvore_processo, materia={"processo": _nome("PROCESSO")}
+    )
+    assert novos == 0
+    assert "processo" not in carregar(arvore_processo).mapeamentos
+
+
+def test_titulo_generico_casa_com_disciplina_compativel(
+    monkeypatch, tmp_path, arvore_processo
+):
+    _mexer(
+        arvore_processo,
+        lambda a: mapear(a, "processo|ciclos", ["A-CICLO"], "humano"),
+    )
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_processo,
+        materia={"processo": _nome("PROCESSO")},
+        assunto={("processo", "ciclos"): _nome("Ciclos")},
+    )
+    assert novos == 1
+    [m] = carregar(arvore_processo).mapeamentos["processo"]
+    assert (m.no_id, m.status) == ("A-PROC", "aprovado")
+
+
+def test_nome_longo_unico_continua_casando_sem_disciplina_inferida(
+    monkeypatch, tmp_path, arvore_path
+):
+    arv = carregar(arvore_path)
+    criar_no(arv, "assunto", "Finanças públicas", "M-DC", id_override="A-FIN")
+    salvar(arv, arvore_path)
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"financas publicas": _nome("Finanças Públicas")},
+    )
+    assert novos == 1
+    [m] = carregar(arvore_path).mapeamentos["financas publicas"]
+    assert (m.no_id, m.status) == ("A-FIN", "aprovado")
+
+
+def test_titulo_igual_a_propria_disciplina_continua_casando(
+    monkeypatch, tmp_path, arvore_path
+):
+    arv = carregar(arvore_path)
+    criar_no(arv, "materia", "Estatística", None, id_override="M-EST")
+    salvar(arv, arvore_path)
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"estatistica": _nome("ESTATÍSTICA")},
+    )
+    assert novos == 1
+
+
+def test_titulo_generico_de_duas_palavras_nao_casa_por_nome(
+    monkeypatch, tmp_path, arvore_path
+):
+    arv = carregar(arvore_path)
+    criar_no(arv, "assunto", "Conceitos básicos", "M-DC", id_override="A-CB")
+    salvar(arv, arvore_path)
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"conceitos basicos": _nome("CONCEITOS BÁSICOS")},
+    )
+    assert novos == 0
+    assert "conceitos basicos" not in carregar(arvore_path).mapeamentos
+
+
+def test_ramo_de_titulo_respeita_veto_de_outra_chave_com_mesma_chave_regra(
+    monkeypatch, tmp_path, arvore_path
+):
+    # O dono rejeitou "Poder Executivo" -> A-EXE sob a chave "outro|poder executivo";
+    # o título "poder executivo" tem a mesma chave_regra e não é regravado.
+    _mexer(
+        arvore_path,
+        lambda a: (
+            mapear(a, "outro|poder executivo", ["A-EXE"], "humano"),
+            rejeitar(a, "outro|poder executivo", "A-EXE"),
+        ),
+    )
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"poder executivo": _nome("Poder Executivo")},
+    )
+    assert novos == 0
+    assert "poder executivo" not in carregar(arvore_path).mapeamentos
+
+
+def test_titulos_genericos_exportados():
+    assert canonico.titulo_generico("PROCESSO")
+    assert canonico.titulo_generico("Conceitos Básicos")
+    assert not canonico.titulo_generico("Finanças públicas")
+    assert canonico.chave_regra("Legislação").chave in canonico.TITULOS_GENERICOS

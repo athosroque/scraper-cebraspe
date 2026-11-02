@@ -190,6 +190,11 @@ class TestGerarRelatorios:
 def _novidades_fake(resultado):
     return {
         "disciplinas_novas": ["Matéria A"],
+        "titulos_sem_destino": [
+            {"titulo": "Matéria A", "chunks": [0], "itens_travados": 2}
+        ],
+        "total_titulos_sem_destino": 1,
+        "total_itens_travados": 2,
         "assuntos_novos": [
             {
                 "disciplina": "Matéria A",
@@ -252,7 +257,11 @@ class TestIndexSecoes:
 
         assert "1 alertas bloqueantes" in index
         assert "1 falhas" in index
-        assert "2 novos sem equivalente" in index
+        assert "2 novos sem equivalente (2 itens)" in index
+        assert (
+            "1 títulos de bloco sem destino (viram assunto) · destravam 2 itens"
+            in index
+        )
         assert "1 propostas a conferir" in index
         assert "data-proposta='1'" in index
         assert "1 disciplinas · 1 assuntos" in index
@@ -318,7 +327,7 @@ class TestPaginaEdital:
         assert "O que revisar" in html
         assert html.index("O que revisar") < html.index("class='chunk'")
         assert "Alertas bloqueantes e falhas (2)" in html
-        assert "Realmente novos — sem nó equivalente (2)" in html
+        assert "Realmente novos — sem nó equivalente (2 entradas; 2 itens)" in html
         assert "Propostas da IA a conferir (1)" in html
         assert "Matéria B › Assunto &lt;X&gt;" in html
         assert "aprovar via curar_arvore" in html
@@ -370,3 +379,51 @@ class TestPaginaEdital:
         assert "<b>x</b>" not in html
         assert "&lt;b&gt;x&lt;/b&gt;" in html
         assert "<u>a</u>" not in html
+
+
+class TestTituloSemDestino:
+    def _html(self, tmp_path, fn):
+        _gravar(tmp_path, "Pend", "PENDENTE — teste.")
+        return (gerar_relatorios(tmp_path, novidades_fn=fn) / "Pend.html").read_text(
+            encoding="utf-8"
+        )
+
+    def test_rotulo_novo_e_sem_disciplina_nova(self, tmp_path):
+        html = self._html(tmp_path, _novidades_fake)
+        assert "Título de bloco sem destino (vira assunto)" in html
+        assert "Não é disciplina nova" in html
+        assert "destrava 2 itens" in html
+        assert "DISCIPLINA nova" not in html
+        assert "novo-tag'>DISCIPLINA<" not in html
+
+    def test_ordena_por_itens_travados(self, tmp_path):
+        def fn(resultado):
+            return {
+                "titulos_sem_destino": [
+                    {"titulo": "Pequeno", "chunks": [], "itens_travados": 1},
+                    {"titulo": "Grande", "chunks": [], "itens_travados": 9},
+                ],
+                "total_itens_travados": 10,
+            }
+
+        html = self._html(tmp_path, fn)
+        assert html.index("Grande") < html.index("Pequeno")
+        assert "os 10 itens abaixo" in html
+
+    def test_titulo_hostil_e_escapado(self, tmp_path):
+        def fn(resultado):
+            return {
+                "titulos_sem_destino": [
+                    {"titulo": "<b>x</b>", "chunks": [], "itens_travados": 1}
+                ]
+            }
+
+        html = self._html(tmp_path, fn)
+        assert "<b>x</b>" not in html
+        assert "&lt;b&gt;x&lt;/b&gt;" in html
+        assert "destrava 1 item" in html
+
+    def test_chave_antiga_continua_funcionando(self, tmp_path):
+        html = self._html(tmp_path, lambda r: {"disciplinas_novas": ["Velha"]})
+        assert "Velha" in html
+        assert "Título de bloco sem destino (vira assunto)" in html

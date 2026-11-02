@@ -661,18 +661,27 @@ Item novo de edital (pipeline, `atualizar_revisao.atualizar_arvore`):
 `canonico.mapear_novos_itens_por_regra` copia os nós de um item aprovado com
 a mesma `chave_regra` **no mesmo nó-pai efetivo**; sem candidato, tenta a memória das
 decisões do dono (P73). Regra ambígua ou pai sem nó fica pendente no `arvore.html`.
-O log traz a contagem por regra de nome, por memória e pendentes.
+O log traz a contagem por regra de nome, por memória e pendentes. A `chave_regra` ignora os
+prefixos "noções de", "fundamentos de" e "conceitos (básicos|gerais) de" (só "noções" liga
+`nocoes`) e unifica gestão e gerenciamento; administração não entra, e a sigla entre
+parênteses é só o campo `ChaveRegra.sigla`, nunca a chave (KAN-84). O mapeamento
+`regra`/`aprovado` só atravessa disciplina com disciplina compatível ou nome específico:
+título genérico (`canonico.TITULOS_GENERICOS`) nunca casa sozinho por nome (KAN-82).
 
 ADRs: nenhuma
 
-Teste guarda: `tests/test_regra_arvore.py::test_mapeia_dentro_do_mesmo_pai_efetivo`, `tests/test_regra_arvore.py::test_nao_mapeia_sob_outro_pai`, `tests/test_regra_arvore.py::test_regra_ambigua_fica_pendente`
+Teste guarda: `tests/test_regra_arvore.py::test_mapeia_dentro_do_mesmo_pai_efetivo`, `tests/test_regra_arvore.py::test_nao_mapeia_sob_outro_pai`, `tests/test_regra_arvore.py::test_regra_ambigua_fica_pendente`, `tests/test_canonico.py::TestChaveRegraPrefixosESinonimos`
 
 #### P72
 
 O nível matéria da árvore é a disciplina e só aceita os nomes de
 `canonico/disciplinas.json`. Título de bloco de edital fora da lista vira **assunto**:
 `mapear_novos_itens_por_regra` aponta o item para o único nó de disciplina ou assunto de mesmo
-nome, e sem equivalente ele fica pendente para a curadoria. Proposta de LLM ou de regra
+nome, e sem equivalente ele fica pendente para a curadoria. Esse casamento por nome só vale se
+o nó é a própria disciplina, está numa disciplina inferida dos itens do bloco já aprovados,
+ou o nome tem 2+ palavras relevantes e não é título genérico (`canonico.TITULOS_GENERICOS`);
+par vetado pelo dono (por `chave_regra`) nunca é regravado, e fora disso o item fica pendente,
+nunca `aprovado` (KAN-82). Proposta de LLM ou de regra
 nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
 do dono. `scripts/auditar_arvore.py` fica verde antes de cada carga.
 
@@ -680,7 +689,7 @@ Núcleo: sim (citada no `CLAUDE.md`)
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
-Teste guarda: `tests/test_regra_arvore.py::test_titulo_de_bloco_fora_da_lista_vira_assunto`, `tests/test_regra_arvore.py::test_proposta_automatica_nao_cria_disciplina`
+Teste guarda: `tests/test_regra_arvore.py::test_titulo_de_bloco_fora_da_lista_vira_assunto`, `tests/test_regra_arvore.py::test_proposta_automatica_nao_cria_disciplina`, `tests/test_regra_arvore.py::test_titulo_generico_nao_casa_com_assunto_de_outra_disciplina`, `tests/test_regra_arvore.py::test_ramo_de_titulo_respeita_veto_de_outra_chave_com_mesma_chave_regra`
 
 #### P73
 

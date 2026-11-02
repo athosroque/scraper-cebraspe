@@ -70,6 +70,92 @@ class TestChaveRegraJunta:
         assert chave_regra("DIREITO ADMINISTRATIVO").nocoes is False
 
 
+class TestChaveRegraPrefixosESinonimos:
+    """KAN-84 (M12): "fundamentos de", "conceitos (básicos) de" e gestão ×
+    gerenciamento viram a mesma chave; sigla fica à parte, só para candidato único."""
+
+    @pytest.mark.parametrize(
+        "a, b",
+        [
+            ("FUNDAMENTOS DE BANCO DE DADOS", "Banco de dados"),
+            ("Fundamentos da Ecologia do Fogo", "Ecologia do Fogo"),
+            ("Fundamentos do planejamento estratégico", "Planejamento estratégico"),
+            ("Conceitos de Banco de Dados", "Banco de dados"),
+            ("Conceitos básicos de Python", "Python"),
+            ("Conceitos gerais de segurança digital", "Segurança digital"),
+            (
+                "Conceitos básicos sobre engenharia de software",
+                "Engenharia de software",
+            ),
+            ("Gerenciamento de Backlog", "gestão de backlog"),
+            ("Gerenciamento de projetos", "Gestão de projeto"),
+            ("Fundamentos de gerenciamento de riscos", "gestão de riscos"),
+        ],
+    )
+    def test_mesma_chave(self, a, b):
+        assert chave_regra(a).chave == chave_regra(b).chave
+
+    @pytest.mark.parametrize(
+        "a, b",
+        [
+            ("Conceitos e fundamentos", "Conceitos"),  # sem "de": não é prefixo
+            ("Fundamentos", "Fundamentos de"),
+            ("Conceitos básicos", "Básicos"),
+            (
+                "Administração de projetos",
+                "Gestão de projetos",
+            ),  # só gestão/gerenciamento
+            ("Administração pública", "Gestão pública"),
+            ("Conceitos de redes", "Gestão de redes"),
+            ("Fundamentos de segurança", "Segurança e governança"),
+        ],
+    )
+    def test_chaves_diferentes(self, a, b):
+        assert chave_regra(a).chave != chave_regra(b).chave
+
+    def test_prefixo_conceitual_nao_liga_nocoes(self):
+        assert chave_regra("Fundamentos de banco de dados").nocoes is False
+        assert chave_regra("Conceitos básicos de SQL").nocoes is False
+        assert chave_regra("Noções básicas de SQL").nocoes is True
+
+    def test_prefixo_sem_resto_nao_zera_a_chave(self):
+        assert chave_regra("Fundamentos de").chave
+        assert chave_regra("Conceitos básicos de").chave
+
+    def test_chaves_antigas_inalteradas(self):
+        assert chave_regra("Conceitos e fundamentos").chave == "conceito e fundamento"
+        assert chave_regra("Lei nº 9.784/1999").chave == "lei 9784 1999"
+
+    @pytest.mark.parametrize(
+        "nome, sigla",
+        [
+            ("Minimum Viable Product (MVP)", "mvp"),
+            ("MVP", "mvp"),
+            ("Plano de Contas Aplicado ao Setor Público (PCASP)", "pcasp"),
+            ("Tribunal de Contas da União (TCU) e outros", ""),
+            ("Educação corporativa (atuação do pedagogo)", ""),
+            ("Redes (rede)", ""),
+            ("Gerenciamento de Backlog", ""),
+            ("Python", ""),
+        ],
+    )
+    def test_sigla_do_nome(self, nome, sigla):
+        assert chave_regra(nome).sigla == sigla
+        assert canonico.sigla_do_nome(nome) == sigla
+
+    def test_sigla_nao_entra_na_igualdade_nem_na_chave(self):
+        assert chave_regra("Produto mínimo viável (MVP)") == canonico.ChaveRegra(
+            "produto minimo viavel", False
+        )
+
+    def test_sigla_unica_casa_ambigua_nao(self):
+        cands = {"A": "mvp", "B": "bpm", "C": "ci", "D": "ci"}
+        assert canonico.candidato_unico_por_sigla("mvp", cands) == "A"
+        assert canonico.candidato_unico_por_sigla("ci", cands) is None
+        assert canonico.candidato_unico_por_sigla("xyz", cands) is None
+        assert canonico.candidato_unico_por_sigla("", cands) is None
+
+
 class TestChaveRegraSepara:
     """Falsos positivos reais de similaridade (task.md, 2026-09-22): a regra
     nunca junta; só a aprovação humana poderia."""

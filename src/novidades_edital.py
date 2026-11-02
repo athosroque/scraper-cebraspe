@@ -65,6 +65,32 @@ def _caminho(arv: arv_mod.ArvoreMestre, no_id: str) -> str:
     return " › ".join(reversed(nomes))
 
 
+def _titulos_sem_destino(
+    resultado: dict, disciplinas: dict[str, str], assuntos: dict
+) -> list[dict]:
+    """Título de bloco sem nó, com o que ele trava, do que mais trava ao que menos.
+
+    Não é disciplina nova (P72): é a decisão de para onde o título vai. Os
+    `itens_travados` são os assuntos sem nó sob o título e os subassuntos deles,
+    que só serão comparados com a árvore depois dessa decisão.
+    """
+    titulos = []
+    for chave, nome in disciplinas.items():
+        travados = sum(
+            1 + len(e["subassuntos"])
+            for e in assuntos.values()
+            if e["_materia_chave"] == chave and e["_novo"]
+        )
+        chunks = []
+        for r in resultado.get("resultados", []):
+            materia = (r.get("taxonomia_extraida") or {}).get("materia")
+            idx = r.get("chunk_index")
+            if normalizar(materia or "") == chave and idx not in chunks:
+                chunks.append(idx)
+        titulos.append({"titulo": nome, "chunks": chunks, "itens_travados": travados})
+    return sorted(titulos, key=lambda t: -t["itens_travados"])
+
+
 def novidades_do_edital(
     resultado: dict,
     disciplinas_conhecidas: list[str] | None = None,
@@ -77,7 +103,9 @@ def novidades_do_edital(
     com subassuntos novos. `total_assuntos` conta essas entradas;
     `total_itens_novos` soma disciplinas novas, assuntos realmente novos e
     subassuntos novos. "Novo" aqui é "realmente novo": sem nó aprovado nem
-    proposto. Os itens com nó só proposto vão para `propostas` (e
+    proposto. `titulos_sem_destino` (alias antigo: `disciplinas_novas`) lista os
+    títulos de bloco sem nó com `chunks` e `itens_travados`, ordenados por
+    itens travados; `total_itens_travados` os soma. Os itens com nó só proposto vão para `propostas` (e
     `total_propostas`), com `nivel`, `item`, `disciplina`, `assunto` (nos
     subassuntos), `no_id`, `no_caminho` e `confianca` quando existir.
     """
@@ -187,16 +215,24 @@ def novidades_do_edital(
                     "assunto": item["topico_nome"],
                     "subassuntos": [],
                     "_novo": not nos_t,
+                    "_materia_chave": m_chave,
                 },
             )
             for sub in subs_novos:
                 if sub not in entrada["subassuntos"]:
                     entrada["subassuntos"].append(sub)
 
-    lista = [{k: v for k, v in e.items() if k != "_novo"} for e in assuntos.values()]
+    lista = [
+        {k: v for k, v in e.items() if not k.startswith("_")} for e in assuntos.values()
+    ]
     n_assuntos_novos = sum(1 for e in assuntos.values() if e["_novo"])
     n_subs = sum(len(e["subassuntos"]) for e in assuntos.values())
+    titulos = _titulos_sem_destino(resultado, disciplinas, assuntos)
     return {
+        "titulos_sem_destino": titulos,
+        "total_titulos_sem_destino": len(titulos),
+        "total_itens_travados": sum(t["itens_travados"] for t in titulos),
+        # alias de compatibilidade: nomes dos títulos, na ordem de aparição
         "disciplinas_novas": list(disciplinas.values()),
         "assuntos_novos": lista,
         "total_disciplinas": len(disciplinas),

@@ -53,6 +53,9 @@ def test_tudo_conhecido(arvore):
         arvore,
     )
     assert r == {
+        "titulos_sem_destino": [],
+        "total_titulos_sem_destino": 0,
+        "total_itens_travados": 0,
         "disciplinas_novas": [],
         "assuntos_novos": [],
         "total_disciplinas": 0,
@@ -228,3 +231,37 @@ def test_aprovado_prevalece_sobre_proposto(arvore):
     )
     assert r["propostas"] == []
     assert r["total_itens_novos"] == 0
+
+
+def test_titulo_sem_destino_conta_itens_travados(arvore):
+    r = novidades_do_edital(
+        _edital("Física Quântica", "Átomos", ["Spin", "Quark"]), DISCIPLINAS, arvore
+    )
+    assert r["titulos_sem_destino"] == [
+        {"titulo": "Física Quântica", "chunks": [0], "itens_travados": 3}
+    ]
+    assert r["total_titulos_sem_destino"] == 1
+    assert r["total_itens_travados"] == 3
+    # chaves antigas continuam
+    assert r["disciplinas_novas"] == ["Física Quântica"]
+    assert r["total_itens_novos"] == 4  # título + assunto + 2 subassuntos
+
+
+def test_titulos_ordenados_por_itens_travados(arvore):
+    base = _edital("Pequeno", "A1", [])
+    grande = _edital("Grande", "B1", ["x", "y", "z"])
+    base["resultados"] += grande["resultados"]
+    r = novidades_do_edital(base, DISCIPLINAS, arvore)
+    assert [t["titulo"] for t in r["titulos_sem_destino"]] == ["Grande", "Pequeno"]
+    assert r["total_itens_travados"] == 5
+    assert r["disciplinas_novas"] == ["Pequeno", "Grande"]  # ordem de aparição
+
+
+def test_titulo_conhecido_nao_trava_nada(arvore):
+    r = novidades_do_edital(
+        _edital("Direito Administrativo", "Licitações", ["Dispensa"]),
+        DISCIPLINAS,
+        arvore,
+    )
+    assert r["titulos_sem_destino"] == []
+    assert r["total_itens_travados"] == 0

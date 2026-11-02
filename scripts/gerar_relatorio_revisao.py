@@ -293,6 +293,9 @@ def renderizar_chunk(
 
 
 NOVIDADES_VAZIAS = {
+    "titulos_sem_destino": [],
+    "total_titulos_sem_destino": 0,
+    "total_itens_travados": 0,
     "disciplinas_novas": [],
     "assuntos_novos": [],
     "total_disciplinas": 0,
@@ -349,8 +352,30 @@ def _situacao(resultado: dict) -> str:
     return "outro"
 
 
+ROTULO_TITULO = "Título de bloco sem destino (vira assunto)"
+EXPLICA_TITULO = (
+    "Não é disciplina nova: escolha o assunto/disciplina existente para onde este "
+    "título vai (decisão sua); sem isso, os {n} itens abaixo não são comparados "
+    "com a árvore."
+)
+
+
+def _titulos_sem_destino(novidades: dict) -> list[dict]:
+    """Títulos de bloco sem destino, do que mais trava ao que menos.
+
+    Sem a chave nova (novidades de versão antiga), cai no alias `disciplinas_novas`.
+    """
+    titulos = novidades.get("titulos_sem_destino")
+    if not titulos:
+        titulos = [
+            {"titulo": d, "chunks": [], "itens_travados": 0}
+            for d in novidades.get("disciplinas_novas", [])
+        ]
+    return sorted(titulos, key=lambda t: -(t.get("itens_travados") or 0))
+
+
 def _novos_do_edital(novidades: dict) -> tuple[set[str], set[str]]:
-    disciplinas = {_chave(d) for d in novidades.get("disciplinas_novas", [])}
+    disciplinas = {_chave(t.get("titulo")) for t in _titulos_sem_destino(novidades)}
     assuntos = {_chave(a.get("assunto")) for a in novidades.get("assuntos_novos", [])}
     return disciplinas, assuntos
 
@@ -443,11 +468,23 @@ def _bloco_o_que_revisar(
                 f" — {escape(str(status))}</li>"
             )
     # (b) realmente novos: sem nó equivalente, aprovado ou proposto
-    itens_b = [
-        f"<li><span class='novo-tag'>DISCIPLINA</span> <strong>{escape(str(d))}</strong> "
-        f"{_link_chunk(_chunks_da_disciplina(resultado, auditoria, d))}</li>"
-        for d in novidades.get("disciplinas_novas", [])
-    ]
+    titulos = _titulos_sem_destino(novidades)
+    itens_titulos = []
+    for t in titulos:
+        nome = t.get("titulo")
+        travados = t.get("itens_travados") or 0
+        destrava = (
+            f" <span class='sub'>destrava {travados} "
+            f"{'item' if travados == 1 else 'itens'}</span>"
+            if travados
+            else ""
+        )
+        itens_titulos.append(
+            f"<li><span class='novo-tag'>TÍTULO DE BLOCO</span> "
+            f"<strong>{escape(str(nome))}</strong>{destrava} "
+            f"{_link_chunk(_chunks_da_disciplina(resultado, auditoria, nome or ''))}</li>"
+        )
+    itens_b: list[str] = []
     for a in novidades.get("assuntos_novos", []):
         subs = a.get("subassuntos") or []
         sub_html = (
@@ -486,10 +523,31 @@ def _bloco_o_que_revisar(
             f"<td>{_link_chunk(indices)}</td></tr>"
         )
 
-    if itens_b:
+    n_entradas = len(itens_titulos) + len(itens_b)
+    if n_entradas:
+        travados_total = novidades.get("total_itens_travados") or sum(
+            t.get("itens_travados") or 0 for t in titulos
+        )
+        itens_novos = novidades.get("total_itens_novos") or 0
+        contagem = f"{n_entradas} entradas"
+        if itens_novos:
+            contagem += f"; {itens_novos} itens"
+        titulos_html = ""
+        if itens_titulos:
+            titulos_html = (
+                f"<h4>{ROTULO_TITULO} ({len(itens_titulos)})</h4>"
+                f"<p class='legenda'>{escape(EXPLICA_TITULO.format(n=travados_total))}</p>"
+                f"<ul>{''.join(itens_titulos)}</ul>"
+            )
+        assuntos_html = (
+            f"<h4>Assuntos e subassuntos novos ({len(itens_b)})</h4>"
+            f"<ul>{''.join(itens_b)}</ul>"
+            if itens_b
+            else ""
+        )
         novos_html = (
-            f"<div class='novos'><h3>Realmente novos — sem nó equivalente ({len(itens_b)})</h3>"
-            f"<ul>{''.join(itens_b)}</ul></div>"
+            f"<div class='novos'><h3>Realmente novos — sem nó equivalente ({contagem})</h3>"
+            f"{titulos_html}{assuntos_html}</div>"
         )
     else:
         novos_html = "<h3>Realmente novos — sem nó equivalente (0)</h3><p class='ok'>Nenhum item novo sem equivalente.</p>"
@@ -507,7 +565,7 @@ def _bloco_o_que_revisar(
         if itens_a
         else "<p class='ok'>Nenhum alerta bloqueante.</p>"
     )
-    nada = not (itens_a or itens_b or linhas_c)
+    nada = not (itens_a or itens_b or itens_titulos or linhas_c)
     nada_html = (
         "<p class='nada-a-decidir'>✔ Nada a decidir neste edital: sem alertas "
         "bloqueantes, sem itens novos e sem propostas pendentes. Pode aprovar.</p>"
@@ -519,7 +577,8 @@ def _bloco_o_que_revisar(
         + "<section class='revisar-box' aria-label='O que revisar'><h2>O que revisar</h2>"
         + nada_html
         + "<p class='legenda'>Novo = nenhum nó equivalente na árvore; será preciso criar ou mapear "
-        "na curadoria. Proposta = a IA achou este nó existente; aprovar via curar_arvore.</p>"
+        f"na curadoria. {ROTULO_TITULO} = título do edital fora da lista de disciplinas: "
+        "decide-se para onde ele vai, e isso destrava os itens abaixo dele. Proposta = a IA achou este nó existente; aprovar via curar_arvore.</p>"
         + alertas_html
         + novos_html
         + propostas_html
@@ -606,7 +665,7 @@ def _resumo_edital(
     resultado: dict, validacao: dict | None, novidades: dict, arquivo_html: str
 ) -> dict:
     bloqueantes, informativos = _alertas_por_severidade(validacao)
-    disciplinas_novas = novidades.get("disciplinas_novas", [])
+    titulos = _titulos_sem_destino(novidades)
     assuntos_novos = novidades.get("assuntos_novos", [])
     return {
         "edital": _rotulo_concurso(resultado) + resultado["edital"],
@@ -618,7 +677,11 @@ def _resumo_edital(
         "total_informativos": informativos,
         "total_disciplinas": novidades.get("total_disciplinas", 0),
         "total_assuntos": novidades.get("total_assuntos", 0),
-        "disciplinas_novas": len(disciplinas_novas),
+        "disciplinas_novas": len(titulos),  # chave antiga: conta títulos sem destino
+        "titulos_sem_destino": len(titulos),
+        "itens_travados": novidades.get("total_itens_travados")
+        or sum(t.get("itens_travados") or 0 for t in titulos),
+        "itens_novos": novidades.get("total_itens_novos", 0),
         "assuntos_novos": len(assuntos_novos),
         "propostas": len(novidades.get("propostas", [])),
     }
@@ -660,7 +723,18 @@ def _linha_edital(e: dict) -> str:
         badges.append(_badge(f"{e['propostas']} propostas a conferir", "proposta"))
     novos = (e.get("disciplinas_novas") or 0) + (e.get("assuntos_novos") or 0)
     if novos:
-        badges.append(_badge(f"{novos} novos sem equivalente", "novo"))
+        itens = e.get("itens_novos") or 0
+        sufixo = f" ({itens} itens)" if itens else ""
+        badges.append(_badge(f"{novos} novos sem equivalente{sufixo}", "novo"))
+    if e.get("titulos_sem_destino"):
+        travados = e.get("itens_travados") or 0
+        destrava = f" · destravam {travados} itens" if travados else ""
+        badges.append(
+            _badge(
+                f"{e['titulos_sem_destino']} títulos de bloco sem destino (viram assunto){destrava}",
+                "novo",
+            )
+        )
     return (
         f"<li data-problema='{int(_tem_problema(e))}' data-novidade='{int(_tem_novidade(e))}' "
         f"data-proposta='{int(_tem_proposta(e))}'>"
