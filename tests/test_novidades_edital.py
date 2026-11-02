@@ -144,19 +144,13 @@ def test_sem_o_passo_a_equivalencia_de_nome_nao_conta(arvore):
     assert r["total_itens_novos"] == 3
 
 
-def test_nome_igual_a_no_filho_sem_decisao_continua_pendente(arvore, tmp_path):
-    """O passo não grava item que só casa com nó-filho por nome (SEFA_PR_25, M1);
-    por isso o relatório também o mostra como pendente."""
+def test_nome_igual_a_no_filho_unico_nao_e_novidade(arvore, tmp_path):
+    """O passo mapeia item que casa com um único nó-filho de mesmo nome (KAN-97, M14,
+    que tirou o caso do SEFA_PR_25 da lista de pendentes); o relatório não o lista."""
     criar_no(arvore, "subassunto", "Convalidação", "A-ATO", id_override="S-CON")
     edital = _edital("Direito Administrativo", "Atos administrativos", ["Convalidação"])
     r = novidades_do_edital(edital, DISCIPLINAS, _apos_passo(arvore, edital, tmp_path))
-    assert r["assuntos_novos"] == [
-        {
-            "disciplina": "Direito Administrativo",
-            "assunto": "Atos administrativos",
-            "subassuntos": ["Convalidação"],
-        }
-    ]
+    assert r["assuntos_novos"] == []
 
 
 def test_titulo_de_bloco_que_e_assunto_nao_e_disciplina(arvore, tmp_path):

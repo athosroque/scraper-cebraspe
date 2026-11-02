@@ -642,3 +642,244 @@ def test_heranca_dry_run_nao_grava(monkeypatch, tmp_path, arvore_folha):
     assert res.por_heranca == 1
     assert "governanca de ti|bsc|backup" in mem.mapeamentos
     assert "governanca de ti|bsc|backup" not in carregar(arvore_folha).mapeamentos
+
+
+# Filho único de mesmo nome (KAN-97, M14) -------------------------------------------
+
+
+@pytest.fixture
+def arvore_sefa(arvore_path):
+    """Estrutura do SEFA_PR_25: o título de bloco "Administração Geral e Pública"
+    aponta para 3 nós de outros editais; os filhos de mesmo nome já existem."""
+
+    def montar(a):
+        criar_no(a, "materia", "Administração Geral", None, id_override="M-AG")
+        criar_no(a, "materia", "Administração Pública", None, id_override="M-AP")
+        criar_no(a, "materia", "Administração Financeira", None, id_override="M-AF")
+        criar_no(a, "assunto", "Evolução da administração", "M-AG", id_override="A-EVO")
+        criar_no(a, "assunto", "Processo administrativo", "M-AG", id_override="A-PRO")
+        criar_no(a, "assunto", "Governo eletrônico", "M-AP", id_override="A-GOV")
+        criar_no(a, "subassunto", "Abordagens", "A-EVO", id_override="S-ABO")
+        criar_no(a, "subassunto", "Transparência", "A-GOV", id_override="S-TRA")
+        criar_no(a, "subassunto", "Accountability", "A-GOV", id_override="S-ACC")
+        criar_no(
+            a, "subassunto", "Cultura organizacional", "A-PRO", id_override="S-CUL"
+        )
+        mapear(a, "administracao geral e publica", ["M-AG", "M-AP", "M-AF"])
+
+    _mexer(arvore_path, montar)
+    return arvore_path
+
+
+def _rodar_filho(monkeypatch, tmp_path, arvore_path, assunto=(), subassunto=()):
+    bloco = "administracao geral e publica"
+    nomes = canonico.NomesOrigem(
+        assunto={(bloco, canonico.chave_regra(n).chave): _nome(n) for n in assunto},
+        subassunto={
+            (bloco, canonico.chave_regra(t).chave, canonico.chave_regra(s).chave): (
+                _nome(s)
+            )
+            for t, s in subassunto
+        },
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    return canonico.mapear_novos_itens(tmp_path, arvore_path)
+
+
+def _destino(arvore_path, *partes):
+    arv = carregar(arvore_path)
+    return [
+        (m.no_id, m.origem, m.status) for m in arv.mapeamentos.get(_cb(*partes), [])
+    ]
+
+
+def test_filho_unico_resolve_os_casos_do_sefa(monkeypatch, tmp_path, arvore_sefa):
+    # O pai tem 3 nós; "Evolução da administração" é filho único no conjunto, e o
+    # subassunto sobe junto na mesma execução (cascata assunto -> subassunto).
+    res = _rodar_filho(
+        monkeypatch,
+        tmp_path,
+        arvore_sefa,
+        assunto=["Evolução da administração", "Governo eletrônico"],
+        subassunto=[
+            ("Evolução da administração", "Abordagens"),
+            ("Governo eletrônico", "Transparência"),
+            ("Governo eletrônico", "Accountability"),
+        ],
+    )
+    assert (res.por_filho, res.por_nome, res.por_memoria, res.pendentes) == (5, 0, 0, 0)
+    assert res.total == 5
+    bloco = "administracao geral e publica"
+    ok = [("A-EVO", "regra", "aprovado")]
+    assert _destino(arvore_sefa, bloco, "evolucao da administracao") == ok
+    assert _destino(arvore_sefa, bloco, "governo eletronico") == [
+        ("A-GOV", "regra", "aprovado")
+    ]
+    assert _destino(arvore_sefa, bloco, "governo eletronico", "accountability") == [
+        ("S-ACC", "regra", "aprovado")
+    ]
+    assert _destino(arvore_sefa, bloco, "governo eletronico", "transparencia") == [
+        ("S-TRA", "regra", "aprovado")
+    ]
+
+
+def test_filho_unico_subassunto_sob_assunto_de_outro_bloco(
+    monkeypatch, tmp_path, arvore_sefa
+):
+    res = _rodar_filho(
+        monkeypatch,
+        tmp_path,
+        arvore_sefa,
+        assunto=["Processo administrativo"],
+        subassunto=[("Processo administrativo", "Cultura organizacional")],
+    )
+    assert res.por_filho == 2 and res.pendentes == 0
+    assert _destino(
+        arvore_sefa,
+        "administracao geral e publica",
+        "processo administrativo",
+        "cultura organizacional",
+    ) == [("S-CUL", "regra", "aprovado")]
+
+
+def test_filho_unico_idempotente(monkeypatch, tmp_path, arvore_sefa):
+    kw = dict(
+        assunto=["Governo eletrônico"],
+        subassunto=[("Governo eletrônico", "Accountability")],
+    )
+    r1 = _rodar_filho(monkeypatch, tmp_path, arvore_sefa, **kw)
+    antes = arvore_sefa.read_text(encoding="utf-8")
+    r2 = _rodar_filho(monkeypatch, tmp_path, arvore_sefa, **kw)
+    assert r1.por_filho == 2 and r2.total == 0 and r2.por_filho == 0
+    assert arvore_sefa.read_text(encoding="utf-8") == antes
+
+
+def test_filho_duplicado_sob_pais_diferentes_do_conjunto_fica_pendente(
+    monkeypatch, tmp_path, arvore_sefa
+):
+    # Mesmo nome sob M-AG e M-AP, ambos no conjunto do pai: ambíguo.
+    _mexer(
+        arvore_sefa,
+        lambda a: criar_no(
+            a, "assunto", "Governo eletrônico", "M-AG", id_override="A-G2"
+        ),
+    )
+    res = _rodar_filho(
+        monkeypatch, tmp_path, arvore_sefa, assunto=["Governo eletrônico"]
+    )
+    assert res.por_filho == 0 and res.pendentes == 1
+    assert (
+        "administracao geral e publica|governo eletronico"
+        not in carregar(arvore_sefa).mapeamentos
+    )
+
+
+def test_filho_duplicado_sob_o_mesmo_pai_fica_pendente(
+    monkeypatch, tmp_path, arvore_sefa
+):
+    _mexer(
+        arvore_sefa,
+        lambda a: criar_no(
+            a, "assunto", "Governo eletrônico", "M-AP", id_override="A-G2"
+        ),
+    )
+    res = _rodar_filho(
+        monkeypatch, tmp_path, arvore_sefa, assunto=["Governo eletrônico"]
+    )
+    assert res.por_filho == 0 and res.pendentes == 1
+
+
+def test_filho_proposto_ou_aposentado_nao_conta(monkeypatch, tmp_path, arvore_sefa):
+    def montar(a):
+        a.nos["A-GOV"].status = "proposto"
+        a.nos["A-EVO"].status = "aposentado"
+
+    _mexer(arvore_sefa, montar)
+    res = _rodar_filho(
+        monkeypatch,
+        tmp_path,
+        arvore_sefa,
+        assunto=["Governo eletrônico", "Evolução da administração"],
+    )
+    assert res.por_filho == 0 and res.pendentes == 2
+
+
+def test_par_vetado_nunca_vai_para_o_filho(monkeypatch, tmp_path, arvore_sefa):
+    _mexer(
+        arvore_sefa,
+        lambda a: (
+            mapear(a, "outro|governo eletronico", ["A-GOV"], "humano"),
+            rejeitar(a, "outro|governo eletronico", "A-GOV"),
+        ),
+    )
+    res = _rodar_filho(
+        monkeypatch, tmp_path, arvore_sefa, assunto=["Governo eletrônico"]
+    )
+    assert res.por_filho == 0 and res.pendentes == 1
+
+
+def test_titulo_generico_nunca_vai_para_o_filho(monkeypatch, tmp_path, arvore_sefa):
+    assert canonico.titulo_generico("Conceitos básicos")
+    _mexer(
+        arvore_sefa,
+        lambda a: criar_no(
+            a, "assunto", "Conceitos básicos", "M-AG", id_override="A-CB"
+        ),
+    )
+    res = _rodar_filho(
+        monkeypatch, tmp_path, arvore_sefa, assunto=["Conceitos básicos"]
+    )
+    assert res.por_filho == 0 and res.pendentes == 1
+
+
+def test_nivel_incompativel_nunca_vai_para_o_filho(monkeypatch, tmp_path, arvore_sefa):
+    # O assunto-item "Gestão" aponta para a matéria M-AF, e o único filho de mesmo
+    # nome dela é um assunto: o subassunto-item não pode ir para um nó de assunto.
+    def montar(a):
+        criar_no(a, "assunto", "Orçamento", "M-AF", id_override="A-ORC")
+        mapear(a, "administracao geral e publica|gestao", ["M-AF"])
+
+    _mexer(arvore_sefa, montar)
+    res = _rodar_filho(
+        monkeypatch, tmp_path, arvore_sefa, subassunto=[("Gestão", "Orçamento")]
+    )
+    assert res.por_filho == 0 and res.pendentes == 1
+
+
+def test_item_de_materia_nao_passa_pelo_ramo_do_filho(
+    monkeypatch, tmp_path, arvore_sefa
+):
+    nomes = canonico.NomesOrigem(
+        materia={"governo eletronico": _nome("Governo eletrônico")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    res = canonico.mapear_novos_itens(tmp_path, arvore_sefa, gravar=False)
+    assert res.por_filho == 0
+
+
+def test_filho_unico_sem_pai_mapeado_fica_pendente(monkeypatch, tmp_path, arvore_sefa):
+    nomes = canonico.NomesOrigem(
+        assunto={("bloco sem no", "governo eletronico"): _nome("Governo eletrônico")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    res = canonico.mapear_novos_itens(tmp_path, arvore_sefa)
+    assert res.por_filho == 0 and res.pendentes == 1
+
+
+def test_filho_unico_dry_run_nao_grava(monkeypatch, tmp_path, arvore_sefa):
+    nomes = canonico.NomesOrigem(
+        assunto={
+            ("administracao geral e publica", "governo eletronico"): _nome(
+                "Governo eletrônico"
+            )
+        }
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    mem = carregar(arvore_sefa)
+    res = canonico.mapear_novos_itens(
+        tmp_path, arvore_sefa, gravar=False, arvore_mem=mem
+    )
+    assert res.por_filho == 1
+    chave = "administracao geral e publica|governo eletronico"
+    assert chave in mem.mapeamentos
+    assert chave not in carregar(arvore_sefa).mapeamentos

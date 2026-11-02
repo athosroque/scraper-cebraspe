@@ -189,12 +189,18 @@ validação não grava nada.""",
         texto="""Item novo de edital (pipeline, `atualizar_revisao.atualizar_arvore`):
 `canonico.mapear_novos_itens_por_regra` copia os nós de um item aprovado com
 a mesma `chave_regra` **no mesmo nó-pai efetivo**; sem candidato, tenta a memória das
-decisões do dono (P73); sem candidato, o subtópico herda o nó do tópico-pai quando ele é
+decisões do dono (P73); sem candidato, assunto ou subassunto com pai mapeado vai para o
+**filho único** (KAN-97): entre os filhos ativos (não propostos) dos nós do pai, juntos,
+exatamente 1 tem a mesma `chave_regra` e nível compatível (assunto: assunto ou subassunto;
+subassunto: subassunto); dois filhos iguais, mesmo sob pais diferentes do conjunto, são
+ambíguos. Entra como `regra`/`aprovado` e conta em `por_filho`; título genérico e par
+vetado pelo dono nunca casam, e o item de matéria (sem pai) não passa por aqui. Sem
+candidato ainda, o subtópico herda o nó do tópico-pai quando ele é
 folha (KAN-85): o pai tem exatamente 1 nó aprovado, ativo, de nível subassunto e sem
 filho ativo, o nome não é título genérico e o par (chave de regra, nó) não foi vetado
 pelo dono; entra como `regra`/`aprovado` e conta em `por_heranca`. Regra ambígua ou pai
 sem nó fica pendente no `arvore.html`.
-O log traz a contagem por regra de nome, por memória, por herança de folha e pendentes. A `chave_regra` ignora os
+O log traz a contagem por regra de nome, por memória, por filho único, por herança de folha e pendentes. A `chave_regra` ignora os
 prefixos "noções de", "fundamentos de" e "conceitos (básicos|gerais) de" (só "noções" liga
 `nocoes`) e unifica gestão e gerenciamento; administração não entra, e a sigla entre
 parênteses é só o campo `ChaveRegra.sigla`, nunca a chave (KAN-84). O mapeamento
@@ -206,6 +212,7 @@ título genérico (`canonico.TITULOS_GENERICOS`) nunca casa sozinho por nome (KA
             "tests/test_regra_arvore.py::test_nao_mapeia_sob_outro_pai",
             "tests/test_regra_arvore.py::test_regra_ambigua_fica_pendente",
             "tests/test_canonico.py::TestChaveRegraPrefixosESinonimos",
+            "tests/test_regra_arvore.py::test_filho_unico_resolve_os_casos_do_sefa",
         ),
     ),
     Regra(
@@ -420,7 +427,9 @@ ou o nome tem 2+ palavras relevantes e não é título genérico (`canonico.TITU
 par vetado pelo dono (por `chave_regra`) nunca é regravado, e fora disso o item fica pendente,
 nunca `aprovado` (KAN-82). Proposta de LLM ou de regra
 nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
-do dono. `scripts/auditar_arvore.py` fica verde antes de cada carga.""",
+do dono. O ramo do filho único (KAN-97, P52) é só de assunto e subassunto, que têm pai: o
+título de bloco (matéria) continua neste ramo de nome e nunca passa por lá.
+`scripts/auditar_arvore.py` fica verde antes de cada carga.""",
         adrs=("ADR-030",),
         testes=(
             "tests/test_regra_arvore.py::test_titulo_de_bloco_fora_da_lista_vira_assunto",
@@ -441,7 +450,10 @@ nível (o assunto mapeado agora serve de pai do subassunto): (1) regra de nome; 
 item de mesma `chave_regra` e mesmo pai efetivo de uma decisão **aprovada**, ou apelido
 exato de nó **fundido** (só nó fundido gera apelido, apontando ao destino ativo; nó ativo
 nunca) na disciplina do pai, com candidato único, vira `regra`/`aprovado`; ambiguidade
-fica pendente; (3) herança de folha, só para subtópico: aponta para o nó único do
+fica pendente; (3) filho único (KAN-97), só assunto e subassunto com pai mapeado: o item vai
+para o único filho ativo de mesma `chave_regra` e nível compatível entre os filhos dos nós do
+pai (`por_filho`, `regra`/`aprovado`), salvo ambiguidade, título genérico ou par vetado;
+(4) herança de folha, só para subtópico: aponta para o nó único do
 tópico-pai se ele é subassunto ativo sem filhos, salvo título genérico ou par vetado
 (KAN-85, `regra`/`aprovado`); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
 reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
@@ -462,8 +474,8 @@ rejeitado nunca é devolvido nem reproposto, e a memória não muda status exist
         area="arvore",
         texto="""O relatório de revisão e a tabela `mapeamento_itens` do `revisao.db` leem a árvore já
 passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
-equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia, e os
-pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
+equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia (nome,
+memória, filho único ou herança de folha), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
 antes de `gerar_relatorios` e `gerar_db` (KAN-81).""",
         adrs=("ADR-030",),
         testes=(

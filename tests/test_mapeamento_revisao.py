@@ -258,8 +258,10 @@ def test_relatorio_depois_do_passo_mapeia_o_que_o_passo_mapeia(tmp_path, arvore)
     # ATOS ADMINISTRATIVOS casa com um item já aprovado (mesma regra, mesmo pai).
     assert it_antes["ATOS ADMINISTRATIVOS"]["categoria"] == "sem_equivalente"
     assert it_depois["ATOS ADMINISTRATIVOS"]["categoria"] == "auto"
-    # Anulação só tem nó-filho de mesmo nome; sem decisão, o passo não grava.
-    assert it_depois["Anulação"]["categoria"] == "sem_equivalente"
+    # Anulação só tem nó-filho de mesmo nome: o ramo do filho único (KAN-97) a mapeia,
+    # depois que ATOS ADMINISTRATIVOS (o pai) resolve na mesma execução.
+    assert it_depois["Anulação"]["categoria"] == "auto"
+    assert res.por_filho == 1
     assert _pendentes_do_relatorio(depois) == set(res.chaves_pendentes) | {
         l["chave"] for l in depois if l["categoria"] == "proposta"
     }

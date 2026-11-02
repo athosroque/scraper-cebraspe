@@ -1120,11 +1120,12 @@ def no_e_folha(arvore, no_id: str, nivel: str | None = None) -> bool:
 
 @dataclass
 class ResultadoRegra:
-    """Contagem do passo determinístico (regra de nome + memória + herança)."""
+    """Contagem do passo determinístico (nome + memória + filho único + herança)."""
 
     por_nome: int = 0
     por_memoria: int = 0
     por_heranca: int = 0
+    por_filho: int = 0
     pendentes: int = 0
     # Chaves dos itens que o passo tentou e não mapeou (sem nó equivalente, regra
     # ambígua, pai sem nó). Item que já tinha entrada (aprovada, proposta ou
@@ -1133,7 +1134,42 @@ class ResultadoRegra:
 
     @property
     def total(self) -> int:
-        return self.por_nome + self.por_memoria + self.por_heranca
+        return self.por_nome + self.por_memoria + self.por_filho + self.por_heranca
+
+
+_NIVEIS_FILHO = {
+    "assunto": frozenset({"assunto", "subassunto"}),
+    "subassunto": frozenset({"subassunto"}),
+}
+
+
+def _no_de_filho_unico(
+    arvore, nivel: str, pais: frozenset[str], nome: str, regra: str, vetados
+) -> str | None:
+    """Filho ativo de mesmo nome sob os nós do pai (KAN-97, M14), ou None.
+
+    Só para item de assunto ou subassunto com pai mapeado: o item vai para o único
+    filho ativo (não proposto) de algum dos `pais` cuja `chave_regra` é a do item e
+    cujo nível é compatível (assunto: assunto/subassunto; subassunto: subassunto).
+    Dois filhos iguais, mesmo sob pais diferentes do conjunto, são ambíguos. Recusa
+    título genérico e par (chave de regra, nó) vetado pelo dono. Nunca cria nó."""
+    from src import arvore as arv_mod
+
+    niveis = _NIVEIS_FILHO.get(nivel)
+    if not niveis or not pais or not regra or titulo_generico(nome):
+        return None
+    achados = {
+        f.id
+        for pai in pais
+        for f in arv_mod._filhos_ativos(arvore, pai)
+        if f.status == "ativo"
+        and f.nivel in niveis
+        and chave_regra(f.nome).chave == regra
+    }
+    if len(achados) != 1:
+        return None
+    (no_id,) = achados
+    return None if (regra, no_id) in vetados else no_id
 
 
 def _no_de_heranca(
@@ -1181,7 +1217,13 @@ def mapear_novos_itens(
        nó está numa disciplina compatível com a inferida dos itens do bloco (ou é a
        própria disciplina de mesmo nome), ou se o nome tem 2+ palavras relevantes e não é título genérico
        (`TITULOS_GENERICOS`); par vetado pelo dono nunca é regravado (M2).
-    4. herança de folha (KAN-85, só subtópico sem candidato dos ramos 1 e 2): se o
+    4. filho único (KAN-97, só assunto e subassunto com pai mapeado, sem candidato
+       dos ramos 1 e 2): se os nós do pai, juntos, têm exatamente 1 filho ativo de
+       mesma `chave_regra` em nível compatível (assunto: assunto/subassunto;
+       subassunto: subassunto), o item aponta para ele (`regra`/`aprovado`, contado
+       em `por_filho`). Dois filhos iguais, título genérico ou par vetado pelo dono:
+       pendente. O item de matéria não tem pai, então não passa por este ramo.
+    5. herança de folha (KAN-85, só subtópico sem candidato dos ramos 1, 2 e 4): se o
        tópico-pai tem exatamente 1 nó aprovado, e ele é um subassunto ativo sem
        nenhum filho ativo (folha), o subtópico aponta para esse mesmo nó, como
        faceta dele (`regra`/`aprovado`, contado em `por_heranca`). Não herda se o
@@ -1262,6 +1304,7 @@ def mapear_novos_itens(
             candidatos = indice.get(sig, set())
             origem_memoria = False
             origem_heranca = False
+            origem_filho = False
             if not candidatos:
                 nos_mem = memoria_mapeamento.resolver_por_memoria(
                     arvore, sig[2], nivel, sig[1], memoria
@@ -1269,8 +1312,18 @@ def mapear_novos_itens(
                 if nos_mem:
                     candidatos = {nos_mem}
                     origem_memoria = True
-            # Futuro (M14, KAN-97): casamento por nome com filho único vem AQUI,
-            # antes da herança abaixo.
+            if not candidatos and nivel != "materia":
+                no_filho = _no_de_filho_unico(
+                    arvore,
+                    nivel,
+                    sig[1],
+                    fonte[chave_orig_por_chave[chave]]["nome"],
+                    sig[2],
+                    memoria.vetados,
+                )
+                if no_filho:
+                    candidatos = {frozenset({no_filho})}
+                    origem_filho = True
             if not candidatos and nivel == "subassunto":
                 no_herdado = _no_de_heranca(
                     arvore,
@@ -1312,7 +1365,9 @@ def mapear_novos_itens(
                 res.pendentes += 1
                 res.chaves_pendentes.append(chave)
                 continue
-            if origem_heranca:
+            if origem_filho:
+                res.por_filho += 1
+            elif origem_heranca:
                 res.por_heranca += 1
             elif origem_memoria:
                 res.por_memoria += 1
@@ -1323,8 +1378,8 @@ def mapear_novos_itens(
         arv_mod.salvar(arvore, arvore_path)
     logger.info(
         f"[ARVORE] Passo determinístico: {res.por_nome} por regra de nome, "
-        f"{res.por_memoria} por memória do dono, {res.por_heranca} por herança de "
-        f"folha, {res.pendentes} pendente(s)."
+        f"{res.por_memoria} por memória do dono, {res.por_filho} por filho "
+        f"único, {res.por_heranca} por herança de folha, {res.pendentes} pendente(s)."
     )
     return res
 
