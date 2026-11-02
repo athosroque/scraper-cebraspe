@@ -984,14 +984,35 @@
               "acessibilidade e usabilidade",
               "Task Flow",
               "Metodologias ágeis e experiência do usuário",
-              "Metodologias ágeis e experiência do usuário - Conceitos básicos e aplicações",
-              "Metodologias ágeis e experiência do usuário - Storytelling",
-              "Metodologias ágeis e experiência do usuário - Design thinking",
-              "Metodologias ágeis e experiência do usuário - Research, user interface",
-              "Metodologias ágeis e experiência do usuário - Research, user interface - Lean Concept, Discovery Sprint",
-              "Metodologias ágeis e experiência do usuário - Prototipação",
+              "Conceitos básicos e aplicações",
+              "Storytelling",
+              "Design thinking",
+              "Research, user interface",
+              "Lean Concept, Discovery Sprint",
+              "Prototipação",
               "Técnicas de facilitação e mediação de atividades co-criativas e Design Sprints"
-            ]
+            ],
+            "caminho_origem": {
+              "Conceitos básicos e aplicações": [
+                "Metodologias ágeis e experiência do usuário"
+              ],
+              "Storytelling": [
+                "Metodologias ágeis e experiência do usuário"
+              ],
+              "Design thinking": [
+                "Metodologias ágeis e experiência do usuário"
+              ],
+              "Research, user interface": [
+                "Metodologias ágeis e experiência do usuário"
+              ],
+              "Lean Concept, Discovery Sprint": [
+                "Metodologias ágeis e experiência do usuário",
+                "Research, user interface"
+              ],
+              "Prototipação": [
+                "Metodologias ágeis e experiência do usuário"
+              ]
+            }
           }
         ]
       }

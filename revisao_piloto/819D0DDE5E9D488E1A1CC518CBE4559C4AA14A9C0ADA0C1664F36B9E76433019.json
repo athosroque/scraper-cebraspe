@@ -271,9 +271,17 @@
             "nome": "Conceito e fontes do direito administrativo",
             "subtopicos": [
               "Regime jurídico-administrativo",
-              "Regime jurídico-administrativo - Conceito",
-              "Regime jurídico-administrativo - Conteúdo: supremacia do interesse público sobre o privado e indisponibilidade, pela administração, dos interesses públicos"
-            ]
+              "Conceito",
+              "Conteúdo: supremacia do interesse público sobre o privado e indisponibilidade, pela administração, dos interesses públicos"
+            ],
+            "caminho_origem": {
+              "Conceito": [
+                "Regime jurídico-administrativo"
+              ],
+              "Conteúdo: supremacia do interesse público sobre o privado e indisponibilidade, pela administração, dos interesses públicos": [
+                "Regime jurídico-administrativo"
+              ]
+            }
           },
           {
             "nome": "Administração pública",
@@ -1692,12 +1700,12 @@
             "nome": "Normas Brasileiras de Contabilidade",
             "subtopicos": [
               "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016",
-              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016 - Objetivos e usuários da informação contábil de propósito geral das entidades do setor público",
-              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016 - Características qualitativas",
-              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016 - Entidade que reporta a informação contábil",
-              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016 - Elementos das demonstrações contábeis",
-              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016 - Reconhecimento nas demonstrações contábeis",
-              "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016 - Mensuração de ativos e passivos nas demonstrações contábeis",
+              "Objetivos e usuários da informação contábil de propósito geral das entidades do setor público",
+              "Características qualitativas",
+              "Entidade que reporta a informação contábil",
+              "Elementos das demonstrações contábeis",
+              "Reconhecimento nas demonstrações contábeis",
+              "Mensuração de ativos e passivos nas demonstrações contábeis",
               "NBC TSP 03 – provisões, passivos contingentes e ativos contingentes",
               "NBC TSP 04 – estoques",
               "NBC TSP 07 – ativo imobilizado",
@@ -1711,7 +1719,27 @@
               "NBC TSP 17 – demonstrações contábeis consolidadas",
               "NBC TSP 23 – políticas contábeis, mudança de estimativa e retificação de erro",
               "NBC TSP 34 – custos no setor público"
-            ]
+            ],
+            "caminho_origem": {
+              "Objetivos e usuários da informação contábil de propósito geral das entidades do setor público": [
+                "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016"
+              ],
+              "Características qualitativas": [
+                "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016"
+              ],
+              "Entidade que reporta a informação contábil": [
+                "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016"
+              ],
+              "Elementos das demonstrações contábeis": [
+                "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016"
+              ],
+              "Reconhecimento nas demonstrações contábeis": [
+                "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016"
+              ],
+              "Mensuração de ativos e passivos nas demonstrações contábeis": [
+                "NBC TSP Estrutura Conceitual, de 23 de setembro de 2016"
+              ]
+            }
           },
           {
             "nome": "Análise das demonstrações contábeis",
@@ -1772,162 +1800,564 @@
             "nome": "Microeconomia",
             "subtopicos": [
               "Conceitos fundamentais",
-              "Conceitos fundamentais - Formas de organização da atividade econômica: laissez-faire, intervencionismo, economia planificada",
-              "Conceitos fundamentais - Fatores de produção",
-              "Conceitos fundamentais - Curva de possibilidades de produção",
-              "Conceitos fundamentais - Papel dos preços",
+              "Formas de organização da atividade econômica: laissez-faire, intervencionismo, economia planificada",
+              "Fatores de produção",
+              "Curva de possibilidades de produção",
+              "Papel dos preços",
               "Teoria da demanda",
-              "Teoria da demanda - Preferências e função utilidade",
-              "Teoria da demanda - Curvas de indiferença",
-              "Teoria da demanda - Restrição orçamentária",
-              "Teoria da demanda - Equilíbrio do consumidor",
-              "Teoria da demanda - Curva de demanda",
-              "Teoria da demanda - Curva de Engel",
-              "Teoria da demanda - Bens substitutos e bens complementares",
-              "Teoria da demanda - Bens inferiores e normais",
-              "Teoria da demanda - Bens de Giffen",
-              "Teoria da demanda - Elasticidades",
-              "Teoria da demanda - Elasticidades - Elasticidade-preço da demanda e seus determinantes",
-              "Teoria da demanda - Elasticidades - Efeito da mudança no preço de um bem sobre a receita total",
-              "Teoria da demanda - Elasticidades - Elasticidade-renda da demanda",
-              "Teoria da demanda - Elasticidades - Elasticidade cruzada da demanda",
-              "Teoria da demanda - Elasticidades - Classificação de bens de acordo com as elasticidades",
-              "Teoria da demanda - Efeito-renda e efeito-substituição",
+              "Preferências e função utilidade",
+              "Curvas de indiferença",
+              "Restrição orçamentária",
+              "Equilíbrio do consumidor",
+              "Curva de demanda",
+              "Curva de Engel",
+              "Bens substitutos e bens complementares",
+              "Bens inferiores e normais",
+              "Bens de Giffen",
+              "Elasticidades",
+              "Elasticidade-preço da demanda e seus determinantes",
+              "Efeito da mudança no preço de um bem sobre a receita total",
+              "Elasticidade-renda da demanda",
+              "Elasticidade cruzada da demanda",
+              "Classificação de bens de acordo com as elasticidades",
+              "Efeito-renda e efeito-substituição",
               "Teoria da oferta",
-              "Teoria da oferta - Função de produção",
-              "Teoria da oferta - Função de produção - Isoquantas",
-              "Teoria da oferta - Função de produção - Produção de longo prazo versus produção de curto prazo, produto médio e produtividade marginal",
-              "Teoria da oferta - Função de produção - Lei dos rendimentos decrescentes e rendimentos de escala",
-              "Teoria da oferta - Custos de produção e linha de isocusto",
-              "Teoria da oferta - Minimização de custos",
-              "Teoria da oferta - Função custo total, custo médio e custo marginal",
-              "Teoria da oferta - Custos de longo prazo versus custos de curto prazo, custos fixos e custos variáveis",
-              "Teoria da oferta - Maximização de lucro",
-              "Teoria da oferta - Curva de oferta sob concorrência perfeita e equilíbrio médio-marginal",
-              "Teoria da oferta - Elasticidade-preço da oferta e seus determinantes",
+              "Função de produção",
+              "Isoquantas",
+              "Produção de longo prazo versus produção de curto prazo, produto médio e produtividade marginal",
+              "Lei dos rendimentos decrescentes e rendimentos de escala",
+              "Custos de produção e linha de isocusto",
+              "Minimização de custos",
+              "Função custo total, custo médio e custo marginal",
+              "Custos de longo prazo versus custos de curto prazo, custos fixos e custos variáveis",
+              "Maximização de lucro",
+              "Curva de oferta sob concorrência perfeita e equilíbrio médio-marginal",
+              "Elasticidade-preço da oferta e seus determinantes",
               "Equilíbrio de mercado",
-              "Equilíbrio de mercado - Equilíbrio sob concorrência perfeita, preço de equilíbrio e quantidade transacionada",
-              "Equilíbrio de mercado - Mudanças de equilíbrio",
-              "Equilíbrio de mercado - Excedente do consumidor e excedente do produtor",
-              "Equilíbrio de mercado - Políticas de fixação de preços",
-              "Equilíbrio de mercado - Políticas de fixação de preços - Preço máximo e preço mínimo",
-              "Equilíbrio de mercado - Políticas de fixação de preços - Perdas de excedente, peso morto",
-              "Equilíbrio de mercado - Efeito de tributos sobre o equilíbrio e sobre os excedentes",
+              "Equilíbrio sob concorrência perfeita, preço de equilíbrio e quantidade transacionada",
+              "Mudanças de equilíbrio",
+              "Excedente do consumidor e excedente do produtor",
+              "Políticas de fixação de preços",
+              "Preço máximo e preço mínimo",
+              "Perdas de excedente, peso morto",
+              "Efeito de tributos sobre o equilíbrio e sobre os excedentes",
               "Estruturas de mercado",
-              "Estruturas de mercado - Concorrência perfeita, concorrência imperfeita, monopólio e oligopólio: definição e caracterização",
-              "Estruturas de mercado - Equilíbrio de mercado sob monopólio",
-              "Estruturas de mercado - Oligopólios e cartelização",
-              "Estruturas de mercado - Concorrência imperfeita e preço-prêmio",
-              "Estruturas de mercado - Dinâmica de determinação de preços e margem de lucro",
-              "Estruturas de mercado - Análise de competitividade",
-              "Estruturas de mercado - Análise de indústrias e da concorrência",
-              "Estruturas de mercado - Vantagens competitivas",
-              "Estruturas de mercado - Cadeias e redes produtivas",
-              "Estruturas de mercado - Competitividade e estratégia empresarial",
+              "Concorrência perfeita, concorrência imperfeita, monopólio e oligopólio: definição e caracterização",
+              "Equilíbrio de mercado sob monopólio",
+              "Oligopólios e cartelização",
+              "Concorrência imperfeita e preço-prêmio",
+              "Dinâmica de determinação de preços e margem de lucro",
+              "Análise de competitividade",
+              "Análise de indústrias e da concorrência",
+              "Vantagens competitivas",
+              "Cadeias e redes produtivas",
+              "Competitividade e estratégia empresarial",
               "Teoria dos jogos",
-              "Teoria dos jogos - Definições básicas: agentes (jogadores), ações, estratégia, resultados (payoffs)",
-              "Teoria dos jogos - Equilíbrios",
-              "Teoria dos jogos - Equilíbrios - Equilíbrio em estratégia dominante",
-              "Teoria dos jogos - Equilíbrios - Equilíbrio de Nash",
-              "Teoria dos jogos - Equilíbrios - Equilíbrio perfeito em subjogos",
-              "Teoria dos jogos - Equilíbrios - Dilema dos prisioneiros",
-              "Teoria dos jogos - Equilíbrios - Estratégias mistas",
-              "Teoria dos jogos - Jogos cooperativos e jogos de soma zero",
-              "Teoria dos jogos - Equilíbrios minimax e maximin",
-              "Teoria dos jogos - Jogos simultâneos e jogos sequenciais",
-              "Teoria dos jogos - Aplicações: duopólio de Cournot e duopólio de Bertrand",
-              "Teoria dos jogos - Jogos repetidos",
+              "Definições básicas: agentes (jogadores), ações, estratégia, resultados (payoffs)",
+              "Equilíbrios",
+              "Equilíbrio em estratégia dominante",
+              "Equilíbrio de Nash",
+              "Equilíbrio perfeito em subjogos",
+              "Dilema dos prisioneiros",
+              "Estratégias mistas",
+              "Jogos cooperativos e jogos de soma zero",
+              "Equilíbrios minimax e maximin",
+              "Jogos simultâneos e jogos sequenciais",
+              "Aplicações: duopólio de Cournot e duopólio de Bertrand",
+              "Jogos repetidos",
               "Equilíbrio geral",
-              "Equilíbrio geral - Caixa de Edgeworth",
-              "Equilíbrio geral - Ótimo de Pareto e melhoria de Pareto",
-              "Equilíbrio geral - Trocas",
-              "Equilíbrio geral - Primeiro teorema da economia do bem-estar",
-              "Equilíbrio geral - Segundo teorema da economia do bem-estar"
-            ]
+              "Caixa de Edgeworth",
+              "Ótimo de Pareto e melhoria de Pareto",
+              "Trocas",
+              "Primeiro teorema da economia do bem-estar",
+              "Segundo teorema da economia do bem-estar"
+            ],
+            "caminho_origem": {
+              "Formas de organização da atividade econômica: laissez-faire, intervencionismo, economia planificada": [
+                "Conceitos fundamentais"
+              ],
+              "Fatores de produção": [
+                "Conceitos fundamentais"
+              ],
+              "Curva de possibilidades de produção": [
+                "Conceitos fundamentais"
+              ],
+              "Papel dos preços": [
+                "Conceitos fundamentais"
+              ],
+              "Preferências e função utilidade": [
+                "Teoria da demanda"
+              ],
+              "Curvas de indiferença": [
+                "Teoria da demanda"
+              ],
+              "Restrição orçamentária": [
+                "Teoria da demanda"
+              ],
+              "Equilíbrio do consumidor": [
+                "Teoria da demanda"
+              ],
+              "Curva de demanda": [
+                "Teoria da demanda"
+              ],
+              "Curva de Engel": [
+                "Teoria da demanda"
+              ],
+              "Bens substitutos e bens complementares": [
+                "Teoria da demanda"
+              ],
+              "Bens inferiores e normais": [
+                "Teoria da demanda"
+              ],
+              "Bens de Giffen": [
+                "Teoria da demanda"
+              ],
+              "Elasticidades": [
+                "Teoria da demanda"
+              ],
+              "Elasticidade-preço da demanda e seus determinantes": [
+                "Teoria da demanda",
+                "Elasticidades"
+              ],
+              "Efeito da mudança no preço de um bem sobre a receita total": [
+                "Teoria da demanda",
+                "Elasticidades"
+              ],
+              "Elasticidade-renda da demanda": [
+                "Teoria da demanda",
+                "Elasticidades"
+              ],
+              "Elasticidade cruzada da demanda": [
+                "Teoria da demanda",
+                "Elasticidades"
+              ],
+              "Classificação de bens de acordo com as elasticidades": [
+                "Teoria da demanda",
+                "Elasticidades"
+              ],
+              "Efeito-renda e efeito-substituição": [
+                "Teoria da demanda"
+              ],
+              "Função de produção": [
+                "Teoria da oferta"
+              ],
+              "Isoquantas": [
+                "Teoria da oferta",
+                "Função de produção"
+              ],
+              "Produção de longo prazo versus produção de curto prazo, produto médio e produtividade marginal": [
+                "Teoria da oferta",
+                "Função de produção"
+              ],
+              "Lei dos rendimentos decrescentes e rendimentos de escala": [
+                "Teoria da oferta",
+                "Função de produção"
+              ],
+              "Custos de produção e linha de isocusto": [
+                "Teoria da oferta"
+              ],
+              "Minimização de custos": [
+                "Teoria da oferta"
+              ],
+              "Função custo total, custo médio e custo marginal": [
+                "Teoria da oferta"
+              ],
+              "Custos de longo prazo versus custos de curto prazo, custos fixos e custos variáveis": [
+                "Teoria da oferta"
+              ],
+              "Maximização de lucro": [
+                "Teoria da oferta"
+              ],
+              "Curva de oferta sob concorrência perfeita e equilíbrio médio-marginal": [
+                "Teoria da oferta"
+              ],
+              "Elasticidade-preço da oferta e seus determinantes": [
+                "Teoria da oferta"
+              ],
+              "Equilíbrio sob concorrência perfeita, preço de equilíbrio e quantidade transacionada": [
+                "Equilíbrio de mercado"
+              ],
+              "Mudanças de equilíbrio": [
+                "Equilíbrio de mercado"
+              ],
+              "Excedente do consumidor e excedente do produtor": [
+                "Equilíbrio de mercado"
+              ],
+              "Políticas de fixação de preços": [
+                "Equilíbrio de mercado"
+              ],
+              "Preço máximo e preço mínimo": [
+                "Equilíbrio de mercado",
+                "Políticas de fixação de preços"
+              ],
+              "Perdas de excedente, peso morto": [
+                "Equilíbrio de mercado",
+                "Políticas de fixação de preços"
+              ],
+              "Efeito de tributos sobre o equilíbrio e sobre os excedentes": [
+                "Equilíbrio de mercado"
+              ],
+              "Concorrência perfeita, concorrência imperfeita, monopólio e oligopólio: definição e caracterização": [
+                "Estruturas de mercado"
+              ],
+              "Equilíbrio de mercado sob monopólio": [
+                "Estruturas de mercado"
+              ],
+              "Oligopólios e cartelização": [
+                "Estruturas de mercado"
+              ],
+              "Concorrência imperfeita e preço-prêmio": [
+                "Estruturas de mercado"
+              ],
+              "Dinâmica de determinação de preços e margem de lucro": [
+                "Estruturas de mercado"
+              ],
+              "Análise de competitividade": [
+                "Estruturas de mercado"
+              ],
+              "Análise de indústrias e da concorrência": [
+                "Estruturas de mercado"
+              ],
+              "Vantagens competitivas": [
+                "Estruturas de mercado"
+              ],
+              "Cadeias e redes produtivas": [
+                "Estruturas de mercado"
+              ],
+              "Competitividade e estratégia empresarial": [
+                "Estruturas de mercado"
+              ],
+              "Definições básicas: agentes (jogadores), ações, estratégia, resultados (payoffs)": [
+                "Teoria dos jogos"
+              ],
+              "Equilíbrios": [
+                "Teoria dos jogos"
+              ],
+              "Equilíbrio em estratégia dominante": [
+                "Teoria dos jogos",
+                "Equilíbrios"
+              ],
+              "Equilíbrio de Nash": [
+                "Teoria dos jogos",
+                "Equilíbrios"
+              ],
+              "Equilíbrio perfeito em subjogos": [
+                "Teoria dos jogos",
+                "Equilíbrios"
+              ],
+              "Dilema dos prisioneiros": [
+                "Teoria dos jogos",
+                "Equilíbrios"
+              ],
+              "Estratégias mistas": [
+                "Teoria dos jogos",
+                "Equilíbrios"
+              ],
+              "Jogos cooperativos e jogos de soma zero": [
+                "Teoria dos jogos"
+              ],
+              "Equilíbrios minimax e maximin": [
+                "Teoria dos jogos"
+              ],
+              "Jogos simultâneos e jogos sequenciais": [
+                "Teoria dos jogos"
+              ],
+              "Aplicações: duopólio de Cournot e duopólio de Bertrand": [
+                "Teoria dos jogos"
+              ],
+              "Jogos repetidos": [
+                "Teoria dos jogos"
+              ],
+              "Caixa de Edgeworth": [
+                "Equilíbrio geral"
+              ],
+              "Ótimo de Pareto e melhoria de Pareto": [
+                "Equilíbrio geral"
+              ],
+              "Trocas": [
+                "Equilíbrio geral"
+              ],
+              "Primeiro teorema da economia do bem-estar": [
+                "Equilíbrio geral"
+              ],
+              "Segundo teorema da economia do bem-estar": [
+                "Equilíbrio geral"
+              ]
+            }
           },
           {
             "nome": "Macroeconomia",
             "subtopicos": [
               "Contabilidade social",
-              "Contabilidade social - Principais agregados macroeconômicos",
-              "Contabilidade social - Produto, renda e despesa agregados",
-              "Contabilidade social - Conceito nominal versus real",
-              "Contabilidade social - Conceito interno versus nacional",
-              "Contabilidade social - Conceito bruto versus líquido",
-              "Contabilidade social - Identidades macroeconômicas básicas",
-              "Contabilidade social - Sistema de contas nacionais",
-              "Contabilidade social - Contas nacionais no Brasil",
+              "Principais agregados macroeconômicos",
+              "Produto, renda e despesa agregados",
+              "Conceito nominal versus real",
+              "Conceito interno versus nacional",
+              "Conceito bruto versus líquido",
+              "Identidades macroeconômicas básicas",
+              "Sistema de contas nacionais",
+              "Contas nacionais no Brasil",
               "Balanço de pagamentos",
-              "Balanço de pagamentos - Balança comercial",
-              "Balanço de pagamentos - Balança de bens e serviços",
-              "Balanço de pagamentos - Balança de rendimentos",
-              "Balanço de pagamentos - Transferências unilaterais",
-              "Balanço de pagamentos - Balança de transações correntes",
-              "Balanço de pagamentos - Balança de capital",
-              "Balanço de pagamentos - Balança financeira",
-              "Balanço de pagamentos - Erros e omissões",
-              "Balanço de pagamentos - Resultado do balanço de pagamentos",
-              "Balanço de pagamentos - Reservas internacionais",
+              "Balança comercial",
+              "Balança de bens e serviços",
+              "Balança de rendimentos",
+              "Transferências unilaterais",
+              "Balança de transações correntes",
+              "Balança de capital",
+              "Balança financeira",
+              "Erros e omissões",
+              "Resultado do balanço de pagamentos",
+              "Reservas internacionais",
               "Agregados monetários",
-              "Agregados monetários - Conceitos de moeda e quase-moeda",
-              "Agregados monetários - Autoridade monetária e oferta de moeda",
-              "Agregados monetários - As contas do sistema monetário",
-              "Agregados monetários - Reservas monetárias",
-              "Agregados monetários - Bancos e multiplicador bancário",
+              "Conceitos de moeda e quase-moeda",
+              "Autoridade monetária e oferta de moeda",
+              "As contas do sistema monetário",
+              "Reservas monetárias",
+              "Bancos e multiplicador bancário",
               "Teoria keynesiana",
-              "Teoria keynesiana - Oferta e demanda agregadas",
-              "Teoria keynesiana - Modelo IS-LM",
-              "Teoria keynesiana - Políticas fiscal e monetária",
-              "Teoria keynesiana - Economia aberta: modelo IS-LM-BP",
-              "Teoria keynesiana - Câmbio fixo e flutuante",
-              "Teoria keynesiana - Mobilidade de capitais",
-              "Teoria keynesiana - Análises de equilíbrio nos modelos de economia fechada e economia aberta",
+              "Oferta e demanda agregadas",
+              "Modelo IS-LM",
+              "Políticas fiscal e monetária",
+              "Economia aberta: modelo IS-LM-BP",
+              "Câmbio fixo e flutuante",
+              "Mobilidade de capitais",
+              "Análises de equilíbrio nos modelos de economia fechada e economia aberta",
               "Inflação",
-              "Inflação - Definição de inflação",
-              "Inflação - Inflação de demanda",
-              "Inflação - Inflação de custos",
-              "Inflação - Inflação inercial",
-              "Inflação - Política econômica e inflação: relações entre inflação, juros e o resultado fiscal",
+              "Definição de inflação",
+              "Inflação de demanda",
+              "Inflação de custos",
+              "Inflação inercial",
+              "Política econômica e inflação: relações entre inflação, juros e o resultado fiscal",
               "Mercado de trabalho",
-              "Mercado de trabalho - Oferta de trabalho",
-              "Mercado de trabalho - Demanda de trabalho",
-              "Mercado de trabalho - Equilíbrio no mercado de trabalho: salários e nível de atividade",
-              "Mercado de trabalho - Salários, inflação e desemprego",
+              "Oferta de trabalho",
+              "Demanda de trabalho",
+              "Equilíbrio no mercado de trabalho: salários e nível de atividade",
+              "Salários, inflação e desemprego",
               "Economia internacional e comércio exterior",
-              "Economia internacional e comércio exterior - Tarifas, subsídios, cotas",
-              "Economia internacional e comércio exterior - Blocos econômicos, acordos internacionais e retaliações",
-              "Economia internacional e comércio exterior - Globalização e organismos multilaterais",
-              "Economia internacional e comércio exterior - Fluxos financeiros internacionais e mercados de capitais"
-            ]
+              "Tarifas, subsídios, cotas",
+              "Blocos econômicos, acordos internacionais e retaliações",
+              "Globalização e organismos multilaterais",
+              "Fluxos financeiros internacionais e mercados de capitais"
+            ],
+            "caminho_origem": {
+              "Principais agregados macroeconômicos": [
+                "Contabilidade social"
+              ],
+              "Produto, renda e despesa agregados": [
+                "Contabilidade social"
+              ],
+              "Conceito nominal versus real": [
+                "Contabilidade social"
+              ],
+              "Conceito interno versus nacional": [
+                "Contabilidade social"
+              ],
+              "Conceito bruto versus líquido": [
+                "Contabilidade social"
+              ],
+              "Identidades macroeconômicas básicas": [
+                "Contabilidade social"
+              ],
+              "Sistema de contas nacionais": [
+                "Contabilidade social"
+              ],
+              "Contas nacionais no Brasil": [
+                "Contabilidade social"
+              ],
+              "Balança comercial": [
+                "Balanço de pagamentos"
+              ],
+              "Balança de bens e serviços": [
+                "Balanço de pagamentos"
+              ],
+              "Balança de rendimentos": [
+                "Balanço de pagamentos"
+              ],
+              "Transferências unilaterais": [
+                "Balanço de pagamentos"
+              ],
+              "Balança de transações correntes": [
+                "Balanço de pagamentos"
+              ],
+              "Balança de capital": [
+                "Balanço de pagamentos"
+              ],
+              "Balança financeira": [
+                "Balanço de pagamentos"
+              ],
+              "Erros e omissões": [
+                "Balanço de pagamentos"
+              ],
+              "Resultado do balanço de pagamentos": [
+                "Balanço de pagamentos"
+              ],
+              "Reservas internacionais": [
+                "Balanço de pagamentos"
+              ],
+              "Conceitos de moeda e quase-moeda": [
+                "Agregados monetários"
+              ],
+              "Autoridade monetária e oferta de moeda": [
+                "Agregados monetários"
+              ],
+              "As contas do sistema monetário": [
+                "Agregados monetários"
+              ],
+              "Reservas monetárias": [
+                "Agregados monetários"
+              ],
+              "Bancos e multiplicador bancário": [
+                "Agregados monetários"
+              ],
+              "Oferta e demanda agregadas": [
+                "Teoria keynesiana"
+              ],
+              "Modelo IS-LM": [
+                "Teoria keynesiana"
+              ],
+              "Políticas fiscal e monetária": [
+                "Teoria keynesiana"
+              ],
+              "Economia aberta: modelo IS-LM-BP": [
+                "Teoria keynesiana"
+              ],
+              "Câmbio fixo e flutuante": [
+                "Teoria keynesiana"
+              ],
+              "Mobilidade de capitais": [
+                "Teoria keynesiana"
+              ],
+              "Análises de equilíbrio nos modelos de economia fechada e economia aberta": [
+                "Teoria keynesiana"
+              ],
+              "Definição de inflação": [
+                "Inflação"
+              ],
+              "Inflação de demanda": [
+                "Inflação"
+              ],
+              "Inflação de custos": [
+                "Inflação"
+              ],
+              "Inflação inercial": [
+                "Inflação"
+              ],
+              "Política econômica e inflação: relações entre inflação, juros e o resultado fiscal": [
+                "Inflação"
+              ],
+              "Oferta de trabalho": [
+                "Mercado de trabalho"
+              ],
+              "Demanda de trabalho": [
+                "Mercado de trabalho"
+              ],
+              "Equilíbrio no mercado de trabalho: salários e nível de atividade": [
+                "Mercado de trabalho"
+              ],
+              "Salários, inflação e desemprego": [
+                "Mercado de trabalho"
+              ],
+              "Tarifas, subsídios, cotas": [
+                "Economia internacional e comércio exterior"
+              ],
+              "Blocos econômicos, acordos internacionais e retaliações": [
+                "Economia internacional e comércio exterior"
+              ],
+              "Globalização e organismos multilaterais": [
+                "Economia internacional e comércio exterior"
+              ],
+              "Fluxos financeiros internacionais e mercados de capitais": [
+                "Economia internacional e comércio exterior"
+              ]
+            }
           },
           {
             "nome": "Economia do setor público",
             "subtopicos": [
               "O Estado e as funções econômicas governamentais",
-              "O Estado e as funções econômicas governamentais - Função estabilizadora, alocativa e distributiva",
-              "O Estado e as funções econômicas governamentais - Necessidades públicas e formas de atuação dos governos",
-              "O Estado e as funções econômicas governamentais - Falhas de mercado e papel do Estado na sua solução",
-              "O Estado e as funções econômicas governamentais - Falhas de mercado e papel do Estado na sua solução - Externalidades",
-              "O Estado e as funções econômicas governamentais - Falhas de mercado e papel do Estado na sua solução - Bens públicos",
-              "O Estado e as funções econômicas governamentais - Falhas de mercado e papel do Estado na sua solução - Assimetria de informações",
-              "O Estado e as funções econômicas governamentais - Estado regulador e produtor",
-              "O Estado e as funções econômicas governamentais - Outras políticas econômicas",
+              "Função estabilizadora, alocativa e distributiva",
+              "Necessidades públicas e formas de atuação dos governos",
+              "Falhas de mercado e papel do Estado na sua solução",
+              "Externalidades",
+              "Bens públicos",
+              "Assimetria de informações",
+              "Estado regulador e produtor",
+              "Outras políticas econômicas",
               "Tributação",
-              "Tributação - Definição e tipos de tributos",
-              "Tributação - Imposto unitário e imposto ad valorem",
-              "Tributação - Impostos regressivos e progressivos",
-              "Tributação - Neutralidade tributária",
-              "Tributação - Imposto sobre valor agregado (IVA)",
-              "Tributação - Imposto sobre patrimônio",
-              "Tributação - Imposto sobre renda",
+              "Definição e tipos de tributos",
+              "Imposto unitário e imposto ad valorem",
+              "Impostos regressivos e progressivos",
+              "Neutralidade tributária",
+              "Imposto sobre valor agregado (IVA)",
+              "Imposto sobre patrimônio",
+              "Imposto sobre renda",
               "Evolução da participação do setor público na atividade econômica",
               "Contabilidade fiscal",
-              "Contabilidade fiscal - Necessidade de financiamento do setor público (NFSP)",
-              "Contabilidade fiscal - Resultados nominal, operacional e primário",
-              "Contabilidade fiscal - Sustentabilidade do endividamento público",
+              "Necessidade de financiamento do setor público (NFSP)",
+              "Resultados nominal, operacional e primário",
+              "Sustentabilidade do endividamento público",
               "Finanças públicas no Brasil a partir dos anos 1980",
               "Inflação, crescimento e função estabilizadora do Estado"
-            ]
+            ],
+            "caminho_origem": {
+              "Função estabilizadora, alocativa e distributiva": [
+                "O Estado e as funções econômicas governamentais"
+              ],
+              "Necessidades públicas e formas de atuação dos governos": [
+                "O Estado e as funções econômicas governamentais"
+              ],
+              "Falhas de mercado e papel do Estado na sua solução": [
+                "O Estado e as funções econômicas governamentais"
+              ],
+              "Externalidades": [
+                "O Estado e as funções econômicas governamentais",
+                "Falhas de mercado e papel do Estado na sua solução"
+              ],
+              "Bens públicos": [
+                "O Estado e as funções econômicas governamentais",
+                "Falhas de mercado e papel do Estado na sua solução"
+              ],
+              "Assimetria de informações": [
+                "O Estado e as funções econômicas governamentais",
+                "Falhas de mercado e papel do Estado na sua solução"
+              ],
+              "Estado regulador e produtor": [
+                "O Estado e as funções econômicas governamentais"
+              ],
+              "Outras políticas econômicas": [
+                "O Estado e as funções econômicas governamentais"
+              ],
+              "Definição e tipos de tributos": [
+                "Tributação"
+              ],
+              "Imposto unitário e imposto ad valorem": [
+                "Tributação"
+              ],
+              "Impostos regressivos e progressivos": [
+                "Tributação"
+              ],
+              "Neutralidade tributária": [
+                "Tributação"
+              ],
+              "Imposto sobre valor agregado (IVA)": [
+                "Tributação"
+              ],
+              "Imposto sobre patrimônio": [
+                "Tributação"
+              ],
+              "Imposto sobre renda": [
+                "Tributação"
+              ],
+              "Necessidade de financiamento do setor público (NFSP)": [
+                "Contabilidade fiscal"
+              ],
+              "Resultados nominal, operacional e primário": [
+                "Contabilidade fiscal"
+              ],
+              "Sustentabilidade do endividamento público": [
+                "Contabilidade fiscal"
+              ]
+            }
           },
           {
             "nome": "Economia brasileira",
