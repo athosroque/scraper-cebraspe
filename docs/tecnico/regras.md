@@ -660,8 +660,12 @@ Teste guarda: `tests/test_curar_arvore.py::test_criar_renomear_mover_fundir_desm
 Item novo de edital (pipeline, `atualizar_revisao.atualizar_arvore`):
 `canonico.mapear_novos_itens_por_regra` copia os nós de um item aprovado com
 a mesma `chave_regra` **no mesmo nó-pai efetivo**; sem candidato, tenta a memória das
-decisões do dono (P73). Regra ambígua ou pai sem nó fica pendente no `arvore.html`.
-O log traz a contagem por regra de nome, por memória e pendentes. A `chave_regra` ignora os
+decisões do dono (P73); sem candidato, o subtópico herda o nó do tópico-pai quando ele é
+folha (KAN-85): o pai tem exatamente 1 nó aprovado, ativo, de nível subassunto e sem
+filho ativo, o nome não é título genérico e o par (chave de regra, nó) não foi vetado
+pelo dono; entra como `regra`/`aprovado` e conta em `por_heranca`. Regra ambígua ou pai
+sem nó fica pendente no `arvore.html`.
+O log traz a contagem por regra de nome, por memória, por herança de folha e pendentes. A `chave_regra` ignora os
 prefixos "noções de", "fundamentos de" e "conceitos (básicos|gerais) de" (só "noções" liga
 `nocoes`) e unifica gestão e gerenciamento; administração não entra, e a sigla entre
 parênteses é só o campo `ChaveRegra.sigla`, nunca a chave (KAN-84). O mapeamento
@@ -700,7 +704,9 @@ nível (o assunto mapeado agora serve de pai do subassunto): (1) regra de nome; 
 item de mesma `chave_regra` e mesmo pai efetivo de uma decisão **aprovada**, ou apelido
 exato de nó **fundido** (só nó fundido gera apelido, apontando ao destino ativo; nó ativo
 nunca) na disciplina do pai, com candidato único, vira `regra`/`aprovado`; ambiguidade
-fica pendente; nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
+fica pendente; (3) herança de folha, só para subtópico: aponta para o nó único do
+tópico-pai se ele é subassunto ativo sem filhos, salvo título genérico ou par vetado
+(KAN-85, `regra`/`aprovado`); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
 reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
 (entra no hash do cache), exemplos aprovados do dono e os pares rejeitados. Proposta
 `proposto` nunca é fonte da memória (só vira fonte depois que o dono a aprova), par

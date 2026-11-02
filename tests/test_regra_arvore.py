@@ -495,3 +495,150 @@ def test_titulos_genericos_exportados():
     assert canonico.titulo_generico("Conceitos Básicos")
     assert not canonico.titulo_generico("Finanças públicas")
     assert canonico.chave_regra("Legislação").chave in canonico.TITULOS_GENERICOS
+
+
+# Herança de nó-folha (KAN-85) ----------------------------------------------------
+
+
+@pytest.fixture
+def arvore_folha(arvore_path):
+    """Tópico "BSC" aponta para o subassunto-folha S-BSC; "Redes" para S-RED;
+    "Dupla" aponta para dois nós."""
+
+    def montar(a):
+        criar_no(a, "materia", "Governança de TI", None, id_override="M-TI")
+        criar_no(a, "assunto", "Gestão", "M-TI", id_override="A-GES")
+        criar_no(a, "subassunto", "BSC", "A-GES", id_override="S-BSC")
+        criar_no(a, "subassunto", "Redes", "A-GES", id_override="S-RED")
+        criar_no(a, "subassunto", "Dupla A", "A-GES", id_override="S-DA")
+        criar_no(a, "subassunto", "Dupla B", "A-GES", id_override="S-DB")
+        mapear(a, "governanca de ti", ["M-TI"])
+        mapear(a, "governanca de ti|bsc", ["S-BSC"])
+        mapear(a, "governanca de ti|redes", ["S-RED"])
+        mapear(a, "governanca de ti|dupla", ["S-DA", "S-DB"])
+
+    _mexer(arvore_path, montar)
+    return arvore_path
+
+
+def _filhos(monkeypatch, tmp_path, arvore_path, itens):
+    sub = {("governanca de ti", pai, k): _nome(n) for pai, k, n in itens}
+    nomes = canonico.NomesOrigem(subassunto=sub)
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    return canonico.mapear_novos_itens(tmp_path, arvore_path)
+
+
+def _cb(*partes):
+    return "|".join(partes)
+
+
+def test_faceta_herda_no_folha(monkeypatch, tmp_path, arvore_folha):
+    res = _filhos(
+        monkeypatch,
+        tmp_path,
+        arvore_folha,
+        [
+            ("bsc", "perspectiva financeira", "Perspectiva financeira"),
+            ("bsc", "backup", "Backup"),
+        ],
+    )
+    assert (res.por_heranca, res.por_nome, res.por_memoria, res.total) == (2, 0, 0, 2)
+    arv = carregar(arvore_folha)
+    m = arv.mapeamentos[_cb("governanca de ti", "bsc", "backup")]
+    assert [(x.no_id, x.origem, x.status) for x in m] == [
+        ("S-BSC", "regra", "aprovado")
+    ]
+
+
+def test_no_e_folha_exige_ativo_nivel_e_sem_filhos(arvore_folha):
+    arv = carregar(arvore_folha)
+    assert canonico.no_e_folha(arv, "S-BSC", "subassunto")
+    assert not canonico.no_e_folha(arv, "A-GES")
+    assert not canonico.no_e_folha(arv, "S-BSC", "assunto")
+    assert not canonico.no_e_folha(arv, "inexistente")
+    # Filho ativo (montado direto, a API de criação não permite nível inválido).
+    arv.nos["S-DA"].pai = "S-BSC"
+    assert not canonico.no_e_folha(arv, "S-BSC", "subassunto")
+    assert not canonico.sem_filhos_ativos(arv, "S-BSC")
+
+
+def test_pai_em_assunto_com_filhos_nao_herda(monkeypatch, tmp_path, arvore_folha):
+    # O tópico "gestao" aponta para o assunto A-GES (nível assunto, com filhos).
+    _mexer(arvore_folha, lambda a: mapear(a, "governanca de ti|gestao", ["A-GES"]))
+    res = _filhos(monkeypatch, tmp_path, arvore_folha, [("gestao", "x", "Escopo X")])
+    assert res.por_heranca == 0 and res.pendentes == 1
+
+
+def test_pai_com_dois_nos_nao_herda(monkeypatch, tmp_path, arvore_folha):
+    res = _filhos(monkeypatch, tmp_path, arvore_folha, [("dupla", "x", "Escopo X")])
+    assert res.por_heranca == 0 and res.pendentes == 1
+
+
+def test_nome_generico_nao_herda(monkeypatch, tmp_path, arvore_folha):
+    res = _filhos(
+        monkeypatch,
+        tmp_path,
+        arvore_folha,
+        [("bsc", "conceitos basicos", "Conceitos básicos")],
+    )
+    assert res.por_heranca == 0 and res.pendentes == 1
+
+
+def test_par_vetado_nao_herda(monkeypatch, tmp_path, arvore_folha):
+    _mexer(
+        arvore_folha,
+        lambda a: (
+            mapear(a, "outro|bsc|perspectivas", ["S-BSC"], "humano"),
+            rejeitar(a, "outro|bsc|perspectivas", "S-BSC"),
+        ),
+    )
+    res = _filhos(
+        monkeypatch, tmp_path, arvore_folha, [("bsc", "perspectivas", "Perspectivas")]
+    )
+    assert res.por_heranca == 0 and res.pendentes == 1
+
+
+def test_item_com_entrada_previa_fica_intocado(monkeypatch, tmp_path, arvore_folha):
+    _mexer(
+        arvore_folha,
+        lambda a: (
+            mapear(a, "governanca de ti|bsc|prop", ["S-RED"], "llm", "proposto"),
+            mapear(a, "governanca de ti|bsc|rej", ["S-RED"], "humano"),
+            rejeitar(a, "governanca de ti|bsc|rej", "S-RED"),
+        ),
+    )
+    res = _filhos(
+        monkeypatch,
+        tmp_path,
+        arvore_folha,
+        [("bsc", "prop", "Prop"), ("bsc", "rej", "Rej")],
+    )
+    assert res.por_heranca == 0
+    arv = carregar(arvore_folha)
+    assert arv.mapeamentos["governanca de ti|bsc|prop"][0].status == "proposto"
+    assert arv.mapeamentos["governanca de ti|bsc|rej"][0].status == "rejeitado"
+
+
+def test_heranca_idempotente(monkeypatch, tmp_path, arvore_folha):
+    itens = [("bsc", "backup", "Backup"), ("redes", "redes locais", "Redes locais")]
+    r1 = _filhos(monkeypatch, tmp_path, arvore_folha, itens)
+    antes = carregar(arvore_folha).mapeamentos["governanca de ti|bsc|backup"]
+    r2 = _filhos(monkeypatch, tmp_path, arvore_folha, itens)
+    assert r1.por_heranca == 2 and r2.por_heranca == 0 and r2.total == 0
+    assert len(
+        carregar(arvore_folha).mapeamentos["governanca de ti|bsc|backup"]
+    ) == len(antes)
+
+
+def test_heranca_dry_run_nao_grava(monkeypatch, tmp_path, arvore_folha):
+    nomes = canonico.NomesOrigem(
+        subassunto={("governanca de ti", "bsc", "backup"): _nome("Backup")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    mem = carregar(arvore_folha)
+    res = canonico.mapear_novos_itens(
+        tmp_path, arvore_folha, gravar=False, arvore_mem=mem
+    )
+    assert res.por_heranca == 1
+    assert "governanca de ti|bsc|backup" in mem.mapeamentos
+    assert "governanca de ti|bsc|backup" not in carregar(arvore_folha).mapeamentos
