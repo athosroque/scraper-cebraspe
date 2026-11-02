@@ -23,7 +23,7 @@ import sqlite_utils
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src import arvore as arv_mod
-from src import mapeamento_revisao
+from src import canonico, mapeamento_revisao
 from src.edital_parser import CAMPOS_CLASSIFICACAO_CHUNK
 from src.logger import logger
 
@@ -285,11 +285,12 @@ def _inserir_alertas_validacao(
         )
 
 
-def _carregar_contexto_mapeamento():
+def _carregar_contexto_mapeamento(revisao_dir: Path):
     # Árvore ou cache ausente/corrompido não derruba o build: a tabela
-    # `mapeamento_itens` só fica mais pobre (ou vazia).
+    # `mapeamento_itens` só fica mais pobre (ou vazia). A árvore já vem com o
+    # passo determinístico aplicado em memória (M1): mesma leitura do relatório.
     try:
-        arvore = arv_mod.carregar()
+        arvore, _ = canonico.arvore_apos_passo(revisao_dir, arv_mod.carregar())
     except Exception as erro:  # noqa: BLE001
         logger.warning(f"Árvore indisponível para mapeamento_itens: {erro}")
         arvore = None
@@ -321,7 +322,7 @@ def gerar_db(revisao_dir: Path = REVISAO_DIR_PADRAO) -> Path:
             f"Nenhum <edital>.json encontrado em {revisao_dir} — banco gerado vazio."
         )
 
-    arvore, propostos = _carregar_contexto_mapeamento()
+    arvore, propostos = _carregar_contexto_mapeamento(revisao_dir)
 
     for json_path in jsons:
         resultado, auditoria, auditoria_path, validacao = _carregar_par(json_path)

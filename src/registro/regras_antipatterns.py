@@ -996,4 +996,16 @@ por `scripts/gerar_docs.py`, e o teste guarda recusa a diferença (ADR-041).""",
         adrs=("ADR-041",),
         testes=("tests/test_registro.py::test_paginas_geradas_batem_com_o_disco",),
     ),
+    Regra(
+        id="A63",
+        tipo="anti-pattern",
+        area="arvore",
+        texto="""Nunca reimplementar a equivalência de nome no relatório de revisão ou no Datasette: usar
+`canonico.arvore_apos_passo`. Divergência faz o relatório prometer "resolvido" o que a carga
+não grava (SEFA_PR_25, 8 itens) e esconde ou infla os pendentes (KAN-81).""",
+        adrs=("ADR-030",),
+        testes=(
+            "tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais",
+        ),
+    ),
 )

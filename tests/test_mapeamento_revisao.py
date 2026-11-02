@@ -1,12 +1,15 @@
 """Origem do mapeamento por item de edital (src/mapeamento_revisao.py)."""
 
 import json
+from pathlib import Path
 
 import pytest
 import sqlite_utils
 
 from scripts.gerar_db_datasette import gerar_db
 from scripts.gerar_relatorio_revisao import gerar_relatorios, renderizar_edital
+from src import arvore as arv_mod
+from src import canonico
 from src import mapeamento_revisao as mr
 from src.arvore import ArvoreMestre, criar_no, mapear
 
@@ -90,14 +93,14 @@ def _por_item(linhas):
     return {l["item"]: l for l in linhas}
 
 
-def test_classifica_as_cinco_categorias(arvore):
+def test_classifica_as_quatro_categorias(arvore):
     linhas = mr.classificar_itens(_edital(TOPICOS), arvore, PROPOSTOS, DISCIPLINAS)
     it = _por_item(linhas)
     assert it["Direito Administrativo"]["categoria"] == "auto"
     assert it["Atos administrativos"]["categoria"] == "dono"
     assert it["Licitações"]["categoria"] == "auto"
-    assert it["Anulação"]["categoria"] == "regra_nome"
-    assert it["Anulação"]["no_id"] == "S-ANU"
+    # M1: nome igual ao de um nó-filho não resolve nada sem mapeamento aprovado.
+    assert it["Anulação"]["categoria"] == "sem_equivalente"
     assert it["Revogação"]["categoria"] == "sem_equivalente"
     assert it["Revogação"]["status"] == "sem_equivalente"
     p = it["Poderes administrativos"]
@@ -109,10 +112,9 @@ def test_classifica_as_cinco_categorias(arvore):
     assert it["Sub inédito"]["categoria"] == "sem_equivalente"
     assert mr.contar_por_categoria(linhas) == {
         "auto": 2,
-        "regra_nome": 1,
         "dono": 1,
         "proposta": 1,
-        "sem_equivalente": 3,
+        "sem_equivalente": 4,
     }
 
 
@@ -191,7 +193,6 @@ def test_gerar_db_cria_tabela_mapeamento_itens(tmp_path, arvore, monkeypatch):
     monkeypatch.setattr(
         mr, "carregar_cache_propostos", lambda path=mr.CACHE_PADRAO: PROPOSTOS
     )
-    monkeypatch.setattr(mr, "carregar_disciplinas", lambda: DISCIPLINAS)
     db = sqlite_utils.Database(gerar_db(tmp_path))
     linhas = list(db["mapeamento_itens"].rows_where("status = ?", ["proposto"]))
     assert len(linhas) == 1 and linhas[0]["confianca"] == "alta"
@@ -214,6 +215,123 @@ def test_gerar_relatorios_integra_quadro(tmp_path, arvore, monkeypatch):
     monkeypatch.setattr(
         "scripts.gerar_relatorio_revisao.arv_mod.carregar", lambda: arvore
     )
-    monkeypatch.setattr(mr, "carregar_disciplinas", lambda: DISCIPLINAS)
     saida = gerar_relatorios(tmp_path, novidades_fn=lambda r: {})
     assert "De onde veio cada mapeamento" in (saida / "x.html").read_text("utf-8")
+
+
+# M1 (Etapa 5B.4): o relatório reporta exatamente o que o passo determinístico faria.
+
+
+def _pendentes_do_relatorio(linhas):
+    """Chaves sem destino aprovado, na visão do relatório."""
+    return {
+        l["chave"] for l in linhas if l["categoria"] in ("proposta", "sem_equivalente")
+    }
+
+
+def _sem_aprovado(arvore, linhas):
+    return {
+        l["chave"]
+        for l in linhas
+        if not any(
+            m.status == "aprovado" for m in arvore.mapeamentos.get(l["chave"], [])
+        )
+    }
+
+
+def test_relatorio_depois_do_passo_mapeia_o_que_o_passo_mapeia(tmp_path, arvore):
+    edital = _edital(
+        [
+            {"nome": "ATOS ADMINISTRATIVOS", "subtopicos": ["Anulação"]},
+            {"nome": "Licitações", "subtopicos": []},
+        ]
+    )
+    edital["resultados"][0]["materia_chunk"] = "NOÇÕES DE DIREITO ADMINISTRATIVO"
+    edital["resultados"][0]["taxonomia_extraida"]["materia"] = (
+        "NOÇÕES DE DIREITO ADMINISTRATIVO"
+    )
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    antes = mr.classificar_itens(edital, arvore, {})
+    sim, res = canonico.arvore_apos_passo(tmp_path, arvore)
+    depois = mr.classificar_itens(edital, sim, {})
+    it_antes, it_depois = _por_item(antes), _por_item(depois)
+    # ATOS ADMINISTRATIVOS casa com um item já aprovado (mesma regra, mesmo pai).
+    assert it_antes["ATOS ADMINISTRATIVOS"]["categoria"] == "sem_equivalente"
+    assert it_depois["ATOS ADMINISTRATIVOS"]["categoria"] == "auto"
+    # Anulação só tem nó-filho de mesmo nome; sem decisão, o passo não grava.
+    assert it_depois["Anulação"]["categoria"] == "sem_equivalente"
+    assert _pendentes_do_relatorio(depois) == set(res.chaves_pendentes) | {
+        l["chave"] for l in depois if l["categoria"] == "proposta"
+    }
+    # a árvore recebida não muda
+    assert "direito administrativo|atos administrativos" in arvore.mapeamentos
+    assert not any(
+        m.origem == "regra" and m.status == "aprovado"
+        for m in arvore.mapeamentos.get("direito administrativo|anulacao", [])
+    )
+
+
+def test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais():
+    """Para cada `<edital>.json` de `revisao_piloto/` com a árvore real: o conjunto
+    de pendentes do relatório (cópia após o passo) é o dos itens sem mapeamento
+    aprovado depois de `mapear_novos_itens(gravar=False)`. Só leitura."""
+    from src.stats_writer import listar_jsons_edital
+
+    revisao_dir = Path(__file__).resolve().parent.parent / "revisao_piloto"
+    jsons = listar_jsons_edital(revisao_dir)
+    if not jsons or not arv_mod.ARVORE_PADRAO.exists():
+        pytest.skip("sem revisao_piloto ou árvore local")
+    arvore = arv_mod.carregar()
+    sim, res = canonico.arvore_apos_passo(revisao_dir, arvore)
+    referencia = arv_mod.carregar()
+    res_ref = canonico.mapear_novos_itens(
+        revisao_dir, gravar=False, arvore_mem=referencia
+    )
+    assert res_ref.chaves_pendentes == res.chaves_pendentes
+    for caminho in jsons:
+        resultado = json.loads(caminho.read_text(encoding="utf-8"))
+        linhas = mr.classificar_itens(resultado, sim, {})
+        assert _pendentes_do_relatorio(linhas) == _sem_aprovado(referencia, linhas), (
+            caminho.name
+        )
+        # o que o passo deixou pendente (sem entrada) está sempre no relatório
+        assert set(res.chaves_pendentes) & {l["chave"] for l in linhas} <= (
+            _pendentes_do_relatorio(linhas)
+        )
+
+
+def test_gerar_db_usa_a_arvore_apos_o_passo(tmp_path, arvore, monkeypatch):
+    edital = _edital([{"nome": "Licitações", "subtopicos": []}])
+    edital["resultados"][0]["materia_chunk"] = "NOÇÕES DE DIREITO ADMINISTRATIVO"
+    edital["resultados"][0]["taxonomia_extraida"]["materia"] = (
+        "NOÇÕES DE DIREITO ADMINISTRATIVO"
+    )
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    monkeypatch.setattr("scripts.gerar_db_datasette.arv_mod.carregar", lambda: arvore)
+    db = sqlite_utils.Database(gerar_db(tmp_path))
+    linha = next(db["mapeamento_itens"].rows_where("nivel = ?", ["disciplina"]))
+    assert (linha["status"], linha["origem"], linha["no_id"]) == (
+        "aprovado",
+        "regra",
+        "M-DA",
+    )
+
+
+def test_gerar_relatorios_nao_mostra_como_novo_o_que_o_passo_mapeia(
+    tmp_path, arvore, monkeypatch
+):
+    edital = _edital([{"nome": "Licitações", "subtopicos": []}])
+    edital["resultados"][0]["materia_chunk"] = "NOÇÕES DE DIREITO ADMINISTRATIVO"
+    edital["resultados"][0]["taxonomia_extraida"]["materia"] = (
+        "NOÇÕES DE DIREITO ADMINISTRATIVO"
+    )
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    (tmp_path / "x.auditoria.json").write_text(
+        json.dumps({"edital": "x.pdf", "chunks": []}), encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        "scripts.gerar_relatorio_revisao.arv_mod.carregar", lambda: arvore
+    )
+    html = (gerar_relatorios(tmp_path) / "x.html").read_text("utf-8")
+    assert "novo-tag'>DISCIPLINA" not in html
+    assert "Nada a decidir" in html

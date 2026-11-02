@@ -25,10 +25,18 @@ def _sem_banco_real(monkeypatch):
 
 
 class TestAtualizarArtefatosRevisao:
-    def test_chama_as_tres_etapas_na_ordem_e_reinicia_datasette(
-        self, monkeypatch, tmp_path
-    ):
+    def test_chama_as_etapas_na_ordem_e_reinicia_datasette(self, monkeypatch, tmp_path):
         chamadas = []
+        monkeypatch.setattr(
+            atualizar_revisao,
+            "atualizar_arvore",
+            lambda d: chamadas.append(("arvore", d)),
+        )
+        monkeypatch.setattr(
+            atualizar_revisao,
+            "atualizar_classificacao",
+            lambda d: chamadas.append(("classificacao", d)),
+        )
         monkeypatch.setattr(
             atualizar_revisao,
             "validar_taxonomia",
@@ -48,9 +56,12 @@ class TestAtualizarArtefatosRevisao:
 
         atualizar_revisao.atualizar_artefatos_revisao(tmp_path)
 
+        # M1: o passo determinístico (árvore) vem ANTES do relatório e do revisao.db.
         assert chamadas == [
             ("validar", tmp_path),
+            ("arvore", tmp_path),
             ("relatorio", tmp_path),
+            ("classificacao", tmp_path),
             ("db", tmp_path),
         ]
         subprocess_mock.assert_called_once()
@@ -62,6 +73,62 @@ class TestAtualizarArtefatosRevisao:
             "scraper-cebraspe-datasette",
         ]
         assert args[1]["cwd"] == str(Path(__file__).resolve().parent.parent)
+
+    def test_relatorio_e_db_leem_a_arvore_ja_atualizada(self, monkeypatch, tmp_path):
+        """A árvore muda no passo; relatório e revisao.db só enxergam a mudança
+        se rodarem depois dele (M1)."""
+        estado = {"arvore": "antiga"}
+        vistos = {}
+
+        def passo(d):
+            estado["arvore"] = "atualizada"
+
+        monkeypatch.setattr(atualizar_revisao, "validar_taxonomia", lambda d: None)
+        monkeypatch.setattr(atualizar_revisao, "atualizar_arvore", passo)
+        monkeypatch.setattr(
+            atualizar_revisao, "atualizar_classificacao", lambda d: None
+        )
+        monkeypatch.setattr(
+            atualizar_revisao,
+            "gerar_relatorios",
+            lambda d: vistos.__setitem__("relatorio", estado["arvore"]),
+        )
+        monkeypatch.setattr(
+            atualizar_revisao,
+            "gerar_db",
+            lambda d: vistos.__setitem__("db", estado["arvore"]),
+        )
+        atualizar_revisao.atualizar_artefatos_revisao(
+            tmp_path, reiniciar_datasette=False, gravar_banco=False
+        )
+        assert vistos == {"relatorio": "atualizada", "db": "atualizada"}
+
+    def test_falha_do_passo_nao_derruba_relatorio_nem_db(self, monkeypatch, tmp_path):
+        """A13/best-effort: o passo falha só com aviso e os artefatos saem."""
+        import src.canonico as canonico
+
+        chamadas = []
+        (tmp_path / "x.json").write_text("{}", encoding="utf-8")
+        monkeypatch.setattr(atualizar_revisao, "validar_taxonomia", lambda d: None)
+        monkeypatch.setattr(atualizar_revisao, "listar_jsons_edital", lambda d: [d])
+        monkeypatch.setattr(
+            canonico,
+            "mapear_novos_itens_por_regra",
+            lambda d: (_ for _ in ()).throw(RuntimeError("quebrou")),
+        )
+        monkeypatch.setattr(
+            atualizar_revisao, "atualizar_classificacao", lambda d: None
+        )
+        monkeypatch.setattr(
+            atualizar_revisao, "gerar_relatorios", lambda d: chamadas.append("rel")
+        )
+        monkeypatch.setattr(
+            atualizar_revisao, "gerar_db", lambda d: chamadas.append("db")
+        )
+        atualizar_revisao.atualizar_artefatos_revisao(
+            tmp_path, reiniciar_datasette=False, gravar_banco=False
+        )
+        assert chamadas == ["rel", "db"]
 
     def test_reiniciar_datasette_false_nao_chama_subprocess(
         self, monkeypatch, tmp_path

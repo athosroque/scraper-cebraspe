@@ -11,22 +11,23 @@ depois de uma extração, só se algo mudou nos JSONs por fora desses scripts
 
 Sequência (cada etapa é idempotente e reconstrói do zero, ver ADR-015):
 1. `scripts.validar_taxonomia` — recalcula `<edital>.validacao.json`
-2. `scripts.gerar_relatorio_revisao` — recalcula `revisao_piloto/relatorio/*.html`
-3. `scripts.gerar_db_datasette` — recalcula `revisao_piloto/revisao.db`
-4. `docker compose restart scraper-cebraspe-datasette` — best-effort; se o
+2. `atualizar_arvore` — passo determinístico (regra de nome + memória) grava a
+   árvore, ANTES de qualquer relatório (M1, Etapa 5B.4)
+3. `scripts.gerar_relatorio_revisao` — recalcula `revisao_piloto/relatorio/*.html`
+   (lê a árvore já atualizada)
+4. `scripts.gerar_db_datasette` — recalcula `revisao_piloto/revisao.db`
+5. `docker compose restart scraper-cebraspe-datasette` — best-effort; se o
    container não estiver no ar (ex.: ambiente de dev sem Docker), loga aviso
    e segue sem falhar o pipeline de extração que chamou isso.
-5. `src.stats_writer.gravar_estatisticas` — grava o star schema no Postgres
+6. `src.stats_writer.gravar_estatisticas` — grava o star schema no Postgres
    próprio (ADR-027). Também best-effort: banco fora do ar só loga aviso.
-6. `scripts.extrair_questoes.processar_fila` — consome a fila de cadernos
+7. `scripts.extrair_questoes.processar_fila` — consome a fila de cadernos
    (Etapa 5C, ADR-031): só o que está `pendente`, sem LLM. Best-effort, e só
-   roda se a carga do passo 5 deu certo.
+   roda se a carga do passo 6 deu certo.
 
-Entre os passos 2 e 3, a camada canônica de sinônimos (Etapa 5B, ADR-029):
-regras determinísticas em `canonico/sinonimos.json` (`src.canonico`) e o
-relatório `relatorio/sinonimos.html`. **Sem LLM:** a proposta de sinônimos
-pelo LLM custa tokens e só roda de forma explícita
-(`python -m scripts.propor_sinonimos`).
+**Sem LLM:** a proposta de sinônimos e o mapeamento por LLM custam tokens e só
+rodam de forma explícita (`python -m scripts.propor_sinonimos`,
+`python -m scripts.mapear_itens_novos`).
 
 Uso:
     python -m scripts.atualizar_revisao [revisao_piloto_dir]
@@ -151,8 +152,10 @@ def atualizar_artefatos_revisao(
         "Atualizando artefatos derivados de revisão (validação + relatório + banco)..."
     )
     validar_taxonomia(revisao_dir)
-    gerar_relatorios(revisao_dir)
+    # M1: o passo determinístico grava a árvore ANTES de qualquer artefato que a
+    # leia, senão o relatório mostra como pendente o que o passo vai mapear.
     atualizar_arvore(revisao_dir)
+    gerar_relatorios(revisao_dir)
     atualizar_classificacao(revisao_dir)
     gerar_db(revisao_dir)
 

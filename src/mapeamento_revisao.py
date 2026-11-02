@@ -1,16 +1,19 @@
 """De onde veio cada mapeamento de item de edital para nó da árvore (revisão).
 
 Função pura, sem LLM e sem gravar: classifica todo item (disciplina, assunto,
-subassunto) de um `<edital>.json` em uma de cinco categorias, para o relatório
+subassunto) de um `<edital>.json` em uma de quatro categorias, para o relatório
 de revisão e para a tabela `mapeamento_itens` do `revisao.db` (Datasette).
-Segue a mesma equivalência de `src/novidades_edital.py` (P72, ADR-030).
+
+Não há critério de equivalência próprio (M1, Etapa 5B.4): só vale mapeamento
+aprovado na árvore recebida. Quem chama passa a árvore já com o passo
+determinístico aplicado (`canonico.arvore_apos_passo`), então o que o passo
+mapeia aparece como `auto`/`dono` e o resto como `proposta` ou `sem_equivalente`,
+exatamente o que `mapear_novos_itens` deixa pendente (P72, ADR-030).
 
 Categorias (`categoria`):
 - `auto`: mapeamento aprovado de `origem="regra"`. A memória das decisões do
   dono grava com a mesma origem, então regra de nome gravada e memória não se
   distinguem na proveniência: o rótulo é "automático (regra/memória)".
-- `regra_nome`: sem mapeamento gravado, mas há nó ativo equivalente por nome
-  (caixa, acento, "noções de", singular...), a regra de `canonico.chave_regra`.
 - `dono`: aprovado por decisão humana ou pela semente (grupos aprovados da 5B).
 - `proposta`: proposto pela IA (`origem="llm"`, status `proposto`), a conferir;
   confiança e justificativa vêm do cache de `src/mapeamento_llm.py`, se houver.
@@ -21,21 +24,15 @@ import json
 from pathlib import Path
 
 from src import arvore as arv_mod
-from src.canonico import chave_regra, normalizar
+from src.canonico import normalizar
 from src.logger import logger
-from src.novidades_edital import (
-    _caminho,
-    _nos_aprovados,
-    _proposto,
-    carregar_disciplinas,
-)
+from src.novidades_edital import _caminho, _nos_aprovados, _proposto
 from src.stats_writer import montar_carga_concurso
 
 CACHE_PADRAO = arv_mod.PROJETO_DIR / "canonico" / ".mapear_itens_novos_cache.json"
 
 ROTULOS = {
     "auto": "automático (regra/memória)",
-    "regra_nome": "automático por equivalência de nome",
     "dono": "decisão sua / semente",
     "proposta": "proposto pela IA (a conferir)",
     "sem_equivalente": "sem equivalente (a decidir)",
@@ -61,7 +58,7 @@ def classificar_itens(
     resultado: dict,
     arvore: arv_mod.ArvoreMestre | None = None,
     propostos: dict[str, dict] | None = None,
-    disciplinas_conhecidas: list[str] | None = None,
+    disciplinas_conhecidas: list[str] | None = None,  # compatibilidade; sem efeito
 ) -> list[dict]:
     """Uma linha por item distinto do edital (ordem de aparição).
 
@@ -73,33 +70,8 @@ def classificar_itens(
         arvore = arv_mod.carregar()
     if propostos is None:
         propostos = carregar_cache_propostos()
-    if disciplinas_conhecidas is None:
-        disciplinas_conhecidas = carregar_disciplinas()
 
-    regras_disc = {chave_regra(n).chave for n in disciplinas_conhecidas}
-    ativos = [n for n in arvore.nos.values() if n.status == "ativo"]
-    filhos: dict[str, list] = {}
-    materias_por_regra: dict[str, set[str]] = {}
-    assuntos_por_regra: dict[str, set[str]] = {}
-    for n in ativos:
-        if n.pai:
-            filhos.setdefault(arv_mod.resolver_no(arvore, n.pai), []).append(n)
-        r = chave_regra(n.nome).chave
-        if n.nivel == "materia":
-            materias_por_regra.setdefault(r, set()).add(n.id)
-        elif n.nivel == "assunto":
-            assuntos_por_regra.setdefault(r, set()).add(n.id)
-
-    def filho_equivalente(pais: set[str], nome: str) -> set[str]:
-        regra = chave_regra(nome).chave
-        return {
-            f.id
-            for p in pais
-            for f in filhos.get(p, [])
-            if chave_regra(f.nome).chave == regra
-        }
-
-    def resolver(chave: str, equivalentes: set[str]):
+    def resolver(chave: str):
         """(nós, categoria, origem, status, mapeamento)."""
         aprovados = [
             m
@@ -111,8 +83,6 @@ def classificar_itens(
             nos = _nos_aprovados(arvore, chave)
             m = aprovados[0]
             return nos, _categoria_aprovada(m.origem), m.origem, "aprovado", m
-        if equivalentes:
-            return equivalentes, "regra_nome", "regra", "aprovado", None
         m = _proposto(arvore, chave)
         if m is not None:
             return (
@@ -130,7 +100,7 @@ def classificar_itens(
     def registrar(chave, nivel, nome, disc, ass, nos, cat, origem, status, m):
         if chave in linhas:
             return
-        no_id = sorted(nos)[0] if nos and "?" not in nos else None
+        no_id = sorted(nos)[0] if nos else None
         info = (propostos.get(chave) or {}) if cat == "proposta" else {}
         confianca = info.get("confianca") or getattr(m, "confianca", None)
         linhas[chave] = {
@@ -151,19 +121,13 @@ def classificar_itens(
 
     for item in montar_carga_concurso(resultado)["itens"]:
         m_chave, m_nome = item["materia_chave"], item["materia_nome"]
-        regra_m = chave_regra(m_nome).chave
         chave_m = arv_mod.chave_item(m_chave)
-        eq = materias_por_regra.get(regra_m, set())
-        if not eq and regra_m in regras_disc:
-            eq = {"?"}  # disciplina da lista fechada ainda sem nó
-        if not eq:
-            eq = assuntos_por_regra.get(regra_m, set())  # P72: vira assunto
-        nos_m, *res_m = resolver(chave_m, eq)
+        nos_m, *res_m = resolver(chave_m)
         registrar(chave_m, "disciplina", m_nome, m_nome, None, nos_m, *res_m)
 
         t_chave = item["topico_chave"]
         chave_t = arv_mod.chave_item((m_chave, t_chave))
-        nos_t, *res_t = resolver(chave_t, filho_equivalente(nos_m, item["topico_nome"]))
+        nos_t, *res_t = resolver(chave_t)
         registrar(chave_t, "assunto", item["topico_nome"], m_nome, None, nos_t, *res_t)
 
         for sub in item["subtopicos"]:
@@ -171,10 +135,7 @@ def classificar_itens(
             if not s_chave:
                 continue
             chave_s = arv_mod.chave_item((m_chave, t_chave, s_chave))
-            if nos_t:
-                nos_s, *res_s = resolver(chave_s, filho_equivalente(nos_t, sub))
-            else:
-                nos_s, res_s = set(), ["sem_equivalente", None, "sem_equivalente", None]
+            nos_s, *res_s = resolver(chave_s)
             registrar(
                 chave_s,
                 "subassunto",

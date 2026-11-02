@@ -1,8 +1,11 @@
 """Novidades de um edital contra a árvore mestre (src/novidades_edital.py)."""
 
+import json
+
 import pytest
 
 from src.arvore import ArvoreMestre, criar_no, mapear
+from src.canonico import arvore_apos_passo
 from src.novidades_edital import novidades_do_edital
 
 
@@ -112,23 +115,53 @@ def test_subassunto_novo_em_assunto_conhecido(arvore):
     assert r["total_itens_novos"] == 1
 
 
-def test_normalizacao_acento_caixa_e_nocoes(arvore):
-    r = novidades_do_edital(
-        _edital(
-            "NOÇÕES DE DIREITO ADMINISTRATIVO",
-            "ATOS ADMINISTRATIVOS",
-            ["ANULACAO E REVOGACAO"],
-        ),
-        DISCIPLINAS,
-        arvore,
+def _apos_passo(arvore, edital, tmp_path):
+    """Árvore com o passo determinístico aplicado, como o relatório a recebe (M1)."""
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    copia, _ = arvore_apos_passo(tmp_path, arvore)
+    return copia
+
+
+def test_normalizacao_acento_caixa_e_nocoes(arvore, tmp_path):
+    edital = _edital(
+        "NOÇÕES DE DIREITO ADMINISTRATIVO",
+        "ATOS ADMINISTRATIVOS",
+        ["ANULACAO E REVOGACAO"],
     )
+    r = novidades_do_edital(edital, DISCIPLINAS, _apos_passo(arvore, edital, tmp_path))
     assert r["total_itens_novos"] == 0
 
 
-def test_titulo_de_bloco_que_e_assunto_nao_e_disciplina(arvore):
-    r = novidades_do_edital(
-        _edital("Atos Administrativos", "Anulação", []), DISCIPLINAS, arvore
+def test_sem_o_passo_a_equivalencia_de_nome_nao_conta(arvore):
+    """M1: o relatório não tem critério de nome próprio; só vale o que está
+    aprovado na árvore recebida (o passo grava ou a cópia em memória)."""
+    edital = _edital(
+        "NOÇÕES DE DIREITO ADMINISTRATIVO",
+        "ATOS ADMINISTRATIVOS",
+        ["ANULACAO E REVOGACAO"],
     )
+    r = novidades_do_edital(edital, DISCIPLINAS, arvore)
+    assert r["total_itens_novos"] == 3
+
+
+def test_nome_igual_a_no_filho_sem_decisao_continua_pendente(arvore, tmp_path):
+    """O passo não grava item que só casa com nó-filho por nome (SEFA_PR_25, M1);
+    por isso o relatório também o mostra como pendente."""
+    criar_no(arvore, "subassunto", "Convalidação", "A-ATO", id_override="S-CON")
+    edital = _edital("Direito Administrativo", "Atos administrativos", ["Convalidação"])
+    r = novidades_do_edital(edital, DISCIPLINAS, _apos_passo(arvore, edital, tmp_path))
+    assert r["assuntos_novos"] == [
+        {
+            "disciplina": "Direito Administrativo",
+            "assunto": "Atos administrativos",
+            "subassuntos": ["Convalidação"],
+        }
+    ]
+
+
+def test_titulo_de_bloco_que_e_assunto_nao_e_disciplina(arvore, tmp_path):
+    edital = _edital("Atos Administrativos", "Anulação", [])
+    r = novidades_do_edital(edital, DISCIPLINAS, _apos_passo(arvore, edital, tmp_path))
     assert r["disciplinas_novas"] == []
 
 

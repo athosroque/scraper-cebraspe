@@ -406,6 +406,11 @@ O que conferir:
 - o "nenhum" não grava nada e fica em cache (`canonico/.mapear_itens_novos_cache.json`); `--reavaliar` pergunta de novo;
 - o dry-run subestima o custo dos subtópicos cuja matéria ainda não tem nó (a disciplina só
   se resolve depois que o nível de cima é proposto), então o valor dele é um teto.
+- ordem do pipeline de revisão (KAN-81, P74): extração, validação, passo determinístico (grava a
+  árvore), relatório e Datasette, LLM de mapeamento, relatório de novo;
+- o número de pendentes do relatório é igual ao `ResultadoRegra.pendentes` de
+  `mapear_novos_itens(gravar=False)`; o rótulo "automático por equivalência de nome" não existe
+  mais, e um item sem decisão cujo nome é igual ao de um nó-filho aparece como pendente.
 
 Chave: `OPENROUTER_KEY_MAPEAMENTO_ITENS` (cai na da curadoria da árvore). Trace
 `mapear_itens_novos`, reasoning `REASONING_PADRAO`.

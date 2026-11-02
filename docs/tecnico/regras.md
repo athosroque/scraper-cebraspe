@@ -710,6 +710,18 @@ ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](.
 
 Teste guarda: `tests/test_memoria_mapeamento.py::test_proposta_nao_aprovada_nao_e_fonte`, `tests/test_mapeamento_llm.py::test_par_rejeitado_nao_e_reproposto_e_vai_no_prompt`, `tests/test_mapeamento_llm.py::test_memoria_resolve_item_repetido_entre_dois_editais`, `tests/test_regra_arvore.py::test_memoria_no_passo_deterministico`
 
+#### P74
+
+O relatório de revisão e a tabela `mapeamento_itens` do `revisao.db` leem a árvore já
+passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
+equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia, e os
+pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
+antes de `gerar_relatorios` e `gerar_db` (KAN-81).
+
+ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais`
+
 ### classificacao
 
 #### P28
@@ -1257,6 +1269,16 @@ repetido e a incidência se divide. Ao fundir ou renomear disciplina, rode
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
 Teste guarda: `tests/test_arvore.py::test_arvore_curada_sem_irmaos_homonimos`, `tests/test_arvore.py::test_arvore_curada_sem_disciplinas_homonimas`
+
+#### A63
+
+Nunca reimplementar a equivalência de nome no relatório de revisão ou no Datasette: usar
+`canonico.arvore_apos_passo`. Divergência faz o relatório prometer "resolvido" o que a carga
+não grava (SEFA_PR_25, 8 itens) e esconde ou infla os pendentes (KAN-81).
+
+ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais`
 
 ### classificacao
 

@@ -34,6 +34,7 @@ Esquema de ID (documentado no ADR-029):
 - grupo criado por humano (`--mover ...:NOVO`): `MH-`/`AH-`/`SH-` + sha1(membros)[:10].
 """
 
+import copy
 import hashlib
 import json
 import re
@@ -1104,6 +1105,10 @@ class ResultadoRegra:
     por_nome: int = 0
     por_memoria: int = 0
     pendentes: int = 0
+    # Chaves dos itens que o passo tentou e não mapeou (sem nó equivalente, regra
+    # ambígua, pai sem nó). Item que já tinha entrada (aprovada, proposta ou
+    # rejeitada) não passa pelo passo e não entra aqui.
+    chaves_pendentes: list[str] = field(default_factory=list)
 
     @property
     def total(self) -> int:
@@ -1209,6 +1214,7 @@ def mapear_novos_itens(
                 pendentes.append((chave, sig))
             else:
                 res.pendentes += 1
+                res.chaves_pendentes.append(chave)
         memoria = memoria_mapeamento.construir_indice(arvore) if pendentes else None
         for chave, sig in pendentes:
             candidatos = indice.get(sig, set())
@@ -1237,6 +1243,7 @@ def mapear_novos_itens(
                     candidatos = {nos_titulo}
             if len(candidatos) != 1:
                 res.pendentes += 1
+                res.chaves_pendentes.append(chave)
                 continue
             (nos,) = candidatos
             try:
@@ -1246,6 +1253,7 @@ def mapear_novos_itens(
             except arv_mod.ArvoreInvalida as e:
                 logger.warning(f"[ARVORE] Mapeamento recusado para {chave}: {e}")
                 res.pendentes += 1
+                res.chaves_pendentes.append(chave)
                 continue
             if origem_memoria:
                 res.por_memoria += 1
@@ -1259,3 +1267,18 @@ def mapear_novos_itens(
         f"{res.por_memoria} por memória do dono, {res.pendentes} pendente(s)."
     )
     return res
+
+
+def arvore_apos_passo(revisao_dir: Path, arvore):
+    """Cópia da árvore com o passo determinístico aplicado em memória.
+
+    É a única definição de "este item tem destino na árvore?" para o relatório de
+    revisão e para a tabela do Datasette (M1, Etapa 5B.4): quem mostra o estado
+    dos itens lê esta cópia, em vez de reimplementar a equivalência. Um item tem
+    destino quando a cópia tem mapeamento aprovado para a chave; o que o passo
+    não mapeia é pendente, proposto ou sem equivalente. Nada é gravado, e a
+    árvore recebida não muda. Devolve `(cópia, ResultadoRegra)`.
+    """
+    copia = copy.deepcopy(arvore)
+    res = mapear_novos_itens(revisao_dir, gravar=False, arvore_mem=copia)
+    return copia, res

@@ -450,4 +450,18 @@ rejeitado nunca é devolvido nem reproposto, e a memória não muda status exist
             "tests/test_regra_arvore.py::test_memoria_no_passo_deterministico",
         ),
     ),
+    Regra(
+        id="P74",
+        tipo="pattern",
+        area="arvore",
+        texto="""O relatório de revisão e a tabela `mapeamento_itens` do `revisao.db` leem a árvore já
+passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
+equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia, e os
+pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
+antes de `gerar_relatorios` e `gerar_db` (KAN-81).""",
+        adrs=("ADR-030",),
+        testes=(
+            "tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais",
+        ),
+    ),
 )

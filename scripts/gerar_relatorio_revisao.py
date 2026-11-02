@@ -20,13 +20,14 @@ Uso:
 import json
 import sys
 from collections.abc import Callable
+from functools import partial
 from html import escape
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src import arvore as arv_mod
-from src import mapeamento_revisao
+from src import canonico, mapeamento_revisao
 from src.edital_parser import PADRAO_ITEM_NUMERADO
 from src.logger import logger
 
@@ -419,9 +420,8 @@ def _bloco_origem_mapeamento(linhas: list[dict] | None) -> str:
     if not linhas:
         return ""
     c = mapeamento_revisao.contar_por_categoria(linhas)
-    auto = c["auto"] + c["regra_nome"] + c["dono"]
+    auto = c["auto"] + c["dono"]
     cards = [
-        ("auto", c["regra_nome"], mapeamento_revisao.ROTULOS["regra_nome"]),
         ("auto", c["auto"], mapeamento_revisao.ROTULOS["auto"]),
         ("auto", c["dono"], mapeamento_revisao.ROTULOS["dono"]),
         ("proposta", c["proposta"], mapeamento_revisao.ROTULOS["proposta"]),
@@ -437,7 +437,8 @@ def _bloco_origem_mapeamento(linhas: list[dict] | None) -> str:
         f"<div class='cards'>{html}</div>"
         "<p class='legenda'>Regra de nome e memória das suas decisões gravam com a mesma "
         "origem (<code>regra</code>); por isso aparecem juntas em "
-        "&quot;automático (regra/memória)&quot;.</p></section>"
+        "&quot;automático (regra/memória)&quot;. O quadro já inclui o que o passo "
+        "determinístico mapearia agora, sem gravar.</p></section>"
     )
 
 
@@ -854,9 +855,11 @@ def _carregar_trio(json_path: Path) -> tuple[dict, dict | None, dict | None]:
     return resultado, auditoria, validacao
 
 
-def _contexto_mapeamento():
+def _contexto_mapeamento(revisao_dir: Path):
+    """Árvore com o passo determinístico já aplicado em memória (M1): o relatório
+    reporta o que `canonico.mapear_novos_itens` mapearia, sem critério próprio."""
     try:
-        arvore = arv_mod.carregar()
+        arvore, _ = canonico.arvore_apos_passo(revisao_dir, arv_mod.carregar())
     except Exception as erro:  # noqa: BLE001
         logger.warning(f"Árvore indisponível; sem quadro de origem: {erro}")
         arvore = None
@@ -869,8 +872,11 @@ def gerar_relatorios(
 ) -> Path:
     """`novidades_fn` (injetável nos testes) calcula as novidades de um
     edital; sem ela, tenta `src.novidades_edital.novidades_do_edital`."""
+    arvore, propostos = _contexto_mapeamento(revisao_dir)
     if novidades_fn is None:
         novidades_fn = _carregar_funcao_novidades()
+        if novidades_fn is not None and arvore is not None:
+            novidades_fn = partial(novidades_fn, arvore=arvore)
     saida_dir = revisao_dir / RELATORIO_SUBDIR
     saida_dir.mkdir(exist_ok=True)
 
@@ -881,7 +887,6 @@ def gerar_relatorios(
         and not p.name.endswith(".validacao.json")
     )
 
-    arvore, propostos = _contexto_mapeamento()
     editais_index = []
     for json_path in jsons:
         resultado, auditoria, validacao = _carregar_trio(json_path)
