@@ -7322,6 +7322,7 @@
   "nutricionista|nutricao normal|necessidades e recomendacoes nutricionais para individuos planejamento e avaliacao": [{"no_id": "S-d7a2d537a9", "origem": "semente", "status": "aprovado"}],
   "nutricionista|programa nacional de atencao basica pnab": [{"no_id": "A-4a90268407", "origem": "semente", "status": "aprovado"}],
   "nutricionista|tecnica dietetica aplicada a nutricao clinica": [{"no_id": "A-df50f18e12", "origem": "semente", "status": "aprovado"}],
+  "processo": [{"no_id": "A-ad3fa21488", "origem": "humano", "status": "rejeitado"}],
   "processo sancionador ambiental": [{"no_id": "M-c85488b734", "origem": "semente", "status": "aprovado"}],
   "processo sancionador ambiental|decreto no 6 514 2008": [{"no_id": "A-e3b8290592", "origem": "semente", "status": "aprovado"}],
   "processo sancionador ambiental|instrucao normativa ibama no 19 2023": [{"no_id": "A-eb3d7a6be1", "origem": "semente", "status": "aprovado"}],

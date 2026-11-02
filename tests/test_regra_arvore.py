@@ -281,6 +281,30 @@ def test_par_rejeitado_nunca_e_devolvido_no_passo(monkeypatch, tmp_path, arvore_
     assert canonico.mapear_novos_itens(tmp_path, arvore_path).total == 0
 
 
+def test_titulo_de_bloco_com_par_rejeitado_nao_e_reintroduzido(
+    monkeypatch, tmp_path, arvore_path
+):
+    # KAN-80: o dono rejeitou "processo" -> assunto homônimo de outra disciplina.
+    # O item já está em `mapeamentos` (só rejeitado), então o passo não o regrava
+    # como regra/aprovado nem o conta como pendente.
+    _mexer(
+        arvore_path,
+        lambda a: (
+            mapear(a, "poder executivo", ["A-EXE"], "humano"),
+            rejeitar(a, "poder executivo", "A-EXE"),
+        ),
+    )
+    novos = _rodar(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        materia={"poder executivo": _nome("Poder Executivo")},
+    )
+    assert novos == 0
+    [m] = carregar(arvore_path).mapeamentos["poder executivo"]
+    assert (m.no_id, m.origem, m.status) == ("A-EXE", "humano", "rejeitado")
+
+
 def test_memoria_encadeia_materia_assunto_subassunto(
     monkeypatch, tmp_path, arvore_path
 ):
