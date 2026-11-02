@@ -226,7 +226,7 @@
       "cargos_restritos": null,
       "materia_origem": "cabecalho",
       "taxonomia_extraida": {
-        "materia": "Concorrência (esquemas de sincronização, deadlocks). Redes Locais. Web Services, APIs REST.",
+        "materia": "CONCEITOS BÁSICOS",
         "topicos": [
           {
             "nome": "Concorrência (esquemas de sincronização, deadlocks)",
@@ -856,7 +856,7 @@
       "cargos_restritos": null,
       "materia_origem": "cabecalho",
       "taxonomia_extraida": {
-        "materia": "",
+        "materia": "COMPUTAÇÃO EM NUVEM",
         "topicos": [
           {
             "nome": "Cloud computing; virtualização.",
