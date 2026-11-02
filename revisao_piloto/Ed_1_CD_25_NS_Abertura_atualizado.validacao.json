@@ -2,6 +2,117 @@
   "edital": "Ed_1_CD_25_NS_Abertura_atualizado.pdf",
   "total_chunks_analisados": 15,
   "total_alertas": 0,
-  "total_informativos": 0,
-  "alertas": []
+  "total_informativos": 11,
+  "alertas": [
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia": "RACIOCÍNIO LÓGICO E ANALÍTICO",
+      "tipo": "topico_lista_nao_dividida",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a ",
+      "topico_nome_extraido": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a estrutura daquelas relações"
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia": "RACIOCÍNIO LÓGICO E ANALÍTICO",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "227 caracteres",
+      "topico_nome_extraido": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a estrutura daquelas relações"
+    },
+    {
+      "chunk_index": 2,
+      "cargo": null,
+      "materia": "RACIOCÍNIO LÓGICO E ANALÍTICO",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "314 caracteres",
+      "topico_nome_extraido": "Compreensão e análise da lógica de uma situação, utilizando as funções intelectuais: raciocínio verbal, raciocínio matemático, raciocínio sequencial, reconhecimento de padrões, orientação espacial e temporal, formação de conceitos, discriminação de elementos Compreensão de dados apresentados em gráficos e tabelas"
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia": "ADMINISTRAÇÃO PÚBLICA",
+      "tipo": "topico_lista_nao_dividida",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "Reformas administrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado",
+      "topico_nome_extraido": "Reformas administrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia": "ADMINISTRAÇÃO PÚBLICA",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "159 caracteres",
+      "topico_nome_extraido": "Reformas administrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
+    },
+    {
+      "chunk_index": 4,
+      "cargo": null,
+      "materia": "ADMINISTRAÇÃO PÚBLICA",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "182 caracteres",
+      "topico_nome_extraido": "Mudanças institucionais: conselhos, organizações sociais (OS), organização da sociedade civil de interesse público (OSCIP), agência reguladora, agência executiva, consórcios públicos"
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "tipo": "subtopico_faceta_solta",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "conceito",
+      "topico_nome_extraido": "Constituição Federal de 1988"
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "tipo": "subtopico_faceta_solta",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "características",
+      "topico_nome_extraido": "Constituição Federal de 1988"
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "tipo": "subtopico_faceta_solta",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "conceito",
+      "topico_nome_extraido": "Poder constituinte"
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "tipo": "subtopico_faceta_solta",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "espécies",
+      "topico_nome_extraido": "Poder constituinte"
+    },
+    {
+      "chunk_index": 10,
+      "cargo": "CARGO 2: TÉCNICO LEGISLATIVO – ATRIBUIÇÃO: ASSISTENTE LEGISLATIVO E ADMINISTRATIVO",
+      "materia": "NOÇÕES DE DIREITO CONSTITUCIONAL E DE REGIMENTO INTERNO DA CÂMARA DOS DEPUTADOS",
+      "tipo": "subtopico_faceta_solta",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "limites",
+      "topico_nome_extraido": "Poder constituinte"
+    }
+  ]
 }

@@ -2,8 +2,38 @@
   "edital": "Ed_1_2025_PF_Administrativo_Abertura_atualizado_ret_5.pdf",
   "total_chunks_analisados": 39,
   "total_alertas": 12,
-  "total_informativos": 1,
+  "total_informativos": 4,
   "alertas": [
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "CONTABILIDADE APLICADA AO SETOR PÚBLICO",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "155 caracteres",
+      "topico_nome_extraido": "NBC TSP Estrutura Conceitual - estrutura conceitual para elaboração e divulgação de informação contábil de propósito geral pelas entidades do setor público"
+    },
+    {
+      "chunk_index": 17,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "CONTABILIDADE APLICADA AO SETOR PÚBLICO",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "181 caracteres",
+      "topico_nome_extraido": "Procedimentos Contábeis Patrimoniais conforme Manual de Contabilidade Aplicada ao Setor Público (MCASP), 10ª edição, aprovado pela Portaria STN/MF nº 1568, de 11 de dezembro de 2023"
+    },
+    {
+      "chunk_index": 20,
+      "cargo": "CARGO 3: CONTADOR",
+      "materia": "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "191 caracteres",
+      "topico_nome_extraido": "18 Manual de Contabilidade Aplicada ao Setor Público (MCASP) 10ª ed - Parte I - Procedimentos Contábeis Orçamentários, aprovada pela Portaria Conjunta STN/SOF nº 23, de 11 de dezembro de 2023"
+    },
     {
       "chunk_index": 22,
       "cargo": "CARGO 4: ENFERMEIRO",

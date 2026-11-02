@@ -455,8 +455,18 @@
             "subtopicos": []
           },
           {
-            "nome": "Tributos: conceito e espécies; impostos; taxas; contribuição de melhoria; imunidades; impostos da União; impostos dos estados e do Distrito Federal; impostos dos municípios",
-            "subtopicos": []
+            "nome": "Tributos",
+            "subtopicos": [
+              "conceito e espécies",
+              "impostos",
+              "taxas",
+              "contribuição de melhoria",
+              "imunidades",
+              "impostos da União",
+              "impostos dos estados e do Distrito Federal",
+              "impostos dos municípios"
+            ],
+            "nome_origem": "Tributos: conceito e espécies; impostos; taxas; contribuição de melhoria; imunidades; impostos da União; impostos dos estados e do Distrito Federal; impostos dos municípios"
           },
           {
             "nome": "Repartição das receitas tributárias",
@@ -471,8 +481,17 @@
             ]
           },
           {
-            "nome": "Obrigação tributária: conceito; espécies; fato gerador (hipótese de incidência); sujeitos ativo e passivo; solidariedade; capacidade tributária; domicílio tributário",
-            "subtopicos": []
+            "nome": "Obrigação tributária",
+            "subtopicos": [
+              "conceito",
+              "espécies",
+              "fato gerador (hipótese de incidência)",
+              "sujeitos ativo e passivo",
+              "solidariedade",
+              "capacidade tributária",
+              "domicílio tributário"
+            ],
+            "nome_origem": "Obrigação tributária: conceito; espécies; fato gerador (hipótese de incidência); sujeitos ativo e passivo; solidariedade; capacidade tributária; domicílio tributário"
           },
           {
             "nome": "Responsabilidade tributária",
@@ -485,8 +504,16 @@
             ]
           },
           {
-            "nome": "Crédito tributário: conceito; natureza; lançamento e suas modalidades; revisão, suspensão, extinção e exclusão; prescrição e decadência; repetição do indébito",
-            "subtopicos": []
+            "nome": "Crédito tributário",
+            "subtopicos": [
+              "conceito",
+              "natureza",
+              "lançamento e suas modalidades",
+              "revisão, suspensão, extinção e exclusão",
+              "prescrição e decadência",
+              "repetição do indébito"
+            ],
+            "nome_origem": "Crédito tributário: conceito; natureza; lançamento e suas modalidades; revisão, suspensão, extinção e exclusão; prescrição e decadência; repetição do indébito"
           },
           {
             "nome": "Garantias e privilégios do crédito tributário",
@@ -891,16 +918,26 @@
             "subtopicos": []
           },
           {
-            "nome": "Funções do Estado; financiamento dos gastos públicos: tributação e equidade",
-            "subtopicos": []
+            "nome": "Funções do Estado",
+            "subtopicos": [
+              "financiamento dos gastos públicos: tributação e equidade"
+            ],
+            "nome_origem": "Funções do Estado; financiamento dos gastos públicos: tributação e equidade"
           },
           {
-            "nome": "Função do bem-estar; políticas alocativas, distributivas e de estabilização",
-            "subtopicos": []
+            "nome": "Função do bem-estar",
+            "subtopicos": [
+              "políticas alocativas, distributivas e de estabilização"
+            ],
+            "nome_origem": "Função do bem-estar; políticas alocativas, distributivas e de estabilização"
           },
           {
-            "nome": "Tributação: tipos de tributos; progressividade, regressividade e neutralidade",
-            "subtopicos": []
+            "nome": "Tributação",
+            "subtopicos": [
+              "tipos de tributos",
+              "progressividade, regressividade e neutralidade"
+            ],
+            "nome_origem": "Tributação: tipos de tributos; progressividade, regressividade e neutralidade"
           },
           {
             "nome": "Federalismo fiscal",
@@ -919,8 +956,11 @@
             "subtopicos": []
           },
           {
-            "nome": "Princípios de descentralização fiscal; transferências intergovernamentais: classificação e critérios",
-            "subtopicos": []
+            "nome": "Princípios de descentralização fiscal",
+            "subtopicos": [
+              "transferências intergovernamentais: classificação e critérios"
+            ],
+            "nome_origem": "Princípios de descentralização fiscal; transferências intergovernamentais: classificação e critérios"
           },
           {
             "nome": "Resultado primário e nominal e relação com indicadores da dívida pública",
@@ -1522,12 +1562,20 @@
             ]
           },
           {
-            "nome": "As reformas administrativas e a redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado",
-            "subtopicos": []
+            "nome": "As reformas administrativas e a redefinição do papel do Estado",
+            "subtopicos": [
+              "reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
+            ],
+            "nome_origem": "As reformas administrativas e a redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
           },
           {
-            "nome": "Governo eletrônico; transparência da administração pública; controle social e cidadania; accountability",
-            "subtopicos": []
+            "nome": "Governo eletrônico",
+            "subtopicos": [
+              "transparência da administração pública",
+              "controle social e cidadania",
+              "accountability"
+            ],
+            "nome_origem": "Governo eletrônico; transparência da administração pública; controle social e cidadania; accountability"
           },
           {
             "nome": "Administração de pessoal",

@@ -2,8 +2,18 @@
   "edital": "Ed_1_IBAMA_24_abertura_atualizado_ret_2.pdf",
   "total_chunks_analisados": 33,
   "total_alertas": 7,
-  "total_informativos": 0,
+  "total_informativos": 1,
   "alertas": [
+    {
+      "chunk_index": 3,
+      "cargo": null,
+      "materia": "NOÇÕES DE ARQUIVOLOGIA",
+      "tipo": "topico_frase_longa",
+      "severidade": "informativo",
+      "numero_item": null,
+      "texto_item_origem": "152 caracteres",
+      "topico_nome_extraido": "Políticas de acesso aos documentos de arquivo, Sistemas informatizados de gestão arquivística de documentos (documentos digitais, requisitos, metadados)"
+    },
     {
       "chunk_index": 16,
       "cargo": "CARGO 1: ANALISTA ADMINISTRATIVO",

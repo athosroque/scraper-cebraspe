@@ -516,7 +516,8 @@
           },
           {
             "nome": "Modelagem de dados: físico, lógico e conceitual",
-            "subtopicos": [
+            "subtopicos": [],
+            "subtopicos_absorvidos": [
               "físico",
               "lógico",
               "conceitual"
@@ -709,16 +710,29 @@
         "materia": "Segurança da Informação",
         "topicos": [
           {
-            "nome": "Aspectos da classificação das informações, segurança de ambientes físicos e lógicos, controles de acesso; gestão de políticas de segurança",
-            "subtopicos": []
+            "nome": "Aspectos da classificação das informações, segurança de ambientes físicos e lógicos, controles de acesso",
+            "subtopicos": [
+              "gestão de políticas de segurança"
+            ],
+            "nome_origem": "Aspectos da classificação das informações, segurança de ambientes físicos e lógicos, controles de acesso; gestão de políticas de segurança"
           },
           {
-            "nome": "Algoritmos de Criptografia Simétrica, Assimétrica e Hash; Certificação Digital; infraestrutura de chaves públicas",
-            "subtopicos": []
+            "nome": "Algoritmos de Criptografia Simétrica, Assimétrica e Hash",
+            "subtopicos": [
+              "Certificação Digital",
+              "infraestrutura de chaves públicas"
+            ],
+            "nome_origem": "Algoritmos de Criptografia Simétrica, Assimétrica e Hash; Certificação Digital; infraestrutura de chaves públicas"
           },
           {
-            "nome": "Segurança em redes de computadores e técnicas de ataque cibernético, resposta a incidentes, resiliência cibernética; firewalls, IDS, IPS, proxies, NAT e VPN; spoofing, flood, DDoS, phishing; malwares; adware, spyware, backdoors, keylogger, worms, ransonware",
-            "subtopicos": []
+            "nome": "Segurança em redes de computadores e técnicas de ataque cibernético, resposta a incidentes, resiliência cibernética",
+            "subtopicos": [
+              "firewalls, IDS, IPS, proxies, NAT e VPN",
+              "spoofing, flood, DDoS, phishing",
+              "malwares",
+              "adware, spyware, backdoors, keylogger, worms, ransonware"
+            ],
+            "nome_origem": "Segurança em redes de computadores e técnicas de ataque cibernético, resposta a incidentes, resiliência cibernética; firewalls, IDS, IPS, proxies, NAT e VPN; spoofing, flood, DDoS, phishing; malwares; adware, spyware, backdoors, keylogger, worms, ransonware"
           }
         ]
       }
@@ -859,11 +873,14 @@
         "materia": "COMPUTAÇÃO EM NUVEM",
         "topicos": [
           {
-            "nome": "Cloud computing; virtualização.",
-            "subtopicos": []
+            "nome": "Cloud computing",
+            "subtopicos": [
+              "virtualização"
+            ],
+            "nome_origem": "Cloud computing; virtualização."
           },
           {
-            "nome": "Conteinerização de aplicações e DeVSecOps.",
+            "nome": "Conteinerização de aplicações e DeVSecOps",
             "subtopicos": []
           }
         ]
@@ -885,7 +902,8 @@
         "topicos": [
           {
             "nome": "Balanced Scorecard (BSC)",
-            "subtopicos": [
+            "subtopicos": [],
+            "subtopicos_absorvidos": [
               "principais conceitos",
               "aplicações",
               "mapa estratégico",
