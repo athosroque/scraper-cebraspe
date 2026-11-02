@@ -174,6 +174,23 @@ class TestGerarDb:
         for subtopico in db["taxonomia_subtopicos"].rows:
             assert subtopico["topico_id"] in ids_topicos
 
+    def test_subtopico_guarda_o_caminho_origem_como_contexto(self, tmp_path):
+        resultado_a, auditoria_a = _resultado_com_auditoria()
+        topico = resultado_a["resultados"][0]["taxonomia_extraida"]["topicos"][0]
+        nome = topico["subtopicos"][0]
+        topico["caminho_origem"] = {nome: ["Avô", "Pai"]}
+        _escrever_json(tmp_path / "Edital_A.json", resultado_a)
+        _escrever_json(tmp_path / "Edital_A.auditoria.json", auditoria_a)
+
+        db = sqlite_utils.Database(gerar_db(tmp_path))
+        por_nome = {
+            r["subtopico_nome"]: r["caminho_origem"]
+            for r in db["taxonomia_subtopicos"].rows
+        }
+
+        assert por_nome[nome] == "Avô › Pai"
+        assert None in por_nome.values()
+
     def test_tabelas_fts_sao_criadas(self, tmp_path):
         # Usa a fixture com subtópicos — a legada ("Tópico Legado") não tem
         # nenhum, então a tabela taxonomia_subtopicos nem chega a existir.

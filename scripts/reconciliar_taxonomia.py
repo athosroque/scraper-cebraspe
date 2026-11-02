@@ -1,5 +1,6 @@
 """Aplica os reparos locais (item/subitem ausente, hífen de quebra de linha e
-matéria do LLM inutilizável; ADR-025) a extrações já salvas,
+matéria do LLM inutilizável e subtópico em cadeia "Pai - Filho" que volta a
+texto próprio, KAN-93; ADR-025) a extrações já salvas,
 sem chamar o LLM.
 
 `reinjetar_itens_ausentes` roda automaticamente dentro de
@@ -31,6 +32,7 @@ from src.logger import logger
 from src.models_scraper import TaxonomiaEdital
 from src.taxonomia_extractor import (
     corrigir_hifen_quebra_de_linha,
+    migrar_cadeias_para_texto_proprio,
     reinjetar_itens_ausentes,
     reinjetar_subitens_ausentes,
     reparar_materia_extraida,
@@ -62,12 +64,21 @@ def reconciliar(json_path: Path) -> dict[int, list[str]]:
         if not taxonomia_salva or not texto:
             continue
         taxonomia = TaxonomiaEdital.model_validate(taxonomia_salva)
-        reinjetados = reinjetar_itens_ausentes(taxonomia, texto)
+        # Primeiro a forma antiga "Pai - Filho" vira texto próprio (KAN-93),
+        # para a cobertura dos reparos seguintes ver os nomes novos.
+        reinjetados = [
+            f"cadeia:{n}" for n in migrar_cadeias_para_texto_proprio(taxonomia, texto)
+        ]
+        reinjetados += reinjetar_itens_ausentes(taxonomia, texto)
         reinjetados += reinjetar_subitens_ausentes(taxonomia, texto)
         # Reparos de forma (sem mudar o conjunto de itens): hífen de quebra de
         # linha e matéria vazia/lista de tópicos.
         reinjetados += [
             f"hifen:{n}" for n in corrigir_hifen_quebra_de_linha(taxonomia, texto)
+        ]
+        # De novo: o conserto do hífen pode ter feito um nome em cadeia casar com a fonte.
+        reinjetados += [
+            f"cadeia:{n}" for n in migrar_cadeias_para_texto_proprio(taxonomia, texto)
         ]
         motivo = reparar_materia_extraida(
             taxonomia, item.get("materia_normalizada") or item.get("materia_chunk")

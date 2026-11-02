@@ -108,6 +108,7 @@ TAREFAS: tuple[Tarefa, ...] = (
             "scripts.curar_arvore",
             "scripts.propor_arvore",
             "scripts.mapear_itens_novos",
+            "scripts.migrar_chaves_cadeia",
             "scripts.detectar_dispersao_arvore",
             "scripts.gerar_relatorio_arvore",
         ),

@@ -735,7 +735,7 @@ class TestReinjetarSubitensAusentes:
             ],
         )
 
-    def test_subitens_entram_em_cadeia_e_na_ordem_da_fonte(self):
+    def test_subitens_entram_com_texto_proprio_e_na_ordem_da_fonte(self):
         tax = self._tax(
             [
                 "Conceitos fundamentais",
@@ -758,21 +758,42 @@ class TestReinjetarSubitensAusentes:
         subs = tax.topicos[0].subtopicos
         assert subs == [
             "Conceitos fundamentais",
-            "Conceitos fundamentais - Formas de organização da atividade econômica: "
+            "Formas de organização da atividade econômica: "
             "laissez-faire, intervencionismo, economia planificada",
-            "Conceitos fundamentais - Fatores de produção",
+            "Fatores de produção",
             "Teoria da demanda",
-            "Teoria da demanda - Preferências e função utilidade",
-            "Teoria da demanda - Curva de demanda",
-            "Teoria da demanda - Curva de Engel",
-            "Teoria da demanda - Bens substitutos e bens complementares",
-            "Teoria da demanda - Elasticidades",
-            "Teoria da demanda - Elasticidades - Elasticidade-preço da demanda e seus determinantes",
-            "Teoria da demanda - Elasticidades - Efeito da mudança no preço de um bem "
-            "sobre a receita total",
+            "Preferências e função utilidade",
+            "Curva de demanda",
+            "Curva de Engel",
+            "Bens substitutos e bens complementares",
+            "Elasticidades",
+            "Elasticidade-preço da demanda e seus determinantes",
+            "Efeito da mudança no preço de um bem sobre a receita total",
             "Teoria da oferta",
         ]
+        # O contexto vai em `caminho_origem`; o 2º nível não tem ancestral a guardar.
+        assert tax.topicos[0].caminho_origem == {
+            "Formas de organização da atividade econômica: "
+            "laissez-faire, intervencionismo, economia planificada": [
+                "Conceitos fundamentais"
+            ],
+            "Fatores de produção": ["Conceitos fundamentais"],
+            "Preferências e função utilidade": ["Teoria da demanda"],
+            "Curva de demanda": ["Teoria da demanda"],
+            "Curva de Engel": ["Teoria da demanda"],
+            "Bens substitutos e bens complementares": ["Teoria da demanda"],
+            "Elasticidades": ["Teoria da demanda"],
+            "Elasticidade-preço da demanda e seus determinantes": [
+                "Teoria da demanda",
+                "Elasticidades",
+            ],
+            "Efeito da mudança no preço de um bem sobre a receita total": [
+                "Teoria da demanda",
+                "Elasticidades",
+            ],
+        }
         assert tax.topicos[1].subtopicos == ["Contas nacionais"]
+        assert tax.topicos[1].caminho_origem is None
 
     def test_subitem_ja_coberto_nao_duplica(self):
         tax = self._tax(["Curva de Engel", "Conceitos fundamentais"])
@@ -838,16 +859,22 @@ class TestReinjetarSubitensAusentes:
             ],
         )
         te.reinjetar_subitens_ausentes(tax, fonte)
+        # "Fatores de produção" (1.1.2) cobre o 1.3.1.1 pela regra do validador
+        # (mesmo texto próprio no chunk): nada é reinjetado duas vezes.
         assert tax.topicos[0].subtopicos == [
             "Conceitos fundamentais",
-            "Conceitos fundamentais - Formas de organização",
-            "Conceitos fundamentais - Fatores de produção",
-            "Conceitos fundamentais - Papel dos preços",
+            "Formas de organização",
+            "Fatores de produção",
+            "Papel dos preços",
             "Teoria da oferta",
-            "Teoria da oferta - Função de produção",
-            "Teoria da oferta - Função de produção - Isoquantas",
-            "Teoria da oferta - Função de produção - Rendimentos de escala",
-            "Teoria da oferta - Minimização de custos",
+            "Função de produção",
+            "Isoquantas",
+            "Rendimentos de escala",
+            "Minimização de custos",
+        ]
+        assert tax.topicos[0].caminho_origem["Isoquantas"] == [
+            "Teoria da oferta",
+            "Função de produção",
         ]
 
     def test_destino_pelo_texto_proprio_do_item_e_nao_pelo_item_inteiro(self):
@@ -878,11 +905,132 @@ class TestReinjetarSubitensAusentes:
         assert tax.topicos[0].subtopicos == []
         assert tax.topicos[1].subtopicos == [
             "NBC TSP Estrutura Conceitual",
-            "NBC TSP Estrutura Conceitual - Objetivos e usuários da informação contábil",
-            "NBC TSP Estrutura Conceitual - Características qualitativas",
-            "NBC TSP Estrutura Conceitual - Mensuração de ativos e passivos nas demonstrações contábeis",
+            "Objetivos e usuários da informação contábil",
+            "Características qualitativas",
+            "Mensuração de ativos e passivos nas demonstrações contábeis",
             "NBC TSP 03 – provisões",
         ]
+        assert tax.topicos[1].caminho_origem["Características qualitativas"] == [
+            "NBC TSP Estrutura Conceitual"
+        ]
+
+
+class TestCadeiaVirandoTextoProprio:
+    """Nome em cadeia "Pai - Filho" vira texto próprio + `caminho_origem` (KAN-93, M7)."""
+
+    # Trecho real do BANRISUL_25 (UX), com o caso de 3 níveis.
+    FONTE = (
+        "2 User Experience (UX). 2.1 Acessibilidade e usabilidade. 2.2 Task Flow. "
+        "2.3 Metodologias ágeis e experiência do usuário. 2.3.1 Conceitos básicos e aplicações. "
+        "2.3.3 Design thinking. 2.3.4 Research, user interface. "
+        "2.3.4.1 Lean Concept, Discovery Sprint. 2.3.5 Prototipação."
+    )
+
+    def _tax_em_cadeia(self, extra=()):
+        return te.TaxonomiaEdital(
+            materia="UX",
+            topicos=[
+                te.Topico(
+                    nome="User Experience (UX)",
+                    subtopicos=[
+                        "Acessibilidade e usabilidade",
+                        "Task Flow",
+                        "Metodologias ágeis e experiência do usuário",
+                        "Metodologias ágeis e experiência do usuário - Design thinking",
+                        "Metodologias ágeis e experiência do usuário - Research, user interface",
+                        "Metodologias ágeis e experiência do usuário - Research, user interface"
+                        " - Lean Concept, Discovery Sprint",
+                        *extra,
+                    ],
+                )
+            ],
+        )
+
+    def test_migra_dois_e_tres_niveis(self):
+        tax = self._tax_em_cadeia()
+        migrados = te.migrar_cadeias_para_texto_proprio(tax, self.FONTE)
+        assert migrados == ["2.3.3", "2.3.4", "2.3.4.1"]
+        topico = tax.topicos[0]
+        assert topico.subtopicos[3:] == [
+            "Design thinking",
+            "Research, user interface",
+            "Lean Concept, Discovery Sprint",
+        ]
+        assert topico.caminho_origem == {
+            "Design thinking": ["Metodologias ágeis e experiência do usuário"],
+            "Research, user interface": ["Metodologias ágeis e experiência do usuário"],
+            "Lean Concept, Discovery Sprint": [
+                "Metodologias ágeis e experiência do usuário",
+                "Research, user interface",
+            ],
+        }
+
+    def test_idempotente(self):
+        tax = self._tax_em_cadeia()
+        te.migrar_cadeias_para_texto_proprio(tax, self.FONTE)
+        assert te.migrar_cadeias_para_texto_proprio(tax, self.FONTE) == []
+
+    def test_hifen_que_pertence_ao_nome_nao_e_tocado(self):
+        fonte = "1 Normas. 1.1 NBC TSP 34 - Custos no Setor Público. 1.1.1 Custos."
+        tax = te.TaxonomiaEdital(
+            materia="C",
+            topicos=[
+                te.Topico(
+                    nome="Normas", subtopicos=["NBC TSP 34 - Custos no Setor Público"]
+                )
+            ],
+        )
+        assert te.migrar_cadeias_para_texto_proprio(tax, fonte) == []
+        assert tax.topicos[0].subtopicos == ["NBC TSP 34 - Custos no Setor Público"]
+        assert tax.topicos[0].caminho_origem is None
+
+    def test_colisao_com_irmao_mantem_a_cadeia(self):
+        # "Conceito" já é irmão: migrar apagaria um dos dois em silêncio.
+        fonte = "1 Direito. 1.1 Regime. 1.1.1 Conceito. 1.2 Poder. 1.2.1 Conceito."
+        tax = te.TaxonomiaEdital(
+            materia="D",
+            topicos=[
+                te.Topico(
+                    nome="Direito",
+                    subtopicos=["Regime - Conceito", "Poder - Conceito"],
+                )
+            ],
+        )
+        assert te.migrar_cadeias_para_texto_proprio(tax, fonte) == ["1.1.1"]
+        assert tax.topicos[0].subtopicos == ["Conceito", "Poder - Conceito"]
+        assert tax.topicos[0].caminho_origem == {"Conceito": ["Regime"]}
+
+    def test_reinjecao_com_colisao_grava_a_cadeia_e_nao_perde_o_subitem(self):
+        fonte = "1 Direito. 1.1 Regime. 1.1.1 Conceito. 1.2 Poder. 1.2.1 Conceito."
+        tax = te.TaxonomiaEdital(
+            materia="D",
+            topicos=[te.Topico(nome="Direito", subtopicos=["Regime", "Poder"])],
+        )
+        te.reinjetar_subitens_ausentes(tax, fonte)
+        # 1.2.1 é coberto pelo "Conceito" de 1.1.1 (mesma regra do validador), então
+        # só um entra, com o texto próprio.
+        assert tax.topicos[0].subtopicos == ["Regime", "Conceito", "Poder"]
+        assert tax.topicos[0].caminho_origem == {"Conceito": ["Regime"]}
+
+    def test_reinjecao_apos_migrar_so_traz_o_que_faltava(self):
+        tax = self._tax_em_cadeia()
+        te.migrar_cadeias_para_texto_proprio(tax, self.FONTE)
+        assert te.reinjetar_subitens_ausentes(tax, self.FONTE) == ["2.3.1", "2.3.5"]
+
+    def test_json_antigo_sem_o_campo_carrega_e_nao_ganha_chave_nula(self):
+        topico = te.Topico.model_validate({"nome": "A", "subtopicos": ["x"]})
+        assert topico.caminho_origem is None
+        assert "caminho_origem" not in topico.model_dump()
+        assert (
+            "caminho_origem"
+            not in te.TaxonomiaEdital(materia="M", topicos=[topico]).model_dump()[
+                "topicos"
+            ][0]
+        )
+
+    def test_caminho_origem_vai_e_volta_no_json(self):
+        topico = te.Topico(nome="A", subtopicos=["x"], caminho_origem={"x": ["Pai"]})
+        assert te.Topico.model_validate(topico.model_dump()) == topico
 
 
 class TestReparosDeForma:

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_serializer
 
 
 class ConcursoMetadados(BaseModel):
@@ -19,8 +19,26 @@ class CargoEdital(BaseModel):
 
 
 class Topico(BaseModel):
+    """Tópico da taxonomia. `subtopicos` guarda o TEXTO PRÓPRIO de cada subitem.
+
+    `caminho_origem` (KAN-93, M7) é contexto, não identidade: para o subtópico
+    reinjetado a partir de um subitem de 3º nível em diante, guarda os textos
+    próprios dos ancestrais de 2º nível para baixo (`{"Design thinking":
+    ["Metodologias ágeis e experiência do usuário"]}`). Nenhum consumidor usa
+    isso para chave: a chave do item é o texto próprio. Opcional e omitido do
+    JSON quando vazio, então o JSON antigo carrega sem mudança.
+    """
+
     nome: str
     subtopicos: list[str] = []
+    caminho_origem: dict[str, list[str]] | None = None
+
+    @model_serializer(mode="wrap")
+    def _omitir_caminho_vazio(self, handler):
+        dados = handler(self)
+        if not dados.get("caminho_origem"):
+            dados.pop("caminho_origem", None)
+        return dados
 
 
 class TaxonomiaEdital(BaseModel):

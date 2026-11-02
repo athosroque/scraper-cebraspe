@@ -95,6 +95,23 @@ class TestGerarRelatorios:
         assert "class='col fonte'" in html
         assert "class='col taxonomia'" in html
 
+    def test_subtopico_com_caminho_origem_mostra_o_contexto(self, tmp_path):
+        resultado, auditoria, validacao = _fixture_basica()
+        topico = resultado["resultados"][0]["taxonomia_extraida"]["topicos"][0]
+        topico["subtopicos"] = ["Pai", "Filho"]
+        topico["caminho_origem"] = {"Filho": ["Pai", "Avô <b>"]}
+        _escrever_json(tmp_path / "Edital_A.json", resultado)
+        _escrever_json(tmp_path / "Edital_A.auditoria.json", auditoria)
+        _escrever_json(tmp_path / "Edital_A.validacao.json", validacao)
+
+        html = (gerar_relatorios(tmp_path) / "Edital_A.html").read_text(
+            encoding="utf-8"
+        )
+
+        assert "<li class='subtopico'>Filho <small class='caminho'>" in html
+        assert "(em: Pai › Avô &lt;b&gt;)" in html
+        assert "<li class='subtopico'>Pai</li>" in html
+
     def test_alerta_topico_ausente_aparece_destacado_no_html(self, tmp_path):
         resultado, auditoria, validacao = _fixture_basica()
         _escrever_json(tmp_path / "Edital_A.json", resultado)

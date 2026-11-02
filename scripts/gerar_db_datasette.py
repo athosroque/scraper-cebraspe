@@ -233,12 +233,19 @@ def _inserir_taxonomia(
                 )
                 .last_pk
             )
+            caminhos = topico.get("caminho_origem") or {}
             for subtopico_ordem, subtopico in enumerate(topico.get("subtopicos", [])):
                 db["taxonomia_subtopicos"].insert(
                     {
                         "topico_id": topico_id,
                         "subtopico_nome": subtopico,
                         "subtopico_ordem": subtopico_ordem,
+                        # Contexto (KAN-93): ancestrais do subitem, fora da chave.
+                        "caminho_origem": (
+                            " › ".join(caminhos[subtopico])
+                            if caminhos.get(subtopico)
+                            else None
+                        ),
                     },
                     pk="id",
                     foreign_keys=[("topico_id", "taxonomia_topicos", "id")],

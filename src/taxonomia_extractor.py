@@ -275,16 +275,84 @@ def _limpar_nome_subitem(texto: str) -> str:
     return " ".join(texto.split()).rstrip(" .;")
 
 
-def _nome_em_cadeia(numero: str, texto_por_numero: dict[str, str]) -> str | None:
-    """Textos próprios do ancestral de 2º nível até `numero`, unidos por " - ";
-    None se algum elo não tem texto próprio."""
+def _partes_da_cadeia(
+    numero: str, texto_por_numero: dict[str, str]
+) -> list[str] | None:
+    """Textos próprios (limpos) do ancestral de 2º nível até `numero`, o último
+    sendo o do próprio subitem; None se algum elo não tem texto próprio."""
     partes = numero.split(".")
     cadeia = [
         texto_por_numero.get(".".join(partes[:n])) for n in range(2, len(partes) + 1)
     ]
     if not all(cadeia):
         return None
-    return " - ".join(_limpar_nome_subitem(c) for c in cadeia)
+    return [_limpar_nome_subitem(c) for c in cadeia]
+
+
+def _nome_em_cadeia(numero: str, texto_por_numero: dict[str, str]) -> str | None:
+    """Textos próprios do ancestral de 2º nível até `numero`, unidos por " - ";
+    None se algum elo não tem texto próprio. Só serve para reconhecer a forma
+    antiga (pré-KAN-93) e ancorar posição: o nome gravado é o texto próprio."""
+    partes = _partes_da_cadeia(numero, texto_por_numero)
+    return " - ".join(partes) if partes else None
+
+
+def _cadeia_do_subtopico(topico: Topico, sub: str) -> tuple[str, ...]:
+    """Ancestrais (de `caminho_origem`) + texto próprio, em minúsculas."""
+    ancestrais = (topico.caminho_origem or {}).get(sub, [])
+    return tuple(_limpar_nome_subitem(x).casefold() for x in [*ancestrais, sub])
+
+
+def _registrar_caminho(topico: Topico, nome: str, ancestrais: list[str]) -> None:
+    if not ancestrais:
+        return
+    if topico.caminho_origem is None:
+        topico.caminho_origem = {}
+    topico.caminho_origem[nome] = list(ancestrais)
+
+
+def migrar_cadeias_para_texto_proprio(
+    taxonomia: TaxonomiaEdital, chunk_text: str
+) -> list[str]:
+    """Converte, in-place e sem LLM, o subtópico gravado em cadeia ("Pai -
+    Filho", forma pré-KAN-93) para o texto próprio, guardando os ancestrais em
+    `Topico.caminho_origem`. Só converte o que é, textualmente, a cadeia de um
+    subitem numerado do `chunk_text`: um " - " que pertence ao nome ("NBC TSP 34
+    - Custos no Setor Público") nunca casa e fica como está. Colisão (o texto
+    próprio já é irmão no mesmo tópico, ou dois subtópicos viram o mesmo nome)
+    deixa o nome em cadeia, que continua único: nada some em silêncio.
+    Idempotente. Retorna os números migrados, na ordem da fonte."""
+    texto = remover_assinatura_final(chunk_text)
+    subitens = extrair_subitens_numerados(texto)
+    if not subitens:
+        return []
+    texto_por_numero = dict(subitens)
+    por_cadeia: dict[str, tuple[str, list[str]]] = {}
+    for numero, _ in subitens:
+        partes = _partes_da_cadeia(numero, texto_por_numero)
+        if partes and len(partes) > 1:
+            por_cadeia.setdefault(" - ".join(partes).casefold(), (numero, partes))
+
+    migrados: list[str] = []
+    for topico in taxonomia.topicos:
+        irmaos = {_limpar_nome_subitem(x).casefold() for x in topico.subtopicos}
+        for idx, sub in enumerate(topico.subtopicos):
+            achado = por_cadeia.get(_limpar_nome_subitem(sub).casefold())
+            if not achado or " - " not in sub:
+                continue
+            numero, partes = achado
+            proprio = partes[-1]
+            if proprio.casefold() in irmaos:
+                logger.warning(
+                    f"[MIGRAR_CADEIA] subitem '{numero}': texto próprio '{proprio[:60]}' "
+                    "já existe no tópico; mantém o nome em cadeia."
+                )
+                continue
+            topico.subtopicos[idx] = proprio
+            irmaos.add(proprio.casefold())
+            _registrar_caminho(topico, proprio, partes[:-1])
+            migrados.append(numero)
+    return sorted(migrados, key=lambda n: [int(x) for x in n.split(".")])
 
 
 def _texto_proprio_do_item(
@@ -365,12 +433,18 @@ def reinjetar_subitens_ausentes(
 
     "Ausente" é `not item_coberto(texto_proprio, todos os tópicos e subtópicos
     do chunk)`, a mesma regra do validador. Destino: o tópico que cobre o item
-    de 1º nível do subitem; sem ele, não reinjeta. Nome: cadeia dos textos
-    próprios do ancestral de 2º nível até o subitem, unida por " - " (só o
-    texto próprio na profundidade 2); acima de
-    `TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL` não reinjeta. Posição: logo depois
+    de 1º nível do subitem; sem ele, não reinjeta. Nome: o texto
+    próprio do subitem (ver abaixo); se a cadeia dos textos próprios do
+    ancestral de 2º nível até o subitem, unida por " - ", passa de
+    `TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL`, não reinjeta. Posição: logo depois
     do subtópico que cobre o subitem de ordem mais próxima (anterior ou o
     próprio ancestral/irmão) do mesmo item de 1º nível; senão, no fim.
+
+    Nome gravado (KAN-93, M7): o TEXTO PRÓPRIO do subitem, não a cadeia; os
+    ancestrais vão em `Topico.caminho_origem` (só contexto, fora da chave).
+    O nome em cadeia impedia o casamento com o nó "Design thinking". Se o texto
+    próprio já é irmão no tópico, o nome vira a cadeia (único), sem
+    `caminho_origem`.
     Retorna os números reinjetados, na ordem da fonte.
     """
     texto = remover_assinatura_final(chunk_text)
@@ -408,13 +482,14 @@ def reinjetar_subitens_ausentes(
             )
             continue
 
-        nome = _nome_em_cadeia(numero, texto_por_numero)
-        if not nome:
+        partes_cadeia = _partes_da_cadeia(numero, texto_por_numero)
+        if not partes_cadeia:
             logger.warning(
                 f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' com ancestral sem "
                 "texto próprio; não reinjetado."
             )
             continue
+        nome = " - ".join(partes_cadeia)
         if len(nome) > TAMANHO_MAXIMO_SUBTOPICO_REINJETAVEL:
             logger.warning(
                 f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' com nome de "
@@ -422,8 +497,28 @@ def reinjetar_subitens_ausentes(
                 "não reinjetado."
             )
             continue
+        # O nome gravado é o texto próprio (KAN-93); a cadeia vai em
+        # `caminho_origem`. Se o texto próprio já é irmão no tópico, grava a
+        # cadeia como nome (único) e sem `caminho_origem`: nunca colide em silêncio.
+        nome_proprio, ancestrais = partes_cadeia[-1], partes_cadeia[:-1]
+        if nome_proprio.casefold() in {
+            _limpar_nome_subitem(x).casefold() for x in destino.subtopicos
+        }:
+            if nome.casefold() in {
+                _limpar_nome_subitem(x).casefold() for x in destino.subtopicos
+            }:
+                logger.warning(
+                    f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}': nome e cadeia "
+                    "já existem no tópico; não reinjetado."
+                )
+                continue
+            logger.warning(
+                f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}': '{nome_proprio[:60]}' "
+                "colide com um irmão; grava o nome em cadeia."
+            )
+            nome_proprio, ancestrais = nome, []
 
-        # Posição: ancora pelo nome em cadeia (não pela cobertura textual, que
+        # Posição: ancora pela cadeia (não pela cobertura textual, que
         # confunde "Fatores de produção" de 1.1.2 com o de 1.3.1.1). Percorre os
         # subitens anteriores do mesmo item de 1º nível, do mais próximo ao mais
         # distante, e insere depois do último subtópico igual à cadeia da âncora
@@ -432,24 +527,27 @@ def reinjetar_subitens_ausentes(
         for n_anc, _ in reversed(
             [(n, p) for n, p in subitens[:ordem] if n.split(".")[0] == partes[0]]
         ):
-            chave = _nome_em_cadeia(n_anc, texto_por_numero)
-            if not chave:
+            partes_anc = _partes_da_cadeia(n_anc, texto_por_numero)
+            if not partes_anc:
                 continue
-            chave = chave.casefold()
+            chave = tuple(p.casefold() for p in partes_anc)
+            chave_legada = " - ".join(chave)
             achados = [
                 idx
                 for idx, sub in enumerate(destino.subtopicos)
-                if _limpar_nome_subitem(sub).casefold() == chave
-                or _limpar_nome_subitem(sub).casefold().startswith(chave + " - ")
+                if _cadeia_do_subtopico(destino, sub)[: len(chave)] == chave
+                or _limpar_nome_subitem(sub).casefold() == chave_legada
+                or _limpar_nome_subitem(sub).casefold().startswith(chave_legada + " - ")
             ]
             if achados:
                 posicao = achados[-1] + 1
                 break
-        destino.subtopicos.insert(posicao, nome)
+        destino.subtopicos.insert(posicao, nome_proprio)
+        _registrar_caminho(destino, nome_proprio, ancestrais)
         reinjetados.append(numero)
         logger.warning(
             f"[REPARO_SUBITEM_AUSENTE] subitem '{numero}' omitido pelo LLM "
-            f"reinjetado em '{destino.nome[:40]}': '{nome[:80]}'"
+            f"reinjetado em '{destino.nome[:40]}': '{nome_proprio[:80]}'"
         )
     return reinjetados
 

@@ -168,8 +168,15 @@ def _renderizar_taxonomia(
     assuntos_novos = assuntos_novos or set()
     itens = []
     for topico in taxonomia["topicos"]:
+        caminhos = topico.get("caminho_origem") or {}
         subitens = "".join(
-            f"<li class='subtopico'>{escape(s)}</li>"
+            f"<li class='subtopico'>{escape(s)}"
+            + (
+                f" <small class='caminho'>(em: {escape(' › '.join(caminhos[s]))})</small>"
+                if caminhos.get(s)
+                else ""
+            )
+            + "</li>"
             for s in topico.get("subtopicos", [])
         )
         novo = NOVO_TAG if _chave(topico["nome"]) in assuntos_novos else ""

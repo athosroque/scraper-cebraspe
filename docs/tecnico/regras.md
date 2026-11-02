@@ -292,6 +292,25 @@ ADRs: nenhuma
 
 Teste guarda: `tests/test_estatisticas_views.py::TestEstatisticasViews::test_vw_edital_vs_prova_situacoes_e_cobertura_descendente`
 
+#### P75
+
+O subtópico reinjetado de um subitem de 3º nível em diante grava o **texto próprio** como
+nome (`Topico.subtopicos`) e os ancestrais de 2º nível para baixo em `Topico.caminho_origem`
+(`{"Design thinking": ["Metodologias ágeis..."]}`), nunca a cadeia "Pai - Filho" (KAN-93).
+`caminho_origem` é só contexto: fica fora de `chave_item`, do banco e do casamento; o
+relatório e o Datasette o mostram. É opcional e omitido do JSON quando vazio, então o
+JSON antigo carrega sem mudança. Nome que já é irmão no tópico não colide em silêncio: a
+reinjeção grava a cadeia (única) sem `caminho_origem`, e a migração deixa o nome em cadeia.
+`migrar_cadeias_para_texto_proprio` só converte o que é, palavra por palavra, a cadeia de um
+subitem numerado do texto-fonte (um " - " do próprio nome nunca casa) e roda dentro de
+`scripts.reconciliar_taxonomia`. Depois de reconciliar, `scripts.migrar_chaves_cadeia`
+(dry-run por padrão) leva os mapeamentos da chave antiga à nova por `src/arvore.py`; conflito
+de nós nunca é decidido pelo script.
+
+ADRs: [ADR-025](../adr/ADR-025-reconciliacao-deterministica-severidade-alertas.md), [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_taxonomia_extractor.py::TestCadeiaVirandoTextoProprio`, `tests/test_migrar_chaves_cadeia.py`
+
 ### prova
 
 #### P36

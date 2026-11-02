@@ -502,4 +502,26 @@ antes de `gerar_relatorios` e `gerar_db` (KAN-81).""",
             "tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais",
         ),
     ),
+    Regra(
+        id="P75",
+        tipo="pattern",
+        area="edital",
+        texto="""O subtópico reinjetado de um subitem de 3º nível em diante grava o **texto próprio** como
+nome (`Topico.subtopicos`) e os ancestrais de 2º nível para baixo em `Topico.caminho_origem`
+(`{"Design thinking": ["Metodologias ágeis..."]}`), nunca a cadeia "Pai - Filho" (KAN-93).
+`caminho_origem` é só contexto: fica fora de `chave_item`, do banco e do casamento; o
+relatório e o Datasette o mostram. É opcional e omitido do JSON quando vazio, então o
+JSON antigo carrega sem mudança. Nome que já é irmão no tópico não colide em silêncio: a
+reinjeção grava a cadeia (única) sem `caminho_origem`, e a migração deixa o nome em cadeia.
+`migrar_cadeias_para_texto_proprio` só converte o que é, palavra por palavra, a cadeia de um
+subitem numerado do texto-fonte (um " - " do próprio nome nunca casa) e roda dentro de
+`scripts.reconciliar_taxonomia`. Depois de reconciliar, `scripts.migrar_chaves_cadeia`
+(dry-run por padrão) leva os mapeamentos da chave antiga à nova por `src/arvore.py`; conflito
+de nós nunca é decidido pelo script.""",
+        adrs=("ADR-025", "ADR-030"),
+        testes=(
+            "tests/test_taxonomia_extractor.py::TestCadeiaVirandoTextoProprio",
+            "tests/test_migrar_chaves_cadeia.py",
+        ),
+    ),
 )

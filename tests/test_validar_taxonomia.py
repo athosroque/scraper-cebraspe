@@ -631,3 +631,37 @@ class TestSubitemAusente:
         validacao = validar_edital(resultado, auditoria)
         assert validacao["total_alertas"] == 1
         assert validacao["alertas"][0]["tipo"] == "subitem_ausente"
+
+
+class TestSubtopicoEmTextoProprio:
+    """Depois do KAN-93 o subtópico é o texto próprio: o validador não acusa
+    `subitem_ausente` e `caminho_origem` não atrapalha nenhuma checagem."""
+
+    FONTE = "1 Metodologias. 1.1 Ágeis. 1.1.1 Design thinking. 1.1.2 Storytelling."
+
+    def _alertas(self, topico):
+        return comparar_chunk(
+            {"chunk_index": 0, "texto_enviado_llm": self.FONTE},
+            {"taxonomia_extraida": {"materia": "UX", "topicos": [topico]}},
+        )
+
+    def test_texto_proprio_com_caminho_origem_cobre_o_subitem(self):
+        alertas = self._alertas(
+            {
+                "nome": "Metodologias",
+                "subtopicos": ["Ágeis", "Design thinking", "Storytelling"],
+                "caminho_origem": {
+                    "Design thinking": ["Ágeis"],
+                    "Storytelling": ["Ágeis"],
+                },
+            }
+        )
+        assert [a for a in alertas if a["tipo"] == "subitem_ausente"] == []
+
+    def test_subitem_que_falta_continua_sendo_acusado(self):
+        alertas = self._alertas(
+            {"nome": "Metodologias", "subtopicos": ["Ágeis", "Design thinking"]}
+        )
+        assert [
+            a["numero_item"] for a in alertas if a["tipo"] == "subitem_ausente"
+        ] == ["1.1.2"]
