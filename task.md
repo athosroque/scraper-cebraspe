@@ -709,6 +709,9 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   - Onda 2 (decisão D2):
     - `[ ]` M5 (KAN-85) Subtópico abaixo de nó-folha herda o nó do tópico (55 de 116 subassuntos).
     - `[ ]` M4 (KAN-86) Inferir a disciplina pelo cargo para destravar os filhos de título (~100 itens).
+    - `[ ]` M14 (KAN-97) Ramo 4 do passo determinístico: item com pai resolvido casa com o filho de mesmo nome
+      do nó do pai (candidato único, sem veto, fora de `TITULOS_GENERICOS`); resolve os 8 itens do SEFA que o
+      relatório antigo dava como "automático por equivalência de nome" (achado do KAN-81). Junto com a M5.
   - Onda 3 (decisões D3, D4):
     - `[ ]` M6 (KAN-87) Casamento exato global com travas (normas em qualquer disciplina).
     - `[ ]` M11 (KAN-88) Título genérico não herda decisão de outro edital sem confirmação.
