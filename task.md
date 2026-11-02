@@ -730,11 +730,16 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como
     `regra/aprovado`, com candidato único, sem veto e fora de `TITULOS_GENERICOS` (muda P52/P73).
-  - `[x]` D3 O subitem vai para a disciplina do conceito (subitem jurídico em bloco de TI vai para o nó de
-    Direito Administrativo que já existe, não para TI); libera a M6 só para nome específico e candidato único.
+  - `[x]` D3 O subitem vai para o nó do conceito: subitem jurídico em bloco de TI vai para o nó que já existe em
+    Direito Administrativo (um conceito, um nó: o banco de questões e a incidência não se dividem). Exceção: se
+    existir nó equivalente em TI, vai para ele; item composto pode apontar para os dois (N:N). Libera a M6 só
+    para nome específico, candidato único e sem veto.
   - `[x]` D4 Não herdar: título genérico não reaproveita decisão de outro edital sem confirmação (M11).
-  - `[ ]` D5 Em aberto: nenhuma disciplina nova por ora (P72, lista fechada de 43); "Gestão de produtos"
-    seria assunto de TI. Destino dos ~14 conceitos novos na C1 (KAN-95).
+  - `[x]` D5 Sem disciplina nova (P72, lista fechada de 43): "Gestão de produtos" e "Inovação no sistema
+    financeiro" viram assuntos novos em Tecnologia da Informação, com subassuntos pequenos (o que a questão
+    testa); "Gestão de projetos" fica no assunto existente de Administração Geral; "Design thinking" reaproveita
+    `S-eb23e19ae9` (Administração Pública › Inovação na gestão pública). Os nós novos precisam existir antes da
+    classificação das questões (5D, lista fechada). Proposta por conceito para o dono aprovar: KAN-95.
   - `[x]` D6 Liberada: trabalho pendente do extrator commitado (`bb791e1`, `0eb6b81`); M7/M8 podem mexer em
     `src/taxonomia_extractor.py` e reprocessar SEFA e BANRISUL antes de aprovar.
 - **Pronto quando:** o relatório mostra só o que o dono precisa decidir, com sugestão de nó; relatório,
