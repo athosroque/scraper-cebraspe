@@ -146,3 +146,133 @@ def test_design_thinking_so_casa_por_nome_com_o_texto_proprio(arvore, tmp_path):
     (tmp_path / "x.json").write_text(json.dumps(antigo), encoding="utf-8")
     nova, _ = arvore_apos_passo(tmp_path, arvore)
     assert CHAVE_ANTIGA not in nova.mapeamentos
+
+
+# --- M8 (KAN-94): lista com ";" e facetas devolvidas ao pai -------------------
+
+
+def _edital_m8(topico):
+    return {
+        "edital": "x.pdf",
+        "concurso": {"slug": "XX_25", "orgao": "XX", "ano": 2025},
+        "cargos": [],
+        "resultados": [
+            {
+                "chunk_index": 0,
+                "materia_chunk": "Estratégia",
+                "materia_origem": "cabecalho",
+                "taxonomia_extraida": {"materia": "Estratégia", "topicos": [topico]},
+            }
+        ],
+    }
+
+
+BSC = "estrategia|balanced scorecard bsc"
+FACETAS_BSC = ["aplicações", "metas", "indicadores"]
+
+
+@pytest.fixture
+def arvore_bsc():
+    arv = ArvoreMestre()
+    criar_no(arv, "materia", "Estratégia", None, id_override="M-E")
+    criar_no(arv, "assunto", "Planejamento", "M-E", id_override="A-P")
+    criar_no(arv, "subassunto", "BSC", "A-P", id_override="S-BSC")
+    criar_no(arv, "subassunto", "Outro", "A-P", id_override="S-OUT")
+    mapear(arv, BSC, ["S-BSC"], origem="semente", status="aprovado")
+    return arv
+
+
+def _grava_bsc(tmp_path):
+    topico = {
+        "nome": "Balanced Scorecard (BSC)",
+        "subtopicos": [],
+        "subtopicos_absorvidos": FACETAS_BSC,
+    }
+    (tmp_path / "x.json").write_text(json.dumps(_edital_m8(topico)), encoding="utf-8")
+    return tmp_path
+
+
+def test_heranca_de_regra_ja_no_pai_e_removida(arvore_bsc, tmp_path):
+    for f in FACETAS_BSC:
+        mapear(arvore_bsc, f"{BSC}|{normalizar_(f)}", ["S-BSC"], origem="regra")
+    plano = mig.planejar(arvore_bsc, _grava_bsc(tmp_path))
+    assert len(plano.absorvidas_descartadas) == 3 and plano.absorvidas_orfas == []
+    mig.aplicar_plano(arvore_bsc, plano)
+    assert set(arvore_bsc.mapeamentos) == {BSC}
+
+
+def test_faceta_com_decisao_do_dono_ou_no_diferente_fica_e_e_relatada(
+    arvore_bsc, tmp_path
+):
+    mapear(arvore_bsc, f"{BSC}|aplicacoes", ["S-BSC"], origem="humano")
+    mapear(arvore_bsc, f"{BSC}|metas", ["S-OUT"], origem="regra")
+    plano = mig.planejar(arvore_bsc, _grava_bsc(tmp_path))
+    assert {c for c, _ in plano.absorvidas_orfas} == {
+        f"{BSC}|aplicacoes",
+        f"{BSC}|metas",
+    }
+    assert plano.absorvidas_sem_mapeamento == [f"{BSC}|indicadores"]
+    antes = {k: list(v) for k, v in arvore_bsc.mapeamentos.items()}
+    mig.aplicar_plano(arvore_bsc, plano)
+    assert {k: list(v) for k, v in arvore_bsc.mapeamentos.items()} == antes
+
+
+def test_faceta_que_outro_item_ainda_produz_fica(arvore_bsc, tmp_path):
+    mapear(arvore_bsc, f"{BSC}|metas", ["S-BSC"], origem="regra")
+    revisao = _grava_bsc(tmp_path)
+    outro = _edital_m8({"nome": "Balanced Scorecard (BSC)", "subtopicos": ["metas"]})
+    (revisao / "y.json").write_text(json.dumps(outro), encoding="utf-8")
+    plano = mig.planejar(arvore_bsc, revisao)
+    assert plano.absorvidas_em_uso == [(f"{BSC}|metas", BSC)]
+    mig.aplicar_plano(arvore_bsc, plano)
+    assert f"{BSC}|metas" in arvore_bsc.mapeamentos
+
+
+def test_topico_com_cabeca_move_o_apontamento_para_a_chave_nova(tmp_path):
+    arv = ArvoreMestre()
+    criar_no(arv, "materia", "Direito", None, id_override="M-D")
+    criar_no(arv, "assunto", "Tributos", "M-D", id_override="A-T")
+    antiga = "direito|tributos conceito e especies impostos"
+    mapear(arv, antiga, ["A-T"], origem="humano", status="aprovado")
+    topico = {
+        "nome": "Tributos",
+        "subtopicos": ["conceito e espécies", "impostos"],
+        "nome_origem": "Tributos: conceito e espécies; impostos",
+    }
+    edital = _edital_m8(topico)
+    edital["resultados"][0]["materia_chunk"] = "Direito"
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    plano = mig.planejar(arv, tmp_path)
+    assert plano.movidos == [(antiga, "direito|tributos")]
+    mig.aplicar_plano(arv, plano)
+    (m,) = arv.mapeamentos["direito|tributos"]
+    assert (m.no_id, m.origem, m.status) == ("A-T", "humano", "aprovado")
+    assert antiga not in arv.mapeamentos
+
+
+def test_topico_com_cabeca_em_conflito_nao_altera_nada(tmp_path):
+    arv = ArvoreMestre()
+    criar_no(arv, "materia", "Direito", None, id_override="M-D")
+    criar_no(arv, "assunto", "Tributos", "M-D", id_override="A-T")
+    criar_no(arv, "assunto", "Outro", "M-D", id_override="A-O")
+    antiga = "direito|tributos conceito e especies impostos"
+    mapear(arv, antiga, ["A-T"])
+    mapear(arv, "direito|tributos", ["A-O"])
+    topico = {
+        "nome": "Tributos",
+        "subtopicos": ["impostos"],
+        "nome_origem": "Tributos: conceito e espécies; impostos",
+    }
+    edital = _edital_m8(topico)
+    edital["resultados"][0]["materia_chunk"] = "Direito"
+    (tmp_path / "x.json").write_text(json.dumps(edital), encoding="utf-8")
+    plano = mig.planejar(arv, tmp_path)
+    assert plano.conflitos == [(antiga, "direito|tributos")]
+    mig.aplicar_plano(arv, plano)
+    assert antiga in arv.mapeamentos
+
+
+def normalizar_(texto):
+    from src.comparacao_texto import normalizar
+
+    return normalizar(texto)

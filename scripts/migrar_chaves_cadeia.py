@@ -1,5 +1,6 @@
 """Migra as chaves de mapeamento do subtópico em cadeia ("Pai - Filho") para o
-texto próprio (KAN-93, M7, Etapa 5B.4).
+texto próprio (KAN-93, M7, Etapa 5B.4) e as do que a forma de lista/faceta
+mudou (KAN-94, M8; ver "M8" mais abaixo).
 
 Depois de `scripts.reconciliar_taxonomia` trocar o nome em cadeia pelo texto próprio
 (com a cadeia em `Topico.caminho_origem`), a chave do item muda: de
@@ -19,6 +20,15 @@ Regras da migração, por chave antiga com mapeamento na árvore:
   item entra no relatório;
 - a chave antiga ainda produzida por algum item atual (outro edital, ou nome que
   coincide) é copiada, não removida.
+
+M8 (KAN-94): `scripts.reconciliar_taxonomia` deixa o rastro no `<edital>.json`
+(`Topico.nome_origem`, `Topico.subtopicos_absorvidos`), de onde as chaves antigas
+são recalculadas. Tópico-lista cuja cabeça virou o nome entra no mesmo plano dos
+pares antiga -> nova (move, descarta ou conflito). Faceta devolvida ao pai tem a
+chave `materia|topico|faceta` fora do JSON: o apontamento só é removido se TODOS
+os seus mapeamentos são `origem=regra` (herança do passo determinístico, KAN-85) e
+os nós já estão no tópico pai; qualquer outro (humano, LLM, nó diferente) fica na
+árvore e vai para o relatório como órfão, para o dono decidir. Nada some sem aviso.
 
 Uso:
     python -m scripts.migrar_chaves_cadeia [--aplicar] [--arvore CAMINHO] [revisao_dir]
@@ -55,6 +65,11 @@ class PlanoMigracao:
     copiados: list[tuple[str, str]] = field(default_factory=list)  # antiga ainda em uso
     conflitos: list[tuple[str, str]] = field(default_factory=list)
     sem_mapeamento: list[str] = field(default_factory=list)
+    # M8: facetas devolvidas ao pai, (chave da faceta, chave do tópico pai).
+    absorvidas_descartadas: list[tuple[str, str]] = field(default_factory=list)
+    absorvidas_em_uso: list[tuple[str, str]] = field(default_factory=list)
+    absorvidas_orfas: list[tuple[str, str]] = field(default_factory=list)
+    absorvidas_sem_mapeamento: list[str] = field(default_factory=list)
 
 
 def _expandir_cadeias(resultado: dict) -> dict:
@@ -71,6 +86,34 @@ def _expandir_cadeias(resultado: dict) -> dict:
     return copia
 
 
+def _topicos_brutos(resultado: dict) -> dict[tuple[int, int], dict]:
+    """`(chunk_index, ordem do tópico)` -> tópico como está no JSON (com o rastro
+    da M8, que a carga do banco não leva)."""
+    return {
+        (item.get("chunk_index"), ordem): topico
+        for item in resultado.get("resultados", [])
+        for ordem, topico in enumerate(
+            (item.get("taxonomia_extraida") or {}).get("topicos", [])
+        )
+    }
+
+
+def facetas_absorvidas(revisao_dir: Path) -> dict[str, set[str]]:
+    """Chave da faceta devolvida ao pai (M8) -> chaves dos tópicos pai."""
+    saida: dict[str, set[str]] = {}
+    for json_path in listar_jsons_edital(revisao_dir):
+        resultado = json.loads(json_path.read_text(encoding="utf-8"))
+        brutos = _topicos_brutos(resultado)
+        for item in montar_carga_concurso(resultado)["itens"]:
+            bruto = brutos.get((item["chunk_index"], item["topico_ordem"]), {})
+            topico = arv_mod.chave_item((item["materia_chave"], item["topico_chave"]))
+            for faceta in bruto.get("subtopicos_absorvidos") or []:
+                if normalizar(faceta):
+                    chave = arv_mod.chave_item((topico, normalizar(faceta)))
+                    saida.setdefault(chave, set()).add(topico)
+    return saida
+
+
 def pares_de_chaves(
     revisao_dir: Path,
 ) -> tuple[dict[str, str], dict[str, set[str]], set[str]]:
@@ -81,12 +124,21 @@ def pares_de_chaves(
     atuais: set[str] = set()
     for json_path in listar_jsons_edital(revisao_dir):
         resultado = json.loads(json_path.read_text(encoding="utf-8"))
+        brutos = _topicos_brutos(resultado)
         nova = montar_carga_concurso(resultado)["itens"]
         antiga = montar_carga_concurso(_expandir_cadeias(resultado))["itens"]
         if len(nova) != len(antiga):
             raise ValueError(f"{json_path.name}: cargas de tamanhos diferentes")
         for item_n, item_a in zip(nova, antiga):
             m, t = item_n["materia_chave"], item_n["topico_chave"]
+            atuais.add(arv_mod.chave_item((m, t)))
+            bruto = brutos.get((item_n["chunk_index"], item_n["topico_ordem"]), {})
+            origem = bruto.get("nome_origem")
+            if origem and normalizar(origem) != t:  # M8: a cabeça virou o nome
+                k_a = arv_mod.chave_item((m, normalizar(origem)))
+                k_n = arv_mod.chave_item((m, t))
+                if pares.setdefault(k_a, k_n) != k_n:
+                    ambiguos.setdefault(k_a, {pares[k_a]}).add(k_n)
             if len(item_n["subtopicos"]) != len(item_a["subtopicos"]):
                 raise ValueError(f"{json_path.name}: subtópicos desalinhados")
             for sub_n, sub_a in zip(item_n["subtopicos"], item_a["subtopicos"]):
@@ -109,10 +161,29 @@ def _nos(arv, chave: str) -> set[str]:
     return {arv_mod.resolver_no(arv, m.no_id) for m in arv.mapeamentos.get(chave, [])}
 
 
+def _planejar_facetas(arv, revisao_dir: Path, atuais: set[str], plano) -> None:
+    """M8: o que fazer com o apontamento de uma faceta devolvida ao pai."""
+    for faceta, topicos in sorted(facetas_absorvidas(revisao_dir).items()):
+        pai = sorted(topicos)[0]
+        if faceta not in arv.mapeamentos:
+            plano.absorvidas_sem_mapeamento.append(faceta)
+        elif faceta in atuais:
+            plano.absorvidas_em_uso.append((faceta, pai))
+        elif (
+            all(m.origem == "regra" for m in arv.mapeamentos[faceta])
+            and pai in arv.mapeamentos
+            and _nos(arv, faceta) <= _nos(arv, pai)
+        ):
+            plano.absorvidas_descartadas.append((faceta, pai))
+        else:
+            plano.absorvidas_orfas.append((faceta, pai))
+
+
 def planejar(arv, revisao_dir: Path) -> PlanoMigracao:
     """Plano da migração; não altera `arv`."""
     pares, ambiguos, atuais = pares_de_chaves(revisao_dir)
     plano = PlanoMigracao(pares=pares, ambiguos=ambiguos)
+    _planejar_facetas(arv, revisao_dir, atuais, plano)
     for antiga, nova in sorted(pares.items()):
         if antiga not in arv.mapeamentos:
             plano.sem_mapeamento.append(antiga)
@@ -141,6 +212,8 @@ def aplicar_plano(arv, plano: PlanoMigracao) -> None:
         arv.mapeamentos[nova] = copy.deepcopy(arv.mapeamentos[antiga])
     for antiga, _ in plano.movidos + plano.descartados:
         arv.mapeamentos.pop(antiga, None)
+    for faceta, _ in plano.absorvidas_descartadas:
+        arv.mapeamentos.pop(faceta, None)
 
 
 def _imprimir(plano: PlanoMigracao) -> None:
@@ -150,7 +223,21 @@ def _imprimir(plano: PlanoMigracao) -> None:
     print(f"  antiga descartada (nova já tem os nós): {len(plano.descartados)}")
     print(f"  copiadas (antiga ainda em uso): {len(plano.copiados)}")
     print(f"  CONFLITOS (nada alterado): {len(plano.conflitos)}")
-    for rotulo, lista in (("movida", plano.movidos), ("conflito", plano.conflitos)):
+    print(
+        "Facetas devolvidas ao pai (M8): "
+        f"{len(plano.absorvidas_descartadas) + len(plano.absorvidas_em_uso) + len(plano.absorvidas_orfas) + len(plano.absorvidas_sem_mapeamento)}"
+    )
+    print(f"  sem mapeamento na árvore: {len(plano.absorvidas_sem_mapeamento)}")
+    print(
+        f"  herança redundante (regra, nós já no pai), removida: {len(plano.absorvidas_descartadas)}"
+    )
+    print(f"  ainda em uso por outro item, mantida: {len(plano.absorvidas_em_uso)}")
+    print(f"  ÓRFÃS mantidas (decisão do dono): {len(plano.absorvidas_orfas)}")
+    for rotulo, lista in (
+        ("movida", plano.movidos),
+        ("conflito", plano.conflitos),
+        ("órfã", plano.absorvidas_orfas),
+    ):
         for antiga, nova in lista:
             print(f"  [{rotulo}] {antiga}  ->  {nova}")
 

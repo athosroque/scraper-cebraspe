@@ -28,6 +28,13 @@ vira `topico_divergencia_leve` com `severidade: "informativo"`, em vez de
 fora de `total_alertas` (contado em `total_informativos`). Todo alerta sem
 `severidade` é bloqueante.
 
+Forma (KAN-94, M8), sempre informativa: `topico_lista_nao_dividida` (nome com ";"
+fora de parênteses e sem subtópicos), `subtopico_faceta_solta` (palavra de
+`FACETAS_GENERICAS` como subtópico: "conceito", "metas"...) e `topico_frase_longa`
+(nome com mais de `TAMANHO_FRASE_LONGA` caracteres). O reparo determinístico
+(`normalizar_listas_e_facetas`) trata o que é seguro; estes alertas listam o
+que sobrou para o dono decidir.
+
 Heurística, não prova formal: matérias sem numeração no PDF não geram itens
 de fonte (nada a comparar, sem alerta); numeração colada sem espaço ao texto
 anterior (ex.: "...lógicos.4 Lógica...") e correspondência textual imperfeita
@@ -44,7 +51,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.comparacao_texto import contido, divergencia_leve, item_coberto, normalizar
+from src.comparacao_texto import (
+    TAMANHO_FRASE_LONGA,
+    contido,
+    divergencia_leve,
+    eh_faceta_generica,
+    item_coberto,
+    normalizar,
+    partes_por_ponto_e_virgula,
+)
 from src.edital_parser import extrair_itens_numerados, extrair_subitens_numerados
 from src.logger import logger
 
@@ -59,6 +74,35 @@ SEVERIDADE_BLOQUEANTE = "bloqueante"
 
 def severidade(alerta: dict) -> str:
     return alerta.get("severidade", SEVERIDADE_BLOQUEANTE)
+
+
+def alertas_de_forma(base: dict, topicos: list[dict]) -> list[dict]:
+    """Alertas informativos sobre a forma dos nomes (KAN-94, M8)."""
+
+    def alerta(tipo: str, topico: str, texto: str) -> dict:
+        return {
+            **base,
+            "tipo": tipo,
+            "severidade": SEVERIDADE_INFORMATIVO,
+            "numero_item": None,
+            "texto_item_origem": texto[:200],
+            "topico_nome_extraido": topico,
+        }
+
+    alertas = []
+    for topico in topicos:
+        nome = topico.get("nome", "")
+        subs = [s for s in topico.get("subtopicos", []) if s]
+        if not subs and len(partes_por_ponto_e_virgula(nome)) > 1:
+            alertas.append(alerta("topico_lista_nao_dividida", nome, nome))
+        if len(nome) > TAMANHO_FRASE_LONGA:
+            alertas.append(
+                alerta("topico_frase_longa", nome, f"{len(nome)} caracteres")
+            )
+        for sub in subs:
+            if eh_faceta_generica(sub):
+                alertas.append(alerta("subtopico_faceta_solta", nome, sub))
+    return alertas
 
 
 def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[dict]:
@@ -106,14 +150,16 @@ def comparar_chunk(chunk_auditoria: dict, resultado_chunk: dict | None) -> list[
             }
         ]
 
+    taxonomia = resultado_chunk.get("taxonomia_extraida") or {}
+    topicos = taxonomia.get("topicos", [])
+    # A forma dos nomes não depende de numeração na fonte.
+    alertas += alertas_de_forma(base, topicos)
+
     if not itens_fonte:
         # Matéria sem numeração no texto-fonte: nada a comparar em nenhuma
         # direção (não dá pra saber se a extração é completa sem uma
         # referência numerada) — melhor não opinar do que gerar ruído.
         return alertas
-
-    taxonomia = resultado_chunk.get("taxonomia_extraida") or {}
-    topicos = taxonomia.get("topicos", [])
 
     # Rede de segurança para dados persistidos antes do reforço de prompt/
     # checagem semântica em `taxonomia_extractor.py` (ver ADR-021) — sinaliza

@@ -187,6 +187,14 @@ def _renderizar_taxonomia(
     return f"<ul>{''.join(itens)}</ul>"
 
 
+# Alertas informativos de forma (KAN-94, M8): não contam em `total_alertas`.
+ROTULOS_ALERTA_FORMA = {
+    "topico_lista_nao_dividida": "tópico é uma lista com “;” sem subtópicos",
+    "subtopico_faceta_solta": "subtópico é só um aspecto genérico do tópico",
+    "topico_frase_longa": "nome de tópico muito longo",
+}
+
+
 def _renderizar_alertas_chunk(alertas: list[dict]) -> str:
     if not alertas:
         return ""
@@ -211,6 +219,12 @@ def _renderizar_alertas_chunk(alertas: list[dict]) -> str:
             linhas.append(
                 f"<span class='alerta topico_divergencia_leve'>ⓘ informativo — nome parafraseado/corrigido "
                 f"em relação à fonte (não conta como alerta): “{escape(alerta.get('topico_nome_extraido') or '')}”</span>"
+            )
+        elif alerta["tipo"] in ROTULOS_ALERTA_FORMA:
+            linhas.append(
+                f"<span class='alerta topico_divergencia_leve'>ⓘ informativo — "
+                f"{ROTULOS_ALERTA_FORMA[alerta['tipo']]}: "
+                f"“{escape(alerta.get('texto_item_origem') or alerta.get('topico_nome_extraido') or '')}”</span>"
             )
         else:
             linhas.append(f"<span class='alerta'>⚠ {escape(alerta['tipo'])}</span>")

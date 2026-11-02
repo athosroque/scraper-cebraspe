@@ -225,3 +225,121 @@ def extrair_cargos_do_texto(texto: str) -> list[int]:
             if n not in resultado:
                 resultado.append(n)
     return resultado
+
+
+# --- Forma das listas e facetas (KAN-94, M8) --------------------------------
+# Vive aqui, e não no extrator, pelo mesmo motivo do resto do módulo: o reparo
+# (`taxonomia_extractor`) e o validador (`validar_taxonomia`) precisam concordar
+# sobre o que é uma lista com ";", uma faceta solta e uma frase longa.
+
+# Nome de tópico acima disso é frase-assunto: informativo no validador. Calibrado
+# nos 1.812 tópicos dos 7 editais (p95 = 98, p99 = 172): 150 pega 29 (1,6%), a
+# maioria título de norma com ementa, que o dono pode aceitar.
+TAMANHO_FRASE_LONGA = 150
+
+# Palavras que, sozinhas e em minúsculas, são aspecto genérico de um conceito
+# ("Balanced Scorecard: conceitos, aplicações, perspectivas, metas...") e não um
+# assunto de estudo. Lista fechada e curta de propósito: "Backup", "Cluster",
+# "jQuery", "estados" ou "mensageria" são subtópicos legítimos e ficam de fora.
+FACETAS_GENERICAS = frozenset(
+    {
+        "aplicação",
+        "aplicações",
+        "características",
+        "conceito",
+        "conceitos",
+        "espécies",
+        "fundamentos",
+        "indicadores",
+        "limites",
+        "metas",
+        "objetivos",
+        "perspectivas",
+    }
+)
+
+# Termos que um pedaço de lista não pode abrir: é continuação da frase anterior,
+# não um item.
+_ABRE_CONTINUACAO = frozenset(
+    {"e", "ou", "que", "com", "sem", "em", "de", "do", "da", "dos", "das", "para"}
+)
+_ABREVIATURAS_COM_PONTO = frozenset(
+    {"etc", "art", "arts", "nº", "ed", "vol", "inc", "cf", "ex", "obs", "pp"}
+)
+PADRAO_SIGLA_ENTRE_PARENTESES = re.compile(r"\(\s*[A-ZÀ-Ú][A-Za-zÀ-ÿ0-9]{1,9}\s*\)")
+MAX_PALAVRAS_CABECA = 8
+
+
+def sem_pontuacao_final(nome: str) -> str:
+    """Tira ".", ";" e "," do fim do nome, menos o ponto de abreviatura ("etc.",
+    "S.A."). A chave (`normalizar`) já ignora pontuação: isto só limpa o texto."""
+    base = " ".join(nome.split())
+    while base and base[-1] in ".;,":
+        if base[-1] == ".":
+            ultimo = re.split(r"[\s(]", base)[-1].rstrip(".")
+            if ultimo.casefold() in _ABREVIATURAS_COM_PONTO or re.fullmatch(
+                r"(?:[A-Za-z]\.)+[A-Za-z]", ultimo
+            ):
+                break
+        base = base[:-1].rstrip()
+    return base
+
+
+def partes_por_ponto_e_virgula(nome: str) -> list[str]:
+    """Pedaços do nome separados por ";" fora de parênteses/colchetes. Parêntese
+    desbalanceado: não divide (devolve o nome inteiro). Sem normalizar o texto."""
+    partes: list[str] = []
+    atual: list[str] = []
+    nivel = 0
+    for ch in nome:
+        if ch in "([":
+            nivel += 1
+        elif ch in ")]":
+            nivel -= 1
+        if ch == ";" and nivel == 0:
+            partes.append("".join(atual))
+            atual = []
+        else:
+            atual.append(ch)
+    partes.append("".join(atual))
+    if nivel != 0:
+        return [" ".join(nome.split())]
+    return [" ".join(p.split()) for p in partes]
+
+
+def parte_de_lista_valida(parte: str) -> bool:
+    """Pedaço de lista com sentido isolado: tem letra/dígito e não abre com
+    palavra de continuação ("e", "ou", "que", "com"...)."""
+    if not re.search(r"\w", parte):
+        return False
+    return parte.split()[0] not in _ABRE_CONTINUACAO
+
+
+def cabeca_e_resto(parte: str) -> tuple[str, str] | None:
+    """Separa "Cabeça: resto" no primeiro ":" fora de parênteses, se a cabeça tem
+    1 a `MAX_PALAVRAS_CABECA` palavras e há resto; senão None."""
+    nivel = 0
+    for pos, ch in enumerate(parte):
+        if ch in "([":
+            nivel += 1
+        elif ch in ")]":
+            nivel -= 1
+        elif ch == ":" and nivel == 0:
+            cabeca, resto = parte[:pos].strip(), parte[pos + 1 :].strip()
+            if cabeca and resto and len(cabeca.split()) <= MAX_PALAVRAS_CABECA:
+                return cabeca, resto
+            return None
+    return None
+
+
+def eh_fragmento_de_uma_palavra(sub: str) -> bool:
+    """Uma palavra só e minúscula na inicial. Sozinho NÃO prova nada: "jQuery",
+    "keycloak" e "estados" também são assim e são assuntos legítimos."""
+    palavras = sub.split()
+    return len(palavras) == 1 and palavras[0][:1].islower()
+
+
+def eh_faceta_generica(sub: str) -> bool:
+    return eh_fragmento_de_uma_palavra(sub) and sub.strip(" .;,").casefold() in (
+        FACETAS_GENERICAS
+    )

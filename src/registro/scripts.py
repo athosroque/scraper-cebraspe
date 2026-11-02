@@ -172,8 +172,8 @@ SCRIPTS: tuple[Script, ...] = (
     ),
     Script(
         "scripts.migrar_chaves_cadeia",
-        "Leva os mapeamentos da chave do subtópico em cadeia para a do texto próprio "
-        "(dry-run por padrão).",
+        "Leva os mapeamentos da chave do subtópico em cadeia para a do texto próprio e "
+        "da lista com ';' (M8); relata facetas órfãs (dry-run por padrão).",
         "manutencao",
         "argparse",
         adrs=("ADR-030",),
@@ -194,8 +194,8 @@ SCRIPTS: tuple[Script, ...] = (
     ),
     Script(
         "scripts.reconciliar_taxonomia",
-        "Aplica o reparo local de item ausente e a volta da cadeia ao texto próprio a "
-        "extrações já salvas, sem LLM.",
+        "Aplica o reparo local de item ausente, a volta da cadeia ao texto próprio e a forma "
+        "de listas, facetas e pontuação (M8) a extrações já salvas, sem LLM.",
         "manutencao",
         "argv",
         uso_argv=(

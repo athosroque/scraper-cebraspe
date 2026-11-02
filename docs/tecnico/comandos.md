@@ -343,7 +343,7 @@ python -m scripts.backfill_classificacao_chunks [edital.pdf [saida.json]]
 
 ### `python -m scripts.migrar_chaves_cadeia`
 
-Leva os mapeamentos da chave do subtópico em cadeia para a do texto próprio (dry-run por padrão).
+Leva os mapeamentos da chave do subtópico em cadeia para a do texto próprio e da lista com ';' (M8); relata facetas órfãs (dry-run por padrão).
 
 **ADRs:** [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
@@ -355,7 +355,7 @@ Leva os mapeamentos da chave do subtópico em cadeia para a do texto próprio (d
 
 ### `python -m scripts.reconciliar_taxonomia`
 
-Aplica o reparo local de item ausente e a volta da cadeia ao texto próprio a extrações já salvas, sem LLM.
+Aplica o reparo local de item ausente, a volta da cadeia ao texto próprio e a forma de listas, facetas e pontuação (M8) a extrações já salvas, sem LLM.
 
 **ADRs:** [ADR-019](../adr/ADR-019-pipeline-automatico-artefatos-revisao.md), [ADR-025](../adr/ADR-025-reconciliacao-deterministica-severidade-alertas.md)
 

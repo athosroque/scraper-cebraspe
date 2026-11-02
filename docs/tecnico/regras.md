@@ -311,6 +311,28 @@ ADRs: [ADR-025](../adr/ADR-025-reconciliacao-deterministica-severidade-alertas.m
 
 Teste guarda: `tests/test_taxonomia_extractor.py::TestCadeiaVirandoTextoProprio`, `tests/test_migrar_chaves_cadeia.py`
 
+#### P76
+
+A forma das listas é consertada por `normalizar_listas_e_facetas` (KAN-94, M8), sem LLM,
+dentro do pós-LLM do extrator e de `scripts.reconciliar_taxonomia`: (1) tópico com ";" fora de
+parênteses e **sem subtópicos** vira subtópicos, um por elemento, sem ponto final; se o 1º
+elemento é "Cabeça: resto" a cabeça vira o nome do tópico (a chave muda, e o nome antigo vai em
+`Topico.nome_origem`), senão o nome fica inteiro; elemento que abre com "e"/"ou"/"com",
+elementos repetidos ou cabeça que colide com outro tópico do chunk impedem a divisão; vírgula e
+"e" nunca dividem; (2) facetas voltam ao pai (`Topico.subtopicos_absorvidos`) só em dois casos:
+todos os subtópicos são uma palavra minúscula que está no nome do pai ("Modelagem de dados:
+físico, lógico e conceitual"), ou o pai tem sigla entre parênteses e pelo menos 3 subtópicos
+são `FACETAS_GENERICAS` (BSC); **nunca** por contar palavras: "jQuery", "keycloak", "estados" e
+"Backup" são assuntos, e subitem numerado da fonte também nunca é absorvido; (3) o ponto final sai
+(a chave já ignora pontuação). O validador só avisa (informativo): `topico_lista_nao_dividida`,
+`subtopico_faceta_solta` e `topico_frase_longa` (> `TAMANHO_FRASE_LONGA`). Depois de reconciliar,
+`scripts.migrar_chaves_cadeia` leva a chave do tópico que mudou e remove só a herança
+`regra` redundante da faceta; o que for humano ou de nó diferente fica e é relatado como órfão.
+
+ADRs: [ADR-025](../adr/ADR-025-reconciliacao-deterministica-severidade-alertas.md), [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_taxonomia_extractor.py::TestFormaDeListasEFacetas`, `tests/test_validar_taxonomia.py::TestAlertasDeForma`, `tests/test_migrar_chaves_cadeia.py`, `tests/test_reconciliar_taxonomia.py`
+
 ### prova
 
 #### P36

@@ -27,17 +27,27 @@ class Topico(BaseModel):
     ["Metodologias ágeis e experiência do usuário"]}`). Nenhum consumidor usa
     isso para chave: a chave do item é o texto próprio. Opcional e omitido do
     JSON quando vazio, então o JSON antigo carrega sem mudança.
+
+    Rastro da M8 (KAN-94), também opcional e omitido quando vazio: `nome_origem`
+    é o nome do tópico antes de a lista com ";" ser dividida e a cabeça antes do
+    ":" virar o nome (a chave do tópico mudou); `subtopicos_absorvidos` são as
+    facetas devolvidas ao pai. Servem só para `scripts.migrar_chaves_cadeia`
+    recalcular as chaves antigas dos mapeamentos; nenhum consumidor os usa como
+    identidade.
     """
 
     nome: str
     subtopicos: list[str] = []
     caminho_origem: dict[str, list[str]] | None = None
+    nome_origem: str | None = None
+    subtopicos_absorvidos: list[str] | None = None
 
     @model_serializer(mode="wrap")
-    def _omitir_caminho_vazio(self, handler):
+    def _omitir_campos_vazios(self, handler):
         dados = handler(self)
-        if not dados.get("caminho_origem"):
-            dados.pop("caminho_origem", None)
+        for campo in ("caminho_origem", "nome_origem", "subtopicos_absorvidos"):
+            if not dados.get(campo):
+                dados.pop(campo, None)
         return dados
 
 

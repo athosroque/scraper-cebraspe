@@ -291,7 +291,7 @@ class TestReparoNomeTopicoNumerico:
 
         assert resultado is not None
         assert motivo_falha is None
-        assert resultado.topicos[0].nome == "Conceito."
+        assert resultado.topicos[0].nome == "Conceito"
         assert mock_post.call_count == 1
 
     def test_numero_sem_correspondencia_na_fonte_retorna_none(self):
@@ -413,7 +413,7 @@ class TestReparoNomeTopicoNumerico:
         assert resultado is not None
         assert motivo_falha is None
         assert resultado.topicos[0].nome == "Direitos fundamentais"
-        assert resultado.topicos[1].nome == "Campo de aplicação."
+        assert resultado.topicos[1].nome == "Campo de aplicação"
         assert mock_post.call_count == 1
 
     def test_nome_com_espacos_ao_redor_de_digito_tambem_e_reparado(self):
@@ -427,7 +427,7 @@ class TestReparoNomeTopicoNumerico:
 
         assert resultado is not None
         assert motivo_falha is None
-        assert resultado.topicos[0].nome == "Conceito."
+        assert resultado.topicos[0].nome == "Conceito"
         assert mock_post.call_count == 1
 
     def test_nome_alfanumerico_nao_e_tratado_como_numerico(self):
@@ -1109,3 +1109,182 @@ class TestReparosDeForma:
         )
         assert te.reparar_materia_extraida(tax, "PROCESSO") is None
         assert tax.materia == "Ciclos de vida e Metodologias ágeis"
+
+
+class TestFormaDeListasEFacetas:
+    """Lista com ";" sem subtópico, facetas e ponto final (KAN-94, M8)."""
+
+    def _tax(self, *topicos):
+        return te.TaxonomiaEdital(materia="X", topicos=list(topicos))
+
+    def test_ponto_e_virgula_sem_subtopico_divide_e_preserva_o_pai(self):
+        tax = self._tax(te.Topico(nome="Cloud computing; virtualização."))
+        feito = te.normalizar_listas_e_facetas(tax)
+        topico = tax.topicos[0]
+        assert feito["listas"] == ["Cloud computing; virtualização."]
+        assert topico.nome == "Cloud computing; virtualização"
+        assert topico.subtopicos == ["Cloud computing", "virtualização"]
+        assert topico.nome_origem is None  # a chave do tópico não mudou
+
+    def test_cabeca_antes_dos_dois_pontos_vira_o_nome_e_guarda_a_origem(self):
+        original = "Tributos: conceito e espécies; impostos; taxas"
+        tax = self._tax(te.Topico(nome=original))
+        te.normalizar_listas_e_facetas(tax)
+        topico = tax.topicos[0]
+        assert topico.nome == "Tributos"
+        assert topico.subtopicos == ["conceito e espécies", "impostos", "taxas"]
+        assert topico.nome_origem == original
+
+    def test_ponto_e_virgula_com_subtopicos_nao_divide(self):
+        tax = self._tax(te.Topico(nome="A; B", subtopicos=["C"]))
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+        assert tax.topicos[0].subtopicos == ["C"]
+        assert tax.topicos[0].nome == "A; B"
+
+    def test_ponto_e_virgula_dentro_de_parenteses_nao_divide(self):
+        nome = "Resolução CNJ nº 335/2020 (institui política; integra os tribunais)"
+        tax = self._tax(te.Topico(nome=nome))
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+        assert tax.topicos[0].subtopicos == []
+
+    def test_parentese_desbalanceado_nao_divide(self):
+        tax = self._tax(te.Topico(nome="A (x; y"))
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+
+    def test_lista_com_virgula_e_e_nao_divide(self):
+        tax = self._tax(te.Topico(nome="Direitos, deveres e garantias"))
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+
+    def test_pedaco_de_continuacao_ou_repetido_nao_divide(self):
+        continuacao = self._tax(te.Topico(nome="Segurança; e outros assuntos"))
+        assert te.normalizar_listas_e_facetas(continuacao)["listas"] == []
+        repetido = self._tax(te.Topico(nome="Redes; redes"))
+        assert te.normalizar_listas_e_facetas(repetido)["listas"] == []
+
+    def test_cabeca_que_colide_com_outro_topico_do_chunk_fica_inteira(self):
+        tax = self._tax(te.Topico(nome="Tributos"), te.Topico(nome="Tributos: a; b"))
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[1].nome == "Tributos: a; b"
+        assert tax.topicos[1].subtopicos == ["Tributos: a", "b"]
+        assert tax.topicos[1].nome_origem is None
+
+    def test_ponto_final_sai_do_topico_e_do_subtopico_menos_abreviatura(self):
+        tax = self._tax(
+            te.Topico(nome="Poder Judiciário.", subtopicos=["Competências.", "etc."]),
+        )
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[0].nome == "Poder Judiciário"
+        assert tax.topicos[0].subtopicos == ["Competências", "etc."]
+
+    def test_ponto_final_mantem_a_chave(self):
+        from src.comparacao_texto import normalizar
+
+        assert normalizar("Cloud computing; virtualização.") == normalizar(
+            "Cloud computing; virtualização"
+        )
+
+    def test_bsc_devolve_todas_as_facetas_ao_pai(self):
+        subs = [
+            "principais conceitos",
+            "aplicações",
+            "mapa estratégico",
+            "perspectivas",
+            "indicadores",
+            "metas",
+        ]
+        tax = self._tax(te.Topico(nome="Balanced Scorecard (BSC)", subtopicos=subs))
+        feito = te.normalizar_listas_e_facetas(tax)
+        topico = tax.topicos[0]
+        assert feito["facetas"] == ["Balanced Scorecard (BSC)"]
+        assert topico.subtopicos == [] and topico.subtopicos_absorvidos == subs
+
+    def test_eco_do_nome_do_pai_devolve_as_palavras(self):
+        tax = self._tax(
+            te.Topico(
+                nome="Modelagem de dados: físico, lógico e conceitual",
+                subtopicos=["físico", "lógico", "conceitual"],
+            )
+        )
+        te.normalizar_listas_e_facetas(tax)
+        assert tax.topicos[0].subtopicos == []
+        assert tax.topicos[0].subtopicos_absorvidos == [
+            "físico",
+            "lógico",
+            "conceitual",
+        ]
+
+    def test_subtopico_legitimo_de_uma_palavra_e_preservado(self):
+        legitimos = [
+            te.Topico(nome="Frameworks", subtopicos=["jQuery", "Laravel", "keycloak"]),
+            te.Topico(nome="Backup", subtopicos=["Backup", "Cluster", "Docker"]),
+            te.Topico(
+                nome="Organização do Estado",
+                subtopicos=["União", "estados", "municípios"],
+            ),
+            te.Topico(
+                nome="Créditos adicionais",
+                subtopicos=["suplementares", "especiais", "extraordinários"],
+            ),
+            # Faceta genérica, mas pai sem sigla e menos de 3 facetas: só alerta.
+            te.Topico(nome="Poder constituinte", subtopicos=["conceito", "espécies"]),
+        ]
+        tax = self._tax(*legitimos)
+        antes = [list(t.subtopicos) for t in tax.topicos]
+        feito = te.normalizar_listas_e_facetas(tax)
+        assert feito["facetas"] == []
+        assert [t.subtopicos for t in tax.topicos] == antes
+
+    def test_subitem_numerado_da_fonte_nunca_e_absorvido(self):
+        fonte = (
+            "1 Balanced Scorecard (BSC). 1.1 aplicações. 1.2 metas. 1.3 indicadores."
+        )
+        tax = self._tax(
+            te.Topico(
+                nome="Balanced Scorecard (BSC)",
+                subtopicos=["aplicações", "metas", "indicadores"],
+            )
+        )
+        assert te.normalizar_listas_e_facetas(tax, fonte)["facetas"] == []
+        assert tax.topicos[0].subtopicos == ["aplicações", "metas", "indicadores"]
+
+    def test_idempotente_e_nao_redivide_o_que_devolveu_facetas(self):
+        tax = self._tax(
+            te.Topico(nome="Tributos: conceito; impostos"),
+            te.Topico(
+                nome="Modelagem: físico; lógico", subtopicos=["físico", "lógico"]
+            ),
+        )
+        te.normalizar_listas_e_facetas(tax)
+        primeiro = tax.model_dump()
+        assert primeiro["topicos"][1]["subtopicos_absorvidos"] == ["físico", "lógico"]
+        assert primeiro["topicos"][1]["subtopicos"] == []
+        assert not any(te.normalizar_listas_e_facetas(tax).values())
+        assert tax.model_dump() == primeiro
+
+    def test_json_antigo_carrega_e_campos_vazios_ficam_fora_do_dump(self):
+        tax = te.TaxonomiaEdital.model_validate(
+            {"materia": "X", "topicos": [{"nome": "A", "subtopicos": ["b"]}]}
+        )
+        assert tax.topicos[0].nome_origem is None
+        assert tax.model_dump()["topicos"][0] == {"nome": "A", "subtopicos": ["b"]}
+
+    def test_colisao_de_subtopicos_com_o_mesmo_nome_nao_divide(self):
+        tax = self._tax(te.Topico(nome="Redes: A; a"))
+        assert te.normalizar_listas_e_facetas(tax)["listas"] == []
+
+    def test_o_gancho_pos_llm_aplica_a_forma(self):
+        tax = self._tax(te.Topico(nome="Cloud computing; virtualização."))
+        resultado = te._pos_validacao_taxonomia("Cloud computing; virtualização.")(
+            tax, ""
+        )
+        assert resultado.objeto.topicos[0].subtopicos == [
+            "Cloud computing",
+            "virtualização",
+        ]
+        assert "reparo_forma_m8" in resultado.metadata
+
+    def test_prompt_diz_que_aspectos_de_um_conceito_nao_viram_subtopicos(self):
+        assert (
+            "não viram" in te.PROMPT_SISTEMA
+            and "Balanced Scorecard" in te.PROMPT_SISTEMA
+        )

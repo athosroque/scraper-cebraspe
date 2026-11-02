@@ -1,6 +1,7 @@
 """Aplica os reparos locais (item/subitem ausente, hífen de quebra de linha e
-matéria do LLM inutilizável e subtópico em cadeia "Pai - Filho" que volta a
-texto próprio, KAN-93; ADR-025) a extrações já salvas,
+matéria do LLM inutilizável, subtópico em cadeia "Pai - Filho" que volta a
+texto próprio, KAN-93, e forma de lista/faceta/pontuação, KAN-94; ADR-025) a
+extrações já salvas,
 sem chamar o LLM.
 
 `reinjetar_itens_ausentes` roda automaticamente dentro de
@@ -33,6 +34,7 @@ from src.models_scraper import TaxonomiaEdital
 from src.taxonomia_extractor import (
     corrigir_hifen_quebra_de_linha,
     migrar_cadeias_para_texto_proprio,
+    normalizar_listas_e_facetas,
     reinjetar_itens_ausentes,
     reinjetar_subitens_ausentes,
     reparar_materia_extraida,
@@ -80,6 +82,12 @@ def reconciliar(json_path: Path) -> dict[int, list[str]]:
         reinjetados += [
             f"cadeia:{n}" for n in migrar_cadeias_para_texto_proprio(taxonomia, texto)
         ]
+        # Forma (KAN-94, M8): lista com ";" sem subtópico, facetas soltas e
+        # ponto final. Por último, para ver os nomes já consertados.
+        forma = normalizar_listas_e_facetas(taxonomia, texto)
+        reinjetados += [f"lista:{n[:50]}" for n in forma["listas"]]
+        reinjetados += [f"faceta:{n[:50]}" for n in forma["facetas"]]
+        reinjetados += [f"pontuacao:{n[:50]}" for n in forma["pontuacao"]]
         motivo = reparar_materia_extraida(
             taxonomia, item.get("materia_normalizada") or item.get("materia_chunk")
         )

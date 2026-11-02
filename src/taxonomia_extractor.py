@@ -16,11 +16,18 @@ from langfuse import Langfuse
 
 from src import llm_openrouter
 from src.comparacao_texto import (
+    PADRAO_SIGLA_ENTRE_PARENTESES,
     PADRAO_SUBITEM,
+    cabeca_e_resto,
     contido,
     divergencia_leve,
+    eh_faceta_generica,
+    eh_fragmento_de_uma_palavra,
     item_coberto,
     normalizar,
+    parte_de_lista_valida,
+    partes_por_ponto_e_virgula,
+    sem_pontuacao_final,
 )
 from src.edital_parser import (
     extrair_itens_numerados,
@@ -102,6 +109,12 @@ Regras:
 - Todo item numerado de primeiro nível vira exatamente um tópico, inclusive
   itens curtos que são só uma norma ou sigla (ex.: "IN Ibama 05/2021",
   "Lei nº 8.112/1990") — nunca pule um item.
+- Aspectos de um mesmo conceito (ex.: Balanced Scorecard (BSC) – conceitos,
+  aplicações, mapa estratégico, perspectivas, indicadores, metas) não viram
+  subtópicos: mantenha o conceito como tópico e não liste os aspectos.
+- Um item que é uma lista separada por ";" vira um tópico com um subtópico por
+  elemento da lista (sem o ";" nem o ponto final); nunca devolva a lista inteira
+  como nome de um tópico sem subtópicos.
 - Não acrescente qualificadores ao "nome" que não estejam no texto; se o
   edital repete o mesmo item, repita o tópico com o mesmo nome.
 - Não invente conteúdo que não está no texto.
@@ -617,6 +630,120 @@ def corrigir_hifen_quebra_de_linha(
     return corrigidos
 
 
+# --- Forma das listas e facetas (KAN-94, M8) ---------------------------------
+
+
+def _absorver_facetas_no_pai(topico: Topico, proprios_da_fonte: set[str]) -> list[str]:
+    """Devolve ao pai, in-place, subtópicos que são aspecto do próprio pai e não
+    assunto de estudo. Só duas situações, ambas determinísticas e raras:
+
+    - eco: TODOS os subtópicos são uma palavra minúscula que já está no nome do
+      pai ("Modelagem de dados: físico, lógico e conceitual" -> físico/lógico/
+      conceitual);
+    - conceito único: o nome do pai tem sigla entre parênteses ("Balanced
+      Scorecard (BSC)") e pelo menos 3 subtópicos são faceta genérica
+      (`FACETAS_GENERICAS`, ou "principais conceitos"); então todos os
+      subtópicos são aspectos do mesmo conceito.
+
+    Subitem numerado da fonte nunca é absorvido (a cobertura o exige). Uma
+    palavra minúscula solta fora desses casos (jQuery, keycloak, estados) fica:
+    o validador só avisa. Devolve os subtópicos absorvidos (vazio se nada)."""
+    subs = [s for s in topico.subtopicos if s]
+    if len(subs) < 2 or any(normalizar(s) in proprios_da_fonte for s in subs):
+        return []
+    palavras_do_pai = set(normalizar(topico.nome).split())
+    eco = all(
+        eh_fragmento_de_uma_palavra(s) and normalizar(s) in palavras_do_pai
+        for s in subs
+    )
+    facetas = sum(
+        1
+        for s in subs
+        if eh_faceta_generica(s) or normalizar(s) == "principais conceitos"
+    )
+    conceito_unico = bool(PADRAO_SIGLA_ENTRE_PARENTESES.search(topico.nome)) and (
+        facetas >= 3
+    )
+    if not (eco or conceito_unico):
+        return []
+    topico.subtopicos_absorvidos = [*(topico.subtopicos_absorvidos or []), *subs]
+    topico.subtopicos = []
+    topico.caminho_origem = None
+    return subs
+
+
+def _dividir_lista_com_ponto_e_virgula(
+    taxonomia: TaxonomiaEdital, topico: Topico
+) -> bool:
+    """Quebra, in-place, o tópico que é uma lista com ";" e não tem subtópico:
+    cada elemento vira subtópico (sem ponto final). Se o primeiro elemento é
+    "Cabeça: resto" (como o LLM já faz nos chunks que acertam), a cabeça vira o
+    nome do tópico e `resto` o primeiro subtópico; senão o nome fica inteiro.
+    Não divide: ";" só dentro de parênteses, elemento sem sentido isolado (abre
+    com "e"/"ou"/"com"...), elementos repetidos, tópico que acabou de devolver
+    facetas ao pai, ou cabeça que colidiria com outro tópico do chunk."""
+    if topico.subtopicos or topico.subtopicos_absorvidos:
+        return False
+    partes = [sem_pontuacao_final(p) for p in partes_por_ponto_e_virgula(topico.nome)]
+    if len(partes) < 2 or not all(parte_de_lista_valida(p) for p in partes):
+        return False
+    nome = sem_pontuacao_final(topico.nome)
+    primeira = cabeca_e_resto(partes[0])
+    if primeira:
+        outros = {normalizar(t.nome) for t in taxonomia.topicos if t is not topico}
+        if normalizar(primeira[0]) in outros:
+            primeira = None
+    subs = [primeira[1] if primeira else partes[0], *partes[1:]]
+    if len({normalizar(x) for x in subs}) != len(subs):
+        return False
+    if primeira:
+        nome = primeira[0]
+        if normalizar(nome) != normalizar(topico.nome):
+            topico.nome_origem = topico.nome_origem or topico.nome
+    topico.nome = nome
+    topico.subtopicos = subs
+    return True
+
+
+def normalizar_listas_e_facetas(
+    taxonomia: TaxonomiaEdital, chunk_text: str = ""
+) -> dict[str, list[str]]:
+    """Pós-processamento determinístico da forma (KAN-94, M8), in-place e sem LLM:
+
+    1. facetas devolvidas ao pai (`_absorver_facetas_no_pai`);
+    2. tópico-lista com ";" e sem subtópico vira tópico + subtópicos;
+    3. pontuação final tirada de tópicos e subtópicos (a chave não muda).
+
+    Idempotente. O que muda a chave de um item fica em `Topico.nome_origem` e
+    `Topico.subtopicos_absorvidos`, para `scripts.migrar_chaves_cadeia` levar os
+    mapeamentos. Retorna `{"facetas": [...], "listas": [...], "pontuacao": [...]}`
+    com o nome (original) de cada tópico/subtópico tocado."""
+    proprios = {
+        normalizar(p)
+        for _, p in extrair_subitens_numerados(remover_assinatura_final(chunk_text))
+    }
+    feito: dict[str, list[str]] = {"facetas": [], "listas": [], "pontuacao": []}
+    for topico in taxonomia.topicos:
+        if _absorver_facetas_no_pai(topico, proprios):
+            feito["facetas"].append(topico.nome)
+        original = topico.nome
+        if _dividir_lista_com_ponto_e_virgula(taxonomia, topico):
+            feito["listas"].append(original)
+    for topico in taxonomia.topicos:
+        limpo = sem_pontuacao_final(topico.nome)
+        if limpo != topico.nome:
+            feito["pontuacao"].append(topico.nome)
+            topico.nome = limpo
+        for idx, sub in enumerate(topico.subtopicos):
+            limpo_sub = sem_pontuacao_final(sub) if sub else sub
+            if limpo_sub != sub:
+                feito["pontuacao"].append(sub)
+                topico.subtopicos[idx] = limpo_sub
+                if topico.caminho_origem and sub in topico.caminho_origem:
+                    topico.caminho_origem[limpo_sub] = topico.caminho_origem.pop(sub)
+    return feito
+
+
 def _pos_validacao_taxonomia(chunk_text: str, materia_chunk: str | None = None):
     """Gancho semântico do núcleo `chamar_llm_json`: reparo de nome numérico
     (ADR-021) e reinjeção de item omitido (ADR-025), sem nova chamada ao LLM.
@@ -668,6 +795,9 @@ def _pos_validacao_taxonomia(chunk_text: str, materia_chunk: str | None = None):
         hifens = corrigir_hifen_quebra_de_linha(taxonomia, chunk_text)
         if hifens:
             metadata["reparo_hifen_quebra_linha"] = {"nomes": hifens}
+        forma = normalizar_listas_e_facetas(taxonomia, chunk_text)
+        if any(forma.values()):
+            metadata["reparo_forma_m8"] = {k: v for k, v in forma.items() if v}
         motivo_materia = reparar_materia_extraida(taxonomia, materia_chunk)
         if motivo_materia:
             logger.warning(

@@ -285,7 +285,12 @@ class TestSeveridadeDivergenciaLeve:
             ]
         )
         alertas = comparar_chunk(chunk, resultado)
-        assert [a["tipo"] for a in alertas] == ["topico_divergencia_leve"]
+        # Os dois nomes são listas com ";" sem subtópicos: o alerta de forma
+        # (KAN-94) vem junto, e também é informativo.
+        assert [
+            a["tipo"] for a in alertas if a["tipo"] != "topico_lista_nao_dividida"
+        ] == ["topico_divergencia_leve"]
+        assert {severidade(a) for a in alertas} == {"informativo"}
 
     def test_nome_parecido_mas_diferente_continua_extra(self):
         chunk = self._chunk("1 Gestão de pessoas. 2 Gamificação.")
@@ -665,3 +670,63 @@ class TestSubtopicoEmTextoProprio:
         assert [
             a["numero_item"] for a in alertas if a["tipo"] == "subitem_ausente"
         ] == ["1.1.2"]
+
+
+class TestAlertasDeForma:
+    """Lista com ";", faceta solta e frase longa são informativos (KAN-94, M8)."""
+
+    def _alertas(self, topicos, fonte=""):
+        alertas = comparar_chunk(
+            {"chunk_index": 0, "texto_enviado_llm": fonte},
+            {"taxonomia_extraida": {"materia": "X", "topicos": topicos}},
+        )
+        return [
+            a
+            for a in alertas
+            if a["tipo"]
+            in (
+                "topico_lista_nao_dividida",
+                "subtopico_faceta_solta",
+                "topico_frase_longa",
+            )
+        ]
+
+    def test_lista_com_ponto_e_virgula_sem_subtopico(self):
+        (alerta,) = self._alertas([{"nome": "Cloud; virtualização", "subtopicos": []}])
+        assert alerta["tipo"] == "topico_lista_nao_dividida"
+        assert severidade(alerta) == "informativo"
+
+    def test_ponto_e_virgula_em_parenteses_ou_com_subtopicos_nao_acusa(self):
+        assert self._alertas([{"nome": "Res. (a; b)", "subtopicos": []}]) == []
+        assert self._alertas([{"nome": "A; B", "subtopicos": ["C"]}]) == []
+
+    def test_faceta_solta_so_para_palavra_da_lista_fechada(self):
+        alertas = self._alertas(
+            [{"nome": "Poder", "subtopicos": ["conceito", "jQuery", "Backup"]}]
+        )
+        assert [(a["tipo"], a["texto_item_origem"]) for a in alertas] == [
+            ("subtopico_faceta_solta", "conceito")
+        ]
+
+    def test_frase_longa_acima_do_limite(self):
+        assert self._alertas([{"nome": "a" * 150, "subtopicos": []}]) == []
+        (alerta,) = self._alertas([{"nome": "a" * 151, "subtopicos": []}])
+        assert alerta["tipo"] == "topico_frase_longa"
+
+    def test_alerta_de_forma_nao_conta_em_total_alertas(self):
+        resultado = {
+            "edital": "x.pdf",
+            "resultados": [
+                {
+                    "chunk_index": 0,
+                    "taxonomia_extraida": {
+                        "materia": "X",
+                        "topicos": [{"nome": "Cloud; virtualização", "subtopicos": []}],
+                    },
+                }
+            ],
+        }
+        auditoria = {"chunks": [{"chunk_index": 0, "texto_enviado_llm": "sem número"}]}
+        validacao = validar_edital(resultado, auditoria)
+        assert validacao["total_alertas"] == 0
+        assert validacao["total_informativos"] == 1
