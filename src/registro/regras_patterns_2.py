@@ -501,7 +501,8 @@ rejeitado nunca é devolvido nem reproposto, e a memória não muda status exist
 passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
 equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia (nome,
 memória, filho único, herança de folha, pai provisório pelo cargo ou casamento global), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
-antes de `gerar_relatorios` e `gerar_db` (KAN-81).""",
+antes de `gerar_relatorios` e `gerar_db` (KAN-81). Seções, sugestão e agrupamento por cima disso são
+só apresentação (P79).""",
         adrs=("ADR-030",),
         testes=(
             "tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais",
@@ -590,6 +591,31 @@ o dono, que podem apontar até dois nós (a árvore é N:N). Lote novo roda K22 
             "tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai",
             "tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global",
             "tests/test_regra_arvore.py::test_economia_nao_casa_com_atualidades",
+        ),
+    ),
+    Regra(
+        id="P79",
+        tipo="pattern",
+        area="arvore",
+        texto="""A revisão do mapeamento é guiada por seções e sugestão, e **só apresenta** (KAN-89, M10):
+`mapeamento_revisao.montar_revisao` agrupa os pendentes do passo (P74) em decisão de bloco (título sem
+nó, com quantos itens destrava), com sugestão (score ≥ `LIMIAR_SUGESTAO`), realmente novo, travado pelo
+pai (pai sem nó e sem disciplina inferida pelo cargo, M4) e herda do tópico (subitem sob nó-folha).
+A sugestão é o top-3 por similaridade de palavras (IDF, sem LLM), restrito à subárvore do pai ou da
+disciplina provisória; nó de outra disciplina só entra com o mesmo `chave_regra` ou sendo a mesma norma
+(`nos_da_mesma_norma`); título genérico não recebe sugestão. Mesmo item em blocos ou cargos
+diferentes vira um grupo (uma linha, lista de cargos). Cada sugestão traz a linha
+`curar_arvore --mapear` para o dono copiar: o relatório e o `revisao.db` nunca aprovam nem
+gravam (A27, A30), e a sugestão não decide equivalência, que continua só do passo. O Datasette
+ganha as colunas `bloco`, `secao`, `sugestao_*`, `score`, `cargos`, `grupo`, `representante`,
+`curar_arvore`, as visões `revisao_*` e `revisao_piloto/datasette/metadata.json` (consultas salvas,
+fora do glob `*.json` dos editais).""",
+        adrs=("ADR-030",),
+        testes=(
+            "tests/test_revisao_guiada.py::test_apresentacao_nao_muda_categoria_nem_pendentes_nem_arvore",
+            "tests/test_revisao_guiada.py::test_nome_parecido_de_outra_disciplina_nao_atravessa",
+            "tests/test_revisao_guiada.py::test_mesmo_item_em_dois_blocos_vira_um_grupo_com_os_dois_cargos",
+            "tests/test_revisao_guiada.py::test_gerar_db_acrescenta_colunas_visoes_e_metadata",
         ),
     ),
 )
