@@ -582,3 +582,292 @@ def test_disciplina_provisoria_vira_o_grupo_do_pendente_sem_pai_mapeado():
     sem_no.disciplina_provisoria = None
     assert mapeamento_llm.disciplinas_do_pendente(arv, sem_no)[0] == frozenset()
     assert "outro" not in arv.mapeamentos
+
+
+# KAN-91 (M9): candidatos por subitens e globais, subassunto como alvo, até 3 nós ----------
+
+
+def _arvore_m9(tmp_path):
+    """TI com subassunto "Sistemas operacionais"; Direito Administrativo com contratos;
+    Legislação específica com a LGPD."""
+    arv = arvore.ArvoreMestre()
+    for i, nome in [
+        ("M-TI", "Tecnologia da Informação"),
+        ("M-DA", "Direito Administrativo"),
+        ("M-LEG", "Legislação Específica"),
+    ]:
+        arvore.criar_no(arv, "materia", nome, None, id_override=i)
+    for i, nome, pai in [
+        ("A-INFRA", "Infraestrutura de TI", "M-TI"),
+        ("A-REDES", "Redes de computadores", "M-TI"),
+        ("A-CONT", "Contratos administrativos", "M-DA"),
+        ("A-LEG", "Normas de proteção", "M-LEG"),
+    ]:
+        arvore.criar_no(arv, "assunto", nome, pai, id_override=i)
+    for i, nome, pai in [
+        ("S-SO", "Sistemas operacionais", "A-INFRA"),
+        ("S-BAL", "Balanceamento de carga entre servidores", "A-INFRA"),
+        ("S-FISC", "Fiscalização de contratos", "A-CONT"),
+        ("S-LGPD", "Lei Geral de Proteção de Dados – LGPD", "A-LEG"),
+        ("S-GEN", "Conceitos básicos", "A-CONT"),
+        ("S-RED", "Redes locais", "A-REDES"),
+    ]:
+        arvore.criar_no(arv, "subassunto", nome, pai, id_override=i)
+    caminho = tmp_path / "arvore.json"
+    arvore.salvar(arv, caminho)
+    return arv, caminho
+
+
+def _pendente(nome, nivel="assunto", subitens=(), prov=None, pais=(), contexto=()):
+    return mapeamento_llm.Pendente(
+        chave=f"bloco|{nome.lower()}" if nivel != "materia" else nome.lower(),
+        nivel=nivel,
+        nome=nome,
+        pais=list(pais),
+        contexto=list(contexto),
+        concursos={"TESTE_25"},
+        materia_chave="bloco",
+        subitens=list(subitens),
+        disciplina_provisoria=prov,
+    )
+
+
+@pytest.fixture
+def m9(tmp_path, monkeypatch):
+    arv, caminho = _arvore_m9(tmp_path)
+    pendentes: list = []
+    monkeypatch.setattr(
+        mapeamento_llm.canonico, "coletar_nomes", lambda _d: canonico.NomesOrigem()
+    )
+    monkeypatch.setattr(mapeamento_llm, "levantar_pendentes", lambda *a, **k: pendentes)
+    monkeypatch.setattr(mapeamento_llm, "coletar_filhos", lambda _d: {})
+    return tmp_path, caminho, arv, pendentes
+
+
+def _rodar_m9(m9, monkeypatch, respostas, **kw):
+    revisao, caminho, _, _ = m9
+    falso = LLMFalso(respostas)
+    monkeypatch.setattr(mapeamento_llm, "chamar_llm_json", falso)
+    conta = mapeamento_llm.mapear_itens_novos(revisao, caminho, **kw)
+    return conta, falso, arvore.carregar(caminho)
+
+
+def _nos_do_item(prompt, numero_item, nomes):
+    return [
+        {
+            "numero": numero_item,
+            "nos": [_local(prompt, n) for n in nomes],
+            "nenhum": False,
+            "confianca": "media",
+            "justificativa": "teste",
+        }
+    ]
+
+
+def test_ranking_do_titulo_inclui_no_pelos_subitens(m9):
+    _, _, arv, _ = m9
+    indice = mapeamento_llm.IndiceNos(arv)
+    so_titulo = _pendente("CONCEITOS GERAIS", "materia")
+    com_subitens = _pendente(
+        "CONCEITOS GERAIS", "materia", subitens=["Balanceamento de carga", "Proxy"]
+    )
+    sem = mapeamento_llm.selecionar_lote(
+        arv, indice, [so_titulo], frozenset(), "materia"
+    )
+    com = mapeamento_llm.selecionar_lote(
+        arv, indice, [com_subitens], frozenset(), "materia"
+    )
+    assert "S-BAL" not in sem[so_titulo.chave]
+    assert "S-BAL" in com[com_subitens.chave]
+    # A lista continua fechada: só nós ativos, e as disciplinas seguem oferecidas.
+    assert {"M-TI", "M-DA", "M-LEG"} <= com[com_subitens.chave]
+    assert all(arv.nos[i].status == "ativo" for i in com[com_subitens.chave])
+
+
+def test_subassunto_e_alvo_valido_de_titulo_e_nunca_vira_aprovado(m9, monkeypatch):
+    _, _, _, pendentes = m9
+    assert "subassunto" in mapeamento_llm.NIVEIS_ALVO["materia"]
+    pendentes.append(
+        _pendente("SISTEMAS OPERACIONAIS", "materia", ["Windows", "Linux"], "M-TI")
+    )
+
+    def respostas(prompt, _n):
+        return _nos_do_item(prompt, 1, ["Sistemas operacionais"])
+
+    conta, falso, arv2 = _rodar_m9(m9, monkeypatch, respostas)
+    assert conta.propostos == 1
+    (mapa,) = arv2.mapeamentos["sistemas operacionais"]
+    assert (mapa.no_id, mapa.origem, mapa.status) == ("S-SO", "llm", "proposto")
+    # O alvo do título é a disciplina provisória (M4): é ela que o modelo vê.
+    lista = falso.chamadas[0]["prompt"].split("CANDIDATOS:")[1]
+    assert "[N1] Tecnologia da Informação (disciplina)" in lista
+
+
+def test_disciplina_provisoria_vai_para_o_topo_da_lista(m9):
+    _, _, arv, _ = m9
+    todos = {"M-DA", "M-LEG", "M-TI", "S-SO", "S-FISC"}
+    sem, _ = mapeamento_llm.formatar_candidatos(arv, todos)
+    com, _ = mapeamento_llm.formatar_candidatos(arv, todos, frozenset({"M-TI"}))
+    assert sem.index("Direito Administrativo") < sem.index("Tecnologia da Informação")
+    assert com.startswith("[N1] Tecnologia da Informação")
+
+
+def test_candidatos_globais_somados_sem_quebrar_a_lista_fechada(m9, monkeypatch):
+    _, caminho, arv, pendentes = m9
+    item = _pendente(
+        "Fiscalização de contratos", "subassunto", pais=["bloco"], contexto=["BLOCO"]
+    )
+    pendentes.append(item)
+    arvore.mapear(arv, "bloco", ["A-INFRA"], "humano", "aprovado")
+    arvore.salvar(arv, caminho)
+    indice = mapeamento_llm.IndiceNos(arv)
+    sel = mapeamento_llm.selecionar_lote(
+        arv, indice, [item], frozenset({"M-TI"}), "subassunto"
+    )[item.chave]
+    # Nó do contrato (outra disciplina) soma-se aos de TI; o genérico fica de fora.
+    assert {"S-SO", "S-BAL", "S-FISC"} <= sel
+    assert "S-GEN" not in sel
+    # Com equivalente na própria disciplina, o de fora não é oferecido (D3).
+    arvore.criar_no(
+        arv,
+        "subassunto",
+        "Fiscalização de contratos",
+        "A-INFRA",
+        id_override="S-FISCTI",
+    )
+    indice = mapeamento_llm.IndiceNos(arv)
+    sel2 = mapeamento_llm.selecionar_lote(
+        arv, indice, [item], frozenset({"M-TI"}), "subassunto"
+    )[item.chave]
+    assert "S-FISCTI" in sel2 and "S-FISC" not in sel2
+
+    # ID fora da lista fechada é recusado e nada é gravado.
+    def invente(_prompt, _n):
+        return [
+            {
+                "numero": 1,
+                "no": "N999",
+                "nenhum": False,
+                "confianca": "alta",
+                "justificativa": "fora da lista",
+            }
+        ]
+
+    conta, _, arv3 = _rodar_m9(m9, monkeypatch, invente)
+    assert conta.propostos == 0 and item.chave not in arv3.mapeamentos
+
+
+def test_ate_3_nos_em_item_composto_e_o_4_e_recusado(m9, monkeypatch):
+    _, caminho, arv, pendentes = m9
+    item = _pendente(
+        "Sistemas operacionais, balanceamento e fiscalização de contratos",
+        "subassunto",
+        pais=["bloco"],
+        contexto=["BLOCO"],
+    )
+    pendentes.append(item)
+    arvore.mapear(arv, "bloco", ["A-INFRA"], "humano", "aprovado")
+    arvore.salvar(arv, caminho)
+    tres = [
+        "Sistemas operacionais",
+        "Balanceamento de carga entre servidores",
+        "Fiscalização de contratos",
+    ]
+    conta, _, arv2 = _rodar_m9(m9, monkeypatch, lambda p, _n: _nos_do_item(p, 1, tres))
+    assert conta.propostos == 1 and conta.propostos_multiplos == 1
+    mapas = arv2.mapeamentos[item.chave]
+    assert {m.no_id for m in mapas} == {"S-SO", "S-BAL", "S-FISC"}
+    assert all((m.origem, m.status) == ("llm", "proposto") for m in mapas)
+
+    # 4º nó: a validação recusa a resposta inteira (nas duas tentativas) e nada é gravado.
+    arv2.mapeamentos.pop(item.chave)
+    arvore.salvar(arv2, caminho)
+    (caminho.parent / mapeamento_llm.CACHE_NOME).unlink(missing_ok=True)
+    quatro = [*tres, "Redes locais"]
+    conta, _, arv3 = _rodar_m9(
+        m9, monkeypatch, lambda p, _n: _nos_do_item(p, 1, quatro)
+    )
+    assert conta.propostos == 0 and conta.lotes_falhos == 1
+    assert conta.falhas[mapeamento_llm.STATUS_FALHA_VALIDACAO_SCHEMA] == 2
+    assert item.chave not in arv3.mapeamentos
+
+
+def test_validacao_de_nos_multiplos():
+    arv = arvore.ArvoreMestre()
+    arvore.criar_no(arv, "materia", "Disc", None, id_override="M")
+    arvore.criar_no(arv, "assunto", "Pai", "M", id_override="A")
+    arvore.criar_no(arv, "subassunto", "Filho", "A", id_override="S")
+    arvore.criar_no(arv, "subassunto", "Outro", "A", id_override="S2")
+    locais = {"N1": "A", "N2": "S", "N3": "S2"}
+
+    def resposta(**campos):
+        base = {"numero": 1, "nenhum": False, "confianca": "alta", "justificativa": ""}
+        return mapeamento_llm.RespostaMapeamento.model_validate(
+            {"itens": [{**base, **campos}]}
+        )
+
+    validar = mapeamento_llm.pos_validacao_mapeamento(locais, [1], None, arv)
+    assert validar(resposta(nos=["N2", "N3"]), "").motivo is None
+    assert validar(resposta(no="N2", nos=["N2", "N3"]), "").motivo is None
+    # Um nó e o descendente dele são o mesmo conceito em dois níveis: recusado.
+    assert validar(resposta(nos=["N1", "N2"]), "").motivo == (
+        mapeamento_llm.STATUS_FALHA_VALIDACAO_SCHEMA
+    )
+    assert validar(resposta(nos=["N2", "N9"]), "").motivo == (
+        mapeamento_llm.STATUS_FALHA_ID_DESCONHECIDO
+    )
+    assert validar(resposta(nos=["N2"], nenhum=True), "").motivo is not None
+
+
+def test_prompt_ensina_heranca_e_varios_nos():
+    sistema = mapeamento_llm.PROMPT_SISTEMA
+    assert "HERANÇA" in sistema
+    assert "aponta para o nó do TÓPICO" in sistema
+    assert "até 3 nós" in sistema and '"nos"' in sistema
+
+
+def test_no_de_assunto_do_pai_entra_para_o_subtopico(m9):
+    _, _, arv, _ = m9
+    item = _pendente("Divisão", "subassunto", pais=["bloco"], contexto=["BLOCO"])
+    indice = mapeamento_llm.IndiceNos(arv)
+    disc = frozenset({"M-TI"})
+    sem = mapeamento_llm.selecionar_lote(arv, indice, [item], disc, "subassunto")
+    com = mapeamento_llm.selecionar_lote(
+        arv, indice, [item], disc, "subassunto", {item.chave: ["A-INFRA"]}
+    )
+    assert "A-INFRA" not in sem[item.chave]  # nível assunto não é alvo de subtópico
+    assert "A-INFRA" in com[item.chave]  # mas é o nó do tópico-pai (herança)
+
+
+def test_cache_do_nenhum_invalida_com_a_disciplina_provisoria(m9, monkeypatch):
+    _, _, _, pendentes = m9
+    item = _pendente("Algo inédito", "assunto", prov="M-TI")
+    pendentes.append(item)
+
+    def nenhum(p, _n):
+        return _itens_por_nome(p, {})
+
+    _, f1, _ = _rodar_m9(m9, monkeypatch, nenhum)
+    assert f1.chamadas
+    _, f2, _ = _rodar_m9(m9, monkeypatch, nenhum)
+    assert f2.chamadas == []  # nada mudou: o "nenhum" fica em cache
+    item.disciplina_provisoria = "M-DA"  # o cargo passou a inferir outra disciplina
+    _, f3, _ = _rodar_m9(m9, monkeypatch, nenhum)
+    assert len(f3.chamadas) == 1
+
+
+def test_hash_leva_a_assinatura_do_desenho():
+    base = mapeamento_llm.hash_candidatos("k", {"A"})
+    assert base == mapeamento_llm.hash_candidatos("k", {"A"}, "", "")
+    ti = mapeamento_llm._assinatura(frozenset({"M-TI"}))
+    da = mapeamento_llm._assinatura(frozenset({"M-DA"}))
+    assert mapeamento_llm.DESENHO in ti
+    assert base != mapeamento_llm.hash_candidatos("k", {"A"}, "", ti)
+    assert mapeamento_llm.hash_candidatos(
+        "k", {"A"}, "", ti
+    ) != mapeamento_llm.hash_candidatos("k", {"A"}, "", da)
+
+
+def test_reasoning_padrao_inalterado():
+    assert llm_openrouter.REASONING_PADRAO == {"reasoning": {"max_tokens": 3000}}
+    assert mapeamento_llm.REASONING_PADRAO is llm_openrouter.REASONING_PADRAO

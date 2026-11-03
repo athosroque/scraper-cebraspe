@@ -782,7 +782,7 @@ provisório (P52, KAN-86), com candidato único na subárvore, sem veto e fora d
 genéricos, e sem apelido de nó fundido; (4) herança de folha, só para subtópico: aponta para o nó único do
 tópico-pai se ele é subassunto ativo sem filhos, salvo título genérico ou par vetado
 (KAN-85, `regra`/`aprovado`); (5) casamento global por nome (KAN-87, P77); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
-reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
+reexecuta o passo determinístico, P80) recebe contexto de subitens extraído do `<edital>.json`
 (entra no hash do cache), exemplos aprovados do dono e os pares rejeitados. Proposta
 `proposto` nunca é fonte da memória (só vira fonte depois que o dono a aprova), par
 rejeitado nunca é devolvido nem reproposto, e a memória não muda status existente (A30).
@@ -821,11 +821,34 @@ dentro da disciplina; (4) título genérico nunca casa (`TITULOS_GENERICOS`, lis
 M5, M14 e M6); (5) par vetado pelo dono não casa; (6) apelido de nó fundido entra como candidato,
 exceto com pai provisório (P52); (7) nunca cria nó nem disciplina (D5, P72). Item composto ("A e B")
 não é dividido aqui: se a `chave_regra` do nome inteiro não é a de um nó, o item fica para o LLM ou
-o dono, que podem apontar até dois nós (a árvore é N:N). Lote novo roda K22 a K24 antes e depois (P71).
+o dono, que podem apontar até 3 nós (a árvore é N:N, P80). Lote novo roda K22 a K24 antes e depois (P71).
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
 Teste guarda: `tests/test_regra_arvore.py::test_contratos_de_ti_casam_em_direito_administrativo`, `tests/test_regra_arvore.py::test_lgpd_casa_global_por_norma`, `tests/test_regra_arvore.py::test_nome_curto_nao_atravessa_disciplina`, `tests/test_regra_arvore.py::test_generico_nunca_casa_global`, `tests/test_regra_arvore.py::test_candidato_duplicado_nao_casa`, `tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai`, `tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global`, `tests/test_regra_arvore.py::test_economia_nao_casa_com_atualidades`
+
+#### P80
+
+**Desenho do LLM de mapeamento** (`src/mapeamento_llm.py`, KAN-91, M9), sobre o resto que o passo
+determinístico (P73, P77) não resolveu. Candidatos, sempre uma **lista fechada** de nós ativos:
+(1) os nós da disciplina do pai, ou da inferida pelo cargo (P52, M4), que vem primeiro no prompt;
+no título de bloco, as disciplinas, os assuntos dela e os subassuntos mais parecidos com o título e
+os subitens; (2) a eles somam-se, por item, os até 4 melhores nós de **outras** disciplinas por
+similaridade (palavras da `chave_regra`, peso idf, cobertura mínima do nome do nó), sem título
+genérico (M6) e sem repetir conceito que a disciplina já tem (um conceito, um nó; D3); sem
+disciplina, o ranking usa o nome, os subitens e os pais. **Alvo de título:** o título de bloco aceita
+também subassunto (o nó natural de "Sistemas operacionais" é subassunto), sempre `proposto`, e
+continua sem poder criar disciplina nem aprovar (P72, A30); o subtópico recebe também o nó de
+assunto do tópico-pai como candidato, para a herança "sem nó mais específico, o subtópico aponta
+para o nó do tópico" (M5, ensinada no prompt). **Até 3 nós** por item composto (`nos`; `no` único
+continua aceito): o 4º, um nó e o descendente dele ou ID fora da lista recusam a resposta inteira
+(`falha_validacao_schema`), e a gravação passa por `arvore.mapear` como `llm`/`proposto`. O hash do
+cache do "nenhum" inclui o desenho (`DESENHO`) e a disciplina provisória quando é ela que restringe,
+então mudar candidatos ou prompt reavalia o item. `REASONING_PADRAO` (P16) não muda.
+
+ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
+
+Teste guarda: `tests/test_mapeamento_llm.py::test_ranking_do_titulo_inclui_no_pelos_subitens`, `tests/test_mapeamento_llm.py::test_subassunto_e_alvo_valido_de_titulo_e_nunca_vira_aprovado`, `tests/test_mapeamento_llm.py::test_candidatos_globais_somados_sem_quebrar_a_lista_fechada`, `tests/test_mapeamento_llm.py::test_ate_3_nos_em_item_composto_e_o_4_e_recusado`, `tests/test_mapeamento_llm.py::test_validacao_de_nos_multiplos`, `tests/test_mapeamento_llm.py::test_prompt_ensina_heranca_e_varios_nos`, `tests/test_mapeamento_llm.py::test_cache_do_nenhum_invalida_com_a_disciplina_provisoria`, `tests/test_mapeamento_llm.py::test_reasoning_padrao_inalterado`
 
 ### classificacao
 

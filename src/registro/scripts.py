@@ -164,8 +164,9 @@ SCRIPTS: tuple[Script, ...] = (
     Script(
         "scripts.mapear_itens_novos",
         "Mapeia item novo de edital: primeiro pela memória das decisões do dono (sem "
-        "LLM, P73), depois pelo LLM sobre lista fechada, com contexto de subitens. O "
-        "LLM grava só proposto. Custa tokens.",
+        "LLM, P73), depois pelo LLM sobre lista fechada (disciplina do item mais "
+        "candidatos globais, até 3 nós por item composto, P80), com contexto de "
+        "subitens. O LLM grava só proposto. Custa tokens.",
         "curadoria",
         "argparse",
         adrs=("ADR-030", "ADR-032"),

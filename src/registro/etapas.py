@@ -232,7 +232,8 @@ ETAPAS: tuple[Etapa, ...] = (
             "Aprovação sempre humana. O mapeamento de item novo de edital "
             "(mapear_itens_novos, runbook §4.6b) é o 1º passo: depois da extração do "
             "edital (P3) e da regra `mapear_novos_itens_por_regra`, antes da revisão do "
-            "dono. A memória das decisões do dono (P73) resolve antes, sem LLM. O modelo escolhe só entre nós ativos da disciplina do item, grava "
+            "dono. A memória das decisões do dono (P73) resolve antes, sem LLM. O modelo escolhe só entre nós ativos da lista fechada (disciplina do item mais os melhores "
+            "de outras disciplinas, até 3 nós por item composto, P80), grava "
             "`proposto/llm`, nunca cria nó nem disciplina (P72) nem aprova (A30). Rode o "
             "--dry-run e as checagens K22–K24 (P71) antes e depois."
         ),
