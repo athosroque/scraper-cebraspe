@@ -211,7 +211,8 @@ compatível na **subárvore** da disciplina) entra como `regra`/`aprovado` com a
 `canonico.no_do_pai_provisorio`: candidato único, par não vetado pelo dono, nome fora de
 `TITULOS_GENERICOS`; o apelido de nó fundido não vale aqui, porque sem o pai real o nome solto
 perde o contexto da fusão. `ResultadoRegra` traz `comparados`, `com_pai_provisorio` e
-`por_pai_provisorio`.
+`por_pai_provisorio`. Depois do filho único e da herança (e do pai provisório), o último ramo
+é o **casamento global por nome** (KAN-87, P77), que conta em `por_global`.
 O log traz a contagem por regra de nome, por memória, por filho único, por herança de folha e pendentes. A `chave_regra` ignora os
 prefixos "noções de", "fundamentos de" e "conceitos (básicos|gerais) de" (só "noções" liga
 `nocoes`) e unifica gestão e gerenciamento; administração não entra, e a sigla entre
@@ -229,6 +230,7 @@ título genérico (`canonico.TITULOS_GENERICOS`) nunca casa sozinho por nome (KA
             "tests/test_regra_arvore.py::test_cargo_de_ti_infere_ti",
             "tests/test_regra_arvore.py::test_chunk_basico_ou_sem_cargo_nao_infere",
             "tests/test_regra_arvore.py::test_banrisul_ganha_mais_de_100_itens_comparados",
+            "tests/test_regra_arvore.py::test_contratos_de_ti_casam_em_direito_administrativo",
         ),
     ),
     Regra(
@@ -439,7 +441,10 @@ diferença bloqueia o lote.""",
 `mapear_novos_itens_por_regra` aponta o item para o único nó de disciplina ou assunto de mesmo
 nome, e sem equivalente ele fica pendente para a curadoria. Esse casamento por nome só vale se
 o nó é a própria disciplina, está numa disciplina inferida dos itens do bloco já aprovados,
-ou o nome tem 2+ palavras relevantes e não é título genérico (`canonico.TITULOS_GENERICOS`);
+ou o nome tem 2+ palavras relevantes e não é título genérico (`canonico.TITULOS_GENERICOS`, a lista
+única de todos os ramos: inclui "Aplicações", "Definição", "Tipos", "Procedimento" e "Instalação,
+configuração e administração", e vale também para rótulo feito só de `PALAVRAS_GENERICAS`, como
+"Conceitos básicos e aplicações", KAN-87);
 par vetado pelo dono (por `chave_regra`) nunca é regravado, e fora disso o item fica pendente,
 nunca `aprovado` (KAN-82). Proposta de LLM ou de regra
 nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
@@ -475,7 +480,7 @@ pai (`por_filho`, `regra`/`aprovado`), salvo ambiguidade, título genérico ou p
 provisório (P52, KAN-86), com candidato único na subárvore, sem veto e fora dos títulos
 genéricos, e sem apelido de nó fundido; (4) herança de folha, só para subtópico: aponta para o nó único do
 tópico-pai se ele é subassunto ativo sem filhos, salvo título genérico ou par vetado
-(KAN-85, `regra`/`aprovado`); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
+(KAN-85, `regra`/`aprovado`); (5) casamento global por nome (KAN-87, P77); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
 reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
 (entra no hash do cache), exemplos aprovados do dono e os pares rejeitados. Proposta
 `proposto` nunca é fonte da memória (só vira fonte depois que o dono a aprova), par
@@ -495,7 +500,7 @@ rejeitado nunca é devolvido nem reproposto, e a memória não muda status exist
         texto="""O relatório de revisão e a tabela `mapeamento_itens` do `revisao.db` leem a árvore já
 passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
 equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia (nome,
-memória, filho único, herança de folha ou pai provisório pelo cargo), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
+memória, filho único, herança de folha, pai provisório pelo cargo ou casamento global), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
 antes de `gerar_relatorios` e `gerar_db` (KAN-81).""",
         adrs=("ADR-030",),
         testes=(
@@ -552,6 +557,39 @@ são `FACETAS_GENERICAS` (BSC); **nunca** por contar palavras: "jQuery", "keyclo
             "tests/test_validar_taxonomia.py::TestAlertasDeForma",
             "tests/test_migrar_chaves_cadeia.py",
             "tests/test_reconciliar_taxonomia.py",
+        ),
+    ),
+    Regra(
+        id="P77",
+        tipo="pattern",
+        area="arvore",
+        texto="""**Casamento global por nome** (KAN-87, M6, `canonico.no_global_por_nome`): último ramo do passo
+determinístico (P52, P73), depois do filho único, da herança de folha e do pai provisório, e
+antes de marcar pendente. Só para assunto e subassunto com pai mapeado (ou disciplina inferida
+pelo cargo). O item de nome idêntico (`chave_regra`) a um nó ativo de nível compatível em **qualquer**
+parte da árvore vai para ele como `regra`/`aprovado` (`por_global`; `chaves_global_fora_disciplina`
+guarda os que atravessaram disciplina). Segue D3: um conceito, um nó, então o subitem jurídico de
+um bloco de TI vai para o nó que já existe em Direito Administrativo. Travas: (1) o candidato é
+único (dois nós iguais, inclusive norma repetida, deixam o item pendente); (2) **exceção de TI**:
+se há nó equivalente na disciplina do pai (ou inferida pelo cargo), ele vale e os de fora são
+ignorados, e dois equivalentes ali são ambíguos; (3) para atravessar disciplina o nome precisa
+de 3+ palavras relevantes (`PALAVRAS_MIN_ENTRE_DISCIPLINAS`) ou ser **norma** (lei, decreto,
+"Lei nº X/ano", `nos_da_mesma_norma`, KAN-64: a norma vive em um nó só); nome curto só casa
+dentro da disciplina; (4) título genérico nunca casa (`TITULOS_GENERICOS`, lista única de M2, M4,
+M5, M14 e M6); (5) par vetado pelo dono não casa; (6) apelido de nó fundido entra como candidato,
+exceto com pai provisório (P52); (7) nunca cria nó nem disciplina (D5, P72). Item composto ("A e B")
+não é dividido aqui: se a `chave_regra` do nome inteiro não é a de um nó, o item fica para o LLM ou
+o dono, que podem apontar até dois nós (a árvore é N:N). Lote novo roda K22 a K24 antes e depois (P71).""",
+        adrs=("ADR-030",),
+        testes=(
+            "tests/test_regra_arvore.py::test_contratos_de_ti_casam_em_direito_administrativo",
+            "tests/test_regra_arvore.py::test_lgpd_casa_global_por_norma",
+            "tests/test_regra_arvore.py::test_nome_curto_nao_atravessa_disciplina",
+            "tests/test_regra_arvore.py::test_generico_nunca_casa_global",
+            "tests/test_regra_arvore.py::test_candidato_duplicado_nao_casa",
+            "tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai",
+            "tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global",
+            "tests/test_regra_arvore.py::test_economia_nao_casa_com_atualidades",
         ),
     ),
 )

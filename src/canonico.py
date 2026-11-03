@@ -1019,11 +1019,27 @@ TITULOS_GENERICOS_NOMES = (
     "Dados",
     "Governança",
     "Tópicos especiais",
+    # Acrescentados no KAN-87 (M6), vistos nos erros do casamento global: rótulos de
+    # subitem que servem a qualquer tema.
+    "Aplicações",
+    "Aplicação",
+    "Definição",
+    "Definições",
+    "Tipos",
+    "Procedimento",
+    "Procedimentos",
+    "Instalação, configuração e administração",
     "Outros",
     "Geral",
     "Gerais",
 )
 TITULOS_GENERICOS = frozenset(chave_regra(n).chave for n in TITULOS_GENERICOS_NOMES)
+# Rótulo feito só dessas palavras também é genérico ("Conceitos básicos e aplicações"):
+# a combinação não nomeia tema nenhum (KAN-87).
+PALAVRAS_GENERICAS = frozenset(
+    "conceito basico geral aplicacao definicao tipo introducao fundamento "
+    "nocao introdutorio".split()
+)
 
 _PALAVRAS_VAZIAS_TITULO = frozenset(
     "de da do das dos e em no na nos nas a o as os ao aos um uma uns umas para por "
@@ -1032,8 +1048,15 @@ _PALAVRAS_VAZIAS_TITULO = frozenset(
 
 
 def titulo_generico(nome_ou_chave: str) -> bool:
-    """True se o nome (ou a `chave_regra` dele) é um título genérico."""
-    return chave_regra(nome_ou_chave).chave in TITULOS_GENERICOS
+    """True se o nome (ou a `chave_regra` dele) é um título genérico: está em
+    `TITULOS_GENERICOS` ou só tem palavras de `PALAVRAS_GENERICAS`."""
+    chave = chave_regra(nome_ou_chave).chave
+    if chave in TITULOS_GENERICOS:
+        return True
+    palavras = [
+        t for t in chave.split() if len(t) >= 3 and t not in _PALAVRAS_VAZIAS_TITULO
+    ]
+    return bool(palavras) and all(t in PALAVRAS_GENERICAS for t in palavras)
 
 
 def palavras_relevantes(nome: str) -> list[str]:
@@ -1288,9 +1311,89 @@ def no_do_pai_provisorio(
     return no_id
 
 
+# Casamento global por nome (KAN-87, M6) ---------------------------------------------
+
+# Palavras relevantes mínimas para um nome casar com nó de OUTRA disciplina. Nome
+# mais curto só casa dentro da disciplina do pai (ou da inferida pelo cargo).
+PALAVRAS_MIN_ENTRE_DISCIPLINAS = 3
+
+
+def indice_global_por_nome(arvore) -> dict[str, set[str]]:
+    """`chave_regra` -> nós ativos de assunto e subassunto, em toda a árvore."""
+    indice: dict[str, set[str]] = {}
+    for no in arvore.nos.values():
+        if no.status == "ativo" and no.nivel in ("assunto", "subassunto"):
+            regra = chave_regra(no.nome).chave
+            if regra:
+                indice.setdefault(regra, set()).add(no.id)
+    return indice
+
+
+def no_global_por_nome(
+    arvore,
+    nivel: str,
+    nome: str,
+    regra: str,
+    disciplinas_ctx: frozenset[str],
+    vetados,
+    indice_global: dict[str, set[str]],
+    apelidos: dict[str, set[str]] | None = None,
+) -> tuple[str, bool] | None:
+    """Nó de mesmo nome em qualquer parte da árvore, ou None (KAN-87, M6).
+
+    Devolve `(no_id, atravessou_disciplina)`. Candidatos: nós ativos de nível
+    compatível com a mesma `chave_regra`, os destinos ativos de nós fundidos com esse
+    nome (`apelidos`) e, se o nome é essencialmente uma norma (lei, decreto, "Lei nº
+    X/ano"), os nós da mesma norma (`arvore.nos_da_mesma_norma`, KAN-64: a norma vive
+    em um nó só). Travas:
+
+    - título genérico nunca casa (`TITULOS_GENERICOS`, a mesma lista de M2, M4, M5);
+    - exceção de TI (D3): se há nó equivalente na disciplina do pai (ou inferida pelo
+      cargo), ele vale e os de fora são ignorados; dois equivalentes ali = ambíguo;
+    - sem equivalente na disciplina, só casa se o candidato é único em toda a
+      árvore; dois nós (norma repetida ou conceito duplicado) ficam pendentes;
+    - para atravessar disciplina: norma, ou `PALAVRAS_MIN_ENTRE_DISCIPLINAS` ou mais
+      palavras relevantes. Nome curto só casa dentro da disciplina;
+    - par (regra, nó) vetado pelo dono nunca casa.
+
+    Nunca cria nó nem disciplina (D5). Item composto ("A e B") não é separado aqui:
+    a `chave_regra` do nome inteiro raramente coincide com um nó, e o composto que
+    deve apontar para dois nós (N:N) fica pendente para o LLM ou o dono."""
+    from src import arvore as arv_mod
+
+    niveis = _NIVEIS_FILHO.get(nivel)
+    if not niveis or not regra or titulo_generico(nome):
+        return None
+    achados = set(indice_global.get(regra, ())) | set((apelidos or {}).get(regra, ()))
+    norma = arv_mod._nome_e_a_norma(nome)
+    if norma:
+        achados |= set(arv_mod.nos_da_mesma_norma(arvore, nome))
+    achados = {
+        n
+        for n in achados
+        if n in arvore.nos
+        and arvore.nos[n].status == "ativo"
+        and arvore.nos[n].nivel in niveis
+    }
+    na_disciplina = {
+        n for n in achados if arv_mod.materia_do_no(arvore, n) in (disciplinas_ctx)
+    }
+    if na_disciplina:
+        escolhidos, fora = na_disciplina, False
+    elif norma or len(palavras_relevantes(nome)) >= PALAVRAS_MIN_ENTRE_DISCIPLINAS:
+        escolhidos, fora = achados, True
+    else:
+        return None
+    if len(escolhidos) != 1:
+        return None
+    (no_id,) = escolhidos
+    return None if (regra, no_id) in vetados else (no_id, fora)
+
+
 @dataclass
 class ResultadoRegra:
-    """Contagem do passo determinístico (nome + memória + filho único + herança)."""
+    """Contagem do passo determinístico (nome + memória + filho único + herança +
+    casamento global)."""
 
     por_nome: int = 0
     por_memoria: int = 0
@@ -1306,6 +1409,12 @@ class ResultadoRegra:
     por_pai_provisorio: int = 0
     chaves_pai_provisorio: list[str] = field(default_factory=list)
     chaves_mapeadas_pai_provisorio: list[str] = field(default_factory=list)
+    # Casamento global por nome (KAN-87, M6): itens mapeados para um nó de outra
+    # parte da árvore (já contados em `por_global`, que entra em `total`).
+    # `chaves_global_fora_disciplina` é o subconjunto que atravessou disciplina.
+    por_global: int = 0
+    chaves_global: list[str] = field(default_factory=list)
+    chaves_global_fora_disciplina: list[str] = field(default_factory=list)
     # Chaves dos itens que o passo tentou e não mapeou (sem nó equivalente, regra
     # ambígua, pai sem nó). Item que já tinha entrada (aprovada, proposta ou
     # rejeitada) não passa pelo passo e não entra aqui.
@@ -1313,7 +1422,13 @@ class ResultadoRegra:
 
     @property
     def total(self) -> int:
-        return self.por_nome + self.por_memoria + self.por_filho + self.por_heranca
+        return (
+            self.por_nome
+            + self.por_memoria
+            + self.por_filho
+            + self.por_heranca
+            + self.por_global
+        )
 
 
 _NIVEIS_FILHO = {
@@ -1440,6 +1555,12 @@ def mapear_novos_itens(
        nenhum filho ativo (folha), o subtópico aponta para esse mesmo nó, como
        faceta dele (`regra`/`aprovado`, contado em `por_heranca`). Não herda se o
        nome é título genérico ou se o par (chave de regra, nó) foi vetado pelo dono.
+    6. casamento global por nome (KAN-87, M6, só assunto e subassunto, depois dos
+       ramos 4 e 5 e do pai provisório): o item vai para o nó de mesmo nome em
+       qualquer parte da árvore, com candidato único, exceção de TI (equivalente na
+       disciplina do pai vale mais), 3+ palavras relevantes ou norma para atravessar
+       disciplina, título genérico e veto barrando (`no_global_por_nome`). Conta em
+       `por_global`.
     Pai provisório (KAN-86, M4, `pai_provisorio=True`): assunto ou subassunto cujo
     título de bloco não tem nó aprovado usa como pai a disciplina que o cargo do
     chunk nomeia (`disciplina_do_cargo`, só chunk `especifico` e só quando o título
@@ -1506,6 +1627,26 @@ def mapear_novos_itens(
             if regra:
                 nos_por_nome.setdefault(regra, set()).add(no.id)
 
+    indice_global = indice_global_por_nome(arvore)
+
+    def tentar_global(nivel, nome_item, sig, memoria, provisorio=False):
+        """Ramo do casamento global (KAN-87, M6), sem tocar a árvore. Com pai
+        provisório o apelido de nó fundido fica de fora, como em D2 (KAN-86): sem o
+        pai real, o nome solto perde o contexto em que o dono fundiu o nó."""
+        if len(memoria.decisoes.get((nivel, sig[1], sig[2]), ())) > 1:
+            return None  # decisões do dono divergentes: continua ambíguo
+        ctx = frozenset(arv_mod.materia_do_no(arvore, p) for p in sig[1])
+        return no_global_por_nome(
+            arvore,
+            nivel,
+            nome_item,
+            sig[2],
+            ctx,
+            memoria.vetados,
+            indice_global,
+            None if provisorio else memoria.apelidos,
+        )
+
     # Nível a nível: o assunto mapeado agora já serve de pai para o subassunto.
     for nivel in NIVEIS:
         fonte = getattr(nomes, nivel)
@@ -1536,9 +1677,11 @@ def mapear_novos_itens(
             origem_memoria = False
             origem_heranca = False
             origem_filho = False
+            origem_global = None
             nome_item = fonte[chave_orig_por_chave[chave]]["nome"]
             if chave in usada_por_chave:
                 # Pai provisório: só resolve com as travas de D2 (KAN-86).
+                regra_ambigua = bool(candidatos)
                 no_prov, origem = _resolver_pai_provisorio(
                     arvore,
                     nivel,
@@ -1552,6 +1695,12 @@ def mapear_novos_itens(
                 candidatos = {frozenset({no_prov})} if no_prov else set()
                 origem_memoria = origem == "memoria"
                 origem_filho = origem == "filho"
+                if not candidatos and not regra_ambigua and nivel != "materia":
+                    origem_global = tentar_global(
+                        nivel, nome_item, sig, memoria, provisorio=True
+                    )
+                    if origem_global:
+                        candidatos = {frozenset({origem_global[0]})}
             else:
                 if not candidatos:
                     nos_mem = memoria_mapeamento.resolver_por_memoria(
@@ -1584,6 +1733,13 @@ def mapear_novos_itens(
                     if no_herdado:
                         candidatos = {frozenset({no_herdado})}
                         origem_heranca = True
+                if not candidatos and nivel != "materia":
+                    # Mesmo nome em outra parte da árvore, com travas (KAN-87, M6).
+                    # Fica depois do filho único e da herança, que são mais
+                    # específicos, e antes de marcar pendente.
+                    origem_global = tentar_global(nivel, nome_item, sig, memoria)
+                    if origem_global:
+                        candidatos = {frozenset({origem_global[0]})}
                 if not candidatos and nivel == "materia":
                     # Título de bloco fora da lista de disciplinas: vira o assunto de
                     # mesmo nome, nunca disciplina nova (Etapa 5B.3, ADR-030).
@@ -1615,7 +1771,12 @@ def mapear_novos_itens(
             if chave in usada_por_chave:
                 res.por_pai_provisorio += 1
                 res.chaves_mapeadas_pai_provisorio.append(chave)
-            if origem_filho:
+            if origem_global:
+                res.por_global += 1
+                res.chaves_global.append(chave)
+                if origem_global[1]:
+                    res.chaves_global_fora_disciplina.append(chave)
+            elif origem_filho:
                 res.por_filho += 1
             elif origem_heranca:
                 res.por_heranca += 1

@@ -1162,3 +1162,406 @@ def test_banrisul_ganha_mais_de_100_itens_comparados(tmp_path):
     )
     assert com.comparados - sem.comparados >= 100
     assert com.total >= sem.total
+
+
+# Casamento global por nome (KAN-87, M6) --------------------------------------------
+
+BLOCO_G = "gestao e governanca"
+LGPD = "Lei Geral de Proteção de Dados – LGPD (Lei nº 13.709/2018)"
+
+
+@pytest.fixture
+def arvore_global(arvore_path):
+    """Bloco de TI ("Gestão e governança" -> TI) com o assunto "Legislação de TI"; em
+    Direito Administrativo, os nós de contratos e a LGPD; em Atualidades, "economia"."""
+
+    def montar(a):
+        criar_no(a, "materia", "Tecnologia da Informação", None, id_override="M-TI")
+        criar_no(a, "materia", "Atualidades", None, id_override="M-ATU")
+        criar_no(a, "assunto", "Legislação de TI", "M-TI", id_override="A-LEGTI")
+        criar_no(a, "assunto", "Governança de TI", "M-TI", id_override="A-GOVTI")
+        criar_no(
+            a, "assunto", "Contratos administrativos", "M-DA", id_override="A-CONT"
+        )
+        criar_no(
+            a,
+            "assunto",
+            "Licitações e contratos administrativos",
+            "M-DA",
+            id_override="A-LIC",
+        )
+        criar_no(a, "assunto", "economia", "M-ATU", id_override="A-ECO")
+        for sid, nome in {
+            "S-FISC": "Papel do fiscalizador do contrato",
+            "S-PREP": "Papel do preposto da contratada",
+            "S-CONC": "Conceitos básicos e aplicações",
+            "S-APL": "Aplicações",
+            "S-GPROC": "Gestão de processos",
+            "S-ELAB": "Elaboração de contratos de software",
+            "S-LGPD": LGPD,
+            "S-LAI": "Lei de Acesso à Informação – LAI (Lei nº 12.527/2011)",
+        }.items():
+            criar_no(a, "subassunto", nome, "A-CONT", id_override=sid)
+        criar_no(
+            a, "subassunto", "Dispensa de licitação", "A-LIC", id_override="S-DISP"
+        )
+        # mesmo nome em TI: o equivalente da disciplina do pai vale mais (exceção TI)
+        criar_no(
+            a,
+            "subassunto",
+            "Elaboração de contratos de software",
+            "A-GOVTI",
+            id_override="S-TI-ELAB",
+        )
+        mapear(a, BLOCO_G, ["M-TI"])
+        mapear(a, f"{BLOCO_G}|legislacao de ti", ["A-LEGTI"])
+
+    _mexer(arvore_path, montar)
+    return arvore_path
+
+
+def _g(monkeypatch, tmp_path, arvore_path, subassunto=(), assunto=(), gravar=True):
+    """Itens do bloco de TI: subassunto sob "Legislação de TI"; assunto sob o bloco."""
+    nomes = canonico.NomesOrigem(
+        assunto={(BLOCO_G, canonico.chave_regra(n).chave): _nome(n) for n in assunto},
+        subassunto={
+            (BLOCO_G, "legislacao de ti", canonico.chave_regra(s).chave): _nome(s)
+            for s in subassunto
+        },
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    return canonico.mapear_novos_itens(tmp_path, arvore_path, gravar=gravar)
+
+
+def _dest(arvore_path, nome, topico="legislacao de ti"):
+    chave = _cb(BLOCO_G, topico, canonico.chave_regra(nome).chave)
+    return [
+        (m.no_id, m.origem, m.status)
+        for m in carregar(arvore_path).mapeamentos.get(chave, [])
+    ]
+
+
+def test_contratos_de_ti_casam_em_direito_administrativo(
+    monkeypatch, tmp_path, arvore_global
+):
+    res = _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=[
+            "Papel do fiscalizador do contrato",
+            "Papel do preposto da contratada",
+        ],
+    )
+    assert (res.por_global, res.total, res.pendentes) == (2, 2, 0)
+    assert len(res.chaves_global_fora_disciplina) == 2
+    ok = lambda s: [(s, "regra", "aprovado")]  # noqa: E731
+    assert _dest(arvore_global, "Papel do fiscalizador do contrato") == ok("S-FISC")
+    assert _dest(arvore_global, "Papel do preposto da contratada") == ok("S-PREP")
+
+
+def test_lgpd_casa_global_por_norma(monkeypatch, tmp_path, arvore_global):
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Lei nº 13.709/2018"])
+    assert res.por_global == 1
+    assert _dest(arvore_global, "Lei nº 13.709/2018") == [
+        ("S-LGPD", "regra", "aprovado")
+    ]
+
+
+def test_norma_de_uma_palavra_casa_em_qualquer_disciplina(
+    monkeypatch, tmp_path, arvore_global
+):
+    # "LAI" tem 1 palavra relevante: só a norma (KAN-64) atravessa a disciplina.
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["LAI"])
+    assert res.por_global == 1
+    assert _dest(arvore_global, "LAI") == [("S-LAI", "regra", "aprovado")]
+
+
+def test_norma_em_dois_nos_nao_casa(monkeypatch, tmp_path, arvore_global):
+    _mexer(
+        arvore_global,
+        lambda a: criar_no(
+            a, "subassunto", "LGPD (Lei nº 13.709/2018)", "A-GOVTI", id_override="S-LG2"
+        ),
+    )
+    # um dos dois está na disciplina do pai (TI): a exceção TI escolhe esse
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Lei nº 13.709/2018"])
+    assert _dest(arvore_global, "Lei nº 13.709/2018") == [
+        ("S-LG2", "regra", "aprovado")
+    ]
+    assert res.chaves_global_fora_disciplina == []
+    # sem equivalente na disciplina do pai, a norma repetida fica pendente
+    _mexer(
+        arvore_global,
+        lambda a: criar_no(
+            a, "subassunto", "LGPD (Lei nº 13.709/2018)", "A-ATO", id_override="S-LG3"
+        ),
+    )
+    mem = carregar(arvore_global)
+    for chave in list(mem.mapeamentos):
+        if chave.startswith(f"{BLOCO_G}|legislacao de ti|"):
+            del mem.mapeamentos[chave]
+    mem.nos["S-LG2"].status = "aposentado"
+    salvar(mem, arvore_global)
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Lei nº 13.709/2018"])
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+def test_nome_curto_nao_atravessa_disciplina(monkeypatch, tmp_path, arvore_global):
+    # "Dispensa de licitação" tem 2 palavras relevantes e só existe em DA: fica de fora
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Dispensa de licitação"])
+    assert (res.por_global, res.pendentes) == (0, 1)
+    assert _dest(arvore_global, "Dispensa de licitação") == []
+
+
+def test_nome_curto_casa_dentro_da_disciplina(monkeypatch, tmp_path, arvore_global):
+    # "Dispensa de licitação" no bloco que o pai mapeia para DA: mesma disciplina
+    _mexer(
+        arvore_global,
+        lambda a: mapear(a, f"{BLOCO_G}|legislacao de ti", ["A-CONT"]),
+    )
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Dispensa de licitação"])
+    assert (res.por_global, res.chaves_global_fora_disciplina) == (1, [])
+    assert _dest(arvore_global, "Dispensa de licitação") == [
+        ("S-DISP", "regra", "aprovado")
+    ]
+
+
+def test_economia_nao_casa_com_atualidades(monkeypatch, tmp_path, arvore_global):
+    # ECONOMIA (1 palavra) no bloco de TI não vai para Atualidades › economia
+    res = _g(monkeypatch, tmp_path, arvore_global, assunto=["ECONOMIA"])
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+@pytest.mark.parametrize(
+    "nome",
+    [
+        "Conceitos básicos e aplicações",
+        "Aplicações",
+        "Gestão de processos",  # 2 palavras: nunca atravessa disciplina
+    ],
+)
+def test_generico_nunca_casa_global(monkeypatch, tmp_path, arvore_global, nome):
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=[nome])
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+def test_titulos_genericos_ampliados_valem_para_todos_os_ramos():
+    for nome in (
+        "Aplicações",
+        "Definição",
+        "Tipos",
+        "Instalação, configuração e administração",
+        "Conceitos básicos e aplicações",
+    ):
+        assert canonico.titulo_generico(nome), nome
+    assert not canonico.titulo_generico("Tipos de indicadores")
+    assert not canonico.titulo_generico("Papel do fiscalizador do contrato")
+
+
+def test_candidato_duplicado_nao_casa(monkeypatch, tmp_path, arvore_global):
+    # o mesmo nome em duas outras disciplinas: ambíguo, fica pendente
+    def dup(a):
+        criar_no(
+            a,
+            "subassunto",
+            "Cláusulas de nível de serviço",
+            "A-CONT",
+            id_override="S-D1",
+        )
+        criar_no(
+            a,
+            "subassunto",
+            "Cláusulas de nível de serviço",
+            "A-ECO",
+            id_override="S-D2",
+        )
+
+    _mexer(arvore_global, dup)
+    res = _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=["Cláusulas de nível de serviço"],
+    )
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+def test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai(
+    monkeypatch, tmp_path, arvore_global
+):
+    # "Elaboração de contratos de software" existe em DA (S-ELAB) e em TI (S-TI-ELAB):
+    # o item de TI vai para o de TI, sem atravessar disciplina
+    res = _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=["Elaboração de contratos de software"],
+    )
+    assert (res.por_global, res.chaves_global_fora_disciplina) == (1, [])
+    assert _dest(arvore_global, "Elaboração de contratos de software") == [
+        ("S-TI-ELAB", "regra", "aprovado")
+    ]
+
+
+def test_dois_equivalentes_na_disciplina_do_pai_ficam_pendentes(
+    monkeypatch, tmp_path, arvore_global
+):
+    _mexer(
+        arvore_global,
+        lambda a: criar_no(
+            a,
+            "subassunto",
+            "Elaboração de contratos de software",
+            "A-LEGTI",
+            id_override="S-TI-ELAB2",
+        ),
+    )
+    # S-TI-ELAB2 é filho do pai (A-LEGTI): o filho único o resolve antes do global
+    res = _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=["Elaboração de contratos de software"],
+    )
+    assert (res.por_filho, res.por_global) == (1, 0)
+    assert _dest(arvore_global, "Elaboração de contratos de software") == [
+        ("S-TI-ELAB2", "regra", "aprovado")
+    ]
+
+
+def test_veto_do_dono_barra_o_global(monkeypatch, tmp_path, arvore_global):
+    chave = f"{BLOCO_G}|outro|papel do fiscalizador do contrato"
+
+    def vetar(a):
+        mapear(a, chave, ["S-FISC"], "llm", "proposto")
+        rejeitar(a, chave, "S-FISC")
+
+    _mexer(arvore_global, vetar)
+    res = _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=["Papel do fiscalizador do contrato"],
+    )
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+def test_global_em_cascata_assunto_para_subassunto(
+    monkeypatch, tmp_path, arvore_global
+):
+    # o assunto casa global em DA e o subassunto, filho dele, sobe na mesma execução
+    nomes = canonico.NomesOrigem(
+        assunto={
+            (BLOCO_G, "licitacoes e contratos administrativos"): _nome(
+                "Licitações e contratos administrativos"
+            )
+        },
+        subassunto={
+            (
+                BLOCO_G,
+                "licitacoes e contratos administrativos",
+                "dispensa de licitacao",
+            ): _nome("Dispensa de licitação")
+        },
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    res = canonico.mapear_novos_itens(tmp_path, arvore_global)
+    assert (res.por_global, res.por_filho, res.pendentes) == (1, 1, 0)
+    arv = carregar(arvore_global)
+    assert (
+        arv.mapeamentos[_cb(BLOCO_G, "licitacoes e contratos administrativos")][0].no_id
+        == "A-LIC"
+    )
+    assert (
+        arv.mapeamentos[
+            _cb(
+                BLOCO_G,
+                "licitacoes e contratos administrativos",
+                "dispensa de licitacao",
+            )
+        ][0].no_id
+        == "S-DISP"
+    )
+
+
+def test_nivel_incompativel_nao_casa_global(monkeypatch, tmp_path, arvore_global):
+    # subassunto não aponta para nó de assunto: "Contratos administrativos" é A-CONT
+    res = _g(
+        monkeypatch, tmp_path, arvore_global, subassunto=["Contratos administrativos"]
+    )
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+def test_global_idempotente_e_dry_run(monkeypatch, tmp_path, arvore_global):
+    itens = ["Papel do fiscalizador do contrato", "Lei nº 13.709/2018"]
+    antes = arvore_global.read_bytes()
+    mem = carregar(arvore_global)
+    nomes = canonico.NomesOrigem(
+        subassunto={
+            (BLOCO_G, "legislacao de ti", canonico.chave_regra(s).chave): _nome(s)
+            for s in itens
+        }
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    res = canonico.mapear_novos_itens(
+        tmp_path, arvore_global, gravar=False, arvore_mem=mem
+    )
+    assert res.por_global == 2 and arvore_global.read_bytes() == antes
+    assert _g(monkeypatch, tmp_path, arvore_global, subassunto=itens).por_global == 2
+    assert _g(monkeypatch, tmp_path, arvore_global, subassunto=itens).total == 0
+
+
+def test_global_com_pai_provisorio_atravessa_para_direito_administrativo(
+    monkeypatch, tmp_path, arvore_ti
+):
+    # BANRISUL: o bloco de TI não tem nó, o cargo infere TI (M4) e o subitem de
+    # contratos, de nome idêntico a um subassunto de DA, vai para o nó de DA.
+    _mexer(
+        arvore_ti,
+        lambda a: criar_no(
+            a,
+            "subassunto",
+            "Papel do fiscalizador do contrato",
+            "A-ATO",
+            id_override="S-FISC",
+        ),
+    )
+    res = _ti(
+        monkeypatch,
+        tmp_path,
+        arvore_ti,
+        subassunto=[("Legislação aplicável", "Papel do fiscalizador do contrato")],
+    )
+    assert (res.por_global, res.por_pai_provisorio, res.pendentes) == (1, 1, 0)
+    assert len(res.chaves_global_fora_disciplina) == 1
+    [m] = carregar(arvore_ti).mapeamentos[
+        "bloco ti|legislacao aplicavel|papel do fiscalizador do contrato"
+    ]
+    assert (m.no_id, m.origem, m.status) == ("S-FISC", "regra", "aprovado")
+
+
+def test_apelido_de_no_fundido_de_outra_disciplina_casa_global(
+    monkeypatch, tmp_path, arvore_global
+):
+    def fundir(a):
+        criar_no(
+            a,
+            "subassunto",
+            "Gestão de acordos de nível de serviço",
+            "A-CONT",
+            id_override="S-OLD",
+        )
+        fundir_nos(a, "S-OLD", "S-PREP")
+
+    _mexer(arvore_global, fundir)
+    res = _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=["Gestão de acordos de nível de serviço"],
+    )
+    assert res.por_global == 1
+    assert _dest(arvore_global, "Gestão de acordos de nível de serviço") == [
+        ("S-PREP", "regra", "aprovado")
+    ]
