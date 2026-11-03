@@ -2,9 +2,10 @@
 
 O item de edital (matéria, tópico, subtópico) sem entrada em `arvore.mapeamentos`
 e que a regra (`canonico.mapear_novos_itens_por_regra`) não resolveu é
-apresentado ao modelo com uma LISTA FECHADA de nós ativos da disciplina dele.
-O modelo escolhe um nó dessa lista ou responde "nenhum". Ele nunca cria nó nem
-disciplina (P72) e nunca aprova: a proposta entra como `origem="llm"`,
+apresentado ao modelo com uma LISTA FECHADA de nós ativos: os da disciplina dele
+mais os melhores de outras disciplinas por similaridade (KAN-91, P80). O modelo
+escolhe até `MAX_NOS_POR_ITEM` nós dessa lista (um, salvo item composto) ou responde
+"nenhum". Ele nunca cria nó nem disciplina (P72) e nunca aprova: a proposta entra como `origem="llm"`,
 `status="proposto"` (A30); a aprovação é do dono, por `scripts/curar_arvore.py`.
 
 Este módulo não faz I/O de rede por conta própria: a chamada vai por
@@ -16,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import time
 from collections import Counter
 from dataclasses import dataclass, field
@@ -49,17 +51,43 @@ MAX_EXEMPLOS = 8
 MAX_VETADOS = 15
 # Teto de nós candidatos quando a disciplina do item não está resolvida: o
 # modelo vê só os nós de mesmo tema (sobreposição de palavras), nunca a árvore toda.
-LIMITE_CANDIDATOS_LIVRE = 120
+LIMITE_CANDIDATOS_LIVRE = 80
+# Marca do desenho de candidatos e prompt (KAN-91, M9). Entra no hash do cache: mudar o
+# desenho (candidatos globais, subassunto como alvo de título, até 3 nós) invalida os
+# "nenhum" guardados sob o desenho anterior.
+DESENHO = "m9-v1"
+# Item composto ("A e B") pode apontar até este número de nós (a árvore é N:N).
+MAX_NOS_POR_ITEM = 3
+# Candidatos globais (KAN-91, M9): por item, os melhores nós de OUTRAS disciplinas
+# por similaridade com o nome e os subitens; no lote, no máximo MAX_GLOBAIS_LOTE.
+GLOBAIS_POR_ITEM = 4
+MAX_GLOBAIS_LOTE = 40
+# Para um nó de outra disciplina ser oferecido: massa mínima (soma de idf das palavras
+# em comum, que barra o casamento só por palavra comum) e cobertura mínima do nome do
+# nó (fração do idf das palavras DELE que o item cobre, o que barra nó longo que só
+# repete vocabulário). Palavra que vem só dos subitens ou do pai vale o peso abaixo.
+MASSA_MINIMA_GLOBAL = 4.0
+COBERTURA_MINIMA_GLOBAL = 0.4
+# Sem disciplina, o ranking só traz nó com ao menos esta cobertura do nome dele.
+COBERTURA_MINIMA_LIVRE = 0.2
+PESO_PALAVRA_FRACA = 0.5
+# Título de bloco numa disciplina já inferida: além das disciplinas e assuntos dela, os
+# subassuntos mais parecidos com o título e os subitens (o nó natural costuma ser um
+# subassunto: "Sistemas operacionais", "Modelagens de dados").
+SUBASSUNTOS_POR_TITULO = 40
+MAX_NOMES_RANKING = 40
 
 STATUS_FALHA_ID_DESCONHECIDO = "falha_id_desconhecido"
 STATUS_FALHA_ITENS_DIVERGENTES = "falha_itens_divergentes"
 STATUS_FALHA_VALIDACAO_SCHEMA = "falha_validacao_schema"
 
 # Níveis de nó que cada nível de item de edital pode receber. Título de bloco
-# (matéria do edital) vira disciplina ou assunto; tópico vira assunto ou
-# subassunto; subtópico vira subassunto (padrão do que já está mapeado).
+# (matéria do edital) vira disciplina, assunto ou subassunto (KAN-91, M9: o nó natural
+# de "Sistemas operacionais" é subassunto; a proposta é sempre `proposto`, o título
+# nunca cria disciplina, P72); tópico vira assunto ou subassunto; subtópico vira
+# subassunto (padrão do que já está mapeado).
 NIVEIS_ALVO = {
-    "materia": ("materia", "assunto"),
+    "materia": ("materia", "assunto", "subassunto"),
     "assunto": ("assunto", "subassunto"),
     "subassunto": ("subassunto",),
 }
@@ -74,21 +102,34 @@ REGRAS ESTRITAS:
 - Na dúvida entre apontar para um nó duvidoso e responder "nenhum", responda "nenhum": um item sem nó vai para o dono decidir, um nó errado esconde o erro.
 - Cada item traz CONTEXTO tirado do próprio edital: "dentro de" (o último elemento é o pai imediato) e "contém" (subitens ou principais tópicos). Use-o só para DESAMBIGUAR o sentido do item (ex: "Arquitetura" de software, de computadores ou de edificações). Se, mesmo com o contexto, o sentido continuar ambíguo, responda "nenhum".
 - Se houver "O DONO JÁ DECIDIU ASSIM", siga o mesmo critério nos itens parecidos. Se houver "PARES REJEITADOS", NUNCA proponha esses pares.
-- Cada item recebe no máximo UM nó.
+- Em geral cada item recebe UM nó. Item COMPOSTO, que junta conceitos distintos ("A e B", "contratos e licitações"), pode receber até 3 nós, um por conceito, em "nos". Nunca ponha dois nós para o mesmo conceito, um nó e o descendente dele, nem nó "só para garantir".
+- HERANÇA: o subtópico sem nó mais específico aponta para o nó do TÓPICO. Se o item traz "o pai foi mapeado para: X" e X está em CANDIDATOS, use X para um subtópico que é parte ou detalhe do tópico, em vez de "nenhum"; confiança "media".
+- Alguns candidatos vêm de OUTRAS disciplinas (aparecem sob a disciplina deles). Um conceito tem um nó só: se a disciplina do item já tem o nó equivalente, use esse; se só uma outra disciplina trata do conceito (ex: contratos administrativos, LGPD), use o nó dela.
 - Forneça uma resposta para CADA item listado.
 - "confianca": "alta" (mesmo conceito), "media" (conceito abrangente ou fronteiriço), "baixa" (enquadramento duvidoso).
 - Em "justificativa", uma frase curta.
 
 Devolva APENAS JSON válido, sem formatação markdown:
-{"itens": [{"numero": 1, "no": "N3", "nenhum": false, "confianca": "alta", "justificativa": "..."}, {"numero": 2, "no": null, "nenhum": true, "confianca": "alta", "justificativa": "..."}]}"""
+{"itens": [{"numero": 1, "nos": ["N3"], "nenhum": false, "confianca": "alta", "justificativa": "..."}, {"numero": 2, "nos": ["N5", "N9"], "nenhum": false, "confianca": "media", "justificativa": "item composto"}, {"numero": 3, "nos": [], "nenhum": true, "confianca": "alta", "justificativa": "..."}]}"""
 
 
 class ItemMapeado(BaseModel):
     numero: int | str
+    # `no` (um só) continua aceito; `nos` leva até MAX_NOS_POR_ITEM para item composto.
     no: str | None = None
+    nos: list[str] = []
     nenhum: bool = False
     confianca: Literal["alta", "media", "baixa"] = "alta"
     justificativa: str = ""
+
+    @property
+    def ids_locais(self) -> list[str]:
+        """IDs locais escolhidos, sem repetir, na ordem da resposta."""
+        vistos: list[str] = []
+        for x in [self.no, *self.nos]:
+            if x and x not in vistos:
+                vistos.append(x)
+        return vistos
 
 
 class RespostaMapeamento(BaseModel):
@@ -112,6 +153,8 @@ class Contabilidade:
     # Só no dry-run: itens que iriam ao LLM.
     itens_previstos: int = 0
     propostos: int = 0
+    # Itens compostos que receberam 2 ou 3 nós (KAN-91).
+    propostos_multiplos: int = 0
     nenhum: int = 0
     rejeitados_gravacao: int = 0
     falhas: Counter = field(default_factory=Counter)
@@ -296,45 +339,190 @@ def _ativos(arv: arvore.ArvoreMestre, niveis: tuple[str, ...]) -> list[arvore.No
 
 
 def selecionaveis_da_disciplina(
-    arv: arvore.ArvoreMestre, disciplinas: frozenset[str], nivel: str
+    arv: arvore.ArvoreMestre,
+    disciplinas: frozenset[str],
+    nivel: str,
+    niveis: tuple[str, ...] | None = None,
 ) -> set[str]:
     """Nós ativos das `disciplinas` que o item de `nivel` pode receber."""
     return {
         n.id
-        for n in _ativos(arv, NIVEIS_ALVO[nivel])
+        for n in _ativos(arv, niveis or NIVEIS_ALVO[nivel])
         if arvore.materia_do_no(arv, n.id) in disciplinas
     }
 
 
 def selecionaveis_por_tema(
-    arv: arvore.ArvoreMestre, itens: list[Pendente], nivel: str
+    arv: arvore.ArvoreMestre,
+    itens: list[Pendente],
+    nivel: str,
+    indice: IndiceNos | None = None,
 ) -> set[str]:
-    """Sem disciplina resolvida: disciplinas (se o nível aceita) e os nós de mesmo
-    tema, ranqueados pela sobreposição de palavras com os itens e seus pais."""
+    """Sem disciplina resolvida: as disciplinas (se o nível aceita) e os nós de mesmo
+    tema, ranqueados pela sobreposição de palavras com o nome, os subitens e os pais
+    dos itens (KAN-91: antes só o nome entrava no ranking)."""
+    indice = indice or IndiceNos(arv)
+    uniao: set[str] = set()
+    for fixos in selecionar_lote(arv, indice, itens, frozenset(), nivel).values():
+        uniao |= fixos
+    return uniao
+
+
+# Ranking por similaridade (KAN-91, M9) --------------------------------------------
+
+
+class IndiceNos:
+    """Palavras relevantes (as da `chave_regra`, com singular) dos nós ativos de
+    assunto e subassunto, com o peso idf de cada palavra na árvore."""
+
+    def __init__(self, arv: arvore.ArvoreMestre) -> None:
+        self.arv = arv
+        self.palavras: dict[str, frozenset[str]] = {}
+        self.regra: dict[str, str] = {}
+        df: Counter = Counter()
+        for n in _ativos(arv, ("assunto", "subassunto")):
+            ps = frozenset(canonico.palavras_relevantes(n.nome))
+            self.palavras[n.id] = ps
+            self.regra[n.id] = canonico.chave_regra(n.nome).chave
+            df.update(ps)
+        total = max(len(self.palavras), 1)
+        self.idf = {t: math.log(1 + total / c) for t, c in df.items()}
+        self.massa_no = {
+            i: sum(self.idf[t] for t in ps) or 1.0 for i, ps in self.palavras.items()
+        }
+        self.disciplina = {i: arvore.materia_do_no(arv, i) for i in self.palavras}
+
+    def pontuar(
+        self,
+        fortes: frozenset[str],
+        fracas: frozenset[str],
+        niveis: tuple[str, ...],
+        fora_de: frozenset[str] | None = None,
+        so_de: frozenset[str] | None = None,
+    ) -> list[tuple[float, float, float, str]]:
+        """(pontuação, cobertura, massa, id) dos nós de `niveis` com alguma palavra em
+        comum, do maior para o menor. Cobertura: fração do idf do NOME DO NÓ que o
+        item cobre (as palavras do nome do item valem 1; as dos subitens e do pai,
+        `PESO_PALAVRA_FRACA`). Massa: idf das palavras em comum. A pontuação é a
+        cobertura mais um bônus pequeno pela massa. `so_de`: só nós dessas
+        disciplinas; `fora_de`: exclui-as."""
+        achados = []
+        for i, ps in self.palavras.items():
+            if self.arv.nos[i].nivel not in niveis:
+                continue
+            disc = self.disciplina[i]
+            if (so_de is not None and disc not in so_de) or (
+                fora_de is not None and disc in fora_de
+            ):
+                continue
+            forte = sum(self.idf[t] for t in ps & fortes)
+            fraco = sum(self.idf[t] for t in (ps & fracas) - fortes)
+            massa = forte + fraco
+            if massa <= 0:
+                continue
+            cobertura = (forte + PESO_PALAVRA_FRACA * fraco) / self.massa_no[i]
+            achados.append((cobertura + 0.05 * min(massa, 10), cobertura, massa, i))
+        achados.sort(key=lambda x: (-x[0], self.arv.nos[x[3]].nome, x[3]))
+        return achados
+
+
+def palavras_do_item(item: Pendente) -> tuple[frozenset[str], frozenset[str]]:
+    """(fortes, fracas): palavras do nome do item; e as dos subitens e dos pais."""
+    fortes = frozenset(canonico.palavras_relevantes(item.nome))
+    fracas: set[str] = set()
+    for sub in item.subitens[:MAX_NOMES_RANKING]:
+        fracas |= set(canonico.palavras_relevantes(sub))
+    for c in item.contexto:
+        fracas |= set(canonico.palavras_relevantes(c))
+    return fortes, frozenset(fracas - fortes)
+
+
+def selecionar_lote(
+    arv: arvore.ArvoreMestre,
+    indice: IndiceNos,
+    itens: list[Pendente],
+    disciplinas: frozenset[str],
+    nivel: str,
+    dicas: dict[str, list[str]] | None = None,
+) -> dict[str, set[str]]:
+    """Candidatos de cada item do lote (chave -> IDs de nós).
+
+    Com disciplina resolvida: os nós dela (no título de bloco, as disciplinas e os
+    assuntos, mais os subassuntos mais parecidos) e os melhores nós de OUTRAS
+    disciplinas por similaridade, sem título genérico e sem repetir conceito que a
+    disciplina já tem (um conceito, um nó; D3 e M6). Sem disciplina: as disciplinas
+    (se o nível aceita) e os nós de mesmo tema em toda a árvore. Só oferece nós
+    ativos, dos níveis que o item aceita; a escolha continua sendo do modelo.
+
+    `dicas` (chave do item -> nós do pai): o nó de assunto do tópico-pai entra também
+    para o subtópico, para que a herança "sem nó mais específico, o subtópico aponta
+    para o nó do tópico" (M5) seja possível quando esse nó não é folha de subassunto."""
     alvo = NIVEIS_ALVO[nivel]
-    texto = set()
-    for it in itens:
-        texto |= _tokens(it.nome)
-        for c in it.contexto:
-            texto |= _tokens(c)
-    escolhidos: set[str] = set()
-    if "materia" in alvo:
-        escolhidos |= {n.id for n in _ativos(arv, ("materia",))}
-    pontuados = []
-    for n in _ativos(arv, tuple(x for x in alvo if x != "materia")):
-        pontos = len(_tokens(n.nome) & texto)
-        if pontos:
-            pontuados.append((-pontos, n.nome, n.id))
-    pontuados.sort()
-    escolhidos |= {i for _, _, i in pontuados[:LIMITE_CANDIDATOS_LIVRE]}
-    return escolhidos
+    niveis_nos = tuple(x for x in alvo if x != "materia")
+    por_item: dict[str, set[str]] = {}
+    extras: dict[str, list[tuple[float, str]]] = {}
+    if disciplinas:
+        niveis_base = ("materia", "assunto") if nivel == "materia" else alvo
+        base = selecionaveis_da_disciplina(arv, disciplinas, nivel, niveis_base)
+        regras_disc = {indice.regra[i] for i in base if i in indice.regra}
+        for it in itens:
+            fortes, fracas = palavras_do_item(it)
+            fixos = set(base) | {
+                n
+                for n in (dicas or {}).get(it.chave, [])
+                if arv.nos[n].nivel in ("assunto", "subassunto")
+            }
+            if nivel == "materia":
+                subs = indice.pontuar(
+                    fortes, fracas, ("subassunto",), so_de=disciplinas
+                )
+                fixos |= {x[3] for x in subs[:SUBASSUNTOS_POR_TITULO]}
+            fora = [
+                (pontos, i)
+                for pontos, cobertura, massa, i in indice.pontuar(
+                    fortes, fracas, niveis_nos, fora_de=disciplinas
+                )
+                if massa >= MASSA_MINIMA_GLOBAL
+                and cobertura >= COBERTURA_MINIMA_GLOBAL
+                and indice.regra[i] not in regras_disc
+                and not canonico.titulo_generico(arv.nos[i].nome)
+            ]
+            por_item[it.chave] = fixos
+            extras[it.chave] = fora[:GLOBAIS_POR_ITEM]
+        teto = MAX_GLOBAIS_LOTE
+    else:
+        fixos_livres = (
+            {n.id for n in _ativos(arv, ("materia",))} if "materia" in alvo else set()
+        )
+        k_item = max(8, LIMITE_CANDIDATOS_LIVRE // max(len(itens), 1))
+        for it in itens:
+            fortes, fracas = palavras_do_item(it)
+            por_item[it.chave] = set(fixos_livres)
+            ranqueados = indice.pontuar(fortes, fracas, niveis_nos)
+            extras[it.chave] = [
+                (x[0], x[3]) for x in ranqueados if x[1] >= COBERTURA_MINIMA_LIVRE
+            ][:k_item]
+        teto = LIMITE_CANDIDATOS_LIVRE
+    melhor: dict[str, float] = {}
+    for lista in extras.values():
+        for pontos, i in lista:
+            melhor[i] = max(melhor.get(i, 0.0), pontos)
+    mantidos = {
+        i for i, _ in sorted(melhor.items(), key=lambda kv: (-kv[1], kv[0]))[:teto]
+    }
+    for chave, lista in extras.items():
+        por_item[chave] |= {i for _, i in lista if i in mantidos}
+    return por_item
 
 
 def formatar_candidatos(
-    arv: arvore.ArvoreMestre, selecionaveis: set[str]
+    arv: arvore.ArvoreMestre,
+    selecionaveis: set[str],
+    prioridade: frozenset[str] = frozenset(),
 ) -> tuple[str, dict[str, str]]:
     """Árvore com IDs locais N1..Nn só nos nós selecionáveis; os ancestrais
-    entram sem ID, apenas como contexto. Devolve (texto, local -> ID)."""
+    entram sem ID, apenas como contexto. As disciplinas de `prioridade` (a do pai ou
+    a inferida pelo cargo) vêm primeiro. Devolve (texto, local -> ID)."""
     visiveis = set(selecionaveis)
     for no_id in list(selecionaveis):
         no = arv.nos[no_id]
@@ -345,8 +533,11 @@ def formatar_candidatos(
     for no_id in visiveis:
         no = arv.nos[no_id]
         filhos.setdefault(no.pai if no.pai in visiveis else None, []).append(no)
-    for lista in filhos.values():
-        lista.sort(key=lambda n: (n.nome, n.id))
+    for chave_pai, lista in filhos.items():
+        if chave_pai is None:
+            lista.sort(key=lambda n: (n.id not in prioridade, n.nome, n.id))
+        else:
+            lista.sort(key=lambda n: (n.nome, n.id))
 
     linhas: list[str] = []
     local_para_id: dict[str, str] = {}
@@ -408,12 +599,29 @@ def montar_prompt(
     return "\n".join(linhas)
 
 
+def _tem_ancestral(arv: arvore.ArvoreMestre, no_ids: list[str]) -> bool:
+    """True se algum nó da lista é ancestral de outro da lista."""
+    conjunto = set(no_ids)
+    for i in conjunto:
+        atual = arv.nos.get(i)
+        for _ in range(6):
+            if atual is None or not atual.pai:
+                break
+            if atual.pai in conjunto:
+                return True
+            atual = arv.nos.get(atual.pai)
+    return False
+
+
 def pos_validacao_mapeamento(
     local_para_id: dict[str, str],
     numeros_esperados: list[int],
     ultimo_erro: list[str] | None = None,
+    arv: arvore.ArvoreMestre | None = None,
 ):
-    """Validação estrita: ID da lista, um objeto por item, `no` xor `nenhum`."""
+    """Validação estrita: IDs da lista, um objeto por item, nós xor `nenhum`, no
+    máximo `MAX_NOS_POR_ITEM` nós por item e nunca um nó com o descendente dele
+    (um conceito, um nó). O 4º nó é recusado, não cortado."""
 
     def falha(motivo: str, msg: str, **meta) -> ResultadoPosValidacao:
         if ultimo_erro is not None:
@@ -426,7 +634,12 @@ def pos_validacao_mapeamento(
 
     def validar(resposta: RespostaMapeamento, _content: str) -> ResultadoPosValidacao:
         desconhecidos = sorted(
-            {it.no for it in resposta.itens if it.no and it.no not in local_para_id}
+            {
+                x
+                for it in resposta.itens
+                for x in it.ids_locais
+                if x not in local_para_id
+            }
         )
         if desconhecidos:
             return falha(
@@ -445,15 +658,27 @@ def pos_validacao_mapeamento(
                 "ou número repetido",
             )
         for it in resposta.itens:
-            if it.nenhum and it.no:
+            ids = it.ids_locais
+            if it.nenhum and ids:
                 return falha(
                     STATUS_FALHA_VALIDACAO_SCHEMA,
-                    f"Item {it.numero} marcado 'nenhum' mas com nó {it.no}",
+                    f"Item {it.numero} marcado 'nenhum' mas com nó {ids}",
                 )
-            if not it.nenhum and not it.no:
+            if not it.nenhum and not ids:
                 return falha(
                     STATUS_FALHA_VALIDACAO_SCHEMA,
                     f"Item {it.numero} sem nó e com 'nenhum' false",
+                )
+            if len(ids) > MAX_NOS_POR_ITEM:
+                return falha(
+                    STATUS_FALHA_VALIDACAO_SCHEMA,
+                    f"Item {it.numero} com {len(ids)} nós (máximo {MAX_NOS_POR_ITEM})",
+                )
+            if arv is not None and _tem_ancestral(arv, [local_para_id[x] for x in ids]):
+                return falha(
+                    STATUS_FALHA_VALIDACAO_SCHEMA,
+                    f"Item {it.numero} aponta para um nó e o descendente dele "
+                    "(um conceito, um nó)",
                 )
         return ResultadoPosValidacao(objeto=resposta, metadata={"status": "ok"})
 
@@ -466,6 +691,7 @@ def chamar_lote(
     local_para_id: dict[str, str],
     metadata_base: dict,
     conta: Contabilidade,
+    arv: arvore.ArvoreMestre | None = None,
 ) -> RespostaMapeamento | None:
     """Até `TENTATIVAS` chamadas; a 2ª leva o erro da 1ª no prompt."""
     resultado = None
@@ -482,7 +708,9 @@ def chamar_lote(
             reasoning=REASONING_PADRAO,
             extras_payload={"usage": {"include": True}},
             metadata={**metadata_base, "tentativa": tentativa, "itens": len(numeros)},
-            pos_validacao=pos_validacao_mapeamento(local_para_id, numeros, ultimo_erro),
+            pos_validacao=pos_validacao_mapeamento(
+                local_para_id, numeros, ultimo_erro, arv
+            ),
             nome_generation=f"mapear_itens_{metadata_base.get('grupo', 'lote')}",
             nome_trace=NOME_TRACE,
             api_key=llm_openrouter.chave_openrouter(
@@ -504,7 +732,9 @@ def chamar_lote(
                 f"Detalhe: {ultimo_erro[0]}\n"
                 f"- Responda um objeto para CADA número de item: {numeros}.\n"
                 "- Use ESTRITAMENTE os IDs locais [N1, N2, ...] de CANDIDATOS.\n"
-                '- Sem nó adequado: "nenhum": true e "no": null.'
+                f'- No máximo {MAX_NOS_POR_ITEM} nós por item (lista "nos"), nunca um nó '
+                "e o descendente dele.\n"
+                '- Sem nó adequado: "nenhum": true e "nos": [].'
             )
         if tentativa < TENTATIVAS:
             time.sleep(BACKOFF_SEGUNDOS)
@@ -541,12 +771,19 @@ def _salvar_cache(cache: dict, path: Path) -> None:
         logger.warning(f"[MAPEAR] Falha ao salvar cache {path}: {e}")
 
 
-def hash_candidatos(chave: str, ids: set[str], contexto: str = "") -> str:
-    """Muda se o item, os candidatos (árvore curada depois) ou o contexto dos
-    subitens mudar. Sem contexto, o hash é o mesmo de antes (cache antigo vale)."""
+def hash_candidatos(
+    chave: str, ids: set[str], contexto: str = "", assinatura: str = ""
+) -> str:
+    """Muda se o item, os candidatos (árvore curada depois), o contexto dos subitens
+    ou a `assinatura` mudar. A assinatura leva o desenho (`DESENHO`) e a disciplina
+    provisória pelo cargo (M4) quando é ela que restringe os candidatos: item com
+    "nenhum" em cache volta ao modelo se qualquer um deles mudar. Sem contexto e sem
+    assinatura, o hash é o mesmo de antes."""
     base = chave + "\n" + "\n".join(sorted(ids))
     if contexto:
         base += "\n#" + contexto
+    if assinatura:
+        base += "\n@" + assinatura
     return hashlib.sha1(base.encode("utf-8")).hexdigest()[:16]
 
 
@@ -591,6 +828,12 @@ def _grupos(
             )
     grupos.sort(key=lambda g: (arvore.NIVEIS.index(g[1]), g[0], g[3][0].chave))
     return grupos
+
+
+def _assinatura(disciplina_provisoria: frozenset[str]) -> str:
+    """Parte do hash do cache que não vem dos candidatos nem dos subitens: o desenho
+    do prompt e a disciplina provisória que restringiu os candidatos."""
+    return DESENHO + "|" + ",".join(sorted(disciplina_provisoria))
 
 
 def _rotulos(nomes: canonico.NomesOrigem) -> dict[str, str]:
@@ -673,6 +916,7 @@ def mapear_itens_novos(
     todos = levantar_pendentes(revisao_dir, arv, concurso, nomes=nomes)
     conta.pendentes = len(todos)
     indice = memoria_mapeamento.construir_indice(arv)
+    ranking = IndiceNos(arv)
     logger.info(f"[MAPEAR] {len(todos)} item(ns) pendente(s) sem nó na árvore.")
 
     for nivel in arvore.NIVEIS:
@@ -681,14 +925,19 @@ def mapear_itens_novos(
             p for p in todos if p.nivel == nivel and p.chave not in arv.mapeamentos
         ]
         for rotulo, _nivel, disciplinas, itens, dicas in _grupos(arv, pend_nivel):
-            if disciplinas:
-                sel = selecionaveis_da_disciplina(arv, disciplinas, nivel)
-            else:
-                sel = selecionaveis_por_tema(arv, itens, nivel)
-            if not sel:
+            por_item = selecionar_lote(arv, ranking, itens, disciplinas, nivel, dicas)
+            if not any(por_item.values()):
                 continue
+            # A disciplina provisória (M4) só conta quando é ela que restringe.
             hashes = {
-                it.chave: hash_candidatos(it.chave, sel, formatar_subitens(it.subitens))
+                it.chave: hash_candidatos(
+                    it.chave,
+                    por_item[it.chave],
+                    formatar_subitens(it.subitens),
+                    _assinatura(
+                        disciplinas if not dicas.get(it.chave) else frozenset()
+                    ),
+                )
                 for it in itens
             }
             if not reavaliar:
@@ -703,7 +952,8 @@ def mapear_itens_novos(
                 continue
             if limite is not None and lotes_feitos >= limite:
                 return conta
-            texto, local_para_id = formatar_candidatos(arv, sel)
+            sel = set().union(*(por_item[it.chave] for it in itens))
+            texto, local_para_id = formatar_candidatos(arv, sel, disciplinas)
             referencia = " ".join(" ".join([it.nome, *it.contexto]) for it in itens)
             exemplos = _linhas_exemplos(
                 memoria_mapeamento.exemplos_aprovados(
@@ -729,6 +979,7 @@ def mapear_itens_novos(
                 local_para_id,
                 {"etapa": "mapear_itens_novos", "grupo": rotulo, "nivel": nivel},
                 conta,
+                arv,
             )
             lotes_feitos += 1
             if resposta is None:
@@ -737,7 +988,7 @@ def mapear_itens_novos(
             for i, it in enumerate(itens, start=1):
                 r = por_numero[str(i)]
                 conta.confianca[r.confianca] += 1
-                if r.nenhum or not r.no:
+                if r.nenhum or not r.ids_locais:
                     conta.nenhum += 1
                     nenhum_cache[it.chave] = {
                         "hash": hashes[it.chave],
@@ -746,10 +997,16 @@ def mapear_itens_novos(
                     continue
                 if it.chave in arv.mapeamentos:
                     continue
-                final = arvore.resolver_no(arv, local_para_id[r.no])
-                if (canonico.chave_regra(it.nome).chave, final) in indice.vetados:
-                    # Par que o dono já rejeitou: nunca é reproposto.
-                    conta.descartados_rejeitados += 1
+                regra_item = canonico.chave_regra(it.nome).chave
+                destinos = []
+                for local in r.ids_locais:
+                    final = arvore.resolver_no(arv, local_para_id[local])
+                    if (regra_item, final) in indice.vetados:
+                        # Par que o dono já rejeitou: nunca é reproposto.
+                        conta.descartados_rejeitados += 1
+                    elif final not in destinos:
+                        destinos.append(final)
+                if not destinos:
                     conta.nenhum += 1
                     nenhum_cache[it.chave] = {
                         "hash": hashes[it.chave],
@@ -760,7 +1017,7 @@ def mapear_itens_novos(
                     arvore.mapear(
                         arv,
                         it.chave,
-                        [local_para_id[r.no]],
+                        destinos,
                         origem="llm",
                         status="proposto",
                     )
@@ -769,9 +1026,11 @@ def mapear_itens_novos(
                     logger.warning(f"[MAPEAR] Proposta recusada para {it.chave}: {e}")
                     continue
                 conta.propostos += 1
+                conta.propostos_multiplos += len(destinos) > 1
                 nenhum_cache.pop(it.chave, None)
                 cache.setdefault("propostos", {})[it.chave] = {
-                    "no": local_para_id[r.no],
+                    "no": destinos[0],
+                    "nos": destinos,
                     "confianca": r.confianca,
                     "justificativa": r.justificativa,
                 }
