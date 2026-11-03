@@ -200,3 +200,53 @@ def test_funcoes_nao_alteram_a_arvore(arv):
         for k, v in arv.mapeamentos.items()
     }
     assert antes == depois
+
+
+# Título genérico só herda decisão do mesmo edital (KAN-88, M11, P78) ---------------
+
+
+def test_chaves_permitidas_filtra_a_decisao_pelo_item_de_origem(arv):
+    arvore.mapear(arv, "direito administrativo|controle", ["A-ATO"], "humano")
+    pais = pais_da(arv, "direito administrativo|x")
+    r = regra("Controle")
+    assert mem.resolver_por_memoria(
+        arv, r, "assunto", pais, chaves_permitidas={"direito administrativo|controle"}
+    ) == {"A-ATO"}
+    assert (
+        mem.resolver_por_memoria(
+            arv, r, "assunto", pais, chaves_permitidas={"outra|chave"}
+        )
+        is None
+    )
+    assert (
+        mem.resolver_por_memoria(arv, r, "assunto", pais, chaves_permitidas=set())
+        is None
+    )
+
+
+def test_chaves_permitidas_desliga_o_apelido_de_no_fundido(arv):
+    arvore.fundir_nos(arv, "A-LIC", "A-ATO")
+    pais = pais_da(arv, "direito administrativo|x")
+    r = regra("Licitações")
+    assert mem.resolver_por_memoria(arv, r, "assunto", pais) == {"A-ATO"}
+    assert (
+        mem.resolver_por_memoria(arv, r, "assunto", pais, chaves_permitidas=set())
+        is None
+    )
+
+
+def test_chaves_permitidas_respeita_par_vetado(arv):
+    arvore.mapear(arv, "direito administrativo|controle", ["A-ATO"], "humano")
+    # O dono rejeitou o par (controle, A-ATO) em outro item de mesma regra.
+    arvore.mapear(arv, "direito penal|controle", ["A-ATO"], "humano", "rejeitado")
+    pais = pais_da(arv, "direito administrativo|x")
+    assert (
+        mem.resolver_por_memoria(
+            arv,
+            regra("Controle"),
+            "assunto",
+            pais,
+            chaves_permitidas={"direito administrativo|controle"},
+        )
+        is None
+    )

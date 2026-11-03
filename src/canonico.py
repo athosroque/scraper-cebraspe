@@ -1415,6 +1415,10 @@ class ResultadoRegra:
     por_global: int = 0
     chaves_global: list[str] = field(default_factory=list)
     chaves_global_fora_disciplina: list[str] = field(default_factory=list)
+    # Título genérico que teria herdado decisão de outro edital (regra de nome ou
+    # memória) e ficou pendente (KAN-88, M11, P78). Já contado em `pendentes`.
+    barrados_generico: int = 0
+    chaves_barradas_generico: list[str] = field(default_factory=list)
     # Chaves dos itens que o passo tentou e não mapeou (sem nó equivalente, regra
     # ambígua, pai sem nó). Item que já tinha entrada (aprovada, proposta ou
     # rejeitada) não passa pelo passo e não entra aqui.
@@ -1538,7 +1542,9 @@ def mapear_novos_itens(
        (dois itens com nós diferentes) fica pendente;
     2. memória das decisões do dono (`memoria_mapeamento`, P73): decisão aprovada
        repetida em outro edital ou apelido de nó fundido; nunca usa proposta não
-       aprovada nem devolve par rejeitado;
+       aprovada nem devolve par rejeitado. Nos ramos 1 e 2, título genérico
+       (`titulo_generico`) só herda decisão de item do mesmo edital: a de outro
+       edital deixa o item pendente (`barrados_generico`), sem `proposto` (KAN-88, P78);
     3. título de bloco (matéria) sem equivalente aponta para o único nó de
        disciplina ou assunto de mesmo nome, nunca vira disciplina nova. Só se o
        nó está numa disciplina compatível com a inferida dos itens do bloco (ou é a
@@ -1629,6 +1635,9 @@ def mapear_novos_itens(
 
     indice_global = indice_global_por_nome(arvore)
 
+    def editais_do_item(info) -> frozenset[str]:
+        return frozenset(oc[0] for oc in info["ocorrencias"])
+
     def tentar_global(nivel, nome_item, sig, memoria, provisorio=False):
         """Ramo do casamento global (KAN-87, M6), sem tocar a árvore. Com pai
         provisório o apelido de nó fundido fica de fora, como em D2 (KAN-86): sem o
@@ -1652,6 +1661,13 @@ def mapear_novos_itens(
         fonte = getattr(nomes, nivel)
         chave_orig_por_chave = {arv_mod.chave_item(k): k for k in fonte}
         indice: dict[tuple, set[frozenset[str]]] = {}
+        # Editais em que cada decisão do índice aparece e itens de cada edital, para o
+        # título genérico só herdar do mesmo edital (KAN-88, M11, P78).
+        editais_decisao: dict[tuple, set[str]] = {}
+        chaves_do_edital: dict[str, set[str]] = {}
+        for k, i in fonte.items():
+            for slug in editais_do_item(i):
+                chaves_do_edital.setdefault(slug, set()).add(arv_mod.chave_item(k))
         pendentes = []
         usada_por_chave: dict[str, str] = {}
         for chave_origem, info in fonte.items():
@@ -1661,6 +1677,9 @@ def mapear_novos_itens(
                 nos = nos_aprovados(chave)
                 if sig and nos:
                     indice.setdefault(sig, set()).add(nos)
+                    editais_decisao.setdefault((sig, nos), set()).update(
+                        editais_do_item(info)
+                    )
             elif sig:
                 pendentes.append((chave, sig))
                 if usada:
@@ -1678,7 +1697,21 @@ def mapear_novos_itens(
             origem_heranca = False
             origem_filho = False
             origem_global = None
-            nome_item = fonte[chave_orig_por_chave[chave]]["nome"]
+            info_item = fonte[chave_orig_por_chave[chave]]
+            nome_item = info_item["nome"]
+            # Título genérico não herda decisão de outro edital (KAN-88, M11, P78):
+            # só vale a decisão de item do mesmo edital; o resto fica pendente.
+            editais_item = editais_do_item(info_item)
+            generico = titulo_generico(nome_item)
+            barrado = False
+            if generico and candidatos:
+                proprios = {
+                    n
+                    for n in candidatos
+                    if editais_decisao.get((sig, n), set()) & editais_item
+                }
+                barrado = not proprios
+                candidatos = proprios
             if chave in usada_por_chave:
                 # Pai provisório: só resolve com as travas de D2 (KAN-86).
                 regra_ambigua = bool(candidatos)
@@ -1703,9 +1736,25 @@ def mapear_novos_itens(
                         candidatos = {frozenset({origem_global[0]})}
             else:
                 if not candidatos:
+                    permitidas = None
+                    if generico:
+                        permitidas = set().union(
+                            *(chaves_do_edital.get(e, set()) for e in editais_item)
+                        )
                     nos_mem = memoria_mapeamento.resolver_por_memoria(
-                        arvore, sig[2], nivel, sig[1], memoria
+                        arvore,
+                        sig[2],
+                        nivel,
+                        sig[1],
+                        memoria,
+                        chaves_permitidas=permitidas,
                     )
+                    if generico and not nos_mem and not barrado:
+                        barrado = bool(
+                            memoria_mapeamento.resolver_por_memoria(
+                                arvore, sig[2], nivel, sig[1], memoria
+                            )
+                        )
                     if nos_mem:
                         candidatos = {nos_mem}
                         origem_memoria = True
@@ -1757,6 +1806,9 @@ def mapear_novos_itens(
             if len(candidatos) != 1:
                 res.pendentes += 1
                 res.chaves_pendentes.append(chave)
+                if barrado and not candidatos:
+                    res.barrados_generico += 1
+                    res.chaves_barradas_generico.append(chave)
                 continue
             (nos,) = candidatos
             try:

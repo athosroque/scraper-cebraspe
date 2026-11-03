@@ -703,7 +703,7 @@ Teste guarda: `tests/test_curar_arvore.py::test_criar_renomear_mover_fundir_desm
 
 Item novo de edital (pipeline, `atualizar_revisao.atualizar_arvore`):
 `canonico.mapear_novos_itens_por_regra` copia os nós de um item aprovado com
-a mesma `chave_regra` **no mesmo nó-pai efetivo**; sem candidato, tenta a memória das
+a mesma `chave_regra` **no mesmo nó-pai efetivo** (título genérico só do mesmo edital, P78); sem candidato, tenta a memória das
 decisões do dono (P73); sem candidato, assunto ou subassunto com pai mapeado vai para o
 **filho único** (KAN-97): entre os filhos ativos (não propostos) dos nós do pai, juntos,
 exatamente 1 tem a mesma `chave_regra` e nível compatível (assunto: assunto ou subassunto;
@@ -781,7 +781,8 @@ pai (`por_filho`, `regra`/`aprovado`), salvo ambiguidade, título genérico ou p
 provisório (P52, KAN-86), com candidato único na subárvore, sem veto e fora dos títulos
 genéricos, e sem apelido de nó fundido; (4) herança de folha, só para subtópico: aponta para o nó único do
 tópico-pai se ele é subassunto ativo sem filhos, salvo título genérico ou par vetado
-(KAN-85, `regra`/`aprovado`); (5) casamento global por nome (KAN-87, P77); nunca cria nó (P72). Só então o LLM (`mapear_itens_novos`, que antes
+(KAN-85, `regra`/`aprovado`); (5) casamento global por nome (KAN-87, P77); nunca cria nó (P72).
+Nos passos (1) e (2), título genérico só herda decisão do mesmo edital (KAN-88, P78). Só então o LLM (`mapear_itens_novos`, que antes
 reexecuta o passo determinístico) recebe contexto de subitens extraído do `<edital>.json`
 (entra no hash do cache), exemplos aprovados do dono e os pares rejeitados. Proposta
 `proposto` nunca é fonte da memória (só vira fonte depois que o dono a aprova), par
@@ -826,6 +827,28 @@ o dono, que podem apontar até dois nós (a árvore é N:N). Lote novo roda K22 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
 Teste guarda: `tests/test_regra_arvore.py::test_contratos_de_ti_casam_em_direito_administrativo`, `tests/test_regra_arvore.py::test_lgpd_casa_global_por_norma`, `tests/test_regra_arvore.py::test_nome_curto_nao_atravessa_disciplina`, `tests/test_regra_arvore.py::test_generico_nunca_casa_global`, `tests/test_regra_arvore.py::test_candidato_duplicado_nao_casa`, `tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai`, `tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global`, `tests/test_regra_arvore.py::test_economia_nao_casa_com_atualidades`
+
+#### P78
+
+**Título genérico não herda decisão de outro edital** (KAN-88, M11, D4 do dono): no passo
+determinístico (P52, P73), o item cujo nome é `canonico.titulo_generico` (a lista única
+`TITULOS_GENERICOS` mais `PALAVRAS_GENERICAS`, em qualquer nível) só herda, pelo ramo da regra de
+nome e pelo da memória, a decisão de um item **do mesmo edital** (mesmo `slug` nas ocorrências de
+`coletar_nomes`). Decisão de item de outro edital, ou de item que nenhum edital em disco traz
+(origem desconhecida), e apelido de nó fundido não valem para ele
+(`memoria_mapeamento.resolver_por_memoria(..., chaves_permitidas=...)`): o item **fica pendente**,
+sem entrada na árvore, e segue para o LLM, que só propõe (`proposto`, A30) e o dono confirma. Não
+vira `proposto`/`regra` de propósito: o relatório, o Datasette e a fila do LLM tratam `proposto` como
+"proposto pela IA". `ResultadoRegra.barrados_generico` e `chaves_barradas_generico` contam o que
+teria herdado e ficou pendente (já dentro de `pendentes`). Filho único, herança de folha, pai
+provisório e casamento global já barravam o genérico (P52, P77). Limite: a chave do item de
+matéria é só `normalizar(título)`, então um título genérico igual em dois editais é **a mesma
+chave** e o mesmo mapeamento (ex.: `legislacao`); isso não passa pelo passo e só se desfaz na
+curadoria (`scripts/curar_arvore.py`) ou com título diferente no edital.
+
+ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_regra_arvore.py::test_titulo_generico_nao_herda_de_outro_edital`, `tests/test_regra_arvore.py::test_titulo_generico_herda_dentro_do_mesmo_edital`, `tests/test_regra_arvore.py::test_titulo_especifico_continua_herdando_de_outro_edital`, `tests/test_regra_arvore.py::test_titulo_generico_sem_origem_conhecida_nao_herda_pela_memoria`, `tests/test_regra_arvore.py::test_titulo_generico_barrado_e_idempotente`, `tests/test_memoria_mapeamento.py::test_chaves_permitidas_filtra_a_decisao_pelo_item_de_origem`, `tests/test_memoria_mapeamento.py::test_chaves_permitidas_respeita_par_vetado`
 
 ### classificacao
 

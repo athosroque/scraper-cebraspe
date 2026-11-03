@@ -344,17 +344,23 @@ def test_sem_gravar_nao_salva_mas_altera_arvore_em_memoria(
 ):
     _mexer(
         arvore_path,
-        lambda a: mapear(a, "direito administrativo|controle", ["A-ATO"], "humano"),
+        lambda a: mapear(
+            a, "direito administrativo|controle externo", ["A-ATO"], "humano"
+        ),
     )
     nomes = canonico.NomesOrigem(
-        assunto={("nocoes de direito administrativo", "controle"): _nome("Controle")}
+        assunto={
+            ("nocoes de direito administrativo", "controles externos"): _nome(
+                "Controles externos"
+            )
+        }
     )
     monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
     conteudo = arvore_path.read_text(encoding="utf-8")
     mem = carregar(arvore_path)
     r = canonico.mapear_novos_itens(tmp_path, arvore_path, gravar=False, arvore_mem=mem)
     assert r.por_memoria == 1
-    assert "nocoes de direito administrativo|controle" in mem.mapeamentos
+    assert "nocoes de direito administrativo|controles externos" in mem.mapeamentos
     assert arvore_path.read_text(encoding="utf-8") == conteudo
 
 
@@ -1565,3 +1571,111 @@ def test_apelido_de_no_fundido_de_outra_disciplina_casa_global(
     assert _dest(arvore_global, "Gestão de acordos de nível de serviço") == [
         ("S-PREP", "regra", "aprovado")
     ]
+
+
+# Título genérico não herda decisão de outro edital (KAN-88, M11, P78) ---------------
+
+
+def _nome_ed(nome, edital):
+    return {"nome": nome, "ocorrencias": {(edital, "superior")}}
+
+
+def _generico(
+    monkeypatch,
+    tmp_path,
+    arvore_path,
+    doador_ed,
+    item_ed,
+    nome_doador="Controle",
+    nome_item="Controles",
+):
+    """Doador aprovado (A-ATO) no edital `doador_ed`; item novo, sob outro bloco que
+    aponta para o mesmo nó-pai, no edital `item_ed`."""
+    regra_doador = canonico.chave_regra(nome_doador).chave
+    regra_item = canonico.chave_regra(nome_item).chave
+    _mexer(
+        arvore_path,
+        lambda a: mapear(
+            a, f"direito administrativo|{regra_doador}", ["A-ATO"], "humano"
+        ),
+    )
+    nomes = canonico.NomesOrigem(
+        assunto={
+            ("direito administrativo", regra_doador): _nome_ed(nome_doador, doador_ed),
+            ("nocoes de direito administrativo", regra_item): _nome_ed(
+                nome_item, item_ed
+            ),
+        }
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    return canonico.mapear_novos_itens(tmp_path, arvore_path)
+
+
+CHAVE_G = "nocoes de direito administrativo|controle"
+
+
+def test_titulo_generico_nao_herda_de_outro_edital(monkeypatch, tmp_path, arvore_path):
+    res = _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_B_25")
+    assert (res.por_nome, res.por_memoria, res.total) == (0, 0, 0)
+    assert res.pendentes == 1 and res.barrados_generico == 1
+    assert res.chaves_barradas_generico == [CHAVE_G]
+    # Nada aprovado em nome do dono: o item fica sem entrada (nem proposto).
+    assert CHAVE_G not in carregar(arvore_path).mapeamentos
+
+
+def test_titulo_generico_herda_dentro_do_mesmo_edital(
+    monkeypatch, tmp_path, arvore_path
+):
+    res = _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_A_25")
+    assert (res.por_nome, res.pendentes, res.barrados_generico) == (1, 0, 0)
+    [m] = carregar(arvore_path).mapeamentos[CHAVE_G]
+    assert (m.no_id, m.origem, m.status) == ("A-ATO", "regra", "aprovado")
+
+
+def test_titulo_especifico_continua_herdando_de_outro_edital(
+    monkeypatch, tmp_path, arvore_path
+):
+    res = _generico(
+        monkeypatch,
+        tmp_path,
+        arvore_path,
+        "ED_A_25",
+        "ED_B_25",
+        "Atos administrativos",
+        "Ato administrativo",
+    )
+    assert (res.por_nome, res.barrados_generico) == (1, 0)
+
+
+def test_titulo_generico_sem_origem_conhecida_nao_herda_pela_memoria(
+    monkeypatch, tmp_path, arvore_path
+):
+    # Decisão do dono em item que nenhum edital em disco traz: origem desconhecida
+    # conta como "outro edital".
+    _mexer(
+        arvore_path,
+        lambda a: mapear(a, "direito administrativo|controle", ["A-ATO"], "humano"),
+    )
+    nomes = canonico.NomesOrigem(
+        assunto={("nocoes de direito administrativo", "controle"): _nome("Controle")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    res = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert (res.total, res.pendentes, res.barrados_generico) == (0, 1, 1)
+
+
+def test_titulo_generico_barrado_e_idempotente(monkeypatch, tmp_path, arvore_path):
+    _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_B_25")
+    antes = carregar(arvore_path).mapeamentos
+    res = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert (res.total, res.barrados_generico) == (0, 1)
+    assert carregar(arvore_path).mapeamentos == antes
+
+
+def test_titulo_generico_aprovado_pelo_dono_deixa_de_ser_pendente(
+    monkeypatch, tmp_path, arvore_path
+):
+    _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_B_25")
+    _mexer(arvore_path, lambda a: mapear(a, CHAVE_G, ["A-ATO"], "humano"))
+    res = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert (res.total, res.pendentes, res.barrados_generico) == (0, 0, 0)

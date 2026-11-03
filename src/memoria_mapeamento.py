@@ -19,7 +19,7 @@ status de nada: quem grava é o chamador, via `arvore.mapear`.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from dataclasses import dataclass, field
 
 from src import arvore
@@ -119,6 +119,9 @@ class Indice:
     # chave_regra -> destinos ativos de nós fundidos que tinham esse nome
     apelidos: dict[str, set[str]] = field(default_factory=dict)
     vetados: dict[tuple[str, str], str] = field(default_factory=dict)
+    # (nível, nós do pai, chave_regra) -> nós aprovados -> chaves dos itens que
+    # deram a decisão (KAN-88, M11: título genérico só herda de item do mesmo edital)
+    doadores: dict[tuple, dict[frozenset[str], set[str]]] = field(default_factory=dict)
 
 
 def construir_indice(arv: arvore.ArvoreMestre) -> Indice:
@@ -137,6 +140,9 @@ def construir_indice(arv: arvore.ArvoreMestre) -> Indice:
         regra = chave_regra(partes[-1]).chave
         if regra:
             ind.decisoes.setdefault((nivel, pais, regra), set()).add(nos)
+            ind.doadores.setdefault((nivel, pais, regra), {}).setdefault(
+                nos, set()
+            ).add(chave)
     for no in arv.nos.values():
         if no.status == "fundido":
             regra = chave_regra(no.nome).chave
@@ -153,13 +159,19 @@ def resolver_por_memoria(
     nivel: str,
     pais: frozenset[str],
     indice: Indice | None = None,
+    chaves_permitidas: Collection[str] | None = None,
 ) -> frozenset[str] | None:
     """Nós do item novo, ou None se a memória não resolve sem ambiguidade.
 
     `regra` é `chave_regra(nome).chave`; `pais` são os nós aprovados do pai efetivo
     (vazio no nível de matéria). Ordem: (1) decisão aprovada de item de mesma regra
     e mesmo pai; (2) apelido exato de nó (nível compatível, mesma disciplina do pai,
-    candidato único). Nó de par rejeitado pelo dono nunca é devolvido."""
+    candidato único). Nó de par rejeitado pelo dono nunca é devolvido.
+
+    `chaves_permitidas` (KAN-88, M11, P78): quando dado, só vale a decisão cujo item
+    de origem está nesse conjunto (itens do mesmo edital do item novo), e o apelido de
+    nó fundido não vale. É o modo do título genérico, que não herda decisão de outro
+    edital sem o dono confirmar."""
     if not regra:
         return None
     ind = indice or construir_indice(arv)
@@ -173,11 +185,20 @@ def resolver_por_memoria(
         return nos
 
     candidatos = ind.decisoes.get((nivel, frozenset(pais), regra), set())
+    if chaves_permitidas is not None:
+        doadores = ind.doadores.get((nivel, frozenset(pais), regra), {})
+        candidatos = {
+            nos
+            for nos in candidatos
+            if any(c in chaves_permitidas for c in doadores.get(nos, ()))
+        }
     if len(candidatos) == 1:
         (nos,) = candidatos
         return livre(nos)
     if len(candidatos) > 1:
         return None  # decisões divergentes: ambíguo, vai para o LLM/dono
+    if chaves_permitidas is not None:
+        return None  # sem decisão do mesmo edital: apelido não vale (P78)
 
     disciplinas = {arvore.materia_do_no(arv, p) for p in pais} - {""}
     alvo = NIVEIS_ALVO[nivel]
