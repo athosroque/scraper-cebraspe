@@ -9,6 +9,7 @@ data/
 revisao_piloto/*.db*
 revisao_piloto/*.bak*
 revisao_piloto/relatorio/
+revisao_piloto/datasette/
 *.bak
 .claude/
 .agents/

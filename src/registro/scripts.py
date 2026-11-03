@@ -103,7 +103,8 @@ SCRIPTS: tuple[Script, ...] = (
     ),
     Script(
         "scripts.gerar_db_datasette",
-        "Constrói o banco SQLite servido via Datasette para revisão humana.",
+        "Constrói o banco SQLite servido via Datasette para revisão humana, com a "
+        "tabela de mapeamento (sugestões, seções) e as visões `revisao_*`.",
         "relatorio",
         "argv",
         uso_argv="python -m scripts.gerar_db_datasette [diretorio_revisao]",

@@ -463,12 +463,266 @@ def _bloco_origem_mapeamento(linhas: list[dict] | None) -> str:
     )
 
 
+CSS_REVISAO = """
+.guiada { margin: 0.6rem 0; }
+.guiada .cards { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0.4rem 0 0.8rem; }
+.guiada .card { border-radius: 8px; padding: 0.35rem 0.8rem; min-width: 8rem; font-size: 0.82rem;
+                background: color-mix(in srgb, CanvasText 7%, Canvas); }
+.guiada .card strong { display: block; font-size: 1.35rem; }
+.guiada .card.bloco { background: color-mix(in srgb, #7c3aed 22%, Canvas); }
+.guiada .card.sug { background: color-mix(in srgb, #0d9488 22%, Canvas); }
+.guiada .card.novo { background: color-mix(in srgb, #d97706 22%, Canvas); }
+.guiada h4 { margin: 1rem 0 0.2rem; }
+.guiada td.num, .guiada td.score { white-space: nowrap; text-align: right; }
+.guiada .score.alto { color: #15803d; font-weight: 700; }
+.guiada .score.medio { color: #b45309; font-weight: 600; }
+.guiada code { font-size: 0.78rem; word-break: break-all; }
+.guiada button.copiar { font: inherit; font-size: 0.75rem; padding: 0 0.5rem; border-radius: 6px;
+                        cursor: pointer; border: 1px solid color-mix(in srgb, CanvasText 35%, Canvas);
+                        background: Canvas; color: CanvasText; margin-left: 0.3rem; }
+.guiada details { margin: 0.4rem 0; }
+.guiada summary { cursor: pointer; font-weight: 600; }
+.guiada tr.cabeca-bloco td { background: color-mix(in srgb, CanvasText 7%, Canvas); font-weight: 600; }
+"""
+
+COPIAR_JS = """<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button.copiar');
+  if (!b) return;
+  navigator.clipboard.writeText(b.dataset.cmd).then(function () {
+    var t = b.textContent; b.textContent = 'copiado'; setTimeout(function () { b.textContent = t; }, 1200);
+  });
+});
+</script>"""
+
+
+CSS += CSS_REVISAO
+
+
+def _pt_score(score: float | None) -> str:
+    if score is None:
+        return "—"
+    classe = (
+        "alto"
+        if score >= mapeamento_revisao.LIMIAR_ALTO
+        else "medio"
+        if score >= mapeamento_revisao.LIMIAR_SUGESTAO
+        else ""
+    )
+    return f"<span class='score {classe}'>{score:.2f}</span>".replace(".", ",", 1)
+
+
+def _celula_cargos(linha: dict) -> str:
+    cargos = linha.get("cargos_grupo") or linha.get("cargos") or []
+    if not cargos:
+        return "—"
+    rotulos = []
+    for c in cargos:
+        # "TÉCNICO EM TI II – ÁREA 1: ADMINISTRAÇÃO DE BD" -> "ÁREA 1: ADMINISTRAÇÃO DE BD"
+        curto = "básicos" if c == "conhecimentos básicos" else c.split("–")[-1].strip()
+        rotulos.append(
+            f"<span title='{escape(c, quote=True)}'>{escape(curto[:40])}</span>"
+        )
+    return ", ".join(rotulos)
+
+
+def _celula_sugestoes(linha: dict) -> str:
+    """Top-1 com score e caminho; os outros dois em linhas menores."""
+    sugestoes = linha.get("sugestoes") or []
+    if not sugestoes:
+        if linha.get("sugestao_caminho"):
+            return f"herda o nó do tópico: {escape(linha['sugestao_caminho'])}"
+        return "<span class='sub'>sem nó parecido</span>"
+    partes = []
+    for n, s in enumerate(sugestoes):
+        texto = (
+            f"{_pt_score(s['score'])} {escape(s['caminho'])} "
+            f"<span class='sub'>[{escape(s['no_id'])}]</span>"
+        )
+        partes.append(texto if n == 0 else f"<div class='sub'>{texto}</div>")
+    return "".join(partes)
+
+
+def _celula_comando(linha: dict) -> str:
+    comandos = linha.get("curar_grupo") or (
+        [linha["curar"]] if linha.get("curar") else []
+    )
+    if not comandos:
+        return "<span class='sub'>—</span>"
+    texto = "\n".join(comandos)
+    return (
+        f"<code>{escape(comandos[0])}</code>"
+        + (
+            f" <span class='sub'>(+{len(comandos) - 1} bloco(s))</span>"
+            if len(comandos) > 1
+            else ""
+        )
+        + f"<button class='copiar' type='button' data-cmd='{escape(texto, quote=True)}'>copiar</button>"
+    )
+
+
+def _celula_item(linha: dict) -> str:
+    blocos = linha.get("blocos_grupo") or [linha["bloco"]]
+    onde = escape("; ".join(blocos))
+    extra = ""
+    if (linha.get("repete") or 1) > 1:
+        extra = f" <span class='badge neutro'>repete em {linha['repete']} blocos</span>"
+    pai = " (pai provisório pelo cargo)" if linha.get("pai_provisorio") else ""
+    nivel = "subassunto" if linha["nivel"] == "subassunto" else linha["nivel"]
+    return (
+        f"{escape(str(linha['item']))}{extra}"
+        f"<div class='sub'>{escape(nivel)} · {onde}{escape(pai)}</div>"
+    )
+
+
+def _tabela_linhas(linhas: list[dict], com_bloco: bool = False) -> str:
+    corpo = []
+    ultimo = None
+    for li in linhas:
+        if com_bloco and li["bloco"] != ultimo:
+            ultimo = li["bloco"]
+            corpo.append(
+                f"<tr class='cabeca-bloco'><td colspan='5'>{escape(str(ultimo))}</td></tr>"
+            )
+        destrava = (
+            f" <span class='badge novo'>trava {li['travados']}</span>"
+            if li.get("travados") and li["nivel"] == "assunto"
+            else ""
+        )
+        corpo.append(
+            f"<tr><td>{_celula_item(li)}{destrava}</td><td>{_celula_cargos(li)}</td>"
+            f"<td>{_celula_sugestoes(li)}</td><td>{_celula_comando(li)}</td></tr>"
+        )
+    return (
+        "<table><thead><tr><th>Item do edital</th><th>Cargos</th>"
+        "<th>Sugestão (similaridade, sem IA)</th><th>Linha para aprovar</th></tr></thead>"
+        f"<tbody>{''.join(corpo)}</tbody></table>"
+    )
+
+
+def _tabela_decisoes(linhas: list[dict], resultado: dict, auditoria: dict) -> str:
+    corpo = []
+    for li in linhas:
+        chunks = _link_chunk(_chunks_da_disciplina(resultado, auditoria, li["item"]))
+        trava = f"{li['itens_bloco']} itens" + (
+            f", {li['travados']} travados" if li["travados"] else ""
+        )
+        corpo.append(
+            f"<tr><td><span class='novo-tag'>TÍTULO DE BLOCO</span> <strong>{escape(str(li['item']))}</strong>"
+            f"<div class='sub'>{chunks}"
+            f"{' · pai provisório pelo cargo' if li.get('pai_provisorio') else ''}</div></td>"
+            f"<td class='num'>{trava}</td><td>{_celula_cargos(li)}</td>"
+            f"<td>{_celula_sugestoes(li)}</td><td>{_celula_comando(li)}</td></tr>"
+        )
+    return (
+        "<table><thead><tr><th>Título do bloco</th><th>No bloco</th><th>Cargos</th>"
+        "<th>Para onde ele vai (sugestão, sem IA)</th><th>Linha para aprovar</th></tr></thead>"
+        f"<tbody>{''.join(corpo)}</tbody></table>"
+    )
+
+
+def _por_secao(revisao: list[dict], secao: str) -> list[dict]:
+    return [
+        li for li in revisao if li["secao"] == secao and li.get("representante", True)
+    ]
+
+
+def _bloco_revisao_guiada(
+    resultado: dict, auditoria: dict, revisao: list[dict], n_antes: int
+) -> str:
+    """Leitura guiada dos pendentes: decisões de bloco, com sugestão, novos, e os
+    travados/ruído recolhidos. Só apresentação (M10): nada aqui decide destino."""
+    decisoes = sorted(
+        _por_secao(revisao, "decisao_bloco"), key=lambda li: -li["itens_bloco"]
+    )
+    com_sug = sorted(
+        _por_secao(revisao, "com_sugestao"),
+        key=lambda li: (li["bloco"], -(li["score"] or 0)),
+    )
+    novos = sorted(_por_secao(revisao, "novo"), key=lambda li: li["bloco"])
+    travados = _por_secao(revisao, "travado")
+    herdam = _por_secao(revisao, "herda_topico")
+    a_ler = len(decisoes) + len(com_sug) + len(novos)
+    if not (decisoes or com_sug or novos or travados or herdam):
+        return ""
+    cards = [
+        ("bloco", len(decisoes), "decisões de bloco"),
+        ("sug", len(com_sug), "com sugestão"),
+        ("novo", len(novos), "realmente novos"),
+        ("", len(travados), "travados pelo pai"),
+        ("", len(herdam), "herdam do tópico"),
+    ]
+    cards_html = "".join(
+        f"<div class='card {cls}'><strong>{n}</strong>{escape(rotulo)}</div>"
+        for cls, n, rotulo in cards
+    )
+    partes = [
+        "<div class='guiada'>",
+        f"<h3>Leitura guiada: {a_ler} linhas a ler (antes: {n_antes} linhas soltas)</h3>",
+        "<p class='legenda'>Sugestão = nó da árvore de nome parecido (similaridade de palavras, sem IA), "
+        "restrita à disciplina do pai e ordenada pelo score. Você decide: copie a linha de "
+        "<code>curar_arvore</code> do que aprovar (nada é gravado por este relatório).</p>",
+        f"<div class='cards'>{cards_html}</div>",
+    ]
+    if decisoes:
+        partes.append(
+            f"<h4>1. Decisões de bloco ({len(decisoes)})</h4>"
+            "<p class='legenda'>Título do edital sem nó: decida para onde ele vai (vira assunto, nunca "
+            "disciplina nova). Enquanto o pai não tem nó, os itens abaixo dele só são comparados com a "
+            "disciplina inferida pelo cargo, ou ficam travados.</p>"
+            + _tabela_decisoes(decisoes, resultado, auditoria)
+        )
+    if com_sug:
+        partes.append(
+            f"<h4>2. Com sugestão ({len(com_sug)})</h4>"
+            "<p class='legenda'>Score a partir de "
+            f"{mapeamento_revisao.LIMIAR_SUGESTAO:.2f}".replace(".", ",")
+            + "; verde a partir de "
+            + f"{mapeamento_revisao.LIMIAR_ALTO:.2f}".replace(".", ",")
+            + ". Itens iguais em vários blocos ou cargos aparecem numa linha só.</p>"
+            + _tabela_linhas(com_sug, com_bloco=True)
+        )
+    if novos:
+        partes.append(
+            f"<h4>3. Realmente novos ({len(novos)})</h4>"
+            "<p class='legenda'>Nenhum nó parecido na disciplina do pai: crie o nó "
+            "(<code>curar_arvore --criar 'NIVEL:PAI=Nome'</code>) ou aponte para o nó mais próximo.</p>"
+            + _tabela_linhas(novos, com_bloco=True)
+        )
+    if travados:
+        por_pai: dict[str, list[dict]] = {}
+        for li in travados:
+            por_pai.setdefault(li["pai_chave"], []).append(li)
+        itens = "".join(
+            f"<li><strong>{escape(str(f[0]['bloco'] if f[0]['nivel'] == 'assunto' else f[0]['assunto']))}"
+            f"</strong> <span class='sub'>({len(f)} itens esperam o pai)</span></li>"
+            for f in por_pai.values()
+        )
+        partes.append(
+            f"<details><summary>Travados pelo pai ({len(travados)})</summary>"
+            "<p class='legenda'>O pai ainda não tem nó (nem disciplina inferida pelo cargo): decida o pai "
+            "acima e estes itens passam a ser comparados.</p>"
+            f"<ul>{itens}</ul></details>"
+        )
+    if herdam:
+        partes.append(
+            f"<details><summary>Herdam o nó do tópico ({len(herdam)})</summary>"
+            "<p class='legenda'>Fragmentos e facetas sem nó próprio, sob um tópico que já aponta para um nó "
+            "sem filhos: normalmente ficam no nó do tópico.</p>"
+            + _tabela_linhas(herdam, com_bloco=True)
+            + "</details>"
+        )
+    partes.append("</div>")
+    return "".join(partes)
+
+
 def _bloco_o_que_revisar(
     resultado: dict,
     auditoria: dict,
     validacao: dict | None,
     novidades: dict,
     mapeamento: list[dict] | None = None,
+    revisao: list[dict] | None = None,
 ) -> str:
     # (a) alertas bloqueantes e chunks com falha
     itens_a = []
@@ -573,6 +827,12 @@ def _bloco_o_que_revisar(
         )
     else:
         novos_html = "<h3>Realmente novos — sem nó equivalente (0)</h3><p class='ok'>Nenhum item novo sem equivalente.</p>"
+    if revisao:
+        guiada = _bloco_revisao_guiada(
+            resultado, auditoria, revisao, novidades.get("total_itens_novos") or 0
+        )
+        if guiada:
+            novos_html = guiada
     if linhas_c:
         propostas_html = (
             f"<h3>Propostas da IA a conferir ({len(linhas_c)})</h3>"
@@ -614,6 +874,7 @@ def renderizar_edital(
     validacao: dict | None,
     novidades: dict | None = None,
     mapeamento: list[dict] | None = None,
+    revisao: list[dict] | None = None,
 ) -> str:
     novidades = {**NOVIDADES_VAZIAS, **(novidades or {})}
     disciplinas_novas, assuntos_novos = _novos_do_edital(novidades)
@@ -659,7 +920,7 @@ def renderizar_edital(
     total_informativos = validacao.get("total_informativos", 0) if validacao else "—"
     edital = escape(_rotulo_concurso(resultado) + resultado["edital"])
     revisar_html = _bloco_o_que_revisar(
-        resultado, auditoria, validacao, novidades, mapeamento
+        resultado, auditoria, validacao, novidades, mapeamento, revisao
     )
     return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8">
@@ -679,6 +940,7 @@ def renderizar_edital(
 </div>
 {alertas_edital_html}
 {chunks_html}
+{COPIAR_JS}
 </body></html>
 """
 
@@ -887,6 +1149,26 @@ def _contexto_mapeamento(revisao_dir: Path):
     return arvore, mapeamento_revisao.carregar_cache_propostos()
 
 
+def _revisao_segura(resultado, mapeamento, arvore, contexto, indice) -> list[dict]:
+    """Leitura guiada (M10); falha vira lista vazia e o relatório sai no formato antigo."""
+    if arvore is None or not mapeamento:
+        return []
+    try:
+        return mapeamento_revisao.montar_revisao(
+            mapeamento,
+            arvore,
+            provisorias=contexto.get("provisorias"),
+            filhos=contexto.get("filhos"),
+            cargos=mapeamento_revisao.cargos_por_chave(resultado),
+            indice=indice,
+        )
+    except Exception as erro:  # noqa: BLE001
+        logger.warning(
+            f"{resultado.get('edital')}: leitura guiada indisponível: {erro}"
+        )
+        return []
+
+
 def gerar_relatorios(
     revisao_dir: Path = REVISAO_DIR_PADRAO,
     novidades_fn: FuncaoNovidades | None = None,
@@ -894,6 +1176,14 @@ def gerar_relatorios(
     """`novidades_fn` (injetável nos testes) calcula as novidades de um
     edital; sem ela, tenta `src.novidades_edital.novidades_do_edital`."""
     arvore, propostos = _contexto_mapeamento(revisao_dir)
+    contexto = (
+        mapeamento_revisao.contexto_revisao(revisao_dir, arvore)
+        if arvore is not None
+        else {}
+    )
+    indice = (
+        mapeamento_revisao.IndiceSimilaridade(arvore) if arvore is not None else None
+    )
     if novidades_fn is None:
         novidades_fn = _carregar_funcao_novidades()
         if novidades_fn is not None and arvore is not None:
@@ -925,7 +1215,10 @@ def gerar_relatorios(
             if arvore is not None
             else []
         )
-        html = renderizar_edital(resultado, auditoria, validacao, novidades, mapeamento)
+        revisao = _revisao_segura(resultado, mapeamento, arvore, contexto, indice)
+        html = renderizar_edital(
+            resultado, auditoria, validacao, novidades, mapeamento, revisao
+        )
         arquivo_html = f"{json_path.stem}.html"
         (saida_dir / arquivo_html).write_text(html, encoding="utf-8")
         editais_index.append(

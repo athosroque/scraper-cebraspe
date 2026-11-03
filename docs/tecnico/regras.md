@@ -798,7 +798,8 @@ O relatório de revisão e a tabela `mapeamento_itens` do `revisao.db` leem a á
 passada pelo passo determinístico (`canonico.arvore_apos_passo`) e não têm critério de
 equivalência próprio: só reportam como resolvido o que `mapear_novos_itens` mapeia (nome,
 memória, filho único, herança de folha, pai provisório pelo cargo ou casamento global), e os pendentes do relatório são exatamente os do passo. `atualizar_revisao` roda `atualizar_arvore`
-antes de `gerar_relatorios` e `gerar_db` (KAN-81).
+antes de `gerar_relatorios` e `gerar_db` (KAN-81). Seções, sugestão e agrupamento por cima disso são
+só apresentação (P79).
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
@@ -872,6 +873,26 @@ então mudar candidatos ou prompt reavalia o item. `REASONING_PADRAO` (P16) não
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
 
 Teste guarda: `tests/test_mapeamento_llm.py::test_ranking_do_titulo_inclui_no_pelos_subitens`, `tests/test_mapeamento_llm.py::test_subassunto_e_alvo_valido_de_titulo_e_nunca_vira_aprovado`, `tests/test_mapeamento_llm.py::test_candidatos_globais_somados_sem_quebrar_a_lista_fechada`, `tests/test_mapeamento_llm.py::test_ate_3_nos_em_item_composto_e_o_4_e_recusado`, `tests/test_mapeamento_llm.py::test_validacao_de_nos_multiplos`, `tests/test_mapeamento_llm.py::test_prompt_ensina_heranca_e_varios_nos`, `tests/test_mapeamento_llm.py::test_cache_do_nenhum_invalida_com_a_disciplina_provisoria`, `tests/test_mapeamento_llm.py::test_reasoning_padrao_inalterado`
+
+#### P79
+
+A revisão do mapeamento é guiada por seções e sugestão, e **só apresenta** (KAN-89, M10):
+`mapeamento_revisao.montar_revisao` agrupa os pendentes do passo (P74) em decisão de bloco (título sem
+nó, com quantos itens destrava), com sugestão (score ≥ `LIMIAR_SUGESTAO`), realmente novo, travado pelo
+pai (pai sem nó e sem disciplina inferida pelo cargo, M4) e herda do tópico (subitem sob nó-folha).
+A sugestão é o top-3 por similaridade de palavras (IDF, sem LLM), restrito à subárvore do pai ou da
+disciplina provisória; nó de outra disciplina só entra com o mesmo `chave_regra` ou sendo a mesma norma
+(`nos_da_mesma_norma`); título genérico não recebe sugestão. Mesmo item em blocos ou cargos
+diferentes vira um grupo (uma linha, lista de cargos). Cada sugestão traz a linha
+`curar_arvore --mapear` para o dono copiar: o relatório e o `revisao.db` nunca aprovam nem
+gravam (A27, A30), e a sugestão não decide equivalência, que continua só do passo. O Datasette
+ganha as colunas `bloco`, `secao`, `sugestao_*`, `score`, `cargos`, `grupo`, `representante`,
+`curar_arvore`, as visões `revisao_*` e `revisao_piloto/datasette/metadata.json` (consultas salvas,
+fora do glob `*.json` dos editais).
+
+ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
+
+Teste guarda: `tests/test_revisao_guiada.py::test_apresentacao_nao_muda_categoria_nem_pendentes_nem_arvore`, `tests/test_revisao_guiada.py::test_nome_parecido_de_outra_disciplina_nao_atravessa`, `tests/test_revisao_guiada.py::test_mesmo_item_em_dois_blocos_vira_um_grupo_com_os_dois_cargos`, `tests/test_revisao_guiada.py::test_gerar_db_acrescenta_colunas_visoes_e_metadata`
 
 ### classificacao
 

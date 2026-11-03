@@ -271,7 +271,7 @@ Exporta a visão executiva do site de documentação para PDF, para quem está f
 
 ### `python -m scripts.gerar_db_datasette`
 
-Constrói o banco SQLite servido via Datasette para revisão humana.
+Constrói o banco SQLite servido via Datasette para revisão humana, com a tabela de mapeamento (sugestões, seções) e as visões `revisao_*`.
 
 **ADRs:** [ADR-020](../adr/ADR-020-classificacao-nivel-tipo-conhecimento-concurso.md), [ADR-026](../adr/ADR-026-banco-postgres-proprio.md)
 
