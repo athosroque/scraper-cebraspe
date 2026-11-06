@@ -761,3 +761,19 @@ Para achar perda de figura, contar imagens por PDF não serve; o que funciona é
 traço fora do texto sem figura gravada. O K19 (regex "texto|tabela|…") deu 60 falsos em 61
 ("contexto", tabela SQL).
 **Custo do aprendizado:** ~1h30 (auditoria visual de 125 páginas e depuração do agrupamento).
+
+### [tags: openrouter, llm, credenciais, dotenv, mapeamento-llm]
+**Sintoma:** a execução do `mapear_itens_novos` (KAN-92) fez 124 chamadas e todas voltaram
+HTTP 401 "User not found". Nada foi gravado e nada foi cobrado. A checagem prévia da chave
+(`GET /api/v1/key`) tinha respondido 200, com `usage: 0`. Depois da troca da chave, o 401
+continuou.
+**Causa:** são duas. (1) Para uma chave apagada, o `/api/v1/key` do OpenRouter ainda respondeu
+200, enquanto `chat/completions` dava 401: o 200 do `/key` não prova que a chave serve. (2) A
+chave nova foi colada numa linha nova do `.env`, e a antiga (morta) continuou mais abaixo. O
+`python-dotenv` usa a **última** ocorrência, então o código seguia lendo a chave morta, mesmo
+com a nova certa no arquivo.
+**Solução:** testar a chave com um chat mínimo (`max_tokens: 1`, custa ~US$ 0,000002) antes de
+qualquer execução paga, e mostrar só status e tamanho, nunca o valor. Depois de trocar uma chave,
+conferir que o nome aparece numa só linha do `.env` (`grep -c '^NOME=' .env`); para achar a
+linha ruim, testar cada ocorrência separadamente.
+**Custo do aprendizado:** ~30 min (uma execução perdida, três rodadas de diagnóstico).
