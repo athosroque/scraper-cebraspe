@@ -1380,7 +1380,7 @@
   "S-091eec91d8": {"id": "S-091eec91d8", "nivel": "subassunto", "nome": "Anafilaxia", "pai": "A-35fc8ddf03", "origem": "semente", "status": "ativo", "fundido_em": null},
   "S-097106b044": {"id": "S-097106b044", "nivel": "subassunto", "nome": "SOAP", "pai": "A-0d5791ace5", "origem": "semente", "status": "fundido", "fundido_em": "A-0d5791ace5"},
   "S-09a1483cc7": {"id": "S-09a1483cc7", "nivel": "subassunto", "nome": "Mecanismos de controle da informação", "pai": "A-c60bfebf6d", "origem": "semente", "status": "ativo", "fundido_em": null},
-  "S-09b573ab36": {"id": "S-09b573ab36", "nivel": "subassunto", "nome": "Organização político-administrativa", "pai": "AL-74a8d407db", "origem": "semente", "status": "ativo", "fundido_em": null},
+  "S-09b573ab36": {"id": "S-09b573ab36", "nivel": "subassunto", "nome": "Organização político-administrativa", "pai": "AL-74a8d407db", "origem": "semente", "status": "fundido", "fundido_em": "AL-74a8d407db"},
   "S-09ff5e725a": {"id": "S-09ff5e725a", "nivel": "subassunto", "nome": "normalização de dados", "pai": "A-48c7cb56b8", "origem": "semente", "status": "fundido", "fundido_em": "A-48c7cb56b8"},
   "S-0a56872b3a": {"id": "S-0a56872b3a", "nivel": "subassunto", "nome": "Participação, atores sociais e controle social", "pai": "A-36bce4a6a2", "origem": "semente", "status": "ativo", "fundido_em": null},
   "S-0a6525cf0e": {"id": "S-0a6525cf0e", "nivel": "subassunto", "nome": "Seguridade social no Brasil: relação Estado/sociedade; contexto atual e neoliberalismo", "pai": "A-ea208d484c", "origem": "semente", "status": "ativo", "fundido_em": null},
