@@ -537,9 +537,118 @@ def test_script_resumo_mostra_memoria_llm_e_sem_no(cenario, monkeypatch, capsys)
     )
     script.main([str(revisao), "--arvore", str(caminho)])
     saida = json.loads(capsys.readouterr().out)
-    assert saida["resolvidos_antes_do_llm_por_memoria"] == 0
+    assert saida["por_origem"]["memoria_do_dono"] == 0
+    assert saida["por_origem"]["llm_propostos"] == 1
+    assert saida["por_origem"]["llm_nenhum"] == 2
     assert saida["propostos_por_llm"] == 1
     assert saida["sem_no"] == 2
+
+
+# Cascata no dry-run (M13, KAN-90) ---------------------------------------------------
+
+
+@pytest.fixture
+def cenario_cascata(cenario, monkeypatch):
+    """Bloco de edital sem disciplina: o tópico só ganha pai pela proposta do nível de
+    cima, e o subtópico só ganha disciplina pela proposta do tópico."""
+    oc = {("CASCATA_25", "superior")}
+    nomes = canonico.NomesOrigem()
+    nomes.materia = {"bloco novo": {"nome": "BLOCO NOVO", "ocorrencias": oc}}
+    nomes.assunto = {
+        ("bloco novo", "atos administrativos em especie"): {
+            "nome": "Atos administrativos em espécie",
+            "ocorrencias": oc,
+        }
+    }
+    nomes.subassunto = {
+        ("bloco novo", "atos administrativos em especie", "anulacao dos atos"): {
+            "nome": "Anulação dos atos",
+            "ocorrencias": oc,
+        }
+    }
+    monkeypatch.setattr(mapeamento_llm.canonico, "coletar_nomes", lambda _d: nomes)
+    return cenario
+
+
+def _rotulos_dry_run(caplog) -> list[str]:
+    return [r.getMessage() for r in caplog.records if "(dry-run)" in r.getMessage()]
+
+
+def test_dry_run_simula_a_cascata_sem_gravar(cenario_cascata, monkeypatch, caplog):
+    caplog.set_level("INFO", logger="scraper_cebraspe")
+    antes = cenario_cascata[1].read_text(encoding="utf-8")
+    conta, falso, _ = _rodar(
+        cenario_cascata, monkeypatch, lambda p, _n: [], dry_run=True
+    )
+    assert falso.chamadas == []
+    # O tópico recebeu a sugestão top-1 (Atos administrativos, de Direito
+    # Administrativo); o subtópico entra no lote da disciplina, não em "sem disciplina".
+    assert conta.simulados_top1 >= 1
+    sub = [m for m in _rotulos_dry_run(caplog) if "Subtópico" in m]
+    assert sub and "Direito Administrativo" in sub[0], sub
+    assert conta.lotes_sem_disciplina == 2  # o título e o tópico, que não têm pai
+    assert cenario_cascata[1].read_text(encoding="utf-8") == antes
+    assert not (cenario_cascata[1].parent / mapeamento_llm.CACHE_NOME).exists()
+
+
+def test_dry_run_preve_as_mesmas_chamadas_do_modo_real(cenario_cascata, monkeypatch):
+    conta_dry, _, _ = _rodar(
+        cenario_cascata, monkeypatch, lambda p, _n: [], dry_run=True
+    )
+    escolhas = {
+        "BLOCO NOVO": None,
+        "Atos administrativos em espécie": "Atos administrativos",
+        "Anulação dos atos": "Anulação e revogação",
+    }
+    conta, falso, arv = _rodar(
+        cenario_cascata, monkeypatch, lambda p, _n: _itens_por_nome(p, escolhas)
+    )
+    assert len(falso.chamadas) == conta_dry.chamadas_previstas
+    assert conta.lotes_sem_disciplina == conta_dry.lotes_sem_disciplina
+    sub = "bloco novo|atos administrativos em especie|anulacao dos atos"
+    assert [m.no_id for m in arv.mapeamentos[sub]] == ["S-ANUL"]
+    assert "Direito Administrativo" in falso.chamadas[-1]["metadata"]["grupo"]
+
+
+def test_sugestao_top1_respeita_par_rejeitado(cenario):
+    arv = arvore.carregar(cenario[1])
+    indice = mapeamento_llm.IndiceNos(arv)
+    item = mapeamento_llm.Pendente(
+        chave="x|atos administrativos em especie",
+        nivel="assunto",
+        nome="Atos administrativos em espécie",
+        pais=["x"],
+        contexto=["X"],
+        concursos={"T"},
+        materia_chave="x",
+    )
+    candidatos = {"A-ATO", "A-LIC"}
+    assert mapeamento_llm.sugestao_top1(arv, indice, item, candidatos, {}) == "A-ATO"
+    regra = canonico.chave_regra(item.nome).chave
+    vetado = {(regra, "A-ATO"): item.nome}
+    assert (
+        mapeamento_llm.sugestao_top1(arv, indice, item, candidatos, vetado) != "A-ATO"
+    )
+    assert mapeamento_llm.sugestao_top1(arv, indice, item, set(), {}) is None
+
+
+def test_script_dry_run_mostra_origem_e_cascata(cenario_cascata, capsys):
+    revisao, caminho = cenario_cascata
+    script.main([str(revisao), "--arvore", str(caminho), "--dry-run"])
+    saida = json.loads(capsys.readouterr().out)
+    assert set(saida["por_origem"]) >= {
+        "regra_de_nome",
+        "memoria_do_dono",
+        "filho_unico",
+        "heranca",
+        "casamento_global",
+        "proposto_por_regra",
+        "llm_previstos",
+        "sem_candidatos",
+        "cache_nenhum",
+    }
+    assert saida["simulados_top1_cascata"] >= 1
+    assert saida["lotes_sem_disciplina"] == 2
 
 
 def test_disciplina_provisoria_vira_o_grupo_do_pendente_sem_pai_mapeado():

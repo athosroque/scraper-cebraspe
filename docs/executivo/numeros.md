@@ -47,9 +47,9 @@ O conteúdo é organizado em três níveis: a matéria é a disciplina (por exem
 |---|---:|
 | Matérias ativas | 43 |
 | Assuntos ativos | 683 |
-| Subassuntos ativos | 1.994 |
+| Subassuntos ativos | 1.993 |
 | Itens do edital | 1.812 |
-| Subitens do edital | 3.961 |
+| Subitens do edital | 3.992 |
 | Apontamentos questão → nó da árvore | 2.965 |
 
 ## Custo do LLM

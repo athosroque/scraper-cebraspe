@@ -167,7 +167,8 @@ SCRIPTS: tuple[Script, ...] = (
         "Mapeia item novo de edital: primeiro pela memória das decisões do dono (sem "
         "LLM, P73), depois pelo LLM sobre lista fechada (disciplina do item mais "
         "candidatos globais, até 3 nós por item composto, P80), com contexto de "
-        "subitens. O LLM grava só proposto. Custa tokens.",
+        "subitens. O LLM grava só proposto. Custa tokens. O --dry-run simula a cascata "
+        "entre níveis (M13) e não grava.",
         "curadoria",
         "argparse",
         adrs=("ADR-030", "ADR-032"),

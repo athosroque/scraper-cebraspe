@@ -19,7 +19,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 > importância: (1) o que mais cai na prova; (2) o que o edital cobra; (3)
 > edital × prova; (4) desempenho pessoal do usuário.
 
-## ⚡ Painel de etapas (atualizado em 2026-10-13)
+## ⚡ Painel de etapas (atualizado em 2026-11-06)
 
 Ordem de trabalho, uma sessão (conversa) por item. O detalhe de cada sessão está no plano
 indicado; o checklist fica na seção da etapa, mais abaixo.
@@ -31,7 +31,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
 | 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, falta ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
-| — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **próxima**, ondas 0 a 6; começa pelo KAN-80 | seção 5B.4 abaixo |
+| — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **em andamento**: ondas 0 a 3 e 5 entregues (em análise); onda 4 só falta o EXEC KAN-92 (M13 KAN-90 entregue) e a 6 (C1 KAN-95, partes 2 e 3) | seção 5B.4 abaixo |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
 
@@ -699,32 +699,32 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   16 títulos de bloco sem destino travam 135 dos 216 itens.
 - **Ordem de execução:**
   - Onda 0, imediata:
-    - `[ ]` P0 (KAN-80, Highest) Rejeitar o par `processo` → Direito Processual Civil (`A-ad3fa21488`)
+    - `[x]` P0 (KAN-80, Highest) Rejeitar o par `processo` → Direito Processual Civil (`A-ad3fa21488`)
       antes de qualquer carga: senão a próxima execução o grava como `regra/aprovado`.
   - Onda 1, sem decisão do dono:
-    - `[ ]` M1 (KAN-81) Rodar o passo determinístico antes do relatório e unificar a função de equivalência.
-    - `[ ]` M2 (KAN-82) Título genérico não casa sozinho com assunto homônimo de outra disciplina.
-    - `[ ]` M3 (KAN-83) Trocar o rótulo "DISCIPLINA nova" por "título de bloco sem destino (vira assunto)".
-    - `[ ]` M12 (KAN-84) Prefixos ("fundamentos de", "conceitos de") e sinônimos (gestão/gerenciamento, sigla) em `chave_regra`.
+    - `[x]` M1 (KAN-81) Rodar o passo determinístico antes do relatório e unificar a função de equivalência.
+    - `[x]` M2 (KAN-82) Título genérico não casa sozinho com assunto homônimo de outra disciplina.
+    - `[x]` M3 (KAN-83) Trocar o rótulo "DISCIPLINA nova" por "título de bloco sem destino (vira assunto)".
+    - `[x]` M12 (KAN-84) Prefixos ("fundamentos de", "conceitos de") e sinônimos (gestão/gerenciamento, sigla) em `chave_regra`.
   - Onda 2 (decisão D2):
-    - `[ ]` M5 (KAN-85) Subtópico abaixo de nó-folha herda o nó do tópico (55 de 116 subassuntos).
-    - `[ ]` M4 (KAN-86) Inferir a disciplina pelo cargo para destravar os filhos de título (~100 itens).
-    - `[ ]` M14 (KAN-97) Ramo 4 do passo determinístico: item com pai resolvido casa com o filho de mesmo nome
+    - `[x]` M5 (KAN-85) Subtópico abaixo de nó-folha herda o nó do tópico (55 de 116 subassuntos).
+    - `[x]` M4 (KAN-86) Inferir a disciplina pelo cargo para destravar os filhos de título (~100 itens).
+    - `[x]` M14 (KAN-97) Ramo 4 do passo determinístico: item com pai resolvido casa com o filho de mesmo nome
       do nó do pai (candidato único, sem veto, fora de `TITULOS_GENERICOS`); resolve os 8 itens do SEFA que o
       relatório antigo dava como "automático por equivalência de nome" (achado do KAN-81). Junto com a M5.
   - Onda 3 (decisões D3, D4):
-    - `[ ]` M6 (KAN-87) Casamento exato global com travas (normas em qualquer disciplina).
-    - `[ ]` M11 (KAN-88) Título genérico não herda decisão de outro edital sem confirmação.
-    - `[ ]` M10 (KAN-89) Datasette: ~16 decisões de bloco + ~14 conceitos, com sugestão top-3.
+    - `[x]` M6 (KAN-87) Casamento exato global com travas (normas em qualquer disciplina).
+    - `[x]` M11 (KAN-88) Título genérico não herda decisão de outro edital sem confirmação.
+    - `[x]` M10 (KAN-89) Datasette: ~16 decisões de bloco + ~14 conceitos, com sugestão top-3.
   - Onda 4, LLM (depois das ondas 1 a 3):
-    - `[ ]` M13 (KAN-90) O dry-run simula a cascata entre níveis.
-    - `[ ]` M9 (KAN-91) `mapeamento_llm`: ranquear pelos subitens, aceitar subassunto como alvo de título,
+    - `[x]` M13 (KAN-90) O dry-run simula a cascata entre níveis.
+    - `[x]` M9 (KAN-91) `mapeamento_llm`: ranquear pelos subitens, aceitar subassunto como alvo de título,
       até 3 nós por item composto; `REASONING_PADRAO` inalterado.
     - `[ ]` EXEC (KAN-92) Rodar `mapear_itens_novos` em `BANRISUL_25` e `SEFA_PR_25`: dry-run novo, custo
       aprovado pelo dono, K22–K24 antes e depois (P71).
   - Onda 5, extrator (decisão D6):
-    - `[ ]` M7 (KAN-93) Nome em cadeia "Pai - Filho" (6 no BANRISUL, 134 no SEFA).
-    - `[ ]` M8 (KAN-94) Divisão de listas por ";" e facetas soltas como subassunto.
+    - `[x]` M7 (KAN-93) Nome em cadeia "Pai - Filho" (6 no BANRISUL, 134 no SEFA).
+    - `[x]` M8 (KAN-94) Divisão de listas por ";" e facetas soltas como subassunto.
   - Onda 6, curadoria (decisão D5):
     - `[ ]` C1 (KAN-95) Criar os ~14 conceitos novos por `curar_arvore` e aprovar o `BANRISUL_25` (P41). Proposta em
       [`plano-etapa-5b4-kan95.md`](plano-etapa-5b4-kan95.md), recomendações Q1 a Q12 aceitas pelo dono em 2026-11-02.

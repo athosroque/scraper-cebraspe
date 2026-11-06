@@ -203,7 +203,7 @@ CLI de curadoria e deliberação humana da classificação das questões.
 
 ### `python -m scripts.mapear_itens_novos`
 
-Mapeia item novo de edital: primeiro pela memória das decisões do dono (sem LLM, P73), depois pelo LLM sobre lista fechada (disciplina do item mais candidatos globais, até 3 nós por item composto, P80), com contexto de subitens. O LLM grava só proposto. Custa tokens.
+Mapeia item novo de edital: primeiro pela memória das decisões do dono (sem LLM, P73), depois pelo LLM sobre lista fechada (disciplina do item mais candidatos globais, até 3 nós por item composto, P80), com contexto de subitens. O LLM grava só proposto. Custa tokens. O --dry-run simula a cascata entre níveis (M13) e não grava.
 
 **ADRs:** [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
 

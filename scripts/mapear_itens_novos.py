@@ -13,11 +13,13 @@ como `origem="llm"`, `status="proposto"` (A30): o dono aprova com
 A memória das decisões do dono (`src/memoria_mapeamento.py`, P73) já faz parte do passo
 determinístico: este script só garante que ele rodou (idempotente) e trata o que sobrar.
 O prompt leva o contexto dos subitens, exemplos aprovados e os pares rejeitados; o resumo
-mostra quantos itens saíram antes do LLM (regra de nome e memória), quantos o LLM propôs e
-quantos ficaram sem nó.
+(`por_origem`) mostra de onde saiu o nó de cada item: cada ramo do passo determinístico,
+o LLM, sem candidato ou cache do "nenhum".
 
 `--dry-run` não chama o LLM nem grava: mostra quantos itens estão pendentes e uma
-estimativa de custo. Chamada via `chamar_llm_json` com `REASONING_PADRAO`
+estimativa de custo. Simula a cascata entre níveis (M13, KAN-90): a sugestão top-1 do
+ranking entra só em memória e serve de pai ao nível seguinte, como a proposta do LLM no
+modo real. Chamada via `chamar_llm_json` com `REASONING_PADRAO`
 (P16) e `nome_trace="mapear_itens_novos"`. A lógica fica em `src/mapeamento_llm.py`.
 """
 
@@ -55,6 +57,28 @@ def estimar(conta: mapeamento_llm.Contabilidade, itens: int) -> dict:
     }
 
 
+def por_origem(conta: mapeamento_llm.Contabilidade, dry_run: bool) -> dict:
+    """De onde sai (ou sairia) o nó de cada item (M13, KAN-90). Os ramos do passo
+    determinístico contam o que ele resolveu nesta execução; os pendentes depois
+    dele vão ao LLM, ficam sem candidato ou já estão no cache do "nenhum"."""
+    origem = {
+        "regra_de_nome": conta.resolvidos_regra,
+        "memoria_do_dono": conta.resolvidos_memoria,
+        "filho_unico": conta.resolvidos_filho_unico,
+        "heranca": conta.resolvidos_heranca,
+        "casamento_global": conta.resolvidos_global,
+        "proposto_por_regra": conta.propostos_regra,
+    }
+    if dry_run:
+        origem["llm_previstos"] = conta.itens_previstos
+    else:
+        origem["llm_propostos"] = conta.propostos
+        origem["llm_nenhum"] = conta.nenhum
+    origem["sem_candidatos"] = conta.sem_candidatos
+    origem["cache_nenhum"] = conta.pulados_cache
+    return origem
+
+
 def main(args_list: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -88,16 +112,15 @@ def main(args_list: list[str] | None = None) -> None:
     saida = {
         "pendentes": conta.pendentes,
         "pulados_cache_nenhum": conta.pulados_cache,
+        "por_origem": por_origem(conta, args.dry_run),
+        "lotes_sem_disciplina": conta.lotes_sem_disciplina,
     }
     if args.dry_run:
-        saida["resolvidos_antes_do_llm_por_regra"] = conta.resolvidos_regra
-        saida["resolvidos_antes_do_llm_por_memoria"] = conta.resolvidos_memoria
+        saida["simulados_top1_cascata"] = conta.simulados_top1
         saida.update(estimar(conta, conta.itens_previstos))
     else:
         saida.update(
             {
-                "resolvidos_antes_do_llm_por_regra": conta.resolvidos_regra,
-                "resolvidos_antes_do_llm_por_memoria": conta.resolvidos_memoria,
                 "propostos_por_llm": conta.propostos,
                 "sem_no": conta.pendentes - conta.propostos,
                 "nenhum": conta.nenhum,

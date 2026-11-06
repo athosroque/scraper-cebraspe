@@ -879,11 +879,15 @@ para o nó do tópico" (M5, ensinada no prompt). **Até 3 nós** por item compos
 continua aceito): o 4º, um nó e o descendente dele ou ID fora da lista recusam a resposta inteira
 (`falha_validacao_schema`), e a gravação passa por `arvore.mapear` como `llm`/`proposto`. O hash do
 cache do "nenhum" inclui o desenho (`DESENHO`) e a disciplina provisória quando é ela que restringe,
-então mudar candidatos ou prompt reavalia o item. `REASONING_PADRAO` (P16) não muda.
+então mudar candidatos ou prompt reavalia o item. `REASONING_PADRAO` (P16) não muda. **Dry-run
+com cascata** (KAN-90, M13): como no modo real a proposta de um nível é o pai do seguinte, o
+`--dry-run` põe a sugestão top-1 do ranking (`sugestao_top1`, fora dos pares rejeitados) só na
+árvore em memória, nunca salva; assim lotes, candidatos e custo previstos batem com a execução. O
+resumo (`por_origem`) separa os ramos do passo determinístico, o LLM, sem candidato e o cache.
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md), [ADR-032](../adr/ADR-032-classificacao-questoes-arvore.md)
 
-Teste guarda: `tests/test_mapeamento_llm.py::test_ranking_do_titulo_inclui_no_pelos_subitens`, `tests/test_mapeamento_llm.py::test_subassunto_e_alvo_valido_de_titulo_e_nunca_vira_aprovado`, `tests/test_mapeamento_llm.py::test_candidatos_globais_somados_sem_quebrar_a_lista_fechada`, `tests/test_mapeamento_llm.py::test_ate_3_nos_em_item_composto_e_o_4_e_recusado`, `tests/test_mapeamento_llm.py::test_validacao_de_nos_multiplos`, `tests/test_mapeamento_llm.py::test_prompt_ensina_heranca_e_varios_nos`, `tests/test_mapeamento_llm.py::test_cache_do_nenhum_invalida_com_a_disciplina_provisoria`, `tests/test_mapeamento_llm.py::test_reasoning_padrao_inalterado`
+Teste guarda: `tests/test_mapeamento_llm.py::test_ranking_do_titulo_inclui_no_pelos_subitens`, `tests/test_mapeamento_llm.py::test_subassunto_e_alvo_valido_de_titulo_e_nunca_vira_aprovado`, `tests/test_mapeamento_llm.py::test_candidatos_globais_somados_sem_quebrar_a_lista_fechada`, `tests/test_mapeamento_llm.py::test_ate_3_nos_em_item_composto_e_o_4_e_recusado`, `tests/test_mapeamento_llm.py::test_validacao_de_nos_multiplos`, `tests/test_mapeamento_llm.py::test_prompt_ensina_heranca_e_varios_nos`, `tests/test_mapeamento_llm.py::test_cache_do_nenhum_invalida_com_a_disciplina_provisoria`, `tests/test_mapeamento_llm.py::test_reasoning_padrao_inalterado`, `tests/test_mapeamento_llm.py::test_dry_run_simula_a_cascata_sem_gravar`, `tests/test_mapeamento_llm.py::test_dry_run_preve_as_mesmas_chamadas_do_modo_real`
 
 #### P79
 

@@ -146,9 +146,19 @@ class Contabilidade:
     custo_usd: float = 0.0
     pendentes: int = 0
     pulados_cache: int = 0
-    # Resolvidos antes do LLM pelo passo determinístico (regra de nome / memória).
+    # Resolvidos antes do LLM pelo passo determinístico, por ramo (o resumo mostra a
+    # origem de cada item, M13 KAN-90). `propostos_regra`: casamento sem pai e título
+    # genérico barrado, gravados como `regra/proposto` (P77, P78).
     resolvidos_regra: int = 0
     resolvidos_memoria: int = 0
+    resolvidos_filho_unico: int = 0
+    resolvidos_heranca: int = 0
+    resolvidos_global: int = 0
+    propostos_regra: int = 0
+    # Itens de lote sem nenhum candidato: ficam sem nó sem ir ao LLM.
+    sem_candidatos: int = 0
+    # Lotes cujo item não tem disciplina (nem pai com nó, nem pai provisório).
+    lotes_sem_disciplina: int = 0
     descartados_rejeitados: int = 0
     # Só no dry-run: itens que iriam ao LLM.
     itens_previstos: int = 0
@@ -162,6 +172,9 @@ class Contabilidade:
     # Só no dry-run: estimativa de entrada em caracteres e chamadas previstas.
     chamadas_previstas: int = 0
     caracteres_previstos: int = 0
+    # Só no dry-run (M13): itens que receberam em memória a sugestão top-1, para o
+    # nível seguinte ver o pai como no modo real.
+    simulados_top1: int = 0
 
     def registrar_usage(self, usage: dict | None) -> None:
         usage = usage or {}
@@ -513,6 +526,35 @@ def selecionar_lote(
     for chave, lista in extras.items():
         por_item[chave] |= {i for _, i in lista if i in mantidos}
     return por_item
+
+
+def sugestao_top1(
+    arv: arvore.ArvoreMestre,
+    indice: IndiceNos,
+    item: Pendente,
+    candidatos: set[str],
+    vetados: dict[tuple[str, str], str],
+) -> str | None:
+    """Melhor candidato do item pelo ranking de palavras, fora dos pares rejeitados.
+
+    O dry-run usa como se fosse a resposta do LLM (M13, KAN-90): no modo real o nível
+    seguinte vê a proposta do pai e ganha disciplina; sem simular, o dry-run agrupava
+    esses filhos como "sem disciplina" e errava lotes, candidatos e custo. Sem palavra
+    em comum, vale a única disciplina oferecida; senão, nenhuma sugestão."""
+    if not candidatos:
+        return None
+    fortes, fracas = palavras_do_item(item)
+    regra = canonico.chave_regra(item.nome).chave
+    niveis = tuple(n for n in NIVEIS_ALVO[item.nivel] if n != "materia")
+    for _pontos, _cobertura, _massa, i in indice.pontuar(fortes, fracas, niveis):
+        if i in candidatos and (regra, i) not in vetados:
+            return i
+    materias = [
+        i
+        for i in candidatos
+        if arv.nos[i].nivel == "materia" and (regra, i) not in vetados
+    ]
+    return materias[0] if len(materias) == 1 else None
 
 
 def formatar_candidatos(
@@ -911,6 +953,10 @@ def mapear_itens_novos(
     )
     conta.resolvidos_regra = pre.por_nome
     conta.resolvidos_memoria = pre.por_memoria
+    conta.resolvidos_filho_unico = pre.por_filho
+    conta.resolvidos_heranca = pre.por_heranca
+    conta.resolvidos_global = pre.por_global
+    conta.propostos_regra = pre.propostos_sem_pai + pre.propostos_generico
     nomes = canonico.coletar_nomes(revisao_dir)
     rotulos = _rotulos(nomes)
     todos = levantar_pendentes(revisao_dir, arv, concurso, nomes=nomes)
@@ -927,6 +973,7 @@ def mapear_itens_novos(
         for rotulo, _nivel, disciplinas, itens, dicas in _grupos(arv, pend_nivel):
             por_item = selecionar_lote(arv, ranking, itens, disciplinas, nivel, dicas)
             if not any(por_item.values()):
+                conta.sem_candidatos += len(itens)
                 continue
             # A disciplina provisória (M4) só conta quando é ela que restringe.
             hashes = {
@@ -963,6 +1010,7 @@ def mapear_itens_novos(
             vetados = _linhas_vetados(arv, indice, itens, local_para_id)
             prompt = montar_prompt(itens, texto, dicas, arv, exemplos, vetados)
             numeros = list(range(1, len(itens) + 1))
+            conta.lotes_sem_disciplina += not disciplinas
             if dry_run:
                 conta.chamadas_previstas += 1
                 conta.itens_previstos += len(itens)
@@ -972,6 +1020,21 @@ def mapear_itens_novos(
                     f"{len(itens)} item(ns), {len(local_para_id)} candidato(s)."
                 )
                 lotes_feitos += 1
+                # Cascata (M13): a sugestão top-1 entra só na árvore em memória, que
+                # o dry-run nunca salva, e vira o pai do nível seguinte.
+                for it in itens:
+                    top = sugestao_top1(
+                        arv, ranking, it, por_item[it.chave], indice.vetados
+                    )
+                    if top is None or it.chave in arv.mapeamentos:
+                        continue
+                    try:
+                        arvore.mapear(
+                            arv, it.chave, [top], origem="llm", status="proposto"
+                        )
+                    except arvore.ArvoreInvalida:
+                        continue
+                    conta.simulados_top1 += 1
                 continue
             resposta = chamar_lote(
                 prompt,
