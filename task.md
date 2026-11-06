@@ -31,7 +31,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
 | 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, falta ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
-| — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **em andamento**: ondas 0 a 3 e 5 entregues (em análise); onda 4 só falta o EXEC KAN-92 (M13 KAN-90 entregue) e a 6 (C1 KAN-95, partes 2 e 3) | seção 5B.4 abaixo |
+| — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **em andamento**: ondas 0 a 3 e 5 entregues (em análise); onda 4 entregue (EXEC KAN-92: 546 propostas do LLM a revisar) e a 6 (C1 KAN-95, partes 2 e 3) | seção 5B.4 abaixo |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
 
@@ -720,7 +720,7 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     - `[x]` M13 (KAN-90) O dry-run simula a cascata entre níveis.
     - `[x]` M9 (KAN-91) `mapeamento_llm`: ranquear pelos subitens, aceitar subassunto como alvo de título,
       até 3 nós por item composto; `REASONING_PADRAO` inalterado.
-    - `[ ]` EXEC (KAN-92) Rodar `mapear_itens_novos` em `BANRISUL_25` e `SEFA_PR_25`: dry-run novo, custo
+    - `[x]` EXEC (KAN-92) Rodar `mapear_itens_novos` em `BANRISUL_25` e `SEFA_PR_25`: dry-run novo, custo
       aprovado pelo dono, K22–K24 antes e depois (P71).
   - Onda 5, extrator (decisão D6):
     - `[x]` M7 (KAN-93) Nome em cadeia "Pai - Filho" (6 no BANRISUL, 134 no SEFA).
