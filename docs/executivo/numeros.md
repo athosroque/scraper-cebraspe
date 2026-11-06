@@ -2,7 +2,7 @@
 
 # Números
 
-Atualizado em 22/10/2026, a partir do banco do projeto.
+Atualizado em 06/11/2026, a partir do banco do projeto.
 
 ## Cobertura
 
@@ -46,10 +46,10 @@ O conteúdo é organizado em três níveis: a matéria é a disciplina (por exem
 | Indicador | Quantidade |
 |---|---:|
 | Matérias ativas | 43 |
-| Assuntos ativos | 772 |
-| Subassuntos ativos | 2.069 |
+| Assuntos ativos | 683 |
+| Subassuntos ativos | 1.994 |
 | Itens do edital | 1.812 |
-| Subitens do edital | 3.936 |
+| Subitens do edital | 3.961 |
 | Apontamentos questão → nó da árvore | 2.965 |
 
 ## Custo do LLM

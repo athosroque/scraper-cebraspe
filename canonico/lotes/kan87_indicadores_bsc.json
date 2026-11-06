@@ -1,0 +1,14 @@
+{
+  "descricao": "KAN-87, decisão do dono em 2026-11-03: concentra Indicadores de desempenho no assunto de Administração Geral e desfaz o composto SWOT; BSC de Administração Pública › Governança.",
+  "operacoes": [
+    {"tipo": "mover", "args": {"no": "S-def3f14b7c", "pai": "A-b34798e56a"}},
+    {"tipo": "mover", "args": {"no": "S-1af6ddeb5c", "pai": "A-b34798e56a"}},
+    {"tipo": "fundir", "args": {"origem": "S-9e3a88bbc7", "destino": "A-b34798e56a"}},
+    {"tipo": "fundir", "args": {"origem": "S-1d811c97a0", "destino": "A-b34798e56a"}},
+    {"tipo": "remapear", "args": {
+      "item": "administracao geral|governanca e estrategia|ferramentas de planejamento estrategico analise swot balanced scorecard bsc principais conceitos aplicacoes mapa estrategico perspectivas temas estrategicos objetivos estrategicos relacoes de causa e efeito indicadores metas iniciativas estrategicas",
+      "de": "S-71b651de26",
+      "para": ["S-bcd5e45306", "S-7a0d161260"]
+    }}
+  ]
+}

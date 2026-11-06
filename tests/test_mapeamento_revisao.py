@@ -155,7 +155,7 @@ def test_relatorio_mostra_quadro_confianca_e_justificativa_escapada(arvore):
     html = renderizar_edital(resultado, auditoria, None, novidades, linhas)
     assert "De onde veio cada mapeamento" in html
     assert "automático (regra/memória)" in html
-    assert "proposto pela IA (a conferir)" in html
+    assert "proposto pela IA ou por regra (a conferir)" in html
     assert "sem equivalente (a decidir)" in html
     assert "<td>alta</td>" in html
     assert "mesmo tema &lt;b&gt;x&lt;/b&gt;" in html

@@ -746,10 +746,10 @@ O nível matéria da árvore é a disciplina e só aceita os nomes de
 `mapear_novos_itens_por_regra` aponta o item para o único nó de disciplina ou assunto de mesmo
 nome, e sem equivalente ele fica pendente para a curadoria. Esse casamento por nome só vale se
 o nó é a própria disciplina, está numa disciplina inferida dos itens do bloco já aprovados,
-ou o nome tem 2+ palavras relevantes e não é título genérico (`canonico.TITULOS_GENERICOS`, a lista
-única de todos os ramos: inclui "Aplicações", "Definição", "Tipos", "Procedimento" e "Instalação,
-configuração e administração", e vale também para rótulo feito só de `PALAVRAS_GENERICAS`, como
-"Conceitos básicos e aplicações", KAN-87);
+ou o nome tem 2+ palavras relevantes e não é título genérico (`canonico.titulo_generico_global`:
+`TITULOS_GENERICOS` mais os genéricos de subitem do KAN-87, como "Aplicações", "Definição", "Tipos",
+"Procedimento" e "Instalação, configuração e administração", e o rótulo feito só de
+`PALAVRAS_GENERICAS`, como "Conceitos básicos e aplicações"; ver P77);
 par vetado pelo dono (por `chave_regra`) nunca é regravado, e fora disso o item fica pendente,
 nunca `aprovado` (KAN-82). Proposta de LLM ou de regra
 nunca cria disciplina (`propor` recusa `criar` de matéria); disciplina nova só por decisão
@@ -809,8 +809,8 @@ Teste guarda: `tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igu
 
 **Casamento global por nome** (KAN-87, M6, `canonico.no_global_por_nome`): último ramo do passo
 determinístico (P52, P73), depois do filho único, da herança de folha e do pai provisório, e
-antes de marcar pendente. Só para assunto e subassunto com pai mapeado (ou disciplina inferida
-pelo cargo). O item de nome idêntico (`chave_regra`) a um nó ativo de nível compatível em **qualquer**
+antes de marcar pendente. Só para assunto e subassunto; com pai mapeado (ou disciplina inferida
+pelo cargo), o item de nome idêntico (`chave_regra`) a um nó ativo de nível compatível em **qualquer**
 parte da árvore vai para ele como `regra`/`aprovado` (`por_global`; `chaves_global_fora_disciplina`
 guarda os que atravessaram disciplina). Segue D3: um conceito, um nó, então o subitem jurídico de
 um bloco de TI vai para o nó que já existe em Direito Administrativo. Travas: (1) o candidato é
@@ -819,29 +819,40 @@ se há nó equivalente na disciplina do pai (ou inferida pelo cargo), ele vale e
 ignorados, e dois equivalentes ali são ambíguos; (3) para atravessar disciplina o nome precisa
 de 3+ palavras relevantes (`PALAVRAS_MIN_ENTRE_DISCIPLINAS`) ou ser **norma** (lei, decreto,
 "Lei nº X/ano", `nos_da_mesma_norma`, KAN-64: a norma vive em um nó só); nome curto só casa
-dentro da disciplina; (4) título genérico nunca casa (`TITULOS_GENERICOS`, lista única de M2, M4,
-M5, M14 e M6); (5) par vetado pelo dono não casa; (6) apelido de nó fundido entra como candidato,
+dentro da disciplina; (4) título genérico nunca casa (`titulo_generico_global`). **Duas listas**
+(decisão D3 do dono, 2026-11-06): onde o pai direto não dá contexto (este ramo, os candidatos globais
+do LLM, o título de bloco de P72 e a subárvore da disciplina inferida de P52) vale a lista ampliada,
+`TITULOS_GENERICOS_GLOBAL` mais rótulo feito só de `PALAVRAS_GENERICAS`; nos ramos que olham o pai
+direto (filho único, herança, regra de nome e memória, P78) vale só `TITULOS_GENERICOS`, e
+"Licitação › Tipos" casa com o filho "Tipos" do nó de Licitação; (5) par vetado pelo dono não casa; (6) apelido de nó fundido entra como candidato,
 exceto com pai provisório (P52); (7) nunca cria nó nem disciplina (D5, P72). Item composto ("A e B")
 não é dividido aqui: se a `chave_regra` do nome inteiro não é a de um nó, o item fica para o LLM ou
-o dono, que podem apontar até 3 nós (a árvore é N:N, P80). Lote novo roda K22 a K24 antes e depois (P71).
+o dono, que podem apontar até 3 nós (a árvore é N:N, P80). **Pai sem nó** (decisão D2 do dono,
+2026-11-06): o item cujo pai não tem nó aprovado nem disciplina inferida passa só por este ramo, sem
+disciplina de contexto (valem as travas 1, 3 a 6) e grava `regra`/**`proposto`**, nunca `aprovado`
+(`propostos_sem_pai`, fora de `total`): sem o pai, o nome solto pode casar errado (o "Normas
+Brasileiras de Contabilidade" de um bloco de setor público ia, por apelido, para a Estrutura
+Conceitual). O dono confere na revisão guiada; proposta rejeitada fica na chave e não volta. Lote
+novo roda K22 a K24 antes e depois (P71).
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
-Teste guarda: `tests/test_regra_arvore.py::test_contratos_de_ti_casam_em_direito_administrativo`, `tests/test_regra_arvore.py::test_lgpd_casa_global_por_norma`, `tests/test_regra_arvore.py::test_nome_curto_nao_atravessa_disciplina`, `tests/test_regra_arvore.py::test_generico_nunca_casa_global`, `tests/test_regra_arvore.py::test_candidato_duplicado_nao_casa`, `tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai`, `tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global`, `tests/test_regra_arvore.py::test_economia_nao_casa_com_atualidades`
+Teste guarda: `tests/test_regra_arvore.py::test_contratos_de_ti_casam_em_direito_administrativo`, `tests/test_regra_arvore.py::test_lgpd_casa_global_por_norma`, `tests/test_regra_arvore.py::test_nome_curto_nao_atravessa_disciplina`, `tests/test_regra_arvore.py::test_generico_nunca_casa_global`, `tests/test_regra_arvore.py::test_candidato_duplicado_nao_casa`, `tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai`, `tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global`, `tests/test_regra_arvore.py::test_economia_nao_casa_com_atualidades`, `tests/test_regra_arvore.py::test_pai_sem_no_casa_global_como_proposta`, `tests/test_regra_arvore.py::test_pai_sem_no_proposta_rejeitada_nao_volta`, `tests/test_regra_arvore.py::test_genericos_do_global_nao_travam_os_ramos_com_pai`, `tests/test_regra_arvore.py::test_tipos_casa_pelo_filho_unico_dentro_do_pai`
 
 #### P78
 
 **Título genérico não herda decisão de outro edital** (KAN-88, M11, D4 do dono): no passo
-determinístico (P52, P73), o item cujo nome é `canonico.titulo_generico` (a lista única
-`TITULOS_GENERICOS` mais `PALAVRAS_GENERICAS`, em qualquer nível) só herda, pelo ramo da regra de
+determinístico (P52, P73), o item cujo nome é `canonico.titulo_generico` (`TITULOS_GENERICOS`, a
+lista dos ramos que olham o pai direto, em qualquer nível; ver P77) só herda, pelo ramo da regra de
 nome e pelo da memória, a decisão de um item **do mesmo edital** (mesmo `slug` nas ocorrências de
 `coletar_nomes`). Decisão de item de outro edital, ou de item que nenhum edital em disco traz
 (origem desconhecida), e apelido de nó fundido não valem para ele
-(`memoria_mapeamento.resolver_por_memoria(..., chaves_permitidas=...)`): o item **fica pendente**,
-sem entrada na árvore, e segue para o LLM, que só propõe (`proposto`, A30) e o dono confirma. Não
-vira `proposto`/`regra` de propósito: o relatório, o Datasette e a fila do LLM tratam `proposto` como
-"proposto pela IA". `ResultadoRegra.barrados_generico` e `chaves_barradas_generico` contam o que
-teria herdado e ficou pendente (já dentro de `pendentes`). Filho único, herança de folha, pai
+(`memoria_mapeamento.resolver_por_memoria(..., chaves_permitidas=...)`), nunca como `aprovado`. Se
+nenhum outro ramo mapeia o item e a decisão de outro edital é única, ela é gravada como
+`regra`/**`proposto`** (decisão D5 do dono, 2026-11-06; `propostos_generico`), que a revisão guiada
+mostra como "proposto pela IA ou por regra" para o dono confirmar; o item sai da fila do LLM. Decisão
+ambígua (dois nós) deixa o item pendente. Proposta rejeitada fica na chave e não volta.
+`ResultadoRegra.barrados_generico` e `chaves_barradas_generico` contam todo item barrado. Filho único, herança de folha, pai
 provisório e casamento global já barravam o genérico (P52, P77). Limite: a chave do item de
 matéria é só `normalizar(título)`, então um título genérico igual em dois editais é **a mesma
 chave** e o mesmo mapeamento (ex.: `legislacao`); isso não passa pelo passo e só se desfaz na
@@ -849,7 +860,7 @@ curadoria (`scripts/curar_arvore.py`) ou com título diferente no edital.
 
 ADRs: [ADR-030](../adr/ADR-030-arvore-mestre-e-site-de-questoes.md)
 
-Teste guarda: `tests/test_regra_arvore.py::test_titulo_generico_nao_herda_de_outro_edital`, `tests/test_regra_arvore.py::test_titulo_generico_herda_dentro_do_mesmo_edital`, `tests/test_regra_arvore.py::test_titulo_especifico_continua_herdando_de_outro_edital`, `tests/test_regra_arvore.py::test_titulo_generico_sem_origem_conhecida_nao_herda_pela_memoria`, `tests/test_regra_arvore.py::test_titulo_generico_barrado_e_idempotente`, `tests/test_memoria_mapeamento.py::test_chaves_permitidas_filtra_a_decisao_pelo_item_de_origem`, `tests/test_memoria_mapeamento.py::test_chaves_permitidas_respeita_par_vetado`
+Teste guarda: `tests/test_regra_arvore.py::test_titulo_generico_nao_herda_de_outro_edital`, `tests/test_regra_arvore.py::test_titulo_generico_herda_dentro_do_mesmo_edital`, `tests/test_regra_arvore.py::test_titulo_especifico_continua_herdando_de_outro_edital`, `tests/test_regra_arvore.py::test_titulo_generico_sem_origem_conhecida_nao_herda_pela_memoria`, `tests/test_regra_arvore.py::test_titulo_generico_barrado_e_idempotente`, `tests/test_regra_arvore.py::test_titulo_generico_proposta_rejeitada_nao_volta`, `tests/test_memoria_mapeamento.py::test_chaves_permitidas_filtra_a_decisao_pelo_item_de_origem`, `tests/test_memoria_mapeamento.py::test_chaves_permitidas_respeita_par_vetado`
 
 #### P80
 

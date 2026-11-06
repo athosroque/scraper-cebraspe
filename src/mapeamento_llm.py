@@ -485,7 +485,7 @@ def selecionar_lote(
                 if massa >= MASSA_MINIMA_GLOBAL
                 and cobertura >= COBERTURA_MINIMA_GLOBAL
                 and indice.regra[i] not in regras_disc
-                and not canonico.titulo_generico(arv.nos[i].nome)
+                and not canonico.titulo_generico_global(arv.nos[i].nome)
             ]
             por_item[it.chave] = fixos
             extras[it.chave] = fora[:GLOBAIS_POR_ITEM]

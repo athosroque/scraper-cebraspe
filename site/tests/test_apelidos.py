@@ -56,7 +56,8 @@ def test_apelidos_da_lai_e_da_lgpd(cliente):
     from app.repositorio import estatisticas_repo
 
     apelidos = estatisticas_repo.apelidos_por_no()
-    assert len(apelidos[LAI]) == 6
+    # 7: o item LAI da SEFA_PR_25 entrou pelo casamento global (KAN-87).
+    assert len(apelidos[LAI]) == 7
     assert "Lei nº 12.527/2011 e Decreto nº 7.724/2012" in apelidos[LAI]
     assert len(apelidos[LGPD]) == 5
 

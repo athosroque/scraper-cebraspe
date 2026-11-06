@@ -1019,8 +1019,18 @@ TITULOS_GENERICOS_NOMES = (
     "Dados",
     "Governança",
     "Tópicos especiais",
-    # Acrescentados no KAN-87 (M6), vistos nos erros do casamento global: rótulos de
-    # subitem que servem a qualquer tema.
+    "Outros",
+    "Geral",
+    "Gerais",
+)
+TITULOS_GENERICOS = frozenset(chave_regra(n).chave for n in TITULOS_GENERICOS_NOMES)
+# Genéricos só para o casamento sem o pai direto como contexto (KAN-87, decisão D3 do
+# dono em 2026-11-06): ramo global (M6), candidatos globais do LLM (M9), título de
+# bloco por nome (M2) e busca na subárvore da disciplina inferida (M4). Vistos nos
+# erros do casamento global, são rótulos de subitem que servem a qualquer tema; sob o
+# pai direto continuam casando ("Licitação › Tipos" com o filho "Tipos" do nó de
+# Licitação, no filho único, na herança e na regra de nome).
+TITULOS_GENERICOS_GLOBAL_NOMES = (
     "Aplicações",
     "Aplicação",
     "Definição",
@@ -1029,13 +1039,12 @@ TITULOS_GENERICOS_NOMES = (
     "Procedimento",
     "Procedimentos",
     "Instalação, configuração e administração",
-    "Outros",
-    "Geral",
-    "Gerais",
 )
-TITULOS_GENERICOS = frozenset(chave_regra(n).chave for n in TITULOS_GENERICOS_NOMES)
-# Rótulo feito só dessas palavras também é genérico ("Conceitos básicos e aplicações"):
-# a combinação não nomeia tema nenhum (KAN-87).
+TITULOS_GENERICOS_GLOBAL = TITULOS_GENERICOS | frozenset(
+    chave_regra(n).chave for n in TITULOS_GENERICOS_GLOBAL_NOMES
+)
+# No casamento global, rótulo feito só dessas palavras também é genérico ("Conceitos
+# básicos e aplicações"): a combinação não nomeia tema nenhum (KAN-87).
 PALAVRAS_GENERICAS = frozenset(
     "conceito basico geral aplicacao definicao tipo introducao fundamento "
     "nocao introdutorio".split()
@@ -1048,10 +1057,19 @@ _PALAVRAS_VAZIAS_TITULO = frozenset(
 
 
 def titulo_generico(nome_ou_chave: str) -> bool:
-    """True se o nome (ou a `chave_regra` dele) é um título genérico: está em
-    `TITULOS_GENERICOS` ou só tem palavras de `PALAVRAS_GENERICAS`."""
+    """True se o nome (ou a `chave_regra` dele) está em `TITULOS_GENERICOS`, a lista
+    dos ramos que olham o pai direto (M5 herança, M11 regra de nome e memória, M14
+    filho único)."""
+    return chave_regra(nome_ou_chave).chave in TITULOS_GENERICOS
+
+
+def titulo_generico_global(nome_ou_chave: str) -> bool:
+    """True se o nome é genérico para casar sem contexto de pai (KAN-87, D3): está em
+    `TITULOS_GENERICOS_GLOBAL` ou só tem palavras de `PALAVRAS_GENERICAS`. Usado onde
+    o pai direto não dá contexto: ramo global (M6), candidatos globais do LLM (M9),
+    título de bloco por nome (M2) e subárvore da disciplina inferida (M4)."""
     chave = chave_regra(nome_ou_chave).chave
-    if chave in TITULOS_GENERICOS:
+    if chave in TITULOS_GENERICOS_GLOBAL:
         return True
     palavras = [
         t for t in chave.split() if len(t) >= 3 and t not in _PALAVRAS_VAZIAS_TITULO
@@ -1071,7 +1089,7 @@ def palavras_relevantes(nome: str) -> list[str]:
 def nome_especifico(nome: str) -> bool:
     """Nome com 2 ou mais palavras relevantes e que não é título genérico: pode
     casar por nome sozinho com um nó único (M2)."""
-    return len(palavras_relevantes(nome)) >= 2 and not titulo_generico(nome)
+    return len(palavras_relevantes(nome)) >= 2 and not titulo_generico_global(nome)
 
 
 def _disciplina_do_no(arvore, no_id: str) -> str | None:
@@ -1285,12 +1303,13 @@ def no_do_pai_provisorio(
 
     Travas: candidato único dentro da subárvore da disciplina (`candidatos` vindos da
     regra de nome ou da memória, ou, sem eles, o único nó ativo de mesma `chave_regra`
-    e nível compatível na subárvore), nome fora de `TITULOS_GENERICOS` e par (regra,
-    nó) não vetado pelo dono. Nunca cria nó."""
+    e nível compatível na subárvore), nome não genérico para a busca sem o pai direto
+    (`titulo_generico_global`, KAN-87 D3) e par (regra, nó) não vetado pelo dono.
+    Nunca cria nó."""
     from src import arvore as arv_mod
 
     niveis = _NIVEIS_FILHO.get(nivel)
-    if not niveis or not regra or titulo_generico(nome):
+    if not niveis or not regra or titulo_generico_global(nome):
         return None
     if candidatos is None:
         achados = {n.id for n in (indice or {}).get((disc, regra), ())}
@@ -1347,7 +1366,8 @@ def no_global_por_nome(
     X/ano"), os nós da mesma norma (`arvore.nos_da_mesma_norma`, KAN-64: a norma vive
     em um nó só). Travas:
 
-    - título genérico nunca casa (`TITULOS_GENERICOS`, a mesma lista de M2, M4, M5);
+    - título genérico nunca casa (`titulo_generico_global`: a lista de M2, M4, M5
+      mais os genéricos só do global e os rótulos feitos só de palavras genéricas);
     - exceção de TI (D3): se há nó equivalente na disciplina do pai (ou inferida pelo
       cargo), ele vale e os de fora são ignorados; dois equivalentes ali = ambíguo;
     - sem equivalente na disciplina, só casa se o candidato é único em toda a
@@ -1362,7 +1382,7 @@ def no_global_por_nome(
     from src import arvore as arv_mod
 
     niveis = _NIVEIS_FILHO.get(nivel)
-    if not niveis or not regra or titulo_generico(nome):
+    if not niveis or not regra or titulo_generico_global(nome):
         return None
     achados = set(indice_global.get(regra, ())) | set((apelidos or {}).get(regra, ()))
     norma = arv_mod._nome_e_a_norma(nome)
@@ -1415,8 +1435,17 @@ class ResultadoRegra:
     por_global: int = 0
     chaves_global: list[str] = field(default_factory=list)
     chaves_global_fora_disciplina: list[str] = field(default_factory=list)
+    # Casamento global de item cujo pai não tem nó (KAN-87, D2): gravado como
+    # `proposto` (origem `regra`), fora de `total` e de `pendentes`.
+    propostos_sem_pai: int = 0
+    chaves_propostas_sem_pai: list[str] = field(default_factory=list)
+    # Título genérico barrado com decisão única de outro edital (KAN-88, D5): gravado
+    # como `regra`/`proposto` com essa decisão; subconjunto de `barrados_generico`,
+    # fora de `total` e de `pendentes`.
+    propostos_generico: int = 0
+    chaves_propostas_generico: list[str] = field(default_factory=list)
     # Título genérico que teria herdado decisão de outro edital (regra de nome ou
-    # memória) e ficou pendente (KAN-88, M11, P78). Já contado em `pendentes`.
+    # memória; KAN-88, M11, P78). O que não virou proposta conta em `pendentes`.
     barrados_generico: int = 0
     chaves_barradas_generico: list[str] = field(default_factory=list)
     # Chaves dos itens que o passo tentou e não mapeou (sem nó equivalente, regra
@@ -1544,7 +1573,9 @@ def mapear_novos_itens(
        repetida em outro edital ou apelido de nó fundido; nunca usa proposta não
        aprovada nem devolve par rejeitado. Nos ramos 1 e 2, título genérico
        (`titulo_generico`) só herda decisão de item do mesmo edital: a de outro
-       edital deixa o item pendente (`barrados_generico`), sem `proposto` (KAN-88, P78);
+       edital não é aprovada: se nenhum outro ramo mapeia o item e a decisão é
+       única, ela vira `regra`/`proposto` (`propostos_generico`, decisão D5 do dono);
+       senão o item fica pendente (`barrados_generico`, KAN-88, P78);
     3. título de bloco (matéria) sem equivalente aponta para o único nó de
        disciplina ou assunto de mesmo nome, nunca vira disciplina nova. Só se o
        nó está numa disciplina compatível com a inferida dos itens do bloco (ou é a
@@ -1635,6 +1666,17 @@ def mapear_novos_itens(
 
     indice_global = indice_global_por_nome(arvore)
 
+    def _propor(chave: str, nos) -> bool:
+        """Grava `regra`/`proposto` (decisões D2 e D5 do dono, KAN-87/KAN-88)."""
+        try:
+            arv_mod.mapear(
+                arvore, chave, sorted(nos), origem="regra", status="proposto"
+            )
+        except arv_mod.ArvoreInvalida as e:
+            logger.warning(f"[ARVORE] Proposta recusada para {chave}: {e}")
+            return False
+        return True
+
     def editais_do_item(info) -> frozenset[str]:
         return frozenset(oc[0] for oc in info["ocorrencias"])
 
@@ -1669,6 +1711,7 @@ def mapear_novos_itens(
             for slug in editais_do_item(i):
                 chaves_do_edital.setdefault(slug, set()).add(arv_mod.chave_item(k))
         pendentes = []
+        sem_pai: list[tuple[str, str]] = []
         usada_por_chave: dict[str, str] = {}
         for chave_origem, info in fonte.items():
             chave = arv_mod.chave_item(chave_origem)
@@ -1686,11 +1729,18 @@ def mapear_novos_itens(
                     usada_por_chave[chave] = usada
                     res.com_pai_provisorio += 1
                     res.chaves_pai_provisorio.append(chave)
+            elif nivel != "materia" and chave_regra(info["nome"]).chave:
+                # Pai sem nó: só o casamento global, e como proposta (KAN-87, D2).
+                sem_pai.append((chave, info["nome"]))
             else:
                 res.pendentes += 1
                 res.chaves_pendentes.append(chave)
         res.comparados += len(pendentes)
-        memoria = memoria_mapeamento.construir_indice(arvore) if pendentes else None
+        memoria = (
+            memoria_mapeamento.construir_indice(arvore)
+            if pendentes or sem_pai
+            else None
+        )
         for chave, sig in pendentes:
             candidatos = indice.get(sig, set())
             origem_memoria = False
@@ -1700,10 +1750,12 @@ def mapear_novos_itens(
             info_item = fonte[chave_orig_por_chave[chave]]
             nome_item = info_item["nome"]
             # Título genérico não herda decisão de outro edital (KAN-88, M11, P78):
-            # só vale a decisão de item do mesmo edital; o resto fica pendente.
+            # só vale a decisão de item do mesmo edital. A de outro edital vira
+            # proposta (`proposta_generico`), se nenhum outro ramo mapear o item.
             editais_item = editais_do_item(info_item)
             generico = titulo_generico(nome_item)
             barrado = False
+            proposta_generico = None
             if generico and candidatos:
                 proprios = {
                     n
@@ -1711,6 +1763,8 @@ def mapear_novos_itens(
                     if editais_decisao.get((sig, n), set()) & editais_item
                 }
                 barrado = not proprios
+                if barrado and len(candidatos) == 1:
+                    (proposta_generico,) = candidatos
                 candidatos = proprios
             if chave in usada_por_chave:
                 # Pai provisório: só resolve com as travas de D2 (KAN-86).
@@ -1750,11 +1804,11 @@ def mapear_novos_itens(
                         chaves_permitidas=permitidas,
                     )
                     if generico and not nos_mem and not barrado:
-                        barrado = bool(
-                            memoria_mapeamento.resolver_por_memoria(
-                                arvore, sig[2], nivel, sig[1], memoria
-                            )
+                        nos_livres = memoria_mapeamento.resolver_por_memoria(
+                            arvore, sig[2], nivel, sig[1], memoria
                         )
+                        barrado = bool(nos_livres)
+                        proposta_generico = nos_livres or None
                     if nos_mem:
                         candidatos = {nos_mem}
                         origem_memoria = True
@@ -1804,11 +1858,17 @@ def mapear_novos_itens(
                     if nos_titulo:
                         candidatos = {nos_titulo}
             if len(candidatos) != 1:
-                res.pendentes += 1
-                res.chaves_pendentes.append(chave)
                 if barrado and not candidatos:
                     res.barrados_generico += 1
                     res.chaves_barradas_generico.append(chave)
+                    # Decisão D5 do dono (2026-11-06): a decisão de outro edital vira
+                    # `regra`/`proposto`, para o dono confirmar na revisão guiada.
+                    if proposta_generico and _propor(chave, proposta_generico):
+                        res.propostos_generico += 1
+                        res.chaves_propostas_generico.append(chave)
+                        continue
+                res.pendentes += 1
+                res.chaves_pendentes.append(chave)
                 continue
             (nos,) = candidatos
             try:
@@ -1837,12 +1897,40 @@ def mapear_novos_itens(
             else:
                 res.por_nome += 1
 
-    if res.total and gravar:
+        # Item cujo pai não tem nó (KAN-87, decisão D2 do dono em 2026-11-06): sem
+        # disciplina de contexto, valem só as travas de fora da disciplina (candidato
+        # único na árvore, 3+ palavras relevantes ou norma). Grava `proposto`, nunca
+        # `aprovado`: sem o pai, o nome solto pode casar errado (ex.: "Normas
+        # Brasileiras de Contabilidade" de um bloco de setor público indo para a
+        # Estrutura Conceitual por apelido), e o dono confere na revisão guiada.
+        # Proposta rejeitada fica na chave e não volta.
+        for chave, nome_item in sem_pai:
+            achado = no_global_por_nome(
+                arvore,
+                nivel,
+                nome_item,
+                chave_regra(nome_item).chave,
+                frozenset(),
+                memoria.vetados,
+                indice_global,
+                memoria.apelidos,
+            )
+            if achado and _propor(chave, [achado[0]]):
+                res.propostos_sem_pai += 1
+                res.chaves_propostas_sem_pai.append(chave)
+                continue
+            res.pendentes += 1
+            res.chaves_pendentes.append(chave)
+
+    if (res.total or res.propostos_sem_pai or res.propostos_generico) and gravar:
         arv_mod.salvar(arvore, arvore_path)
     logger.info(
         f"[ARVORE] Passo determinístico: {res.por_nome} por regra de nome, "
         f"{res.por_memoria} por memória do dono, {res.por_filho} por filho "
-        f"único, {res.por_heranca} por herança de folha, {res.pendentes} pendente(s)."
+        f"único, {res.por_heranca} por herança de folha, {res.por_global} por "
+        f"casamento global, {res.propostos_sem_pai} proposto(s) sem pai mapeado, "
+        f"{res.propostos_generico} proposto(s) de título genérico, "
+        f"{res.pendentes} pendente(s)."
     )
     return res
 

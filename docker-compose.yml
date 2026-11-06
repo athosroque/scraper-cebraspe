@@ -97,6 +97,10 @@ services:
       - "5000"
       - --static
       - relatorio:/data/relatorio
+      # Consultas salvas da revisão guiada (KAN-89), regeradas por
+      # scripts/gerar_db_datasette.py a cada atualizar_revisao.
+      - --metadata
+      - /data/datasette/metadata.json
     volumes:
       - ./revisao_piloto:/data:ro
     ports:

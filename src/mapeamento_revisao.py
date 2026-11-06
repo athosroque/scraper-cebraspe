@@ -15,8 +15,10 @@ Categorias (`categoria`):
   dono grava com a mesma origem, então regra de nome gravada e memória não se
   distinguem na proveniência: o rótulo é "automático (regra/memória)".
 - `dono`: aprovado por decisão humana ou pela semente (grupos aprovados da 5B).
-- `proposta`: proposto pela IA (`origem="llm"`, status `proposto`), a conferir;
-  confiança e justificativa vêm do cache de `src/mapeamento_llm.py`, se houver.
+- `proposta`: status `proposto`, a conferir. Vem da IA (`origem="llm"`; confiança
+  e justificativa no cache de `src/mapeamento_llm.py`, se houver) ou do passo
+  determinístico (`origem="regra"`): item sem pai mapeado que casou por nome e
+  título genérico com decisão de outro edital (KAN-87 D2, KAN-88 D5).
 - `sem_equivalente`: nada aprovado nem proposto; o dono precisa decidir.
 
 Sobre essas categorias, `montar_revisao` (M10, Etapa 5B.4, KAN-89) só apresenta:
@@ -45,7 +47,7 @@ CACHE_PADRAO = arv_mod.PROJETO_DIR / "canonico" / ".mapear_itens_novos_cache.jso
 ROTULOS = {
     "auto": "automático (regra/memória)",
     "dono": "decisão sua / semente",
-    "proposta": "proposto pela IA (a conferir)",
+    "proposta": "proposto pela IA ou por regra (a conferir)",
     "sem_equivalente": "sem equivalente (a decidir)",
 }
 CATEGORIAS = tuple(ROTULOS)

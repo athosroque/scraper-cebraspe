@@ -1,0 +1,6 @@
+{
+  "descricao": "KAN-87, decisão do dono em 2026-11-03: aposenta o composto SWOT; BSC depois de o item e as questões CD 113/115 irem para os nós separados. Aposentar, não fundir, para não deixar apelido que mande SWOT para o BSC.",
+  "operacoes": [
+    {"tipo": "aposentar", "args": {"no": "S-71b651de26"}}
+  ]
+}

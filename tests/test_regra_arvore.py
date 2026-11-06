@@ -1352,7 +1352,8 @@ def test_generico_nunca_casa_global(monkeypatch, tmp_path, arvore_global, nome):
     assert (res.por_global, res.pendentes) == (0, 1)
 
 
-def test_titulos_genericos_ampliados_valem_para_todos_os_ramos():
+def test_genericos_do_global_nao_travam_os_ramos_com_pai():
+    # Decisão D3 do dono (2026-11-06): os genéricos do KAN-87 travam só o global.
     for nome in (
         "Aplicações",
         "Definição",
@@ -1360,9 +1361,33 @@ def test_titulos_genericos_ampliados_valem_para_todos_os_ramos():
         "Instalação, configuração e administração",
         "Conceitos básicos e aplicações",
     ):
-        assert canonico.titulo_generico(nome), nome
-    assert not canonico.titulo_generico("Tipos de indicadores")
-    assert not canonico.titulo_generico("Papel do fiscalizador do contrato")
+        assert canonico.titulo_generico_global(nome), nome
+        assert not canonico.titulo_generico(nome), nome
+    # a lista dos ramos com pai continua valendo no global
+    assert canonico.titulo_generico_global("Conceitos")
+    assert canonico.titulo_generico("Conceitos")
+    assert not canonico.titulo_generico_global("Tipos de indicadores")
+    assert not canonico.titulo_generico_global("Papel do fiscalizador do contrato")
+
+
+def test_tipos_casa_pelo_filho_unico_dentro_do_pai(monkeypatch, tmp_path, arvore_path):
+    # "Licitação › Tipos" de um edital novo vai para o filho "Tipos" do nó de
+    # Licitação: o pai dá o contexto que falta ao rótulo genérico.
+    def montar(a):
+        criar_no(a, "assunto", "Licitação", "M-DA", id_override="A-LICIT")
+        criar_no(a, "subassunto", "Tipos", "A-LICIT", id_override="S-TIPOS")
+        mapear(a, "direito administrativo|licitacao", ["A-LICIT"])
+
+    _mexer(arvore_path, montar)
+    nomes = canonico.NomesOrigem(
+        subassunto={("direito administrativo", "licitacao", "tipos"): _nome("Tipos")}
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    res = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert (res.por_filho, res.pendentes) == (1, 0)
+    assert _destino(arvore_path, "direito administrativo", "licitacao", "tipos") == [
+        ("S-TIPOS", "regra", "aprovado")
+    ]
 
 
 def test_candidato_duplicado_nao_casa(monkeypatch, tmp_path, arvore_global):
@@ -1573,6 +1598,85 @@ def test_apelido_de_no_fundido_de_outra_disciplina_casa_global(
     ]
 
 
+# Pai sem nó: casamento global só como proposta (KAN-87, decisão D2) -------------------
+
+BLOCO_SEM_NO = "contabilidade"
+
+
+def _sem_pai(monkeypatch, tmp_path, arvore_path, itens, gravar=True, arvore_mem=None):
+    """Subassuntos sob "contabilidade|tópico solto", sem nó para o pai."""
+    nomes = canonico.NomesOrigem(
+        subassunto={
+            (BLOCO_SEM_NO, "topico solto", canonico.chave_regra(s).chave): _nome(s)
+            for s in itens
+        }
+    )
+    monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
+    return canonico.mapear_novos_itens(
+        tmp_path, arvore_path, gravar=gravar, arvore_mem=arvore_mem
+    )
+
+
+def _dest_sem_pai(arvore_path, nome):
+    chave = _cb(BLOCO_SEM_NO, "topico solto", canonico.chave_regra(nome).chave)
+    return [
+        (m.no_id, m.origem, m.status)
+        for m in carregar(arvore_path).mapeamentos.get(chave, [])
+    ]
+
+
+def test_pai_sem_no_casa_global_como_proposta(monkeypatch, tmp_path, arvore_global):
+    res = _sem_pai(
+        monkeypatch, tmp_path, arvore_global, ["Papel do fiscalizador do contrato"]
+    )
+    assert (res.propostos_sem_pai, res.total, res.pendentes) == (1, 0, 0)
+    assert _dest_sem_pai(arvore_global, "Papel do fiscalizador do contrato") == [
+        ("S-FISC", "regra", "proposto")
+    ]
+
+
+def test_pai_sem_no_norma_casa_como_proposta(monkeypatch, tmp_path, arvore_global):
+    res = _sem_pai(monkeypatch, tmp_path, arvore_global, ["Lei nº 13.709/2018"])
+    assert res.propostos_sem_pai == 1
+    assert _dest_sem_pai(arvore_global, "Lei nº 13.709/2018") == [
+        ("S-LGPD", "regra", "proposto")
+    ]
+
+
+@pytest.mark.parametrize("nome", ["Dispensa de licitação", "Aplicações", "Economia"])
+def test_pai_sem_no_nome_curto_ou_generico_fica_pendente(
+    monkeypatch, tmp_path, arvore_global, nome
+):
+    # sem disciplina de contexto, nome com menos de 3 palavras relevantes não casa
+    res = _sem_pai(monkeypatch, tmp_path, arvore_global, [nome])
+    assert (res.propostos_sem_pai, res.pendentes) == (0, 1)
+    assert _dest_sem_pai(arvore_global, nome) == []
+
+
+def test_pai_sem_no_proposta_rejeitada_nao_volta(monkeypatch, tmp_path, arvore_global):
+    nome = "Papel do fiscalizador do contrato"
+    _sem_pai(monkeypatch, tmp_path, arvore_global, [nome])
+    chave = _cb(BLOCO_SEM_NO, "topico solto", canonico.chave_regra(nome).chave)
+    _mexer(arvore_global, lambda a: rejeitar(a, chave, "S-FISC"))
+    res = _sem_pai(monkeypatch, tmp_path, arvore_global, [nome])
+    assert res.propostos_sem_pai == 0
+    assert _dest_sem_pai(arvore_global, nome) == [("S-FISC", "regra", "rejeitado")]
+
+
+def test_pai_sem_no_proposta_dry_run_nao_grava(monkeypatch, tmp_path, arvore_global):
+    antes = arvore_global.read_bytes()
+    mem = carregar(arvore_global)
+    res = _sem_pai(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        ["Papel do fiscalizador do contrato"],
+        gravar=False,
+        arvore_mem=mem,
+    )
+    assert res.propostos_sem_pai == 1 and arvore_global.read_bytes() == antes
+
+
 # Título genérico não herda decisão de outro edital (KAN-88, M11, P78) ---------------
 
 
@@ -1617,10 +1721,12 @@ CHAVE_G = "nocoes de direito administrativo|controle"
 def test_titulo_generico_nao_herda_de_outro_edital(monkeypatch, tmp_path, arvore_path):
     res = _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_B_25")
     assert (res.por_nome, res.por_memoria, res.total) == (0, 0, 0)
-    assert res.pendentes == 1 and res.barrados_generico == 1
+    assert res.pendentes == 0 and res.barrados_generico == 1
     assert res.chaves_barradas_generico == [CHAVE_G]
-    # Nada aprovado em nome do dono: o item fica sem entrada (nem proposto).
-    assert CHAVE_G not in carregar(arvore_path).mapeamentos
+    # Nada aprovado em nome do dono: a decisão de outro edital vira proposta (D5).
+    assert (res.propostos_generico, res.chaves_propostas_generico) == (1, [CHAVE_G])
+    [m] = carregar(arvore_path).mapeamentos[CHAVE_G]
+    assert (m.no_id, m.origem, m.status) == ("A-ATO", "regra", "proposto")
 
 
 def test_titulo_generico_herda_dentro_do_mesmo_edital(
@@ -1661,15 +1767,29 @@ def test_titulo_generico_sem_origem_conhecida_nao_herda_pela_memoria(
     )
     monkeypatch.setattr(canonico, "coletar_nomes", lambda d: nomes)
     res = canonico.mapear_novos_itens(tmp_path, arvore_path)
-    assert (res.total, res.pendentes, res.barrados_generico) == (0, 1, 1)
+    assert (res.total, res.pendentes, res.barrados_generico) == (0, 0, 1)
+    [m] = carregar(arvore_path).mapeamentos["nocoes de direito administrativo|controle"]
+    assert (m.no_id, m.origem, m.status) == ("A-ATO", "regra", "proposto")
 
 
 def test_titulo_generico_barrado_e_idempotente(monkeypatch, tmp_path, arvore_path):
     _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_B_25")
     antes = carregar(arvore_path).mapeamentos
+    # a proposta já é entrada da chave: a segunda execução não reavalia o item
     res = canonico.mapear_novos_itens(tmp_path, arvore_path)
-    assert (res.total, res.barrados_generico) == (0, 1)
+    assert (res.total, res.barrados_generico, res.propostos_generico) == (0, 0, 0)
     assert carregar(arvore_path).mapeamentos == antes
+
+
+def test_titulo_generico_proposta_rejeitada_nao_volta(
+    monkeypatch, tmp_path, arvore_path
+):
+    _generico(monkeypatch, tmp_path, arvore_path, "ED_A_25", "ED_B_25")
+    _mexer(arvore_path, lambda a: rejeitar(a, CHAVE_G, "A-ATO"))
+    res = canonico.mapear_novos_itens(tmp_path, arvore_path)
+    assert res.propostos_generico == 0
+    [m] = carregar(arvore_path).mapeamentos[CHAVE_G]
+    assert m.status == "rejeitado"
 
 
 def test_titulo_generico_aprovado_pelo_dono_deixa_de_ser_pendente(
