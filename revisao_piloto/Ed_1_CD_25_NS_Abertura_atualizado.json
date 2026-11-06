@@ -134,8 +134,11 @@
             ]
           },
           {
-            "nome": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a estrutura daquelas relações",
-            "subtopicos": []
+            "nome": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios",
+            "subtopicos": [
+              "dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a estrutura daquelas relações"
+            ],
+            "nome_origem": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios; dedução de novas informações das relações fornecidas e avaliação das condições usadas para estabelecer a estrutura daquelas relações"
           },
           {
             "nome": "Compreensão e análise da lógica de uma situação, utilizando as funções intelectuais: raciocínio verbal, raciocínio matemático, raciocínio sequencial, reconhecimento de padrões, orientação espacial e temporal, formação de conceitos, discriminação de elementos Compreensão de dados apresentados em gráficos e tabelas",
@@ -304,8 +307,11 @@
             ]
           },
           {
-            "nome": "Reformas administrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado",
-            "subtopicos": []
+            "nome": "Reformas administrativas e redefinição do papel do Estado",
+            "subtopicos": [
+              "reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
+            ],
+            "nome_origem": "Reformas administrativas e redefinição do papel do Estado; reforma do serviço civil (mérito, flexibilidade e responsabilização) e reforma do aparelho do Estado"
           },
           {
             "nome": "Mudanças institucionais: conselhos, organizações sociais (OS), organização da sociedade civil de interesse público (OSCIP), agência reguladora, agência executiva, consórcios públicos",
@@ -366,53 +372,53 @@
           {
             "nome": "Constituição da República Federativa do Brasil de 1988",
             "subtopicos": [
-              "Conceito, classificações, princípios fundamentais, emendas constitucionais."
+              "Conceito, classificações, princípios fundamentais, emendas constitucionais"
             ]
           },
           {
             "nome": "Direitos e garantias fundamentais",
             "subtopicos": [
-              "Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos políticos, partidos políticos."
+              "Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos políticos, partidos políticos"
             ]
           },
           {
             "nome": "Organização político-administrativa",
             "subtopicos": [
-              "União, estados, Distrito Federal e municípios."
+              "União, estados, Distrito Federal e municípios"
             ]
           },
           {
             "nome": "Administração pública",
             "subtopicos": [
-              "Disposições gerais, servidores públicos."
+              "Disposições gerais, servidores públicos"
             ]
           },
           {
             "nome": "Poder Legislativo",
             "subtopicos": [
-              "Congresso Nacional, Câmara dos Deputados, Senado Federal, deputados e senadores, atribuições, competências, reuniões e comissões."
+              "Congresso Nacional, Câmara dos Deputados, Senado Federal, deputados e senadores, atribuições, competências, reuniões e comissões"
             ]
           },
           {
             "nome": "Poder Executivo",
             "subtopicos": [
-              "Atribuições do presidente da República e dos ministros de Estado."
+              "Atribuições do presidente da República e dos ministros de Estado"
             ]
           },
           {
             "nome": "Poder Judiciário",
             "subtopicos": [
-              "Disposições gerais.",
-              "Órgãos do Poder Judiciário.",
-              "Competências.",
-              "Conselho Nacional de Justiça (CNJ).",
-              "Composição e competência."
+              "Disposições gerais",
+              "Órgãos do Poder Judiciário",
+              "Competências",
+              "Conselho Nacional de Justiça (CNJ)",
+              "Composição e competência"
             ]
           },
           {
             "nome": "Funções essenciais à Justiça",
             "subtopicos": [
-              "Ministério Público, advocacia e defensoria públicas."
+              "Ministério Público, advocacia e defensoria públicas"
             ]
           },
           {
@@ -426,27 +432,27 @@
           {
             "nome": "Crimes de Responsabilidade e abuso de autoridade",
             "subtopicos": [
-              "Lei nº 1.079/1950.",
-              "Lei nº 13.869/2019 (crimes de abuso de autoridade)."
+              "Lei nº 1.079/1950",
+              "Lei nº 13.869/2019 (crimes de abuso de autoridade)"
             ]
           },
           {
             "nome": "Procedimento Legislativo",
             "subtopicos": [
-              "Tipos de procedimento, ordinário, abreviado, sumário, sumaríssimo, especial e concentrado.",
-              "Etapas e noções básicas.",
-              "Comissões, pareceres, deliberação, votação, sanção e veto."
+              "Tipos de procedimento, ordinário, abreviado, sumário, sumaríssimo, especial e concentrado",
+              "Etapas e noções básicas",
+              "Comissões, pareceres, deliberação, votação, sanção e veto"
             ]
           },
           {
             "nome": "Matérias Legislativas",
             "subtopicos": [
-              "Projeto de lei ordinária, complementar e delegada.",
-              "Medida provisória.",
-              "Projeto de decreto legislativo e projeto de resolução.",
-              "Proposta de Emenda à Constituição (PEC).",
-              "Indicações, pareceres, requerimentos e vetos.",
-              "Iniciativa Legislativa: Presidência da República, Congresso Nacional, tribunais e cidadãos."
+              "Projeto de lei ordinária, complementar e delegada",
+              "Medida provisória",
+              "Projeto de decreto legislativo e projeto de resolução",
+              "Proposta de Emenda à Constituição (PEC)",
+              "Indicações, pareceres, requerimentos e vetos",
+              "Iniciativa Legislativa: Presidência da República, Congresso Nacional, tribunais e cidadãos"
             ]
           },
           {
@@ -456,13 +462,13 @@
           {
             "nome": "Processo Legislativo Orçamentário",
             "subtopicos": [
-              "Plano Plurianual (PPA).",
-              "Lei de Diretrizes Orçamentárias (LDO).",
-              "Lei Orçamentária Anual (LOA).",
-              "As interfaces entre LDO, LOA, Lei nº 4.320/1964 e Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal).",
-              "Elaboração e aprovação das leis de matéria orçamentária.",
-              "Proposta orçamentária e sua integração com PPA e LDO.",
-              "Execução financeira e créditos."
+              "Plano Plurianual (PPA)",
+              "Lei de Diretrizes Orçamentárias (LDO)",
+              "Lei Orçamentária Anual (LOA)",
+              "As interfaces entre LDO, LOA, Lei nº 4.320/1964 e Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal)",
+              "Elaboração e aprovação das leis de matéria orçamentária",
+              "Proposta orçamentária e sua integração com PPA e LDO",
+              "Execução financeira e créditos"
             ]
           },
           {

@@ -21,6 +21,7 @@ from src.comparacao_texto import (
     TAMANHO_FRASE_LONGA,
     cabeca_e_resto,
     contido,
+    desfazer_ligaduras,
     divergencia_leve,
     eh_faceta_generica,
     eh_fragmento_de_uma_palavra,
@@ -255,7 +256,7 @@ def reinjetar_itens_ausentes(taxonomia: TaxonomiaEdital, chunk_text: str) -> lis
         numero, item_texto = itens[pos]
         if PADRAO_SUBITEM.search(item_texto):
             continue
-        nome = " ".join(item_texto.split()).rstrip(" .;")
+        nome = desfazer_ligaduras(" ".join(item_texto.split()).rstrip(" .;"))
         if not nome or len(nome) > TAMANHO_MAXIMO_ITEM_REINJETAVEL:
             continue
         # Comparação restrita a ESTE item (não ao texto-fonte inteiro): senão
@@ -286,7 +287,7 @@ def _limpar_nome_subitem(texto: str) -> str:
     # Hífen no fim da linha do PDF ("Elasticidade-\nrenda") é do próprio nome:
     # juntar sem espaço, senão sai "Elasticidade- renda".
     texto = re.sub(r"-[ \t]*\n[ \t]*", "-", texto)
-    return " ".join(texto.split()).rstrip(" .;")
+    return desfazer_ligaduras(" ".join(texto.split()).rstrip(" .;"))
 
 
 def _partes_da_cadeia(

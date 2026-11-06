@@ -1160,14 +1160,46 @@
               "Recrutamento e seleção de pessoas",
               "Análise e descrição de cargos",
               "Educação, treinamento e desenvolvimento",
+              "Educação corporativa",
+              "Educação a distância",
+              "Planejamento, desenvolvimento e objetivos do ensino",
               "Gestão de conflito"
-            ]
+            ],
+            "caminho_origem": {
+              "Educação corporativa": [
+                "Educação, treinamento e desenvolvimento"
+              ],
+              "Educação a distância": [
+                "Educação, treinamento e desenvolvimento"
+              ],
+              "Planejamento, desenvolvimento e objetivos do ensino": [
+                "Educação, treinamento e desenvolvimento"
+              ]
+            }
           },
           {
             "nome": "Gestão organizacional",
             "subtopicos": [
-              "Planejamento estratégico"
-            ]
+              "Planejamento estratégico",
+              "Definições de estratégia",
+              "Condições necessárias para se desenvolver a estratégia",
+              "Questões‐chave em estratégia",
+              "Metas estratégicas e resultados pretendidos"
+            ],
+            "caminho_origem": {
+              "Definições de estratégia": [
+                "Planejamento estratégico"
+              ],
+              "Condições necessárias para se desenvolver a estratégia": [
+                "Planejamento estratégico"
+              ],
+              "Questões‐chave em estratégia": [
+                "Planejamento estratégico"
+              ],
+              "Metas estratégicas e resultados pretendidos": [
+                "Planejamento estratégico"
+              ]
+            }
           },
           {
             "nome": "Indicadores de desempenho",

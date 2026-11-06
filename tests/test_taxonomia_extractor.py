@@ -1098,6 +1098,19 @@ class TestReparosDeForma:
             "Elasticidade-renda da demanda"
         )
 
+    def test_nome_reinjetado_desfaz_ligadura_da_fonte(self):
+        # Achado real: IBAMA_25 2.11.1 e 3.1.1 entravam como "corporaƟva" e "Deﬁnições".
+        assert te._limpar_nome_subitem("Educação corporaƟva.") == "Educação corporativa"
+        assert te._limpar_nome_subitem("Deﬁnições de estratégia") == (
+            "Definições de estratégia"
+        )
+
+    def test_item_reinjetado_desfaz_ligadura_da_fonte(self):
+        tax = te.TaxonomiaEdital(materia="X", topicos=[te.Topico(nome="Ética")])
+        fonte = "1 Ética. 2 Educação corporaƟva."
+        assert te.reinjetar_itens_ausentes(tax, fonte) == ["2"]
+        assert [t.nome for t in tax.topicos] == ["Ética", "Educação corporativa"]
+
     def test_materia_composta_que_so_cita_topicos_nao_e_trocada(self):
         tax = te.TaxonomiaEdital(
             materia="Ciclos de vida e Metodologias ágeis",

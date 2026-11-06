@@ -1,8 +1,8 @@
 {
   "edital": "Ed_1_2025_STM_Abertura_atualizado_ret_3.pdf",
   "total_chunks_analisados": 53,
-  "total_alertas": 3,
-  "total_informativos": 17,
+  "total_alertas": 0,
+  "total_informativos": 13,
   "alertas": [
     {
       "chunk_index": 1,
@@ -13,33 +13,6 @@
       "numero_item": null,
       "texto_item_origem": "153 caracteres",
       "topico_nome_extraido": "Resolução do CNJ nº 351/2020 (Política de Prevenção e Enfrentamento do Assédio Moral, do Assédio Sexual e da Discriminação no âmbito do Poder Judiciário)"
-    },
-    {
-      "chunk_index": 10,
-      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
-      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
-      "tipo": "subitem_ausente",
-      "numero_item": "2.11.1",
-      "texto_item_origem": "Educação corporativa.",
-      "topico_nome_extraido": null
-    },
-    {
-      "chunk_index": 10,
-      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
-      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
-      "tipo": "subitem_ausente",
-      "numero_item": "2.11.2",
-      "texto_item_origem": "Educação a \ndistância.",
-      "topico_nome_extraido": null
-    },
-    {
-      "chunk_index": 10,
-      "cargo": "CARGO 2: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: ADMINISTRAÇÃO",
-      "materia": "ADMINISTRAÇÃO GERAL E PÚBLICA",
-      "tipo": "subitem_ausente",
-      "numero_item": "2.11.3",
-      "texto_item_origem": "Planejamento, desenvolvimento e objetivos do ensino.",
-      "topico_nome_extraido": null
     },
     {
       "chunk_index": 14,
@@ -60,26 +33,6 @@
       "numero_item": null,
       "texto_item_origem": "219 caracteres",
       "topico_nome_extraido": "Elaboração de demonstrações contábeis pela legislação societária, pelas normas brasileiras de contabilidade do Conselho Federal da Contabilidade (CFC) e pelos pronunciamentos do Comitê de Pronunciamentos Contábeis (CPC)"
-    },
-    {
-      "chunk_index": 28,
-      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
-      "materia": "SEGURANÇA DA INFORMAÇÃO",
-      "tipo": "topico_lista_nao_dividida",
-      "severidade": "informativo",
-      "numero_item": null,
-      "texto_item_origem": "Infraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP-Brasil",
-      "topico_nome_extraido": "Infraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP-Brasil"
-    },
-    {
-      "chunk_index": 28,
-      "cargo": "CARGO 6: ANALISTA JUDICIÁRIO – ÁREA: APOIO ESPECIALIZADO – ESPECIALIDADE: SUPORTE EM TECNOLOGIA DA INFORMAÇÃO",
-      "materia": "SEGURANÇA DA INFORMAÇÃO",
-      "tipo": "topico_lista_nao_dividida",
-      "severidade": "informativo",
-      "numero_item": null,
-      "texto_item_origem": "Monitoramento de tráfego; ferramentas e conceitos de sniffer de rede; wireshark; análise de pacotes",
-      "topico_nome_extraido": "Monitoramento de tráfego; ferramentas e conceitos de sniffer de rede; wireshark; análise de pacotes"
     },
     {
       "chunk_index": 30,
@@ -150,26 +103,6 @@
       "numero_item": null,
       "texto_item_origem": null,
       "topico_nome_extraido": "Persistência; JPA 2.0; Hibernate 4.3 ou superior; Hibernate Envers; Biblioteca Flyway"
-    },
-    {
-      "chunk_index": 33,
-      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
-      "materia": "DIREITO PROCESSUAL PENAL MILITAR",
-      "tipo": "topico_lista_nao_dividida",
-      "severidade": "informativo",
-      "numero_item": null,
-      "texto_item_origem": "Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; execução das medidas de segurança; incidentes da execução",
-      "topico_nome_extraido": "Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; execução das medidas de segurança; incidentes da execução"
-    },
-    {
-      "chunk_index": 33,
-      "cargo": "CARGO 7: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
-      "materia": "DIREITO PROCESSUAL PENAL MILITAR",
-      "tipo": "topico_frase_longa",
-      "severidade": "informativo",
-      "numero_item": null,
-      "texto_item_origem": "154 caracteres",
-      "topico_nome_extraido": "Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; execução das medidas de segurança; incidentes da execução"
     },
     {
       "chunk_index": 50,

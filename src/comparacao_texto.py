@@ -45,13 +45,20 @@ PADRAO_SUFIXO_PARENTETICO = re.compile(r"\s*\([^()]*\)\s*$")
 PADRAO_SUBITEM = re.compile(r"(?<![\d/.])\b\d{1,3}(?:\.\d{1,3})+\.?\s+(?=[A-ZÀ-Ú(])")
 
 
+def desfazer_ligaduras(texto: str) -> str:
+    """Troca os glifos de ligadura da fonte do PDF ("corporaƟva", "Deﬁnição")
+    pelas letras. Usado em nome tirado do texto-fonte, que vai para a tela."""
+    for de, para in MAPA_LIGATURAS_FONTES.items():
+        if de in texto:
+            texto = texto.replace(de, para)
+    return texto
+
+
 def normalizar(texto: str) -> str:
     """Minúsculas, sem acento/pontuação, sem número de prefixo ('1 ', '3.1 ')."""
     texto = texto.strip()
     texto = re.sub(r"^\d+(\.\d+)*\.?\s+", "", texto)
-    for de, para in MAPA_LIGATURAS_FONTES.items():
-        if de in texto:
-            texto = texto.replace(de, para)
+    texto = desfazer_ligaduras(texto)
     # Converte para NFC para unir acentos combinantes (ex.: i + ́ -> í)
     # antes da remoção de caracteres não-palavra
     texto = unicodedata.normalize("NFC", texto)

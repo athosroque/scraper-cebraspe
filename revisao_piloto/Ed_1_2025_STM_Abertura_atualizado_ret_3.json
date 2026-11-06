@@ -692,8 +692,22 @@
               "Recrutamento e seleção de pessoas",
               "Análise e descrição de cargos",
               "Educação, treinamento e desenvolvimento",
+              "Educação corporativa",
+              "Educação a distância",
+              "Planejamento, desenvolvimento e objetivos do ensino",
               "Gestão de conflitos"
-            ]
+            ],
+            "caminho_origem": {
+              "Educação corporativa": [
+                "Educação, treinamento e desenvolvimento"
+              ],
+              "Educação a distância": [
+                "Educação, treinamento e desenvolvimento"
+              ],
+              "Planejamento, desenvolvimento e objetivos do ensino": [
+                "Educação, treinamento e desenvolvimento"
+              ]
+            }
           },
           {
             "nome": "Gestão estratégica",
@@ -2272,8 +2286,11 @@
             ]
           },
           {
-            "nome": "Infraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP-Brasil",
-            "subtopicos": []
+            "nome": "Infraestrutura de chaves públicas — public key infrastructure (PKI)",
+            "subtopicos": [
+              "organização ICP-Brasil"
+            ],
+            "nome_origem": "Infraestrutura de chaves públicas — public key infrastructure (PKI); organização ICP-Brasil"
           },
           {
             "nome": "Controle de acesso",
@@ -2294,8 +2311,13 @@
             ]
           },
           {
-            "nome": "Monitoramento de tráfego; ferramentas e conceitos de sniffer de rede; wireshark; análise de pacotes",
-            "subtopicos": []
+            "nome": "Monitoramento de tráfego",
+            "subtopicos": [
+              "ferramentas e conceitos de sniffer de rede",
+              "wireshark",
+              "análise de pacotes"
+            ],
+            "nome_origem": "Monitoramento de tráfego; ferramentas e conceitos de sniffer de rede; wireshark; análise de pacotes"
           },
           {
             "nome": "Ameaças e ataques em aplicações web",
@@ -2730,8 +2752,13 @@
             "subtopicos": []
           },
           {
-            "nome": "Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; execução das medidas de segurança; incidentes da execução",
-            "subtopicos": []
+            "nome": "Execução da sentença e das penas em espécie",
+            "subtopicos": [
+              "indulto, comutação da pena, anistia e reabilitação",
+              "execução das medidas de segurança",
+              "incidentes da execução"
+            ],
+            "nome_origem": "Execução da sentença e das penas em espécie: indulto, comutação da pena, anistia e reabilitação; execução das medidas de segurança; incidentes da execução"
           },
           {
             "nome": "Jurisprudência aplicada dos tribunais superiores",
@@ -3609,7 +3636,7 @@
       "materia_normalizada": "LEGISLAÇÃO ESPECIAL",
       "apenas_discursiva": false,
       "taxonomia_extraida": {
-        "materia": "",
+        "materia": "LEGISLAÇÃO ESPECIAL",
         "topicos": [
           {
             "nome": "Lei nº 11.418/2006",

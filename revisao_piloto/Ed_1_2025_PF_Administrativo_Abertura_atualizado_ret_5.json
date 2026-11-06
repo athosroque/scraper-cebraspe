@@ -1947,11 +1947,17 @@
               "Níveis progressivos de assistência à saúde",
               "Políticas públicas do SUS para gestão de recursos físicos, financeiros, materiais e humanos",
               "Sistema de planejamento do SUS",
+              "Planejamento estratégico e normativo",
               "Direitos dos usuários do SUS",
               "Participação e controle social",
               "Ações e programas do SUS",
               "Legislação básica do SUS"
-            ]
+            ],
+            "caminho_origem": {
+              "Planejamento estratégico e normativo": [
+                "Sistema de planejamento do SUS"
+              ]
+            }
           },
           {
             "nome": "Vigilância epidemiológica e vigilância em saúde",
@@ -1966,8 +1972,14 @@
             "subtopicos": [
               "Hospital-dia, assistência domiciliar, trabalho de grupo",
               "Prática de enfermagem na comunidade",
+              "Cuidado de saúde familiar",
               "Estratégia da saúde da família"
-            ]
+            ],
+            "caminho_origem": {
+              "Cuidado de saúde familiar": [
+                "Prática de enfermagem na comunidade"
+              ]
+            }
           },
           {
             "nome": "Teorias e processo de enfermagem",
@@ -1979,8 +1991,18 @@
             "nome": "Assistência de enfermagem ao adulto portador de transtorno mental",
             "subtopicos": [
               "Unidades de atenção à saúde mental",
-              "Instrumentos de intervenção de enfermagem em saúde mental"
-            ]
+              "Ambulatório de saúde mental, centro de atenção psicossocial e hospital psiquiátrico",
+              "Instrumentos de intervenção de enfermagem em saúde mental",
+              "Relacionamento interpessoal, comunicação terapêutica, psicopatologias, psicofarmacologia"
+            ],
+            "caminho_origem": {
+              "Ambulatório de saúde mental, centro de atenção psicossocial e hospital psiquiátrico": [
+                "Unidades de atenção à saúde mental"
+              ],
+              "Relacionamento interpessoal, comunicação terapêutica, psicopatologias, psicofarmacologia": [
+                "Instrumentos de intervenção de enfermagem em saúde mental"
+              ]
+            }
           },
           {
             "nome": "Assistência de enfermagem em gerontologia",
@@ -2046,17 +2068,45 @@
               "Atendimento inicial ao politraumatizado",
               "Atendimento na parada cardiorrespiratória",
               "Assistência de enfermagem ao paciente crítico com distúrbios hidroeletrolíticos, acidobásicos, insuficiência respiratória e ventilação mecânica",
+              "Insuficiência renal e métodos dialíticos",
+              "Insuficiência hepática",
+              "Avaliação de consciência no paciente em coma",
               "Doação, captação e transplante de órgãos",
-              "Enfermagem em urgências"
-            ]
+              "Enfermagem em urgências",
+              "Violência, abuso de drogas, intoxicações, emergências ambientais"
+            ],
+            "caminho_origem": {
+              "Insuficiência renal e métodos dialíticos": [
+                "Assistência de enfermagem ao paciente crítico com distúrbios hidroeletrolíticos, acidobásicos, insuficiência respiratória e ventilação mecânica"
+              ],
+              "Insuficiência hepática": [
+                "Assistência de enfermagem ao paciente crítico com distúrbios hidroeletrolíticos, acidobásicos, insuficiência respiratória e ventilação mecânica"
+              ],
+              "Avaliação de consciência no paciente em coma": [
+                "Assistência de enfermagem ao paciente crítico com distúrbios hidroeletrolíticos, acidobásicos, insuficiência respiratória e ventilação mecânica"
+              ],
+              "Violência, abuso de drogas, intoxicações, emergências ambientais": [
+                "Enfermagem em urgências"
+              ]
+            }
           },
           {
             "nome": "Gerenciamento de enfermagem em serviços de saúde",
             "subtopicos": [
               "Gerenciamento de recursos humanos",
+              "Dimensionamento, recrutamento e seleção, educação continuada, avaliação de desempenho, liderança, supervisão, comunicação, relações de trabalho e processo grupal",
               "Avaliação da qualidade nos processos de trabalho",
+              "Custos, auditoria, acreditação",
               "Processo de trabalho de gerenciamento em enfermagem"
-            ]
+            ],
+            "caminho_origem": {
+              "Dimensionamento, recrutamento e seleção, educação continuada, avaliação de desempenho, liderança, supervisão, comunicação, relações de trabalho e processo grupal": [
+                "Gerenciamento de recursos humanos"
+              ],
+              "Custos, auditoria, acreditação": [
+                "Avaliação da qualidade nos processos de trabalho"
+              ]
+            }
           },
           {
             "nome": "Atuação da enfermagem em procedimentos e métodos diagnósticos",
@@ -2086,8 +2136,18 @@
             "nome": "Práticas de biossegurança aplicadas ao processo de cuidar",
             "subtopicos": [
               "Risco biológico e medidas de precauções básicas para a segurança individual e coletiva no serviço de assistência à saúde",
-              "Precaução-padrão e precauções por forma de transmissão das doenças"
-            ]
+              "Precaução-padrão e precauções por forma de transmissão das doenças",
+              "Definição, indicações de uso e recursos materiais",
+              "Medidas de proteção cabíveis nas situações de risco potencial de exposição"
+            ],
+            "caminho_origem": {
+              "Definição, indicações de uso e recursos materiais": [
+                "Precaução-padrão e precauções por forma de transmissão das doenças"
+              ],
+              "Medidas de proteção cabíveis nas situações de risco potencial de exposição": [
+                "Precaução-padrão e precauções por forma de transmissão das doenças"
+              ]
+            }
           },
           {
             "nome": "Controle de infecção hospitalar",
