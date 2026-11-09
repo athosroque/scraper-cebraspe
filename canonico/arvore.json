@@ -5323,7 +5323,7 @@
   "direito administrativo|agentes publicos especies e classificacao|cargo emprego e funcao publicos": [{"no_id": "SL-aea7ac8fe1", "origem": "llm", "status": "proposto"}],
   "direito administrativo|agentes publicos especies e classificacao|formas de provimento e vacancia dos cargos publicos": [{"no_id": "S-553ee52694", "origem": "llm", "status": "proposto"}, {"no_id": "S-98db140823", "origem": "llm", "status": "proposto"}],
   "direito administrativo|agentes publicos especies e classificacao|responsabilidade civil penal e administrativa": [{"no_id": "S-7052d4368b", "origem": "llm", "status": "proposto"}],
-  "direito administrativo|agentes publicos especies e classificacao|titulos iii e iv do regime juridico dos funcionarios civis do poder executivo do estado do parana lei estadual no 6 174 1970": [{"no_id": "SL-f7dc270f3c", "origem": "llm", "status": "proposto"}],
+  "direito administrativo|agentes publicos especies e classificacao|titulos iii e iv do regime juridico dos funcionarios civis do poder executivo do estado do parana lei estadual no 6 174 1970": [{"no_id": "A-c1f695d9ea", "origem": "humano", "status": "aprovado"}],
   "direito administrativo|agentes publicos|cargo emprego e funcao publica": [{"no_id": "SL-aea7ac8fe1", "origem": "semente", "status": "aprovado"}],
   "direito administrativo|agentes publicos|conceito": [{"no_id": "S-3190950700", "origem": "semente", "status": "aprovado"}],
   "direito administrativo|agentes publicos|direitos e deveres": [{"no_id": "S-a6b78a5568", "origem": "semente", "status": "aprovado"}],

@@ -1,0 +1,21 @@
+{
+ "descricao": "Decisão do dono (2026-11-09): Lei estadual nº 6.174/1970 (estatuto dos servidores do PR, sem questões) vai para o assunto geral Agentes públicos, sem nó próprio até aparecerem questões.",
+ "operacoes": [
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao|titulos iii e iv do regime juridico dos funcionarios civis do poder executivo do estado do parana lei estadual no 6 174 1970",
+    "no": "SL-f7dc270f3c"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao|titulos iii e iv do regime juridico dos funcionarios civis do poder executivo do estado do parana lei estadual no 6 174 1970",
+    "nos": [
+     "A-c1f695d9ea"
+    ]
+   }
+  }
+ ]
+}
