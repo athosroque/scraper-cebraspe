@@ -1118,3 +1118,93 @@ def test_pai_so_proposto_nao_manda_herdar(m9, monkeypatch):
     assert len(f2.chamadas) == 1
     linha2 = f2.chamadas[0]["prompt"].split("ITENS:")[1]
     assert "o pai foi mapeado para: Infraestrutura de TI" in linha2
+
+
+# M16 (KAN-102): subtópico recebe o assunto de mesmo nome ---------------------------
+
+
+def _subtopico(nome: str) -> mapeamento_llm.Pendente:
+    return mapeamento_llm.Pendente(
+        chave=f"direito administrativo|bloco|{canonico.chave_regra(nome).chave}",
+        nivel="subassunto",
+        nome=nome,
+        pais=["direito administrativo|bloco", "direito administrativo"],
+        contexto=["DIREITO ADMINISTRATIVO", "Bloco"],
+        concursos={"T"},
+        materia_chave="direito administrativo",
+    )
+
+
+def test_m16_assunto_de_mesmo_nome_entra_como_candidato(cenario):
+    arv = arvore.carregar(cenario[1])
+    indice = mapeamento_llm.IndiceNos(arv)
+    disc = frozenset({"M-DA"})
+    igual = _subtopico("Atos administrativos")
+    outro = _subtopico("Atos em espécie")
+    por_item = mapeamento_llm.selecionar_lote(
+        arv, indice, [igual, outro], disc, "subassunto"
+    )
+    assert "A-ATO" in por_item[igual.chave]
+    # Nome diferente: o assunto não entra (o subtópico continua só com subassuntos).
+    assert "A-ATO" not in por_item[outro.chave]
+    assert mapeamento_llm.assunto_de_mesmo_nome(arv, indice, outro, disc) is None
+
+
+def test_m16_nome_generico_ou_dois_assuntos_nao_entram(cenario):
+    arv = arvore.carregar(cenario[1])
+    arvore.criar_no(arv, "assunto", "Conceito", "M-DA", id_override="A-CONC")
+    arvore.criar_no(arv, "assunto", "Licitações", "M-DP", id_override="A-LIC2")
+    indice = mapeamento_llm.IndiceNos(arv)
+    disc = frozenset({"M-DA"})
+    assert (
+        mapeamento_llm.assunto_de_mesmo_nome(arv, indice, _subtopico("Conceito"), disc)
+        is None
+    )
+    assert (
+        mapeamento_llm.assunto_de_mesmo_nome(
+            arv, indice, _subtopico("Licitações"), disc
+        )
+        is None
+    )
+
+
+def test_m16_pos_validacao_aceita_so_o_assunto_permitido(cenario):
+    arv = arvore.carregar(cenario[1])
+    local = {"N1": "A-ATO", "N2": "A-LIC", "N3": "S-ANUL"}
+    validar = mapeamento_llm.pos_validacao_mapeamento(
+        local, [1], None, arv, {1: frozenset({"A-ATO"})}
+    )
+
+    def resp(no):
+        return mapeamento_llm.RespostaMapeamento.model_validate(
+            {"itens": [{"numero": 1, "no": no, "nenhum": False}]}
+        )
+
+    assert validar(resp("N1"), "").motivo is None
+    assert validar(resp("N3"), "").motivo is None
+    assert (
+        validar(resp("N2"), "").motivo == mapeamento_llm.STATUS_FALHA_VALIDACAO_SCHEMA
+    )
+    # Sem o conjunto (tópico, ou chamada antiga), nada muda.
+    livre = mapeamento_llm.pos_validacao_mapeamento(local, [1], None, arv)
+    assert livre(resp("N2"), "").motivo is None
+
+
+def test_m16_assuntos_permitidos_somam_pai_e_mesmo_nome(cenario):
+    arv = arvore.carregar(cenario[1])
+    indice = mapeamento_llm.IndiceNos(arv)
+    item = _subtopico("Atos administrativos")
+    dicas = {item.chave: ["A-LIC"]}
+    assert mapeamento_llm.assuntos_permitidos(
+        arv, indice, item, frozenset({"M-DA"}), dicas
+    ) == frozenset({"A-ATO", "A-LIC"})
+
+
+def test_m16_sugestao_top1_prefere_assunto_de_mesmo_nome(cenario):
+    arv = arvore.carregar(cenario[1])
+    indice = mapeamento_llm.IndiceNos(arv)
+    item = _subtopico("Atos administrativos")
+    assert (
+        mapeamento_llm.sugestao_top1(arv, indice, item, {"A-ATO", "S-ANUL"}, {})
+        == "A-ATO"
+    )

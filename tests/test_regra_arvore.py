@@ -852,7 +852,9 @@ def test_nivel_incompativel_nunca_vai_para_o_filho(monkeypatch, tmp_path, arvore
     res = _rodar_filho(
         monkeypatch, tmp_path, arvore_sefa, subassunto=[("Gestão", "Orçamento")]
     )
-    assert res.por_filho == 0 and res.pendentes == 1
+    # O ramo 4 continua sem aceitar o assunto; desde o M16 (KAN-102) quem casa é o
+    # nome igual (casamento global), com as travas dele.
+    assert (res.por_filho, res.por_global, res.pendentes) == (0, 1, 0)
 
 
 def test_item_de_materia_nao_passa_pelo_ramo_do_filho(
@@ -1799,3 +1801,88 @@ def test_titulo_generico_aprovado_pelo_dono_deixa_de_ser_pendente(
     _mexer(arvore_path, lambda a: mapear(a, CHAVE_G, ["A-ATO"], "humano"))
     res = canonico.mapear_novos_itens(tmp_path, arvore_path)
     assert (res.total, res.pendentes, res.barrados_generico) == (0, 0, 0)
+
+
+# M16 (KAN-102): subtópico casa com assunto de mesmo nome --------------------------
+
+
+def test_m16_subtopico_casa_com_assunto_de_mesmo_nome(
+    monkeypatch, tmp_path, arvore_global
+):
+    # "Governança de TI" é assunto em TI; antes do M16 o subtópico ficava pendente.
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Governança de TI"])
+    assert (res.por_global, res.pendentes) == (1, 0)
+    assert _dest(arvore_global, "Governança de TI") == [
+        ("A-GOVTI", "regra", "aprovado")
+    ]
+
+
+def test_m16_assunto_de_nome_diferente_continua_recusado(
+    monkeypatch, tmp_path, arvore_global
+):
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Governança"])
+    assert (res.por_global, res.pendentes) == (0, 1)
+    assert _dest(arvore_global, "Governança") == []
+
+
+def test_m16_nome_generico_nao_casa_com_assunto(monkeypatch, tmp_path, arvore_global):
+    _mexer(
+        arvore_global,
+        lambda a: criar_no(
+            a, "assunto", "Conceitos básicos", "M-TI", id_override="A-CB"
+        ),
+    )
+    res = _g(monkeypatch, tmp_path, arvore_global, subassunto=["Conceitos básicos"])
+    assert res.por_global == 0
+    assert _dest(arvore_global, "Conceitos básicos") == []
+
+
+def test_m16_dois_assuntos_de_mesmo_nome_ficam_pendentes(
+    monkeypatch, tmp_path, arvore_global
+):
+    def montar(a):
+        criar_no(a, "assunto", "Gestão de riscos de TI", "M-TI", id_override="A-R1")
+        criar_no(a, "assunto", "Gestão de riscos de TI", "M-TI", id_override="A-R2")
+
+    _mexer(arvore_global, montar)
+    res = _g(
+        monkeypatch, tmp_path, arvore_global, subassunto=["Gestão de riscos de TI"]
+    )
+    assert (res.por_global, res.pendentes) == (0, 1)
+
+
+def test_m16_subassunto_de_mesmo_nome_vale_mais_que_o_assunto(
+    monkeypatch, tmp_path, arvore_global
+):
+    # Com subassunto de mesmo nome, o resultado é o de antes do M16 (sem ambiguidade).
+    _mexer(
+        arvore_global,
+        lambda a: criar_no(
+            a,
+            "assunto",
+            "Elaboração de contratos de software",
+            "M-DA",
+            id_override="A-ELAB",
+        ),
+    )
+    _g(
+        monkeypatch,
+        tmp_path,
+        arvore_global,
+        subassunto=["Elaboração de contratos de software"],
+    )
+    assert _dest(arvore_global, "Elaboração de contratos de software") == [
+        ("S-TI-ELAB", "regra", "aprovado")
+    ]
+
+
+def test_m16_nivel_aceito_por_nome():
+    arv = ArvoreMestre()
+    criar_no(arv, "materia", "Administração Pública", None, id_override="M-AP")
+    criar_no(arv, "assunto", "Processo decisório", "M-AP", id_override="A-INT")
+    no = arv.nos["A-INT"]
+    regra = canonico.chave_regra("processo decisório").chave
+    assert canonico.nivel_aceito_por_nome(no, "subassunto", regra)
+    assert not canonico.nivel_aceito_por_nome(no, "subassunto", "outra coisa")
+    assert canonico.nivel_aceito_por_nome(no, "assunto", "qualquer")
+    assert not canonico.nivel_aceito_por_nome(no, "materia", regra)
