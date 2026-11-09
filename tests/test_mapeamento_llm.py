@@ -980,3 +980,141 @@ def test_hash_leva_a_assinatura_do_desenho():
 def test_reasoning_padrao_inalterado():
     assert llm_openrouter.REASONING_PADRAO == {"reasoning": {"max_tokens": 3000}}
     assert mapeamento_llm.REASONING_PADRAO is llm_openrouter.REASONING_PADRAO
+
+
+# KAN-101 (M15): destino genérico em vez de "nenhum", nó amplo como depósito e herança
+# demais (padrões vistos no KAN-92) -------------------------------------------------------
+
+
+def _com_atualidades(arv):
+    arvore.criar_no(arv, "materia", "Atualidades", None, id_override="M-AT")
+    arvore.criar_no(arv, "assunto", "Tópicos atuais", "M-AT", id_override="A-AT")
+    arvore.criar_no(arv, "subassunto", "economia", "A-AT", id_override="S-ATECO")
+    arvore.criar_no(
+        arv,
+        "subassunto",
+        "Redes sociais e economia digital",
+        "A-AT",
+        id_override="S-ATRS",
+    )
+    return arv
+
+
+def test_prompt_pede_nenhum_com_exemplo_negativo_e_o_no_mais_especifico():
+    sistema = mapeamento_llm.PROMPT_SISTEMA
+    assert "Mesmo tema ou mesma área NÃO basta" in sistema
+    assert '"NOÇÕES DE ECONOMIA"' in sistema and "Atualidades" in sistema
+    assert "MAIS ESPECÍFICO PRIMEIRO" in sistema
+    assert "Repita o nó do pai só quando nenhum nó mais específico couber" in sistema
+    assert mapeamento_llm.DESENHO == "m9-v2"
+
+
+def test_no_de_atualidades_nao_entra_por_semelhanca_de_palavra(m9):
+    _, _, arv, _ = m9
+    _com_atualidades(arv)
+    indice = mapeamento_llm.IndiceNos(arv)
+    assert {"A-AT", "S-ATECO", "S-ATRS"} <= indice.restritos
+    titulo = _pendente("NOÇÕES DE ECONOMIA", "materia", ["Microeconomia"])
+    livre = mapeamento_llm.selecionar_lote(
+        arv, indice, [titulo], frozenset(), "materia"
+    )
+    # Sem disciplina: as disciplinas seguem oferecidas, o nó "economia" de Atualidades não.
+    assert "M-AT" in livre[titulo.chave]
+    assert "S-ATECO" not in livre[titulo.chave]
+    # Candidato global (item de TI com palavras em comum) também não traz Atualidades.
+    item = _pendente(
+        "Redes sociais e economia digital", "subassunto", pais=["b"], contexto=["B"]
+    )
+    glob = mapeamento_llm.selecionar_lote(
+        arv, indice, [item], frozenset({"M-TI"}), "subassunto"
+    )
+    assert "S-ATRS" not in glob[item.chave]
+    # Item que já é de Atualidades continua vendo os nós dela.
+    proprio = mapeamento_llm.selecionar_lote(
+        arv, indice, [item], frozenset({"M-AT"}), "subassunto"
+    )
+    assert {"S-ATECO", "S-ATRS"} <= proprio[item.chave]
+
+
+def test_no_generico_nao_entra_no_ranking_livre(m9):
+    _, _, arv, _ = m9
+    indice = mapeamento_llm.IndiceNos(arv)
+    item = _pendente("Conceitos básicos e fiscalização de contratos", "subassunto")
+    livre = mapeamento_llm.selecionar_lote(
+        arv, indice, [item], frozenset(), "subassunto"
+    )
+    assert "S-GEN" not in livre[item.chave]  # "Conceitos básicos"
+    assert "S-FISC" in livre[item.chave]
+
+
+def test_filho_mais_especifico_so_quando_repete_o_pai(m9):
+    _, _, arv, _ = m9
+    indice = mapeamento_llm.IndiceNos(arv)
+    item = _pendente("Sistemas operacionais Linux", "subassunto", pais=["b"])
+    f = mapeamento_llm.filho_mais_especifico
+    assert f(arv, indice, item, ["A-INFRA"], ["A-INFRA"]) == "S-SO"
+    # Proposta que não repete o pai, ou pai sem nó: nada a sinalizar.
+    assert f(arv, indice, item, ["S-SO"], ["A-INFRA"]) is None
+    assert f(arv, indice, item, ["A-INFRA"], []) is None
+    # Sem palavra em comum com nenhum filho: herança legítima.
+    outro = _pendente("Virtualização", "subassunto", pais=["b"])
+    assert f(arv, indice, outro, ["A-INFRA"], ["A-INFRA"]) is None
+
+
+def test_proposta_que_repete_o_pai_sai_com_confianca_baixa(m9, monkeypatch):
+    _, caminho, arv, pendentes = m9
+    item = _pendente(
+        "Sistemas operacionais Linux", "subassunto", pais=["bloco"], contexto=["BLOCO"]
+    )
+    pendentes.append(item)
+    arvore.mapear(arv, "bloco", ["A-INFRA"], "humano", "aprovado")
+    arvore.salvar(arv, caminho)
+
+    def herda(prompt, _n):
+        return [
+            {
+                "numero": 1,
+                "nos": [_local(prompt, "Infraestrutura de TI")],
+                "nenhum": False,
+                "confianca": "media",
+                "justificativa": "herança do tópico",
+            }
+        ]
+
+    conta, _, arv2 = _rodar_m9(m9, monkeypatch, herda)
+    assert conta.propostos == 1 and conta.rebaixados_heranca == 1
+    # O nó proposto não muda; só a confiança que a revisão mostra.
+    (mapa,) = arv2.mapeamentos[item.chave]
+    assert (mapa.no_id, mapa.status) == ("A-INFRA", "proposto")
+    cache = json.loads((caminho.parent / mapeamento_llm.CACHE_NOME).read_text())
+    info = cache["propostos"][item.chave]
+    assert info["confianca"] == "baixa"
+    assert "Sistemas operacionais" in info["justificativa"]
+
+
+def test_pai_so_proposto_nao_manda_herdar(m9, monkeypatch):
+    _, caminho, arv, pendentes = m9
+    item = _pendente("Virtualização", "subassunto", pais=["bloco"], contexto=["BLOCO"])
+    pendentes.append(item)
+    assert "NÃO herde X" in mapeamento_llm.PROMPT_SISTEMA
+    # Pai com proposta do LLM, sem aprovação: dica rotulada como não confirmada.
+    arvore.mapear(arv, "bloco", ["A-INFRA"], "llm", "proposto")
+    arvore.salvar(arv, caminho)
+    assert not mapeamento_llm.pai_confirmado(arv, item)
+
+    def nenhum(p, _n):
+        return _itens_por_nome(p, {})
+
+    _, f1, _ = _rodar_m9(m9, monkeypatch, nenhum)
+    linha = f1.chamadas[0]["prompt"].split("ITENS:")[1]
+    assert "o pai foi PROPOSTO (não confirmado) para: Infraestrutura de TI" in linha
+    assert "o pai foi mapeado para" not in linha
+    # O dono aprova o pai: o "nenhum" em cache volta ao modelo, agora com herança.
+    arv2 = arvore.carregar(caminho)
+    arv2.mapeamentos["bloco"][0].status = "aprovado"
+    arvore.salvar(arv2, caminho)
+    assert mapeamento_llm.pai_confirmado(arv2, item)
+    _, f2, _ = _rodar_m9(m9, monkeypatch, nenhum)
+    assert len(f2.chamadas) == 1
+    linha2 = f2.chamadas[0]["prompt"].split("ITENS:")[1]
+    assert "o pai foi mapeado para: Infraestrutura de TI" in linha2

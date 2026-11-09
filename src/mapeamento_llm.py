@@ -55,7 +55,12 @@ LIMITE_CANDIDATOS_LIVRE = 80
 # Marca do desenho de candidatos e prompt (KAN-91, M9). Entra no hash do cache: mudar o
 # desenho (candidatos globais, subassunto como alvo de título, até 3 nós) invalida os
 # "nenhum" guardados sob o desenho anterior.
-DESENHO = "m9-v1"
+DESENHO = "m9-v2"
+# Disciplinas de nó amplo ("Atualidades › … › economia"): os nós delas só são oferecidos
+# ao item que já é dessa disciplina, nunca por semelhança de palavra (ranking livre,
+# candidatos globais ou subassuntos do título). No KAN-92, o título "NOÇÕES DE ECONOMIA"
+# caiu em "Atualidades › economia" e levou os 18 filhos junto.
+DISCIPLINAS_SO_PROPRIAS = frozenset({"atualidades"})
 # Item composto ("A e B") pode apontar até este número de nós (a árvore é N:N).
 MAX_NOS_POR_ITEM = 3
 # Candidatos globais (KAN-91, M9): por item, os melhores nós de OUTRAS disciplinas
@@ -71,6 +76,9 @@ COBERTURA_MINIMA_GLOBAL = 0.4
 # Sem disciplina, o ranking só traz nó com ao menos esta cobertura do nome dele.
 COBERTURA_MINIMA_LIVRE = 0.2
 PESO_PALAVRA_FRACA = 0.5
+# Proposta que só repete o nó do pai sai com confiança "baixa" quando um filho desse nó
+# tem ao menos esta cobertura do nome dele pelas palavras do item (KAN-101, M15).
+COBERTURA_MINIMA_FILHO = 0.5
 # Título de bloco numa disciplina já inferida: além das disciplinas e assuntos dela, os
 # subassuntos mais parecidos com o título e os subitens (o nó natural costuma ser um
 # subassunto: "Sistemas operacionais", "Modelagens de dados").
@@ -99,11 +107,14 @@ Cada ITEM é um trecho do conteúdo programático de um edital que ainda não ap
 REGRAS ESTRITAS:
 - Use APENAS os IDs locais listados em CANDIDATOS (ex: N1, N2...). NUNCA invente IDs e NUNCA proponha criar nó, renomear ou mover nada.
 - Escolha o nó que trata do MESMO conceito do item. Se o item for mais específico que todos os candidatos, escolha o candidato mais próximo apenas quando ele realmente cobrir o item; se for um conceito que a lista não cobre, responda "nenhum".
+- Mesmo tema ou mesma área NÃO basta. Exemplo negativo: o título "NOÇÕES DE ECONOMIA" (microeconomia, macroeconomia) NÃO aponta para "Atualidades › … › economia": esse nó trata de notícias atuais, não da teoria econômica. Título de bloco que é uma disciplina inteira e que a lista não tem como disciplina só aponta para um nó que cubra o bloco todo; um nó que apenas cita o tema no nome não serve: responda "nenhum".
 - Na dúvida entre apontar para um nó duvidoso e responder "nenhum", responda "nenhum": um item sem nó vai para o dono decidir, um nó errado esconde o erro.
 - Cada item traz CONTEXTO tirado do próprio edital: "dentro de" (o último elemento é o pai imediato) e "contém" (subitens ou principais tópicos). Use-o só para DESAMBIGUAR o sentido do item (ex: "Arquitetura" de software, de computadores ou de edificações). Se, mesmo com o contexto, o sentido continuar ambíguo, responda "nenhum".
 - Se houver "O DONO JÁ DECIDIU ASSIM", siga o mesmo critério nos itens parecidos. Se houver "PARES REJEITADOS", NUNCA proponha esses pares.
 - Em geral cada item recebe UM nó. Item COMPOSTO, que junta conceitos distintos ("A e B", "contratos e licitações"), pode receber até 3 nós, um por conceito, em "nos". Nunca ponha dois nós para o mesmo conceito, um nó e o descendente dele, nem nó "só para garantir".
 - HERANÇA: o subtópico sem nó mais específico aponta para o nó do TÓPICO. Se o item traz "o pai foi mapeado para: X" e X está em CANDIDATOS, use X para um subtópico que é parte ou detalhe do tópico, em vez de "nenhum"; confiança "media".
+- Se o item traz "o pai foi PROPOSTO (não confirmado) para: X", NÃO herde X: essa proposta ainda pode estar errada. Use um nó que trate do próprio item ou responda "nenhum".
+- MAIS ESPECÍFICO PRIMEIRO: antes de herdar, procure em CANDIDATOS um filho de X (ou outro nó) que trate do subtópico e use-o. Repita o nó do pai só quando nenhum nó mais específico couber. Um nó amplo não é depósito: se itens diferentes do lote têm nós próprios, cada um vai para o seu.
 - Alguns candidatos vêm de OUTRAS disciplinas (aparecem sob a disciplina deles). Um conceito tem um nó só: se a disciplina do item já tem o nó equivalente, use esse; se só uma outra disciplina trata do conceito (ex: contratos administrativos, LGPD), use o nó dela.
 - Forneça uma resposta para CADA item listado.
 - "confianca": "alta" (mesmo conceito), "media" (conceito abrangente ou fronteiriço), "baixa" (enquadramento duvidoso).
@@ -175,6 +186,9 @@ class Contabilidade:
     # Só no dry-run (M13): itens que receberam em memória a sugestão top-1, para o
     # nível seguinte ver o pai como no modo real.
     simulados_top1: int = 0
+    # Propostas que só repetem o nó do pai quando um filho dele parece mais específico:
+    # gravadas com confiança "baixa" para a revisão do dono (KAN-92).
+    rebaixados_heranca: int = 0
 
     def registrar_usage(self, usage: dict | None) -> None:
         usage = usage or {}
@@ -333,6 +347,24 @@ def _nos_do_pai(arv: arvore.ArvoreMestre, pendente: Pendente) -> list[str]:
     return []
 
 
+def pai_confirmado(arv: arvore.ArvoreMestre, pendente: Pendente) -> bool:
+    """True se o ancestral mais próximo com nó tem mapeamento `aprovado` (o mesmo
+    ancestral de `_nos_do_pai`). Pai só `proposto` (do LLM, ainda sem decisão do dono)
+    dá a disciplina do lote, mas não manda herdar: senão o erro do título desce em
+    cascata para os filhos (KAN-100: 34 de 55 filhos repetiam o nó do título)."""
+    for chave_pai in pendente.pais:
+        validos = [
+            m
+            for m in arv.mapeamentos.get(chave_pai, [])
+            if m.status != "rejeitado"
+            and arv.nos.get(arvore.resolver_no(arv, m.no_id)) is not None
+            and arv.nos[arvore.resolver_no(arv, m.no_id)].status == "ativo"
+        ]
+        if validos:
+            return any(m.status == "aprovado" for m in validos)
+    return False
+
+
 def disciplinas_do_pendente(
     arv: arvore.ArvoreMestre, pendente: Pendente
 ) -> tuple[frozenset[str], list[str]]:
@@ -404,6 +436,19 @@ class IndiceNos:
             i: sum(self.idf[t] for t in ps) or 1.0 for i, ps in self.palavras.items()
         }
         self.disciplina = {i: arvore.materia_do_no(arv, i) for i in self.palavras}
+        self.restritos = frozenset(
+            i
+            for i, d in self.disciplina.items()
+            if d in arv.nos and normalizar(arv.nos[d].nome) in DISCIPLINAS_SO_PROPRIAS
+        )
+
+    def oferecivel(self, no_id: str) -> bool:
+        """Nó que pode entrar por semelhança de palavra, fora da disciplina do item:
+        não é de disciplina de nó amplo (`DISCIPLINAS_SO_PROPRIAS`) nem tem nome
+        genérico (`canonico.titulo_generico_global`)."""
+        return no_id not in self.restritos and not canonico.titulo_generico_global(
+            self.arv.nos[no_id].nome
+        )
 
     def pontuar(
         self,
@@ -489,7 +534,15 @@ def selecionar_lote(
                 subs = indice.pontuar(
                     fortes, fracas, ("subassunto",), so_de=disciplinas
                 )
-                fixos |= {x[3] for x in subs[:SUBASSUNTOS_POR_TITULO]}
+                # Na própria disciplina, só o nome genérico sai ("Conceitos básicos"
+                # não é destino de título de bloco).
+                fixos |= set(
+                    [
+                        x[3]
+                        for x in subs
+                        if not canonico.titulo_generico_global(arv.nos[x[3]].nome)
+                    ][:SUBASSUNTOS_POR_TITULO]
+                )
             fora = [
                 (pontos, i)
                 for pontos, cobertura, massa, i in indice.pontuar(
@@ -498,7 +551,7 @@ def selecionar_lote(
                 if massa >= MASSA_MINIMA_GLOBAL
                 and cobertura >= COBERTURA_MINIMA_GLOBAL
                 and indice.regra[i] not in regras_disc
-                and not canonico.titulo_generico_global(arv.nos[i].nome)
+                and indice.oferecivel(i)
             ]
             por_item[it.chave] = fixos
             extras[it.chave] = fora[:GLOBAIS_POR_ITEM]
@@ -513,7 +566,9 @@ def selecionar_lote(
             por_item[it.chave] = set(fixos_livres)
             ranqueados = indice.pontuar(fortes, fracas, niveis_nos)
             extras[it.chave] = [
-                (x[0], x[3]) for x in ranqueados if x[1] >= COBERTURA_MINIMA_LIVRE
+                (x[0], x[3])
+                for x in ranqueados
+                if x[1] >= COBERTURA_MINIMA_LIVRE and indice.oferecivel(x[3])
             ][:k_item]
         teto = LIMITE_CANDIDATOS_LIVRE
     melhor: dict[str, float] = {}
@@ -526,6 +581,38 @@ def selecionar_lote(
     for chave, lista in extras.items():
         por_item[chave] |= {i for _, i in lista if i in mantidos}
     return por_item
+
+
+def filho_mais_especifico(
+    arv: arvore.ArvoreMestre,
+    indice: IndiceNos,
+    item: Pendente,
+    destinos: list[str],
+    nos_pai: list[str],
+) -> str | None:
+    """Quando a proposta só repete o nó do pai (`destinos` ⊆ `nos_pai`): o filho ativo
+    desse nó com mais palavras em comum com o NOME do item (peso idf), fora dos nomes
+    genéricos. None se a proposta não repete o pai ou se nenhum filho tem palavra em
+    comum. Só sinaliza a revisão (confiança "baixa"); não troca o nó proposto."""
+    if not destinos or not nos_pai or not set(destinos) <= set(nos_pai):
+        return None
+    fortes, _ = palavras_do_item(item)
+    alvo = set(destinos)
+    melhor: tuple[float, str] | None = None
+    for n in arv.nos.values():
+        if n.pai not in alvo or n.status != "ativo" or n.id not in indice.palavras:
+            continue
+        if canonico.titulo_generico_global(n.nome):
+            continue
+        massa = sum(indice.idf[t] for t in indice.palavras[n.id] & fortes)
+        # O item precisa cobrir boa parte do nome do filho: "Estado oligárquico e
+        # patrimonial, Estado autoritário…" não é mais específico que "Reforma do
+        # serviço civil" só porque ambos dizem "Estado".
+        if massa / indice.massa_no[n.id] < COBERTURA_MINIMA_FILHO:
+            continue
+        if melhor is None or (massa, melhor[1]) > (melhor[0], n.id):
+            melhor = (massa, n.id)
+    return melhor[1] if melhor else None
 
 
 def sugestao_top1(
@@ -611,7 +698,10 @@ def montar_prompt(
     arv: arvore.ArvoreMestre,
     exemplos: list[str] | None = None,
     vetados: list[str] | None = None,
+    pais_propostos: set[str] | frozenset[str] = frozenset(),
 ) -> str:
+    """`pais_propostos`: itens cujo pai só tem proposta (sem aprovação do dono); a dica
+    sai rotulada como não confirmada e o prompt manda não herdar (KAN-100)."""
     linhas = ["CANDIDATOS:", texto_candidatos, ""]
     if exemplos:
         linhas += ["O DONO JÁ DECIDIU ASSIM (siga o mesmo critério):", *exemplos, ""]
@@ -630,7 +720,10 @@ def montar_prompt(
             nomes = "; ".join(
                 f"{arv.nos[n].nome} ({arv.nos[n].nivel})" for n in nos_pai
             )
-            linha += f" | o pai foi mapeado para: {nomes}"
+            if it.chave in pais_propostos:
+                linha += f" | o pai foi PROPOSTO (não confirmado) para: {nomes}"
+            else:
+                linha += f" | o pai foi mapeado para: {nomes}"
         rotulo_filhos = "principais tópicos" if it.nivel == "materia" else "contém"
         filhos = formatar_subitens(it.subitens)
         if filhos:
@@ -872,10 +965,14 @@ def _grupos(
     return grupos
 
 
-def _assinatura(disciplina_provisoria: frozenset[str]) -> str:
+def _assinatura(
+    disciplina_provisoria: frozenset[str], pai_proposto: bool = False
+) -> str:
     """Parte do hash do cache que não vem dos candidatos nem dos subitens: o desenho
-    do prompt e a disciplina provisória que restringiu os candidatos."""
-    return DESENHO + "|" + ",".join(sorted(disciplina_provisoria))
+    do prompt, a disciplina provisória que restringiu os candidatos e se o pai era só
+    proposta (o "nenhum" volta ao modelo quando o dono aprova o pai)."""
+    base = DESENHO + "|" + ",".join(sorted(disciplina_provisoria))
+    return base + "|pai-proposto" if pai_proposto else base
 
 
 def _rotulos(nomes: canonico.NomesOrigem) -> dict[str, str]:
@@ -975,6 +1072,11 @@ def mapear_itens_novos(
             if not any(por_item.values()):
                 conta.sem_candidatos += len(itens)
                 continue
+            pais_propostos = {
+                it.chave
+                for it in itens
+                if dicas.get(it.chave) and not pai_confirmado(arv, it)
+            }
             # A disciplina provisória (M4) só conta quando é ela que restringe.
             hashes = {
                 it.chave: hash_candidatos(
@@ -982,7 +1084,8 @@ def mapear_itens_novos(
                     por_item[it.chave],
                     formatar_subitens(it.subitens),
                     _assinatura(
-                        disciplinas if not dicas.get(it.chave) else frozenset()
+                        disciplinas if not dicas.get(it.chave) else frozenset(),
+                        it.chave in pais_propostos,
                     ),
                 )
                 for it in itens
@@ -1008,7 +1111,9 @@ def mapear_itens_novos(
                 )
             )
             vetados = _linhas_vetados(arv, indice, itens, local_para_id)
-            prompt = montar_prompt(itens, texto, dicas, arv, exemplos, vetados)
+            prompt = montar_prompt(
+                itens, texto, dicas, arv, exemplos, vetados, pais_propostos
+            )
             numeros = list(range(1, len(itens) + 1))
             conta.lotes_sem_disciplina += not disciplinas
             if dry_run:
@@ -1091,11 +1196,22 @@ def mapear_itens_novos(
                 conta.propostos += 1
                 conta.propostos_multiplos += len(destinos) > 1
                 nenhum_cache.pop(it.chave, None)
+                confianca, justificativa = r.confianca, r.justificativa
+                filho = filho_mais_especifico(
+                    arv, ranking, it, destinos, dicas.get(it.chave, [])
+                )
+                if filho:
+                    conta.rebaixados_heranca += 1
+                    confianca = "baixa"
+                    justificativa = (
+                        f"{justificativa} [revisar: repete o nó do pai; o filho "
+                        f'"{arv.nos[filho].nome}" parece mais específico]'
+                    ).strip()
                 cache.setdefault("propostos", {})[it.chave] = {
                     "no": destinos[0],
                     "nos": destinos,
-                    "confianca": r.confianca,
-                    "justificativa": r.justificativa,
+                    "confianca": confianca,
+                    "justificativa": justificativa,
                 }
             arvore.salvar(arv, arvore_path)
             _salvar_cache(cache, cache_path)

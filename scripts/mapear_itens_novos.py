@@ -126,6 +126,7 @@ def main(args_list: list[str] | None = None) -> None:
                 "nenhum": conta.nenhum,
                 "descartados_par_rejeitado": conta.descartados_rejeitados,
                 "recusados_na_gravacao": conta.rejeitados_gravacao,
+                "rebaixados_repete_pai": conta.rebaixados_heranca,
                 "chamadas": conta.chamadas,
                 "lotes_ok": conta.lotes_ok,
                 "lotes_falhos": conta.lotes_falhos,
