@@ -1,0 +1,1042 @@
+{
+ "descricao": "Decisão do dono (2026-11-09, KAN-92/M15): aprova as 136 propostas de Economia em bloco; Intermediação de interesses → assunto de mesmo nome; DIREITO TRIBUTÁRIO › Tributos → 2 assuntos (regra do KAN-100); assunto novo para a Lei estadual nº 20.656/2021 do PR (3 questões no SEFA).",
+ "operacoes": [
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|aspectos gerais do comportamento recente da economia brasileira e das politicas economicas adotadas pelos ultimos governos",
+    "no": "NS-e385b97d53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|cambio reservas e relacoes comerciais e financeiras do brasil com o resto do mundo",
+    "no": "NS-a6e16341d6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|desigualdades pessoais e espaciais de renda e de riqueza",
+    "no": "NS-a110451208"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|estrutura orcamentaria e evolucao do deficit e da divida publica brasileiros",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|estrutura tributaria brasileira",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|indicadores de desenvolvimento economico e social brasileiro contemporaneo",
+    "no": "NA-398967b7ab"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|mercado de trabalho e condicoes de emprego e renda",
+    "no": "NS-a110451208"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|mudancas estruturais da economia brasileira a partir da aceleracao dos processos de industrializacao e urbanizacao",
+    "no": "NS-18bf1ea02d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|perfil demografico brasileiro",
+    "no": "NA-398967b7ab"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|planos de desenvolvimento mais importantes desde a segunda metade do seculo xx",
+    "no": "NS-18bf1ea02d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|previdencia social e suas perspectivas",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia brasileira|principais caracteristicas e resultados dos planos de estabilizacao a partir da decada de 80 do seculo xx",
+    "no": "NS-7583fa0478"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do estado do parana",
+    "no": "NS-a9b73c61a9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|assimetria de informacoes",
+    "no": "NS-6ea2a46e07"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|bens publicos",
+    "no": "NS-6ea2a46e07"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|contabilidade fiscal",
+    "no": "NS-baef1b747a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|definicao e tipos de tributos",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|estado regulador e produtor",
+    "no": "NS-7a94d3edae"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|externalidades",
+    "no": "NS-6ea2a46e07"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|financas publicas no brasil a partir dos anos 1980",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|imposto sobre patrimonio",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|imposto sobre renda",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|imposto sobre valor agregado iva",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|imposto unitario e imposto ad valorem",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|impostos regressivos e progressivos",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|neutralidade tributaria",
+    "no": "NS-6c0ae64ead"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|agregados monetarios",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|analises de equilibrio nos modelos de economia fechada e economia aberta",
+    "no": "NS-0236d87ad5"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|analises de equilibrio nos modelos de economia fechada e economia aberta",
+    "no": "NS-ffa15886b2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|as contas do sistema monetario",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|autoridade monetaria e oferta de moeda",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|balanca comercial",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|balanca de bens e servicos",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|balanca de capital",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|balanca de rendimentos",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|balanca de transacoes correntes",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|balanca financeira",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|bancos e multiplicador bancario",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|blocos economicos acordos internacionais e retaliacoes",
+    "no": "NS-75a4673f87"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|conceito bruto versus liquido",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|conceito interno versus nacional",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|conceito nominal versus real",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|conceitos de moeda e quase moeda",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|contas nacionais no brasil",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|cambio fixo e flutuante",
+    "no": "NS-ffa15886b2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|definicao de inflacao",
+    "no": "NS-02398effb6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|demanda de trabalho",
+    "no": "NS-be026a3ab2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|equilibrio no mercado de trabalho salarios e nivel de atividade",
+    "no": "NS-be026a3ab2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|erros e omissoes",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|fluxos financeiros internacionais e mercados de capitais",
+    "no": "NS-75a4673f87"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|globalizacao e organismos multilaterais",
+    "no": "NS-75a4673f87"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|identidades macroeconomicas basicas",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|inflacao de custos",
+    "no": "NS-02398effb6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|inflacao de demanda",
+    "no": "NS-02398effb6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|inflacao inercial",
+    "no": "NS-02398effb6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|mobilidade de capitais",
+    "no": "NS-ffa15886b2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|oferta de trabalho",
+    "no": "NS-be026a3ab2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|politica economica e inflacao relacoes entre inflacao juros e o resultado fiscal",
+    "no": "NS-02398effb6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|principais agregados macroeconomicos",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|produto renda e despesa agregados",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|reservas internacionais",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|reservas monetarias",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|resultado do balanco de pagamentos",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|salarios inflacao e desemprego",
+    "no": "NS-be026a3ab2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|sistema de contas nacionais",
+    "no": "NS-667e15c5f3"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|tarifas subsidios cotas",
+    "no": "NS-75a4673f87"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|macroeconomia|transferencias unilaterais",
+    "no": "NS-a71dc6f59a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|aplicacoes duopolio de cournot e duopolio de bertrand",
+    "no": "NS-2a2bd1b913"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|bens de giffen",
+    "no": "NS-b219df80cb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|bens inferiores e normais",
+    "no": "NS-b219df80cb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|bens substitutos e bens complementares",
+    "no": "NS-b219df80cb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|caixa de edgeworth",
+    "no": "NS-56537a711d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|classificacao de bens de acordo com as elasticidades",
+    "no": "NS-cc790cfc3d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|conceitos fundamentais",
+    "no": "NA-c416fd7ab6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|concorrencia imperfeita e preco premio",
+    "no": "NS-2a2bd1b913"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|concorrencia perfeita concorrencia imperfeita monopolio e oligopolio definicao e caracterizacao",
+    "no": "NS-2a2bd1b913"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|curva de engel",
+    "no": "NS-cd80074dca"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|curva de demanda",
+    "no": "NS-b219df80cb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|curva de oferta sob concorrencia perfeita e equilibrio medio marginal",
+    "no": "NS-21fd23fd95"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|curva de possibilidades de producao",
+    "no": "NS-827284d58e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|curvas de indiferenca",
+    "no": "NS-cd80074dca"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|custos de longo prazo versus custos de curto prazo custos fixos e custos variaveis",
+    "no": "NS-f64031286e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|custos de producao e linha de isocusto",
+    "no": "NS-2774995431"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|custos de producao e linha de isocusto",
+    "no": "NS-f64031286e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|definicoes basicas agentes jogadores acoes estrategia resultados payoffs",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|dilema dos prisioneiros",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|dinamica de determinacao de precos e margem de lucro",
+    "no": "NS-6816cf7c02"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|efeito da mudanca no preco de um bem sobre a receita total",
+    "no": "NS-cc790cfc3d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|efeito de tributos sobre o equilibrio e sobre os excedentes",
+    "no": "NS-8d29f21fea"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|efeito de tributos sobre o equilibrio e sobre os excedentes",
+    "no": "NS-ad272422ad"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|efeito renda e efeito substituicao",
+    "no": "NS-cd80074dca"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|elasticidade cruzada da demanda",
+    "no": "NS-cc790cfc3d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|elasticidade preco da demanda e seus determinantes",
+    "no": "NS-cc790cfc3d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|elasticidade preco da oferta e seus determinantes",
+    "no": "NS-cc790cfc3d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|elasticidade renda da demanda",
+    "no": "NS-cc790cfc3d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrio de nash",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrio de mercado sob monopolio",
+    "no": "NS-2a2bd1b913"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrio do consumidor",
+    "no": "NS-cd80074dca"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrio em estrategia dominante",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrio perfeito em subjogos",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrio sob concorrencia perfeita preco de equilibrio e quantidade transacionada",
+    "no": "NS-8d29f21fea"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|equilibrios minimax e maximin",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|estrategias mistas",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|fatores de producao",
+    "no": "NS-827284d58e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|funcao custo total custo medio e custo marginal",
+    "no": "NS-f64031286e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|funcao de producao",
+    "no": "NS-2774995431"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|isoquantas",
+    "no": "NS-2774995431"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|jogos cooperativos e jogos de soma zero",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|jogos repetidos",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|jogos simultaneos e jogos sequenciais",
+    "no": "NS-e00e3be080"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|lei dos rendimentos decrescentes e rendimentos de escala",
+    "no": "NS-2774995431"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|maximizacao de lucro",
+    "no": "NS-2774995431"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|minimizacao de custos",
+    "no": "NS-f64031286e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|mudancas de equilibrio",
+    "no": "NS-8d29f21fea"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|oligopolios e cartelizacao",
+    "no": "NS-2a2bd1b913"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|papel dos precos",
+    "no": "NS-8d29f21fea"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|perdas de excedente peso morto",
+    "no": "NS-ad272422ad"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|politicas de fixacao de precos",
+    "no": "NS-2a2bd1b913"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|preferencias e funcao utilidade",
+    "no": "NS-cd80074dca"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|preco maximo e preco minimo",
+    "no": "NS-8d29f21fea"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|primeiro teorema da economia do bem estar",
+    "no": "NS-56537a711d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|producao de longo prazo versus producao de curto prazo produto medio e produtividade marginal",
+    "no": "NS-2774995431"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|restricao orcamentaria",
+    "no": "NS-cd80074dca"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|segundo teorema da economia do bem estar",
+    "no": "NS-56537a711d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|trocas",
+    "no": "NS-56537a711d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|microeconomia|otimo de pareto e melhoria de pareto",
+    "no": "NS-56537a711d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|aspectos gerais do comportamento recente da economia brasileira e das politicas economicas adotadas pelos ultimos governos",
+    "no": "NS-e385b97d53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|cambio reservas e relacoes comerciais e financeiras do brasil com o resto do mundo",
+    "no": "NS-a6e16341d6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|desigualdades pessoais e espaciais de renda e de riqueza",
+    "no": "NS-a110451208"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|estrutura orcamentaria e evolucao do deficit e da divida publica brasileiros",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|estrutura tributaria brasileira",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|mercado de trabalho e condicoes de emprego e renda",
+    "no": "NS-a110451208"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|mudancas estruturais da economia brasileira a partir da aceleracao dos processos de industrializacao e urbanizacao",
+    "no": "NS-18bf1ea02d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|planos de desenvolvimento mais importantes desde a segunda metade do seculo xx",
+    "no": "NS-18bf1ea02d"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|previdencia social e suas perspectivas",
+    "no": "NS-d3b21bdec9"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|taxas de juros",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|financiamento do deficit publico a partir dos anos 80 do seculo xx",
+    "no": "NS-baef1b747a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|inflacao e crescimento",
+    "no": "NS-02398effb6"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|politicas fiscal e monetaria outras politicas economicas",
+    "no": "NS-95c2e2eaba"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao publica|governabilidade e governanca|intermediacao de interesses clientelismo corporativismo e neocorporativismo",
+    "no": "S-f797302b7a"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|governabilidade e governanca|intermediacao de interesses clientelismo corporativismo e neocorporativismo",
+    "nos": [
+     "A-d249e72520"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos",
+    "no": "S-4a716c73bb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos",
+    "no": "A-f826c2b177"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito tributario|tributos",
+    "nos": [
+     "A-addcf5f370"
+    ]
+   }
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@pr20656",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Processo administrativo no Paraná (Lei estadual nº 20.656/2021)",
+    "pai": "M-6f50f4f1dd"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|processo administrativo|lei estadual no 20 656 2021",
+    "no": "AL-fe35b41dc5"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|processo administrativo|lei estadual no 20 656 2021",
+    "nos": [
+     "@pr20656"
+    ]
+   }
+  }
+ ]
+}
