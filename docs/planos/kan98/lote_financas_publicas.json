@@ -1,0 +1,266 @@
+{
+ "descricao": "Decisão do dono (2026-11-09, KAN-98): 15 filhos de NOÇÕES DE FINANÇAS PÚBLICAS trocados para Economia/AFO, 2 aprovados, e opção A da duplicidade: funde Economia › O Estado e as funções econômicas governamentais em AFO › Funções do orçamento público (um conceito, um nó).",
+ "operacoes": [
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico|conceito",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico|conceito",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico|financiamento do deficit",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico|financiamento do deficit",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico|sustentabilidade da politica fiscal",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|deficit publico|sustentabilidade da politica fiscal",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|resultado primario e nominal e relacao com indicadores da divida publica",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|resultado primario e nominal e relacao com indicadores da divida publica",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|federalismo fiscal",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|federalismo fiscal",
+    "nos": [
+     "NS-c4ef119b03"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|principios de descentralizacao fiscal",
+    "no": "S-70b5ed405b"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|principios de descentralizacao fiscal",
+    "nos": [
+     "NS-c4ef119b03"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|principios de descentralizacao fiscal|transferencias intergovernamentais classificacao e criterios",
+    "no": "S-70b5ed405b"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|principios de descentralizacao fiscal|transferencias intergovernamentais classificacao e criterios",
+    "nos": [
+     "NS-c4ef119b03"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|financas publicas objetivos metas abrangencia e definicao",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|financas publicas objetivos metas abrangencia e definicao",
+    "nos": [
+     "NA-6ac3a5bb8f"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|funcao do bem estar",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|funcao do bem estar",
+    "nos": [
+     "SL-fc1e2c2b92"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|funcoes do estado",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|funcoes do estado",
+    "nos": [
+     "SL-fc1e2c2b92"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|funcoes do estado|financiamento dos gastos publicos tributacao e equidade",
+    "no": "A-2418b321de"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|funcoes do estado|financiamento dos gastos publicos tributacao e equidade",
+    "nos": [
+     "NS-6c0ae64ead"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|tributacao",
+    "no": "A-f826c2b177"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|tributacao",
+    "nos": [
+     "NS-6c0ae64ead"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|tributacao|progressividade regressividade e neutralidade",
+    "no": "A-f826c2b177"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|tributacao|progressividade regressividade e neutralidade",
+    "nos": [
+     "NS-6c0ae64ead"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de financas publicas|tributacao|tipos de tributos",
+    "no": "S-c582d93e13"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de financas publicas|tributacao|tipos de tributos",
+    "nos": [
+     "NS-6c0ae64ead"
+    ]
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de financas publicas|funcao do bem estar|politicas alocativas distributivas e de estabilizacao",
+    "no": "SL-fc1e2c2b92"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de financas publicas|indicadores financeiros fundamentos e principais indices e taxas",
+    "no": "NS-23536d9e53"
+   }
+  },
+  {
+   "tipo": "fundir",
+   "args": {
+    "origem": "NS-ddcaa01543",
+    "destino": "SL-fc1e2c2b92"
+   }
+  }
+ ]
+}
