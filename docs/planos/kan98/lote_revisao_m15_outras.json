@@ -1,0 +1,217 @@
+{
+ "descricao": "Decisão do dono (2026-11-09, KAN-92/M15): aprova 28 propostas novas fora de Economia e troca laissez-faire para Microeconomia › Problema econômico. A proposta da Lei estadual 6.174/1970 saiu do lote para conferir.",
+ "operacoes": [
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|evolucao da administracao|processos participativos de gestao publica",
+    "no": "S-81ba4580e0"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|o silencio no direito administrativo",
+    "no": "A-eb4a85393a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|teoria dos motivos determinantes",
+    "no": "A-eb4a85393a"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|credito tributario|conceito",
+    "no": "NS-045ccbff61"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|codigo tributario nacional|norma tributaria especies vigencia e aplicacao interpretacao e integracao natureza",
+    "no": "NS-f217cec358"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|conceito",
+    "no": "NS-f085595958"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|conceito e especies",
+    "no": "A-f826c2b177"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|impostos",
+    "no": "S-c582d93e13"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|impostos da uniao",
+    "no": "S-4a716c73bb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|impostos dos estados e do distrito federal",
+    "no": "S-4a716c73bb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|impostos dos municipios",
+    "no": "S-4a716c73bb"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|imunidades",
+    "no": "S-0f96fb53c2"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario|tributos|taxas",
+    "no": "S-c582d93e13"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|funcao estabilizadora alocativa e distributiva",
+    "no": "SL-fc1e2c2b92"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|inflacao crescimento e funcao estabilizadora do estado",
+    "no": "SL-fc1e2c2b92"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "economia|economia do setor publico|necessidades publicas e formas de atuacao dos governos",
+    "no": "SL-fc1e2c2b92"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatuto da crianca e do adolescente",
+    "no": "S-0754c3760b"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software",
+    "no": "NA-5ea6287326"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|conceitos basicos sobre engenharia de software",
+    "no": "NA-5ea6287326"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|disciplinas de engenharia de software",
+    "no": "NA-5ea6287326"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|contratacoes gestao e fiscalizacao de contratos administrativos especializados em tic",
+    "no": "A-91e52e6c2e"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis",
+    "no": "A-684307b65b"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de servicos de ti",
+    "no": "A-ef84a862e5"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti",
+    "no": "A-62cc2b0c63"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|infraestrutura de tic",
+    "no": "A-4b13bcdab5"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|infraestrutura de tic|redes de computadores",
+    "no": "A-4b13bcdab5"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|infraestrutura de servicos servidores virtualizacao e servicos em cloud",
+    "no": "NA-e8ea9374ad"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|programacao funcional e orientacao a objetos",
+    "no": "NS-ee97a45438"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|microeconomia|formas de organizacao da atividade economica laissez faire intervencionismo economia planificada",
+    "no": "SL-fc1e2c2b92"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|formas de organizacao da atividade economica laissez faire intervencionismo economia planificada",
+    "nos": [
+     "NS-827284d58e"
+    ]
+   }
+  }
+ ]
+}
