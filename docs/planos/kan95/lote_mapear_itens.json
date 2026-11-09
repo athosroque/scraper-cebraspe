@@ -1,0 +1,1816 @@
+{
+ "descricao": "KAN-95 Parte 2 (2026-11-09): mapeamentos do BANRISUL_25 pelo plano aceito pelo dono (Q1-Q12, 2026-11-02), com a §1.1 (KAN-100) nos títulos e as chaves novas da M7/M8. Propostas do LLM que contrariam o plano saem por desmapear (rejeitar vetaria o par por nome).",
+ "operacoes": [
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "conceitos basicos",
+    "no": "A-7fea9d8be7"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "conceitos basicos",
+    "nos": [
+     "M-41f37f57d8"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao",
+    "no": "A-3408fede43"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao",
+    "nos": [
+     "NA-870524a5bf"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "modelagem de dados",
+    "no": "A-48c7cb56b8"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "modelagem de dados",
+    "nos": [
+     "A-e02df9d2b4"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais",
+    "no": "A-2777136b57"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais",
+    "nos": [
+     "A-e02df9d2b4"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "performance e tuning",
+    "no": "NS-839d3b0755"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "performance e tuning",
+    "nos": [
+     "A-e02df9d2b4"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "arquitetura",
+    "no": "A-f57e5aa487"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura",
+    "nos": [
+     "NA-870524a5bf"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnologias emergentes",
+    "no": "A-bfc314b10d"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologias emergentes",
+    "nos": [
+     "NA-07a7c2b773"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "infraestrutura de redes",
+    "nos": [
+     "A-4b13bcdab5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "sistemas operacionais",
+    "no": "A-b7f5d728c0"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "sistemas operacionais",
+    "nos": [
+     "NA-e8ea9374ad"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "servidores",
+    "no": "A-32f00392f2"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "servidores",
+    "nos": [
+     "NA-e8ea9374ad"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "armazenamento",
+    "no": "A-27cb1a6971"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "armazenamento",
+    "nos": [
+     "NA-e8ea9374ad"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "computacao em nuvem",
+    "no": "S-1873949dfa"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "computacao em nuvem",
+    "nos": [
+     "NA-e8ea9374ad"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao e governanca",
+    "no": "S-20e16b751f"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao e governanca",
+    "nos": [
+     "NA-8a2987f6b8",
+     "A-424f65c051"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro",
+    "nos": [
+     "NA-6e1171de9d"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|organizacao fisica e metodos de acesso",
+    "nos": [
+     "NS-7a537f09a6"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|concorrencia recuperacao e integridade",
+    "nos": [
+     "NS-84742764b0",
+     "NS-56d6ecb70c"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|controle de protecao integridade e concorrencia",
+    "nos": [
+     "A-2777136b57",
+     "NS-84742764b0"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "performance e tuning|indices e otimizacao de acesso",
+    "nos": [
+     "NS-7a537f09a6",
+     "NS-839d3b0755"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "performance e tuning|indices e otimizacao de acesso|otimizacao de codigo sql ansi tuning uso do join union exists e subconsultas",
+    "nos": [
+     "NS-839d3b0755",
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "performance e tuning|indices e otimizacao de acesso|uso de variaveis bind",
+    "nos": [
+     "NS-839d3b0755"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "performance e tuning|indices e otimizacao de acesso|desempenho e deteccao de problemas",
+    "nos": [
+     "NS-839d3b0755"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|indices e otimizacao de acesso",
+    "nos": [
+     "NS-7a537f09a6",
+     "NS-839d3b0755"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|boas praticas de programacao",
+    "nos": [
+     "NS-5a7ae88c4e",
+     "NS-7658f2bc38"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|boas praticas de programacao|solid",
+    "nos": [
+     "NS-5a7ae88c4e"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|boas praticas de programacao|design patterns",
+    "nos": [
+     "NS-7658f2bc38"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|implementacao|orientacao a objetos",
+    "nos": [
+     "NS-ee97a45438"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes|modelo de negocios e quadro de modelo de negocios business model canvas",
+    "nos": [
+     "NS-ae746b6bf4"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de projetos|indicadores lead time delivery rate net promoter score nps metricas de ux para produtos digitais objectives and key results okr e key performance indicator kpi",
+    "nos": [
+     "NS-94de5d3b25",
+     "A-834a863292",
+     "A-b34798e56a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de produtos|produtos",
+    "no": "NS-7207b23a2b"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de produtos|produtos",
+    "no": "NS-91f271365d"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos",
+    "nos": [
+     "NA-e4ab58963f"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|releases",
+    "nos": [
+     "NS-9ed794912d"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|design de produto",
+    "nos": [
+     "NS-8646654fd2"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|processo de desenvolvimento de produtos digitais",
+    "nos": [
+     "NS-91f271365d"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux",
+    "nos": [
+     "NS-8646654fd2"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|metodologias ageis e experiencia do usuario",
+    "nos": [
+     "NS-8646654fd2",
+     "A-441ecdfb0c"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|tecnicas de facilitacao e mediacao de atividades co criativas e design sprints",
+    "nos": [
+     "NS-8204a47f30"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|novas tecnologias|blockchain iot fintechs inteligencia artificial e machine learning aplicados ao setor financeiro",
+    "no": "NA-6e1171de9d"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|novas tecnologias|blockchain iot fintechs inteligencia artificial e machine learning aplicados ao setor financeiro",
+    "nos": [
+     "NS-9ac3b019f5",
+     "A-067cc93992",
+     "A-bfc314b10d"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|transformacao digital",
+    "no": "NS-69ea62a7ae"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|transformacao digital",
+    "nos": [
+     "NS-5574f8fe8f"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|transformacao digital|estrategias e praticas para digitalizacao de servicos financeiros",
+    "nos": [
+     "NS-5574f8fe8f"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|tendencias de mercado|acompanhamento e identificacao de novas tecnologias e oportunidades de negocio no setor financeiro como criptomoedas pagamentos digitais e digital banking",
+    "nos": [
+     "NS-9ac3b019f5",
+     "NS-df52f4afb3",
+     "NS-f7a6982126"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico|razoes e proporcoes",
+    "nos": [
+     "A-d4f5c80605"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico|razoes e proporcoes|divisao proporcional",
+    "nos": [
+     "A-d4f5c80605"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico|razoes e proporcoes|regras de tres simples e compostas",
+    "nos": [
+     "A-d4f5c80605"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao e governanca|gestao de contratacao de solucoes de ti",
+    "no": "NA-8a2987f6b8"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao e governanca|gestao de contratacao de solucoes de ti",
+    "nos": [
+     "A-424f65c051"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao e governanca|legislacao aplicavel a contratacao de bens e servicos de ti e suas alteracoes",
+    "nos": [
+     "A-424f65c051"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao e governanca|principios fundamentais da administracao publica",
+    "nos": [
+     "S-20e16b751f"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "computacao em nuvem|conteinerizacao de aplicacoes e devsecops",
+    "nos": [
+     "A-2d664f1470",
+     "A-7704ba4ec9"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes|ferramentas de analise de ambiente analise swot analise de cenarios matriz gut",
+    "no": "S-655449dbb0"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes|ferramentas de analise de ambiente analise swot analise de cenarios matriz gut",
+    "nos": [
+     "S-bcd5e45306",
+     "A-7e84a0b377"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de projetos|projetos|gerenciamento de projetos conceitos basicos areas de conhecimento projetos programas portfolio",
+    "nos": [
+     "S-66e4a7f6e3",
+     "S-0d78a6b816"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de projetos|tipos de abordagem tradicional hibrida e agil framework scrum metodologia lean e metodo kanban",
+    "nos": [
+     "S-2eda8c5abd",
+     "S-774833cfc8"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de produtos|produtos|user story map usm",
+    "no": "NS-7207b23a2b"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|user story map usm",
+    "nos": [
+     "A-6a5ad94fa5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de produtos|produtos|user story us",
+    "no": "A-441ecdfb0c"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|user story us",
+    "nos": [
+     "A-6a5ad94fa5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de produtos|produtos|minimum viable product mvp",
+    "no": "NS-91f271365d"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|minimum viable product mvp",
+    "nos": [
+     "A-6a5ad94fa5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de produtos|produtos|gerenciamento de backlog",
+    "no": "A-441ecdfb0c"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|gerenciamento de backlog",
+    "nos": [
+     "A-6a5ad94fa5"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "lingua portuguesa|redacao oficial conforme manual de redacao da presidencia da republica",
+    "nos": [
+     "AL-d25ac0285d"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "lingua inglesa|itens gramaticais relevantes para o entendimento dos sentidos dos textos",
+    "nos": [
+     "AL-f7d4935fd3"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico|compreensao de estruturas logicas",
+    "nos": [
+     "A-05d3a2c440"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico|logica de argumentacao analogias inferencias deducoes e conclusoes",
+    "nos": [
+     "S-4e4ac31f38"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "conceitos basicos|concorrencia esquemas de sincronizacao deadlocks",
+    "nos": [
+     "A-b7f5d728c0"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "conceitos basicos|redes locais",
+    "nos": [
+     "A-5cc2d6e82a"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "conceitos basicos|web services apis rest",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|programacao estruturada",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|componentizacao",
+    "no": "A-3408fede43"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|componentizacao",
+    "nos": [
+     "A-f57e5aa487"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|sub rotinas",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|sub rotinas|passagem de parametros por endereco",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|sub rotinas|passagem de parametros por referencia",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|sub rotinas|passagem de parametros por valor",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|escopo de variaveis",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|tipos de dados",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|tipos de dados|vinculacao",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|tipos de dados|verificacao de tipos",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|tipos de dados|tipificacao forte",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "modelagem de dados|fundamentos de administracao de dados",
+    "no": "A-48c7cb56b8"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "modelagem de dados|fundamentos de administracao de dados",
+    "nos": [
+     "S-abaaaebdfc"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "modelagem de dados|fundamentos de administracao de dados|seguranca controle de acesso aos dados",
+    "nos": [
+     "A-8763b26044"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "fundamentos de banco de dados|sistemas de gerencia de banco de dados sgbd",
+    "no": "S-abaaaebdfc"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|sistemas de gerencia de banco de dados sgbd",
+    "nos": [
+     "A-2777136b57"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|arquitetura",
+    "nos": [
+     "S-abaaaebdfc"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|modelos logicos e representacao fisica",
+    "nos": [
+     "A-48c7cb56b8"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|conceito de transacao",
+    "nos": [
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|linguagens de definicao ddl e manipulacao de dados dml em sgbds relacionais",
+    "nos": [
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|procedimentos stored procedures",
+    "nos": [
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|visoes views",
+    "nos": [
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "fundamentos de banco de dados|gatilhos triggers",
+    "nos": [
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|projeto e implantacao de sgbds relacionais",
+    "nos": [
+     "A-2777136b57"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|administracao de usuarios e perfis de acesso",
+    "nos": [
+     "A-2777136b57"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|backup e restauracao de dados",
+    "no": "A-2777136b57"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|backup e restauracao de dados",
+    "nos": [
+     "A-268e85e223"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|tolerancia a falhas e continuidade de operacao",
+    "no": "NS-56d6ecb70c"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao de banco de dados relacionais|tolerancia a falhas e continuidade de operacao",
+    "nos": [
+     "A-d831972bed"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019",
+    "nos": [
+     "S-fed7e2d779"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|instalacao configuracao e administracao",
+    "no": "S-fed7e2d779"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|instalacao configuracao e administracao",
+    "nos": [
+     "A-2777136b57"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|replicacao de banco de dados",
+    "no": "S-fed7e2d779"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|replicacao de banco de dados",
+    "nos": [
+     "A-2777136b57"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|suporte ao uso dos bancos de dados para os desenvolvedores",
+    "no": "S-fed7e2d779"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|banco de dados oracle 19c mysql v8 e ms sql server 2019|suporte ao uso dos bancos de dados para os desenvolvedores",
+    "nos": [
+     "A-2777136b57"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "processo|ciclos de vida",
+    "nos": [
+     "A-1a727febee"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "processo|ciclos de vida|modelo cascata",
+    "nos": [
+     "A-1a727febee"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "processo|ciclos de vida|modelo agil",
+    "nos": [
+     "A-441ecdfb0c"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "processo|metodologias ageis de desenvolvimento",
+    "nos": [
+     "A-441ecdfb0c"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "processo|metodologias ageis de desenvolvimento|scrum tdd modelagem agil e kanban",
+    "nos": [
+     "A-441ecdfb0c"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|arquitetura de banco de dados relacional",
+    "nos": [
+     "S-abaaaebdfc"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|modelagem de dados fisico logico e conceitual",
+    "nos": [
+     "A-48c7cb56b8"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "banco de dados|sql ansi",
+    "nos": [
+     "S-551a90e864"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|linguagens",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|linguagens|java javascript c",
+    "nos": [
+     "A-3408fede43"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|linguagens|html5 css3",
+    "nos": [
+     "A-75c9ae985d"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnicas e linguagens de programacao|processamento assincrono e mensageria",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "engenharia de software|analise e projeto",
+    "no": "A-6a5ad94fa5"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|analise e projeto",
+    "nos": [
+     "A-1a727febee"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "engenharia de software|implementacao",
+    "no": "NS-525402b8a4"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "engenharia de software|implementacao",
+    "no": "NS-ee97a45438"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|implementacao",
+    "nos": [
+     "NA-5ea6287326"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|qualidade",
+    "nos": [
+     "S-afc6a31091"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|qualidade|analise de codigo",
+    "nos": [
+     "S-afc6a31091"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|qualidade|teste unitario",
+    "nos": [
+     "S-afc6a31091"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|qualidade|teste de integracao",
+    "nos": [
+     "S-afc6a31091"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|qualidade|teste de carga estresse",
+    "nos": [
+     "S-afc6a31091"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|devsecops",
+    "nos": [
+     "A-7704ba4ec9"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "engenharia de software|seguranca da informacao|confiabilidade integridade e disponibilidade",
+    "nos": [
+     "A-e82b500a76"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|tecnologias de integracao",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|tecnologias de integracao|web services e apis",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|tecnologias de integracao|restful",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|tecnologias de integracao|mensageria",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura",
+    "nos": [
+     "A-f57e5aa487"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|arquitetura em camadas",
+    "nos": [
+     "A-f57e5aa487"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|arquitetura cliente servidor",
+    "nos": [
+     "A-f57e5aa487"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|arquitetura orientada a servicos",
+    "nos": [
+     "A-f57e5aa487"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|arquitetura de microsservicos",
+    "nos": [
+     "A-505e7be779"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|arquitetura orientada a eventos",
+    "nos": [
+     "A-f57e5aa487"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|front end back end e full stack",
+    "no": "A-f57e5aa487"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|padroes de arquitetura|front end back end e full stack",
+    "nos": [
+     "A-75c9ae985d"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "arquitetura|transacoes distribuidas",
+    "no": "S-551a90e864"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "arquitetura|transacoes distribuidas",
+    "nos": [
+     "A-505e7be779"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologias emergentes|inteligencia artificial fundamentos e aplicacoes",
+    "nos": [
+     "S-fe253f32ca"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologias emergentes|aprendizado de maquina",
+    "nos": [
+     "A-bfc314b10d"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologias emergentes|ia generativa",
+    "nos": [
+     "A-048ceace24"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "infraestrutura de redes|gerenciamento de redes tcp ip",
+    "nos": [
+     "A-a67f9900ba"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "infraestrutura de redes|gerenciamento de redes tcp ip|arquitetura de gerenciamento smi snmp e mib",
+    "nos": [
+     "A-a67f9900ba"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "infraestrutura de redes|redes locais e de longa distancia",
+    "nos": [
+     "A-5cc2d6e82a"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "infraestrutura de redes|redes locais e de longa distancia|mpls redes cabeadas redes sem fio padroes 802 11 protocolos 802 1x eap wep wpa e wpa2",
+    "no": "A-5cc2d6e82a"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "infraestrutura de redes|redes locais e de longa distancia|mpls redes cabeadas redes sem fio padroes 802 11 protocolos 802 1x eap wep wpa e wpa2",
+    "nos": [
+     "A-7060542510"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "infraestrutura de redes|redes locais e de longa distancia|conceitos basicos de routing e switching",
+    "no": "A-5cc2d6e82a"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "infraestrutura de redes|redes locais e de longa distancia|conceitos basicos de routing e switching",
+    "nos": [
+     "A-4391a841ed"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "sistemas operacionais|sistemas operacionais|fundamentos",
+    "nos": [
+     "A-b7f5d728c0"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "servidores|servidores de aplicacao|conceitos basicos",
+    "nos": [
+     "A-32f00392f2"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "armazenamento|armazenamento",
+    "nos": [
+     "A-27cb1a6971"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "armazenamento|armazenamento|servicos de armazenamento padroes de disco e de interfaces",
+    "nos": [
+     "A-27cb1a6971"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "armazenamento|armazenamento|raid",
+    "nos": [
+     "A-27cb1a6971"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "armazenamento|armazenamento|tecnologias de armazenamento nas e san",
+    "nos": [
+     "A-27cb1a6971"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "armazenamento|armazenamento|tecnologias de backup",
+    "nos": [
+     "A-268e85e223"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes",
+    "no": "A-7e84a0b377"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes",
+    "no": "NS-ae746b6bf4"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes",
+    "no": "S-4fbb5eef47"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes",
+    "nos": [
+     "S-aedc8bb2b0"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes|analise de ambiente interno e externo",
+    "nos": [
+     "A-7e84a0b377"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "estrategia|referencial estrategico das organizacoes|negocio missao visao de futuro valores",
+    "nos": [
+     "S-4fbb5eef47"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de projetos|projetos",
+    "no": "S-0d78a6b816"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de projetos|projetos",
+    "no": "S-66e4a7f6e3"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao de projetos|projetos",
+    "no": "S-a36d8a0434"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de projetos|projetos",
+    "nos": [
+     "S-4edb6e0be3"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de projetos|projetos|ciclo de vida do projeto",
+    "nos": [
+     "S-a36d8a0434"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|produtos|tecnicas de levantamento de requisitos",
+    "nos": [
+     "A-6a5ad94fa5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|novas tecnologias",
+    "no": "NA-6e1171de9d"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|novas tecnologias",
+    "nos": [
+     "A-067cc93992"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|transformacao digital|integracao de apis",
+    "no": "NS-69ea62a7ae"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|transformacao digital|integracao de apis",
+    "nos": [
+     "A-0d5791ace5"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|tendencias de mercado",
+    "no": "NA-6e1171de9d"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "inovacao em ti no sistema financeiro|tendencias de mercado",
+    "nos": [
+     "A-067cc93992"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "seguranca da informacao|aspectos da classificacao das informacoes seguranca de ambientes fisicos e logicos controles de acesso",
+    "no": "A-bf492b5cfb"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|aspectos da classificacao das informacoes seguranca de ambientes fisicos e logicos controles de acesso",
+    "nos": [
+     "A-3fc8e1543c",
+     "A-8763b26044"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|aspectos da classificacao das informacoes seguranca de ambientes fisicos e logicos controles de acesso|gestao de politicas de seguranca",
+    "nos": [
+     "A-bf492b5cfb"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "seguranca da informacao|algoritmos de criptografia simetrica assimetrica e hash",
+    "no": "A-d8c9b18de0"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|algoritmos de criptografia simetrica assimetrica e hash",
+    "nos": [
+     "A-805590e68b"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|algoritmos de criptografia simetrica assimetrica e hash|infraestrutura de chaves publicas",
+    "nos": [
+     "A-4e29084c17"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica",
+    "no": "S-35ab3a8c71"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica",
+    "nos": [
+     "A-f2edc4437f",
+     "A-addef0af06",
+     "A-a72164a20c"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica|spoofing flood ddos phishing",
+    "nos": [
+     "A-addef0af06"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica|malwares",
+    "nos": [
+     "S-35ab3a8c71"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica|adware spyware backdoors keylogger worms ransonware",
+    "nos": [
+     "S-35ab3a8c71"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "computacao em nuvem|cloud computing",
+    "no": "S-1873949dfa"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "computacao em nuvem|cloud computing",
+    "nos": [
+     "A-0d5ca71b92"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|conceitos basicos e aplicacoes",
+    "nos": [
+     "NS-8646654fd2"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|storytelling",
+    "nos": [
+     "NS-49a5087cf0"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|design thinking",
+    "nos": [
+     "S-eb23e19ae9"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|research user interface",
+    "nos": [
+     "NS-d5580e802e"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao de produtos|user experience ux|lean concept discovery sprint",
+    "nos": [
+     "NS-8204a47f30"
+    ]
+   }
+  }
+ ]
+}

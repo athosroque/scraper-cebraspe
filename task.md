@@ -730,9 +730,17 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
       [`plano-etapa-5b4-kan95.md`](plano-etapa-5b4-kan95.md), recomendações Q1 a Q12 aceitas pelo dono em 2026-11-02.
       - `[x]` Parte 1: 35 nós novos criados (3 assuntos e 32 subassuntos, nenhuma disciplina; 2.688 → 2.723 nós
         ativos), K22–K24 e `auditar_arvore` inalterados.
-      - `[ ]` Parte 2 (depois da M7/M8, KAN-93/94): 214 mapeamentos de itens, inclusive os 15 títulos sem destino
-        (`--mapear`; rascunho em `docs/planos/kan95/mapear_itens.sh`, não executado, e lote aplicado em
-        `docs/planos/kan95/lote_nos_novos.json`; acrescentar a operação "mapear" ao lote do `curar_arvore`).
+      - `[x]` Parte 2 (2026-11-09): o rascunho `mapear_itens.sh` virou `docs/planos/kan95/lote_mapear_itens.json`.
+        - **O lote:** 210 operações (160 `mapear`, 50 `desmapear`), com a §1.1 do plano (KAN-100) nos títulos.
+        - **Chaves que sumiram:** das 23 que deixaram de existir com a M7/M8:
+          - 6 de UX viraram 5 chaves novas, todas mapeadas;
+          - 4 compostos viraram 11 chaves de pai e filhos: 9 mapeadas e 2 para o dono;
+          - 3 facetas voltaram ao pai;
+          - 10 de BSC já estavam no pai aprovado.
+        - **O que já estava feito:** 43 linhas já estavam aplicadas. 2 filhos de SERVIDORES ficaram como estavam
+          (aprovados em Servidores de aplicação).
+        - **Resultado:** o BANRISUL_25 tem 253 de 255 itens aprovados. Restam 2 propostas e 1 nó extra para o dono.
+        - **Checagens:** K22–K24 e `auditar_arvore` sem mudança.
       - `[ ]` Parte 3: classificação das questões (5D) só depois dos nós e dos mapeamentos, e aprovação do edital.
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como

@@ -89,9 +89,37 @@ esta tabela aponta para o assunto. O dono aceitou a recomendação do levantamen
     fusão anterior. Esta proposta queria *Conceitos e tecnologias de IA*.
   - Em SERVIDORES, 2 filhos estão aprovados em Servidores de aplicação, e esta proposta quer "alta
     disponibilidade".
-- **Falta (depois do KAN-98/99):** refazer o `docs/planos/kan95/mapear_itens.sh` com esta decisão e
-  as 23 chaves que deixaram de existir depois da M7/M8.
 - **Ajuste no LLM:** a dica do pai só proposto não manda mais herdar (M15, KAN-101).
+
+### 1.2 Parte 2 aplicada (2026-11-09)
+
+- **O lote:** `docs/planos/kan95/lote_mapear_itens.json`, com 210 operações (160 `mapear` e 50 `desmapear`), aplicado
+  inteiro.
+- **O que veio do rascunho:** o `mapear_itens.sh` tinha 214 linhas.
+  - 146 foram aplicadas, com a §1.1 por cima.
+  - 43 já estavam aprovadas iguais.
+  - As 2 de SERVIDORES ficaram de fora: os filhos continuam aprovados em Servidores de aplicação, e mudar isso
+    é decisão do dono.
+  - As 23 chaves que sumiram foram tratadas como no item seguinte.
+- **Propostas contrárias ao plano:** as propostas do LLM que contrariavam o plano saíram por `desmapear`, e não
+  por `rejeitar`, porque o veto vale para o par (nome, nó). Rejeitar "sistemas operacionais" → subassunto
+  Sistemas operacionais bloquearia um subtópico de mesmo nome em outro edital.
+- **As 23 chaves que deixaram de existir com a M7/M8:**
+  - 6 de UX/Design thinking: a M7 tirou o prefixo "Metodologias ágeis e experiência do usuário - ". O item
+    "research user interface lean concept discovery sprint" virou dois itens.
+  - 4 compostos (segurança e nuvem): a M8 dividiu cada um em pai e filhos. Os nós do composto foram
+    repartidos entre o pai e os filhos.
+  - 3 facetas de modelagem (físico, lógico, conceitual): voltaram ao pai.
+  - 10 de BSC: estão no pai `estrategia|balanced scorecard bsc`, já aprovado.
+- **"Aprendizado de máquina"** foi mapeado à mão para *Conceitos e tecnologias de IA*, como propõe esta proposta,
+  antes do passo.
+- **BANRISUL_25:** 253 de 255 itens aprovados; 2 só propostos e 0 sem nó.
+- **Para o dono:**
+  - "certificação digital", em que esta proposta e o LLM divergem entre ICP e o nó "Certificação digital"
+    (conceito duplicado);
+  - "firewalls, IDS, IPS…", entre Prevenção e combate a ataques e Ativos e perímetros;
+  - o nó extra "vírus, worms" no item de adware/worms;
+  - os 2 filhos de SERVIDORES.
 
 ---
 
