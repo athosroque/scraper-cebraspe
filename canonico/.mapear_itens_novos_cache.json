@@ -1,104 +1,88 @@
 {
   "nenhum": {
-    "administracao publica|governabilidade e governanca|intermediacao de interesses clientelismo corporativismo e neocorporativismo": {
-      "hash": "1c8279e1e5ced36d",
-      "justificativa": "Intermediação de interesses (clientelismo, corporativismo) não é coberta por nenhum candidato de governança."
-    },
     "administracao|administracao financeira": {
-      "hash": "777d61d3ad686a90",
-      "justificativa": "Administração financeira (alavancagem, planejamento financeiro) não tem nó equivalente na lista; análise de balanços está em outra disciplina e não cobre o tópico inteiro"
+      "hash": "cca510c02ac3359f",
+      "justificativa": "Administração financeira (alavancagem, planejamento financeiro, análise de balanços) não é coberta por nenhum candidato; N103 cobre apenas análise econômico-financeira, parte do bloco."
     },
     "administracao|administracao financeira|nocoes de analise de balancos e demonstracoes financeiras": {
-      "hash": "e3510e7989a14c3c",
-      "justificativa": "análise de balanços e demonstrações financeiras não é coberta pelos candidatos disponíveis"
+      "hash": "570661c0d8a183e5",
+      "justificativa": "Análise de balanços e demonstrações financeiras é conceito de análise financeira, não coberto pelos nós de elaboração de balanços (N91-N94)."
     },
     "administracao|administracao financeira|planejamento financeiro de curto e longo prazo": {
-      "hash": "dbb8eee0939934f3",
-      "justificativa": "planejamento financeiro de curto e longo prazo é conceito de finanças sem nó equivalente"
+      "hash": "342c02d54fb7f86c",
+      "justificativa": "Planejamento financeiro de curto e longo prazo é tema de administração financeira sem nó equivalente na lista."
     },
     "administracao|administracao financeira|principios gerais de alavancagem operacional e financeira": {
-      "hash": "1b84226ab015f957",
-      "justificativa": "alavancagem operacional e financeira não é coberta por nenhum candidato"
-    },
-    "administracao|evolucao da administracao|processos participativos de gestao publica": {
-      "hash": "1eec41da6cf30359",
-      "justificativa": "o único candidato (orçamento participativo) cobre apenas parte do conceito de processos participativos"
+      "hash": "9c0a90b44e60a7c5",
+      "justificativa": "Alavancagem operacional e financeira não é tratada por nenhum candidato."
     },
     "administracao|legislacao administrativa|lei estadual no 20 656 2021": {
-      "hash": "581f9df8d0a725ff",
-      "justificativa": "lei estadual específica sem candidato equivalente na lista"
+      "hash": "63b797f8d04d213c",
+      "justificativa": "Lei estadual específica sem nó correspondente; pai apenas proposto, não herda"
     },
     "administracao|planejamento financeiro": {
-      "hash": "b0c812d4bcc7059e",
-      "justificativa": "Planejamento financeiro corporativo não é coberto pelos nós de planejamento estratégico ou orçamentário"
+      "hash": "15f6d186168978e0",
+      "justificativa": "Planejamento financeiro de curto e longo prazo não corresponde a nenhum nó candidato; N103 trata de análise de resultados, não de planejamento financeiro."
     },
     "administracao|planejamento financeiro|conceito de planejamento financeiro": {
-      "hash": "c131d64bc3968afa",
-      "justificativa": "Planejamento financeiro é conceito específico não coberto pelos candidatos de planejamento (estratégico, tático, operacional)."
+      "hash": "04e131bb0d72abca",
+      "justificativa": "Conceito de planejamento financeiro é tema específico de finanças sem nó correspondente."
     },
     "administracao|planejamento financeiro|etapas do planejamento financeiro": {
-      "hash": "388c9dd1410fd174",
-      "justificativa": "Etapas do planejamento financeiro pertencem ao domínio financeiro, não ao processo genérico de planejamento dos candidatos."
+      "hash": "7ccba4c07dbc4c58",
+      "justificativa": "Etapas do planejamento financeiro não são cobertas; N106 trata de planejamento de ensino (Pedagogia)."
     },
     "administracao|planejamento financeiro|ferramentas de planejamento financeiro": {
-      "hash": "b58d98d13fefd5af",
-      "justificativa": "Ferramentas de planejamento financeiro não correspondem às ferramentas de qualidade nem às de planejamento estratégico listadas."
+      "hash": "50169f09871983bd",
+      "justificativa": "Ferramentas de planejamento financeiro não correspondem a N55, que trata de planejamento estratégico."
     },
     "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb": {
-      "hash": "bb1eaafb86767863",
-      "justificativa": "Lei do Fundeb (financiamento da educação básica) não é coberta por nenhum candidato de Contabilidade Pública."
+      "hash": "b9a0cee933e017ca",
+      "justificativa": "Lei do Fundeb (financiamento da educação básica) não é coberta por nenhum candidato de contabilidade pública; não herdar proposta não confirmada."
     },
     "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb|composicao financeira": {
-      "hash": "6d828fa87652e42c",
-      "justificativa": "Fundeb (Lei 14.113/2020) não é coberto por nenhum candidato da lista."
+      "hash": "03959500ca4c86ea",
+      "justificativa": "Composição financeira do Fundeb (Lei 14.113/2020) não é coberta por nenhum candidato; pai apenas proposto, sem herança."
     },
     "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb|distribuicao de recursos": {
-      "hash": "95fa138e10656d60",
-      "justificativa": "Distribuição de recursos do Fundeb não tem nó equivalente nos candidatos."
+      "hash": "bffbc1769dc32e0a",
+      "justificativa": "Distribuição de recursos do Fundeb não corresponde a nenhum nó candidato (ex.: N42 é distribuição de materiais); pai apenas proposto."
     },
     "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb|utilizacao dos recursos": {
-      "hash": "0d106a8fee1206f1",
-      "justificativa": "Utilização dos recursos do Fundeb não é coberta por nenhum candidato."
-    },
-    "direito administrativo|agentes publicos especies e classificacao|titulos iii e iv do regime juridico dos funcionarios civis do poder executivo do estado do parana lei estadual no 6 174 1970": {
-      "hash": "709d8c2b646b0967",
-      "justificativa": "regime jurídico estadual (Lei nº 6.174/1970) sem candidato equivalente; N17 é federal"
-    },
-    "direito administrativo|atos administrativos|o silencio no direito administrativo": {
-      "hash": "24427bb735e92645",
-      "justificativa": "Silêncio administrativo não é coberto por nenhum candidato."
-    },
-    "direito administrativo|atos administrativos|teoria dos motivos determinantes": {
-      "hash": "a34cd2a1a135b7c5",
-      "justificativa": "Teoria dos motivos determinantes não tem nó equivalente nos candidatos."
+      "hash": "a0c7a5152c94fd36",
+      "justificativa": "Utilização dos recursos do Fundeb não tem nó candidato que a cubra; pai apenas proposto, sem herança."
     },
     "direito administrativo|bens publicos": {
-      "hash": "330908fa1474ef33",
-      "justificativa": "bens públicos não é coberto por nenhum candidato"
+      "hash": "ce14c520eabae837",
+      "justificativa": "Tópico sobre regime jurídico dos bens públicos (Direito Administrativo) não é coberto por nenhum candidato; N183-N185 tratam de gestão patrimonial em outra disciplina e cobririam apenas fragmentos, não o bloco todo."
     },
     "direito administrativo|bens publicos|aquisicao e alienacao dos bens publicos": {
-      "hash": "d96697dc41469c50",
-      "justificativa": "Bens públicos não possuem nó candidato."
+      "hash": "d09349022c10377d",
+      "justificativa": "Bens públicos não possui nó na lista de candidatos"
     },
     "direito administrativo|bens publicos|formas de utilizacao dos bens publicos pelos particulares": {
-      "hash": "e16095b44e2ac4b7",
-      "justificativa": "Bens públicos não possuem nó candidato."
+      "hash": "67f15a27a6dbe617",
+      "justificativa": "Bens públicos não possui nó na lista de candidatos"
     },
     "direito administrativo|bens publicos|regime juridico": {
-      "hash": "fd6729c75bf734c2",
-      "justificativa": "Bens públicos não possuem nó candidato."
-    },
-    "direito administrativo|processo administrativo|lei estadual no 20 656 2021": {
-      "hash": "cbd5fc91cd2e070a",
-      "justificativa": "Lei estadual específica não corresponde à Lei 9.784/1999 federal."
+      "hash": "386180084716b013",
+      "justificativa": "Bens públicos não possui nó na lista de candidatos"
     },
     "direito constitucional|direitos das comunidades remanescentes de quilombos": {
-      "hash": "d2dc3f6a4a03b902",
-      "justificativa": "Direitos de quilombolas não coberto pelos candidatos; ordem social não tem nó específico."
+      "hash": "d6348ff43338aa3e",
+      "justificativa": "Direitos de quilombolas não têm nó correspondente na lista de candidatos."
     },
     "direito constitucional|direitos e interesses das populacoes indigenas": {
-      "hash": "cfabc6ec64b7c84d",
-      "justificativa": "Direitos indígenas sem nó equivalente na lista."
+      "hash": "d696d465832f55f1",
+      "justificativa": "Direitos das populações indígenas não são cobertos por nenhum candidato específico."
+    },
+    "direito tributario|codigo tributario nacional|competencia tributaria e suas limitacoes": {
+      "hash": "1d29f15817955f09",
+      "justificativa": "pai proposto não confirmado; não há nó específico sobre competência tributária e limitações"
+    },
+    "direito tributario|tributos|contribuicao de melhoria": {
+      "hash": "0de7b298d1d92a65",
+      "justificativa": "contribuição de melhoria é espécie tributária própria, não coberta explicitamente por impostos, taxas e contribuições (contribuições parafiscais)"
     },
     "economia": {
       "hash": "23fb8d4c2680cb28",
@@ -108,149 +92,21 @@
       "hash": "f739d0a2cc98e7b6",
       "justificativa": "Economia brasileira como disciplina estruturada não corresponde ao subassunto de tópicos atuais de economia (N11)."
     },
-    "economia|economia brasileira|aspectos gerais do comportamento recente da economia brasileira e das politicas economicas adotadas pelos ultimos governos": {
-      "hash": "ce6fa0a1ac9123e7",
-      "justificativa": "Economia brasileira contemporânea não é coberta pelos candidatos; N18 é tópico de atualidades, muito mais genérico."
-    },
-    "economia|economia brasileira|cambio reservas e relacoes comerciais e financeiras do brasil com o resto do mundo": {
-      "hash": "893bf2bd6d9b0967",
-      "justificativa": "Câmbio e relações comerciais do Brasil não têm nó equivalente; N20 trata de relações internacionais como atualidade, não economia."
-    },
-    "economia|economia brasileira|desigualdades pessoais e espaciais de renda e de riqueza": {
-      "hash": "7daf1b31ca1f7df6",
-      "justificativa": "Desigualdade de renda e riqueza é conceito econômico sem candidato correspondente."
-    },
-    "economia|economia brasileira|estrutura orcamentaria e evolucao do deficit e da divida publica brasileiros": {
-      "hash": "41347f32c4959131",
-      "justificativa": "Dívida e déficit públicos sob ótica econômica; N2 é de LRF e N21 é contábil, não cobrindo a análise econômica."
-    },
-    "economia|economia brasileira|estrutura tributaria brasileira": {
-      "hash": "a0face249afe7927",
-      "justificativa": "Estrutura tributária brasileira não corresponde a N45/N46, que são princípios e repartição do STN na Constituição."
-    },
-    "economia|economia brasileira|indicadores de desenvolvimento economico e social brasileiro contemporaneo": {
-      "hash": "79b837aa77ee16ee",
-      "justificativa": "Indicadores de desenvolvimento econômico e social não têm candidato equivalente."
-    },
-    "economia|economia brasileira|mercado de trabalho e condicoes de emprego e renda": {
-      "hash": "673dcbde149a4e6f",
-      "justificativa": "Mercado de trabalho e emprego é conceito econômico sem nó correspondente."
-    },
-    "economia|economia brasileira|mudancas estruturais da economia brasileira a partir da aceleracao dos processos de industrializacao e urbanizacao": {
-      "hash": "ab5d40b4c34f19cc",
-      "justificativa": "Industrialização e urbanização da economia brasileira não são cobertos pelos candidatos."
-    },
-    "economia|economia brasileira|perfil demografico brasileiro": {
-      "hash": "3d880f1be4415010",
-      "justificativa": "Perfil demográfico não tem candidato correspondente."
-    },
-    "economia|economia brasileira|planos de desenvolvimento mais importantes desde a segunda metade do seculo xx": {
-      "hash": "43c5c39c6caaaf16",
-      "justificativa": "Planos de desenvolvimento econômico não equivalem a N3/N68, que tratam do PPA atual."
-    },
-    "economia|economia brasileira|previdencia social e suas perspectivas": {
-      "hash": "2c5a01464cd7299f",
-      "justificativa": "Previdência sob ótica econômica; N41 e N76 são de Direito Constitucional e Serviço Social, disciplinas distintas."
-    },
-    "economia|economia brasileira|principais caracteristicas e resultados dos planos de estabilizacao a partir da decada de 80 do seculo xx": {
-      "hash": "ec0628051e62b047",
-      "justificativa": "Planos de estabilização não têm candidato correspondente."
-    },
-    "economia|economia do estado do parana": {
-      "hash": "fcfe40fe2de71310",
-      "justificativa": "Economia estadual específica do Paraná não é coberta por nenhum candidato."
+    "economia|economia do setor publico|outras politicas economicas": {
+      "hash": "34fced4826302101",
+      "justificativa": "Título genérico de 'outras políticas' sem conceito específico coberto pelos candidatos."
     },
     "economia|macroeconomia": {
       "hash": "a04c6424b0aadce9",
       "justificativa": "Macroeconomia como disciplina técnica não tem nó equivalente; N11 trata apenas de economia em atualidades."
     },
-    "economia|macroeconomia|agregados monetarios": {
-      "hash": "c7fd58928e50a5d3",
-      "justificativa": "Agregados monetários é conceito de macroeconomia sem candidato."
-    },
-    "economia|macroeconomia|analises de equilibrio nos modelos de economia fechada e economia aberta": {
-      "hash": "9fda1c53a59d9688",
-      "justificativa": "Modelos macroeconômicos de equilíbrio não têm candidato."
-    },
-    "economia|macroeconomia|as contas do sistema monetario": {
-      "hash": "3379b145930728a9",
-      "justificativa": "Contas do sistema monetário não têm candidato."
-    },
-    "economia|macroeconomia|autoridade monetaria e oferta de moeda": {
-      "hash": "33824369368dc103",
-      "justificativa": "Autoridade monetária e oferta de moeda não têm candidato."
-    },
-    "economia|macroeconomia|balanca comercial": {
-      "hash": "33122efb752dd1e7",
-      "justificativa": "Balança comercial é conceito macroeconômico sem candidato."
-    },
-    "economia|macroeconomia|balanca de bens e servicos": {
-      "hash": "d3e623748fddb253",
-      "justificativa": "Balança de bens e serviços não tem candidato."
-    },
-    "economia|macroeconomia|balanca de capital": {
-      "hash": "19579491fd1f04bb",
-      "justificativa": "Balança de capital não tem candidato."
-    },
-    "economia|macroeconomia|balanca de rendimentos": {
-      "hash": "c6f815133b4423a5",
-      "justificativa": "Balança de rendimentos não tem candidato."
-    },
-    "economia|macroeconomia|balanca de transacoes correntes": {
-      "hash": "3577fb79a0f37710",
-      "justificativa": "Balança de transações correntes não tem candidato."
-    },
-    "economia|macroeconomia|balanca financeira": {
-      "hash": "bf5b7abf1d5d7f8d",
-      "justificativa": "Balança financeira não tem candidato."
-    },
     "economia|macroeconomia|balanco de pagamentos": {
       "hash": "90ac90a68c63dc1f",
       "justificativa": "Balanço de pagamentos é conceito macroeconômico sem candidato."
     },
-    "economia|macroeconomia|bancos e multiplicador bancario": {
-      "hash": "b6652e76b1470b30",
-      "justificativa": "Multiplicador bancário não tem candidato."
-    },
-    "economia|macroeconomia|blocos economicos acordos internacionais e retaliacoes": {
-      "hash": "0bf6885da9b1e99c",
-      "justificativa": "Blocos econômicos sob ótica macroeconômica; N20 é relações internacionais como atualidade, enquadramento duvidoso."
-    },
-    "economia|macroeconomia|cambio fixo e flutuante": {
-      "hash": "c35d6df5466217ed",
-      "justificativa": "Tópico teórico de macroeconomia (regime cambial) sem nó equivalente; N11 é atualidades econômicas, não teoria macroeconômica."
-    },
-    "economia|macroeconomia|conceito bruto versus liquido": {
-      "hash": "0618bebf353f5f46",
-      "justificativa": "Conceito de contas nacionais (PIB bruto vs líquido) não coberto por candidato algum."
-    },
-    "economia|macroeconomia|conceito interno versus nacional": {
-      "hash": "918aa4525c1d2821",
-      "justificativa": "Distinção PIB interno vs nacional é conceito de contabilidade nacional sem nó correspondente."
-    },
-    "economia|macroeconomia|conceito nominal versus real": {
-      "hash": "218ffa7aadb36369",
-      "justificativa": "Distinção nominal vs real é conceito macroeconômico sem nó equivalente na lista."
-    },
-    "economia|macroeconomia|conceitos de moeda e quase moeda": {
-      "hash": "cb89158fe90f985b",
-      "justificativa": "Conceitos de moeda e quase-moeda pertencem à teoria monetária, não coberta pelos candidatos."
-    },
     "economia|macroeconomia|contabilidade social": {
       "hash": "6d5fdfa553f7c472",
       "justificativa": "Contabilidade social é tópico central de macroeconomia sem nó correspondente."
-    },
-    "economia|macroeconomia|contas nacionais no brasil": {
-      "hash": "ff9949ad83785740",
-      "justificativa": "Contas nacionais no Brasil é tópico técnico de macroeconomia sem nó equivalente."
-    },
-    "economia|macroeconomia|definicao de inflacao": {
-      "hash": "4c95f849558455c6",
-      "justificativa": "Definição de inflação é conceito teórico de macroeconomia sem nó correspondente."
-    },
-    "economia|macroeconomia|demanda de trabalho": {
-      "hash": "6b76e94981d50f61",
-      "justificativa": "Demanda de trabalho é tópico de macroeconomia do trabalho sem nó equivalente."
     },
     "economia|macroeconomia|economia aberta modelo is lm bp": {
       "hash": "76423f93978bd702",
@@ -260,109 +116,29 @@
       "hash": "b6e0ecceea8c097d",
       "justificativa": "Tópico amplo de economia internacional; N11 (atualidades/economia) não cobre conteúdo teórico de comércio exterior."
     },
-    "economia|macroeconomia|equilibrio no mercado de trabalho salarios e nivel de atividade": {
-      "hash": "b4508328ad8aee98",
-      "justificativa": "Equilíbrio no mercado de trabalho é tópico teórico de macroeconomia sem nó equivalente."
-    },
-    "economia|macroeconomia|erros e omissoes": {
-      "hash": "c826b230a204e0c8",
-      "justificativa": "Erros e omissões do balanço de pagamentos é detalhe de contabilidade nacional sem nó correspondente."
-    },
-    "economia|macroeconomia|fluxos financeiros internacionais e mercados de capitais": {
-      "hash": "f96bda7eb16580b5",
-      "justificativa": "Fluxos financeiros internacionais e mercados de capitais não são cobertos pelos candidatos; N48 é ordem constitucional, não teoria econômica."
-    },
-    "economia|macroeconomia|globalizacao e organismos multilaterais": {
-      "hash": "d64b294219d13106",
-      "justificativa": "Globalização e organismos multilaterais poderiam lembrar N12 (relações internacionais de atualidades), mas o contexto é teoria macroeconômica."
-    },
-    "economia|macroeconomia|identidades macroeconomicas basicas": {
-      "hash": "250d64359fa0f0ea",
-      "justificativa": "Identidades macroeconômicas básicas são conteúdo teórico de contabilidade nacional sem nó correspondente."
-    },
     "economia|macroeconomia|inflacao": {
       "hash": "e1ee3daab6cc1e74",
       "justificativa": "Tópico geral de inflação é teoria macroeconômica sem nó equivalente na lista."
-    },
-    "economia|macroeconomia|inflacao de custos": {
-      "hash": "859252bba415a214",
-      "justificativa": "Inflação de custos é tipologia teórica de inflação sem nó correspondente."
-    },
-    "economia|macroeconomia|inflacao de demanda": {
-      "hash": "d3b5a14f65f2c2f0",
-      "justificativa": "Inflação de demanda é tipologia teórica de inflação sem nó correspondente."
-    },
-    "economia|macroeconomia|inflacao inercial": {
-      "hash": "b0adb34cfb0b2f2c",
-      "justificativa": "Inflação inercial é tipologia teórica de inflação sem nó correspondente."
     },
     "economia|macroeconomia|mercado de trabalho": {
       "hash": "eda38098b7a9018a",
       "justificativa": "Mercado de trabalho como tópico macroeconômico não é coberto por candidato algum."
     },
-    "economia|macroeconomia|mobilidade de capitais": {
-      "hash": "5d4fff982f420a55",
-      "justificativa": "Mobilidade de capitais é conceito de economia aberta sem nó equivalente."
-    },
     "economia|macroeconomia|modelo is lm": {
       "hash": "9f3acb0d7be7d533",
       "justificativa": "Modelo IS-LM é modelo teórico central de macroeconomia sem nó correspondente."
-    },
-    "economia|macroeconomia|oferta de trabalho": {
-      "hash": "7e6ba4ccceeadd8a",
-      "justificativa": "Oferta de trabalho é tópico de macroeconomia do trabalho sem nó equivalente."
     },
     "economia|macroeconomia|oferta e demanda agregadas": {
       "hash": "1fd68bd2bafd4afa",
       "justificativa": "Oferta e demanda agregadas são conceitos centrais de macroeconomia sem nó correspondente."
     },
-    "economia|macroeconomia|politica economica e inflacao relacoes entre inflacao juros e o resultado fiscal": {
-      "hash": "5f56b4916356bddf",
-      "justificativa": "Teoria macroeconômica (inflação, juros, resultado fiscal) não é coberta por nenhum candidato; N18 é economia de atualidades, não teoria econômica."
-    },
     "economia|macroeconomia|politicas fiscal e monetaria": {
       "hash": "45850caf5ff3a96a",
       "justificativa": "Políticas fiscal e monetária como tópico de Macroeconomia não têm nó equivalente na lista."
     },
-    "economia|macroeconomia|principais agregados macroeconomicos": {
-      "hash": "c4d26d66a07704b1",
-      "justificativa": "Agregados macroeconômicos é conceito teórico de Macroeconomia sem candidato correspondente."
-    },
-    "economia|macroeconomia|produto renda e despesa agregados": {
-      "hash": "29e64b85bc4722ca",
-      "justificativa": "Produto, renda e despesa agregados é teoria macroeconômica não coberta pelos candidatos."
-    },
-    "economia|macroeconomia|reservas internacionais": {
-      "hash": "5e5c60cc92c9533f",
-      "justificativa": "Reservas internacionais é tópico de Macroeconomia/setor externo sem nó equivalente."
-    },
-    "economia|macroeconomia|reservas monetarias": {
-      "hash": "f77d9cb0f2cbcccd",
-      "justificativa": "Reservas monetárias é conceito de Macroeconomia não coberto pela lista."
-    },
-    "economia|macroeconomia|resultado do balanco de pagamentos": {
-      "hash": "879c4667b155aa30",
-      "justificativa": "Balanço de pagamentos é tópico de Macroeconomia sem candidato correspondente."
-    },
-    "economia|macroeconomia|salarios inflacao e desemprego": {
-      "hash": "7b50f351b7091ebc",
-      "justificativa": "Salários, inflação e desemprego é teoria macroeconômica não coberta pelos candidatos."
-    },
-    "economia|macroeconomia|sistema de contas nacionais": {
-      "hash": "992bea998ffd59d3",
-      "justificativa": "Sistema de contas nacionais é conceito de Macroeconomia sem nó equivalente."
-    },
-    "economia|macroeconomia|tarifas subsidios cotas": {
-      "hash": "5e0d1e9954401bab",
-      "justificativa": "Tarifas, subsídios e cotas é teoria de Microeconomia/intervenção estatal não coberta pela lista."
-    },
     "economia|macroeconomia|teoria keynesiana": {
       "hash": "a9738642b8286e70",
       "justificativa": "Teoria keynesiana é escola de pensamento macroeconômico sem candidato correspondente."
-    },
-    "economia|macroeconomia|transferencias unilaterais": {
-      "hash": "2ba7c1abdb24e980",
-      "justificativa": "Transferências unilaterais no contexto de Macroeconomia (balanço de pagamentos) não é transferência voluntária da LRF (N3) nem transferência arquivística (N17)."
     },
     "economia|microeconomia": {
       "hash": "754d0c141fa31c20",
@@ -376,117 +152,13 @@
       "hash": "fa2501b9a8b3bff5",
       "justificativa": "Análise de indústrias e da concorrência é organização industrial de Microeconomia, não fundamento de estratégia (N9) do edital de Administração."
     },
-    "economia|microeconomia|aplicacoes duopolio de cournot e duopolio de bertrand": {
-      "hash": "148cf6fc08ede172",
-      "justificativa": "Duopólios de Cournot e Bertrand são modelos teóricos de Microeconomia sem candidato correspondente."
-    },
-    "economia|microeconomia|bens de giffen": {
-      "hash": "8c86bf2c35adf980",
-      "justificativa": "Bens de Giffen é conceito teórico de Microeconomia não coberto pela lista."
-    },
-    "economia|microeconomia|bens inferiores e normais": {
-      "hash": "445062386ff0f15b",
-      "justificativa": "Bens inferiores e normais é teoria do consumidor de Microeconomia sem nó equivalente."
-    },
-    "economia|microeconomia|bens substitutos e bens complementares": {
-      "hash": "c7a955b744ea438d",
-      "justificativa": "Bens substitutos e complementares é teoria do consumidor de Microeconomia não coberta pelos candidatos."
-    },
     "economia|microeconomia|cadeias e redes produtivas": {
       "hash": "3214b433ef890f2a",
       "justificativa": "Cadeias e redes produtivas em Microeconomia não corresponde a cadeia de valor (N6) nem a cadeia de suprimentos (N13), que são conceitos de gestão."
     },
-    "economia|microeconomia|caixa de edgeworth": {
-      "hash": "973a52549b150353",
-      "justificativa": "Caixa de Edgeworth é modelo teórico de equilíbrio geral de Microeconomia sem candidato correspondente."
-    },
-    "economia|microeconomia|classificacao de bens de acordo com as elasticidades": {
-      "hash": "defe903682cf1595",
-      "justificativa": "Classificação de bens por elasticidades é teoria de Microeconomia não coberta pela lista."
-    },
     "economia|microeconomia|competitividade e estrategia empresarial": {
       "hash": "694228ce8cbdd58c",
       "justificativa": "Competitividade e estratégia empresarial em contexto de Microeconomia é enquadramento duvidoso frente aos nós de estratégia de Administração."
-    },
-    "economia|microeconomia|conceitos fundamentais": {
-      "hash": "4c6ee762267a8cb4",
-      "justificativa": "Conceitos fundamentais de Microeconomia não têm candidato correspondente; nós 'Conceito' existentes pertencem a outras disciplinas."
-    },
-    "economia|microeconomia|concorrencia imperfeita e preco premio": {
-      "hash": "f985994c05bb5a20",
-      "justificativa": "Concorrência imperfeita e preço-prêmio é teoria de Microeconomia sem nó equivalente."
-    },
-    "economia|microeconomia|concorrencia perfeita concorrencia imperfeita monopolio e oligopolio definicao e caracterizacao": {
-      "hash": "0a05b3db86632424",
-      "justificativa": "Estruturas de mercado (concorrência perfeita, monopólio, oligopólio) são teoria de Microeconomia não coberta pelos candidatos."
-    },
-    "economia|microeconomia|curva de demanda": {
-      "hash": "f8b997b95792c4d1",
-      "justificativa": "Curva de demanda é conceito de microeconomia; N14 (economia em Atualidades) trata de tópicos atuais, não teoria microeconômica."
-    },
-    "economia|microeconomia|curva de engel": {
-      "hash": "453ae88eeeb261fa",
-      "justificativa": "Curva de Engel é conceito específico de microeconomia não coberto pelos candidatos."
-    },
-    "economia|microeconomia|curva de oferta sob concorrencia perfeita e equilibrio medio marginal": {
-      "hash": "bdb13dbd3b2752e1",
-      "justificativa": "Curva de oferta e equilíbrio sob concorrência perfeita é teoria microeconômica sem nó equivalente."
-    },
-    "economia|microeconomia|curva de possibilidades de producao": {
-      "hash": "2cadf1c02323b219",
-      "justificativa": "Curva de possibilidades de produção é conceito de microeconomia não coberto pela lista."
-    },
-    "economia|microeconomia|curvas de indiferenca": {
-      "hash": "ad2c02ff52cc558a",
-      "justificativa": "Curvas de indiferença (teoria do consumidor) não têm nó candidato equivalente."
-    },
-    "economia|microeconomia|custos de longo prazo versus custos de curto prazo custos fixos e custos variaveis": {
-      "hash": "a680a5b0bc1711fb",
-      "justificativa": "Teoria dos custos de produção em microeconomia não corresponde aos nós de custos contábeis disponíveis."
-    },
-    "economia|microeconomia|custos de producao e linha de isocusto": {
-      "hash": "e90dccffe88ced7b",
-      "justificativa": "Custos de produção e isocusto são teoria microeconômica, distinta dos nós de custos contábeis."
-    },
-    "economia|microeconomia|definicoes basicas agentes jogadores acoes estrategia resultados payoffs": {
-      "hash": "b5e4ab62d274e5d8",
-      "justificativa": "Teoria dos jogos (agentes, ações, payoffs) é microeconomia sem nó candidato."
-    },
-    "economia|microeconomia|dilema dos prisioneiros": {
-      "hash": "dfcfb5d35456b33c",
-      "justificativa": "Dilema dos prisioneiros é conceito de teoria dos jogos/microeconomia não coberto."
-    },
-    "economia|microeconomia|dinamica de determinacao de precos e margem de lucro": {
-      "hash": "b521ca1706582172",
-      "justificativa": "Determinação de preços e margem de lucro em microeconomia não corresponde aos nós de custos disponíveis."
-    },
-    "economia|microeconomia|efeito da mudanca no preco de um bem sobre a receita total": {
-      "hash": "79a5ca24126fc200",
-      "justificativa": "Efeito de variação de preço sobre receita total é conceito de elasticidade em microeconomia sem nó."
-    },
-    "economia|microeconomia|efeito de tributos sobre o equilibrio e sobre os excedentes": {
-      "hash": "fe73099dd9cbc434",
-      "justificativa": "Efeitos de tributos sobre equilíbrio e excedentes é microeconomia (economia do bem-estar), não tributação contábil."
-    },
-    "economia|microeconomia|efeito renda e efeito substituicao": {
-      "hash": "c2b47ec36e659149",
-      "justificativa": "Efeito-renda e efeito-substituição são teoria do consumidor sem nó candidato."
-    },
-    "economia|microeconomia|elasticidade cruzada da demanda": {
-      "hash": "589ada6c8a592a55",
-      "justificativa": "Elasticidade cruzada da demanda é conceito microeconômico não coberto pela lista."
-    },
-    "economia|microeconomia|elasticidade preco da demanda e seus determinantes": {
-      "hash": "a25c0e12123bb557",
-      "justificativa": "Elasticidade-preço da demanda é teoria microeconômica sem nó equivalente."
-    },
-    "economia|microeconomia|elasticidade preco da oferta e seus determinantes": {
-      "hash": "28c08c8a6429f95b",
-      "justificativa": "Elasticidade-preço da oferta é conceito de microeconomia não coberto."
-    },
-    "economia|microeconomia|elasticidade renda da demanda": {
-      "hash": "47ba60ee7d818554",
-      "justificativa": "Elasticidade-renda da demanda é teoria do consumidor sem nó candidato."
     },
     "economia|microeconomia|elasticidades": {
       "hash": "07f92347e854c938",
@@ -496,45 +168,13 @@
       "hash": "ad877c72e29bf24c",
       "justificativa": "Equilíbrio de mercado é conceito central de microeconomia sem nó candidato."
     },
-    "economia|microeconomia|equilibrio de mercado sob monopolio": {
-      "hash": "8d8076abcc1cf450",
-      "justificativa": "Equilíbrio sob monopólio (estruturas de mercado) não é coberto pelos candidatos."
-    },
-    "economia|microeconomia|equilibrio de nash": {
-      "hash": "4b72b426914d3493",
-      "justificativa": "Equilíbrio de Nash é teoria dos jogos/microeconomia sem nó; N3-N9 tratam de estratégia organizacional."
-    },
-    "economia|microeconomia|equilibrio do consumidor": {
-      "hash": "af470f5df3ab0bc8",
-      "justificativa": "Equilíbrio do consumidor é teoria do consumidor em microeconomia sem nó."
-    },
-    "economia|microeconomia|equilibrio em estrategia dominante": {
-      "hash": "b58a8de57d941c50",
-      "justificativa": "Equilíbrio em estratégia dominante é teoria dos jogos sem nó candidato."
-    },
     "economia|microeconomia|equilibrio geral": {
       "hash": "a1e7cb38228ecfd5",
       "justificativa": "Equilíbrio geral é conceito de microeconomia não coberto pela lista."
     },
-    "economia|microeconomia|equilibrio perfeito em subjogos": {
-      "hash": "4129d5e88eb0f777",
-      "justificativa": "Equilíbrio perfeito em subjogos é teoria dos jogos avançada sem nó candidato."
-    },
-    "economia|microeconomia|equilibrio sob concorrencia perfeita preco de equilibrio e quantidade transacionada": {
-      "hash": "e07df60d59c26ef4",
-      "justificativa": "Microeconomia (equilíbrio de mercado) não é coberta pelos candidatos; N22 é atualidades, não teoria microeconômica."
-    },
     "economia|microeconomia|equilibrios": {
-      "hash": "07281823c3ae2b64",
-      "justificativa": "Equilíbrio de mercado em microeconomia não tem nó candidato."
-    },
-    "economia|microeconomia|equilibrios minimax e maximin": {
-      "hash": "0325fa431bf2023a",
-      "justificativa": "Teoria dos jogos (minimax/maximin) não coberta pelos candidatos."
-    },
-    "economia|microeconomia|estrategias mistas": {
-      "hash": "99c4905c7fb0daea",
-      "justificativa": "Estratégias mistas em teoria dos jogos não tem nó candidato."
+      "hash": "d03e9069325803e6",
+      "justificativa": "Título genérico 'Equilíbrios' não permite saber se trata de equilíbrio de mercado, geral, do consumidor ou do produtor."
     },
     "economia|microeconomia|estruturas de mercado": {
       "hash": "0a3e051d64b1f697",
@@ -543,98 +183,6 @@
     "economia|microeconomia|excedente do consumidor e excedente do produtor": {
       "hash": "94ca5534792de026",
       "justificativa": "Excedente do consumidor/produtor não tem nó candidato."
-    },
-    "economia|microeconomia|fatores de producao": {
-      "hash": "9be133ebd692db78",
-      "justificativa": "Fatores de produção em microeconomia não coberto."
-    },
-    "economia|microeconomia|formas de organizacao da atividade economica laissez faire intervencionismo economia planificada": {
-      "hash": "30925d1f6c0bffee",
-      "justificativa": "Formas de organização da atividade econômica poderia lembrar N2, mas N2 é intervenção da administração na economia em finanças públicas, não microeconomia."
-    },
-    "economia|microeconomia|funcao custo total custo medio e custo marginal": {
-      "hash": "d95cbded73104741",
-      "justificativa": "Funções de custo em microeconomia não cobertas; N38 é terminologia de custos em contabilidade pública."
-    },
-    "economia|microeconomia|funcao de producao": {
-      "hash": "c0a79234fd2ada89",
-      "justificativa": "Função de produção é microeconomia, sem nó candidato."
-    },
-    "economia|microeconomia|isoquantas": {
-      "hash": "3859222e096a813a",
-      "justificativa": "Isoquantas é microeconomia, sem nó candidato."
-    },
-    "economia|microeconomia|jogos cooperativos e jogos de soma zero": {
-      "hash": "5cd34586f7580029",
-      "justificativa": "Teoria dos jogos cooperativos não coberta."
-    },
-    "economia|microeconomia|jogos repetidos": {
-      "hash": "b26dcbafeea60d50",
-      "justificativa": "Jogos repetidos não coberto."
-    },
-    "economia|microeconomia|jogos simultaneos e jogos sequenciais": {
-      "hash": "a728836b6f491b09",
-      "justificativa": "Jogos simultâneos e sequenciais não cobertos."
-    },
-    "economia|microeconomia|lei dos rendimentos decrescentes e rendimentos de escala": {
-      "hash": "51763fc9e4eae68d",
-      "justificativa": "Rendimentos decrescentes e de escala é microeconomia, sem nó."
-    },
-    "economia|microeconomia|maximizacao de lucro": {
-      "hash": "000a22294c6151b4",
-      "justificativa": "Maximização de lucro é microeconomia, sem nó."
-    },
-    "economia|microeconomia|minimizacao de custos": {
-      "hash": "2d412dd02134e449",
-      "justificativa": "Minimização de custos é microeconomia, sem nó."
-    },
-    "economia|microeconomia|mudancas de equilibrio": {
-      "hash": "48cd72d06ea89358",
-      "justificativa": "Mudanças de equilíbrio de mercado não cobertas."
-    },
-    "economia|microeconomia|oligopolios e cartelizacao": {
-      "hash": "32350f9f02305ee4",
-      "justificativa": "Oligopólios e cartelização é microeconomia, sem nó."
-    },
-    "economia|microeconomia|otimo de pareto e melhoria de pareto": {
-      "hash": "9012e334bd50903c",
-      "justificativa": "Ótimo de Pareto é microeconomia/bem-estar, sem nó."
-    },
-    "economia|microeconomia|papel dos precos": {
-      "hash": "0cc168bf3cafe464",
-      "justificativa": "Papel dos preços é microeconomia, sem nó."
-    },
-    "economia|microeconomia|perdas de excedente peso morto": {
-      "hash": "10e838214a1797db",
-      "justificativa": "Peso morto é microeconomia, sem nó."
-    },
-    "economia|microeconomia|politicas de fixacao de precos": {
-      "hash": "a21ecea1fb743766",
-      "justificativa": "Políticas de fixação de preços é microeconomia, sem nó."
-    },
-    "economia|microeconomia|preco maximo e preco minimo": {
-      "hash": "bf34c1d40ac47aa9",
-      "justificativa": "Preço máximo e mínimo é microeconomia, sem nó."
-    },
-    "economia|microeconomia|preferencias e funcao utilidade": {
-      "hash": "aaeb9a56bfa27104",
-      "justificativa": "Preferências e função utilidade é microeconomia, sem nó."
-    },
-    "economia|microeconomia|primeiro teorema da economia do bem estar": {
-      "hash": "eed59119be41cb54",
-      "justificativa": "Teoremas do bem-estar são teoria microeconômica, não tópicos atuais de economia (N6)."
-    },
-    "economia|microeconomia|producao de longo prazo versus producao de curto prazo produto medio e produtividade marginal": {
-      "hash": "ba3f4b4b3dc5c1bd",
-      "justificativa": "Teoria da produção de curto/longo prazo é microeconomia teórica, não coberta por N6 (economia atual)."
-    },
-    "economia|microeconomia|restricao orcamentaria": {
-      "hash": "61b84c7714f0753e",
-      "justificativa": "Restrição orçamentária do consumidor é conceito de microeconomia, distinto de orçamento público (N1-N5)."
-    },
-    "economia|microeconomia|segundo teorema da economia do bem estar": {
-      "hash": "d022680509a6cbb1",
-      "justificativa": "Segundo teorema do bem-estar é conceito de microeconomia teórica, sem nó equivalente na lista."
     },
     "economia|microeconomia|teoria da demanda": {
       "hash": "bb7ce6d392fa8c16",
@@ -648,65 +196,45 @@
       "hash": "65c18457f8268719",
       "justificativa": "Teoria dos jogos é ramo teórico da microeconomia, não coberto por N6 (economia de atualidades)."
     },
-    "economia|microeconomia|trocas": {
-      "hash": "74da162f60fab1b3",
-      "justificativa": "Trocas (economia do bem-estar/microeconomia) não é coberto por nenhum candidato."
-    },
-    "estatuto da crianca e do adolescente": {
-      "hash": "e6f2380c399a408e",
-      "justificativa": "Sem contexto de disciplina, o ECA pode apontar para Serviço Social (N49) ou Direito Penal (N21); ambíguo."
-    },
     "gestao de produtos|produtos|design de produto": {
-      "hash": "79e0b143ed1fe743",
-      "justificativa": "design de produto é conceito próprio sem candidato equivalente na lista"
+      "hash": "c52d40e8ebe520bb",
+      "justificativa": "Design de Produto é conceito próprio sem candidato equivalente; nós de UX, prototipação ou ciclo de vida não cobrem o tema como um todo."
     },
-    "nocoes de financas publicas|indicadores financeiros fundamentos e principais indices e taxas": {
-      "hash": "53d6dab3a7555a6d",
-      "justificativa": "Indicadores financeiros/índices e taxas não cobertos pelos candidatos."
+    "nocoes de economia|economia brasileira|indicadores de desenvolvimento economico e social brasileiro contemporaneo": {
+      "hash": "a20480afbce2db98",
+      "justificativa": "Indicadores de desenvolvimento econômico e social não correspondem a nenhum candidato listado."
     },
     "raciocinio logico e matematico|conjuntos numericos numeros inteiros racionais e reais": {
-      "hash": "fbaa2cbff3f0f925",
-      "justificativa": "Conjuntos numéricos (inteiros, racionais, reais) é conceito matemático distinto de operações com conjuntos (N14), não coberto pelos candidatos"
+      "hash": "b62491bd89501a48",
+      "justificativa": "Conjuntos numéricos (inteiros, racionais, reais) é classificação de números, não operações com conjuntos; N14 trata de outro conceito."
     },
     "raciocinio logico e matematico|equacoes e inequacoes de 1o e de 2o graus": {
-      "hash": "1d3aab26f1c4857a",
-      "justificativa": "Equações e inequações de 1º e 2º graus não correspondem a nenhum candidato de Raciocínio Lógico"
+      "hash": "e69c5de9b171ee17",
+      "justificativa": "Equações e inequações de 1º e 2º graus é conteúdo matemático que nenhum candidato cobre."
     },
     "raciocinio logico e matematico|funcoes e graficos": {
-      "hash": "d63c5cc029b6910a",
-      "justificativa": "Funções e gráficos matemáticos não são cobertos por nenhum candidato"
+      "hash": "e4e69930a687899f",
+      "justificativa": "Funções e gráficos (estudo de funções) não corresponde a gráficos e tabelas de dados de N1 nem a qualquer outro nó."
     },
     "raciocinio logico e matematico|progressoes aritmeticas e geometricas": {
-      "hash": "f50cbc5cb1b5066b",
-      "justificativa": "Progressões aritméticas e geométricas não são cobertas por nenhum candidato"
+      "hash": "842348e0979eb62b",
+      "justificativa": "Progressões aritméticas e geométricas não é coberto por nenhum candidato de Raciocínio Lógico."
     },
     "raciocinio logico e matematico|sistema legal de medidas": {
-      "hash": "8a6dd994cf4e9f52",
-      "justificativa": "Sistema legal de medidas não é coberto por nenhum candidato"
+      "hash": "c1c9ef09909dbfae",
+      "justificativa": "Sistema legal de medidas (unidades de medida) não tem nó correspondente na lista."
     },
     "raciocinio logico e matematico|sistemas lineares": {
-      "hash": "c72c4e8d1e6ce0a0",
-      "justificativa": "Sistemas lineares não são cobertos por nenhum candidato"
-    },
-    "tecnologia da informacao|arquitetura e engenharia de software|conceitos basicos sobre engenharia de software": {
-      "hash": "7f980275850ae8fd",
-      "justificativa": "Conceitos básicos de engenharia de software não têm nó equivalente; N71 trata de processos/gestão, não de fundamentos gerais."
-    },
-    "tecnologia da informacao|arquitetura e engenharia de software|disciplinas de engenharia de software": {
-      "hash": "79759c48b58b518d",
-      "justificativa": "Disciplinas/áreas da engenharia de software não são cobertas por nenhum candidato."
+      "hash": "7cb3009f9650cc8b",
+      "justificativa": "Sistemas lineares é conteúdo de matemática que nenhum candidato cobre."
     },
     "tecnologia da informacao|arquitetura e engenharia de software|qualidade de software isso iec 9126 metricas de qualidade de software": {
-      "hash": "8af706f16c1701d7",
-      "justificativa": "Qualidade de software (ISO/IEC 9126, métricas) não possui nó correspondente na lista."
+      "hash": "6556e3f6d8ec7ac6",
+      "justificativa": "Qualidade de software e ISO/IEC 9126 não têm nó específico; o pai foi apenas proposto, não confirmado, e a herança não é permitida."
     },
     "tecnologia da informacao|contratacoes gestao e fiscalizacao de contratos administrativos especializados em tic|decreto estadual no 10 086 2022 titulo v da tecnologia da informacao e de comunicacao arts 646 a 657": {
-      "hash": "f795b84ac9875446",
-      "justificativa": "Legislação estadual específica de TIC não tem nó correspondente entre os candidatos."
-    },
-    "tecnologia da informacao|infraestrutura de tic|redes de computadores": {
-      "hash": "b373a4397bc8f2da",
-      "justificativa": "Item genérico que nomeia a disciplina inteira; nenhum candidato equivale ao conceito amplo."
+      "hash": "1bde72661aa246c8",
+      "justificativa": "Decreto estadual específico de TIC sem nó correspondente; pai apenas proposto"
     }
   },
   "propostos": {
@@ -820,6 +348,14 @@
       "no": "A-2c9c7eb394",
       "nos": [
         "A-2c9c7eb394"
+      ]
+    },
+    "administracao publica|governabilidade e governanca|intermediacao de interesses clientelismo corporativismo e neocorporativismo": {
+      "confianca": "baixa",
+      "justificativa": "subtópico de governabilidade/governança pública; N16 é o mais próximo, mas enquadramento duvidoso",
+      "no": "S-f797302b7a",
+      "nos": [
+        "S-f797302b7a"
       ]
     },
     "administracao publica|indicadores de desempenho": {
@@ -1016,6 +552,14 @@
       "no": "S-1e3bfe8c59",
       "nos": [
         "S-1e3bfe8c59"
+      ]
+    },
+    "administracao|evolucao da administracao|processos participativos de gestao publica": {
+      "confianca": "media",
+      "justificativa": "Item é o tópico que contém N89 (orçamento participativo), único nó do tema de processos participativos.",
+      "no": "S-81ba4580e0",
+      "nos": [
+        "S-81ba4580e0"
       ]
     },
     "administracao|evolucao da administracao|qualidade na administracao publica": {
@@ -2105,6 +1649,14 @@
         "S-7052d4368b"
       ]
     },
+    "direito administrativo|agentes publicos especies e classificacao|titulos iii e iv do regime juridico dos funcionarios civis do poder executivo do estado do parana lei estadual no 6 174 1970": {
+      "confianca": "media",
+      "justificativa": "Regime jurídico de servidores estaduais enquadra-se em regime jurídico dos servidores públicos",
+      "no": "SL-f7dc270f3c",
+      "nos": [
+        "SL-f7dc270f3c"
+      ]
+    },
     "direito administrativo|atos administrativos|ato administrativo inexistente": {
       "confianca": "alta",
       "justificativa": "ato inexistente integra o nó de nulidades",
@@ -2193,6 +1745,14 @@
         "S-6544a78fea"
       ]
     },
+    "direito administrativo|atos administrativos|o silencio no direito administrativo": {
+      "confianca": "media",
+      "justificativa": "Silêncio administrativo é aspecto do ato/processo administrativo sem nó mais específico",
+      "no": "A-eb4a85393a",
+      "nos": [
+        "A-eb4a85393a"
+      ]
+    },
     "direito administrativo|atos administrativos|revogacao anulacao e convalidacao do ato administrativo": {
       "confianca": "alta",
       "justificativa": "Revogação, anulação e convalidação são exatamente o conteúdo do nó N25.",
@@ -2207,6 +1767,14 @@
       "no": "S-d4f9eafeef",
       "nos": [
         "S-d4f9eafeef"
+      ]
+    },
+    "direito administrativo|atos administrativos|teoria dos motivos determinantes": {
+      "confianca": "media",
+      "justificativa": "Teoria dos motivos determinantes é tema do ato administrativo sem subassunto próprio",
+      "no": "A-eb4a85393a",
+      "nos": [
+        "A-eb4a85393a"
       ]
     },
     "direito administrativo|atos administrativos|validade eficacia e autoexecutoriedade do ato administrativo": {
@@ -2354,6 +1922,14 @@
         "S-b34d4b1874"
       ]
     },
+    "direito administrativo|processo administrativo|lei estadual no 20 656 2021": {
+      "confianca": "baixa",
+      "justificativa": "Lei estadual de processo administrativo é o análogo estadual do processo administrativo federal",
+      "no": "AL-fe35b41dc5",
+      "nos": [
+        "AL-fe35b41dc5"
+      ]
+    },
     "direito constitucional|constituicao|mutacao constitucional": {
       "confianca": "media",
       "justificativa": "Mutação constitucional é tratada como fenômeno ligado à interpretação das normas constitucionais.",
@@ -2475,8 +2051,8 @@
       ]
     },
     "direito tributario|codigo tributario nacional": {
-      "confianca": "alta",
-      "justificativa": "CTN é a Lei nº 5.172/1966, subassunto de Direito Financeiro e Tributário.",
+      "confianca": "media",
+      "justificativa": "CTN é a Lei nº 5.172/1966, que o nó N31 cobre como Sistema Tributário Nacional.",
       "no": "S-1cb6537d7f",
       "nos": [
         "S-1cb6537d7f"
@@ -2491,16 +2067,16 @@
       ]
     },
     "direito tributario|codigo tributario nacional|norma tributaria especies vigencia e aplicacao interpretacao e integracao natureza": {
-      "confianca": "media",
-      "justificativa": "norma tributária é matéria do CTN, mapeado para Lei 5.172/1966",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "N21 trata exatamente de vigência, aplicação, interpretação e integração da legislação tributária",
+      "no": "NS-f217cec358",
       "nos": [
-        "S-1cb6537d7f"
+        "NS-f217cec358"
       ]
     },
     "direito tributario|codigo tributario nacional|normas gerais de direito tributario": {
       "confianca": "media",
-      "justificativa": "normas gerais de direito tributário correspondem ao CTN",
+      "justificativa": "normas gerais de direito tributário correspondem ao CTN/Lei 5.172/1966",
       "no": "S-1cb6537d7f",
       "nos": [
         "S-1cb6537d7f"
@@ -2515,11 +2091,11 @@
       ]
     },
     "direito tributario|credito tributario|conceito": {
-      "confianca": "baixa",
-      "justificativa": "conceito de crédito tributário sem nó específico; assunto genérico mais próximo",
-      "no": "A-1b9a725b23",
+      "confianca": "alta",
+      "justificativa": "subtópico 'conceito' do crédito tributário herda o nó do pai mapeado",
+      "no": "NS-045ccbff61",
       "nos": [
-        "A-1b9a725b23"
+        "NS-045ccbff61"
       ]
     },
     "direito tributario|credito tributario|lancamento e suas modalidades": {
@@ -2564,7 +2140,7 @@
     },
     "direito tributario|direito tributario conceito e principios": {
       "confianca": "baixa",
-      "justificativa": "Conceito e princípios de direito tributário sem nó específico; nó genérico da disciplina.",
+      "justificativa": "Conceito e princípios de direito tributário enquadram-se no assunto Direito Financeiro e Tributário, pai já mapeado. [revisar: repete o nó do pai; o filho \"Crédito tributário\" parece mais específico]",
       "no": "A-1b9a725b23",
       "nos": [
         "A-1b9a725b23"
@@ -2595,11 +2171,11 @@
       ]
     },
     "direito tributario|obrigacao tributaria|conceito": {
-      "confianca": "media",
-      "justificativa": "conceito de obrigação tributária é parte do tópico pai mapeado para N16",
-      "no": "A-1b9a725b23",
+      "confianca": "alta",
+      "justificativa": "subtópico 'conceito' da obrigação tributária herda o nó do pai mapeado",
+      "no": "NS-f085595958",
       "nos": [
-        "A-1b9a725b23"
+        "NS-f085595958"
       ]
     },
     "direito tributario|obrigacao tributaria|domicilio tributario": {
@@ -2692,18 +2268,19 @@
     },
     "direito tributario|tributos": {
       "confianca": "media",
-      "justificativa": "Tributos: conceito e espécies conforme CTN (Lei 5.172/1966).",
-      "no": "S-1cb6537d7f",
+      "justificativa": "Item composto: espécies de tributos em N110 e impostos da União/estados/municípios em N117.",
+      "no": "A-f826c2b177",
       "nos": [
-        "S-1cb6537d7f"
+        "A-f826c2b177",
+        "S-4a716c73bb"
       ]
     },
     "direito tributario|tributos|conceito e especies": {
       "confianca": "media",
-      "justificativa": "conceito e espécies de tributos são tratados pela Lei 5.172/1966, pai já mapeado para N19",
-      "no": "S-1cb6537d7f",
+      "justificativa": "conceito e espécies de tributos é o próprio tema do nó tributos; não se herda a proposta não confirmada do pai",
+      "no": "A-f826c2b177",
       "nos": [
-        "S-1cb6537d7f"
+        "A-f826c2b177"
       ]
     },
     "direito tributario|tributos|contribuicao de melhoria": {
@@ -2715,51 +2292,155 @@
       ]
     },
     "direito tributario|tributos|impostos": {
-      "confianca": "media",
-      "justificativa": "impostos como espécie tributária são tratados no CTN, pai mapeado para N19",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "impostos como espécie tributária está coberto pelo nó impostos, taxas e contribuições",
+      "no": "S-c582d93e13",
       "nos": [
-        "S-1cb6537d7f"
+        "S-c582d93e13"
       ]
     },
     "direito tributario|tributos|impostos da uniao": {
-      "confianca": "media",
-      "justificativa": "impostos da União são parte do Sistema Tributário Nacional do CTN, pai mapeado para N19",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "impostos da União é exatamente o conteúdo do nó sobre impostos da União, estados e municípios",
+      "no": "S-4a716c73bb",
       "nos": [
-        "S-1cb6537d7f"
+        "S-4a716c73bb"
       ]
     },
     "direito tributario|tributos|impostos dos estados e do distrito federal": {
-      "confianca": "media",
-      "justificativa": "impostos estaduais e do DF são parte do Sistema Tributário Nacional do CTN, pai mapeado para N19",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "impostos estaduais e do DF integram o nó que trata dos impostos repartidos por ente federativo",
+      "no": "S-4a716c73bb",
       "nos": [
-        "S-1cb6537d7f"
+        "S-4a716c73bb"
       ]
     },
     "direito tributario|tributos|impostos dos municipios": {
-      "confianca": "media",
-      "justificativa": "impostos municipais são parte do Sistema Tributário Nacional do CTN, pai mapeado para N19",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "impostos municipais integram o nó que trata dos impostos da União, estados e municípios",
+      "no": "S-4a716c73bb",
       "nos": [
-        "S-1cb6537d7f"
+        "S-4a716c73bb"
       ]
     },
     "direito tributario|tributos|imunidades": {
-      "confianca": "baixa",
-      "justificativa": "imunidades são matéria constitucional, mas o pai já foi mapeado para N19, que abrange o tema no contexto do edital",
-      "no": "S-1cb6537d7f",
+      "confianca": "media",
+      "justificativa": "imunidades tributárias é subtema clássico das limitações constitucionais ao poder de tributar",
+      "no": "S-0f96fb53c2",
       "nos": [
-        "S-1cb6537d7f"
+        "S-0f96fb53c2"
       ]
     },
     "direito tributario|tributos|taxas": {
-      "confianca": "media",
-      "justificativa": "taxas são espécie tributária prevista no CTN, pai mapeado para N19",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "taxas como espécie tributária está coberto pelo nó impostos, taxas e contribuições",
+      "no": "S-c582d93e13",
       "nos": [
-        "S-1cb6537d7f"
+        "S-c582d93e13"
+      ]
+    },
+    "economia|economia brasileira|aspectos gerais do comportamento recente da economia brasileira e das politicas economicas adotadas pelos ultimos governos": {
+      "confianca": "alta",
+      "justificativa": "Comportamento recente da economia e políticas econômicas de governos recentes = política econômica recente.",
+      "no": "NS-e385b97d53",
+      "nos": [
+        "NS-e385b97d53"
+      ]
+    },
+    "economia|economia brasileira|cambio reservas e relacoes comerciais e financeiras do brasil com o resto do mundo": {
+      "confianca": "alta",
+      "justificativa": "Câmbio, reservas e relações comerciais com o exterior = setor externo brasileiro.",
+      "no": "NS-a6e16341d6",
+      "nos": [
+        "NS-a6e16341d6"
+      ]
+    },
+    "economia|economia brasileira|desigualdades pessoais e espaciais de renda e de riqueza": {
+      "confianca": "alta",
+      "justificativa": "Desigualdades de renda e riqueza = mercado de trabalho, renda e desigualdade no Brasil.",
+      "no": "NS-a110451208",
+      "nos": [
+        "NS-a110451208"
+      ]
+    },
+    "economia|economia brasileira|estrutura orcamentaria e evolucao do deficit e da divida publica brasileiros": {
+      "confianca": "alta",
+      "justificativa": "Déficit e dívida pública brasileiros = finanças públicas brasileiras.",
+      "no": "NS-d3b21bdec9",
+      "nos": [
+        "NS-d3b21bdec9"
+      ]
+    },
+    "economia|economia brasileira|estrutura tributaria brasileira": {
+      "confianca": "media",
+      "justificativa": "Estrutura tributária brasileira coberta por finanças públicas brasileiras (tributação).",
+      "no": "NS-d3b21bdec9",
+      "nos": [
+        "NS-d3b21bdec9"
+      ]
+    },
+    "economia|economia brasileira|indicadores de desenvolvimento economico e social brasileiro contemporaneo": {
+      "confianca": "baixa",
+      "justificativa": "Indicadores de desenvolvimento econômico e social brasileiro: sem nó específico, herda o pai Economia brasileira.",
+      "no": "NA-398967b7ab",
+      "nos": [
+        "NA-398967b7ab"
+      ]
+    },
+    "economia|economia brasileira|mercado de trabalho e condicoes de emprego e renda": {
+      "confianca": "alta",
+      "justificativa": "Mercado de trabalho, emprego e renda no Brasil.",
+      "no": "NS-a110451208",
+      "nos": [
+        "NS-a110451208"
+      ]
+    },
+    "economia|economia brasileira|mudancas estruturais da economia brasileira a partir da aceleracao dos processos de industrializacao e urbanizacao": {
+      "confianca": "alta",
+      "justificativa": "Industrialização e mudanças estruturais da economia brasileira.",
+      "no": "NS-18bf1ea02d",
+      "nos": [
+        "NS-18bf1ea02d"
+      ]
+    },
+    "economia|economia brasileira|perfil demografico brasileiro": {
+      "confianca": "baixa",
+      "justificativa": "Perfil demográfico não tem nó específico; herda Economia brasileira.",
+      "no": "NA-398967b7ab",
+      "nos": [
+        "NA-398967b7ab"
+      ]
+    },
+    "economia|economia brasileira|planos de desenvolvimento mais importantes desde a segunda metade do seculo xx": {
+      "confianca": "alta",
+      "justificativa": "Planos de desenvolvimento = industrialização, mudanças estruturais e planos de desenvolvimento.",
+      "no": "NS-18bf1ea02d",
+      "nos": [
+        "NS-18bf1ea02d"
+      ]
+    },
+    "economia|economia brasileira|previdencia social e suas perspectivas": {
+      "confianca": "media",
+      "justificativa": "Previdência social como tema de finanças públicas brasileiras.",
+      "no": "NS-d3b21bdec9",
+      "nos": [
+        "NS-d3b21bdec9"
+      ]
+    },
+    "economia|economia brasileira|principais caracteristicas e resultados dos planos de estabilizacao a partir da decada de 80 do seculo xx": {
+      "confianca": "alta",
+      "justificativa": "Planos de estabilização e inflação no Brasil.",
+      "no": "NS-7583fa0478",
+      "nos": [
+        "NS-7583fa0478"
+      ]
+    },
+    "economia|economia do estado do parana": {
+      "confianca": "alta",
+      "justificativa": "Título idêntico ao subassunto Economia do Paraná.",
+      "no": "NS-a9b73c61a9",
+      "nos": [
+        "NS-a9b73c61a9"
       ]
     },
     "economia|economia do setor publico": {
@@ -2772,42 +2453,42 @@
     },
     "economia|economia do setor publico|assimetria de informacoes": {
       "confianca": "media",
-      "justificativa": "Assimetria de informação é falha de mercado que justifica a intervenção do Estado, coberta pelo nó do pai mapeado.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Assimetria de informação é falha de mercado tratada no papel do Estado na sua solução.",
+      "no": "NS-6ea2a46e07",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-6ea2a46e07"
       ]
     },
     "economia|economia do setor publico|bens publicos": {
       "confianca": "media",
-      "justificativa": "Bens públicos fundamentam a intervenção estatal na economia, conceito do nó pai mapeado.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Bens públicos são falha de mercado clássica; nó mais próximo.",
+      "no": "NS-6ea2a46e07",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-6ea2a46e07"
       ]
     },
     "economia|economia do setor publico|contabilidade fiscal": {
       "confianca": "media",
-      "justificativa": "Contabilidade fiscal é detalhe do tema economia do setor público; sem candidato mais específico, herda o nó do pai.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Contabilidade fiscal trata de déficit e dívida pública.",
+      "no": "NS-baef1b747a",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-baef1b747a"
       ]
     },
     "economia|economia do setor publico|definicao e tipos de tributos": {
-      "confianca": "media",
-      "justificativa": "Definição e tipos de tributos são tratados no Sistema Tributário Nacional (CTN), único candidato que cobre o conceito.",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "Definição e tipos de tributos = tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "S-1cb6537d7f"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|estado regulador e produtor": {
       "confianca": "media",
-      "justificativa": "Estado regulador e produtor é forma de intervenção da administração na economia.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Estado regulador e produtor = participação do setor público na atividade econômica.",
+      "no": "NS-7a94d3edae",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-7a94d3edae"
       ]
     },
     "economia|economia do setor publico|evolucao da participacao do setor publico na atividade economica": {
@@ -2819,11 +2500,11 @@
       ]
     },
     "economia|economia do setor publico|externalidades": {
-      "confianca": "media",
-      "justificativa": "Externalidades são falha de mercado que justifica intervenção estatal, conceito do nó pai.",
-      "no": "SL-2a5673cf57",
+      "confianca": "alta",
+      "justificativa": "Externalidades são falhas de mercado.",
+      "no": "NS-6ea2a46e07",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-6ea2a46e07"
       ]
     },
     "economia|economia do setor publico|falhas de mercado e papel do estado na sua solucao": {
@@ -2836,66 +2517,66 @@
     },
     "economia|economia do setor publico|financas publicas no brasil a partir dos anos 1980": {
       "confianca": "media",
-      "justificativa": "Evolução das finanças públicas é detalhe do tema intervenção do Estado na economia; herda o nó do pai.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Finanças públicas no Brasil a partir dos anos 1980 = finanças públicas brasileiras.",
+      "no": "NS-d3b21bdec9",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-d3b21bdec9"
       ]
     },
     "economia|economia do setor publico|funcao estabilizadora alocativa e distributiva": {
-      "confianca": "media",
-      "justificativa": "Funções alocativa, distributiva e estabilizadora são as dimensões clássicas da atuação do governo na economia.",
-      "no": "SL-2a5673cf57",
+      "confianca": "alta",
+      "justificativa": "Funções estabilizadora, alocativa e distributiva = funções econômicas governamentais.",
+      "no": "NS-ddcaa01543",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-ddcaa01543"
       ]
     },
     "economia|economia do setor publico|imposto sobre patrimonio": {
-      "confianca": "media",
-      "justificativa": "Impostos sobre patrimônio são tipificados no Sistema Tributário Nacional (CTN).",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "Imposto sobre patrimônio é tema de tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "S-1cb6537d7f"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|imposto sobre renda": {
-      "confianca": "media",
-      "justificativa": "Imposto sobre renda é tributo regulado pelo Sistema Tributário Nacional (CTN).",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "Imposto sobre renda é tema de tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "S-1cb6537d7f"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|imposto sobre valor agregado iva": {
-      "confianca": "media",
-      "justificativa": "Tributos sobre valor agregado integram o Sistema Tributário Nacional (CTN).",
-      "no": "S-1cb6537d7f",
+      "confianca": "alta",
+      "justificativa": "IVA é tema de tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "S-1cb6537d7f"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|imposto unitario e imposto ad valorem": {
-      "confianca": "baixa",
-      "justificativa": "Classificação econômica de tributos (unitário vs ad valorem) é teoria tributária; sem candidato específico, herda o nó do pai.",
-      "no": "SL-2a5673cf57",
+      "confianca": "alta",
+      "justificativa": "Tipos de imposto (unitário e ad valorem) = tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|impostos regressivos e progressivos": {
-      "confianca": "baixa",
-      "justificativa": "Regressividade e progressividade são conceitos de teoria tributária; sem candidato específico, herda o nó do pai.",
-      "no": "SL-2a5673cf57",
+      "confianca": "alta",
+      "justificativa": "Progressividade e regressividade de impostos = tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|inflacao crescimento e funcao estabilizadora do estado": {
       "confianca": "media",
-      "justificativa": "Função estabilizadora do Estado perante inflação e crescimento é dimensão da intervenção na economia.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Função estabilizadora do Estado é uma das funções econômicas governamentais tratadas em N13.",
+      "no": "NS-ddcaa01543",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-ddcaa01543"
       ]
     },
     "economia|economia do setor publico|necessidade de financiamento do setor publico nfsp": {
@@ -2908,18 +2589,18 @@
     },
     "economia|economia do setor publico|necessidades publicas e formas de atuacao dos governos": {
       "confianca": "media",
-      "justificativa": "Necessidades públicas e formas de atuação dos governos correspondem às formas de intervenção estatal.",
-      "no": "SL-2a5673cf57",
+      "justificativa": "Necessidades públicas e formas de atuação do governo correspondem ao papel do Estado e suas funções econômicas.",
+      "no": "NS-ddcaa01543",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-ddcaa01543"
       ]
     },
     "economia|economia do setor publico|neutralidade tributaria": {
-      "confianca": "baixa",
-      "justificativa": "Neutralidade tributária é conceito de teoria econômica dos tributos; sem candidato específico, herda o nó do pai.",
-      "no": "SL-2a5673cf57",
+      "confianca": "alta",
+      "justificativa": "Neutralidade tributária é conceito do tema Tributação.",
+      "no": "NS-6c0ae64ead",
       "nos": [
-        "SL-2a5673cf57"
+        "NS-6c0ae64ead"
       ]
     },
     "economia|economia do setor publico|o estado e as funcoes economicas governamentais": {
@@ -2960,6 +2641,793 @@
       "no": "S-1cb6537d7f",
       "nos": [
         "S-1cb6537d7f"
+      ]
+    },
+    "economia|macroeconomia|agregados monetarios": {
+      "confianca": "alta",
+      "justificativa": "Agregados monetários são parte de Moeda e sistema monetário.",
+      "no": "NS-23536d9e53",
+      "nos": [
+        "NS-23536d9e53"
+      ]
+    },
+    "economia|macroeconomia|analises de equilibrio nos modelos de economia fechada e economia aberta": {
+      "confianca": "media",
+      "justificativa": "Item composto: equilíbrio em economia fechada (IS-LM) e aberta (IS-LM-BP).",
+      "no": "NS-0236d87ad5",
+      "nos": [
+        "NS-0236d87ad5",
+        "NS-ffa15886b2"
+      ]
+    },
+    "economia|macroeconomia|as contas do sistema monetario": {
+      "confianca": "media",
+      "justificativa": "Contas do sistema monetário integram o tema Moeda e sistema monetário.",
+      "no": "NS-23536d9e53",
+      "nos": [
+        "NS-23536d9e53"
+      ]
+    },
+    "economia|macroeconomia|autoridade monetaria e oferta de moeda": {
+      "confianca": "alta",
+      "justificativa": "Autoridade monetária e oferta de moeda são conteúdo de Moeda e sistema monetário.",
+      "no": "NS-23536d9e53",
+      "nos": [
+        "NS-23536d9e53"
+      ]
+    },
+    "economia|macroeconomia|balanca comercial": {
+      "confianca": "alta",
+      "justificativa": "Balança comercial é componente do Balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|balanca de bens e servicos": {
+      "confianca": "alta",
+      "justificativa": "Balança de bens e serviços é componente do Balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|balanca de capital": {
+      "confianca": "alta",
+      "justificativa": "Balança de capital é componente do Balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|balanca de rendimentos": {
+      "confianca": "alta",
+      "justificativa": "Balança de rendimentos é componente do Balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|balanca de transacoes correntes": {
+      "confianca": "alta",
+      "justificativa": "Transações correntes são parte do Balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|balanca financeira": {
+      "confianca": "alta",
+      "justificativa": "Balança financeira (conta capital e financeira) é parte do Balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|bancos e multiplicador bancario": {
+      "confianca": "alta",
+      "justificativa": "Bancos e multiplicador bancário pertencem a Moeda e sistema monetário.",
+      "no": "NS-23536d9e53",
+      "nos": [
+        "NS-23536d9e53"
+      ]
+    },
+    "economia|macroeconomia|blocos economicos acordos internacionais e retaliacoes": {
+      "confianca": "alta",
+      "justificativa": "Blocos econômicos, acordos e retaliações são temas de Economia internacional e comércio exterior.",
+      "no": "NS-75a4673f87",
+      "nos": [
+        "NS-75a4673f87"
+      ]
+    },
+    "economia|macroeconomia|cambio fixo e flutuante": {
+      "confianca": "media",
+      "justificativa": "Regimes cambiais fixo e flutuante são tratados no modelo de economia aberta.",
+      "no": "NS-ffa15886b2",
+      "nos": [
+        "NS-ffa15886b2"
+      ]
+    },
+    "economia|macroeconomia|conceito bruto versus liquido": {
+      "confianca": "alta",
+      "justificativa": "Conceito bruto versus líquido é distinção da Contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|conceito interno versus nacional": {
+      "confianca": "alta",
+      "justificativa": "Conceito interno versus nacional é distinção da Contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|conceito nominal versus real": {
+      "confianca": "alta",
+      "justificativa": "Conceito nominal versus real é distinção da Contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|conceitos de moeda e quase moeda": {
+      "confianca": "alta",
+      "justificativa": "Moeda e quase-moeda são conceitos de Moeda e sistema monetário.",
+      "no": "NS-23536d9e53",
+      "nos": [
+        "NS-23536d9e53"
+      ]
+    },
+    "economia|macroeconomia|contas nacionais no brasil": {
+      "confianca": "alta",
+      "justificativa": "Contas nacionais no Brasil são conteúdo de Contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|definicao de inflacao": {
+      "confianca": "alta",
+      "justificativa": "Definição de inflação é o conceito central do nó Inflação.",
+      "no": "NS-02398effb6",
+      "nos": [
+        "NS-02398effb6"
+      ]
+    },
+    "economia|macroeconomia|demanda de trabalho": {
+      "confianca": "alta",
+      "justificativa": "Demanda de trabalho é parte do Mercado de trabalho macroeconômico.",
+      "no": "NS-be026a3ab2",
+      "nos": [
+        "NS-be026a3ab2"
+      ]
+    },
+    "economia|macroeconomia|equilibrio no mercado de trabalho salarios e nivel de atividade": {
+      "confianca": "alta",
+      "justificativa": "Equilíbrio no mercado de trabalho e salários pertencem ao nó Mercado de trabalho.",
+      "no": "NS-be026a3ab2",
+      "nos": [
+        "NS-be026a3ab2"
+      ]
+    },
+    "economia|macroeconomia|erros e omissoes": {
+      "confianca": "alta",
+      "justificativa": "Erros e omissões é rubrica clássica do balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|fluxos financeiros internacionais e mercados de capitais": {
+      "confianca": "media",
+      "justificativa": "Fluxos financeiros internacionais e mercados de capitais integram a economia internacional.",
+      "no": "NS-75a4673f87",
+      "nos": [
+        "NS-75a4673f87"
+      ]
+    },
+    "economia|macroeconomia|globalizacao e organismos multilaterais": {
+      "confianca": "media",
+      "justificativa": "Globalização e organismos multilaterais são tema de economia internacional.",
+      "no": "NS-75a4673f87",
+      "nos": [
+        "NS-75a4673f87"
+      ]
+    },
+    "economia|macroeconomia|identidades macroeconomicas basicas": {
+      "confianca": "alta",
+      "justificativa": "Identidades macroeconômicas básicas são conteúdo de contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|inflacao de custos": {
+      "confianca": "alta",
+      "justificativa": "Inflação de custos é tipo de inflação, subtópico do nó Inflação.",
+      "no": "NS-02398effb6",
+      "nos": [
+        "NS-02398effb6"
+      ]
+    },
+    "economia|macroeconomia|inflacao de demanda": {
+      "confianca": "alta",
+      "justificativa": "Inflação de demanda é tipo de inflação, subtópico do nó Inflação.",
+      "no": "NS-02398effb6",
+      "nos": [
+        "NS-02398effb6"
+      ]
+    },
+    "economia|macroeconomia|inflacao inercial": {
+      "confianca": "alta",
+      "justificativa": "Inflação inercial é tipo de inflação, subtópico do nó Inflação.",
+      "no": "NS-02398effb6",
+      "nos": [
+        "NS-02398effb6"
+      ]
+    },
+    "economia|macroeconomia|mobilidade de capitais": {
+      "confianca": "media",
+      "justificativa": "Mobilidade de capitais é pressuposto central do modelo de economia aberta IS-LM-BP.",
+      "no": "NS-ffa15886b2",
+      "nos": [
+        "NS-ffa15886b2"
+      ]
+    },
+    "economia|macroeconomia|oferta de trabalho": {
+      "confianca": "alta",
+      "justificativa": "Oferta de trabalho é componente do mercado de trabalho na macroeconomia.",
+      "no": "NS-be026a3ab2",
+      "nos": [
+        "NS-be026a3ab2"
+      ]
+    },
+    "economia|macroeconomia|politica economica e inflacao relacoes entre inflacao juros e o resultado fiscal": {
+      "confianca": "media",
+      "justificativa": "O foco do item é a inflação e suas relações com juros e resultado fiscal.",
+      "no": "NS-02398effb6",
+      "nos": [
+        "NS-02398effb6"
+      ]
+    },
+    "economia|macroeconomia|principais agregados macroeconomicos": {
+      "confianca": "alta",
+      "justificativa": "Agregados macroeconômicos são objeto da contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|produto renda e despesa agregados": {
+      "confianca": "alta",
+      "justificativa": "Produto, renda e despesa agregados são as óticas da contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|reservas internacionais": {
+      "confianca": "media",
+      "justificativa": "Reservas internacionais são componente do balanço de pagamentos no contexto macro.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|reservas monetarias": {
+      "confianca": "media",
+      "justificativa": "Reservas monetárias correspondem às reservas internacionais, rubrica do balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|resultado do balanco de pagamentos": {
+      "confianca": "alta",
+      "justificativa": "Resultado do balanço de pagamentos é exatamente o conceito do nó.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|macroeconomia|salarios inflacao e desemprego": {
+      "confianca": "media",
+      "justificativa": "Relação salários-inflação-desemprego (curva de Phillips) integra o mercado de trabalho macroeconômico.",
+      "no": "NS-be026a3ab2",
+      "nos": [
+        "NS-be026a3ab2"
+      ]
+    },
+    "economia|macroeconomia|sistema de contas nacionais": {
+      "confianca": "alta",
+      "justificativa": "Sistema de contas nacionais é o conteúdo central da contabilidade social.",
+      "no": "NS-667e15c5f3",
+      "nos": [
+        "NS-667e15c5f3"
+      ]
+    },
+    "economia|macroeconomia|tarifas subsidios cotas": {
+      "confianca": "alta",
+      "justificativa": "Tarifas, subsídios e cotas são instrumentos de política comercial, tema de comércio exterior.",
+      "no": "NS-75a4673f87",
+      "nos": [
+        "NS-75a4673f87"
+      ]
+    },
+    "economia|macroeconomia|transferencias unilaterais": {
+      "confianca": "alta",
+      "justificativa": "Transferências unilaterais são rubrica do balanço de pagamentos.",
+      "no": "NS-a71dc6f59a",
+      "nos": [
+        "NS-a71dc6f59a"
+      ]
+    },
+    "economia|microeconomia|aplicacoes duopolio de cournot e duopolio de bertrand": {
+      "confianca": "media",
+      "justificativa": "Duopólios de Cournot e Bertrand são modelos de oligopólio, dentro de estruturas de mercado.",
+      "no": "NS-2a2bd1b913",
+      "nos": [
+        "NS-2a2bd1b913"
+      ]
+    },
+    "economia|microeconomia|bens de giffen": {
+      "confianca": "alta",
+      "justificativa": "Bens de Giffen são caso particular da teoria da demanda.",
+      "no": "NS-b219df80cb",
+      "nos": [
+        "NS-b219df80cb"
+      ]
+    },
+    "economia|microeconomia|bens inferiores e normais": {
+      "confianca": "alta",
+      "justificativa": "Classificação de bens inferiores e normais pertence à teoria da demanda.",
+      "no": "NS-b219df80cb",
+      "nos": [
+        "NS-b219df80cb"
+      ]
+    },
+    "economia|microeconomia|bens substitutos e bens complementares": {
+      "confianca": "alta",
+      "justificativa": "Bens substitutos e complementares são conceitos da teoria da demanda.",
+      "no": "NS-b219df80cb",
+      "nos": [
+        "NS-b219df80cb"
+      ]
+    },
+    "economia|microeconomia|caixa de edgeworth": {
+      "confianca": "alta",
+      "justificativa": "A caixa de Edgeworth é instrumento clássico de análise de equilíbrio geral.",
+      "no": "NS-56537a711d",
+      "nos": [
+        "NS-56537a711d"
+      ]
+    },
+    "economia|microeconomia|classificacao de bens de acordo com as elasticidades": {
+      "confianca": "alta",
+      "justificativa": "Classificação de bens por elasticidades é conteúdo direto do nó Elasticidades.",
+      "no": "NS-cc790cfc3d",
+      "nos": [
+        "NS-cc790cfc3d"
+      ]
+    },
+    "economia|microeconomia|conceitos fundamentais": {
+      "confianca": "media",
+      "justificativa": "subtópico genérico de conceitos fundamentais da microeconomia, sem nó mais específico; herda do tópico mapeado",
+      "no": "NA-c416fd7ab6",
+      "nos": [
+        "NA-c416fd7ab6"
+      ]
+    },
+    "economia|microeconomia|concorrencia imperfeita e preco premio": {
+      "confianca": "alta",
+      "justificativa": "concorrência imperfeita e preço-prêmio são tema de estruturas de mercado",
+      "no": "NS-2a2bd1b913",
+      "nos": [
+        "NS-2a2bd1b913"
+      ]
+    },
+    "economia|microeconomia|concorrencia perfeita concorrencia imperfeita monopolio e oligopolio definicao e caracterizacao": {
+      "confianca": "alta",
+      "justificativa": "definição e caracterização das estruturas de mercado",
+      "no": "NS-2a2bd1b913",
+      "nos": [
+        "NS-2a2bd1b913"
+      ]
+    },
+    "economia|microeconomia|curva de demanda": {
+      "confianca": "alta",
+      "justificativa": "curva de demanda é conteúdo central da teoria da demanda",
+      "no": "NS-b219df80cb",
+      "nos": [
+        "NS-b219df80cb"
+      ]
+    },
+    "economia|microeconomia|curva de engel": {
+      "confianca": "media",
+      "justificativa": "curva de Engel deriva da teoria do consumidor (demanda e renda)",
+      "no": "NS-cd80074dca",
+      "nos": [
+        "NS-cd80074dca"
+      ]
+    },
+    "economia|microeconomia|curva de oferta sob concorrencia perfeita e equilibrio medio marginal": {
+      "confianca": "alta",
+      "justificativa": "curva de oferta da firma em concorrência perfeita é teoria da oferta",
+      "no": "NS-21fd23fd95",
+      "nos": [
+        "NS-21fd23fd95"
+      ]
+    },
+    "economia|microeconomia|curva de possibilidades de producao": {
+      "confianca": "alta",
+      "justificativa": "curva de possibilidades de produção está explicitamente no nó",
+      "no": "NS-827284d58e",
+      "nos": [
+        "NS-827284d58e"
+      ]
+    },
+    "economia|microeconomia|curvas de indiferenca": {
+      "confianca": "alta",
+      "justificativa": "curvas de indiferença são instrumento da teoria do consumidor",
+      "no": "NS-cd80074dca",
+      "nos": [
+        "NS-cd80074dca"
+      ]
+    },
+    "economia|microeconomia|custos de longo prazo versus custos de curto prazo custos fixos e custos variaveis": {
+      "confianca": "alta",
+      "justificativa": "tipos de custos (curto/longo prazo, fixos, variáveis) são teoria dos custos",
+      "no": "NS-f64031286e",
+      "nos": [
+        "NS-f64031286e"
+      ]
+    },
+    "economia|microeconomia|custos de producao e linha de isocusto": {
+      "confianca": "media",
+      "justificativa": "item composto: linha de isocusto pertence à teoria da produção e custos de produção à teoria dos custos",
+      "no": "NS-2774995431",
+      "nos": [
+        "NS-2774995431",
+        "NS-f64031286e"
+      ]
+    },
+    "economia|microeconomia|definicoes basicas agentes jogadores acoes estrategia resultados payoffs": {
+      "confianca": "alta",
+      "justificativa": "definições básicas de jogos (jogadores, estratégias, payoffs)",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|dilema dos prisioneiros": {
+      "confianca": "alta",
+      "justificativa": "dilema dos prisioneiros é exemplo clássico de teoria dos jogos",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|dinamica de determinacao de precos e margem de lucro": {
+      "confianca": "media",
+      "justificativa": "determinação de preços e margem de lucro alinha-se com organização industrial, seguindo critério dos pares decididos",
+      "no": "NS-6816cf7c02",
+      "nos": [
+        "NS-6816cf7c02"
+      ]
+    },
+    "economia|microeconomia|efeito da mudanca no preco de um bem sobre a receita total": {
+      "confianca": "alta",
+      "justificativa": "efeito de preço sobre receita total é o teste de elasticidade",
+      "no": "NS-cc790cfc3d",
+      "nos": [
+        "NS-cc790cfc3d"
+      ]
+    },
+    "economia|microeconomia|efeito de tributos sobre o equilibrio e sobre os excedentes": {
+      "confianca": "media",
+      "justificativa": "item composto: efeito de tributos sobre o equilíbrio e sobre os excedentes do consumidor e do produtor",
+      "no": "NS-8d29f21fea",
+      "nos": [
+        "NS-8d29f21fea",
+        "NS-ad272422ad"
+      ]
+    },
+    "economia|microeconomia|efeito renda e efeito substituicao": {
+      "confianca": "alta",
+      "justificativa": "efeito-renda e efeito-substituição são conteúdo da teoria do consumidor",
+      "no": "NS-cd80074dca",
+      "nos": [
+        "NS-cd80074dca"
+      ]
+    },
+    "economia|microeconomia|elasticidade cruzada da demanda": {
+      "confianca": "alta",
+      "justificativa": "elasticidade cruzada da demanda é elasticidade",
+      "no": "NS-cc790cfc3d",
+      "nos": [
+        "NS-cc790cfc3d"
+      ]
+    },
+    "economia|microeconomia|elasticidade preco da demanda e seus determinantes": {
+      "confianca": "alta",
+      "justificativa": "elasticidade-preço da demanda é elasticidade",
+      "no": "NS-cc790cfc3d",
+      "nos": [
+        "NS-cc790cfc3d"
+      ]
+    },
+    "economia|microeconomia|elasticidade preco da oferta e seus determinantes": {
+      "confianca": "alta",
+      "justificativa": "elasticidade-preço da oferta é elasticidade",
+      "no": "NS-cc790cfc3d",
+      "nos": [
+        "NS-cc790cfc3d"
+      ]
+    },
+    "economia|microeconomia|elasticidade renda da demanda": {
+      "confianca": "alta",
+      "justificativa": "elasticidade-renda da demanda é elasticidade",
+      "no": "NS-cc790cfc3d",
+      "nos": [
+        "NS-cc790cfc3d"
+      ]
+    },
+    "economia|microeconomia|equilibrio de mercado sob monopolio": {
+      "confianca": "media",
+      "justificativa": "equilíbrio sob monopólio é estudado nas estruturas de mercado",
+      "no": "NS-2a2bd1b913",
+      "nos": [
+        "NS-2a2bd1b913"
+      ]
+    },
+    "economia|microeconomia|equilibrio de nash": {
+      "confianca": "alta",
+      "justificativa": "equilíbrio de Nash é conceito de teoria dos jogos",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|equilibrio do consumidor": {
+      "confianca": "alta",
+      "justificativa": "equilíbrio do consumidor é conteúdo da teoria do consumidor",
+      "no": "NS-cd80074dca",
+      "nos": [
+        "NS-cd80074dca"
+      ]
+    },
+    "economia|microeconomia|equilibrio em estrategia dominante": {
+      "confianca": "alta",
+      "justificativa": "equilíbrio em estratégia dominante é conceito de teoria dos jogos",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|equilibrio perfeito em subjogos": {
+      "confianca": "alta",
+      "justificativa": "equilíbrio perfeito em subjogos é conceito de teoria dos jogos",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|equilibrio sob concorrencia perfeita preco de equilibrio e quantidade transacionada": {
+      "confianca": "alta",
+      "justificativa": "Equilíbrio de concorrência perfeita com preço e quantidade é o conceito central de equilíbrio de mercado.",
+      "no": "NS-8d29f21fea",
+      "nos": [
+        "NS-8d29f21fea"
+      ]
+    },
+    "economia|microeconomia|equilibrios minimax e maximin": {
+      "confianca": "alta",
+      "justificativa": "Equilíbrios minimax e maximin são conceitos de teoria dos jogos.",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|estrategias mistas": {
+      "confianca": "alta",
+      "justificativa": "Estratégias mistas é tópico típico de teoria dos jogos.",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|fatores de producao": {
+      "confianca": "alta",
+      "justificativa": "Fatores de produção fazem parte do nó que trata do problema econômico e fatores de produção.",
+      "no": "NS-827284d58e",
+      "nos": [
+        "NS-827284d58e"
+      ]
+    },
+    "economia|microeconomia|formas de organizacao da atividade economica laissez faire intervencionismo economia planificada": {
+      "confianca": "media",
+      "justificativa": "Laissez-faire versus intervencionismo trata do papel do Estado na economia, tema do nó sobre funções econômicas governamentais.",
+      "no": "NS-ddcaa01543",
+      "nos": [
+        "NS-ddcaa01543"
+      ]
+    },
+    "economia|microeconomia|funcao custo total custo medio e custo marginal": {
+      "confianca": "alta",
+      "justificativa": "Custo total, médio e marginal são o núcleo da teoria dos custos.",
+      "no": "NS-f64031286e",
+      "nos": [
+        "NS-f64031286e"
+      ]
+    },
+    "economia|microeconomia|funcao de producao": {
+      "confianca": "alta",
+      "justificativa": "Função de produção é conceito central da teoria da produção.",
+      "no": "NS-2774995431",
+      "nos": [
+        "NS-2774995431"
+      ]
+    },
+    "economia|microeconomia|isoquantas": {
+      "confianca": "alta",
+      "justificativa": "Isoquantas são instrumento da teoria da produção.",
+      "no": "NS-2774995431",
+      "nos": [
+        "NS-2774995431"
+      ]
+    },
+    "economia|microeconomia|jogos cooperativos e jogos de soma zero": {
+      "confianca": "alta",
+      "justificativa": "Jogos cooperativos e de soma zero são classificações da teoria dos jogos.",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|jogos repetidos": {
+      "confianca": "alta",
+      "justificativa": "Jogos repetidos são tópico da teoria dos jogos.",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|jogos simultaneos e jogos sequenciais": {
+      "confianca": "alta",
+      "justificativa": "Jogos simultâneos e sequenciais são classificação da teoria dos jogos.",
+      "no": "NS-e00e3be080",
+      "nos": [
+        "NS-e00e3be080"
+      ]
+    },
+    "economia|microeconomia|lei dos rendimentos decrescentes e rendimentos de escala": {
+      "confianca": "alta",
+      "justificativa": "Rendimentos decrescentes e de escala são conceitos da teoria da produção.",
+      "no": "NS-2774995431",
+      "nos": [
+        "NS-2774995431"
+      ]
+    },
+    "economia|microeconomia|maximizacao de lucro": {
+      "confianca": "media",
+      "justificativa": "Maximização de lucro é condição estudada na teoria da produção e da firma.",
+      "no": "NS-2774995431",
+      "nos": [
+        "NS-2774995431"
+      ]
+    },
+    "economia|microeconomia|minimizacao de custos": {
+      "confianca": "media",
+      "justificativa": "Minimização de custos é problema ligado à teoria dos custos.",
+      "no": "NS-f64031286e",
+      "nos": [
+        "NS-f64031286e"
+      ]
+    },
+    "economia|microeconomia|mudancas de equilibrio": {
+      "confianca": "alta",
+      "justificativa": "Mudanças de equilíbrio (deslocamentos de oferta e demanda) pertencem ao equilíbrio de mercado.",
+      "no": "NS-8d29f21fea",
+      "nos": [
+        "NS-8d29f21fea"
+      ]
+    },
+    "economia|microeconomia|oligopolios e cartelizacao": {
+      "confianca": "alta",
+      "justificativa": "Oligopólios e cartelização são estruturas de mercado.",
+      "no": "NS-2a2bd1b913",
+      "nos": [
+        "NS-2a2bd1b913"
+      ]
+    },
+    "economia|microeconomia|otimo de pareto e melhoria de pareto": {
+      "confianca": "media",
+      "justificativa": "Ótimo de Pareto é conceito tratado no âmbito do equilíbrio geral e bem-estar.",
+      "no": "NS-56537a711d",
+      "nos": [
+        "NS-56537a711d"
+      ]
+    },
+    "economia|microeconomia|papel dos precos": {
+      "confianca": "media",
+      "justificativa": "Papel dos preços como sinalizadores e alocadores é função do mecanismo de equilíbrio de mercado.",
+      "no": "NS-8d29f21fea",
+      "nos": [
+        "NS-8d29f21fea"
+      ]
+    },
+    "economia|microeconomia|perdas de excedente peso morto": {
+      "confianca": "alta",
+      "justificativa": "Perdas de excedente e peso morto são analisados via excedente do consumidor e do produtor.",
+      "no": "NS-ad272422ad",
+      "nos": [
+        "NS-ad272422ad"
+      ]
+    },
+    "economia|microeconomia|politicas de fixacao de precos": {
+      "confianca": "media",
+      "justificativa": "Políticas de fixação de preços pela firma se enquadram nas estruturas de mercado; controle de preços pelo Estado já aparece no item 22.",
+      "no": "NS-2a2bd1b913",
+      "nos": [
+        "NS-2a2bd1b913"
+      ]
+    },
+    "economia|microeconomia|preco maximo e preco minimo": {
+      "confianca": "alta",
+      "justificativa": "Preço máximo e mínimo são intervenções no equilíbrio de mercado.",
+      "no": "NS-8d29f21fea",
+      "nos": [
+        "NS-8d29f21fea"
+      ]
+    },
+    "economia|microeconomia|preferencias e funcao utilidade": {
+      "confianca": "alta",
+      "justificativa": "Preferências e função utilidade são o núcleo da teoria do consumidor.",
+      "no": "NS-cd80074dca",
+      "nos": [
+        "NS-cd80074dca"
+      ]
+    },
+    "economia|microeconomia|primeiro teorema da economia do bem estar": {
+      "confianca": "media",
+      "justificativa": "O primeiro teorema do bem-estar relaciona equilíbrio competitivo e eficiência, tema do equilíbrio geral.",
+      "no": "NS-56537a711d",
+      "nos": [
+        "NS-56537a711d"
+      ]
+    },
+    "economia|microeconomia|producao de longo prazo versus producao de curto prazo produto medio e produtividade marginal": {
+      "confianca": "alta",
+      "justificativa": "Curto e longo prazo, produto médio e produtividade marginal são conceitos da teoria da produção.",
+      "no": "NS-2774995431",
+      "nos": [
+        "NS-2774995431"
+      ]
+    },
+    "economia|microeconomia|restricao orcamentaria": {
+      "confianca": "alta",
+      "justificativa": "Restrição orçamentária é tópico clássico da teoria do consumidor.",
+      "no": "NS-cd80074dca",
+      "nos": [
+        "NS-cd80074dca"
+      ]
+    },
+    "economia|microeconomia|segundo teorema da economia do bem estar": {
+      "confianca": "media",
+      "justificativa": "Os teoremas do bem-estar são tratados no âmbito do equilíbrio geral.",
+      "no": "NS-56537a711d",
+      "nos": [
+        "NS-56537a711d"
+      ]
+    },
+    "economia|microeconomia|trocas": {
+      "confianca": "media",
+      "justificativa": "Trocas (economia de trocas, caixa de Edgeworth) é tema de equilíbrio geral.",
+      "no": "NS-56537a711d",
+      "nos": [
+        "NS-56537a711d"
       ]
     },
     "economia|microeconomia|vantagens competitivas": {
@@ -3210,6 +3678,14 @@
       "no": "S-eaf88a285d",
       "nos": [
         "S-eaf88a285d"
+      ]
+    },
+    "estatuto da crianca e do adolescente": {
+      "confianca": "media",
+      "justificativa": "O item trata do Estatuto da Criança e do Adolescente como um todo (Lei nº 8.069/1990), conceito coberto pelo subassunto N50; N21 restringe-se aos crimes do ECA e não cobre o estatuto inteiro.",
+      "no": "S-0754c3760b",
+      "nos": [
+        "S-0754c3760b"
       ]
     },
     "estrategia|referencial estrategico das organizacoes": {
@@ -4166,43 +4642,43 @@
       ]
     },
     "nocoes de economia|economia brasileira|aspectos gerais do comportamento recente da economia brasileira e das politicas economicas adotadas pelos ultimos governos": {
-      "confianca": "media",
-      "justificativa": "Subtópico de economia brasileira; por herança, aponta para o nó do tópico mapeado (economia).",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Comportamento recente da economia e políticas dos últimos governos é exatamente política econômica recente.",
+      "no": "NS-e385b97d53",
       "nos": [
-        "S-b82cf235e0"
+        "NS-e385b97d53"
       ]
     },
     "nocoes de economia|economia brasileira|cambio reservas e relacoes comerciais e financeiras do brasil com o resto do mundo": {
-      "confianca": "media",
-      "justificativa": "Câmbio e relações comerciais do Brasil são detalhe do tópico economia brasileira, mapeado para economia.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Câmbio, reservas e relações comerciais e financeiras com o exterior definem o setor externo brasileiro.",
+      "no": "NS-a6e16341d6",
       "nos": [
-        "S-b82cf235e0"
+        "NS-a6e16341d6"
       ]
     },
     "nocoes de economia|economia brasileira|desigualdades pessoais e espaciais de renda e de riqueza": {
-      "confianca": "media",
-      "justificativa": "Desigualdade de renda no contexto de economia brasileira; herda o nó do pai mapeado.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Desigualdades de renda e riqueza no Brasil são o tema do nó de mercado de trabalho, renda e desigualdade.",
+      "no": "NS-a110451208",
       "nos": [
-        "S-b82cf235e0"
+        "NS-a110451208"
       ]
     },
     "nocoes de economia|economia brasileira|estrutura orcamentaria e evolucao do deficit e da divida publica brasileiros": {
-      "confianca": "media",
-      "justificativa": "Déficit e dívida pública vistos sob ótica econômica, dentro de economia brasileira; herda o nó do pai.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Estrutura orçamentária, déficit e dívida pública brasileiros são o escopo do nó de finanças públicas brasileiras.",
+      "no": "NS-d3b21bdec9",
       "nos": [
-        "S-b82cf235e0"
+        "NS-d3b21bdec9"
       ]
     },
     "nocoes de economia|economia brasileira|estrutura tributaria brasileira": {
       "confianca": "media",
-      "justificativa": "Estrutura tributária como tema econômico de economia brasileira; herda o nó do pai mapeado.",
-      "no": "S-b82cf235e0",
+      "justificativa": "Estrutura tributária brasileira está coberta pelo nó de finanças públicas brasileiras, que cita tributação no contexto nacional.",
+      "no": "NS-d3b21bdec9",
       "nos": [
-        "S-b82cf235e0"
+        "NS-d3b21bdec9"
       ]
     },
     "nocoes de economia|economia brasileira|indicadores de desenvolvimento economico e social brasileiro contemporaneo": {
@@ -4214,43 +4690,43 @@
       ]
     },
     "nocoes de economia|economia brasileira|mercado de trabalho e condicoes de emprego e renda": {
-      "confianca": "media",
-      "justificativa": "Mercado de trabalho e emprego como subtópico de economia brasileira; herda o nó do pai.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Mercado de trabalho, emprego e renda no Brasil é o tema exato do nó.",
+      "no": "NS-a110451208",
       "nos": [
-        "S-b82cf235e0"
+        "NS-a110451208"
       ]
     },
     "nocoes de economia|economia brasileira|mudancas estruturais da economia brasileira a partir da aceleracao dos processos de industrializacao e urbanizacao": {
-      "confianca": "media",
-      "justificativa": "Industrialização e urbanização da economia brasileira; herda o nó do pai mapeado.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Industrialização e mudanças estruturais da economia brasileira definem o nó.",
+      "no": "NS-18bf1ea02d",
       "nos": [
-        "S-b82cf235e0"
+        "NS-18bf1ea02d"
       ]
     },
     "nocoes de economia|economia brasileira|planos de desenvolvimento mais importantes desde a segunda metade do seculo xx": {
-      "confianca": "media",
-      "justificativa": "Planos de desenvolvimento econômico como detalhe de economia brasileira; herda o nó do pai.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Planos de desenvolvimento integram o nó de industrialização, mudanças estruturais e planos de desenvolvimento.",
+      "no": "NS-18bf1ea02d",
       "nos": [
-        "S-b82cf235e0"
+        "NS-18bf1ea02d"
       ]
     },
     "nocoes de economia|economia brasileira|previdencia social e suas perspectivas": {
-      "confianca": "media",
-      "justificativa": "Previdência tratada sob ótica econômica (perspectivas fiscais) dentro de economia brasileira; herda o nó do pai.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Previdência social no contexto das finanças públicas brasileiras é citado explicitamente no nó.",
+      "no": "NS-d3b21bdec9",
       "nos": [
-        "S-b82cf235e0"
+        "NS-d3b21bdec9"
       ]
     },
     "nocoes de economia|economia brasileira|taxas de juros": {
-      "confianca": "media",
-      "justificativa": "Taxas de juros como tema de economia brasileira; herda o nó do pai mapeado.",
-      "no": "S-b82cf235e0",
+      "confianca": "baixa",
+      "justificativa": "Taxas de juros são tema de moeda e sistema monetário; não há nó específico no contexto brasileiro.",
+      "no": "NS-23536d9e53",
       "nos": [
-        "S-b82cf235e0"
+        "NS-23536d9e53"
       ]
     },
     "nocoes de economia|economia do setor publico": {
@@ -4270,19 +4746,19 @@
       ]
     },
     "nocoes de economia|economia do setor publico|financiamento do deficit publico a partir dos anos 80 do seculo xx": {
-      "confianca": "media",
-      "justificativa": "Financiamento do déficit público sob ótica econômica; herda o nó do pai mapeado.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Financiamento do déficit público é o tema do nó déficit e dívida pública.",
+      "no": "NS-baef1b747a",
       "nos": [
-        "S-b82cf235e0"
+        "NS-baef1b747a"
       ]
     },
     "nocoes de economia|economia do setor publico|inflacao e crescimento": {
       "confianca": "media",
-      "justificativa": "Inflação e crescimento como tema de economia do setor público; herda o nó do pai.",
-      "no": "S-b82cf235e0",
+      "justificativa": "Inflação e crescimento tem a inflação como conceito central, coberto pelo nó de inflação da macroeconomia.",
+      "no": "NS-02398effb6",
       "nos": [
-        "S-b82cf235e0"
+        "NS-02398effb6"
       ]
     },
     "nocoes de economia|economia do setor publico|o estado e as funcoes economicas governamentais": {
@@ -4294,11 +4770,11 @@
       ]
     },
     "nocoes de economia|economia do setor publico|politicas fiscal e monetaria outras politicas economicas": {
-      "confianca": "media",
-      "justificativa": "Políticas fiscal e monetária como subtópico de economia do setor público; herda o nó do pai.",
-      "no": "S-b82cf235e0",
+      "confianca": "alta",
+      "justificativa": "Políticas fiscal e monetária são exatamente o tema do nó correspondente.",
+      "no": "NS-95c2e2eaba",
       "nos": [
-        "S-b82cf235e0"
+        "NS-95c2e2eaba"
       ]
     },
     "nocoes de financas publicas|deficit publico": {
@@ -4379,6 +4855,14 @@
       "no": "A-2418b321de",
       "nos": [
         "A-2418b321de"
+      ]
+    },
+    "nocoes de financas publicas|indicadores financeiros fundamentos e principais indices e taxas": {
+      "confianca": "media",
+      "justificativa": "Índices e taxas financeiras (juros, inflação, moeda) se enquadram melhor em Moeda e sistema monetário; não é detalhe de Economia do setor público.",
+      "no": "NS-23536d9e53",
+      "nos": [
+        "NS-23536d9e53"
       ]
     },
     "nocoes de financas publicas|principios de descentralizacao fiscal": {
@@ -4825,6 +5309,15 @@
         "A-3408fede43"
       ]
     },
+    "tecnicas e linguagens de programacao|boas praticas de programacao": {
+      "confianca": "alta",
+      "justificativa": "item composto: SOLID e Design Patterns têm nós próprios",
+      "no": "NS-5a7ae88c4e",
+      "nos": [
+        "NS-5a7ae88c4e",
+        "NS-7658f2bc38"
+      ]
+    },
     "tecnicas e linguagens de programacao|boas praticas de programacao|design patterns": {
       "confianca": "alta",
       "justificativa": "design patterns é o nó específico",
@@ -4841,6 +5334,30 @@
         "NS-5a7ae88c4e"
       ]
     },
+    "tecnicas e linguagens de programacao|componentizacao": {
+      "confianca": "baixa",
+      "justificativa": "componentização é técnica de programação; sem nó específico, herda linguagens de programação",
+      "no": "A-3408fede43",
+      "nos": [
+        "A-3408fede43"
+      ]
+    },
+    "tecnicas e linguagens de programacao|escopo de variaveis": {
+      "confianca": "baixa",
+      "justificativa": "escopo de variáveis é conceito de linguagens de programação",
+      "no": "A-3408fede43",
+      "nos": [
+        "A-3408fede43"
+      ]
+    },
+    "tecnicas e linguagens de programacao|linguagens": {
+      "confianca": "alta",
+      "justificativa": "lista de linguagens aponta para linguagens de programação",
+      "no": "A-3408fede43",
+      "nos": [
+        "A-3408fede43"
+      ]
+    },
     "tecnicas e linguagens de programacao|linguagens|html5 css3": {
       "confianca": "media",
       "justificativa": "HTML5 e CSS3 são tecnologias de desenvolvimento web",
@@ -4852,6 +5369,30 @@
     "tecnicas e linguagens de programacao|linguagens|java javascript c": {
       "confianca": "alta",
       "justificativa": "linguagens de programação é o conceito exato",
+      "no": "A-3408fede43",
+      "nos": [
+        "A-3408fede43"
+      ]
+    },
+    "tecnicas e linguagens de programacao|processamento assincrono e mensageria": {
+      "confianca": "media",
+      "justificativa": "mensageria e processamento assíncrono se enquadram em integração de sistemas",
+      "no": "A-0d5791ace5",
+      "nos": [
+        "A-0d5791ace5"
+      ]
+    },
+    "tecnicas e linguagens de programacao|programacao estruturada": {
+      "confianca": "media",
+      "justificativa": "paradigma de programação coberto por linguagens de programação",
+      "no": "A-3408fede43",
+      "nos": [
+        "A-3408fede43"
+      ]
+    },
+    "tecnicas e linguagens de programacao|sub rotinas": {
+      "confianca": "media",
+      "justificativa": "sub-rotinas e passagem de parâmetros são conceitos de linguagens de programação",
       "no": "A-3408fede43",
       "nos": [
         "A-3408fede43"
@@ -4881,6 +5422,14 @@
         "A-3408fede43"
       ]
     },
+    "tecnicas e linguagens de programacao|tipos de dados": {
+      "confianca": "media",
+      "justificativa": "tipos de dados e verificação de tipos são conceitos de linguagens de programação",
+      "no": "A-3408fede43",
+      "nos": [
+        "A-3408fede43"
+      ]
+    },
     "tecnicas e linguagens de programacao|tipos de dados|tipificacao forte": {
       "confianca": "media",
       "justificativa": "tipificação forte é característica de linguagens de programação",
@@ -4903,6 +5452,14 @@
       "no": "A-3408fede43",
       "nos": [
         "A-3408fede43"
+      ]
+    },
+    "tecnologia da informacao|arquitetura e engenharia de software": {
+      "confianca": "alta",
+      "justificativa": "bloco abrange engenharia de software como um todo",
+      "no": "NA-5ea6287326",
+      "nos": [
+        "NA-5ea6287326"
       ]
     },
     "tecnologia da informacao|arquitetura e engenharia de software|analise de pontos de funcao": {
@@ -4935,6 +5492,22 @@
       "no": "A-505e7be779",
       "nos": [
         "A-505e7be779"
+      ]
+    },
+    "tecnologia da informacao|arquitetura e engenharia de software|conceitos basicos sobre engenharia de software": {
+      "confianca": "baixa",
+      "justificativa": "O item trata dos conceitos básicos da própria engenharia de software, exatamente o escopo do nó N67. [revisar: repete o nó do pai; o filho \"Engenharia de requisitos\" parece mais específico]",
+      "no": "NA-5ea6287326",
+      "nos": [
+        "NA-5ea6287326"
+      ]
+    },
+    "tecnologia da informacao|arquitetura e engenharia de software|disciplinas de engenharia de software": {
+      "confianca": "baixa",
+      "justificativa": "Disciplinas da engenharia de software é conteúdo central do próprio assunto Engenharia de software (N67). [revisar: repete o nó do pai; o filho \"Engenharia de requisitos\" parece mais específico]",
+      "no": "NA-5ea6287326",
+      "nos": [
+        "NA-5ea6287326"
       ]
     },
     "tecnologia da informacao|arquitetura e engenharia de software|modelagem de dados modelagem relacional": {
@@ -4978,6 +5551,22 @@
         "A-48c7cb56b8"
       ]
     },
+    "tecnologia da informacao|contratacoes gestao e fiscalizacao de contratos administrativos especializados em tic": {
+      "confianca": "media",
+      "justificativa": "gestão e fiscalização de contratos administrativos, conceito do Direito Administrativo",
+      "no": "A-91e52e6c2e",
+      "nos": [
+        "A-91e52e6c2e"
+      ]
+    },
+    "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis": {
+      "confianca": "alta",
+      "justificativa": "gerenciamento de projetos de TIC com PMBOK e práticas ágeis",
+      "no": "A-684307b65b",
+      "nos": [
+        "A-684307b65b"
+      ]
+    },
     "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis|ciclo de vida de projetos de ti abordagens preditivas iterativas incrementais ageis e hibridas": {
       "confianca": "media",
       "justificativa": "Ciclo de vida e abordagens de projetos de TI se enquadra no nó Gerenciamento de projetos de TIC, da mesma disciplina.",
@@ -5003,6 +5592,14 @@
         "A-441ecdfb0c"
       ]
     },
+    "tecnologia da informacao|gerenciamento de servicos de ti": {
+      "confianca": "alta",
+      "justificativa": "gerenciamento de serviços de TI baseado em ITIL v4",
+      "no": "A-ef84a862e5",
+      "nos": [
+        "A-ef84a862e5"
+      ]
+    },
     "tecnologia da informacao|gerenciamento de servicos de ti|gerenciamento de incidentes e problemas gestao de mudancas configuracoes e liberacoes": {
       "confianca": "media",
       "justificativa": "Incidentes, problemas, mudanças, configurações e liberações são práticas de ITIL v4.",
@@ -5025,6 +5622,14 @@
       "no": "A-ef84a862e5",
       "nos": [
         "A-ef84a862e5"
+      ]
+    },
+    "tecnologia da informacao|governanca de ti": {
+      "confianca": "alta",
+      "justificativa": "governança de TIC, COBIT e planejamento estratégico de TI",
+      "no": "A-62cc2b0c63",
+      "nos": [
+        "A-62cc2b0c63"
       ]
     },
     "tecnologia da informacao|governanca de ti|alinhamento estrategico entre ti e negocios": {
@@ -5067,6 +5672,22 @@
         "A-9579bc2a33"
       ]
     },
+    "tecnologia da informacao|infraestrutura de servicos servidores virtualizacao e servicos em cloud": {
+      "confianca": "media",
+      "justificativa": "servidores, virtualização e nuvem compõem infraestrutura de TI",
+      "no": "NA-e8ea9374ad",
+      "nos": [
+        "NA-e8ea9374ad"
+      ]
+    },
+    "tecnologia da informacao|infraestrutura de tic": {
+      "confianca": "alta",
+      "justificativa": "redes, TCP/IP e classificação de redes",
+      "no": "A-4b13bcdab5",
+      "nos": [
+        "A-4b13bcdab5"
+      ]
+    },
     "tecnologia da informacao|infraestrutura de tic|classificacao de redes pan lan man wan": {
       "confianca": "alta",
       "justificativa": "Classificação PAN, LAN, MAN, WAN é exatamente o tema do nó.",
@@ -5081,6 +5702,22 @@
       "no": "A-710241c2f3",
       "nos": [
         "A-710241c2f3"
+      ]
+    },
+    "tecnologia da informacao|infraestrutura de tic|redes de computadores": {
+      "confianca": "baixa",
+      "justificativa": "O item é o próprio tema Redes de computadores, coberto diretamente pelo assunto N107. [revisar: repete o nó do pai; o filho \"Gerenciamento de redes\" parece mais específico]",
+      "no": "A-4b13bcdab5",
+      "nos": [
+        "A-4b13bcdab5"
+      ]
+    },
+    "tecnologia da informacao|programacao funcional e orientacao a objetos": {
+      "confianca": "media",
+      "justificativa": "orientação a objetos tem nó próprio; programação funcional sem nó específico",
+      "no": "NS-ee97a45438",
+      "nos": [
+        "NS-ee97a45438"
       ]
     },
     "tecnologia da informacao|seguranca da informacao|confiabilidade integridade disponibilidade autenticidade e nao repudio": {
@@ -5132,6 +5769,30 @@
       "no": "A-bfc314b10d",
       "nos": [
         "A-bfc314b10d"
+      ]
+    },
+    "tecnologias emergentes|aprendizado de maquina": {
+      "confianca": "alta",
+      "justificativa": "aprendizado de máquina está no nó de tecnologias de IA",
+      "no": "A-bfc314b10d",
+      "nos": [
+        "A-bfc314b10d"
+      ]
+    },
+    "tecnologias emergentes|ia generativa": {
+      "confianca": "alta",
+      "justificativa": "IA generativa tem nó próprio",
+      "no": "A-048ceace24",
+      "nos": [
+        "A-048ceace24"
+      ]
+    },
+    "tecnologias emergentes|inteligencia artificial fundamentos e aplicacoes": {
+      "confianca": "media",
+      "justificativa": "fundamentos e aplicações de IA correspondem a conceitos básicos de IA",
+      "no": "S-fe253f32ca",
+      "nos": [
+        "S-fe253f32ca"
       ]
     }
   }

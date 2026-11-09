@@ -1,0 +1,53 @@
+{
+ "descricao": "KAN-99 (TRIB): subassuntos de Direito Tributário em AFO › Direito Financeiro e Tributário, decisão do dono em 2026-11-09 (ADR-030)",
+ "operacoes": [
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Obrigação tributária",
+    "pai": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Crédito tributário",
+    "pai": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Responsabilidade tributária",
+    "pai": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Garantias e privilégios do crédito tributário",
+    "pai": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Administração tributária",
+    "pai": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Legislação tributária: vigência, aplicação, interpretação e integração",
+    "pai": "A-1b9a725b23"
+   }
+  }
+ ]
+}

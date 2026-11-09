@@ -1,0 +1,8 @@
+{
+  "descricao": "Decisão do dono (2026-11-09, KAN-99): aprova 3 pares tributários que voltaram como proposta do LLM depois da D1.",
+  "operacoes": [
+    {"tipo": "mapear", "args": {"item": "direito tributario|codigo tributario nacional", "nos": ["S-1cb6537d7f"]}},
+    {"tipo": "mapear", "args": {"item": "direito tributario|codigo tributario nacional|normas gerais de direito tributario", "nos": ["S-1cb6537d7f"]}},
+    {"tipo": "mapear", "args": {"item": "direito tributario|direito tributario conceito e principios", "nos": ["A-1b9a725b23"]}}
+  ]
+}

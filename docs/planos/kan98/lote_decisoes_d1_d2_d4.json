@@ -1,0 +1,655 @@
+{
+ "descricao": "KAN-98/KAN-99: decisões do dono de 2026-11-09. D1: retira as propostas do LLM erradas de economia (Atualidades, AFO › intervenção e CTN) e de Direito Tributário (AFO › Direito Financeiro e Tributário e CTN) e aprova o título DIREITO TRIBUTÁRIO em AFO › Direito Financeiro e Tributário; os pares retirados voltam como rejeitados em lote_vetos_d1.json depois do passo e do LLM. D2: título NOÇÕES DE FINANÇAS PÚBLICAS vai para Economia › Economia do setor público. D4: subassunto Organização industrial e competitividade em Economia › Microeconomia com os 5 itens de competitividade.",
+ "operacoes": [
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|administracao tributaria",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|administracao tributaria|certidoes negativas",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|administracao tributaria|divida ativa",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|administracao tributaria|fiscalizacao",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|administracao tributaria|sigilo fiscal",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|codigo tributario nacional",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|codigo tributario nacional|competencia tributaria e suas limitacoes",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|codigo tributario nacional|norma tributaria especies vigencia e aplicacao interpretacao e integracao natureza",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|codigo tributario nacional|normas gerais de direito tributario",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario|conceito",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario|lancamento e suas modalidades",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario|natureza",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario|prescricao e decadencia",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario|repeticao do indebito",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|credito tributario|revisao suspensao extincao e exclusao",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|direito tributario conceito e principios",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|garantias e privilegios do credito tributario",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|capacidade tributaria",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|conceito",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|domicilio tributario",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|especies",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|fato gerador hipotese de incidencia",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|solidariedade",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|obrigacao tributaria|sujeitos ativo e passivo",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|responsabilidade tributaria",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|responsabilidade tributaria|responsabilidade dos sucessores",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|responsabilidade tributaria|responsabilidade pessoal e de terceiros",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|responsabilidade tributaria|responsabilidade por infracoes",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|responsabilidade tributaria|responsabilidade supletiva",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|responsabilidade tributaria|solidariedade e sucessao",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|conceito e especies",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|contribuicao de melhoria",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|impostos",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|impostos da uniao",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|impostos dos estados e do distrito federal",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|impostos dos municipios",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|imunidades",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito tributario|tributos|taxas",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|assimetria de informacoes",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|bens publicos",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|contabilidade fiscal",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|definicao e tipos de tributos",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|estado regulador e produtor",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|evolucao da participacao do setor publico na atividade economica",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|externalidades",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|falhas de mercado e papel do estado na sua solucao",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|financas publicas no brasil a partir dos anos 1980",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|funcao estabilizadora alocativa e distributiva",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|imposto sobre patrimonio",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|imposto sobre renda",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|imposto sobre valor agregado iva",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|imposto unitario e imposto ad valorem",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|impostos regressivos e progressivos",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|inflacao crescimento e funcao estabilizadora do estado",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|necessidades publicas e formas de atuacao dos governos",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|neutralidade tributaria",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|o estado e as funcoes economicas governamentais",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|outras politicas economicas",
+    "no": "SL-2a5673cf57"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|tributacao",
+    "no": "S-1cb6537d7f"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|aspectos gerais do comportamento recente da economia brasileira e das politicas economicas adotadas pelos ultimos governos",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|cambio reservas e relacoes comerciais e financeiras do brasil com o resto do mundo",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|desigualdades pessoais e espaciais de renda e de riqueza",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|estrutura orcamentaria e evolucao do deficit e da divida publica brasileiros",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|estrutura tributaria brasileira",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|indicadores de desenvolvimento economico e social brasileiro contemporaneo",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|mercado de trabalho e condicoes de emprego e renda",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|mudancas estruturais da economia brasileira a partir da aceleracao dos processos de industrializacao e urbanizacao",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|planos de desenvolvimento mais importantes desde a segunda metade do seculo xx",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|previdencia social e suas perspectivas",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia brasileira|taxas de juros",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|evolucao da participacao do setor publico na atividade economica",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|financiamento do deficit publico a partir dos anos 80 do seculo xx",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|inflacao e crescimento",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|o estado e as funcoes economicas governamentais",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de economia|economia do setor publico|politicas fiscal e monetaria outras politicas economicas",
+    "no": "S-b82cf235e0"
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito tributario",
+    "no": "A-1b9a725b23"
+   }
+  },
+  {
+   "tipo": "remapear",
+   "args": {
+    "item": "nocoes de financas publicas",
+    "de": "A-2418b321de",
+    "para": "NA-6ac3a5bb8f"
+   }
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@orgind",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Organização industrial e competitividade",
+    "pai": "NA-c416fd7ab6"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|microeconomia|vantagens competitivas",
+    "no": "S-47a964b70f"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|analise de competitividade",
+    "nos": [
+     "@orgind"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|analise de industrias e da concorrencia",
+    "nos": [
+     "@orgind"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|vantagens competitivas",
+    "nos": [
+     "@orgind"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|cadeias e redes produtivas",
+    "nos": [
+     "@orgind"
+    ]
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|competitividade e estrategia empresarial",
+    "nos": [
+     "@orgind"
+    ]
+   }
+  }
+ ]
+}

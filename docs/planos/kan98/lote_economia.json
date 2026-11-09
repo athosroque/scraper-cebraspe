@@ -1,0 +1,337 @@
+{
+ "descricao": "KAN-98 (ECO): disciplina Economia, decisão do dono em 2026-11-09 (ADR-030)",
+ "operacoes": [
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "materia",
+    "nome": "Economia"
+   },
+   "apelido": "@eco"
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Microeconomia",
+    "pai": "@eco"
+   },
+   "apelido": "@micro"
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Problema econômico, fatores de produção e curva de possibilidades de produção",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria da demanda",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria da oferta",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Equilíbrio de mercado",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Elasticidades",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria do consumidor",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria da produção",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria dos custos",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Estruturas de mercado",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria dos jogos",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Excedente do consumidor e excedente do produtor",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Equilíbrio geral",
+    "pai": "@micro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Macroeconomia",
+    "pai": "@eco"
+   },
+   "apelido": "@macro"
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Contabilidade social",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Moeda e sistema monetário",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Inflação",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Oferta e demanda agregadas",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Teoria keynesiana",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Modelo IS-LM",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Economia aberta: modelo IS-LM-BP",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Políticas fiscal e monetária",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Mercado de trabalho",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Balanço de pagamentos",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Economia internacional e comércio exterior",
+    "pai": "@macro"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Economia brasileira",
+    "pai": "@eco"
+   },
+   "apelido": "@br"
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Industrialização, mudanças estruturais e planos de desenvolvimento",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Planos de estabilização e inflação no Brasil",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Política econômica recente",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Setor externo brasileiro: câmbio, reservas e comércio",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Finanças públicas brasileiras: déficit, dívida, tributação e previdência",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Mercado de trabalho, renda e desigualdade no Brasil",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Economia do Paraná",
+    "pai": "@br"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "assunto",
+    "nome": "Economia do setor público",
+    "pai": "@eco"
+   },
+   "apelido": "@sp"
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Falhas de mercado e papel do Estado na sua solução",
+    "pai": "@sp"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "O Estado e as funções econômicas governamentais",
+    "pai": "@sp"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Tributação",
+    "pai": "@sp"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Déficit e dívida pública",
+    "pai": "@sp"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Federalismo fiscal",
+    "pai": "@sp"
+   }
+  },
+  {
+   "tipo": "criar",
+   "args": {
+    "nivel": "subassunto",
+    "nome": "Evolução da participação do setor público na atividade econômica",
+    "pai": "@sp"
+   }
+  }
+ ]
+}

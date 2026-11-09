@@ -65,6 +65,34 @@ existente e ativo (conferido por código), com exceção dos dois assuntos novos
 Soma: 124 itens destravados. Com só o lote e os títulos, o passo atual (sem M4/M5/M14) casa mais
 2 filhos por nome. O resto depende das regras da D2 ou do `--mapear` (seção 5).
 
+### 1.1 Decisão do dono sobre o nível dos títulos (KAN-100, 2026-11-09)
+
+Origem: a revisão das propostas do KAN-92 achou 14 títulos em que o LLM apontou para um subassunto e
+esta tabela aponta para o assunto. O dono aceitou a recomendação do levantamento:
+
+- **Regra geral:** o título de bloco vai para o menor nó que contém os nós de todos os filhos, que
+  costuma ser o assunto. Vai para subassunto só quando o bloco inteiro é aquele conceito e nenhum
+  filho já leva esse subassunto. Um item sem filhos fica com o nó mais específico do mesmo conceito.
+- **Fica a tabela acima (assunto):** ADM. DE BD RELACIONAIS, ARMAZENAMENTO, ARQUITETURA, COMPUTAÇÃO EM
+  NUVEM, MODELAGEM DE DADOS, PERFORMANCE E TUNING, SERVIDORES, SISTEMAS OPERACIONAIS, TECNOLOGIAS
+  EMERGENTES, TÉCNICAS E LINGUAGENS DE PROGRAMAÇÃO e GESTÃO DE PRODUTOS › Produtos (assunto Gestão de
+  produtos). As propostas do LLM nesses títulos são rejeitadas.
+- **CONCEITOS BÁSICOS:** vai para a disciplina Tecnologia da Informação, como na tabela.
+- **GESTÃO E GOVERNANÇA:** vai para 2 assuntos, TI › Governança e gestão de TI e Direito Administrativo
+  › contratação (D3). O subassunto "Princípios" que o LLM propôs fica de fora.
+- **"Lógica de argumentação: analogias…":** aceita a proposta do LLM (subassunto de mesmo nome). É uma
+  folha e é o mesmo conceito.
+- "Processo de Desenvolvimento de Produtos digitais" é folha e pode ficar no Ciclo de vida que o LLM
+  propôs.
+- **A conferir na Parte 2:**
+  - "Aprendizado de máquina" passa a ser aprovado pelo passo em *Ciência de dados*, por causa de uma
+    fusão anterior. Esta proposta queria *Conceitos e tecnologias de IA*.
+  - Em SERVIDORES, 2 filhos estão aprovados em Servidores de aplicação, e esta proposta quer "alta
+    disponibilidade".
+- **Falta (depois do KAN-98/99):** refazer o `docs/planos/kan95/mapear_itens.sh` com esta decisão e
+  as 23 chaves que deixaram de existir depois da M7/M8.
+- **Ajuste no LLM:** a dica do pai só proposto não manda mais herdar (M15, KAN-101).
+
 ---
 
 ## 2. Nós novos a criar (35)

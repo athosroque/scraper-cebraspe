@@ -1,5 +1,5 @@
 {
- "descricao": "Lista fechada de disciplinas (nível matéria da árvore mestre), aprovada pelo dono em 2026-10-22 (Etapa 5B.3, KAN-78). Matéria ativa fora daqui faz scripts/auditar_arvore.py falhar. Disciplina nova só com decisão do dono.",
+ "descricao": "Lista fechada de disciplinas (nível matéria da árvore mestre), aprovada pelo dono em 2026-10-22 (Etapa 5B.3, KAN-78); Economia entrou por decisão do dono em 2026-11-09 (KAN-98, ADR-030). Matéria ativa fora daqui faz scripts/auditar_arvore.py falhar. Disciplina nova só com decisão do dono.",
  "disciplinas": [
   {"id": "ML-2379de85f7", "nome": "Administração Financeira e Orçamentária"},
   {"id": "M-507aa314f3", "nome": "Administração Geral"},
@@ -9,6 +9,7 @@
   {"id": "M-ed74c9a4c7", "nome": "Atualidades"},
   {"id": "M-1c36ca8d18", "nome": "Auditoria Governamental"},
   {"id": "M-a7df5b3373", "nome": "Ciência Política"},
+  {"id": "NM-e30434a088", "nome": "Economia"},
   {"id": "M-e779c36584", "nome": "Clínica Médica"},
   {"id": "M-47fdccf9bb", "nome": "Comunicação Social"},
   {"id": "M-81d0763230", "nome": "Comércio Exterior"},
