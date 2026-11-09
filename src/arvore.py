@@ -610,10 +610,33 @@ def _trocar_apelidos(valor, apelidos: dict[str, str]):
     return valor
 
 
+OPERACOES_DE_ITEM = ("mapear", "desmapear", "aprovar", "rejeitar")
+
+
+def _executar_operacao_de_item(arv: ArvoreMestre, tipo: str, args: dict) -> None:
+    """Decisão do dono sobre o apontamento de um item de edital, dentro do lote.
+    `mapear` leva `{"item", "nos"}` (aprovado, origem humano); as outras levam
+    `{"item", "no"}` (KAN-95, KAN-98)."""
+    if "item" not in args:
+        raise ArvoreInvalida(f"Argumento 'item' obrigatório para {tipo}")
+    if tipo == "mapear":
+        nos = args.get("nos")
+        if not nos:
+            raise ArvoreInvalida("Argumento 'nos' obrigatório para mapear")
+        mapear(arv, args["item"], [nos] if isinstance(nos, str) else list(nos))
+        return
+    if "no" not in args:
+        raise ArvoreInvalida(f"Argumento 'no' obrigatório para {tipo}")
+    {"desmapear": desmapear, "aprovar": aprovar, "rejeitar": rejeitar}[tipo](
+        arv, args["item"], args["no"]
+    )
+
+
 def aplicar_lote(arv: ArvoreMestre, operacoes: list[dict]) -> list[str]:
     """Aplica um lote ordenado de operações do dono (Etapa 5B.3). Tudo ou nada.
 
-    Cada operação é `{"tipo", "args"}`, com os tipos de `_executar_operacao`.
+    Cada operação é `{"tipo", "args"}`, com os tipos de `_executar_operacao` e os
+    de item (`OPERACOES_DE_ITEM`: mapear, desmapear, aprovar, rejeitar).
     Um `criar` pode levar `"apelido": "@nome"`: o ID do nó é gerado, e as
     operações seguintes citam o nó novo pelo apelido. Devolve uma linha por
     operação.
@@ -635,6 +658,9 @@ def aplicar_lote(arv: ArvoreMestre, operacoes: list[dict]) -> list[str]:
                         )
                     apelidos[apelido] = no_id
                 feitas.append(f"{i}: criado {no_id} ({args['nivel']}) {args['nome']!r}")
+            elif tipo in OPERACOES_DE_ITEM:
+                _executar_operacao_de_item(copia, tipo, args)
+                feitas.append(f"{i}: {tipo} {json.dumps(args, ensure_ascii=False)}")
             else:
                 _executar_operacao(copia, tipo, args, origem="humano")
                 feitas.append(f"{i}: {tipo} {json.dumps(args, ensure_ascii=False)}")

@@ -1131,6 +1131,44 @@ def test_fundir_continua_recusando_materia_entre_niveis():
         fundir_nos(arv, "M-OPS", "A-DEV")
 
 
+def test_aplicar_lote_operacoes_de_item():
+    arv = _arvore_rebaixar()
+    mapear(arv, "ti|git", ["A-K8S"], origem="llm", status="proposto")
+    mapear(arv, "ti|docker", ["A-K8S"], origem="llm", status="proposto")
+    mapear(arv, "ti|helm", ["A-K8S"], origem="llm", status="proposto")
+    aplicar_lote(
+        arv,
+        [
+            {"tipo": "desmapear", "args": {"item": "ti|git", "no": "A-K8S"}},
+            {"tipo": "rejeitar", "args": {"item": "ti|docker", "no": "A-K8S"}},
+            {"tipo": "aprovar", "args": {"item": "ti|helm", "no": "A-K8S"}},
+            {
+                "tipo": "criar",
+                "apelido": "@novo",
+                "args": {"nivel": "assunto", "nome": "Versionamento", "pai": "M-TI"},
+            },
+            {"tipo": "mapear", "args": {"item": "ti|git", "nos": ["@novo"]}},
+        ],
+    )
+    novo = next(n.id for n in arv.nos.values() if n.nome == "Versionamento")
+    assert [(m.no_id, m.origem, m.status) for m in arv.mapeamentos["ti|git"]] == [
+        (novo, "humano", "aprovado")
+    ]
+    assert arv.mapeamentos["ti|docker"][0].status == "rejeitado"
+    assert arv.mapeamentos["ti|helm"][0].status == "aprovado"
+
+    antes = copy.deepcopy(arv)
+    with pytest.raises(ArvoreInvalida, match="Operação 2 .*não aponta"):
+        aplicar_lote(
+            arv,
+            [
+                {"tipo": "rejeitar", "args": {"item": "ti|helm", "no": "A-K8S"}},
+                {"tipo": "desmapear", "args": {"item": "ti|helm", "no": "M-TI"}},
+            ],
+        )
+    assert arv == antes
+
+
 def test_aplicar_lote_com_apelido_e_tudo_ou_nada():
     arv = _arvore_rebaixar()
     feitas = aplicar_lote(
