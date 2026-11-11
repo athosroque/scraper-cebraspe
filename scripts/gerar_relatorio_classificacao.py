@@ -88,6 +88,9 @@ CSS_CLASSIFICACAO = """
 .secao-enunciado { font-size: 0.85rem; font-style: italic; opacity: 0.85; margin: 0.3rem 0; padding-left: 0.5rem; border-left: 2px solid color-mix(in srgb, CanvasText 25%, Canvas); }
 .texto-base-box { background: color-mix(in srgb, CanvasText 5%, Canvas); padding: 0.8rem; border-radius: 6px; font-size: 0.88rem; margin: 0.6rem 0; line-height: 1.45; white-space: pre-wrap; border: 1px dashed color-mix(in srgb, CanvasText 15%, Canvas); }
 .enunciado-texto { font-size: 0.95rem; line-height: 1.5; margin: 0.8rem 0; white-space: pre-wrap; }
+.alternativas { list-style: none; padding-left: 0.5rem; margin: 0 0 0.8rem; font-size: 0.92rem; line-height: 1.45; }
+.alternativas li { margin: 0.25rem 0; padding: 0.15rem 0.4rem; border-radius: 4px; }
+.alternativas li.alt-correta { background: color-mix(in srgb, #16a34a 15%, Canvas); border-left: 3px solid #16a34a; }
 
 .apontamento-item { background: color-mix(in srgb, CanvasText 4%, Canvas); padding: 0.6rem 0.8rem; border-radius: 6px; margin-top: 0.6rem; border: 1px solid color-mix(in srgb, CanvasText 10%, Canvas); }
 .apontamento-topo { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.3rem; }
@@ -137,7 +140,7 @@ def carregar_contexto_questoes(conn=None) -> dict[str, dict[str, Any]]:
             cur.execute(
                 """
                 SELECT c.slug, p.codigo_caderno, q.numero, q.enunciado, q.gabarito, q.anulada, q.secao,
-                       tb.texto AS texto_base, o.sigla AS orgao,
+                       tb.texto AS texto_base, o.sigla AS orgao, q.alternativas,
                        array_agg(DISTINCT ce.nome) FILTER (WHERE ce.nome IS NOT NULL) AS cargos
                 FROM questoes q
                 JOIN provas p ON p.id = q.prova_id
@@ -146,11 +149,24 @@ def carregar_contexto_questoes(conn=None) -> dict[str, dict[str, Any]]:
                 LEFT JOIN textos_base tb ON tb.id = q.texto_base_id AND tb.prova_id = p.id
                 LEFT JOIN provas_cargos pc ON pc.prova_id = p.id
                 LEFT JOIN cargos_editais ce ON ce.id = pc.cargo_edital_id
-                GROUP BY c.slug, p.codigo_caderno, q.numero, q.enunciado, q.gabarito, q.anulada, q.secao, tb.texto, o.sigla
+                GROUP BY c.slug, p.codigo_caderno, q.numero, q.enunciado, q.gabarito, q.anulada, q.secao, tb.texto, o.sigla,
+                         q.alternativas
                 """
             )
             for row in cur.fetchall():
-                slug, cod_cad, num, enun, gab, anulada, sec, tb_txt, orgao, cargos = row
+                (
+                    slug,
+                    cod_cad,
+                    num,
+                    enun,
+                    gab,
+                    anulada,
+                    sec,
+                    tb_txt,
+                    orgao,
+                    alts,
+                    cargos,
+                ) = row
                 chave = f"{slug}|{cod_cad}|{num}"
                 contexto[chave] = {
                     "tipo": "objetiva",
@@ -164,6 +180,9 @@ def carregar_contexto_questoes(conn=None) -> dict[str, dict[str, Any]]:
                     "texto_base": tb_txt or "",
                     "orgao": orgao or "",
                     "cargos": cargos or [],
+                    # Múltipla escolha (Etapa 8.M): sem as opções não dá para revisar
+                    # a classificação, que o LLM faz com elas (5D).
+                    "alternativas": alts or [],
                 }
 
             # 2. Questões discursivas
@@ -402,6 +421,15 @@ def renderizar_relatorio(
                     f"[Enunciado não carregado do banco. Hash: {reg.hash_enunciado}]"
                 )
             enun_html = f"<div class='enunciado-texto'>{escape(enunciado)}</div>"
+            alternativas = ctx.get("alternativas") or []
+            if alternativas:
+                gab = ctx.get("gabarito", "")
+                linhas = "".join(
+                    f"<li class='{'alt-correta' if a.get('letra') == gab else ''}'>"
+                    f"<b>{escape(str(a.get('letra', '')))})</b> {escape(a.get('texto', ''))}</li>"
+                    for a in alternativas
+                )
+                enun_html += f"<ol class='alternativas'>{linhas}</ol>"
 
             # Apontamentos
             apontamentos_html = []
