@@ -748,6 +748,36 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
           Confiança: 189 alta, 44 média e 1 baixa.
         - **Relatório:** o `classificacao.html` passou a mostrar as alternativas de múltipla escolha.
         - **Aprovação:** o dono aprovou o `BANRISUL_25` (P41). K22–K24 continuam sem mudança.
+    - `[ ]` C2 Curadoria dos itens do `SEFA_PR_25` e aprovação do edital (P41).
+      - `[x]` Parte 1 (2026-11-11): mapeamentos dos itens, lote `docs/planos/sefa_pr_25/lote_sefa_final.json`.
+        - **Antes:** 938 itens, 629 aprovados, 278 só propostos (KAN-92) e 31 sem nó; o passo determinístico
+          não resolvia nenhum. Das 546 propostas do KAN-92 sobravam 294 abertas: 278 do SEFA e 16 do piloto
+          (PF 12, STM 2, CD 2), que continuam para decisão (P71).
+        - **Como:** 5 lotes revisados item a item (A: confiança alta e pai aprovado; B: pai só proposto;
+          C: nó novo; fechamento: compostos e confiança baixa; D: confiança média), consolidados num só, com as
+          decisões do dono por estatística (título no menor nó que contém os filhos), um conceito por nó,
+          uma norma, um nó e o que o passo faria sozinho no próximo edital.
+        - **Critério de título (KAN-100, complemento):** filhos em até 4 assuntos → lista desses assuntos;
+          acima disso → assunto de mesmo nome, se existir; disciplina só se o bloco tem o nome dela ou não há
+          outra saída (exceção aceita: "Normas Brasileiras de Contabilidade" → Contabilidade Pública).
+        - **O lote:** 455 operações (24 `criar`, 87 `desmapear`, 222 `aprovar`, 122 `mapear`), mais a rejeição da
+          fusão `P-e44065f695` (despesa ≠ receita). 24 nós novos (nenhuma disciplina, 44 → 44; 2.767 → 2.791
+          ativos), entre eles Bens públicos, 6 assuntos de matemática básica em Raciocínio Lógico,
+          Administração financeira (Administração Geral), Fundeb, Decreto estadual nº 10.086/2022, Intervenção
+          do Estado na propriedade › Requisição administrativa, PPP (Lei nº 11.079/2004), Transformação de
+          variáveis aleatórias, Lei nº 10.028/2000 e Análise e projeto orientados a objetos (UML).
+        - **Família execução financeira** (mesmo bloco em ADMINISTRAÇÃO e EXECUÇÃO FINANCEIRA, mesmos nós):
+          noções → AFO; planejamento → Administração financeira (empresa); monitoramento → AFO + Administração
+          financeira; risco → Administração Geral › Gestão de risco; análise → Análise econômico-financeira +
+          Avaliação de projetos. Separado pelo que as questões cobram.
+        - **Resultado:** SEFA com 938 de 938 itens aprovados; os outros 6 editais sem mudança; K22–K24 antes e
+          depois, `auditar_arvore` com 0 erros e banco recarregado.
+        - **Pendências de árvore (não bloqueiam):** Segurança pública duplicada (assunto `A-e642b967a1` ×
+          subassunto `S-9bff9d7cb9`); Desapropriação como filho de Intervenção do Estado na propriedade (o
+          `mover` não troca nível); conceitos repetidos em consórcios, conflitos, capacitação, recrutamento e
+          seleção, antivírus, sanções, despesa com pessoal, gestão por resultados e contratos.
+      - `[ ]` Parte 2: classificação 5D das 380 questões (LLM pago, lista fechada).
+      - `[ ]` Parte 3: o dono aprova o edital do `SEFA_PR_25`.
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como
     `regra/aprovado`, com candidato único, sem veto e fora de `TITULOS_GENERICOS` (muda P52/P73).

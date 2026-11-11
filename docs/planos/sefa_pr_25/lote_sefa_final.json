@@ -1,0 +1,3983 @@
+{
+ "descricao": "SEFA_PR_25, Etapa 8.C C1a (2026-11-11): lote consolidado (A, B, C, fechamento, decisões 1-11 do dono) + Lote D + recomendações Q1-Q3 do D. Rascunho, não aplicado. + N1, N2 e título de recrutamento (R), aprovados pelo dono em 2026-11-11.",
+ "operacoes": [
+  {
+   "tipo": "criar",
+   "apelido": "@bens_publicos",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-6f50f4f1dd",
+    "nome": "Bens públicos"
+   },
+   "origem": "C",
+   "comentario": "Dir. Adm.: nenhum nó de bens públicos (busca 'bens? public', 'dominio public|afetac', 'uso (comum|especial)')"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@bens_regime",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@bens_publicos",
+    "nome": "Regime jurídico dos bens públicos"
+   },
+   "origem": "C",
+   "comentario": "inalienabilidade, impenhorabilidade, imprescritibilidade"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@bens_alienacao",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@bens_publicos",
+    "nome": "Aquisição e alienação de bens públicos"
+   },
+   "origem": "C",
+   "comentario": "S-1afe16d497 (Adm. Rec. Materiais › Alienação de bens) é gestão patrimonial, outro enfoque"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@bens_uso",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@bens_publicos",
+    "nome": "Uso de bens públicos por particulares"
+   },
+   "origem": "C",
+   "comentario": "autorização, permissão e concessão de uso"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@indigenas",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-99e1985020",
+    "nome": "Populações indígenas"
+   },
+   "origem": "C",
+   "comentario": "CF, Ordem social, cap. VIII (arts. 231 e 232); AL-81d3f615ac (arts. 23, 170, 225 e 231) é nó de lista de artigos"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@quilombos",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-99e1985020",
+    "nome": "Comunidades remanescentes de quilombos"
+   },
+   "origem": "C",
+   "comentario": "CF art. 216 § 5º e ADCT art. 68"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@conjuntos_numericos",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-32a53d984e",
+    "nome": "Conjuntos numéricos"
+   },
+   "origem": "C",
+   "comentario": "RLM básico; A-7f3e9f717f Operações com conjuntos é outro conceito"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@medidas",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-32a53d984e",
+    "nome": "Sistema legal de medidas"
+   },
+   "origem": "C",
+   "comentario": "RLM básico; 'medida' só casa Estatística, Direito Penal e Psicologia"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@equacoes",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-32a53d984e",
+    "nome": "Equações e inequações"
+   },
+   "origem": "C",
+   "comentario": "RLM básico; 'equac' só casa a equação básica da Contabilidade"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@sistemas_lineares",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-32a53d984e",
+    "nome": "Sistemas lineares"
+   },
+   "origem": "C",
+   "comentario": "RLM básico; nada com 'sistema linear|matriz' em matemática"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@funcoes",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-32a53d984e",
+    "nome": "Funções e gráficos"
+   },
+   "origem": "C",
+   "comentario": "RLM básico; 'func' só casa funções de probabilidade e de outras áreas"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@progressoes",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-32a53d984e",
+    "nome": "Progressões aritméticas e geométricas"
+   },
+   "origem": "C",
+   "comentario": "RLM básico; 'progress' só casa Enfermagem"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@adm_fin",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-507aa314f3",
+    "nome": "Administração financeira"
+   },
+   "origem": "C",
+   "comentario": "Finanças da empresa; AFO (ML-2379de85f7) trata de orçamento público. P72: título vira assunto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@alavancagem",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@adm_fin",
+    "nome": "Alavancagem operacional e financeira"
+   },
+   "origem": "C",
+   "comentario": "'alavanc': nada na árvore"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@planejamento_fin",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@adm_fin",
+    "nome": "Planejamento financeiro"
+   },
+   "origem": "C",
+   "comentario": "curto e longo prazo; AFO › Programação financeira (S-062e5204cf) é programação do Tesouro"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@fundeb",
+   "args": {
+    "nivel": "assunto",
+    "pai": "ML-2379de85f7",
+    "nome": "Lei nº 14.113/2020 (Fundeb)"
+   },
+   "origem": "C",
+   "comentario": "'fundeb|14.113|educacao basica': nada; nos_da_mesma_norma vazio"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@decreto_10086",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-424f65c051",
+    "nome": "Decreto estadual nº 10.086/2022 (licitações e contratos no Paraná)"
+   },
+   "origem": "C",
+   "comentario": "8 questões do SEFA; ao lado de S-bf1fb476cd Lei nº 14.133/2021, que ele regulamenta no PR"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@qualidade_sw",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-5ea6287326",
+    "nome": "Qualidade de software"
+   },
+   "origem": "C",
+   "comentario": "'9126|qualidade de software|metrica': só ISO 20000, 27001 e métricas de ML/produto"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@intervencao",
+   "args": {
+    "nivel": "assunto",
+    "pai": "M-6f50f4f1dd",
+    "nome": "Intervenção do Estado na propriedade"
+   },
+   "origem": "decisão 5",
+   "comentario": "Decisão 5: Dir. Adm. não tem nó de intervenção na propriedade (busca 'interven', 'requisic', 'tombamento', 'servidao administrativa': nada). Desapropriação (A-389afc966b) fica onde está; mover depois"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@requisicao_adm",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "@intervencao",
+    "nome": "Requisição administrativa"
+   },
+   "origem": "decisão 5",
+   "comentario": "Decisão 5: S-bba2be7f38 (Agentes públicos › Requisição) é requisição de servidor, outro conceito"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@ppp",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-4560a11578",
+    "nome": "Parcerias público-privadas (Lei nº 11.079/2004)"
+   },
+   "origem": "decisão 8",
+   "comentario": "Decisão 8: não há nó de PPP nem da Lei 11.079 (busca 'parceri', '11.079'); nos_da_mesma_norma vazio"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@transf_va",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "A-c91614a9ef",
+    "nome": "Transformação de variáveis aleatórias"
+   },
+   "origem": "decisão 8",
+   "comentario": "Decisão 8: S-eaf88a285d (Variáveis aleatórias discretas e contínuas) é outro conceito"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@lei_10028",
+   "args": {
+    "nivel": "assunto",
+    "pai": "ML-2379de85f7",
+    "nome": "Lei nº 10.028/2000 (Lei de Crimes Fiscais)"
+   },
+   "origem": "N1",
+   "comentario": "uma norma, um nó; infrações administrativas contra as leis de finanças públicas (art. 5º); questão CG1#43"
+  },
+  {
+   "tipo": "criar",
+   "apelido": "@apoo_uml",
+   "args": {
+    "nivel": "subassunto",
+    "pai": "NA-5ea6287326",
+    "nome": "Análise e projeto orientados a objetos (UML)"
+   },
+   "origem": "N2",
+   "comentario": "análise/projeto OO e UML, distinto de Programação orientada a objetos; questão 006#14"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|administracao de pessoal",
+    "no": "S-4cd3036363"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|as reformas administrativas e a redefinicao do papel do estado",
+    "no": "A-9b014a88e2"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|as reformas administrativas e a redefinicao do papel do estado|reforma do servico civil merito flexibilidade e responsabilizacao e reforma do aparelho do estado",
+    "no": "A-9b014a88e2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|excelencia nos servicos publicos|gestao de pessoas por competencias",
+    "no": "S-23743b08cb"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|gestao de projetos",
+    "no": "A-2c9c7eb394"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|indicadores de desempenho",
+    "no": "A-b34798e56a"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|indicadores de desempenho|tipos de indicadores",
+    "no": "S-def3f14b7c"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|mudancas institucionais",
+    "no": "A-4fdf54a881"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|mudancas institucionais|conselhos organizacoes sociais os organizacoes da sociedade civil de interesse publico oscip agencias reguladoras agencias executivas",
+    "no": "A-4fdf54a881"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas|analise custo beneficio e analise custo efetividade",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas|aspectos administrativos tecnicos economicos e financeiros",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas|avaliacao de programas e projetos",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas|formulacao de programas e projetos",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas|nocoes de planejamento",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|planejamento e avaliacao nas politicas publicas|tipos de avaliacao",
+    "no": "A-36bce4a6a2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao publica|processo de formulacao e desenvolvimento de politicas",
+    "no": "S-6838b58abf"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|processo de formulacao e desenvolvimento de politicas",
+    "nos": [
+     "A-36bce4a6a2"
+    ]
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|processo de formulacao e desenvolvimento de politicas construcao de agendas formulacao de politicas implementacao de politicas",
+    "no": "S-6838b58abf"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|processo de formulacao e desenvolvimento de politicas|construcao de agendas formulacao de politicas implementacao de politicas",
+    "no": "S-6838b58abf"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes",
+    "no": "S-4fbb5eef47"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes",
+    "nos": [
+     "A-7e84a0b377",
+     "A-fdd929e9b9"
+    ]
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes|analise de ambiente interno e externo",
+    "no": "S-4fbb5eef47"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes|analise de ambiente interno e externo",
+    "nos": [
+     "A-7e84a0b377"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes|ferramentas de analise de ambiente analise swot analise de cenarios matriz gut e ferramenta 5w2h",
+    "no": "A-7e84a0b377"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes|ferramentas de analise de ambiente analise swot analise de cenarios matriz gut e ferramenta 5w2h",
+    "no": "S-655449dbb0"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes|ferramentas de analise de ambiente analise swot analise de cenarios matriz gut e ferramenta 5w2h",
+    "no": "S-bcd5e45306"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|referencial estrategico das organizacoes|negocio missao visao de futuro valores",
+    "no": "S-4fbb5eef47"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|administracao financeira",
+    "nos": [
+     "A-9480bcb1e9",
+     "A-b34798e56a",
+     "@adm_fin"
+    ]
+   },
+   "origem": "C, decisão 9"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|administracao financeira|indicadores de desempenho tipos variaveis",
+    "no": "S-1af6ddeb5c"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|administracao financeira|indicadores de desempenho tipos variaveis",
+    "no": "S-def3f14b7c"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|administracao financeira|nocoes de analise de balancos e demonstracoes financeiras",
+    "nos": [
+     "A-9480bcb1e9"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|administracao financeira|planejamento financeiro de curto e longo prazo",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|administracao financeira|principios gerais de alavancagem operacional e financeira",
+    "nos": [
+     "@alavancagem"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|evolucao da administracao|governanca governabilidade e accountability na administracao publica",
+    "no": "S-68a76ed346"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|evolucao da administracao|governanca governabilidade e accountability na administracao publica",
+    "no": "S-f797302b7a"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|evolucao da administracao|plano de reforma do aparelho do estado",
+    "no": "S-1e3bfe8c59"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|evolucao da administracao|transparencia na administracao publica",
+    "no": "S-5a45296072"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|evolucao da administracao|transparencia na administracao publica",
+    "nos": [
+     "A-1e3a391b16"
+    ]
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|carreira",
+    "no": "A-4af1eec8dc"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|carreira",
+    "nos": [
+     "A-d8ff6c0634"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de pessoas|principais tecnicas de selecao de pessoas caracteristicas vantagens e desvantagens",
+    "no": "S-28d9eadb04"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de processos|bpm",
+    "no": "S-54f88d273c"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de risco financeiro",
+    "no": "A-5f8fb9dc53"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de risco financeiro|estrategias de mitigacao",
+    "no": "S-71833333ff"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de risco financeiro|identificacao de riscos financeiros",
+    "no": "S-71833333ff"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de risco financeiro|monitoramento continuo de riscos",
+    "no": "S-71833333ff"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|legislacao administrativa",
+    "no": "S-bba2be7f38"
+   },
+   "origem": "B, decisão 5"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|legislacao administrativa",
+    "no": "A-633ff2fe6c"
+   },
+   "origem": "B, decisão 5"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|legislacao administrativa",
+    "no": "A-eb4a85393a"
+   },
+   "origem": "B, decisão 5"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|legislacao administrativa",
+    "nos": [
+     "NA-1fecdaef62",
+     "@intervencao"
+    ]
+   },
+   "origem": "B, decisão 5"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|legislacao administrativa|administracao direta indireta e fundacional",
+    "no": "S-6c1b8059ee"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|legislacao administrativa|atos administrativos",
+    "no": "A-eb4a85393a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|legislacao administrativa|lei estadual no 20 656 2021",
+    "nos": [
+     "NA-1fecdaef62"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|legislacao administrativa|requisicao",
+    "no": "S-bba2be7f38"
+   },
+   "origem": "decisão 5"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|legislacao administrativa|requisicao",
+    "nos": [
+     "@requisicao_adm"
+    ]
+   },
+   "origem": "decisão 5"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|licitacao publica",
+    "no": "A-2261b82645"
+   },
+   "origem": "decisão 3"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|licitacao publica",
+    "nos": [
+     "A-91e52e6c2e"
+    ]
+   },
+   "origem": "decisão 3"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|licitacao publica|contratos e compras",
+    "no": "S-51221357bd"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|licitacao publica|contratos e compras",
+    "nos": [
+     "A-91e52e6c2e"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|licitacao publica|convenios e termos similares",
+    "no": "S-74f299e438"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|licitacao publica|modalidades dispensa e inexigibilidade",
+    "no": "S-1dc7fd7157"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|licitacao publica|modalidades dispensa e inexigibilidade",
+    "no": "SL-1f7207ac54"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|licitacao publica|pregao",
+    "no": "S-1dc7fd7157"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|monitoramento e controle financeiro",
+    "no": "A-9a585c0013"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|monitoramento e controle financeiro",
+    "nos": [
+     "A-9ced69392e",
+     "@adm_fin"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|monitoramento e controle financeiro|ajustes e correcoes",
+    "no": "A-9a585c0013"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|monitoramento e controle financeiro|ajustes e correcoes",
+    "nos": [
+     "@adm_fin",
+     "SL-1a55fbe838"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|monitoramento e controle financeiro|metodos de controle financeiro",
+    "no": "A-9a585c0013"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|monitoramento e controle financeiro|metodos de controle financeiro",
+    "nos": [
+     "@adm_fin",
+     "SL-1a55fbe838"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|nocoes de execucao financeira",
+    "no": "A-9a585c0013"
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|nocoes de execucao financeira|definicao",
+    "no": "A-9a585c0013"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|nocoes de execucao financeira|importancia e objetivos da execucao financeira nas organizacoes",
+    "no": "A-9a585c0013"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico",
+    "no": "AL-948e52bb9f"
+   },
+   "origem": "decisão 2"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|orcamento publico|conta unica do tesouro",
+    "no": "S-9cf0308dea"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|orcamento publico|conta unica do tesouro",
+    "nos": [
+     "A-99661a58c5"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|despesa publica categorias estagios",
+    "no": "S-dc9d094f20"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|diretrizes orcamentarias",
+    "no": "SL-407eae9b08"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|metodos tecnicas e instrumentos do orcamento publico normas legais aplicaveis",
+    "no": "S-a8ff1e2cb1"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|principios orcamentarios",
+    "no": "S-800f5418a7"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|processo orcamentario",
+    "no": "SL-1260470bec"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|orcamento publico|receita publica categorias fontes estagios divida ativa",
+    "no": "S-2bce88fe17"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|receita publica categorias fontes estagios divida ativa",
+    "no": "AL-49fc7bbd0b"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|orcamento publico|receita publica categorias fontes estagios divida ativa",
+    "nos": [
+     "A-68a52d046c"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|restos a pagar",
+    "no": "SL-ddc4fce8dd"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|siop e siafi",
+    "no": "S-a56b424606"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|orcamento publico|suprimento de fundos",
+    "no": "SL-1620382828"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|planejamento financeiro",
+    "nos": [
+     "@adm_fin"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|planejamento financeiro|conceito de planejamento financeiro",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|planejamento financeiro|etapas do planejamento financeiro",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|planejamento financeiro|ferramentas de planejamento financeiro",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|processo administrativo|cultura organizacional",
+    "no": "S-3dd08a2a50"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|processo administrativo|planejamento estrategico visao missao e analise swot matriz gut e ferramenta 5w2h",
+    "no": "S-4fbb5eef47"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|processo administrativo|planejamento estrategico visao missao e analise swot matriz gut e ferramenta 5w2h",
+    "no": "S-655449dbb0"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade",
+    "no": "ML-d3c974c363"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis",
+    "no": "S-73293ed643"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis",
+    "no": "S-d3cdae7a96"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis",
+    "no": "S-d99861516a"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis",
+    "nos": [
+     "A-9480bcb1e9",
+     "AL-3b6e43967f"
+    ]
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis|analise de informacoes extraidas das notas explicativas",
+    "no": "S-78a9bdced7"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis|analise de informacoes extraidas das notas explicativas",
+    "nos": [
+     "SL-e55da70bf6"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis|analise horizontal e vertical",
+    "no": "S-d99861516a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis|indicadores de endividamento",
+    "no": "S-d3cdae7a96"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis|indicadores de estrutura de capital",
+    "no": "S-8538189a7e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|analise das demonstracoes contabeis|indicadores de liquidez",
+    "no": "S-73293ed643"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|conceituacao objeto e campo de aplicacao",
+    "no": "AL-58b83bf93c"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|creditos adicionais",
+    "no": "A-6046b68747"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|despesa publica",
+    "no": "AL-baa42ce1dc"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|despesa publica|conceito etapas estagios e categorias economicas",
+    "no": "S-dc9d094f20"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|despesas com pessoal",
+    "no": "S-aab3e485e5"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|despesas com pessoal",
+    "no": "S-b40efeb6a4"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|despesas com pessoal",
+    "nos": [
+     "AL-02b4bc3a67"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|despesas com pessoal|definicoes e limites",
+    "no": "S-b40efeb6a4"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|despesas de exercicios anteriores",
+    "no": "A-25cda6b4f4"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb",
+    "nos": [
+     "@fundeb"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb|composicao financeira",
+    "nos": [
+     "@fundeb"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb|distribuicao de recursos",
+    "nos": [
+     "@fundeb"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|lei no 14 113 2020 novo fundo de manutencao e desenvolvimento da educacao basica e de valorizacao dos profissionais de educacao fundeb|utilizacao dos recursos",
+    "nos": [
+     "@fundeb"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|mensuracao de ativos",
+    "no": "AL-5cfbb3534a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|mensuracao de ativos|ativo imobilizado",
+    "no": "SL-710739892e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|mensuracao de ativos|ativo intangivel",
+    "no": "SL-91b70bfb30"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|mensuracao de passivos",
+    "no": "AL-1eb5a269de"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|mensuracao de passivos|passivos contingentes",
+    "no": "SL-d5e1e65513"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|mensuracao de passivos|provisoes",
+    "no": "SL-30d9bd3da8"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade",
+    "nos": [
+     "ML-d3c974c363"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|caracteristicas qualitativas",
+    "no": "S-9f5ab2d1f0"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|caracteristicas qualitativas",
+    "nos": [
+     "AL-43753cad5d"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|elementos das demonstracoes contabeis",
+    "no": "S-5a623c5d00"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|elementos das demonstracoes contabeis",
+    "nos": [
+     "AL-43753cad5d"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|entidade que reporta a informacao contabil",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|entidade que reporta a informacao contabil",
+    "nos": [
+     "AL-43753cad5d"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|mensuracao de ativos e passivos nas demonstracoes contabeis",
+    "no": "AL-1eb5a269de"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|mensuracao de ativos e passivos nas demonstracoes contabeis",
+    "no": "AL-5cfbb3534a"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 03 provisoes passivos contingentes e ativos contingentes",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 03 provisoes passivos contingentes e ativos contingentes",
+    "nos": [
+     "SL-30d9bd3da8",
+     "SL-d5e1e65513"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 04 estoques",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 04 estoques",
+    "nos": [
+     "A-85abba366c"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 07 ativo imobilizado",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 07 ativo imobilizado",
+    "nos": [
+     "SL-710739892e"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 08 ativo intangivel",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 08 ativo intangivel",
+    "nos": [
+     "SL-91b70bfb30"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 09 reducao ao valor recuperavel de ativo nao gerador de caixa",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 09 reducao ao valor recuperavel de ativo nao gerador de caixa",
+    "nos": [
+     "SL-ddfb6d7312"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 10 reducao ao valor recuperavel de ativo gerador de caixa",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 10 reducao ao valor recuperavel de ativo gerador de caixa",
+    "nos": [
+     "SL-ddfb6d7312"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 11 apresentacao das demonstracoes contabeis",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 11 apresentacao das demonstracoes contabeis",
+    "nos": [
+     "S-5a623c5d00"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 12 demonstracao dos fluxos de caixa",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 12 demonstracao dos fluxos de caixa",
+    "nos": [
+     "SL-6f213d5cd7"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 13 apresentacao de informacao orcamentaria nas demonstracoes contabeis",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 13 apresentacao de informacao orcamentaria nas demonstracoes contabeis",
+    "nos": [
+     "A-3ebaa495a7"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 16 demonstracoes contabeis separadas",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 16 demonstracoes contabeis separadas",
+    "nos": [
+     "A-4a2df0effe"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 17 demonstracoes contabeis consolidadas",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 17 demonstracoes contabeis consolidadas",
+    "nos": [
+     "S-f293322cbf"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 23 politicas contabeis mudanca de estimativa e retificacao de erro",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp 23 politicas contabeis mudanca de estimativa e retificacao de erro",
+    "nos": [
+     "A-d55ae8f203"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp estrutura conceitual de 23 de setembro de 2016",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|nbc tsp estrutura conceitual de 23 de setembro de 2016",
+    "nos": [
+     "AL-43753cad5d"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|objetivos e usuarios da informacao contabil de proposito geral das entidades do setor publico",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|objetivos e usuarios da informacao contabil de proposito geral das entidades do setor publico",
+    "nos": [
+     "AL-43753cad5d"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|reconhecimento nas demonstracoes contabeis",
+    "no": "S-cd1a887ef3"
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "contabilidade|normas brasileiras de contabilidade|reconhecimento nas demonstracoes contabeis",
+    "nos": [
+     "AL-43753cad5d"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|receita publica",
+    "no": "AL-49fc7bbd0b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|receita publica|conceito etapas estagios e categorias economicas",
+    "no": "S-26865bee27"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|relatorio de gestao fiscal",
+    "no": "S-5eab745611"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|relatorio resumido da execucao orcamentaria rreo",
+    "no": "S-30250b66d7"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|restos a pagar",
+    "no": "SL-ddc4fce8dd"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|sistema de custos",
+    "no": "A-d03a41732b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|sistema de custos|terminologia de custos",
+    "no": "S-491474294b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|suprimento de fundos",
+    "no": "SL-1620382828"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|variacoes patrimoniais",
+    "no": "AL-f39ed6f82c"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|variacoes patrimoniais|qualitativas",
+    "no": "S-0b0cf7ab5e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|variacoes patrimoniais|quantitativas receita e despesa sob o enfoque patrimonial",
+    "no": "SL-d88cf385be"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "contabilidade|variacoes patrimoniais|resultado patrimonial",
+    "no": "SL-4f5d933a4b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|administracao publica",
+    "no": "S-20e16b751f"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|administracao publica",
+    "no": "S-9bda7db676"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|administracao publica",
+    "no": "S-edee3bd3c5"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|administracao publica",
+    "nos": [
+     "A-633ff2fe6c",
+     "A-866b5656ef",
+     "A-de0e55ab1a"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|administracao publica|administracao publica em sentido amplo e em sentido estrito",
+    "no": "S-775e03dd0f"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|administracao publica|administracao publica em sentido objetivo e em sentido subjetivo",
+    "no": "S-775e03dd0f"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|administracao publica|organizacao descentralizacao desconcentracao orgaos publicos",
+    "no": "S-9bda7db676"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|administracao publica|organizacao descentralizacao desconcentracao orgaos publicos",
+    "no": "S-edee3bd3c5"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao",
+    "no": "A-c1f695d9ea"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao|cargo emprego e funcao publicos",
+    "no": "SL-aea7ac8fe1"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao|formas de provimento e vacancia dos cargos publicos",
+    "no": "S-553ee52694"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao|formas de provimento e vacancia dos cargos publicos",
+    "no": "S-98db140823"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|agentes publicos especies e classificacao|responsabilidade civil penal e administrativa",
+    "no": "S-7052d4368b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|ato administrativo inexistente",
+    "no": "S-d4f9eafeef"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|atos administrativos gerais e individuais",
+    "no": "S-dcb8ad1404"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|atos administrativos nulos e anulaveis",
+    "no": "S-d4f9eafeef"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|atos administrativos simples complexos e compostos",
+    "no": "S-dcb8ad1404"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|atos administrativos unilaterais bilaterais e multilaterais",
+    "no": "S-dcb8ad1404"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|atos administrativos vinculados e discricionarios",
+    "no": "S-6544a78fea"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|cassacao",
+    "no": "S-d2f332d8d4"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|conceitos requisitos elementos pressupostos e classificacao",
+    "no": "S-56ad2dbc7e"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|fato e ato administrativo",
+    "no": "S-cfbaaf1241"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|revogacao anulacao e convalidacao do ato administrativo",
+    "no": "S-d2f332d8d4"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|bens publicos",
+    "nos": [
+     "@bens_publicos"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|bens publicos|aquisicao e alienacao dos bens publicos",
+    "nos": [
+     "@bens_alienacao"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|bens publicos|formas de utilizacao dos bens publicos pelos particulares",
+    "nos": [
+     "@bens_uso"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|bens publicos|regime juridico",
+    "nos": [
+     "@bens_regime"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|conceito e fontes do direito administrativo",
+    "no": "A-9761f0d86a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|conceito e fontes do direito administrativo",
+    "no": "A-de0e55ab1a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|conceito e fontes do direito administrativo|conceito",
+    "no": "S-72d42deba3"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|conceito e fontes do direito administrativo|conteudo supremacia do interesse publico sobre o privado e indisponibilidade pela administracao dos interesses publicos",
+    "no": "S-d07e5928b1"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|conceito e fontes do direito administrativo|regime juridico administrativo",
+    "no": "A-de0e55ab1a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|contratos administrativos|procedimento",
+    "no": "S-f7065e5a17"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|contratos administrativos|tipos",
+    "no": "S-f6e31a60c2"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|controle e responsabilizacao da administracao controle administrativo controle judicial controle legislativo",
+    "no": "A-3b6e7bebd4"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|controle e responsabilizacao da administracao controle administrativo controle judicial controle legislativo",
+    "nos": [
+     "S-2744fa5ed4",
+     "S-3cf946c3cf",
+     "S-e96c1c3a65"
+    ]
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|intervencao do estado sobre a propriedade privada",
+    "no": "A-389afc966b"
+   },
+   "origem": "decisão 5"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|intervencao do estado sobre a propriedade privada",
+    "nos": [
+     "@intervencao"
+    ]
+   },
+   "origem": "decisão 5"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|intervencao do estado sobre a propriedade privada|intervencao do estado no dominio economico",
+    "no": "A-389afc966b"
+   },
+   "origem": "decisão 5"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|intervencao do estado sobre a propriedade privada|intervencao do estado no dominio economico",
+    "nos": [
+     "A-1bfb01b768"
+    ]
+   },
+   "origem": "decisão 5"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|licitacoes modalidades e procedimentos",
+    "no": "A-2261b82645"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|licitacoes modalidades e procedimentos",
+    "nos": [
+     "S-1dc7fd7157",
+     "S-f7065e5a17"
+    ]
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|parceria publico privada",
+    "no": "A-4560a11578"
+   },
+   "origem": "B, decisão 8"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|parceria publico privada",
+    "nos": [
+     "@ppp"
+    ]
+   },
+   "origem": "B, decisão 8"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|parceria publico privada|conceito",
+    "no": "S-f4630f8a69"
+   },
+   "origem": "B, decisão 8"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|parceria publico privada|conceito",
+    "nos": [
+     "@ppp"
+    ]
+   },
+   "origem": "B, decisão 8"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|parceria publico privada|delegacao concessao permissao e autorizacao",
+    "no": "S-21c4a58b62"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|poderes da administracao publica|hierarquia poder hierarquico e suas manifestacoes",
+    "no": "S-d44c3466a5"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|poderes da administracao publica|liberdades publicas e poder de policia",
+    "no": "S-b34d4b1874"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito constitucional|defesa do estado e das instituicoes democraticas|seguranca publica",
+    "no": "S-9bff9d7cb9"
+   },
+   "origem": "decisão 4"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito constitucional|defesa do estado e das instituicoes democraticas|seguranca publica",
+    "nos": [
+     "A-e642b967a1"
+    ]
+   },
+   "origem": "decisão 4"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito constitucional|direitos das comunidades remanescentes de quilombos",
+    "nos": [
+     "@quilombos"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito constitucional|direitos e interesses das populacoes indigenas",
+    "nos": [
+     "@indigenas"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito tributario|tributos|contribuicao de melhoria",
+    "nos": [
+     "S-c582d93e13"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|economia do setor publico|outras politicas economicas",
+    "nos": [
+     "NA-6ac3a5bb8f"
+    ]
+   },
+   "origem": "decisão 6"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|microeconomia|equilibrios",
+    "nos": [
+     "NS-e00e3be080"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|inferencia estatistica|estimacao intervalar",
+    "no": "S-66dde10dbf"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|inferencia estatistica|estimacao pontual",
+    "no": "S-ebced3b1f9"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|inferencia estatistica|hipoteses simples e compostas niveis de significancia e potencia de um teste teste t de student teste qui quadrado",
+    "no": "S-6987848f3e"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|inferencia estatistica|intervalos de confianca intervalos de credibilidade",
+    "no": "S-66dde10dbf"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|inferencia estatistica|metodos de estimacao propriedades dos estimadores suficiencia",
+    "no": "S-ebced3b1f9"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|inferencia estatistica|testes de hipoteses",
+    "no": "S-6987848f3e"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "estatistica|probabilidade|leis dos grandes numeros",
+    "no": "S-894206e4ce"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "estatistica|probabilidade|transformacao de variaveis",
+    "no": "S-eaf88a285d"
+   },
+   "origem": "decisão 8"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "estatistica|probabilidade|transformacao de variaveis",
+    "nos": [
+     "@transf_va"
+    ]
+   },
+   "origem": "decisão 8"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira",
+    "no": "A-9ced69392e"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira",
+    "nos": [
+     "M-507aa314f3",
+     "ML-2379de85f7"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|analise financeira",
+    "no": "A-9ced69392e"
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|analise financeira",
+    "nos": [
+     "A-9480bcb1e9",
+     "A-a5ee1063ce"
+    ]
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|analise financeira|ferramentas de analise",
+    "no": "A-9ced69392e"
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|analise financeira|ferramentas de analise",
+    "nos": [
+     "A-9480bcb1e9",
+     "A-a5ee1063ce"
+    ]
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|analise financeira|metodos de analise",
+    "no": "A-9ced69392e"
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|analise financeira|metodos de analise",
+    "nos": [
+     "A-9480bcb1e9",
+     "A-a5ee1063ce"
+    ]
+   },
+   "origem": "decisão 1"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|execucao de despesas e receitas",
+    "no": "A-9ced69392e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|execucao de despesas e receitas",
+    "nos": [
+     "AL-49fc7bbd0b"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|execucao de despesas e receitas|gestao de despesas",
+    "no": "S-83dbcb481c"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|execucao de despesas e receitas|gestao de receitas",
+    "no": "S-5df009406a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|gestao de risco financeiro",
+    "no": "A-9ced69392e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|gestao de risco financeiro",
+    "nos": [
+     "A-5f8fb9dc53"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|gestao de risco financeiro|estrategias de mitigacao",
+    "no": "S-71833333ff"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|gestao de risco financeiro|identificacao de riscos financeiros",
+    "no": "S-71833333ff"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|gestao de risco financeiro|monitoramento continuo de riscos",
+    "no": "S-71833333ff"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|monitoramento e controle financeiro",
+    "no": "SL-1a55fbe838"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|monitoramento e controle financeiro",
+    "nos": [
+     "A-9ced69392e",
+     "@adm_fin"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|monitoramento e controle financeiro|ajustes e correcoes",
+    "no": "SL-1a55fbe838"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|monitoramento e controle financeiro|ajustes e correcoes",
+    "nos": [
+     "@adm_fin"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "execucao financeira|monitoramento e controle financeiro|metodos de controle financeiro",
+    "no": "SL-1a55fbe838"
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|monitoramento e controle financeiro|metodos de controle financeiro",
+    "nos": [
+     "@adm_fin"
+    ]
+   },
+   "origem": "B, decisão 1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|nocoes de execucao financeira",
+    "no": "A-9ced69392e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|nocoes de execucao financeira",
+    "nos": [
+     "A-9a585c0013"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|nocoes de execucao financeira|definicao",
+    "no": "A-9ced69392e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|nocoes de execucao financeira|definicao",
+    "nos": [
+     "A-9a585c0013"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|nocoes de execucao financeira|importancia e objetivos da execucao financeira nas organizacoes",
+    "no": "A-9ced69392e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|nocoes de execucao financeira|importancia e objetivos da execucao financeira nas organizacoes",
+    "nos": [
+     "A-9a585c0013"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro",
+    "no": "S-062e5204cf"
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro",
+    "nos": [
+     "@adm_fin"
+    ]
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro|conceito de planejamento financeiro",
+    "no": "S-062e5204cf"
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro|conceito de planejamento financeiro",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro|etapas do planejamento financeiro",
+    "no": "S-062e5204cf"
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro|etapas do planejamento financeiro",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro|ferramentas de planejamento financeiro",
+    "no": "S-062e5204cf"
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "execucao financeira|planejamento financeiro|ferramentas de planejamento financeiro",
+    "nos": [
+     "@planejamento_fin"
+    ]
+   },
+   "origem": "B-depois-do-C"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade",
+    "no": "A-8df81a683e"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade",
+    "no": "A-51c66be0c2"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade",
+    "no": "A-834565a4d4"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade",
+    "nos": [
+     "A-71a8532a58",
+     "A-be0f39aac0"
+    ]
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade|agenda esg e sustentabilidade na administracao publica",
+    "no": "A-834565a4d4"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade|agenda esg e sustentabilidade na administracao publica",
+    "nos": [
+     "A-71a8532a58"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade|gestao por resultados e valor publico",
+    "no": "A-8df81a683e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade|gestao por resultados e valor publico",
+    "nos": [
+     "S-865a6957bc"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade|inovacao em politicas publicas",
+    "no": "A-51c66be0c2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|inovacao e sustentabilidade|laboratorios de inovacao e design thinking",
+    "no": "A-51c66be0c2"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|processo administrativo",
+    "no": "S-68fb64a623"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|processo administrativo",
+    "nos": [
+     "A-c415e4b4f5"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|administracao por objetivos",
+    "no": "S-81590475b7"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|balanced scorecard",
+    "no": "S-68fb64a623"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|balanced scorecard",
+    "nos": [
+     "S-7a0d161260"
+    ]
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|estrutura organizacional",
+    "no": "S-6e1d90a296"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|gestao de riscos e compliance no setor publico",
+    "no": "S-0b50b1da53"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|gestao de riscos e compliance no setor publico",
+    "no": "S-14dd03a6ba"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|governanca publica e accountability",
+    "no": "S-39f2cd6d84"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|governanca publica e accountability",
+    "no": "S-f797302b7a"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|governanca publica e accountability",
+    "nos": [
+     "S-68a76ed346"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|organizacao",
+    "no": "S-25195cd4bf"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|planejamento operacional",
+    "no": "S-3105046476"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|planejamento participativo e governanca colaborativa",
+    "no": "S-68fb64a623"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|planejamento participativo e governanca colaborativa",
+    "no": "S-af22ec4961"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "gestao publica|processo administrativo|planejamento participativo e governanca colaborativa",
+    "nos": [
+     "A-6a961350d9"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|planejamento tatico",
+    "no": "S-98f5c7f1bc"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|processo de planejamento",
+    "no": "S-ebcf932a2e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|processo administrativo|redes e aliancas",
+    "no": "S-0f87785cb0"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|transformacao digital e governo eletronico govtech dados abertos inteligencia artificial uso etico e seguro de dados publicos",
+    "no": "A-4d3dc07a36"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|transformacao digital e governo eletronico govtech dados abertos inteligencia artificial uso etico e seguro de dados publicos",
+    "no": "S-d4bb119012"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|transformacao digital e governo eletronico govtech dados abertos inteligencia artificial uso etico e seguro de dados publicos",
+    "no": "S-dc1c2b90bb"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos",
+    "no": "A-4ef0c7d0e1"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos",
+    "nos": [
+     "A-91e52e6c2e"
+    ]
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos|acrescimos e supressoes",
+    "no": "S-6e6606b2c7"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos|alteracao do objeto",
+    "no": "S-6e6606b2c7"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos|formalizacao e fiscalizacao do contrato",
+    "no": "S-aa0607c8cb"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos|garantia contratual",
+    "no": "S-4b30fd0ade"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "licitacoes e contratos|administracao de contratos|sancao administrativa",
+    "no": "S-b02401c9bd"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "licitacoes e contratos|licitacoes e contratos administrativos|decreto estadual no 10 086 2022 titulo ii disposicoes gerais sobre compras e contratacao de prestacao de servicos",
+    "no": "S-71cf533808"
+   },
+   "origem": "decisão 7"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "licitacoes e contratos|licitacoes e contratos administrativos|decreto estadual no 10 086 2022 titulo ii disposicoes gerais sobre compras e contratacao de prestacao de servicos",
+    "nos": [
+     "@decreto_10086"
+    ]
+   },
+   "origem": "decisão 7"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de contabilidade aplicada ao setor publico casp|sistema de custos no setor publico",
+    "no": "A-d03a41732b"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de contabilidade aplicada ao setor publico casp|sistema de custos no setor publico|classificacao e nomenclatura de custos",
+    "no": "S-491474294b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de contabilidade aplicada ao setor publico casp|sistema de custos no setor publico|terminologia de custos",
+    "no": "S-491474294b"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico",
+    "no": "M-32a53d984e"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|conjuntos numericos numeros inteiros racionais e reais",
+    "nos": [
+     "@conjuntos_numericos"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|equacoes e inequacoes de 1o e de 2o graus",
+    "nos": [
+     "@equacoes"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|estruturas logicas",
+    "no": "A-05d3a2c440"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|funcoes e graficos",
+    "nos": [
+     "@funcoes"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|logica de argumentacao analogias inferencias deducoes e conclusoes",
+    "no": "S-4e4ac31f38"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|logica sentencial ou proposicional",
+    "no": "A-be258b4660"
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|logica sentencial ou proposicional",
+    "nos": [
+     "A-d54b6f8e58"
+    ]
+   },
+   "origem": "B, decisão 9"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|logica sentencial ou proposicional|diagramas logicos",
+    "no": "S-d78a45ead8"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|logica sentencial ou proposicional|equivalencias",
+    "no": "S-5b6e7b24d0"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|logica sentencial ou proposicional|leis de de morgan",
+    "no": "S-8c8c7dfc8a"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|logica sentencial ou proposicional|tabelas verdade",
+    "no": "S-6607f63c21"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|operacoes com conjuntos",
+    "no": "A-7f3e9f717f"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|principios de contagem",
+    "no": "A-16894f77a3"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|progressoes aritmeticas e geometricas",
+    "nos": [
+     "@progressoes"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|razoes e proporcoes",
+    "no": "A-d4f5c80605"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|razoes e proporcoes|divisao proporcional",
+    "no": "A-d4f5c80605"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|razoes e proporcoes|porcentagens",
+    "no": "A-d4f5c80605"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "raciocinio logico e matematico|razoes e proporcoes|regras de tres simples e compostas",
+    "no": "A-d4f5c80605"
+   },
+   "origem": "B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|sistema legal de medidas",
+    "nos": [
+     "@medidas"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "raciocinio logico e matematico|sistemas lineares",
+    "nos": [
+     "@sistemas_lineares"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|analise de requisitos funcionais e nao funcionais",
+    "no": "A-6a5ad94fa5"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|modelagem de dados modelagem relacional",
+    "no": "A-48c7cb56b8"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|qualidade de software isso iec 9126 metricas de qualidade de software",
+    "nos": [
+     "@qualidade_sw"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|banco de dados|arquitetura de banco de dados relacional postgresql oracle sqlserver nao relacional orientado a documento chave valor grafo colunar time series",
+    "no": "S-d5fc6db6ad"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|banco de dados|arquitetura de banco de dados relacional postgresql oracle sqlserver nao relacional orientado a documento chave valor grafo colunar time series",
+    "no": "S-fed7e2d779"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|banco de dados|gestao de banco de dados controle de acesso usuario calculo volumetrico replicacao cluster particionamento e esquemas",
+    "no": "A-2777136b57"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|banco de dados|modelagem de banco de dados fisico logico e conceitual",
+    "no": "A-48c7cb56b8"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|contratacoes gestao e fiscalizacao de contratos administrativos especializados em tic|decreto estadual no 10 086 2022 titulo v da tecnologia da informacao e de comunicacao arts 646 a 657",
+    "nos": [
+     "@decreto_10086"
+    ]
+   },
+   "origem": "C"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis|ferramentas de gestao de projetos ms project jira trello",
+    "no": "S-0ccb002a44"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis|metodologias e frameworks de gestao de projetos pmbok 7a edicao agile scrum kanban",
+    "no": "A-441ecdfb0c"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis|metodologias e frameworks de gestao de projetos pmbok 7a edicao agile scrum kanban",
+    "no": "S-c741425bc1"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis|metodologias e frameworks de gestao de projetos pmbok 7a edicao agile scrum kanban",
+    "nos": [
+     "S-774833cfc8"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de servicos de ti|nocoes de itil v 4 e seus processos",
+    "no": "A-ef84a862e5"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti|cobit 2019",
+    "no": "A-62cc2b0c63"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti|conceitos e principios de governanca de tic",
+    "no": "A-62cc2b0c63"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti|frameworks e modelos de governanca",
+    "no": "A-62cc2b0c63"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti|planejamento estrategico de ti",
+    "no": "A-9579bc2a33"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|infraestrutura de tic|classificacao de redes pan lan man wan",
+    "no": "A-5cc2d6e82a"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|infraestrutura de tic|enderecamento e protocolos da familia tcp ip",
+    "no": "A-710241c2f3"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|confiabilidade integridade disponibilidade autenticidade e nao repudio",
+    "no": "A-e82b500a76"
+   },
+   "origem": "A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|gestao de riscos e continuidade de negocio",
+    "no": "A-c700f36823"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|gestao de riscos e continuidade de negocio",
+    "no": "A-d816aaf9d1"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|mecanismos de seguranca criptografia conceitos basicos e aplicacoes principais algoritmos de criptografia assinatura digital garantia de integridade controle de acesso certificacao digital",
+    "no": "A-4e29084c17"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|mecanismos de seguranca criptografia conceitos basicos e aplicacoes principais algoritmos de criptografia assinatura digital garantia de integridade controle de acesso certificacao digital",
+    "no": "A-805590e68b"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|mecanismos de seguranca criptografia conceitos basicos e aplicacoes principais algoritmos de criptografia assinatura digital garantia de integridade controle de acesso certificacao digital",
+    "no": "A-8763b26044"
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|mecanismos de seguranca criptografia conceitos basicos e aplicacoes principais algoritmos de criptografia assinatura digital garantia de integridade controle de acesso certificacao digital",
+    "nos": [
+     "A-d8c9b18de0"
+    ]
+   },
+   "origem": "fechamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito constitucional|constituicao|mutacao constitucional",
+    "no": "S-5befc39619"
+   },
+   "comentario": "mutação é mudança informal por interpretação; sem nó próprio; filho do nó do pai (CF/88)"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito constitucional|direitos e garantias fundamentais|o ente estatal titular de direitos fundamentais",
+    "no": "A-3699f9a8aa"
+   },
+   "comentario": "sem nó de teoria geral/titularidade; assunto = nó do pai"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito constitucional|defesa do estado e das instituicoes democraticas|estado de defesa e estado de sitio",
+    "no": "A-120de13db6"
+   },
+   "comentario": "assunto sem filhos; busca 'sitio|estado de defesa' vazia"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito constitucional|defesa do estado e das instituicoes democraticas|forcas armadas",
+    "no": "A-120de13db6"
+   },
+   "comentario": "'forcas armadas|militar' só casa Dir. Penal Militar e servidores militares (outro conceito)"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito constitucional|ordem economica e financeira|politica urbana agricola e fundiaria e reforma agraria",
+    "no": "A-1bfb01b768"
+   },
+   "comentario": "busca 'politica urbana|agrari|fundiari' vazia; assunto = nó do pai"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito constitucional|emenda constitucional no 103 2019 reforma da previdencia",
+    "no": "S-1d4a496ad7"
+   },
+   "comentario": "EC 103 altera o regime previdenciário da CF; Previdência Social é o nó do conceito; nenhum nó da EC"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|formacao do ato administrativo elementos procedimento administrativo",
+    "no": "S-076d7d44a2"
+   },
+   "comentario": "formação = elementos/requisitos; filho do nó do pai"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|validade eficacia e autoexecutoriedade do ato administrativo",
+    "no": "S-066ac5e0f1"
+   },
+   "comentario": "autoexecutoriedade é atributo; sem nó de planos validade/eficácia"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|merito do ato administrativo discricionariedade",
+    "no": "S-6544a78fea"
+   },
+   "comentario": "mesmo nó do irmão 'atos vinculados e discricionários' (aprovado)"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|teoria das nulidades no direito administrativo",
+    "no": "S-d4f9eafeef"
+   },
+   "comentario": "mesmo conceito; irmãos 'nulos e anuláveis' e 'inexistente' já aprovados aí"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|atos administrativos|vicios do ato administrativo",
+    "no": "S-d4f9eafeef"
+   },
+   "comentario": "vício → nulidade/anulabilidade; sem nó de vícios"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|administracao publica",
+    "no": "A-9b014a88e2"
+   },
+   "comentario": "título de bloco: os 2 filhos estão em subassuntos de A-9b014a88e2 (menor nó que os contém)"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de tecnologia da informacao|nocoes de data warehouse",
+    "no": "A-5bdd39bcd0"
+   },
+   "comentario": "mesmo nó já aprovado para 'BI, data warehouse, data mart' em outro edital"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de tecnologia da informacao|nocoes de analytics",
+    "no": "A-b0eeb58e68"
+   },
+   "comentario": "mesmo nó aprovado para 'conceitos de big data e analytics'"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "nocoes de tecnologia da informacao|nocoes de business intelligence",
+    "no": "A-5bdd39bcd0"
+   },
+   "comentario": "idem DW"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|competencia interpessoal",
+    "no": "S-8123798742"
+   },
+   "comentario": "nó de mesmo nome; já aprovado para o mesmo item em 3 editais"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "gestao publica|gerenciamento de conflitos",
+    "no": "S-f06ff8a230"
+   },
+   "comentario": "nó de mesmo nome; já aprovado para o mesmo item em outros editais"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|evolucao da administracao|qualidade na administracao publica",
+    "no": "S-2d347e3152"
+   },
+   "comentario": "programas de qualidade no setor público (PQSP → GesPública); nenhum nó mais próximo"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao|gestao de pessoas|principais tipos caracteristicas vantagens e desvantagens",
+    "no": "S-90c05b9019"
+   },
+   "comentario": "no edital é o 3.3.2 de 'recrutamento e seleção' → tipos de recrutamento"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|banco de dados|algebra relacional sql ansi e linguagens procedurais embarcadas",
+    "no": "S-551a90e864"
+   },
+   "comentario": "SQL ANSI e PL/SQL; 'algebra relacional' sem nó"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|seguranca cibernetica",
+    "no": "A-8bc51b3a2f"
+   },
+   "comentario": "conceito amplo = o assunto; A-c02bf434e4 é só de frameworks"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de projetos com base nos dominios de desempenho e praticas ageis|ciclo de vida de projetos de ti abordagens preditivas iterativas incrementais ageis e hibridas",
+    "no": "A-684307b65b"
+   },
+   "comentario": "nó do pai, enfoque TI; S-a36d8a0434 (Adm. Geral) seria outra disciplina"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de servicos de ti|gerenciamento de servicos catalogo de servicos niveis de servico gerenciamento de capacidade e disponibilidade",
+    "no": "A-ef84a862e5"
+   },
+   "comentario": "práticas do ITIL v4; nó sem filhos"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|gerenciamento de servicos de ti|gerenciamento de incidentes e problemas gestao de mudancas configuracoes e liberacoes",
+    "no": "A-ef84a862e5"
+   },
+   "comentario": "práticas do ITIL v4; A-a72164a20c é incidente de segurança (enfoque errado)"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "direito administrativo|administracao indireta e entidades paralelas",
+    "no": "S-6c1b8059ee"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|administracao indireta e entidades paralelas",
+    "nos": [
+     "A-633ff2fe6c"
+    ]
+   },
+   "comentario": "cobre >4 subassuntos (adm. indireta, autarquias, fundações, EP, SEM, agências, paraestatais, OS, OSCIP) → assunto que os contém"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "direito administrativo|convenios e consorcios administrativos",
+    "no": "S-74f299e438"
+   },
+   "comentario": "item composto: convênios (aprovar o proposto) + consórcios (2 nós do mesmo conceito, ver pergunta)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "direito administrativo|convenios e consorcios administrativos",
+    "nos": [
+     "S-a2930b550b",
+     "S-ee55341a52"
+    ]
+   },
+   "comentario": "item composto: convênios (aprovar o proposto) + consórcios (2 nós do mesmo conceito, ver pergunta)"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de tecnologia da informacao|redes de computadores|grupos de discussao",
+    "no": "S-0da4ddc89c"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de tecnologia da informacao|redes de computadores|grupos de discussao",
+    "nos": [
+     "S-43ed8a5b23"
+    ]
+   },
+   "comentario": "o edital separa 3.5 grupos de discussão de 3.6 redes sociais; fóruns/listas são aplicativos de Internet"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "nocoes de contabilidade aplicada ao setor publico casp|principios e normas de contabilidade sob a perspectiva do setor publico|mcasp 11a edicao",
+    "no": "AL-68a79a9117"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "nocoes de contabilidade aplicada ao setor publico casp|principios e normas de contabilidade sob a perspectiva do setor publico|mcasp 11a edicao",
+    "nos": [
+     "A-0dcd05d4dd"
+    ]
+   },
+   "comentario": "uma norma, um nó: existe o assunto MCASP 11ª edição"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|objetivos e caracteristicas",
+    "no": "S-9a7909dd67"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|objetivos e caracteristicas",
+    "nos": [
+     "A-608e6fac70"
+    ]
+   },
+   "comentario": "no edital é o 3.3.1 de 'recrutamento e seleção' (não da gestão de pessoas, que é o 3.2 já aprovado)"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|capacitacao de pessoas",
+    "no": "S-b28a2f1b72"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|capacitacao de pessoas",
+    "nos": [
+     "AL-6e05cfe18b"
+    ]
+   },
+   "comentario": "assunto 'Capacitação e desenvolvimento de pessoas', já aprovado para itens iguais"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "licitacoes e contratos|licitacoes e contratos administrativos|lei no 8 987 1995 e suas alteracoes lei de concessoes",
+    "no": "S-71cf533808"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "licitacoes e contratos|licitacoes e contratos administrativos|lei no 8 987 1995 e suas alteracoes lei de concessoes",
+    "nos": [
+     "S-21c4a58b62"
+    ]
+   },
+   "comentario": "Lei de Concessões trata de concessão/permissão de serviço público, não de licitação"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao publica|lei federal no 12 527 2011 e suas alteracoes lei de acesso a informacao",
+    "no": "A-1e3a391b16"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|lei federal no 12 527 2011 e suas alteracoes lei de acesso a informacao",
+    "nos": [
+     "S-256fbea4b7"
+    ]
+   },
+   "comentario": "uma norma, um nó: nó da LAI, já aprovado para o mesmo item em Noções de TI do SEFA"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao publica|lei complementar no 131 2009 lei da transparencia",
+    "no": "A-1e3a391b16"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|lei complementar no 131 2009 lei da transparencia",
+    "nos": [
+     "SL-45fc51771b"
+    ]
+   },
+   "comentario": "LC 131 altera a LRF (arts. 48, 48-A, 73-A a 73-C) → LRF › Transparência, controle e fiscalização"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|necessidade de financiamento do setor publico nfsp",
+    "no": "SL-624c60f90a"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|economia do setor publico|necessidade de financiamento do setor publico nfsp",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   },
+   "comentario": "enfoque econômico; precedente a077129 (resultado primário/nominal → Déficit e dívida pública); pai 'contabilidade fiscal' já aí"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|resultados nominal operacional e primario",
+    "no": "SL-624c60f90a"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|economia do setor publico|resultados nominal operacional e primario",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   },
+   "comentario": "idem"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "economia|economia do setor publico|sustentabilidade do endividamento publico",
+    "no": "SL-624c60f90a"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "economia|economia do setor publico|sustentabilidade do endividamento publico",
+    "nos": [
+     "NS-baef1b747a"
+    ]
+   },
+   "comentario": "idem ('sustentabilidade da política fiscal' → NS-baef1b747a)"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|tecnologias de seguranca firewalls sistema de deteccao e prevencao de intrusoes antivirus",
+    "no": "S-b9c40349f1"
+   },
+   "comentario": "composto: antivírus/firewall (aprovar o proposto) + firewalls/IDS/IPS (decisão do dono 6441486)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|seguranca da informacao|tecnologias de seguranca firewalls sistema de deteccao e prevencao de intrusoes antivirus",
+    "nos": [
+     "A-f2edc4437f"
+    ]
+   },
+   "comentario": "composto: antivírus/firewall (aprovar o proposto) + firewalls/IDS/IPS (decisão do dono 6441486)"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti|alinhamento estrategico entre ti e negocios",
+    "no": "A-9579bc2a33"
+   },
+   "comentario": "proposta do LLM trocada (desmapear, não rejeitar: KAN-95 §1.2)"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|governanca de ti|alinhamento estrategico entre ti e negocios",
+    "nos": [
+     "A-62cc2b0c63"
+    ]
+   },
+   "comentario": "alinhamento é área-foco da governança (COBIT 2019, questão 006#45); o edital separa 10.4 alinhamento de 10.5 PETI; nó do pai"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "administracao publica|administracao de compras e materiais processos de compras governamentais e gerenciamento de materiais e estoques",
+    "no": "A-8161bcb8ab"
+   },
+   "comentario": "Q1 opção A"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao publica|administracao de compras e materiais processos de compras governamentais e gerenciamento de materiais e estoques",
+    "nos": [
+     "A-ad7c69f8cb"
+    ]
+   },
+   "comentario": "Q1 opção A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|analise de pontos de funcao",
+    "no": "A-1a727febee"
+   },
+   "comentario": "Q2 opção A"
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|aplicacoes cloud native",
+    "no": "A-505e7be779"
+   },
+   "comentario": "Q3 opção B"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|aplicacoes cloud native",
+    "nos": [
+     "A-2d664f1470"
+    ]
+   },
+   "comentario": "Q3 opção B"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao financeira e orcamentaria|lei no 10 028 2000 infracoes administrativas contra as leis de financas publicas",
+    "no": "AL-02b4bc3a67"
+   },
+   "origem": "N1"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao financeira e orcamentaria|lei no 10 028 2000 infracoes administrativas contra as leis de financas publicas",
+    "nos": [
+     "@lei_10028"
+    ]
+   },
+   "origem": "N1"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|analise projeto e modelagem orientada a objetos uml 2 5 1 2017",
+    "no": "NS-ee97a45438"
+   },
+   "origem": "N2"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "tecnologia da informacao|arquitetura e engenharia de software|analise projeto e modelagem orientada a objetos uml 2 5 1 2017",
+    "nos": [
+     "@apoo_uml"
+    ]
+   },
+   "origem": "N2"
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|recrutamento e selecao de pessoas",
+    "no": "S-a26b3a7b47"
+   },
+   "origem": "R",
+   "comentario": "KAN-100: título vai para o assunto que contém os filhos 3.3.1-3.3.3"
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "administracao|gestao de pessoas|recrutamento e selecao de pessoas",
+    "nos": [
+     "A-608e6fac70"
+    ]
+   },
+   "origem": "R"
+  }
+ ]
+}
