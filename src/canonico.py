@@ -1305,11 +1305,11 @@ def no_do_pai_provisorio(
     regra de nome ou da memória, ou, sem eles, o único nó ativo de mesma `chave_regra`
     e nível compatível na subárvore), nome não genérico para a busca sem o pai direto
     (`titulo_generico_global`, KAN-87 D3) e par (regra, nó) não vetado pelo dono.
-    Nunca cria nó."""
+    Subtópico aceita o assunto de mesmo nome (M16, `nivel_aceito_por_nome`). Nunca
+    cria nó."""
     from src import arvore as arv_mod
 
-    niveis = _NIVEIS_FILHO.get(nivel)
-    if not niveis or not regra or titulo_generico_global(nome):
+    if not _NIVEIS_FILHO.get(nivel) or not regra or titulo_generico_global(nome):
         return None
     if candidatos is None:
         achados = {n.id for n in (indice or {}).get((disc, regra), ())}
@@ -1322,7 +1322,7 @@ def no_do_pai_provisorio(
     if (
         no is None
         or no.status != "ativo"
-        or no.nivel not in niveis
+        or not nivel_aceito_por_nome(no, nivel, regra)
         or arv_mod.materia_do_no(arvore, no_id) != disc
         or (regra, no_id) in vetados
     ):
@@ -1374,7 +1374,9 @@ def no_global_por_nome(
       árvore; dois nós (norma repetida ou conceito duplicado) ficam pendentes;
     - para atravessar disciplina: norma, ou `PALAVRAS_MIN_ENTRE_DISCIPLINAS` ou mais
       palavras relevantes. Nome curto só casa dentro da disciplina;
-    - par (regra, nó) vetado pelo dono nunca casa.
+    - par (regra, nó) vetado pelo dono nunca casa;
+    - subtópico casa com assunto só pelo nome igual (M16, KAN-102), e só quando não
+      há candidato de subassunto: com ele, o resultado é o de antes do M16.
 
     Nunca cria nó nem disciplina (D5). Item composto ("A e B") não é separado aqui:
     a `chave_regra` do nome inteiro raramente coincide com um nó, e o composto que
@@ -1393,8 +1395,13 @@ def no_global_por_nome(
         for n in achados
         if n in arvore.nos
         and arvore.nos[n].status == "ativo"
-        and arvore.nos[n].nivel in niveis
+        and nivel_aceito_por_nome(arvore.nos[n], nivel, regra)
     }
+    # O nível próprio vale primeiro: o assunto de mesmo nome só entra quando nenhum
+    # nó do nível do item casa (M16), para não tornar ambíguo o que já casava.
+    proprios = {n for n in achados if arvore.nos[n].nivel in niveis}
+    if proprios:
+        achados = proprios
     na_disciplina = {
         n for n in achados if arv_mod.materia_do_no(arvore, n) in (disciplinas_ctx)
     }
@@ -1468,6 +1475,25 @@ _NIVEIS_FILHO = {
     "assunto": frozenset({"assunto", "subassunto"}),
     "subassunto": frozenset({"subassunto"}),
 }
+
+
+def nivel_aceito_por_nome(no, nivel: str, regra: str) -> bool:
+    """O nó serve de destino para o item de `nivel` num casamento por nome igual.
+
+    Nível compatível (`_NIVEIS_FILHO`) ou, para subtópico, o assunto cuja `chave_regra`
+    é a do item (KAN-102, M16): o mesmo conceito que a árvore guarda um nível acima não
+    fica invisível. Só por igualdade de nome; os outros ramos seguem `_NIVEIS_FILHO`."""
+    niveis = _NIVEIS_FILHO.get(nivel)
+    if not niveis or no is None:
+        return False
+    if no.nivel in niveis:
+        return True
+    return (
+        nivel == "subassunto"
+        and no.nivel == "assunto"
+        and bool(regra)
+        and chave_regra(no.nome).chave == regra
+    )
 
 
 def _no_de_filho_unico(

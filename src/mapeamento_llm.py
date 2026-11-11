@@ -484,6 +484,36 @@ class IndiceNos:
         return achados
 
 
+def assunto_de_mesmo_nome(
+    arv: arvore.ArvoreMestre,
+    indice: IndiceNos,
+    item: Pendente,
+    disciplinas: frozenset[str] = frozenset(),
+) -> str | None:
+    """Assunto ativo único cuja `chave_regra` é a do subtópico (KAN-102, M16), ou None.
+
+    Um subtópico só recebe subassuntos (`NIVEIS_ALVO`), mas o mesmo conceito pode estar
+    na árvore um nível acima ("Intermediação de interesses" é assunto). Recusa nome
+    genérico, dois assuntos de mesmo nome e nó de disciplina restrita fora da do item
+    (`IndiceNos.oferecivel`, M15)."""
+    if item.nivel != "subassunto" or canonico.titulo_generico_global(item.nome):
+        return None
+    regra = canonico.chave_regra(item.nome).chave
+    if not regra:
+        return None
+    achados = [
+        i
+        for i, r in indice.regra.items()
+        if r == regra and arv.nos[i].nivel == "assunto"
+    ]
+    if len(achados) != 1:
+        return None
+    (no_id,) = achados
+    if indice.disciplina.get(no_id) not in disciplinas and not indice.oferecivel(no_id):
+        return None
+    return no_id
+
+
 def palavras_do_item(item: Pendente) -> tuple[frozenset[str], frozenset[str]]:
     """(fortes, fracas): palavras do nome do item; e as dos subitens e dos pais."""
     fortes = frozenset(canonico.palavras_relevantes(item.nome))
@@ -514,7 +544,47 @@ def selecionar_lote(
 
     `dicas` (chave do item -> nós do pai): o nó de assunto do tópico-pai entra também
     para o subtópico, para que a herança "sem nó mais específico, o subtópico aponta
-    para o nó do tópico" (M5) seja possível quando esse nó não é folha de subassunto."""
+    para o nó do tópico" (M5) seja possível quando esse nó não é folha de subassunto.
+    O assunto de mesmo nome do subtópico (`assunto_de_mesmo_nome`, M16) também entra
+    como candidato fixo."""
+    por_item = _selecionar_lote_base(arv, indice, itens, disciplinas, nivel, dicas)
+    if nivel == "subassunto":
+        for it in itens:
+            igual = assunto_de_mesmo_nome(arv, indice, it, disciplinas)
+            if igual:
+                por_item[it.chave].add(igual)
+    return por_item
+
+
+def assuntos_permitidos(
+    arv: arvore.ArvoreMestre,
+    indice: IndiceNos,
+    item: Pendente,
+    disciplinas: frozenset[str],
+    dicas: dict[str, list[str]] | None = None,
+) -> frozenset[str]:
+    """Assuntos que um subtópico pode receber (M16): o do pai (dica, M5) e o de mesmo
+    nome. Outro assunto da lista de candidatos (o de outro item do lote) é recusado
+    na pós-validação."""
+    nos = {
+        n
+        for n in (dicas or {}).get(item.chave, [])
+        if n in arv.nos and arv.nos[n].nivel == "assunto"
+    }
+    igual = assunto_de_mesmo_nome(arv, indice, item, disciplinas)
+    if igual:
+        nos.add(igual)
+    return frozenset(nos)
+
+
+def _selecionar_lote_base(
+    arv: arvore.ArvoreMestre,
+    indice: IndiceNos,
+    itens: list[Pendente],
+    disciplinas: frozenset[str],
+    nivel: str,
+    dicas: dict[str, list[str]] | None = None,
+) -> dict[str, set[str]]:
     alvo = NIVEIS_ALVO[nivel]
     niveis_nos = tuple(x for x in alvo if x != "materia")
     por_item: dict[str, set[str]] = {}
@@ -632,6 +702,21 @@ def sugestao_top1(
         return None
     fortes, fracas = palavras_do_item(item)
     regra = canonico.chave_regra(item.nome).chave
+    # O assunto de mesmo nome do subtópico (M16) é a melhor sugestão quando oferecido.
+    igual = next(
+        (
+            i
+            for i in candidatos
+            if regra
+            and item.nivel == "subassunto"
+            and arv.nos[i].nivel == "assunto"
+            and indice.regra.get(i) == regra
+            and (regra, i) not in vetados
+        ),
+        None,
+    )
+    if igual:
+        return igual
     niveis = tuple(n for n in NIVEIS_ALVO[item.nivel] if n != "materia")
     for _pontos, _cobertura, _massa, i in indice.pontuar(fortes, fracas, niveis):
         if i in candidatos and (regra, i) not in vetados:
@@ -753,10 +838,14 @@ def pos_validacao_mapeamento(
     numeros_esperados: list[int],
     ultimo_erro: list[str] | None = None,
     arv: arvore.ArvoreMestre | None = None,
+    assuntos_por_numero: dict[int, frozenset[str]] | None = None,
 ):
     """Validação estrita: IDs da lista, um objeto por item, nós xor `nenhum`, no
     máximo `MAX_NOS_POR_ITEM` nós por item e nunca um nó com o descendente dele
-    (um conceito, um nó). O 4º nó é recusado, não cortado."""
+    (um conceito, um nó). O 4º nó é recusado, não cortado.
+
+    `assuntos_por_numero` (só lote de subtópicos, M16): assunto escolhido para o item
+    tem de estar no conjunto dele (`assuntos_permitidos`: o do pai e o de mesmo nome)."""
 
     def falha(motivo: str, msg: str, **meta) -> ResultadoPosValidacao:
         if ultimo_erro is not None:
@@ -815,6 +904,20 @@ def pos_validacao_mapeamento(
                     f"Item {it.numero} aponta para um nó e o descendente dele "
                     "(um conceito, um nó)",
                 )
+            if arv is not None and assuntos_por_numero is not None:
+                permitidos = assuntos_por_numero.get(int(it.numero), frozenset())
+                fora = [
+                    x
+                    for x in ids
+                    if arv.nos[local_para_id[x]].nivel == "assunto"
+                    and local_para_id[x] not in permitidos
+                ]
+                if fora:
+                    return falha(
+                        STATUS_FALHA_VALIDACAO_SCHEMA,
+                        f"Item {it.numero} (subtópico) aponta para assunto {fora} que "
+                        "não é o do pai nem o de mesmo nome; use um subassunto",
+                    )
         return ResultadoPosValidacao(objeto=resposta, metadata={"status": "ok"})
 
     return validar
@@ -827,6 +930,7 @@ def chamar_lote(
     metadata_base: dict,
     conta: Contabilidade,
     arv: arvore.ArvoreMestre | None = None,
+    assuntos_por_numero: dict[int, frozenset[str]] | None = None,
 ) -> RespostaMapeamento | None:
     """Até `TENTATIVAS` chamadas; a 2ª leva o erro da 1ª no prompt."""
     resultado = None
@@ -844,7 +948,7 @@ def chamar_lote(
             extras_payload={"usage": {"include": True}},
             metadata={**metadata_base, "tentativa": tentativa, "itens": len(numeros)},
             pos_validacao=pos_validacao_mapeamento(
-                local_para_id, numeros, ultimo_erro, arv
+                local_para_id, numeros, ultimo_erro, arv, assuntos_por_numero
             ),
             nome_generation=f"mapear_itens_{metadata_base.get('grupo', 'lote')}",
             nome_trace=NOME_TRACE,
@@ -1141,6 +1245,14 @@ def mapear_itens_novos(
                         continue
                     conta.simulados_top1 += 1
                 continue
+            assuntos_por_numero = (
+                {
+                    i: assuntos_permitidos(arv, ranking, it, disciplinas, dicas)
+                    for i, it in enumerate(itens, start=1)
+                }
+                if nivel == "subassunto"
+                else None
+            )
             resposta = chamar_lote(
                 prompt,
                 numeros,
@@ -1148,6 +1260,7 @@ def mapear_itens_novos(
                 {"etapa": "mapear_itens_novos", "grupo": rotulo, "nivel": nivel},
                 conta,
                 arv,
+                assuntos_por_numero,
             )
             lotes_feitos += 1
             if resposta is None:

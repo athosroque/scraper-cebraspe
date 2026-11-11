@@ -585,7 +585,11 @@ direto (filho único, herança, regra de nome e memória, P78) vale só `TITULOS
 "Licitação › Tipos" casa com o filho "Tipos" do nó de Licitação; (5) par vetado pelo dono não casa; (6) apelido de nó fundido entra como candidato,
 exceto com pai provisório (P52); (7) nunca cria nó nem disciplina (D5, P72). Item composto ("A e B")
 não é dividido aqui: se a `chave_regra` do nome inteiro não é a de um nó, o item fica para o LLM ou
-o dono, que podem apontar até 3 nós (a árvore é N:N, P80). **Pai sem nó** (decisão D2 do dono,
+o dono, que podem apontar até 3 nós (a árvore é N:N, P80). **Subtópico e assunto de mesmo nome**
+(KAN-102, M16, `canonico.nivel_aceito_por_nome`): o subtópico só aponta para subassunto, salvo o
+assunto cuja `chave_regra` é igual à dele (o mesmo conceito guardado um nível acima), com as mesmas
+travas; o subassunto de mesmo nome, se houver, vale primeiro, e o resultado fica o de antes do M16.
+Vale só aqui e na subárvore da disciplina inferida (P52); filho único e herança não mudam. **Pai sem nó** (decisão D2 do dono,
 2026-11-06): o item cujo pai não tem nó aprovado nem disciplina inferida passa só por este ramo, sem
 disciplina de contexto (valem as travas 1, 3 a 6) e grava `regra`/**`proposto`**, nunca `aprovado`
 (`propostos_sem_pai`, fora de `total`): sem o pai, o nome solto pode casar errado (o "Normas
@@ -598,6 +602,8 @@ novo roda K22 a K24 antes e depois (P71).""",
             "tests/test_regra_arvore.py::test_lgpd_casa_global_por_norma",
             "tests/test_regra_arvore.py::test_nome_curto_nao_atravessa_disciplina",
             "tests/test_regra_arvore.py::test_generico_nunca_casa_global",
+            "tests/test_regra_arvore.py::test_m16_subtopico_casa_com_assunto_de_mesmo_nome",
+            "tests/test_regra_arvore.py::test_m16_subassunto_de_mesmo_nome_vale_mais_que_o_assunto",
             "tests/test_regra_arvore.py::test_candidato_duplicado_nao_casa",
             "tests/test_regra_arvore.py::test_excecao_ti_prefere_o_equivalente_da_disciplina_do_pai",
             "tests/test_regra_arvore.py::test_veto_do_dono_barra_o_global",
@@ -655,7 +661,9 @@ disciplina, o ranking usa o nome, os subitens e os pais. **Alvo de título:** o 
 também subassunto (o nó natural de "Sistemas operacionais" é subassunto), sempre `proposto`, e
 continua sem poder criar disciplina nem aprovar (P72, A30); o subtópico recebe também o nó de
 assunto do tópico-pai como candidato, para a herança "sem nó mais específico, o subtópico aponta
-para o nó do tópico" (M5, ensinada no prompt). **Até 3 nós** por item composto (`nos`; `no` único
+para o nó do tópico" (M5, ensinada no prompt), e o assunto único de mesmo nome
+(`assunto_de_mesmo_nome`, KAN-102, M16). Num lote de subtópicos, assunto fora desses dois
+(`assuntos_permitidos`) recusa a resposta. **Até 3 nós** por item composto (`nos`; `no` único
 continua aceito): o 4º, um nó e o descendente dele ou ID fora da lista recusam a resposta inteira
 (`falha_validacao_schema`), e a gravação passa por `arvore.mapear` como `llm`/`proposto`. O hash do
 cache do "nenhum" inclui o desenho (`DESENHO`) e a disciplina provisória quando é ela que restringe,
@@ -667,6 +675,8 @@ resumo (`por_origem`) separa os ramos do passo determinístico, o LLM, sem candi
         adrs=("ADR-030", "ADR-032"),
         testes=(
             "tests/test_mapeamento_llm.py::test_ranking_do_titulo_inclui_no_pelos_subitens",
+            "tests/test_mapeamento_llm.py::test_m16_assunto_de_mesmo_nome_entra_como_candidato",
+            "tests/test_mapeamento_llm.py::test_m16_pos_validacao_aceita_so_o_assunto_permitido",
             "tests/test_mapeamento_llm.py::test_subassunto_e_alvo_valido_de_titulo_e_nunca_vira_aprovado",
             "tests/test_mapeamento_llm.py::test_candidatos_globais_somados_sem_quebrar_a_lista_fechada",
             "tests/test_mapeamento_llm.py::test_ate_3_nos_em_item_composto_e_o_4_e_recusado",
