@@ -1,0 +1,67 @@
+{
+ "descricao": "Decisão do dono (2026-11-11, KAN-95): 4 casos do BANRISUL_25 que sobraram da Parte 2 — certificação digital, firewalls/IDS/IPS, malware em 2 nós e os 2 filhos de SERVIDORES em alta disponibilidade.",
+ "operacoes": [
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "seguranca da informacao|algoritmos de criptografia simetrica assimetrica e hash|certificacao digital",
+    "no": "A-d8c9b18de0"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica|firewalls ids ips proxies nat e vpn",
+    "no": "A-e66414a075"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica|firewalls ids ips proxies nat e vpn",
+    "nos": [
+     "A-f2edc4437f"
+    ]
+   }
+  },
+  {
+   "tipo": "aprovar",
+   "args": {
+    "item": "seguranca da informacao|seguranca em redes de computadores e tecnicas de ataque cibernetico resposta a incidentes resiliencia cibernetica|adware spyware backdoors keylogger worms ransonware",
+    "no": "S-92703fcd38"
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "servidores|servidores de aplicacao|balanceamento de carga fail over e replicacao de estado",
+    "no": "A-32f00392f2"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "servidores|servidores de aplicacao|balanceamento de carga fail over e replicacao de estado",
+    "nos": [
+     "A-d831972bed"
+    ]
+   }
+  },
+  {
+   "tipo": "desmapear",
+   "args": {
+    "item": "servidores|servidores de aplicacao|topologia tipica de ambientes com alta disponibilidade e escalabilidade",
+    "no": "A-32f00392f2"
+   }
+  },
+  {
+   "tipo": "mapear",
+   "args": {
+    "item": "servidores|servidores de aplicacao|topologia tipica de ambientes com alta disponibilidade e escalabilidade",
+    "nos": [
+     "A-d831972bed"
+    ]
+   }
+  }
+ ]
+}
