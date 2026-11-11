@@ -1,0 +1,11 @@
+{
+ "descricao": "Decisão do dono (2026-11-09, KAN-102, M16): subtópicos com assunto de mesmo nome passam a apontar para esse assunto. Dos 6 casos levantados, 3 são claros; Ativo imobilizado (há subassunto de mesmo nome em Contabilidade Pública, o contexto certo) e Comportamento/clima/cultura e Educação/treinamento (já apontam para subassunto de nome idêntico, filho do assunto de mesmo nome) ficaram de fora.",
+ "operacoes": [
+  {"tipo": "desmapear", "args": {"item": "gestao publica|processo administrativo|processo decisorio", "no": "S-68fb64a623"}},
+  {"tipo": "mapear", "args": {"item": "gestao publica|processo administrativo|processo decisorio", "nos": ["A-35230b45ff"]}},
+  {"tipo": "desmapear", "args": {"item": "matematica financeira|calculo financeiro|custo real e efetivo das operacoes de financiamento emprestimo e investimento", "no": "A-8fa8c75ab7"}},
+  {"tipo": "mapear", "args": {"item": "matematica financeira|calculo financeiro|custo real e efetivo das operacoes de financiamento emprestimo e investimento", "nos": ["A-5aa02ec180"]}},
+  {"tipo": "desmapear", "args": {"item": "administracao|evolucao da administracao|processos participativos de gestao publica", "no": "S-81ba4580e0"}},
+  {"tipo": "mapear", "args": {"item": "administracao|evolucao da administracao|processos participativos de gestao publica", "nos": ["A-6a961350d9"]}}
+ ]
+}
