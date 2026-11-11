@@ -1118,5 +1118,5 @@
       }
     }
   ],
-  "status_revisao_humana": "PENDENTE — este resultado ainda NÃO foi revisado por um humano. Não usar em lote/produção até aprovação explícita (ver task.md, Etapa 4)."
+  "status_revisao_humana": "APROVADO — revisão humana concluída pelo dono (registrada em 2026-11-11, KAN-95)"
 }

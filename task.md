@@ -741,7 +741,13 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
           (aprovados em Servidores de aplicação).
         - **Resultado:** o BANRISUL_25 tem 253 de 255 itens aprovados. Restam 2 propostas e 1 nó extra para o dono.
         - **Checagens:** K22–K24 e `auditar_arvore` sem mudança.
-      - `[ ]` Parte 3: classificação das questões (5D) só depois dos nós e dos mapeamentos, e aprovação do edital.
+        - **Os 4 casos que sobraram** foram decididos pelo dono em 2026-11-11 (`docs/planos/kan95/lote_quatro_casos.json`):
+          com isso, 255 de 255 itens estão aprovados.
+      - `[x]` Parte 3 (2026-11-11): classificação das questões (5D) e aprovação do edital.
+        - **Classificação 5D:** 234 itens (230 objetivas e 4 discursivas), 0 falhas, US$ 0,0185.
+          Confiança: 189 alta, 44 média e 1 baixa.
+        - **Relatório:** o `classificacao.html` passou a mostrar as alternativas de múltipla escolha.
+        - **Aprovação:** o dono aprovou o `BANRISUL_25` (P41). K22–K24 continuam sem mudança.
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como
     `regra/aprovado`, com candidato único, sem veto e fora de `TITULOS_GENERICOS` (muda P52/P73).
