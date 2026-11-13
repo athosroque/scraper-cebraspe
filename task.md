@@ -786,14 +786,23 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
         - **Checagens:** K22 antes e depois sem nenhuma linha (piloto intacto), `auditar_arvore` com 0 erros
           de hierarquia e 0 normas em mais de um nó ativo, banco recarregado pelo `stats_writer`
           (SEFA com 228 tópicos e 704 subtópicos; os outros 6 editais sem mudança de carga).
-        - **`make test-all` vermelho com 3 falhas pré-existentes**, nenhuma tocada por este passo (os 3 testes
-          não leem `classificacao_questoes.json`), todas por expectativa velha depois da curadoria da C1/C2:
-          `site/tests/test_apelidos.py::test_apelidos_da_lai_e_da_lgpd` (a LAI ganhou um 8º apelido, o teste
-          espera 7), `tests/test_c2_dagster.py::test_lote_c1_modo_conferencia_status_honestos` (espera o
-          BANRISUL não aprovado, e ele já está) e
-          `tests/test_regra_arvore.py::test_banrisul_ganha_mais_de_100_itens_comparados` (o BANRISUL está
-          255/255, então o pai provisório não tem mais nada a destravar: `0 - 0 >= 100`). Pendente de decisão
-          do dono: corrigir os 3 testes.
+        - **`make test-all` ficou vermelho com 3 falhas pré-existentes** (nenhuma tocada por este passo, os 3
+          testes não leem `classificacao_questoes.json`), todas por expectativa velha depois da curadoria da
+          C1/C2; corrigidas em 2026-11-13:
+          `site/tests/test_apelidos.py::test_apelidos_da_lai_e_da_lgpd` — a LAI ganhou um 8º apelido legítimo
+          (2ª frase da LAI carregada do `SEFA_PR_25`, só depois da curadoria completa de 938/938 da Parte 1);
+          conferido no banco que vem de um item real, e a expectativa foi recalibrada de 7 para 8.
+          `tests/test_c2_dagster.py::test_lote_c1_modo_conferencia_status_honestos` — o teste lia o
+          `status_revisao_humana` real do `SEFA_PR_25`/`BANRISUL_25` em `revisao_piloto/`, que muda a cada
+          curadoria (o BANRISUL foi aprovado em 11/11); passou a travar `verificar_portao_edital` com `patch`,
+          então testa o que importa (P3 reporta honestamente o que o portão devolve) sem depender do estado
+          vivo de aprovação.
+          `tests/test_regra_arvore.py::test_banrisul_ganha_mais_de_100_itens_comparados` — com o BANRISUL
+          255/255 aprovado, não sobrou item novo para o pai provisório destravar (`0 - 0 >= 100`); o teste
+          passou a montar a própria fixture sintética (um bloco de TI sem nó, 120 assuntos sintéticos, via
+          `arvore_ti`/`_ti`), sem depender de o BANRISUL ter pendência; nome do teste mantido porque é citado
+          em P52 e renomear pediria `make docs-gerar` (P70/A62), fora do escopo. `make test-all` verde: 1.870
+          passados, 31 pulados, 1 esperado-falho; K22 conferido antes e depois, sem mudança.
       - `[ ]` Parte 3: o dono aprova o edital do `SEFA_PR_25`.
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como

@@ -307,36 +307,46 @@ def test_banco_dagster_fora_sai_com_codigo_1(monkeypatch):
 def test_lote_c1_modo_conferencia_status_honestos(instance):
     """Lote da C1 em conferência: o sucesso do job não prova nada sozinho, então
     os status por etapa dizem o que rodou. A prova de 'não muda nada' são as
-    contagens do banco antes e depois (relatório da rodada)."""
+    contagens do banco antes e depois (relatório da rodada).
+
+    P3 ('aprovado') é travado com `patch` em vez de ler o `status_revisao_humana`
+    real do `revisao_piloto/`: esse campo muda a cada curadoria (SEFA_PR_25 e
+    BANRISUL_25 já foram aprovados desde que este teste nasceu), e o que o
+    teste protege é P3 reportar honestamente o que `verificar_portao_edital`
+    devolve — não o valor de aprovação do dia em que o teste foi escrito."""
     job = defs.get_job_def("lote_concursos")
 
     for slug in ["SEFA_PR_25", "BANRISUL_25"]:
-        res = job.execute_in_process(
-            instance=instance,
-            partition_key=slug,
-            run_config={
-                "ops": {
-                    f"p{i}": {
-                        "config": {"conferencia": True, "exigir_aprovacao": False}
+        with patch(
+            "src.c2.assets.verificar_portao_edital",
+            return_value=(False, "PENDENTE"),
+        ):
+            res = job.execute_in_process(
+                instance=instance,
+                partition_key=slug,
+                run_config={
+                    "ops": {
+                        f"p{i}": {
+                            "config": {"conferencia": True, "exigir_aprovacao": False}
+                        }
+                        for i in [
+                            "0",
+                            "1",
+                            "2",
+                            "3",
+                            "4",
+                            "4b",
+                            "5",
+                            "6",
+                            "7",
+                            "8",
+                            "9",
+                            "10",
+                            "11",
+                        ]
                     }
-                    for i in [
-                        "0",
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "4b",
-                        "5",
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "10",
-                        "11",
-                    ]
-                }
-            },
-        )
+                },
+            )
         assert res.success
         saidas = {n: res.output_for_node(n) for n in ["p0", "p2", "p3", "p4", "p8"]}
         assert saidas["p0"]["status"] == "ok"

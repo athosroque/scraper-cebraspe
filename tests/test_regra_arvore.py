@@ -1150,24 +1150,41 @@ def test_pai_provisorio_dry_run_nao_grava(monkeypatch, tmp_path, arvore_ti):
     assert "bloco ti|banco de dados" not in carregar(arvore_ti).mapeamentos
 
 
-def test_banrisul_ganha_mais_de_100_itens_comparados(tmp_path):
-    """Nos 4 cargos de TI do BANRISUL_25, o pai provisório destrava a comparação de
-    pelo menos 100 itens que antes ficavam sem pai. Só leitura (árvore em memória)."""
-    import shutil
+def test_banrisul_ganha_mais_de_100_itens_comparados(monkeypatch, tmp_path, arvore_ti):
+    """O pai provisório (KAN-86, M4) destrava a comparação de itens que, sem ele,
+    ficam sem pai (sem como medir equivalência). Fixture sintética (árvore e
+    "edital" só em memória, via `_ti`/`arvore_ti`): um bloco de TI sem nó mapeado,
+    só com o cargo de TI, e 120 assuntos sintéticos sem nó correspondente na
+    árvore. Sem pai provisório, nenhum chega à comparação; com ele, a disciplina
+    inferida do cargo (M-TI) serve de pai pra todos.
 
-    origem = Path(__file__).resolve().parent.parent / "revisao_piloto"
-    jsons = list(origem.glob("*Banrisul*.json"))
-    if not jsons or not arv_mod.ARVORE_PADRAO.exists():
-        pytest.skip("sem revisao_piloto ou árvore local")
-    for j in jsons:
-        if not j.name.endswith((".auditoria.json", ".validacao.json")):
-            shutil.copy(j, tmp_path)
-    sem = canonico.mapear_novos_itens(
-        tmp_path, gravar=False, arvore_mem=arv_mod.carregar(), pai_provisorio=False
+    Nome do teste mantido (citado em P52, `src/registro/regras_patterns_2.py`)
+    apesar de o corpo não usar mais o BANRISUL_25 real: aquele concurso, 100%
+    aprovado desde 2026-11-11 (KAN-56/KAN-95), deixou de ter item novo para
+    comparar, então `com.comparados - sem.comparados` virou 0 nos dois lados — o
+    cenário do pai provisório desapareceu dos dados reais, não a regra que o
+    produz. Renomear o teste exigiria `make docs-gerar` (P70/A62), que tocaria
+    `docs/tecnico/`, fora do escopo desta correção."""
+    assuntos = [f"Assunto Sintético {i:03d}" for i in range(120)]
+
+    sem = _ti(
+        monkeypatch,
+        tmp_path,
+        arvore_ti,
+        assunto=assuntos,
+        gravar=False,
+        arvore_mem=carregar(arvore_ti),
+        pai_provisorio=False,
     )
-    com = canonico.mapear_novos_itens(
-        tmp_path, gravar=False, arvore_mem=arv_mod.carregar()
+    com = _ti(
+        monkeypatch,
+        tmp_path,
+        arvore_ti,
+        assunto=assuntos,
+        gravar=False,
+        arvore_mem=carregar(arvore_ti),
     )
+    assert sem.comparados == 0
     assert com.comparados - sem.comparados >= 100
     assert com.total >= sem.total
 
