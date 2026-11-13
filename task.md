@@ -776,7 +776,24 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
           subassunto `S-9bff9d7cb9`); Desapropriação como filho de Intervenção do Estado na propriedade (o
           `mover` não troca nível); conceitos repetidos em consórcios, conflitos, capacitação, recrutamento e
           seleção, antivírus, sanções, despesa com pessoal, gestão por resultados e contratos.
-      - `[ ]` Parte 2: classificação 5D das 380 questões (LLM pago, lista fechada).
+      - `[x]` Parte 2 (2026-11-13): classificação 5D das questões do `SEFA_PR_25`.
+        - **Execução:** 65 chamadas, 65 lotes, **0 falhas**, 316.666 tokens de entrada e 31.845 de saída,
+          **US$ 0,0449**. Tudo gravado como `proposto`/`origem: llm` (A30).
+        - **Gravado:** 381 itens (380 objetivas e 1 discursiva) e 408 apontamentos (406 em `questao_no`,
+          2 em `discursiva_no`); 0 itens sem nó e 1 apontamento marcado `fora_do_edital`.
+          Confiança: 335 alta, 72 média e 1 baixa. (O log do script resume 384/315/68/1; o conferido no
+          `classificacao_questoes.json` e no banco é o acima.)
+        - **Checagens:** K22 antes e depois sem nenhuma linha (piloto intacto), `auditar_arvore` com 0 erros
+          de hierarquia e 0 normas em mais de um nó ativo, banco recarregado pelo `stats_writer`
+          (SEFA com 228 tópicos e 704 subtópicos; os outros 6 editais sem mudança de carga).
+        - **`make test-all` vermelho com 3 falhas pré-existentes**, nenhuma tocada por este passo (os 3 testes
+          não leem `classificacao_questoes.json`), todas por expectativa velha depois da curadoria da C1/C2:
+          `site/tests/test_apelidos.py::test_apelidos_da_lai_e_da_lgpd` (a LAI ganhou um 8º apelido, o teste
+          espera 7), `tests/test_c2_dagster.py::test_lote_c1_modo_conferencia_status_honestos` (espera o
+          BANRISUL não aprovado, e ele já está) e
+          `tests/test_regra_arvore.py::test_banrisul_ganha_mais_de_100_itens_comparados` (o BANRISUL está
+          255/255, então o pai provisório não tem mais nada a destravar: `0 - 0 >= 100`). Pendente de decisão
+          do dono: corrigir os 3 testes.
       - `[ ]` Parte 3: o dono aprova o edital do `SEFA_PR_25`.
 - **Decisões do dono (KAN-96, 2026-11-02):**
   - `[x]` D2 Aprovado: herança do nó do tópico (M5), disciplina pelo cargo (M4) e ramo 4 (M14) entram como
