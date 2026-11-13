@@ -59,12 +59,22 @@ STATUS_FALHA_ITENS_DIVERGENTES = "falha_itens_divergentes"
 STATUS_FALHA_SEM_GABARITO = "falha_sem_gabarito"
 STATUS_FALHA_SEM_QUESTAO = "falha_sem_questao"
 
+# Sobe quando a extração passa a produzir resultado diferente para o mesmo
+# PDF (regra nova, alerta novo, mudança de corte/segmentação etc.) — não por
+# refatoração sem efeito observável. Gravada em `provas.parser_versao` (ver
+# `src/questoes_writer.py`) e no JSON do caderno, para dar pra responder
+# "quais cadernos foram extraídos com parser anterior à versão N" por
+# consulta, em vez de arqueologia no git. Caderno extraído antes de existir
+# esse controle fica com a coluna `NULL` (não é retroativamente preenchida).
+# v1 (2026-11-13): detector `formula_perdida` (ver `PADRAO_FORMULA_PERDIDA`).
+PARSER_VERSAO = 1
+
 SEVERIDADE_BLOQUEANTE = "bloqueante"
 SEVERIDADE_INFORMATIVO = "informativo"
 # Alertas por item que tiram a questão do site (`questoes.utilizavel=false`)
 # sem derrubar o caderno inteiro (o que a severidade bloqueante faria).
 ALERTAS_ITEM_INUTILIZAVEL = frozenset(
-    {"simbolo_ilegivel", "possivel_preambulo_no_item"}
+    {"simbolo_ilegivel", "possivel_preambulo_no_item", "formula_perdida"}
 )
 
 PADRAO_CABECALHO = re.compile(r"^\s*CEBRASPE\s*[–-].*Edital", re.IGNORECASE)
@@ -167,6 +177,28 @@ SIMBOLO_PUA = str.maketrans(
         "\uf0d6": "\u221a",
         "\uf0d7": "\u22c5",
     }
+)
+# F\u00f3rmula apagada em sil\u00eancio (`135_SEFAPR_005_01`, itens 4, 5, 7, 9, 10, 12,
+# 13, 15, 16): o PDF usa Cambria Math para a equa\u00e7\u00e3o, mas o pr\u00f3prio
+# `ToUnicode` embutido no PDF mapeia a maioria dos c\u00f3digos de glifo da
+# f\u00f3rmula para `U+0020` (espa\u00e7o) \u2014 n\u00e3o \u00e9 bug de extra\u00e7\u00e3o, PyMuPDF decodifica
+# fielmente o que o CMap manda (confirmado com `get_text("rawdict")`: o char
+# j\u00e1 chega como `" "`). O glifo continua existindo e sendo desenhado (o PDF
+# renderiza certo visualmente), s\u00f3 n\u00e3o tem Unicode recuper\u00e1vel: \u00e9 perda real
+# de texto, n\u00e3o presentation/ligadura. Dois sinais, cada um sem falso
+# positivo nas 3.449 quest\u00f5es correntes (ver matriz do diagn\u00f3stico):
+# - `\(\s+\)`: par\u00eanteses "ocos" com espa\u00e7o dentro, sobras da f\u00f3rmula ao
+#   redor do que sumiu. Difere de c\u00f3digo por `()`/`( )` grudado no
+#   identificador (`consultarSaldo()`, `RANK()`) nunca ter espa\u00e7o dentro \u2014
+#   s\u00f3 s\u00edmbolo + c\u00f3digo, zero espa\u00e7o.
+# - preposi\u00e7\u00e3o ("de"/"do"/"da"/"dos"/"das") seguida direto de um verbo de
+#   "ser" (sem nenhum substantivo/vari\u00e1vel entre os dois): "o valor esperado
+#   de \u00e9 igual a" \u2014 a f\u00f3rmula inteira (sem nem os par\u00eanteses) sumiu entre a
+#   preposi\u00e7\u00e3o e o verbo, algo que n\u00e3o ocorre em portugu\u00eas corrido.
+PADRAO_FORMULA_PERDIDA = re.compile(
+    r"\(\s+\)"
+    r"|\b(?:de|do|da|dos|das)\s+(?:\u00e9|ser\u00e1|ser\u00e3o|foi|foram|s[a\u00e3]o)\b",
+    re.IGNORECASE,
 )
 # `$ CI_COMMIT_TAG` (`072_STM_003_01`, itens 72-73): o PDF traz espa\u00e7o depois
 # do `$` de vari\u00e1vel; s\u00f3 em c\u00f3digo, e s\u00f3 antes de nome em mai\u00fasculas (prompt
@@ -2699,6 +2731,7 @@ def extrair_caderno_objetivo(
         "arquivo": pdf_path.name,
         "tipo": "objetiva",
         "status": STATUS_SUCESSO,
+        "parser_versao": PARSER_VERSAO,
         "itens_esperados": len(gabarito or {}),
         "itens_extraidos": 0,
         "itens_faltando": [],
@@ -2865,6 +2898,14 @@ def extrair_caderno_objetivo(
             resultado["alertas"].append(
                 {
                     "tipo": "simbolo_ilegivel",
+                    "severidade": SEVERIDADE_INFORMATIVO,
+                    "item": item["numero"],
+                }
+            )
+        if any(PADRAO_FORMULA_PERDIDA.search(t) for t in textos_item):
+            resultado["alertas"].append(
+                {
+                    "tipo": "formula_perdida",
                     "severidade": SEVERIDADE_INFORMATIVO,
                     "item": item["numero"],
                 }
@@ -3140,6 +3181,7 @@ def extrair_caderno_discursivo(pdf_path: Path, caderno: str) -> tuple[dict, dict
         "arquivo": pdf_path.name,
         "tipo": "discursiva",
         "status": STATUS_SUCESSO,
+        "parser_versao": PARSER_VERSAO,
         "questoes": [],
         "alertas": [],
     }

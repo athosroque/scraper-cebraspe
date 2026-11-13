@@ -201,6 +201,12 @@ CREATE TABLE IF NOT EXISTS provas (
 -- (`094_PF_CB1_01`), que liga gabarito e caderno com nome em hash (CD/TCU).
 ALTER TABLE provas ADD COLUMN IF NOT EXISTS codigo_caderno TEXT;
 
+-- `src.prova_parser.PARSER_VERSAO` no momento da extração (ADR-031), gravada
+-- por `src.questoes_writer`. NULL = caderno extraído antes de existir esse
+-- controle (não preenchido retroativamente); dá pra achar quem precisa de
+-- reextração com `WHERE parser_versao IS NULL OR parser_versao < N`.
+ALTER TABLE provas ADD COLUMN IF NOT EXISTS parser_versao INTEGER;
+
 -- N:1 nos básicos (CB1 -> cargos 1..14) e 1:1 em específica/discursiva.
 CREATE TABLE IF NOT EXISTS provas_cargos (
     prova_id INTEGER NOT NULL REFERENCES provas (id) ON DELETE CASCADE,

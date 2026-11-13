@@ -2285,3 +2285,88 @@ class TestCadernosMEReais:
             for tb in resultado["textos_base"]
             if tb["figuras"]
         } == esperado["figuras_por_texto"]
+
+
+class TestFormulaPerdida:
+    """`135_SEFAPR_005_01` (SEFA_PR_25, seção ESTATÍSTICA): o `ToUnicode`
+    embutido no PDF mapeia a maioria dos glifos da equação (fonte Cambria
+    Math) para espaço (`U+0020`) — confirmado com `get_text("rawdict")`, o
+    char já chega como `" "` antes de qualquer processamento nosso. O texto
+    sai como `( )`/`( ) ( )` vazio, sem `simbolo_ilegivel` (não é `�`) e
+    sem figura (não é imagem). `formula_perdida` cobre esse buraco."""
+
+    TEXTOS_PERDIDOS_REAIS = [
+        # Enunciados reais de 135_SEFAPR_005_01 (questões 4, 5, 9, 10, 12, 15).
+        "Caso uma variável aleatória contínua cuja função de densidade de "
+        "probabilidade seja dada pela expressão ( ) { ( ) ( ) em que A é "
+        "uma constante positiva, então a probabilidade P(Y < 0,5) é igual a",
+        "Se for uma variável aleatória contínua tal que ( ) ( √ ), para , "
+        "e ( ) , para , então a função de densidade de probabilidade de "
+        "para será dada pela expressão",
+        "Em uma entidade pública, em que o número de processos instruídos "
+        "para determinada finalidade segue uma distribuição condicional na "
+        "forma ( ) . / ( ) na qual * + e segue uma distribuição uniforme",
+        "Se , - , em que segue uma distribuição exponencial, então a "
+        "probabilidade condicional ( ) será igual a",
+        "Com base nas informações do texto 5A1, é correto afirmar que a "
+        "( )√ razão tem variância",
+        "Se ( ), então ( ) ( ) ( ) ( ) é igual a",
+        # Questão 13: a fórmula inteira sumiu sem deixar parênteses.
+        "No texto 5A1, o valor esperado de é igual a",
+    ]
+
+    # Falsos-positivos medidos na base inteira (3.449 questões): código com
+    # parênteses vazios grudados no identificador, sem espaço dentro.
+    TEXTOS_CODIGO_REAIS = [
+        "if(s.length() == 0 || s.length() == 1) return true;",  # 072_STM_003_01 #86
+        "HttpRequest.newBuilder()",  # 072_STM_003_01 #87
+        "RANK() OVER (...) AS rank, DENSE_RANK() OVER (...), ROW_NUMBER()",  # 077_BANRISUL_001_01 #59
+        "SUM(), AVG(), MIN(), MAX(), COUNT()",  # 077_BANRISUL_002_01 #35
+        "public virtual void GetInfo(){ Console.WriteLine($\"Nome\"); }",  # 077_BANRISUL_002_01 #45
+        "public String getNome() { return nome; }",  # 077_BANRISUL_002_01 #46
+        "consultarSaldo() {}",  # 077_BANRISUL_002_01 #69
+        "for pessoa, dados in prisao.items():",  # 094_PF_005_01 #113
+    ]
+
+    def test_detector_pega_formula_apagada_sem_pegar_codigo(self):
+        import src.prova_parser as pp
+
+        for texto in self.TEXTOS_PERDIDOS_REAIS:
+            assert pp.PADRAO_FORMULA_PERDIDA.search(texto), texto
+        for texto in self.TEXTOS_CODIGO_REAIS:
+            assert not pp.PADRAO_FORMULA_PERDIDA.search(texto), texto
+
+    def test_alerta_formula_perdida_e_item_inutilizavel(self, tmp_path, monkeypatch):
+        import src.prova_parser as pp
+
+        assert "formula_perdida" in pp.ALERTAS_ITEM_INUTILIZAVEL
+
+        linhas = [
+            _linha_caderno("ESTATÍSTICA", 304.3, 500.0),
+            _linha_caderno("Questão 1", 304.3, 500.0),
+            _linha_caderno(
+                "Se ( ), então ( ) ( ) ( ) ( ) é igual a",
+                304.3,
+                569.5,
+                inicio=False,
+            ),
+        ]
+        for letra, texto in zip("ABCDE", ["4.", "3.", "2.", "1.", "0."]):
+            linhas.append(
+                _linha_caderno(
+                    f"{letra} {texto}", 304.3, 420.0, primeiro_span=letra
+                )
+            )
+        monkeypatch.setattr(pp, "extrair_linhas", lambda doc: linhas)
+
+        doc = pymupdf.open()
+        doc.new_page()
+        pdf_path = tmp_path / "caderno.pdf"
+        doc.save(pdf_path)
+        doc.close()
+
+        resultado, _ = extrair_caderno_objetivo(pdf_path, {1: "A"}, "TESTE")
+        assert resultado["status"] == STATUS_SUCESSO
+        q1 = resultado["questoes"][0]
+        assert "formula_perdida" in q1["alertas"]
+        assert not pp.ALERTAS_ITEM_INUTILIZAVEL.isdisjoint(q1["alertas"])

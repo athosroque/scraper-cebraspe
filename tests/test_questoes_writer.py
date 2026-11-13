@@ -111,6 +111,60 @@ class TestQuestoesWriter:
             cur.execute("SELECT numero FROM vw_questoes_utilizaveis ORDER BY numero")
             assert [r[0] for r in cur.fetchall()] == [1, 3]
 
+    def test_gravar_caderno_objetivo_grava_parser_versao_em_provas(self, conn):
+        prova_id = self._criar_prova(conn)
+        resultado = {
+            "parser_versao": 1,
+            "textos_base": [],
+            "alertas": [],
+            "questoes": [
+                {
+                    "numero": 1,
+                    "enunciado": "Item qualquer.",
+                    "gabarito": "C",
+                    "anulada": False,
+                    "texto_base_ordem": None,
+                    "figuras": [],
+                    "secao": None,
+                    "alertas": [],
+                }
+            ],
+        }
+        questoes_writer.gravar_caderno_objetivo(conn, prova_id, resultado)
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT parser_versao FROM provas WHERE id = %s", (prova_id,))
+            assert cur.fetchone() == (1,)
+
+        # Caderno extraído sem a chave (resultado antigo/sem versão): a
+        # coluna fica NULL, não é inventada uma versão retroativa.
+        del resultado["parser_versao"]
+        questoes_writer.gravar_caderno_objetivo(conn, prova_id, resultado)
+        with conn.cursor() as cur:
+            cur.execute("SELECT parser_versao FROM provas WHERE id = %s", (prova_id,))
+            assert cur.fetchone() == (None,)
+
+    def test_gravar_caderno_discursivo_grava_parser_versao_em_provas(self, conn):
+        prova_id = self._criar_prova(conn)
+        resultado = {
+            "parser_versao": 1,
+            "questoes": [
+                {
+                    "numero": 1,
+                    "titulo": "Questão 1",
+                    "tema": "Tema qualquer",
+                    "enunciado": "Enunciado.",
+                    "quesitos": [],
+                    "padrao_resposta": None,
+                }
+            ],
+        }
+        questoes_writer.gravar_caderno_discursivo(conn, prova_id, resultado)
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT parser_versao FROM provas WHERE id = %s", (prova_id,))
+            assert cur.fetchone() == (1,)
+
     def test_valida_texto_base_ordem_inexistente(self, conn):
         prova_id = self._criar_prova(conn)
         resultado = {

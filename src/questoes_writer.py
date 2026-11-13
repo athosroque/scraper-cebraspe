@@ -47,6 +47,10 @@ def calcular_hash_5d(
 def gravar_caderno_objetivo(conn, prova_id: int, resultado: dict) -> int:
     """Substitui textos-base e questões do caderno. Retorna o nº de questões."""
     with conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE provas SET parser_versao = %s WHERE id = %s",
+            (resultado.get("parser_versao"), prova_id),
+        )
         cur.execute("DELETE FROM questoes WHERE prova_id = %s", (prova_id,))
         cur.execute("DELETE FROM textos_base WHERE prova_id = %s", (prova_id,))
         ids_base: dict[int, int] = {}
@@ -120,6 +124,10 @@ def gravar_caderno_discursivo(conn, prova_id: int, resultado: dict) -> int:
     """Substitui as questões discursivas do caderno e grava os temas em
     `provas.tema`. Retorna o nº de questões."""
     with conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE provas SET parser_versao = %s WHERE id = %s",
+            (resultado.get("parser_versao"), prova_id),
+        )
         cur.execute("DELETE FROM discursivas WHERE prova_id = %s", (prova_id,))
         for q in resultado["questoes"]:
             cur.execute(
