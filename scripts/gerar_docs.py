@@ -294,8 +294,8 @@ def pagina_pipeline(reg: Registro) -> str:
             linhas.append(f"    {_id_mermaid(dependencia)} --> {_id_mermaid(etapa.id)}")
     # Portão só na borda e LLM só no fundo: uma etapa pode ter os dois.
     # Fundo semitransparente: o texto do nó segue a cor do tema (claro ou escuro).
-    linhas.append("    classDef llm fill:#3b82f633,stroke:#3b82f6")
-    linhas.append("    classDef portao stroke:#f59e0b,stroke-width:3px")
+    linhas.append("    classDef llm fill:#92670a1f,stroke:#a97c1a,stroke-dasharray:4 3")
+    linhas.append("    classDef portao stroke:#c08a1e,stroke-width:3px")
     portoes = [_id_mermaid(e.id) for e in reg.etapas if e.portao_humano]
     com_llm = [_id_mermaid(e.id) for e in reg.etapas if e.llm]
     if com_llm:

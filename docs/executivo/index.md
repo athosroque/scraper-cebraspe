@@ -1,8 +1,26 @@
-# Visão executiva
+# O que o edital cobra, e quanto disso cai
+
+Este projeto reúne os editais, as provas e os gabaritos dos concursos do CEBRASPE, liga cada linha do conteúdo programático aos assuntos que de fato aparecem nas provas, e publica o resultado como um site de questões.
+
+<div class="de-para">
+<figure class="de-para__peca de-para__peca--edital">
+<span class="de-para__fonte">No edital do STM de 2025, analista judiciário administrativo</span>
+<p class="de-para__texto">Licitações e contratos administrativos: legislação pertinente; Lei nº 14.133/2021; elaboração e fiscalização de contratos; papel do fiscalizador do contrato… — um bloco com 14 itens, numa lista de 53 blocos do edital.</p>
+</figure>
+<figure class="de-para__peca de-para__peca--no">
+<span class="de-para__fonte">Virou este nó da árvore de assuntos</span>
+<p class="de-para__caminho"><span class="de-para__nivel">Direito Administrativo</span><span class="de-para__nivel">Contratos administrativos</span><span class="de-para__nivel">Lei nº 14.133/2021</span></p>
+</figure>
+<figure class="de-para__peca de-para__peca--prova">
+<span class="de-para__fonte">E pesa, na prova desse cargo</span>
+<p class="de-para__texto"><span class="de-para__numero">16,2%</span></p>
+<p class="de-para__detalhe">11 das 68 questões do caderno. É o assunto mais cobrado do cargo.</p>
+</figure>
+</div>
+
+Essa passagem — linha de edital, nó de assunto, peso na prova — é o que o projeto automatiza. Esta página resume o problema, a solução e o estágio atual; as outras páginas da seção detalham a arquitetura, os números, as decisões principais e o roadmap.
 
 <a href="scraper-cebraspe-executivo.pdf" class="md-button so-tela">Baixar esta visão em PDF</a>
-
-Este projeto reúne os editais, as provas e os gabaritos dos concursos do CEBRASPE, organiza o conteúdo cobrado numa árvore de assuntos e transforma tudo isso num site de questões. Esta página resume o problema, a solução e o estágio atual. As outras páginas da seção detalham a arquitetura, os números, as decisões principais e o roadmap.
 
 ## O problema
 

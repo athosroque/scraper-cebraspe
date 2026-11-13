@@ -19,7 +19,7 @@ enviar o bloco de uma etapa específica para o agente construir.
 > importância: (1) o que mais cai na prova; (2) o que o edital cobra; (3)
 > edital × prova; (4) desempenho pessoal do usuário.
 
-## ⚡ Painel de etapas (atualizado em 2026-11-06)
+## ⚡ Painel de etapas (atualizado em 2026-11-13)
 
 Ordem de trabalho, uma sessão (conversa) por item. O detalhe de cada sessão está no plano
 indicado; o checklist fica na seção da etapa, mais abaixo.
@@ -31,6 +31,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
 | 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, falta ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
+| 6 | 10 Portfólio público (identidade visual dos dois fronts, seção de processos e governança, repositório público do scraper) | **em andamento**: P1 (site de documentação) aberta em 2026-11-13, a pedido do dono | [`plano-etapa-10.md`](plano-etapa-10.md), sessões P1 a P4; checklist na seção Etapa 10 |
 | — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **em andamento**: ondas 0 a 3 e 5 entregues (em análise); onda 4 entregue (EXEC KAN-92: 546 propostas do LLM a revisar) e a 6 (C1 KAN-95, partes 2 e 3) | seção 5B.4 abaixo |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
@@ -1416,6 +1417,56 @@ Trilha B, Dagster (é a C2 da 8.C, depois da C1b):
   checagens verdes e um teste mostra o portão travando a etapa seguinte.
   Estado: entregue e validada (2026-10-21); falta ADR-042 (commits c2d7719 e 3a6120c).
   Faltam também a página do Dagster no guia e a movimentação dos cards no Jira.
+
+## Etapa 10: Portfólio público (identidade visual, processos e GitHub)
+
+Pedido do dono em 2026-11-13: apresentar o projeto no GitHub como portfólio público,
+melhorar a apresentação dos dois fronts e nomear o que o projeto já pratica com o
+vocabulário de mapeamento e documentação de processos (BPMN, matriz RACI, indicadores,
+Jira/ITSM). Detalhe de cada sessão em [`plano-etapa-10.md`](plano-etapa-10.md).
+
+Decisões da abertura: redesenhar os dois fronts, documentação primeiro; manter o
+`docs/index.md` e o `docs/executivo/index.md`, cortando só o parágrafo repetido; seção
+completa de processos e governança; repositório público apenas com o `scraper_cebraspe`.
+
+### 10/P1 — Identidade visual do site de documentação
+- `[ ]` Plano de design (paleta, tipografia, layout, princípios) revisado contra o brief
+  e aprovado pelo dono antes de qualquer CSS.
+- `[ ]` `docs/stylesheets/tema.css` com a identidade nova, preservando `font: false`
+  (medição do Mermaid), os dois modos de cor e o `impressao.css` do PDF.
+- `[ ]` Abertura do `docs/index.md` sem o parágrafo repetido no `executivo/index.md`.
+- `[ ]` Hero da visão executiva pelo que é característico do projeto.
+- `[ ]` Responsivo, foco visível, `prefers-reduced-motion`, contraste nos dois modos.
+- `[ ]` Conferido no Chromium e no PDF; `make check` verde.
+- `[ ]` ADR-043 com a direção visual e o que foi descartado.
+
+### 10/P2 — Seção "Processos e governança"
+- `[ ]` Fluxo BPMN da curadoria de edital, em raias (dono/curador, pipeline, LLM), com
+  gateway de aprovação e evento de erro. Registrar a escolha da ferramenta.
+- `[ ]` Matriz RACI por etapa do pipeline.
+- `[ ]` Painel de indicadores, com fonte, periodicidade e evidência auditável.
+- `[ ]` Registro de riscos e plano de ação, tirado dos ADRs, do `LESSONS.md` e dos
+  anti-patterns.
+- `[ ]` Política de versionamento documental (git, `--strict`, páginas geradas, hook).
+- `[ ]` Fluxo de card no Jira como processo de ITSM, ligando card ↔ etapa ↔ commit.
+- `[ ]` `nav` atualizado com `index.md` de abertura da seção; ADR-044.
+
+### 10/P3 — Repositório público do scraper e README de portfólio
+- `[ ]` Decidir com o dono: histórico novo ou extração com `git filter-repo`.
+- `[ ]` Varredura de segredos no conteúdo publicado (e no histórico, se for junto).
+- `[ ]` Definir o que fica fora: `data/`, `logs/`, `questoes/`, `build/`, bancos locais.
+- `[ ]` `README.md` reescrito como apresentação, com a instalação depois.
+- `[ ]` Decidir se `CLAUDE.md` e `task.md` vão junto.
+- `[ ]` Criar e publicar o repositório, com confirmação explícita do dono antes do push.
+- `[ ]` Atualizar "Repositório GitHub" no `CLAUDE.md` §1; ADR-045.
+
+### 10/P4 — Identidade visual do site de questões
+- `[ ]` Plano de design aprovado, dizendo o que muda e o que fica do formato Gran em teal
+  (ADR-035) e se aquele ADR é substituído ou complementado.
+- `[ ]` `site/estilos/entrada.css`, `site/tailwind.config.js` e templates, sem quebrar
+  HTMX nem Alpine.
+- `[ ]` Teste do site no navegador (`docs/guia-teste-navegador.md`) e `make test-all`.
+- `[ ]` ADR novo ou "Atualização" no ADR-035.
 
 ## Pendências posteriores (fora de etapa)
 

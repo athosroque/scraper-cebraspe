@@ -372,7 +372,8 @@ def test_pipeline_mermaid_tem_arestas_e_portao(registro_minimo):
     assert 'P2_1["P2.1 Curadoria | árvore"]' in pagina
     assert "P1 --> P2_1" in pagina
     assert "P2_1 --> P3" in pagina
-    assert "classDef portao stroke:#f59e0b" in pagina
+    # Sem fixar o hex: a cor dos diagramas é decisão de tema (ADR-043).
+    assert "classDef portao stroke:" in pagina
     assert "class P2_1 portao" in pagina
     assert "class P3 llm" in pagina
     assert "## P2.1 Curadoria | árvore" in pagina

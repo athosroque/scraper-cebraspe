@@ -2,8 +2,6 @@
 
 Pipeline que coleta editais, provas e gabaritos do CEBRASPE, organiza o conteúdo cobrado numa árvore de assuntos e alimenta um site público de questões, começando pelo piloto de 2025.
 
-O crawler (Playwright) percorre os concursos encerrados e baixa os PDFs. O parser (PyMuPDF) recorta os editais e os cadernos de prova, e um LLM (OpenRouter, `z-ai/glm-5.3-flash`) extrai a taxonomia de cada edital, que passa por revisão humana. As questões são classificadas na árvore mestre (matéria → assunto → subassunto) e gravadas num Postgres próprio. Desse banco saem as estatísticas e o site.
-
 ## Por onde começar
 
 Escolha pelo que você precisa fazer.

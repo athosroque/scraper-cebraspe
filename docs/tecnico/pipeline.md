@@ -33,8 +33,8 @@ flowchart TD
     P8 --> P9
     P9 --> P10
     P10 --> P11
-    classDef llm fill:#3b82f633,stroke:#3b82f6
-    classDef portao stroke:#f59e0b,stroke-width:3px
+    classDef llm fill:#92670a1f,stroke:#a97c1a,stroke-dasharray:4 3
+    classDef portao stroke:#c08a1e,stroke-width:3px
     class P3,P7,P8 llm
     class P3,P5,P6,P7,P9 portao
 ```

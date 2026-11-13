@@ -50,7 +50,7 @@ ASSUNTO_PDF = (
     "Coleta estruturada de editais, provas e gabaritos para um site de questões"
 )
 ENDERECO_SITE = "docs.projetoathos.com.br"
-RODAPE = "Scraper CEBRASPE · Visão executiva"
+RODAPE = "Scraper CEBRASPE, visão executiva"
 TIMEOUT_MERMAID_MS = 10_000
 MARCADOR_MERMAID = '<pre class="mermaid">'
 
@@ -68,11 +68,14 @@ def html_capa(data_geracao: datetime.date) -> str:
 <meta charset="utf-8">
 <title>{html.escape(TITULO_PDF)}</title>
 <style>
+  /* Capa na mesma identidade do site (ADR-043): Spectral, preto real, um
+     acento ocre. As marcas de registro nos cantos vêm da folha de leitura
+     ótica e são o único enfeite da página. */
+  @import url("https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&display=swap");
   html, body {{ margin: 0; height: 100%; }}
   body {{
-    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-      Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #18181b;
+    font-family: "Spectral", Georgia, "Times New Roman", serif;
+    color: #000000;
     background: #ffffff;
     display: flex;
     flex-direction: column;
@@ -80,38 +83,52 @@ def html_capa(data_geracao: datetime.date) -> str:
     padding: 0 22mm;
     box-sizing: border-box;
     height: 297mm;
+    position: relative;
   }}
+  .registro {{
+    position: absolute;
+    width: 4mm;
+    height: 4mm;
+    background: #000000;
+  }}
+  .registro--se {{ top: 12mm; left: 12mm; }}
+  .registro--sd {{ top: 12mm; right: 12mm; }}
+  .registro--ie {{ bottom: 12mm; left: 12mm; }}
+  .registro--id {{ bottom: 12mm; right: 12mm; }}
   .rotulo {{
     font-size: 11pt;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #52525b;
+    color: #5a5a5e;
     margin: 0 0 10mm 0;
   }}
   h1 {{
     font-size: 34pt;
     line-height: 1.1;
     margin: 0 0 6mm 0;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.012em;
   }}
   .subtitulo {{
     font-size: 15pt;
-    line-height: 1.4;
-    color: #3f3f46;
+    line-height: 1.45;
+    color: #5a5a5e;
     margin: 0 0 22mm 0;
     max-width: 150mm;
   }}
   .faixa {{
-    border-top: 2px solid #18181b;
+    border-top: 2px solid #92670a;
     padding-top: 6mm;
     font-size: 11pt;
     line-height: 1.7;
-    color: #3f3f46;
+    color: #5a5a5e;
   }}
-  .faixa strong {{ color: #18181b; }}
+  .faixa strong {{ color: #000000; font-weight: 600; }}
 </style>
 </head>
 <body>
+  <span class="registro registro--se"></span>
+  <span class="registro registro--sd"></span>
+  <span class="registro registro--ie"></span>
+  <span class="registro registro--id"></span>
   <p class="rotulo">Visão executiva</p>
   <h1>{html.escape("Scraper CEBRASPE")}</h1>
   <p class="subtitulo">{html.escape(ASSUNTO_PDF)}</p>

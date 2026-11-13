@@ -173,6 +173,7 @@ nav:
           - "036 · Etapas de testes e ruff": adr/ADR-036-etapas-testes-e-ruff.md
           - "040 · Site de documentação MkDocs": adr/ADR-040-site-documentacao-mkdocs.md
           - "041 · Registro e páginas geradas": adr/ADR-041-registro-e-paginas-geradas.md
+          - "043 · Identidade visual da documentação": adr/ADR-043-identidade-visual-documentacao.md
   - Histórico:
       - historico/index.md
       - Planos concluídos:
@@ -189,6 +190,7 @@ nav:
           - "8.M.1 Incidência em dois níveis": planos/plano-etapa-8m1.md
           - "8.C/C0 Download pelo inventário": planos/plano-kan-30.md
           - "KAN-65 Gestão estratégica": planos/kan-65-mapeamento.md
+          - "KAN-88 Heranças de títulos genéricos": planos/kan88_heranças_genericas.md
       - Relatórios:
           - relatorios/index.md
           - "Dispersão da árvore (2026-10-12)": relatorios/dispersao_arvore_2026-10-12.md

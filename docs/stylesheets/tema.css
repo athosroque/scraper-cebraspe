@@ -1,63 +1,84 @@
-/* Tema do site de documentação: paleta neutra (zinco), cabeçalho na cor do
-   fundo, título forte e menu com item ativo em pílula, no estilo da
-   documentação do Orca. Fonte do sistema (ver `font: false` no mkdocs.yml).
-   A hierarquia (abas por propósito, seção com página de abertura em cartões)
-   está no `nav` do mkdocs.yml; aqui ficam só os estilos que a deixam visível. */
+/* Tema do site de documentação — direção "Folha de leitura ótica" (Etapa 10/P1,
+   KAN-103, ADR-043). O vernáculo é o do material impresso de concurso: caderno
+   em preto sobre branco, item de edital numerado, folha de leitura ótica com
+   marcas de registro nos cantos, pasta de arquivo em ocre.
+
+   Decisões que explicam o resto do arquivo:
+   - Preto e branco reais, sem cinza-quase-preto fazendo papel de preto. O modo
+     escuro é o negativo exato, não um cinza-chumbo.
+   - Um único acento, ocre de pasta de arquivo. Nada mais é colorido.
+   - Spectral (serifada de talho forte) no texto; IBM Plex Mono só em código de
+     verdade, nunca em rótulo pequeno.
+   - O Mermaid continua na fonte do sistema: ele mede o rótulo antes de a fonte
+     web carregar, e o texto saía do quadro (`font: false` no mkdocs.yml, ADR-040).
+   - Raio por hierarquia, não um só para tudo: réguas e listas sem raio, código
+     inline 2px, blocos e tabelas 4px.
+   A hierarquia das abas e seções está no `nav` do mkdocs.yml. */
+
+@import url("https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap");
 
 :root {
-  --md-text-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
-  --md-code-font: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo,
+  --md-text-font: "Spectral", Georgia, "Times New Roman", serif;
+  --md-code-font: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
     Consolas, monospace;
+  /* Medida de leitura: a coluna de texto corrido não passa de 68 caracteres. */
+  --tema-medida: 68ch;
 }
 
 [data-md-color-scheme="default"] {
   --md-default-bg-color: #ffffff;
-  --md-default-fg-color: #18181b;
-  --md-default-fg-color--light: #52525b;
-  --md-default-fg-color--lighter: #a1a1aa;
-  --md-default-fg-color--lightest: #e4e4e7;
+  --md-default-fg-color: #000000;
+  --md-default-fg-color--light: #5a5a5e;
+  --md-default-fg-color--lighter: #8a8a8f;
+  --md-default-fg-color--lightest: #d8d8d4;
   --md-primary-fg-color: #ffffff;
-  --md-primary-bg-color: #18181b;
-  --md-accent-fg-color: #2563eb;
-  --md-typeset-color: #27272a;
-  --md-typeset-a-color: #18181b;
-  --md-code-bg-color: #f4f4f5;
-  --md-code-fg-color: #27272a;
-  --tema-borda: #e4e4e7;
-  --tema-ativo: #f4f4f5;
+  --md-primary-bg-color: #000000;
+  --md-accent-fg-color: #92670a;
+  --md-typeset-color: #000000;
+  --md-typeset-a-color: #000000;
+  --md-code-bg-color: #f7f6f1;
+  --md-code-fg-color: #1c1c1a;
+  --tema-borda: #d8d8d4;
+  --tema-ativo: #f2f1ec;
+  --tema-acento-fundo: #faf4e4;
+  --tema-registro: #000000;
 }
 
 [data-md-color-scheme="slate"] {
-  --md-hue: 240;
-  --md-default-bg-color: #0a0a0b;
-  --md-default-fg-color: #fafafa;
-  --md-default-fg-color--light: #a1a1aa;
-  --md-default-fg-color--lighter: #71717a;
-  --md-default-fg-color--lightest: #27272a;
-  --md-primary-fg-color: #0a0a0b;
-  --md-primary-bg-color: #fafafa;
-  --md-accent-fg-color: #60a5fa;
-  --md-typeset-color: #d4d4d8;
-  --md-typeset-a-color: #fafafa;
-  --md-code-bg-color: #111113;
-  --md-code-fg-color: #e4e4e7;
-  --md-footer-bg-color: #0a0a0b;
-  --md-footer-bg-color--dark: #0a0a0b;
-  --tema-borda: #27272a;
-  --tema-ativo: #1c1c1f;
+  --md-hue: 40;
+  --md-default-bg-color: #000000;
+  --md-default-fg-color: #f2f2f0;
+  --md-default-fg-color--light: #9a9a9f;
+  --md-default-fg-color--lighter: #6e6e73;
+  --md-default-fg-color--lightest: #2a2a26;
+  --md-primary-fg-color: #000000;
+  --md-primary-bg-color: #f2f2f0;
+  --md-accent-fg-color: #e8b931;
+  --md-typeset-color: #ebebe7;
+  --md-typeset-a-color: #f2f2f0;
+  --md-code-bg-color: #0e0e0c;
+  --md-code-fg-color: #e4e4dd;
+  --md-footer-bg-color: #000000;
+  --md-footer-bg-color--dark: #000000;
+  --tema-borda: #2a2a26;
+  --tema-ativo: #151512;
+  --tema-acento-fundo: #1d1708;
+  --tema-registro: #f2f2f0;
 }
 
+/* O Mermaid fica fora da fonte web de propósito (ver cabeçalho). */
 [data-md-color-scheme="default"],
 [data-md-color-scheme="slate"] {
-  --md-mermaid-font-family: var(--md-text-font);
+  --md-mermaid-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Arial, sans-serif;
   --md-mermaid-node-bg-color: var(--md-default-bg-color);
   --md-mermaid-node-fg-color: var(--md-default-fg-color--lighter);
   --md-mermaid-label-fg-color: var(--md-default-fg-color);
   --md-mermaid-edge-color: var(--md-default-fg-color--light);
 }
 
-/* Cabeçalho e abas na cor do fundo, separados por uma linha. */
+/* ── Cabeçalho e abas ──────────────────────────────────────────────────────
+   Na cor do fundo, separados por uma régua. */
 .md-header,
 .md-tabs {
   background-color: var(--md-default-bg-color);
@@ -90,13 +111,14 @@
 }
 .md-header__title {
   font-weight: 600;
+  letter-spacing: -0.005em;
 }
 
-/* Busca neutra no cabeçalho. */
+/* Busca: caixa de formulário de papel, canto quase reto. */
 .md-search__form {
   background-color: var(--tema-ativo);
   border: 1px solid var(--tema-borda);
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
 }
 .md-search__form:hover {
   background-color: var(--tema-ativo);
@@ -109,22 +131,20 @@
   color: var(--md-default-fg-color--light);
 }
 
-/* Barra lateral: seção em destaque, item ativo em pílula. */
+/* ── Barra lateral ─────────────────────────────────────────────────────────
+   Título de seção em caixa normal (caixa alta de rótulo é enfeite, não
+   informação), com uma linha-guia à esquerda nos itens da seção. */
 .md-sidebar--primary {
   border-right: 1px solid var(--tema-borda);
 }
 .md-nav__link {
   color: var(--md-default-fg-color--light);
 }
-/* Título de seção em caixa alta pequena, e os itens dela com uma linha-guia
-   à esquerda: a seção e as páginas da seção não se confundem. */
 .md-nav__item--section > .md-nav__link {
-  color: var(--md-default-fg-color--light);
-  font-size: 0.62rem;
+  color: var(--md-default-fg-color);
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-top: 1.1em;
+  margin-top: 1.2em;
 }
 .md-nav__item--section > .md-nav__link a,
 .md-nav__item--section > .md-nav__link .md-ellipsis {
@@ -135,29 +155,37 @@
   margin-left: 0.6rem;
   padding-left: 0.2rem;
 }
+/* Item ativo: marcado por uma barra de tinta à esquerda, como a marca de quem
+   acompanha a leitura com o dedo. Sem pílula e sem fundo colorido. */
 .md-sidebar--primary .md-nav__link--active {
   color: var(--md-default-fg-color);
-  background-color: var(--tema-ativo);
-  border-radius: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 0 var(--md-accent-fg-color);
+  padding-left: 0.5rem;
   margin-left: -0.5rem;
-  margin-right: 0.25rem;
-  font-weight: 500;
 }
 .md-nav__link:hover,
 .md-nav__link:focus {
   color: var(--md-default-fg-color);
 }
 
-/* Título forte e o primeiro parágrafo como subtítulo. */
+/* ── Tipografia ───────────────────────────────────────────────────────────
+   Serifada pede entrelinha maior que a sans do tema. */
+.md-typeset {
+  line-height: 1.75;
+}
 .md-typeset h1 {
   color: var(--md-default-fg-color);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  margin-bottom: 0.6em;
+  font-weight: 600;
+  font-size: 2.1em;
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+  margin-bottom: 0.5em;
+  max-width: 30ch;
 }
 .md-typeset h1 + p {
-  font-size: 1.1em;
+  font-size: 1.12em;
+  line-height: 1.6;
   color: var(--md-default-fg-color--light);
 }
 .md-typeset h2,
@@ -165,11 +193,12 @@
 .md-typeset h4 {
   color: var(--md-default-fg-color);
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.008em;
 }
 .md-typeset h2 {
   border-top: 1px solid var(--tema-borda);
   padding-top: 1.2em;
+  font-size: 1.5em;
 }
 /* Páginas antigas põem `---` antes do `##`: sem isso, a linha sai dupla. */
 .md-typeset hr + h2 {
@@ -177,13 +206,23 @@
   padding-top: 0;
 }
 
-/* Links sublinhados, como no Orca. */
+/* Medida de leitura só no texto corrido: tabela, diagrama e bloco de código
+   continuam usando a largura inteira da coluna. */
+.md-typeset > p,
+.md-typeset > ul,
+.md-typeset > ol,
+.md-typeset > blockquote {
+  max-width: var(--tema-medida);
+}
+
+/* Links sublinhados; o acento aparece ao passar o mouse e no foco. */
 .md-typeset a {
   text-decoration: underline;
   text-decoration-color: var(--md-default-fg-color--lighter);
-  text-underline-offset: 0.2em;
+  text-underline-offset: 0.18em;
 }
-.md-typeset a:hover {
+.md-typeset a:hover,
+.md-typeset a:focus-visible {
   color: var(--md-accent-fg-color);
   text-decoration-color: currentColor;
 }
@@ -191,70 +230,252 @@
   text-decoration: none;
 }
 
-/* Código: blocos arredondados com borda, código inline com borda fina. */
+/* Foco visível em tudo que recebe teclado, inclusive fora do conteúdo. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.md-nav__link:focus-visible,
+.md-tabs__link:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+/* ── Código, tabelas e avisos ─────────────────────────────────────────────
+   Raio por hierarquia: inline 2px, bloco e tabela 4px. */
 .md-typeset pre > code {
   border: 1px solid var(--tema-borda);
-  border-radius: 0.75rem;
+  border-radius: 0.25rem;
 }
 .md-typeset :not(pre) > code {
   border: 1px solid var(--tema-borda);
-  border-radius: 0.3rem;
+  border-radius: 0.125rem;
 }
-
-/* Tabelas e avisos com a mesma borda. */
 .md-typeset table:not([class]) {
   border: 1px solid var(--tema-borda);
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   box-shadow: none;
+}
+.md-typeset table:not([class]) th {
+  font-weight: 600;
+  background-color: var(--tema-ativo);
+}
+.md-typeset table:not([class]) td {
+  font-variant-numeric: tabular-nums;
 }
 .md-typeset .admonition,
 .md-typeset details {
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   box-shadow: none;
 }
 
-/* Diagrama Mermaid centralizado e sem passar da coluna. */
+/* Diagrama Mermaid sem passar da coluna. */
 .md-typeset .mermaid {
   text-align: center;
   overflow-x: auto;
 }
 
-/* Cartões das páginas de abertura: mesma borda das tabelas, sem sombra, e a
-   borda no tom de destaque ao passar o mouse. */
+/* ── Páginas de abertura ──────────────────────────────────────────────────
+   Os cartões do Material viram uma lista de caminhos separada por réguas: a
+   caixa ao redor de cada item não acrescentava informação, e seis caixas
+   iguais escondiam qual é a diferença entre elas. */
+.md-typeset .grid.cards > ul {
+  gap: 0;
+}
 .md-typeset .grid.cards > ul > li {
-  border: 1px solid var(--tema-borda);
-  border-radius: 0.75rem;
-  padding: 0.9rem 1rem;
+  border: 0;
+  border-top: 1px solid var(--tema-borda);
+  border-radius: 0;
+  padding: 0.9rem 1.2rem 1rem 0;
   box-shadow: none;
-  transition: border-color 0.15s;
+  margin: 0;
+  transition: none;
 }
 .md-typeset .grid.cards > ul > li:hover {
-  border-color: var(--md-accent-fg-color);
+  border-color: var(--tema-borda);
   box-shadow: none;
 }
 .md-typeset .grid.cards > ul > li > hr {
-  margin: 0.5rem 0;
-  border-color: var(--tema-borda);
+  display: none;
 }
 .md-typeset .grid.cards > ul > li > p {
-  margin: 0.3em 0;
+  margin: 0.2em 0;
+  max-width: 46ch;
+}
+.md-typeset .grid.cards > ul > li > p:first-child {
+  font-size: 1.05em;
+  font-weight: 600;
 }
 .md-typeset .grid.cards > ul > li > p:last-child {
   color: var(--md-default-fg-color--light);
+  font-weight: 400;
 }
 .md-typeset .grid.cards .twemoji {
-  color: var(--md-default-fg-color--light);
-  margin-right: 0.3rem;
+  display: none;
 }
 .md-typeset .grid.cards a {
   text-decoration: none;
 }
 .md-typeset .grid.cards a:hover {
   text-decoration: underline;
+  text-decoration-color: var(--md-accent-fg-color);
 }
 
 /* Breadcrumb discreto acima do título. */
 .md-path {
   font-size: 0.68rem;
   color: var(--md-default-fg-color--light);
+}
+
+/* ── O de-para do edital (herói da visão executiva) ───────────────────────
+   O único lugar com liberdade visual da página: mostra a passagem de uma
+   linha de edital para um nó da árvore e para o peso daquele assunto na
+   prova. É o projeto inteiro em três peças, com dados reais do banco.
+   As marcas de registro nos cantos vêm da folha de leitura ótica. */
+.md-typeset .de-para {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 0.8fr;
+  gap: 0;
+  margin: 2em 0 2.4em;
+  border: 1px solid var(--tema-borda);
+  border-radius: 0;
+  background-color: var(--md-default-bg-color);
+}
+.md-typeset .de-para::before,
+.md-typeset .de-para::after {
+  content: "";
+  position: absolute;
+  top: 0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--tema-registro);
+}
+.md-typeset .de-para::before {
+  left: 0.5rem;
+}
+.md-typeset .de-para::after {
+  right: 0.5rem;
+}
+.md-typeset .de-para__peca {
+  /* O Material centraliza `figure` e a deixa com a largura do conteúdo; aqui
+     o texto é de leitura, e a peça precisa preencher a coluna da grade. */
+  text-align: left;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 2.1rem 1.3rem 1.4rem;
+  border-left: 1px solid var(--tema-borda);
+}
+.md-typeset .de-para__peca:first-child {
+  border-left: 0;
+}
+.md-typeset .de-para__fonte {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 0.5rem;
+}
+.md-typeset .de-para__texto {
+  margin: 0;
+  max-width: none;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.md-typeset .de-para__peca--edital .de-para__texto {
+  font-style: italic;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .de-para__caminho {
+  margin: 0;
+  max-width: none;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+/* Um nível por linha, com recuo: a profundidade do nó é informação, e em linha
+   corrida o separador sobrava solto no fim da linha. */
+.md-typeset .de-para__nivel {
+  display: block;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .de-para__nivel + .de-para__nivel {
+  margin-top: 0.3em;
+}
+.md-typeset .de-para__nivel:nth-child(2) {
+  padding-left: 1rem;
+}
+.md-typeset .de-para__nivel:nth-child(3) {
+  padding-left: 2rem;
+}
+.md-typeset .de-para__nivel:not(:first-child)::before {
+  content: "›";
+  color: var(--md-default-fg-color--lighter);
+  margin-left: -0.75rem;
+  padding-right: 0.3rem;
+}
+/* A folha é o nó que a questão aponta: é ela que fica em tinta cheia. */
+.md-typeset .de-para__nivel:last-child {
+  color: var(--md-default-fg-color);
+  font-weight: 600;
+}
+/* A terceira peça é a única com fundo de acento: é onde a resposta está. */
+.md-typeset .de-para__peca--prova {
+  background-color: var(--tema-acento-fundo);
+}
+.md-typeset .de-para__numero {
+  display: block;
+  font-size: 2.6rem;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  color: var(--md-accent-fg-color);
+}
+.md-typeset .de-para__detalhe {
+  margin: 0.4rem 0 0;
+  max-width: none;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--md-default-fg-color--light);
+}
+
+@media screen and (max-width: 59.9375em) {
+  .md-typeset .de-para {
+    grid-template-columns: 1fr;
+  }
+  .md-typeset .de-para__peca {
+    border-left: 0;
+    border-top: 1px solid var(--tema-borda);
+  }
+  .md-typeset .de-para__peca:first-child {
+    border-top: 0;
+    padding-top: 2.2rem;
+  }
+}
+
+/* ── Seções numeradas ─────────────────────────────────────────────────────
+   Para as páginas que são de fato uma sequência (pipeline, runbook, processo).
+   Aplicada por `{: .secoes-numeradas }` na página, nunca global: numerar o que
+   não é sequência informaria algo falso. */
+.md-typeset.secoes-numeradas,
+.secoes-numeradas .md-typeset {
+  counter-reset: secao;
+}
+.secoes-numeradas h2:not(.nao-numerar)::before {
+  counter-increment: secao;
+  content: counter(secao) ". ";
+  color: var(--md-default-fg-color--lighter);
+  font-weight: 400;
+}
+
+/* Quem pediu menos movimento não recebe nenhum. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

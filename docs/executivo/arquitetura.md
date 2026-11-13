@@ -28,9 +28,9 @@ flowchart TB
     sistema -->|"registra as chamadas ao LLM"| langfuse
     sistema -->|"autentica o login"| google
     cloudflare -->|"expõe e protege com SSO"| sistema
-    classDef pessoa fill:#3b82f633,stroke:#3b82f6,stroke-width:2px
-    classDef sistemaPrincipal fill:#14b8a640,stroke:#0d9488,stroke-width:3px
-    classDef externo fill:#71717a26,stroke:#71717a
+    classDef pessoa fill:#92670a1f,stroke:#a97c1a,stroke-width:2px
+    classDef sistemaPrincipal fill:#92670a3d,stroke:#c08a1e,stroke-width:3px
+    classDef externo fill:#8a8a8f1f,stroke:#8a8a8f
     class estudante,dono pessoa
     class sistema sistemaPrincipal
     class cebraspe,openrouter,langfuse,google,cloudflare,telegram externo
@@ -71,7 +71,7 @@ flowchart TB
     pipeline -->|"lê e grava (JSON)"| arvore
     pipeline -->|"gera artefatos (arquivos)"| revisao
     site -->|"lê as views (SQL)"| banco
-    classDef conteiner fill:#14b8a633,stroke:#0d9488,stroke-width:2px
+    classDef conteiner fill:#92670a29,stroke:#a97c1a,stroke-width:2px
     class traefik,pipeline,arvore,revisao,banco,site,bot,docs conteiner
 ```
 

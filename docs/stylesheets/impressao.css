@@ -123,4 +123,20 @@
   .md-typeset thead {
     display: table-header-group;
   }
+
+  /* Herói da visão executiva: no papel ele continua em três colunas, mas o
+     fundo de acento da terceira peça só sai se a impressão puder pintar. */
+  .md-typeset .de-para {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .md-typeset .de-para__peca--prova {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .md-typeset .de-para__numero {
+    font-size: 20pt;
+  }
 }
