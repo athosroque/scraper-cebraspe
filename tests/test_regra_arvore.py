@@ -1,10 +1,7 @@
 """Mapeamento de item novo de edital por regra (Etapa 5B.1, ADR-030)."""
 
-from pathlib import Path
-
 import pytest
 
-from src import arvore as arv_mod
 from src import canonico
 from src.arvore import (
     ArvoreMestre,

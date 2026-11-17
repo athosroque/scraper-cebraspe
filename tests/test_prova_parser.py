@@ -2322,7 +2322,7 @@ class TestFormulaPerdida:
         "HttpRequest.newBuilder()",  # 072_STM_003_01 #87
         "RANK() OVER (...) AS rank, DENSE_RANK() OVER (...), ROW_NUMBER()",  # 077_BANRISUL_001_01 #59
         "SUM(), AVG(), MIN(), MAX(), COUNT()",  # 077_BANRISUL_002_01 #35
-        "public virtual void GetInfo(){ Console.WriteLine($\"Nome\"); }",  # 077_BANRISUL_002_01 #45
+        'public virtual void GetInfo(){ Console.WriteLine($"Nome"); }',  # 077_BANRISUL_002_01 #45
         "public String getNome() { return nome; }",  # 077_BANRISUL_002_01 #46
         "consultarSaldo() {}",  # 077_BANRISUL_002_01 #69
         "for pessoa, dados in prisao.items():",  # 094_PF_005_01 #113
@@ -2353,9 +2353,7 @@ class TestFormulaPerdida:
         ]
         for letra, texto in zip("ABCDE", ["4.", "3.", "2.", "1.", "0."]):
             linhas.append(
-                _linha_caderno(
-                    f"{letra} {texto}", 304.3, 420.0, primeiro_span=letra
-                )
+                _linha_caderno(f"{letra} {texto}", 304.3, 420.0, primeiro_span=letra)
             )
         monkeypatch.setattr(pp, "extrair_linhas", lambda doc: linhas)
 

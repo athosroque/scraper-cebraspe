@@ -13,6 +13,7 @@ def _consulta(sql, params=()):
         cur.execute(sql, params)
         return cur.fetchall()
 
+
 # O piloto (P71/K22) é invariante: 5 concursos, 2.800 itens, 2.781 utilizáveis.
 # Testes que precisam de um total fixo filtram por ele, em vez do total global
 # do banco (que cresce a cada concurso novo).
