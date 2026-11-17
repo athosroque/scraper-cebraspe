@@ -5,9 +5,11 @@
 > Base normativa: ADR-026 (banco próprio), ADR-030 (árvore), ADR-031 (cadernos), ADR-032
 > (classificação), ADR-037 (inventário e exclusões), ADR-038 (ME), ADR-039 (incidência).
 > Jira: KAN-55 (etapa); C0 = KAN-30, C1a = KAN-56, C1b = KAN-57, C2 = KAN-31 + KAN-32 (Dagster,
-> sessões D5a e D5b da Etapa 9, `plano-etapa-9.md`), C3–C7 = KAN-58 a KAN-62, C8 = KAN-63.
-> Ao abrir uma sessão, ler só este arquivo e a seção dela. O `task.md` tem o resumo e o
-> checklist.
+> sessões D5a e D5b da Etapa 9, `plano-etapa-9.md`), C3 = KAN-58, C5 = KAN-60, C6 = KAN-61,
+> C8 = KAN-63. **Repartido em 2026-11-13** (decisão do dono): C4 (KAN-59) e C7 (KAN-62) saíram
+> daqui para a Etapa 8.D (domínio novo, fora deste documento — ver `task.md`, seção 8.D); a
+> 8.C agora cobre só 7 concursos (os 2 da C1a + 5 nos lotes C3/C5/C6). Ao abrir uma sessão,
+> ler só este arquivo e a seção dela. O `task.md` tem o resumo e o checklist.
 
 ## Por que existe
 
@@ -18,24 +20,46 @@ C/E do piloto. O Gate da 8.M carregou o `SEFA_PR_25` (380 itens ME) numa cópia 
 `revisao_piloto/`. Esta etapa leva os concursos ME para o banco de verdade pelo pipeline
 inteiro (download → edital → questões → árvore → classificação → site), com revisão do dono.
 
-## Fatos de partida (2026-10-12)
+## Fatos de partida (2026-10-12; repartição em 2026-11-13)
 
-- **Alvo da 8.C: os 11 concursos ME de 2025 encerrados** (formato da amostra do inventário,
-  `inventario/RELATORIO.md`; o formato real é por questão e sai no parse):
+- **Alvo da 8.C: 7 dos 11 concursos ME de 2025 encerrados** — a família fiscal/jurídica/
+  administrativa, onde a árvore mestre hoje resolve bem o mapeamento de itens do edital por
+  regra determinística (formato da amostra do inventário, `inventario/RELATORIO.md`; o
+  formato real é por questão e sai no parse):
 
   | Concurso | Cadernos obj. | Cadernos disc. | Observação |
   |---|---:|---:|---|
   | `SEFA_PR_25` | 7 | 1 | já passou no Gate (cópia); P1 peso 1,00 e P2 peso 1,50 (KAN-53) |
   | `BANRISUL_25` | 5 | 4 | caderno de calibração com figura |
   | `SEBRAE_25_PSE_1` | 12 | 2 | "TIPO 1–4" e "perfis", como o `SEBRAE_26_PSE_1` da calibração |
-  | `UNIVESP_25_PSS` | 12 | 1 | |
-  | `IPAAM_25` | 22 | 0 | um básico para os cargos 1 a 19 (prova distinta, ADR-039) |
-  | `SEMA_AM_25` | 14 | 0 | |
   | `PGE_ES_25_PROCURADOR` | 1 | 1 | "PROVA PREAMBULAR (OBJETIVA)" + 2 `prova_outra` |
   | `PGE_PI_25` | 1 | 2 | |
   | `SEFAZ_SE_25_AUDITOR` | 6 | 6 | "MANHÃ"/"TARDE" no texto do link |
   | `TCE_MG_25` | 11 | 10 | |
+
+- **Remanejados para a Etapa 8.D em 2026-11-13** (decisão do dono, fora deste documento — ver
+  `task.md`, seção 8.D): os 4 concursos de domínio novo, onde a árvore mestre ainda não cobre
+  a maioria dos itens do edital (licenciatura/pedagogia, meio ambiente, ensino superior).
+
+  | Concurso | Cadernos obj. | Cadernos disc. | Observação |
+  |---|---:|---:|---|
+  | `UNIVESP_25_PSS` | 12 | 1 | |
+  | `IPAAM_25` | 22 | 0 | um básico para os cargos 1 a 19 (prova distinta, ADR-039) |
+  | `SEMA_AM_25` | 14 | 0 | |
   | `SEED_SE_25_PROFESSOR` | 19 | 17 | o maior; lote sozinho |
+
+  Motivo (medição desta sessão, baixando e extraindo só os editais de 2 concursos novos): o
+  custo humano da curadoria da árvore varia pela família de disciplina do concurso, não pelo
+  volume de itens do edital.
+
+  | Concurso | Itens do edital | Resolvidos sozinho pelo passo determinístico | Títulos de bloco sem destino |
+  |---|---:|---:|---|
+  | `SEFA_PR_25` (referência, família madura) | 938 | 67% | 16 títulos → 135 itens |
+  | `SEFAZ_SE_25_AUDITOR` (família madura) | 501 | 16,8% | 12 títulos → 225 itens |
+  | `SEED_SE_25_PROFESSOR` (domínio novo) | 867 | 0,1% | 20 títulos → 779 itens |
+
+  (Correção de registro: a hipótese anterior de que a fila humana cairia a cada edital novo,
+  independente da família, não se sustentou nesta medição.)
 
 - **Fora da 8.C (decisão do dono depois):** ME de 2026 encerrados (`SEBRAE_26_PSE_1`,
   `SEBRAE_26_PSE_2`) e os ME em andamento (13 de 2025 e 7 de 2026), que dependem de gabarito
@@ -154,34 +178,36 @@ concurso, asset checks e portões humanos. O detalhe está no `plano-etapa-9.md`
 **Pronto quando:** materializar o lote da C1 em modo conferência não muda nada (idempotente)
 e o relatório do lote sai com as checagens verdes.
 
-### C3 a C7 — Lotes ME de 2025 (uma sessão por lote, pausa do dono no meio)
+### C3, C5, C6 — Lotes ME de 2025, família madura (uma sessão por lote, pausa do dono no meio)
 
-Pares por afinidade (a árvore cresce por área, e a curadoria fica mais curta):
+Pares por afinidade (a árvore cresce por área, e a curadoria fica mais curta). **Repartido em
+2026-11-13:** o antigo C4 (KAN-59, `IPAAM_25` + `SEMA_AM_25`) e o antigo C7 (KAN-62,
+`SEED_SE_25_PROFESSOR`) saíram daqui para a Etapa 8.D; `UNIVESP_25_PSS`, que dividia o C3
+original com `SEBRAE_25_PSE_1`, foi junto. As letras C3/C5/C6 e os cards KAN-58/KAN-60/KAN-61
+não mudaram — só o conteúdo do C3 encolheu para um concurso só.
 
 | Sessão | Lote | Concursos |
 |---|---|---|
-| C3 | 2 | `SEBRAE_25_PSE_1` + `UNIVESP_25_PSS` |
-| C4 | 3 | `IPAAM_25` + `SEMA_AM_25` (ambiental, Amazonas) |
-| C5 | 4 | `PGE_ES_25_PROCURADOR` + `PGE_PI_25` (procuradorias) |
-| C6 | 5 | `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25` (fiscal e controle) |
-| C7 | 6 | `SEED_SE_25_PROFESSOR` (sozinho: 19 objetivos + 17 discursivos) |
+| C3 (KAN-58) | 2 | `SEBRAE_25_PSE_1` (sozinho; `UNIVESP_25_PSS` foi para a 8.D) |
+| C5 (KAN-60) | 4 | `PGE_ES_25_PROCURADOR` + `PGE_PI_25` (procuradorias) |
+| C6 (KAN-61) | 5 | `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25` (fiscal e controle) |
 
 Cada lote: materializar no Dagster até o portão do edital → dono aprova → até a pausa da
 curadoria → dono decide → classificação aplicada → relatório do lote → `--aprovar`. Correção
 de parser no meio exige reextrair os lotes anteriores e conferir chaves 5D e contagens.
 
-### C8 — Fechamento da coleta ME de 2025
+### C8 — Fechamento da coleta ME de 2025 (família madura, 8.C)
 
-1. Reconciliação das views da 5E com 16 concursos (5 C/E + 11 ME); desempenho da
-   `fn_prova_cobra` com o volume novo.
+1. Reconciliação das views da 5E com 12 concursos (5 C/E do piloto + 7 ME da 8.C); desempenho
+   da `fn_prova_cobra` com o volume novo.
 2. Textos ME no site (pendência da 8.M): o KPI "Nota CEBRASPE" mostra "certas − erradas", o
    subtítulo da lista diz "padrão certo/errado" no filtro ME, e a introdução do simulado só
    descreve +1/−1.
 3. `CLAUDE.md` §5, `task.md`, ADR novo só se houver decisão nova (ex.: regra do caderno único
    objetivo + discursivo); `git mv plano-etapa-8c.md docs/planos/`.
 
-**Pronto quando:** os 11 concursos ME de 2025 `aprovado`, views reconciliadas, textos ME
-corrigidos e `make test-all` verde.
+**Pronto quando:** os 7 concursos ME de 2025 da 8.C `aprovado`, views reconciliadas, textos
+ME corrigidos e `make test-all` verde.
 
 ## Pontos em aberto (dono)
 
@@ -190,3 +216,8 @@ corrigidos e `make test-all` verde.
   `TJ_*_25_NOTARIOS`...): entram na 8.C ou esperam o encerramento?
 - Classificação média/baixa: revisar por lote (premissa) ou acumular para o fim?
 - Pontuação do simulado ME por edital (KAN-53) continua fora; o simulado ME usa +1/0.
+- **(2026-11-13)** O critério de divisão 8.C/8.D hoje é uma lista nomeada, decidida pelo dono
+  caso a caso. A revisão da medição levantou a proposta de um **portão normativo medível** —
+  por exemplo, o concurso só entra na 8.C quando o passo determinístico resolve pelo menos
+  ~15% dos itens do edital — em vez de julgamento manual. Fica como proposta a decidir quando
+  a 8.D for planejada de verdade (ver `task.md`, seção 8.D).

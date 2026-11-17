@@ -117,16 +117,29 @@ fica só o estado resumido. Mantenha o título de cada item (o texto antes do ` 
 - [x] Etapa 8.M.1 Estatísticas: incidência em dois níveis, prova → concurso (fn_prova_cobra) — cada edital pesa 1 (ADR-039, KAN-28).
 - [x] Etapa 5B.3 Auditoria da hierarquia da árvore — 74 matérias → 43 disciplinas, um conceito por nó, K22 inalterado (ADR-030, KAN-78, 2026-10-29).
 - [ ] Etapa 8.C Coleta dos concursos de múltipla escolha (ME) de 2025 — prioridade do dono
-      (2026-10-12), plano em `plano-etapa-8c.md`. C0 (KAN-30) concluída; C1a (KAN-56) em
-      análise, falta aprovar os editais de `SEFA_PR_25` e `BANRISUL_25`. Próximas: C1b →
-      C2 (Dagster, Etapa 9/D5a e D5b) → C3–C7 lotes → C8. Pronto quando os 11 concursos ME
-      de 2025 encerrados estão `aprovado`, o piloto segue inalterado e `make test-all` está verde.
+      (2026-10-12), plano em `plano-etapa-8c.md`. **Repartida em 2026-11-13** (decisão do
+      dono): só a família fiscal/jurídica/administrativa, 7 concursos (`SEFA_PR_25`,
+      `BANRISUL_25`, `SEBRAE_25_PSE_1`, `PGE_ES_25_PROCURADOR`, `PGE_PI_25`,
+      `SEFAZ_SE_25_AUDITOR`, `TCE_MG_25`); os outros 4, de domínio novo, foram para a Etapa
+      8.D. C0 (KAN-30) e C1a (KAN-56) concluídas — os 2 editais aprovados e as duas
+      classificações 5D decididas pelo dono em 2026-11-13, site em 3.409 questões.
+      Próximas: C1b → C2 (Dagster, Etapa 9/D5a e D5b) → C3
+      (KAN-58), C5 (KAN-60), C6 (KAN-61) → C8. Pronto quando os 7 concursos ME de 2025 da 8.C
+      estão `aprovado`, o piloto segue inalterado e `make test-all` está verde.
+- [ ] Etapa 8.D Coleta dos concursos ME de 2025 de domínio novo — remanejados da 8.C em
+      2026-11-13 (decisão do dono): `SEED_SE_25_PROFESSOR`, `UNIVESP_25_PSS`, `IPAAM_25`,
+      `SEMA_AM_25` (licenciatura/pedagogia, ensino superior, meio ambiente). Medição mostrou
+      que a árvore mestre hoje resolve só ~0,1% dos itens do edital nesses domínios (contra
+      67% no `SEFA_PR_25`), por isso saíram do lote da família madura; exige ampliar a árvore
+      mestre antes de começar. Sem plano de sessões ainda; detalhes e pontos em aberto
+      (inclusive a proposta de um portão normativo medível em vez de lista nomeada) no
+      `task.md`, seção 8.D.
 - [ ] Etapa 8.M.2 Estatísticas por recorte: drill-down matéria → assunto → subassunto e filtros banca/ano/órgão/nível — na fila,
       depois da 8.C; detalhes no `task.md`.
 - [ ] Etapa 9 Documentação viva (MkDocs executivo + técnico, contexto para agentes) e Dagster como C2 — plano em
       `plano-etapa-9.md` (KAN-67). D1 (KAN-68, ADR-040), D2 (KAN-69, ADR-041) e
       D3 (KAN-70) concluídas; D4 (KAN-71, executivo e PDF) em análise; D5a e D5b (KAN-31 e
-      KAN-32, Dagster) entregues e validadas em 2026-10-21; falta ADR-042.
+      KAN-32, Dagster) entregues e validadas em 2026-10-21, registradas no ADR-042.
 - [ ] Etapa 10 Portfólio público — identidade visual dos dois fronts (skill `frontend-design`), seção de
       processos e governança (BPMN da curadoria, matriz RACI, indicadores, riscos, fluxo Jira/ITSM) e
       repositório público só do `scraper_cebraspe`. Pedido do dono em 2026-11-13, plano em

@@ -26,11 +26,12 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 
 | # | Etapa | Estado | Onde está o detalhe |
 |---|---|---|---|
-| 1 | **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12) | **próxima** (a C2 é o Dagster, Etapa 9/D5a e D5b) | [`plano-etapa-8c.md`](plano-etapa-8c.md), sessões C0 a C8 |
+| 1 | **8.C Coleta dos concursos ME de 2025** (prioridade do dono, 2026-10-12; repartida em 2026-11-13 — só a família fiscal/jurídica/administrativa, 7 concursos; os 4 de domínio novo foram para a 8.D) | **próxima** (a C2 é o Dagster, Etapa 9/D5a e D5b) | [`plano-etapa-8c.md`](plano-etapa-8c.md), sessões C0 a C8 |
+| — | 8.D Coleta dos concursos ME de 2025 de domínio novo (`SEED_SE_25_PROFESSOR`, `UNIVESP_25_PSS`, `IPAAM_25`, `SEMA_AM_25`) | na fila (depois da 8.C; exige ampliar a árvore mestre) | seção 8.D abaixo |
 | 2 | 8.M.2 Estatísticas por recorte (drill-down e filtros, KAN-28/KAN-54) | na fila | seção 8.M.2 abaixo |
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
-| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, falta ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
+| 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, registradas no ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
 | 6 | 10 Portfólio público (identidade visual dos dois fronts, seção de processos e governança, repositório público do scraper) | **em andamento**: P1 (site de documentação) aberta em 2026-11-13, a pedido do dono | [`plano-etapa-10.md`](plano-etapa-10.md), sessões P1 a P4; checklist na seção Etapa 10 |
 | — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **em andamento**: ondas 0 a 3 e 5 entregues (em análise); onda 4 entregue (EXEC KAN-92: 546 propostas do LLM a revisar) e a 6 (C1 KAN-95, partes 2 e 3) | seção 5B.4 abaixo |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
@@ -1286,13 +1287,18 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
 - `[ ]` **8.C Coleta dos concursos ME de 2025** (KAN-55; prioridade do dono, 2026-10-12; plano
   autocontido em [`plano-etapa-8c.md`](plano-etapa-8c.md), uma sessão por item). Nenhuma
   questão ME está no banco de produção: o Gate da 8.M carregou o `SEFA_PR_25` só na cópia
-  `cebraspe_gate`. Alvo: os 11 concursos ME de 2025 encerrados do inventário. Os ME de 2026 e
-  os em andamento ficam para decisão do dono.
+  `cebraspe_gate`. Alvo: 7 dos 11 concursos ME de 2025 encerrados do inventário — a família
+  fiscal/jurídica/administrativa, onde a árvore mestre hoje resolve bem o mapeamento de itens
+  do edital por regra determinística. Os outros 4 (domínio novo: licenciatura/pedagogia, meio
+  ambiente, ensino superior) foram remanejados para a **Etapa 8.D** em 2026-11-13, decisão do
+  dono (ver seção 8.D abaixo) — não são exclusão do inventário (`inventario/exclusoes.json`
+  continua sem citá-los), só saem de ordem. Os ME de 2026 e os em andamento ficam para decisão
+  do dono.
   - `[x]` C0 (KAN-30) Download guiado pelo inventário: `map_pdf_links` com o classificador fino,
     `pdf_vai_para_o_site` e `exclusoes.json`; preservação de texto de links para editais/gabaritos;
     seleção de edital canônico (`escolher_edital_extracao`); "PROVA PRÁTICA – OPÇÃO" e o caderno único
     objetivo + discursivo (pendências da 8.0). Reclassificação aplicada (5 PDFs EMBRAPA_24). Piloto inalterado.
-  - `[ ]` C1a (KAN-56) Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
+  - `[x]` C1a (KAN-56) Calibração `SEFA_PR_25` + `BANRISUL_25`: download, edital (LLM), questões no
     banco, 3 questões conferidas no PDF e roteiro `docs/runbook-lote.md`. Pausa: editais.
     Feito em 2026-10-12 (falta só a pausa do dono): 18 + 21 PDFs iguais ao inventário; editais
     com 22 e 28 chunks, 0 falhas, 0 alertas, US$ 0,018; 380 + 230 questões ME (5 alternativas,
@@ -1305,7 +1311,15 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
     antes do LLM, `subitem_ausente` bloqueante em todos os níveis (ADR-017) e reinjeção
     determinística de subitem (ADR-025); SEFA com 0 alertas. A validação nova acha 22 perdas
     reais no piloto (PF 12, STM 3, IBAMA 7), sem reconciliar: decisão do dono.
-    **Pausa do dono:** aprovar os 2 editais (`status_revisao_humana`).
+    **Pausa do dono cumprida em 2026-11-13:** os 2 editais estão `APROVADO`
+    (`status_revisao_humana`), com a curadoria dos 938 itens do edital do SEFA antes
+    (commit `d06bd4d`) e a aprovação do JSON depois (commit `3972d04`). Aprovar o edital
+    moveu a estatística, não o site: Língua Portuguesa foi de 139 para 148 itens na
+    `fn_prova_cobra`, sem publicar questão nenhuma (ADR-044). A publicação veio da
+    classificação 5D aprovada à parte: SEFA com 408 apontamentos, 407 aprovados e 1
+    rejeitado (`135_SEFAPR_005_01|15`, enunciado com fórmula apagada — commits `ef7eba5`
+    e `f542a62`), e BANRISUL com 239 apontamentos aprovados (commit `a93caaf`). Site em
+    3.409 questões; piloto inalterado (K22 verde).
   - `[ ]` C1b.0 (KAN-64, **urgente**, dono em 2026-10-12) Árvore: o mesmo conceito espalhado em
     vários pais. LGPD tem 13 questões em 6 nós de 4 disciplinas; LRF está em 6 disciplinas; o BSC
     está em 4 nós. A incidência e o filtro do site se dividem entre os pedaços.
@@ -1326,15 +1340,54 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   - `[ ]` C2 (KAN-31, KAN-32) Orquestrador mínimo no **Dagster** (decisão do dono em 2026-10-13,
     KAN-67): sessões D5a e D5b da Etapa 9 (`plano-etapa-9.md`), com o alerta "ME sem texto-base"
     e `--concurso` no `classificar_questoes`. Checklist na seção Etapa 9.
-  - `[ ]` C3 (KAN-58) `SEBRAE_25_PSE_1` + `UNIVESP_25_PSS`
-  - `[ ]` C4 (KAN-59) `IPAAM_25` + `SEMA_AM_25`
+  - `[ ]` C3 (KAN-58) `SEBRAE_25_PSE_1` (sozinho agora; `UNIVESP_25_PSS`, a outra metade do
+    lote original, foi remanejado para a 8.D).
   - `[ ]` C5 (KAN-60) `PGE_ES_25_PROCURADOR` + `PGE_PI_25`
   - `[ ]` C6 (KAN-61) `SEFAZ_SE_25_AUDITOR` + `TCE_MG_25`
-  - `[ ]` C7 (KAN-62) `SEED_SE_25_PROFESSOR`
-  - `[ ]` C8 (KAN-63) Fechamento: views da 5E com 16 concursos, textos ME do site (pendência da 8.M),
-    `CLAUDE.md`/`task.md` e arquivar o plano.
-  - **Pronto quando:** os 11 concursos ME de 2025 estão `aprovado`, o piloto segue inalterado
-    (2.800 itens, 129 anuladas, 3.029 apontamentos) e `make test-all` está verde.
+  - `[ ]` C8 (KAN-63) Fechamento: views da 5E com 12 concursos (5 C/E do piloto + 7 ME da
+    8.C), textos ME do site (pendência da 8.M), `CLAUDE.md`/`task.md` e arquivar o plano.
+
+  > **Remanejado para a 8.D em 2026-11-13** (decisão do dono — domínio novo, a árvore mestre
+  > ainda não cobre, ver seção 8.D abaixo): o antigo C4 (KAN-59) `IPAAM_25` + `SEMA_AM_25`; o
+  > antigo C7 (KAN-62) `SEED_SE_25_PROFESSOR`; e `UNIVESP_25_PSS`, que era a outra metade do
+  > C3 original (KAN-58). As letras C0, C1a, C1b, C2 e C8 continuam valendo como estavam; C4 e
+  > C7 não têm mais trabalho pendente aqui.
+
+  - **Pronto quando:** os 7 concursos ME de 2025 da 8.C estão `aprovado` (os 2 da C1a +
+    `SEBRAE_25_PSE_1`, `PGE_ES_25_PROCURADOR`, `PGE_PI_25`, `SEFAZ_SE_25_AUDITOR` e
+    `TCE_MG_25`), o piloto segue inalterado (2.800 itens, 129 anuladas, 3.029 apontamentos) e
+    `make test-all` está verde.
+- `[ ]` **8.D Coleta dos concursos ME de 2025 de domínio novo** (decisão do dono, 2026-11-13;
+  card a criar no Jira — está sendo aberto em paralelo, não inventar número KAN aqui). Saem da
+  8.C (acima) os concursos de domínio novo: `SEED_SE_25_PROFESSOR` (licenciatura/pedagogia),
+  `UNIVESP_25_PSS` (ensino superior), `IPAAM_25` e `SEMA_AM_25` (meio ambiente). Nenhum dos 4
+  está em `inventario/exclusoes.json`: continuam previstos, só em etapa própria (P67).
+  - Motivo (medição feita na sessão de 2026-11-13, baixando e extraindo só os editais de 2
+    concursos novos): o custo humano da curadoria da árvore varia muito pela **família de
+    disciplina** do concurso, não pelo volume de itens do edital.
+
+    | Concurso | Itens do edital | Resolvidos sozinho pelo passo determinístico | Títulos de bloco sem destino |
+    |---|---:|---:|---|
+    | `SEFA_PR_25` (referência, família madura, já feito) | 938 | 67% | 16 títulos → 135 itens |
+    | `SEFAZ_SE_25_AUDITOR` (família madura) | 501 | 16,8% | 12 títulos → 225 itens |
+    | `SEED_SE_25_PROFESSOR` (domínio novo) | 867 | 0,1% | 20 títulos → 779 itens |
+
+    A árvore mestre hoje cobre bem a família fiscal/jurídica/administrativa. Para domínio novo
+    ela resolve quase nada por regra e a fila humana de curadoria explodiria dentro da 8.C.
+    (Correção de registro: a hipótese anterior, de que essa fila cairia a cada edital novo
+    independente da família, não se sustentou nesta medição.)
+  - Exige antes de começar: ampliar a árvore mestre para os domínios novos (matérias/
+    assuntos/subassuntos de licenciatura/pedagogia, meio ambiente e ensino superior que hoje
+    não existem lá), via `scripts/curar_arvore.py`/`propor_arvore.py` e aprovação do dono
+    (P51, A27–A30) — provavelmente com fila humana maior do que a da 8.C.
+  - Pontos em aberto (dono):
+    - A divisão 8.C/8.D hoje é uma lista nomeada (decisão do dono em 2026-11-13). Na revisão
+      ficou a proposta de um **portão normativo medível** em vez de julgamento caso a caso —
+      por exemplo, o concurso só entra na "família madura" quando o passo determinístico
+      resolve pelo menos ~15% dos itens do edital. Fica para decidir quando a 8.D for
+      planejada de verdade (sessões tipo C0→C8 ainda não existem para ela).
+    - Reaproveitar os cards KAN-59 (antigo C4) e KAN-62 (antigo C7) nas sessões da 8.D, ou
+      abrir cards novos — a decidir junto com o plano de sessões.
 - `[ ]` **8.M.2 Estatísticas por recorte: drill-down e filtros** (pedido do dono, 2026-10-10,
   KAN-28). Usa a regra de dois níveis da 8.M.1. Usos-alvo: (1) "para Língua Portuguesa, o que a
   banca X cobra no ano X, no assunto X ou subassunto"; (2) "no concurso X, na matéria X, o que
@@ -1411,11 +1464,11 @@ Trilha B, Dagster (é a C2 da 8.C, depois da C1b):
 - `[x]` D5a (KAN-31) Infra e assets: containers, banco `dagster`, domínio com Access, assets
   por concurso gerados do registro e `--concurso` no `classificar_questoes`. **Pronto
   quando:** o lote da C1 em modo conferência não muda nada e a UI abre no domínio.
-  Estado: entregue e validada (2026-10-21); falta ADR-042 (commit c3a6eb9).
+  Estado: entregue e validada (2026-10-21), registrada no ADR-042 (commit c3a6eb9).
 - `[x]` D5b (KAN-32) Asset checks, portões do dono, detector de dispersão e relatório
   `inventario/lotes/lote_NN.md`. **Pronto quando:** o relatório do lote da C1 sai com as
   checagens verdes e um teste mostra o portão travando a etapa seguinte.
-  Estado: entregue e validada (2026-10-21); falta ADR-042 (commits c2d7719 e 3a6120c).
+  Estado: entregue e validada (2026-10-21), registrada no ADR-042 (commits c2d7719 e 3a6120c).
   Faltam também a página do Dagster no guia e a movimentação dos cards no Jira.
 
 ## Etapa 10: Portfólio público (identidade visual, processos e GitHub)
