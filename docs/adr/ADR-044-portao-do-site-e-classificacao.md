@@ -80,3 +80,26 @@ atrasaria a publicação sem melhorar a qualidade do que é publicado.
 Teste de site **não pode** fixar total global do banco: ele cresce a cada classificação
 aprovada. Os 14 testes quebrados em 2026-11-13 foram reescritos para ancorar no piloto
 (invariante por P71/K22) ou calcular o esperado das tabelas-base.
+
+## Atualização (2026-11-17): os dois portões não fazem a mesma coisa, e os dois importam
+
+A decisão da §2 ficou lida como "aprovar edital não serve pra nada" — não é isso. Os dois
+atos de aprovação governam coisas diferentes, e as duas continuam necessárias:
+
+- **Aprovação do edital (P41)** governa a **estatística do que é cobrado**: `fn_prova_cobra`
+  e as views `vw_edital_cobra_*`, que alimentam "o que mais cai" e "edital × prova". Prova
+  concreta: ao aprovar o edital do `SEFA_PR_25` em 2026-11-13, Língua Portuguesa saltou de
+  **139 para 148 itens** nessas views — sem publicar nenhuma questão nova. O número mudou
+  porque a estatística de cobertura lê o edital aprovado, não a classificação de questões.
+- **Aprovação da classificação (ADR-032)** governa a **publicação**: é a `vw_questoes` da
+  §1, que decide se a questão aparece no site. Esta parte não muda com esta atualização —
+  continua como a §2 decidiu.
+
+Ou seja: **o edital aprovado governa a estatística; a classificação aprovada governa a
+publicação.** São dois portões paralelos, não um portão e um apêndice decorativo dele. Um
+concurso pode ter o edital aprovado sem nenhuma questão publicada (estatística de cobertura
+em dia, site ainda sem itens), ou questões publicadas com o edital pendente (o próprio caso
+do `SEFA_PR_25` relatado na §1) — nenhum dos dois estados é um bug.
+
+A P41 (`src/registro/regras_patterns_2.py`) foi reescrita para dizer isso de forma explícita,
+em vez de só descrever o mecanismo (`status_revisao_humana`) sem dizer o que ele libera.

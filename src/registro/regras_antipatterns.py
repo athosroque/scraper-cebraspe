@@ -1008,4 +1008,25 @@ não grava (SEFA_PR_25, 8 itens) e esconde ou infla os pendentes (KAN-81).""",
             "tests/test_mapeamento_revisao.py::test_pendentes_do_relatorio_igual_aos_do_passo_nos_editais_reais",
         ),
     ),
+    Regra(
+        id="A64",
+        tipo="anti-pattern",
+        area="testes",
+        texto="""Nunca fixar total global, ordem de listagem ou estado de curadoria em teste do
+site: os três mudam a cada lote novo (classificação aprovada, edital aprovado) e quebram
+testes que não têm nada a ver com o lote. Teste afirma o que quer verificar — pede o filtro
+explícito (`tipo=certo_errado`), lê o total do próprio endpoint, compara com a função do
+banco (`fn_prova_cobra`) ou, quando quer mesmo um número exato, escopa o filtro ao piloto
+congelado (`concurso=PILOTO`, 2.781 utilizáveis pela P71) — em vez de fixar um total que
+vale para o banco inteiro. Em 2026-11-13 a entrada do
+`BANRISUL_25` e a aprovação do edital do `SEFA_PR_25` quebraram 27 testes de uma vez, nas
+três variantes: total global fixo (`2781` questões, LP `139`, LGPD `13`), estado de
+aprovação vivo (teste supunha quais concursos estavam publicados) e tipo da primeira questão
+(`itens[0]` virou múltipla escolha quando o BANRISUL entrou, e o teste esperava Certo/Errado).""",
+        adrs=("ADR-044",),
+        testes=(
+            "site/tests/test_api_questoes.py::test_listar_questoes_piloto_sem_filtro_total_2781_utilizaveis",
+            "site/tests/test_materia.py::test_api_materias_lp_distintas_bate_com_fn_prova_cobra",
+        ),
+    ),
 )

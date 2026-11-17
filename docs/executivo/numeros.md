@@ -2,7 +2,7 @@
 
 # Números
 
-Atualizado em 06/11/2026, a partir do banco do projeto.
+Atualizado em 17/11/2026, a partir do banco do projeto.
 
 ## Cobertura
 
@@ -22,7 +22,7 @@ O inventário lista os concursos encerrados do CEBRASPE a partir de 2020, ano a 
 | Indicador | Quantidade |
 |---|---:|
 | Concursos carregados na base | 7 |
-| Concursos aprovados pelo dono | 5 |
+| Concursos aprovados pelo dono | 7 |
 | Cargos dos editais | 41 |
 | Cadernos de prova | 87 |
 
@@ -36,7 +36,7 @@ As questões saem das provas já extraídas. Certo ou errado (C/E) é o formato 
 | Certo ou errado (C/E) | 2.800 |
 | Múltipla escolha | 610 |
 | Anuladas | 152 |
-| Utilizáveis no site | 3.391 |
+| Utilizáveis no site | 3.382 |
 | Discursivas | 39 |
 
 ## Árvore de assuntos
@@ -45,12 +45,12 @@ O conteúdo é organizado em três níveis: a matéria é a disciplina (por exem
 
 | Indicador | Quantidade |
 |---|---:|
-| Matérias ativas | 43 |
-| Assuntos ativos | 683 |
-| Subassuntos ativos | 1.993 |
+| Matérias ativas | 44 |
+| Assuntos ativos | 699 |
+| Subassuntos ativos | 2.048 |
 | Itens do edital | 1.812 |
 | Subitens do edital | 3.992 |
-| Apontamentos questão → nó da árvore | 2.965 |
+| Apontamentos questão → nó da árvore | 3.603 |
 
 ## Custo do LLM
 
@@ -58,10 +58,10 @@ Quanto o projeto gastou com modelo de linguagem, em dólar. Cada valor é o tota
 
 | Etapa | Custo acumulado |
 |---|---:|
-| Taxonomia do edital | US$ 0,0198 |
+| Taxonomia do edital | US$ 0,0328 |
 | Sinônimos | US$ 0,0001 |
 | Curadoria da árvore | US$ 0,0002 |
-| Classificação das questões | US$ 0,0007 |
+| Classificação das questões | US$ 0,0641 |
 | Bot do Telegram | US$ 0,0002 |
 | Chave geral (fallback e etapas antigas) | US$ 0,2907 |
-| **Total** | **US$ 0,3117** |
+| **Total** | **US$ 0,3881** |

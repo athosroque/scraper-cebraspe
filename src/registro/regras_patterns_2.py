@@ -64,8 +64,12 @@ writer.""",
         tipo="pattern",
         area="revisao",
         texto="""Aprovação da revisão humana é o `status_revisao_humana` do `<edital>.json`
-(`APROVADO...`). O writer relê o JSON a cada carga.""",
-        adrs=(),
+(`APROVADO...`). O writer relê o JSON a cada carga. **Isto não é o portão do site** — é o
+portão da estatística do que o edital cobra (`fn_prova_cobra`, `vw_edital_cobra_*`): ao
+aprovar o edital do `SEFA_PR_25`, Língua Portuguesa saltou de 139 para 148 itens nessas
+views, sem publicar questão nenhuma. Quem decide se a questão aparece no site é a
+classificação aprovada (ADR-032), um portão separado e paralelo (ADR-044).""",
+        adrs=("ADR-044",),
         testes=(),
     ),
     Regra(
