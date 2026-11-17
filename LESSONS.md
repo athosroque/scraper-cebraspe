@@ -777,3 +777,16 @@ qualquer execução paga, e mostrar só status e tamanho, nunca o valor. Depois 
 conferir que o nome aparece numa só linha do `.env` (`grep -c '^NOME=' .env`); para achar a
 linha ruim, testar cada ocorrência separadamente.
 **Custo do aprendizado:** ~30 min (uma execução perdida, três rodadas de diagnóstico).
+
+### [tags: git, sessoes-concorrentes, commit, indice]
+**Sintoma:** com duas sessões escrevendo no mesmo checkout ao vivo, um `git commit -- <caminhos>`
+feito para pegar só os arquivos próprios levou junto o `task.md` inteiro da working tree, com as
+edições não commitadas da outra sessão dentro.
+**Causa:** `git commit -- <pathspec>` é "partial commit": para os caminhos listados, o git usa o
+conteúdo da **working tree**, não o que foi preparado no índice com `git add`. Um `git add` anterior
+daquele arquivo não limita nada — o pathspec sobrescreve a decisão.
+**Solução:** preparar com `git add <caminhos>` e commitar **sem** pathspec (`git commit -m ...`), que
+é o único modo que respeita o índice. Em repositório com sessão concorrente, conferir o commit
+depois (`git show --stat`) antes de seguir. Para desfazer sem perder o trabalho alheio: restaurar o
+blob correto no índice com `git update-index --cacheinfo` e refazer com `git commit --amend`.
+**Custo do aprendizado:** ~20 min (detecção na conferência pós-commit e recuperação do índice).

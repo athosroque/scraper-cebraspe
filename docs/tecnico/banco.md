@@ -194,6 +194,7 @@ A estrutura é lida do `information_schema`. Só tabelas base e views; os schema
 | texto_link | text | sim |
 | tema | text | sim |
 | codigo_caderno | text | sim |
+| parser_versao | integer | sim |
 
 ## provas_cargos
 

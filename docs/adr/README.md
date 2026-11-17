@@ -86,6 +86,7 @@ Stack, contas, interface e o que entra ou fica fora do site de questões (Etapas
 | [ADR-034](ADR-034-fidelidade-ao-caderno-e-filtros.md) | 2026-10-06 | Fidelidade ao caderno (parágrafos, comando, figuras vetoriais, item × preâmbulo) e filtros multisseleção; GRANTs preservados na carga e chave canônica sem quebra de parágrafo | Aceito |
 | [ADR-035](ADR-035-card-e-filtros-formato-gran.md) | 2026-10-06 | Card da questão e filtros no formato Gran em teal: ID curto, Responder, dropdowns no topo aplicados só no Filtrar, recontagem em `/questoes/facetas`, palavra-chave e "questões com" | Aceito |
 | [ADR-037](ADR-037-escopo-do-site-no-inventario.md) | 2026-10-09 | Escopo do site no inventário: `inventario/exclusoes.json` (cancelado, sem prova, página vazia, curso de formação…), `aguardando_prova` e correção do classificador (caderno com gabarito, abertura do SEBRAE) | Aceito |
+| [ADR-044](ADR-044-portao-do-site-e-classificacao.md) | 2026-11-13 | O portão do site é a classificação aprovada, não a aprovação do edital: aprovar classificação publica, e o `status_revisao_humana` passa a ser o aceite da taxonomia | Aceito |
 
 ## Engenharia e documentação
 
