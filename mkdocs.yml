@@ -173,6 +173,7 @@ nav:
           - "036 · Etapas de testes e ruff": adr/ADR-036-etapas-testes-e-ruff.md
           - "040 · Site de documentação MkDocs": adr/ADR-040-site-documentacao-mkdocs.md
           - "041 · Registro e páginas geradas": adr/ADR-041-registro-e-paginas-geradas.md
+          - "042 · Orquestrador em Dagster (C2)": adr/ADR-042-orquestrador-dagster-c2.md
           - "043 · Identidade visual da documentação": adr/ADR-043-identidade-visual-documentacao.md
           - "044 · Portão do site é a classificação": adr/ADR-044-portao-do-site-e-classificacao.md
   - Histórico:
