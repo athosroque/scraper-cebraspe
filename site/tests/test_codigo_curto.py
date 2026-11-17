@@ -13,13 +13,18 @@ pytestmark = pytest.mark.skipif(
 
 _CHAVE = "PF_25_ADM|094_PF_CB1_01|1"
 
+# O piloto (P71/K22) é invariante: sempre 2.800 chaves (itens), mesmo com
+# concurso novo entrando no banco.
+_PILOTO = ("PF_25_ADM|", "TCU_25_TEFC|", "IBAMA_25|", "STM_25|", "CD_25_NS|")
+
 
 def test_codigos_distintos_para_todas_as_chaves(cliente):
     # Guarda contra colisão: 8 hex dão folga, mas a base pode crescer.
     from app.repositorio import questoes_repo
 
     chaves = questoes_repo.todas_as_chaves()
-    assert len(chaves) == 2800
+    chaves_piloto = [c for c in chaves if c.startswith(_PILOTO)]
+    assert len(chaves_piloto) == 2800
     assert len({codigo_curto(c) for c in chaves}) == len(chaves)
 
 

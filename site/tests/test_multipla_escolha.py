@@ -193,8 +193,11 @@ def test_facetas_incluem_tipo_e_filtram(cliente):
 @banco
 def test_responder_api_confere_letra_com_o_tipo(cliente_logado):
     c, usuario = cliente_logado
-    # O piloto só tem C/E: "A" não existe na questão e não pode ir ao histórico.
-    itens = c.get("/api/v1/questoes", params={"tamanho_pagina": 1}).json()["itens"]
+    # Numa questão C/E, "A" não existe e não pode ir ao histórico. O tipo é
+    # pedido ao filtro: a base deixou de ser só C/E quando o BANRISUL_25 entrou.
+    itens = c.get(
+        "/api/v1/questoes", params={"tamanho_pagina": 1, "tipo": "certo_errado"}
+    ).json()["itens"]
     assert len(itens) == 1 and itens[0]["tipo"] == "certo_errado"
     chave = itens[0]["questao_chave"]
 
@@ -213,9 +216,10 @@ def test_responder_api_confere_letra_com_o_tipo(cliente_logado):
 
 @banco
 def test_corrigir_questao_web_certo_errado_recusa_letra_de_alternativa(cliente):
-    itens = cliente.get("/api/v1/questoes", params={"tamanho_pagina": 1}).json()[
-        "itens"
-    ]
+    itens = cliente.get(
+        "/api/v1/questoes", params={"tamanho_pagina": 1, "tipo": "certo_errado"}
+    ).json()["itens"]
+    assert itens[0]["tipo"] == "certo_errado"
     chave = itens[0]["questao_chave"]
 
     # O tipo vem do banco: "A" num C/E devolve o form de Certo/Errado com aviso.

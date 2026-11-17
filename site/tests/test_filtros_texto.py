@@ -116,9 +116,11 @@ def test_texto_curinga_vale_como_literal(cliente, textos):
         assert _total(cliente, {"texto": termo}) == esperado, termo
 
 
-def test_texto_vazio_e_sem_filtro(cliente):
+def test_texto_vazio_e_sem_filtro(cliente, textos):
+    # Esperado vem da mesma base independente (`textos`, Python puro sobre o
+    # banco) usada no resto do arquivo, não de um total fixo do site.
     sem_filtro = _total(cliente, {})
-    assert sem_filtro == 2781
+    assert sem_filtro == len(textos)
     assert _total(cliente, {"texto": ""}) == sem_filtro
     assert _total(cliente, {"texto": "   "}) == sem_filtro
 

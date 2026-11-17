@@ -10,6 +10,7 @@
 
 import pytest
 
+from src import stats_writer
 from tests.test_stats_writer import _postgres_disponivel
 
 com_banco = pytest.mark.skipif(
@@ -18,13 +19,19 @@ com_banco = pytest.mark.skipif(
 
 HX = {"HX-Request": "true"}
 
+# O piloto (P71/K22) é invariante: 5 concursos, contagens fixas por nó e por
+# texto nunca mudam. Os testes com número fixo filtram por ele, em vez do
+# total global (que cresce a cada concurso novo).
+PILOTO = ["PF_25_ADM", "TCU_25_TEFC", "IBAMA_25", "STM_25", "CD_25_NS"]
+
 
 @com_banco
 def test_busca_traz_questoes_classificadas_no_no(cliente):
     """Palavra-chave traz questões classificadas no nó mesmo quando o texto não cita o termo."""
-    # LGPD: 13 no nó, 11 no texto, 17 na união (6 questões do nó não citam LGPD no texto)
+    # LGPD no piloto: 13 no nó, 11 no texto, 17 na união (6 questões do nó não citam LGPD no texto)
     r_lgpd = cliente.get(
-        "/api/v1/questoes", params={"texto": "LGPD", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"texto": "LGPD", "tamanho_pagina": 50, "concurso": PILOTO},
     )
     assert r_lgpd.status_code == 200
     dados_lgpd = r_lgpd.json()
@@ -32,14 +39,16 @@ def test_busca_traz_questoes_classificadas_no_no(cliente):
 
     # Todas as 13 questões classificadas no nó da LGPD estão presentes nos resultados
     r_no = cliente.get(
-        "/api/v1/questoes", params={"no_id": "NS-11c10a8ea6", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"no_id": "NS-11c10a8ea6", "tamanho_pagina": 50, "concurso": PILOTO},
     )
     chaves_do_no = {q["questao_chave"] for q in r_no.json()["itens"]}
     assert len(chaves_do_no) == 13
 
     # Busca em páginas maiores ou consulta de chaves
     r_todas = cliente.get(
-        "/api/v1/questoes", params={"texto": "LGPD", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"texto": "LGPD", "tamanho_pagina": 50, "concurso": PILOTO},
     )
     chaves_busca = {q["questao_chave"] for q in r_todas.json()["itens"]}
     assert chaves_do_no.issubset(chaves_busca)
@@ -56,15 +65,18 @@ def test_sigla_como_palavra_inteira_nao_casa_subpalavra(cliente):
 
 @com_banco
 def test_variacoes_numero_lei_mesmo_resultado(cliente):
-    """'12.527', '12527' e 'nº 12.527' dão o mesmo resultado."""
+    """'12.527', '12527' e 'nº 12.527' dão o mesmo resultado (piloto: 13)."""
     t1 = cliente.get(
-        "/api/v1/questoes", params={"texto": "12.527", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"texto": "12.527", "tamanho_pagina": 50, "concurso": PILOTO},
     ).json()
     t2 = cliente.get(
-        "/api/v1/questoes", params={"texto": "12527", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"texto": "12527", "tamanho_pagina": 50, "concurso": PILOTO},
     ).json()
     t3 = cliente.get(
-        "/api/v1/questoes", params={"texto": "nº 12.527", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"texto": "nº 12.527", "tamanho_pagina": 50, "concurso": PILOTO},
     ).json()
 
     assert t1["total"] == t2["total"] == t3["total"] == 13
@@ -76,8 +88,12 @@ def test_variacoes_numero_lei_mesmo_resultado(cliente):
 
 @com_banco
 def test_lrf_traz_questoes_do_no(cliente):
-    """'LRF' na palavra-chave traz as questões classificadas sob o nó da LRF."""
-    r = cliente.get("/api/v1/questoes", params={"texto": "LRF", "tamanho_pagina": 50})
+    """'LRF' na palavra-chave traz as questões classificadas sob o nó da LRF
+    (piloto: 19)."""
+    r = cliente.get(
+        "/api/v1/questoes",
+        params={"texto": "LRF", "tamanho_pagina": 50, "concurso": PILOTO},
+    )
     assert r.status_code == 200
     dados = r.json()
     # 18 questões classificadas sob o assunto AL-02b4bc3a67 e descendentes + 1 no texto fora do nó = 19
@@ -85,7 +101,8 @@ def test_lrf_traz_questoes_do_no(cliente):
 
     # Confere que as 18 do nó estão inclusas
     r_no = cliente.get(
-        "/api/v1/questoes", params={"no_id": "AL-02b4bc3a67", "tamanho_pagina": 50}
+        "/api/v1/questoes",
+        params={"no_id": "AL-02b4bc3a67", "tamanho_pagina": 50, "concurso": PILOTO},
     )
     chaves_do_no = {q["questao_chave"] for q in r_no.json()["itens"]}
     assert len(chaves_do_no) == 18
@@ -95,16 +112,31 @@ def test_lrf_traz_questoes_do_no(cliente):
 
 @com_banco
 def test_sugestoes_ao_digitar_na_palavra_chave(cliente):
-    """Endpoint /questoes/sugestoes devolve sugestões formatadas com caminho e total."""
+    """Endpoint /questoes/sugestoes devolve sugestões formatadas com caminho e total.
+
+    `/questoes/sugestoes` não aceita filtro de concurso (não há `PILOTO` aqui
+    para ancorar), e o total do nó cresce a cada classificação aprovada
+    (ADR-044 §5). O que este teste protege não é o número exato, e sim: a
+    sugestão acha a LGPD pelo nome, o caminho do pai aparece no rótulo, e o
+    total mostrado é o mesmo que a árvore soma para o nó (fonte independente,
+    `fn_prova_cobra`) — não um valor congelado.
+    """
+    with stats_writer.conectar() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT questoes FROM fn_prova_cobra('subassunto') WHERE no_id = %s",
+            ("NS-11c10a8ea6",),
+        )
+        total_esperado = cur.fetchone()[0]
+
     r = cliente.get("/questoes/sugestoes", params={"q": "LGPD"})
     assert r.status_code == 200
     itens = r.json()
     assert len(itens) >= 1
     lgpd = next(i for i in itens if i["id"] == "NS-11c10a8ea6")
-    assert lgpd["total"] == 13
+    assert lgpd["total"] == total_esperado
     assert "LGPD" in lgpd["rotulo"]
     assert "Acesso à informação e proteção de dados" in lgpd["rotulo"]
-    assert "(13)" in lgpd["rotulo"]
+    assert f"({total_esperado})" in lgpd["rotulo"]
 
     # Termo curto (< 2 caracteres) devolve vazio
     assert cliente.get("/questoes/sugestoes", params={"q": "L"}).json() == []

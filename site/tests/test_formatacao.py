@@ -21,6 +21,15 @@ def test_rotulo_concurso():
     assert rotulo_concurso("XYZ_23_BLA") == "XYZ 2023"
     assert rotulo_concurso("ORGAO_19") == "ORGAO 2019"
     assert rotulo_concurso("AB") == "AB"
+    # Órgão com UF no meio: o ano não está na segunda posição (KAN-56). Antes
+    # destes casos o rótulo caía no slug cru e aparecia com underline no site.
+    assert rotulo_concurso("SEFA_PR_25") == "SEFA-PR 2025"
+    assert rotulo_concurso("TCE_MG_25") == "TCE-MG 2025"
+    assert rotulo_concurso("SEFAZ_SE_25_AUDITOR") == "SEFAZ-SE 2025"
+    assert rotulo_concurso("SEED_SE_25_PROFESSOR") == "SEED-SE 2025"
+    assert rotulo_concurso("PGE_ES_25_PROCURADOR") == "PGE-ES 2025"
+    # Sem ano reconhecível, segue devolvendo o slug como está.
+    assert rotulo_concurso("ORGAO_SEM_ANO") == "ORGAO_SEM_ANO"
 
 
 def test_rotulos_de_nivel_tipo_e_materia():

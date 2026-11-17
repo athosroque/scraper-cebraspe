@@ -24,10 +24,14 @@ def _url(chave):
 
 
 def test_home_pagina_inteira(cliente):
+    total = cliente.get("/api/v1/questoes", params={"tamanho_pagina": 1}).json()[
+        "total"
+    ]
+    total_fmt = f"{total:,}".replace(",", ".")
     r = cliente.get("/questoes")
     assert r.status_code == 200
     assert 'data-chave="materia"' in r.text
-    assert ">2.781</strong> questões encontradas" in r.text
+    assert f">{total_fmt}</strong> questões encontradas" in r.text
     assert '<meta name="description"' in r.text
 
 
@@ -115,7 +119,9 @@ def test_correcao_anulada(cliente):
 @pytest.mark.parametrize("resposta", [None, "", "X"])
 def test_correcao_sem_marcacao_devolve_o_form_com_aviso(cliente, resposta):
     # Sem marcação o HTMX troca o form por ele mesmo com o aviso (não um 422).
-    q = _questao(cliente)
+    # O tipo é pedido explicitamente: o aviso deste caso é o de Certo/Errado, e
+    # desde o BANRISUL_25 a 1ª questão sem filtro pode ser de múltipla escolha.
+    q = _questao(cliente, tipo="certo_errado")
     dados = {"chave": q["questao_chave"]}
     if resposta is not None:
         dados["resposta"] = resposta
@@ -278,8 +284,15 @@ def test_chips_de_nivel_e_tipo_com_rotulo(cliente):
 
 
 def test_milhar_com_ponto_nos_totais(cliente):
+    # Formatação com separador de milhar, não o valor (que cresce a cada
+    # concurso novo): confere o formatado e que a forma sem ponto não aparece.
+    total = cliente.get("/api/v1/questoes", params={"tamanho_pagina": 1}).json()[
+        "total"
+    ]
+    assert total >= 1000, "teste pressupõe total de 4 dígitos para checar o separador"
+    total_fmt = f"{total:,}".replace(",", ".")
     html = cliente.get("/questoes").text
-    assert ">2.781</strong>" in html and ">2781<" not in html
+    assert f">{total_fmt}</strong>" in html and f">{total}<" not in html
 
 
 def test_disciplina_curada_mostra_area_e_edital_mostra_cargo(cliente):
@@ -351,7 +364,9 @@ def _cards(html):
 
 
 def test_card_da_lista_tem_posicao_codigo_e_resposta(cliente):
-    params = {"tamanho_pagina": 5, "pagina": 2}
+    # `tipo` fixo porque o corpo do teste conta os 2 radios do Certo/Errado; sem
+    # ele, uma questão de múltipla escolha (5 radios) entra na página e quebra.
+    params = {"tamanho_pagina": 5, "pagina": 2, "tipo": "certo_errado"}
     api = cliente.get("/api/v1/questoes", params=params).json()["itens"]
     cards = _cards(cliente.get("/questoes", params=params, headers=HX).text)
     assert len(cards) == len(api)

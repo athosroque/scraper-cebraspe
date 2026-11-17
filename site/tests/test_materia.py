@@ -70,11 +70,20 @@ def test_reconciliacao_ranking_com_total_independente_lp(cliente):
 
 
 # -- API de matérias e busca (5F.7) --
-def test_api_materias_lp_com_139_distintas(cliente):
+def test_api_materias_lp_distintas_bate_com_fn_prova_cobra(cliente):
+    # `/api/v1/materias` não aceita filtro de concurso (lista todas), então o
+    # total não é fixo: cresce a cada classificação aprovada (ADR-044 §5). O
+    # esperado vem de `fn_prova_cobra('materia')`, a mesma base que
+    # `materias_com_contagem` usa para montar o total de cada disciplina.
+    materia = _id_lp()
+    esperado = _consulta(
+        "SELECT questoes FROM fn_prova_cobra('materia') WHERE no_id = %s",
+        (materia,),
+    )[0][0]
     r = cliente.get("/api/v1/materias")
     assert r.status_code == 200
     lp = next(m for m in r.json() if m["nome"] == "Língua Portuguesa")
-    assert lp["total_questoes"] == 139
+    assert lp["total_questoes"] == esperado
     assert lp["nome_de_cargo"] is False
     assert 0 < lp["pct_incidencia"] < 100
 
@@ -90,10 +99,16 @@ def test_api_materia_detalhe_bate_com_fn_prova_cobra(cliente):
         """,
         (materia,),
     )
+    # Total da disciplina, mesma base (ADR-044 §5: cresce a cada classificação
+    # aprovada, não dá para fixar).
+    total_esperado = _consulta(
+        "SELECT questoes FROM fn_prova_cobra('materia') WHERE no_id = %s",
+        (materia,),
+    )[0][0]
     r = cliente.get(f"/api/v1/materias/{materia}")
     assert r.status_code == 200
     corpo = r.json()
-    assert corpo["total_questoes"] == 139
+    assert corpo["total_questoes"] == total_esperado
     assert [(s["no_id"], s["questoes"]) for s in corpo["top_subassuntos"]] == [
         tuple(e) for e in esperado
     ]

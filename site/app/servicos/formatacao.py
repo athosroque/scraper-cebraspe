@@ -28,15 +28,22 @@ def letras_validas(tipo: str, alternativas=None) -> tuple[str, ...]:
 
 
 def rotulo_concurso(slug: str) -> str:
+    """Slug do concurso em texto de tela. O ano é procurado em qualquer posição,
+    não só na segunda: o órgão costuma trazer a UF no meio (`SEFA_PR_25`,
+    `TCE_MG_25`), e fixar a posição devolvia o slug cru para quase todo concurso
+    estadual. O que vem antes do ano é o órgão (UF ligada por hífen); o que vem
+    depois é qualificador de cargo e não entra no rótulo, como já era o caso de
+    `PF_25_ADM` e `TCU_25_TEFC`."""
     if not slug:
         return ""
     if slug in _MAPA_CONCURSOS:
         return _MAPA_CONCURSOS[slug]
     partes = slug.split("_")
-    if len(partes) >= 2 and partes[1].isdigit():
-        orgao = partes[0]
-        ano = f"20{partes[1]}" if len(partes[1]) == 2 else partes[1]
-        return f"{orgao} {ano}"
+    for i, parte in enumerate(partes[1:], start=1):
+        if parte.isdigit() and len(parte) in (2, 4):
+            orgao = "-".join(partes[:i])
+            ano = f"20{parte}" if len(parte) == 2 else parte
+            return f"{orgao} {ano}"
     return slug
 
 

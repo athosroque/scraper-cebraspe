@@ -112,6 +112,9 @@ def test_valor_unico_compativel(cliente):
 
 
 def test_parametro_vazio_nao_da_422(cliente):
+    # Verdadeiramente sem filtro (nenhum parâmetro): a referência contra a
+    # qual se compara "todos vazios", sem fixar o total do banco.
+    sem_filtro_fmt = f"{_total(cliente, {}):,}".replace(",", ".")
     vazio = {
         k: ""
         for k in (
@@ -131,7 +134,7 @@ def test_parametro_vazio_nao_da_422(cliente):
     for headers in ({}, HX):
         r = cliente.get("/questoes", params=vazio, headers=headers)
         assert r.status_code == 200
-        assert ">2.781</strong> questões encontradas" in r.text
+        assert f">{sem_filtro_fmt}</strong> questões encontradas" in r.text
     r = cliente.get("/questoes", params={"ano": ["", "2025", "abc"]}, headers=HX)
     assert r.status_code == 200
 

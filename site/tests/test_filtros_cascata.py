@@ -335,23 +335,27 @@ LP = "M-0f9a364d06"
 LP_MORFOSSINTAXE = "A-351189f1a6"  # Domínio da estrutura morfossintática do período
 DIREITO_ADMINISTRATIVO = "M-6f50f4f1dd"
 
+# O piloto (P71/K22) é invariante: os números do exemplo do dono valem para
+# ele, mesmo com concurso novo classificado nos mesmos nós.
+PILOTO = ["PF_25_ADM", "TCU_25_TEFC", "IBAMA_25", "STM_25", "CD_25_NS"]
+
 
 @com_banco
 def test_exemplo_do_dono_igual_no_site_e_na_api(cliente):
     """LP + "Domínio da estrutura morfossintática do período" + Direito
-    Administrativo = 316 (66 do assunto + 250 da disciplina), nos dois.
-    Direito Administrativo tinha 142; a LGPD consolidada nele (KAN-64,
+    Administrativo = 316 (66 do assunto + 250 da disciplina), nos dois, no
+    piloto. Direito Administrativo tinha 142; a LGPD consolidada nele (KAN-64,
     2026-10-12) trouxe 4 questões de TI, Governança de TI e Direito Civil, e a
     Fase 1 da 5B.3 (KAN-78, 2026-10-22) trouxe Controle Externo, Licitações e
     Contratos, a Lei 9.784 e a Lei 8.112 (146 → 235). As Fases 2 e 3 (KAN-78,
         2026-10-24) puseram a Lei 8.429 num nó só em Direito Administrativo (+15, 250) e
         moveram "Emprego de tempos e modos verbais" para a morfossintaxe (+3, 66)."""
     nos = [LP, LP_MORFOSSINTAXE, DIREITO_ADMINISTRATIVO]
-    r = cliente.get("/questoes", params={"no_id": nos})
+    r = cliente.get("/questoes", params={"no_id": nos, "concurso": PILOTO})
     assert _total_html(r.text) == 316
-    assert _total_api(cliente, no_id=nos) == 316
-    assert _total_api(cliente, no_id=LP_MORFOSSINTAXE) == 66
-    assert _total_api(cliente, no_id=DIREITO_ADMINISTRATIVO) == 250
+    assert _total_api(cliente, no_id=nos, concurso=PILOTO) == 316
+    assert _total_api(cliente, no_id=LP_MORFOSSINTAXE, concurso=PILOTO) == 66
+    assert _total_api(cliente, no_id=DIREITO_ADMINISTRATIVO, concurso=PILOTO) == 250
 
 
 @com_banco
