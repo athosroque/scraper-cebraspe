@@ -87,28 +87,75 @@ fonte no código ou no ADR que o sustenta.
 Objetivo: um repositório público contendo só este projeto, apresentável a quem avalia o
 portfólio, sem arrastar o resto do homelab nem nenhum segredo.
 
-- `[ ]` Decidir, com o dono, histórico novo (commit inicial único) ou extração do
+- `[x]` Decidir, com o dono, histórico novo (commit inicial único) ou extração do
   histórico com `git filter-repo`. O histórico tem valor de portfólio, mas exige
   varredura completa antes.
-- `[ ]` Varredura de segredos no que for publicado: `.env`, chaves `OPENROUTER_KEY_*`,
+- `[x]` Varredura de segredos no que for publicado: `.env`, chaves `OPENROUTER_KEY_*`,
   senha do Postgres, senha de role do site, URLs internas e o e-mail pessoal onde não
   for intencional. Conferir também o histórico, se ele for publicado.
-- `[ ]` Definir o que fica fora: `data/`, `logs/`, `questoes/`, `revisao_piloto/*.db`,
+- `[x]` Definir o que fica fora: `data/`, `logs/`, `questoes/`, `revisao_piloto/*.db`,
   `build/`, `venv/`.
-- `[ ]` Reescrever o `README.md` como apresentação de portfólio: o que o projeto resolve,
+- `[x]` Reescrever o `README.md` como apresentação de portfólio: o que o projeto resolve,
   arquitetura em uma imagem, o que ele demonstra, e só depois o passo a passo de
   instalação (que hoje abre o arquivo e ocupa as primeiras 60 linhas).
-- `[ ]` Ligar README ↔ site de documentação ↔ PDF executivo, nos dois sentidos.
-- `[ ]` Conferir se o CLAUDE.md e o `task.md` devem ir junto — eles mostram método, mas
+- `[x]` Ligar README ↔ site de documentação ↔ PDF executivo, nos dois sentidos.
+- `[x]` Resolver o acesso à documentação antes de linká-la: `docs.projetoathos.com.br`
+  hoje está atrás do Cloudflare Access, restrito ao dono (ADR-040). Link de um README
+  público para uma porta trancada não serve de vitrine. Opções: abrir o host, publicar
+  uma cópia do `build/docs` no GitHub Pages do repositório novo, ou deixar só o PDF
+  executivo versionado no repositório. Decisão do dono, com ADR.
+- `[x]` Conferir se o CLAUDE.md e o `task.md` devem ir junto — eles mostram método, mas
   também expõem decisões internas. Decisão do dono.
 - `[ ]` Criar o repositório e publicar. **Confirmação explícita do dono antes do push**,
   por ser ação pública e difícil de reverter.
-- `[ ]` Atualizar o campo "Repositório GitHub" no `CLAUDE.md` (§1), hoje
+- `[ ]` Depois da primeira publicação: transformar os dois comandos do `subtree split` em
+  script registrado em `src/registro/scripts.py` (P70) com alvo no `Makefile`, para que
+  publicar não seja um passo de memória (A13). Fica para depois de o repositório existir,
+  porque o registro novo exige `make docs-gerar` e, com ele, a regeneração de
+  `docs/tecnico/`.
+- `[x]` Atualizar o campo "Repositório GitHub" no `CLAUDE.md` (§1), hoje
   "homelab local / a versionar".
-- `[ ]` ADR-045 com a decisão de repositório, histórico e escopo publicado.
+- `[x]` ADR-045 com a decisão de repositório, histórico e escopo publicado.
+- `[x]` `mkdocs.yml` com `site_url`, `repo_url`, `repo_name` e `edit_uri` do repositório
+  público, e `site_description`/`site_author` para o cartão de compartilhamento.
+- `[x]` `.github/workflows/publicar-docs.yml`: `mkdocs build --strict` e deploy no Pages
+  por OIDC, com permissões mínimas e `concurrency: pages`. Inerte no monorepo (o GitHub só
+  lê `.github/workflows/` na raiz do repositório), ativo depois do `subtree split`.
+- `[x]` `requirements-docs.txt`: só `mkdocs-material`, `pymdown-extensions`, `playwright`
+  e `pymupdf`. O build do site não precisa de banco nem de chave de LLM.
+- `[x]` PDF executivo gerado no próprio job, com
+  `--url-base https://athosroque.github.io/scraper-cebraspe`, senão o botão da página
+  executiva cai em 404 no Pages.
 
 Pronto quando: o repositório público está no ar, sem segredo nenhum, e o README abre
 pela apresentação do projeto.
+
+### P3b — Card no README do perfil do GitHub
+
+O perfil `github.com/athosroque` é a primeira página que um recrutador abre, e o README
+dele mora no repositório `athosroque/athosroque` (público, última alteração em
+2026-09-18). Hoje ele destaca cinco projetos e não cita o scraper. Depois que o
+repositório público existir:
+
+- `[ ]` Escrever o card do scraper CEBRASPE no mesmo formato dos outros (título com link,
+  uma linha de chamada, um parágrafo e as badges da stack), posicionado como projeto de
+  destaque: é o único do portfólio com pipeline de ponta a ponta, banco próprio,
+  governança documentada e site público.
+- `[ ]` Puxar para o card o que a vaga de mapeamento de processos valoriza e que nenhum
+  outro projeto do perfil mostra: BPMN da curadoria, matriz RACI, indicadores auditáveis,
+  ADRs numerados, versionamento da documentação e fluxo de card no Jira (vem da P2).
+- `[ ]` Corrigir o link do card do Genesys: aponta para `genesys-manager-v2-pilot`, nome
+  antigo do repositório `genesys-manager-api`. Funciona por redirecionamento do GitHub,
+  mas o endereço certo é o atual.
+- `[ ]` Avaliar com o dono o enxugamento da seção "Stack Tecnológica": são cerca de 30
+  badges em cinco grupos, e a lista longa dilui o que ele realmente quer destacar.
+- `[ ]` Decidir se entram no perfil os públicos hoje não citados (`portfolio-sites`,
+  `mushroom-information-gain`, `Power-B.I-projetos`, `-Movie-Recommender-System-MLOps`).
+- `[ ]` **Confirmação explícita do dono antes de qualquer push** em
+  `athosroque/athosroque`: é conteúdo público e com o nome dele.
+
+Pronto quando: o perfil abre citando o scraper entre os destaques, com link que resolve
+para o repositório novo.
 
 ## P4 — Identidade visual do site de questões
 

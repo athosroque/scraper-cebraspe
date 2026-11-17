@@ -1,4 +1,17 @@
 site_name: "Scraper CEBRASPE — Documentação"
+site_description: >-
+  Documentação do pipeline que coleta editais, provas e gabaritos do CEBRASPE,
+  organiza o conteúdo numa árvore de assuntos e mede o que cada prova cobra.
+site_author: "Athos Roque"
+
+# Duas publicações do mesmo build (ADR-045): o GitHub Pages do repositório
+# público é o endereço de portfólio, e o nginx atrás do Cloudflare Access serve
+# a cópia interna. `site_url` aponta para o Pages porque é o endereço canônico
+# para quem vem de fora.
+site_url: https://athosroque.github.io/scraper-cebraspe/
+repo_url: https://github.com/athosroque/scraper-cebraspe
+repo_name: athosroque/scraper-cebraspe
+edit_uri: edit/main/docs/
 
 # docs_dir e site_dir fora do padrão de propósito: o padrão `site/` apagaria
 # o app FastAPI que vive em `site/` a cada `mkdocs build`. O build vai para
@@ -176,6 +189,7 @@ nav:
           - "042 · Orquestrador em Dagster (C2)": adr/ADR-042-orquestrador-dagster-c2.md
           - "043 · Identidade visual da documentação": adr/ADR-043-identidade-visual-documentacao.md
           - "044 · Portão do site é a classificação": adr/ADR-044-portao-do-site-e-classificacao.md
+          - "045 · Repositório público e GitHub Pages": adr/ADR-045-repositorio-publico-e-github-pages.md
   - Histórico:
       - historico/index.md
       - Planos concluídos:

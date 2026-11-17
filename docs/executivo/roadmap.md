@@ -19,9 +19,9 @@ Onde o projeto está, o que está em andamento e o que vem depois. A ordem dos p
 
 ## Em andamento
 
-- **Coleta dos 11 concursos de múltipla escolha de 2025** (Etapa 8.C, [KAN-55](https://athoslobin.atlassian.net/browse/KAN-55)). O download guiado pelo inventário já está pronto ([KAN-30](https://athoslobin.atlassian.net/browse/KAN-30)). O primeiro lote de calibração, com os concursos `SEFA_PR_25` e `BANRISUL_25`, está em análise ([KAN-56](https://athoslobin.atlassian.net/browse/KAN-56)). As etapas seguintes ([KAN-57](https://athoslobin.atlassian.net/browse/KAN-57) a [KAN-63](https://athoslobin.atlassian.net/browse/KAN-63)) levam os demais concursos ao banco e ao site, em lotes de dois.
-- **Documentação executiva** ([KAN-71](https://athoslobin.atlassian.net/browse/KAN-71)). Esta seção, com o PDF para quem está de fora.
-- **Orquestrador Dagster** ([KAN-31](https://athoslobin.atlassian.net/browse/KAN-31) e [KAN-32](https://athoslobin.atlassian.net/browse/KAN-32)). Ferramenta que organiza as etapas do pipeline como tarefas, roda cada lote com checagens automáticas e para em cada ponto em que o dono precisa aprovar. É a próxima peça de infraestrutura.
+- **Coleta dos 11 concursos de múltipla escolha de 2025** (Etapa 8.C, `KAN-55`). O download guiado pelo inventário já está pronto (`KAN-30`). O primeiro lote de calibração, com os concursos `SEFA_PR_25` e `BANRISUL_25`, está em análise (`KAN-56`). As etapas seguintes (`KAN-57` a `KAN-63`) levam os demais concursos ao banco e ao site, em lotes de dois.
+- **Documentação executiva** (`KAN-71`). Esta seção, com o PDF para quem está de fora.
+- **Orquestrador Dagster** (`KAN-31` e `KAN-32`). Ferramenta que organiza as etapas do pipeline como tarefas, roda cada lote com checagens automáticas e para em cada ponto em que o dono precisa aprovar. É a próxima peça de infraestrutura.
 
 ## Próximos passos
 

@@ -1,0 +1,77 @@
+# Publica a documentação do projeto no GitHub Pages (Etapa 10/P3, ADR-045).
+#
+# O mesmo build que o nginx interno serve passa a ter um endereço público:
+# https://athosroque.github.io/scraper-cebraspe/. O PDF da visão executiva é
+# gerado no próprio job, senão o botão "Baixar esta visão em PDF" da página
+# executiva cai em 404.
+name: Publicar documentação
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/**
+      - mkdocs.yml
+      - requirements-docs.txt
+      - scripts/exportar_pdf_executivo.py
+      - .github/workflows/publicar-docs.yml
+  workflow_dispatch:
+
+# Só leitura do repositório; a escrita é no Pages, via OIDC.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Um deploy por vez, sem cancelar o que já está no meio: cancelar deixaria o
+# Pages servindo um build parcial.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      - name: Instalar dependências do build
+        run: pip install -r requirements-docs.txt
+
+      - name: Instalar o Chromium do Playwright
+        run: python -m playwright install --with-deps chromium
+
+      - name: Construir o site
+        # --strict: página fora do nav, link quebrado ou âncora inexistente
+        # falham o build, como no `make docs-build`.
+        run: mkdocs build --strict
+
+      - name: Gerar o PDF da visão executiva
+        # --url-base reescreve os links absolutos do PDF para o endereço público
+        # do Pages, não para o host interno atrás do Cloudflare Access.
+        run: >-
+          python -m scripts.exportar_pdf_executivo
+          --site build/docs
+          --url-base https://athosroque.github.io/scraper-cebraspe
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/docs
+
+  publicar:
+    needs: construir
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

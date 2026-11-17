@@ -1,183 +1,125 @@
 # Scraper CEBRASPE
 
-> Pipeline automatizado de rastreamento, download, extração de conteúdo programático e estruturação taxonômica de editais, provas e gabaritos de concursos públicos do CEBRASPE.
+**Liga cada item de um edital de concurso às questões que a banca realmente cobrou, e mede quanto de uma prova cada assunto representa.**
+
+[![Documentação](https://img.shields.io/badge/documentação-athosroque.github.io-92670a?style=flat)](https://athosroque.github.io/scraper-cebraspe/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 ---
 
-## ⚡ Início Rápido (< 5 minutos)
+## O problema
 
-### Pré-requisitos
-- Python 3.11+
-- Docker e Docker Compose (para visualização no Datasette)
-- Rede Docker `homelab_default` (PostgreSQL próprio `scraper-cebraspe-db`, sobe com `docker compose up -d`)
+Quem estuda para um concurso do CEBRASPE abre um edital com centenas de itens e não tem como saber quais deles caem de verdade. As provas anteriores existem, mas em PDF, sem nenhuma ligação com o item do edital a que se referem. O candidato resolve questões soltas sem saber se o assunto é recorrente, se o edital o cobra, ou quanto da prova ele representa.
 
-### Instalação
+Este projeto desfaz esse nó. Um exemplo real, lido do banco:
+
+> No edital do **STM 2025**, o cargo de Analista Judiciário – Área Administrativa traz o bloco **"Licitações e contratos administrativos"**, com 14 itens, dentro de uma lista de 53 blocos. Esses itens apontam para o nó `Direito Administrativo › Contratos administrativos › Lei nº 14.133/2021` da árvore de assuntos. Na prova, esse nó respondeu por **11 das 68 questões do cargo — 16,2%**, o assunto mais cobrado.
+
+Essa frase não foi escrita à mão: ela é o resultado de uma consulta a views do banco, e qualquer item de qualquer edital carregado produz a sua.
+
+## Números
+
+Da base em 17/11/2026, gerados por `scripts/gerar_numeros.py` direto do Postgres.
+
+| | |
+|---|---:|
+| Concursos no inventário (2020–2026) | 346 |
+| Concursos carregados e aprovados | 7 |
+| Cargos de edital · cadernos de prova | 41 · 87 |
+| Questões extraídas | 3.410 |
+| Certo ou errado · múltipla escolha | 2.800 · 610 |
+| Itens de edital · subitens | 1.812 · 3.992 |
+| Nós da árvore (matéria · assunto · subassunto) | 44 · 699 · 2.048 |
+| Apontamentos questão → árvore | 3.603 |
+| **Custo acumulado de LLM, desde o início** | **US$ 0,39** |
+
+O custo é baixo de propósito: o modelo de linguagem só é chamado onde o julgamento é inevitável — ler a lista de conteúdos de um edital e sugerir onde uma questão se encaixa na árvore. Ler a prova, separar as questões, casar o gabarito e calcular a incidência é tudo determinístico, por regra, sem token nenhum.
+
+## Como funciona
+
+```mermaid
+flowchart LR
+    subgraph coleta["Coleta"]
+        A["Crawler<br/>Playwright"] --> B["Downloader<br/>dedup por URL e hash"]
+    end
+    subgraph edital["Edital"]
+        C["Parser<br/>PyMuPDF"] --> D["Extração LLM<br/>matéria → tópico → subtópico"]
+        D --> E{{"Revisão humana<br/>Datasette"}}
+    end
+    subgraph prova["Prova"]
+        F["Extração de questões<br/>e gabarito, por regra"] --> G["Classificação na árvore<br/>LLM com lista fechada"]
+        G --> H{{"Curadoria do dono"}}
+    end
+    subgraph base["Base"]
+        I[("PostgreSQL<br/>star schema")] --> J["Views de incidência<br/>edital × prova"]
+        J --> K["Site de questões<br/>FastAPI + HTMX"]
+    end
+    B --> C
+    B --> F
+    E --> I
+    H --> I
+```
+
+Os losangos são portões humanos: nada que um modelo propôs entra na base sem aprovação registrada. A unidade que costura tudo é a **árvore mestre de assuntos** — um nó por conceito, com matéria, assunto e subassunto. Item de edital e questão apontam para nós, numa relação N:N, e é dessa ligação que saem todas as estatísticas.
+
+Desenho completo, com os contratos de cada etapa: [Arquitetura](https://athosroque.github.io/scraper-cebraspe/executivo/arquitetura/).
+
+## O que este repositório demonstra
+
+- **Pipeline de dados de ponta a ponta**, do HTML da banca até views consultáveis: coleta idempotente, validação binária dos PDFs, desduplicação em duas camadas, carga que pode rodar de novo sem duplicar nada, orquestração em Dagster com *asset checks*.
+- **LLM sob governança.** O modelo propõe, a pessoa decide. Toda chamada tem trilha de auditoria em disco, telemetria no Langfuse, classificação explícita de falha (timeout, rate limit, schema inválido) e lista fechada de saída validada por Pydantic. Um invariante de regressão (K22) trava qualquer lote que altere o piloto já aprovado.
+- **Modelagem dimensional**, com *star schema*, chave natural normalizada e incidência calculada em dois níveis — prova e concurso — para que um caderno básico compartilhado entre cargos não seja contado várias vezes.
+- **Documentação como parte do produto.** 97 páginas publicadas, com as páginas técnicas **geradas do código**: um registro em `src/registro/` descreve scripts, etapas, checagens e regras, e um teste recusa o commit se a página gerada divergir da fonte.
+- **Decisões registradas.** [45 ADRs](https://athosroque.github.io/scraper-cebraspe/adr/) explicam por que cada escolha foi feita e o que foi descartado, com data e status.
+- **Rastreabilidade de processo.** Cada etapa é um card no Jira, cada commit cita o card, cada decisão cita o ADR. 1.906 testes automatizados, agrupados por etapa do pipeline.
+
+## Documentação
+
+| | |
+|---|---|
+| [Site de documentação](https://athosroque.github.io/scraper-cebraspe/) | Visão executiva, guia técnico, decisões e páginas geradas do código |
+| [Visão executiva em PDF](https://athosroque.github.io/scraper-cebraspe/executivo/scraper-cebraspe-executivo.pdf) | O projeto em 20 páginas, para ler fora do navegador |
+| [Catálogo de ADRs](docs/adr/README.md) | As 45 decisões, por tema |
+| [Números](https://athosroque.github.io/scraper-cebraspe/executivo/numeros/) | Cobertura, questões, árvore e custo, lidos do banco |
+| [`CLAUDE.md`](CLAUDE.md) · [`task.md`](task.md) | Contexto operacional e roteiro por etapas — o método de trabalho, aberto |
+| [`LESSONS.md`](LESSONS.md) | Post-mortems de bugs reais de scraping e de comportamento de modelo |
+
+## Rodando localmente
+
+Requer Python 3.11+, Docker e Docker Compose.
 
 ```bash
-# 1. Clonar ou acessar o repositório
-cd /home/athos/homelab/scraper_cebraspe
+git clone https://github.com/athosroque/scraper-cebraspe.git
+cd scraper-cebraspe
 
-# 2. Criar e ativar o ambiente virtual
-python3 -m venv venv
-source venv/bin/activate
-
-# 3. Instalar dependências Python
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-
-# 4. Instalar os navegadores do Playwright (Chromium)
 playwright install chromium
 
-# 5. Configurar variáveis de ambiente
-cp .env.example .env
-# Edite o .env preenchendo as chaves necessárias
+cp .env.example .env     # preencher POSTGRES_PASSWORD e a chave do OpenRouter
+docker compose up -d scraper-cebraspe-db
 ```
 
-### Execução Básica (Pipeline Automatizado)
+A partir daí:
 
 ```bash
-# 1. Executar o crawler e download dos PDFs (concursos de 2025)
-python -m src.spider
-
-# 2. Subir a interface do Datasette para inspeção (uma única vez)
-docker compose up -d
-
-# 3. Extrair taxonomia via LLM (piloto)
-# O script executa a extração E dispara automaticamente scripts.atualizar_revisao
-# (validação de-para -> relatórios HTML -> banco SQLite -> restart do Datasette):
-python -m scripts.revisar_taxonomia_piloto
-
-# 4. (Opcional) Reprocessar falhas com context window ampliado
-# Também aciona scripts.atualizar_revisao automaticamente ao obter novos sucessos:
-python -m scripts.reprocessar_falhas_piloto
-# Ou forçar chunk_index específicos mesmo com status=sucesso (ex.: achado
-# semântico que o reparo automático não cobriu, ver ADR-021):
-python -m scripts.reprocessar_falhas_piloto --chunks 17,21
-
-# 5. (Opcional) Sincronizar manualmente todos os artefatos de revisão
-# Útil caso arquivos JSON em revisao_piloto/ sejam editados diretamente:
-python -m scripts.atualizar_revisao
-
-# 6. (Opcional) Executar backfill determinístico de classificação e concurso
-# Enriquece extrações legadas sem custo de inferência LLM (ADR-020):
-python -m scripts.backfill_classificacao_chunks
-
-# Acesse o banco tabular em http://127.0.0.1:8011 ou https://datasette.projetoathos.com.br
-# Acesse os relatórios visuais em https://datasette.projetoathos.com.br/relatorio/index.html
+python -m src.spider                      # coleta os concursos do ano configurado
+python -m scripts.revisar_taxonomia_piloto # extrai a taxonomia dos editais e monta a revisão
+make test-all                             # 1.906 testes
+make docs-serve                           # documentação em 127.0.0.1:8001
 ```
 
----
+O comando de cada script, com os argumentos, está em [Comandos](https://athosroque.github.io/scraper-cebraspe/tecnico/comandos/). Para entender o pipeline antes de rodar, comece por [Começando](https://athosroque.github.io/scraper-cebraspe/guia/comecando/).
 
-## ✨ Funcionalidades
+## O que não está neste repositório
 
-- **Rastreamento Resiliente:** Coleta automatizada a partir de `/concursos/encerrado`, com resolução de links relativos e extração de ano e órgão diretamente pelo slug da URL.
-- **Download com Desduplicação Dupla:**
-  - *Camada de Rede:* Manifesto `.manifest.json` por concurso para ignorar URLs já baixadas.
-  - *Camada de Armazenamento:* Verificação de hash SHA256 para evitar arquivos idênticos duplicados em disco.
-- **Validação Rigorosa de PDFs:** Checagem de integridade binária através de magic bytes `%PDF-` e Content-Type, descartando falsos 200 com HTML de erro.
-- **Parser Inteligente de Editais:** Recorte focado exclusivamente na seção `"OBJETOS DE AVALIAÇÃO"`, com suporte a layouts multicolunas via PyMuPDF e limpeza de notas de retificação.
-- **Chunking em Dois Níveis:** Associação estrita de conteúdo programático por cargo e disciplina, atendendo tanto a cargos administrativos quanto a especialidades médicas e técnicas.
-- **Extração Taxonômica via LLM:** Extração hierárquica (matéria → tópico → subtópico) validada por modelos Pydantic, utilizando o modelo `glm-5.3-flash` via OpenRouter com retry exponencial e trilha de auditoria completa (`.auditoria.json`).
-- **Reparo Local Determinístico (ADR-021):** Resolução automática para tópicos cujo nome veio preenchido apenas pelo numeral do item ("1", "2", etc.). O extrator busca o texto do tópico diretamente no texto-fonte sem novas chamadas de LLM (zero token), registrando a correção com tag `[REPARO_NOME_NUMERICO]` e metadados no Langfuse.
-- **Classificação Granular de Erros de Inferência (ADR-022):** Mapeamento explícito de exceções e desfechos técnicos (`falha_timeout`, `falha_conexao`, `falha_rate_limit`, `falha_http`, `falha_rede`, `falha_conteudo_vazio`, `falha_parse_json`, `falha_validacao_schema`, `falha_nome_numerico_nao_mapeado`), persistido no `status` do chunk e no metadata `tipo_erro` do Langfuse, permitindo distinguir instabilidades transitórias de problemas de schema ou prompt.
-- **Validação Heurística De-Para:** Comparação determinística por texto normalizado entre o edital e os tópicos retornados pelo LLM, sinalizando 5 tipos de alertas (`topico_ausente`, `topico_extra`, `chunk_sem_extracao`, `chunk_sem_classificacao` e `topico_nome_numerico`) em `.validacao.json` sem custo adicional de API.
-- **Relatórios Estáticos Lado a Lado:** Geração de página única HTML por edital com layout em duas colunas (texto-fonte com `<mark>` para tópicos ausentes vs. taxonomia extraída).
-- **Pipeline Automático de Artefatos (ADR-019):** Orquestração automática da sequência de validação, relatórios HTML, reconstrução de banco e restart do Datasette a cada extração ou reprocessamento, eliminando passos manuais.
-- **Classificação por Nível e Tipo de Conhecimento (ADR-020):** Cada chunk do edital sai com concurso, nível (médio/superior), básico/específico, cargo e marcação "só discursiva", para filtrar tópicos (e, depois, questões) por esses eixos.
-- **Interface de Revisão Humana:** Geração de banco `revisao.db` com busca Full-Text Search (FTS5), tabela `alertas_validacao`, tabela `cargos` e facets de classificação em `taxonomia_topicos` servido via Datasette, expondo também os relatórios estáticos e protegido por Cloudflare Access SSO.
+Omissões deliberadas, não esquecimentos:
 
----
+- **Os PDFs baixados** (`data/`) e **o texto das questões** (`questoes/`). O conteúdo das provas é da banca; o repositório guarda só o que é derivado e próprio — a árvore de assuntos, a classificação (por *hash* do enunciado, nunca pelo texto) e as estatísticas.
+- **Credenciais.** Tudo vem de `.env`, que está no `.gitignore`. O `.env.example` lista as variáveis sem valor.
+- **Os logs** (`logs/`) e os artefatos regeneráveis (`build/`, `revisao.db`).
 
-## ⚙️ Configuração (.env)
+## Licença
 
-Copie o arquivo `.env.example` para `.env` e configure as variáveis conforme seu ambiente:
-
-| Variável | Descrição | Padrão / Exemplo |
-|---|---|---|
-| `POSTGRES_HOST` | Host do PostgreSQL próprio (`scraper-cebraspe-db`, ADR-026) | `localhost` (fora de container) ou `scraper-cebraspe-db` |
-| `POSTGRES_PORT` | Porta de acesso ao banco PostgreSQL | `5435` (local, só `127.0.0.1`) ou `5432` (Docker) |
-| `POSTGRES_DB` | Nome do banco de dados relacional | `cebraspe` |
-| `POSTGRES_USER` | Usuário de autenticação no banco | `cebraspe` |
-| `POSTGRES_PASSWORD` | Senha do banco; obrigatória (sem ela o container não sobe) | *(gerar com `secrets.token_urlsafe`)* |
-| `TELEGRAM_BOT_TOKEN` | Token do bot de notificações do Telegram | *(opcional)* |
-| `TELEGRAM_ALLOWED_USER_ID` | ID do usuário autorizado no bot | *(opcional)* |
-| `OPENROUTER_KEY_TELEGRAM` | Chave dedicada do OpenRouter para o Telegram Bot | `sk-or-v1-...` |
-| `OPENROUTER_API_KEY` | Chave do OpenRouter para extração de taxonomia | `sk-or-v1-...` |
-| `LANGFUSE_PUBLIC_KEY` | Chave pública do Langfuse para observabilidade (SDK oficial OTel, ver ADR-023) | *(opcional)* |
-| `LANGFUSE_SECRET_KEY` | Chave secreta do Langfuse (SDK oficial OTel, ver ADR-023) | *(opcional)* |
-| `LANGFUSE_HOST` | Endpoint do servidor Langfuse | `https://cloud.langfuse.com` |
-
----
-
-## 📂 Estrutura de Diretórios
-
-```text
-scraper_cebraspe/
-├── data/                       # Armazenamento físico de PDFs e metadados
-│   ├── <ano>/CEBRASPE/<orgao>/ # Editais, Provas e Gabaritos baixados
-│   └── processed_concursos.json # Registro de idempotência do crawler
-├── docs/                       # Documentação técnica do projeto
-│   ├── architecture.md         # Desenho arquitetural e diagramas Mermaid
-│   └── adr/                    # Registros de Decisões de Arquitetura (ADRs)
-├── revisao_piloto/             # Artefatos da Etapa 4 de revisão humana
-│   ├── <edital>.json           # Taxonomia extraída pelo LLM
-│   ├── <edital>.auditoria.json # Trilha de auditoria (offsets e texto bruto)
-│   ├── <edital>.validacao.json # Alertas de tópicos ausentes ou divergentes
-│   ├── relatorio/              # Relatórios HTML estáticos lado a lado
-│   └── revisao.db              # Banco SQLite FTS5 para o Datasette
-├── scripts/                    # Utilitários de migração, testes e auditoria
-│   ├── atualizar_revisao.py    # Pipeline automatizado de validação, relatórios e restart
-│   ├── backfill_classificacao_chunks.py # Backfill de classificação e concurso sem LLM (ADR-020)
-│   ├── experimento_falhas_llm.py # Teste controlado de parâmetros de inferência
-│   ├── gerar_db_datasette.py   # Constrói revisao.db a partir dos JSONs
-│   ├── gerar_relatorio_revisao.py # Gera relatórios HTML de revisão humana
-│   ├── reprocessar_falhas_piloto.py # Reprocessador com contexto estendido
-│   ├── revisar_taxonomia_piloto.py # Orquestrador de extração do piloto
-│   └── validar_taxonomia.py    # Validação heurística de-para edital vs taxonomia
-├── src/                        # Código-fonte principal
-│   ├── spider.py               # Crawler Playwright para CEBRASPE
-│   ├── downloader.py           # Downloader com duplo dedup e validação
-│   ├── edital_parser.py        # Parser PyMuPDF e fatiamento de seções
-│   ├── taxonomia_extractor.py  # Integração com OpenRouter e schemas Pydantic
-│   ├── telegram_bot.py         # Bot de notificações e consultas via Telegram
-│   ├── models_scraper.py       # Modelos de dados e validação de entidades
-│   └── logger.py               # Configuração centralizada de logs
-├── tests/                      # Bateria de testes automatizados (pytest)
-├── docker-compose.yml          # Serviço Datasette para revisão local/web
-├── requirements.txt            # Dependências Python do projeto
-├── CLAUDE.md                   # Diretrizes operacionais para assistentes de IA
-├── LESSONS.md                  # Registro de post-mortems e lições aprendidas
-└── task.md                     # Roteiro mestre de tarefas e etapas
-```
-
----
-
-## 🧪 Testes e Validação
-
-Para rodar a suíte completa de testes unitários e de integração:
-
-```bash
-# Executar todos os testes
-pytest
-
-# Executar com saída detalhada
-pytest -v
-
-# Executar testes específicos do spider
-pytest tests/test_spider.py
-```
-
----
-
-## 📚 Documentação Técnica
-
-- [Arquitetura do Sistema](docs/architecture.md): Visão aprofundada dos pipelines, diagramas Mermaid e fluxo de dados.
-- [Catálogo de ADRs](docs/adr/README.md): Histórico completo das decisões de arquitetura e trade-offs técnicos (ADR-001 a ADR-022).
-- [Lições Aprendidas](LESSONS.md): Post-mortems detalhados de bugs reais de web scraping e comportamento de modelos de linguagem.
-- [Diretrizes de IA](CLAUDE.md): Padrões de engenharia e contexto operacional do repositório.
-- [Índice de tarefas](docs/tecnico/tarefas.md): o que ler (regras, comandos, etapas) para cada tipo de tarefa, para agentes de IA.
-
----
-
-## 📄 Licença
-
-Uso interno no ecossistema Homelab / Athos Roque. Todos os direitos reservados.
+Código e documentação de autoria de Athos Roque, publicados para leitura e avaliação. Os editais, provas e gabaritos são documentos do CEBRASPE e dos órgãos contratantes, e não são redistribuídos aqui.

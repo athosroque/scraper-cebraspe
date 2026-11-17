@@ -32,7 +32,7 @@ indicado; o checklist fica na seção da etapa, mais abaixo.
 | 3 | 8.1 Orquestrador de lotes (o que sobrar depois do Dagster da 8.C/C2) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.1 |
 | 4 | 8.2+ Lotes C/E de 2025 e anos seguintes (2025 → 2026 → 2024 … 2020) | na fila | [`plano-etapa-8.md`](plano-etapa-8.md), Fase 8.2+ |
 | 5 | 9 Documentação viva (MkDocs executivo + técnico, registro gerado do código, contexto para agentes) e Dagster como C2 | **em paralelo à 8.C** (docs D1–D4 numa worktree própria; D5a/D5b, entregues, são a C2 da 8.C), decisões fechadas em 2026-10-13 (KAN-67); D1 (KAN-68), D2 (KAN-69) e D3 (KAN-70) concluídas; D4 (KAN-71) em análise; D5a (KAN-31) e D5b (KAN-32) entregues em 2026-10-21, registradas no ADR-042 | [`plano-etapa-9.md`](plano-etapa-9.md), sessões D1 a D5b; checklist na seção Etapa 9 |
-| 6 | 10 Portfólio público (identidade visual dos dois fronts, seção de processos e governança, repositório público do scraper) | **em andamento**: P1 (site de documentação) aberta em 2026-11-13, a pedido do dono | [`plano-etapa-10.md`](plano-etapa-10.md), sessões P1 a P4; checklist na seção Etapa 10 |
+| 6 | 10 Portfólio público (identidade visual dos dois fronts, seção de processos e governança, repositório público do scraper) | **em andamento**: P1 entregue em 2026-11-13 (ADR-043), em análise; P3 em andamento desde 2026-11-17 (repositório público + GitHub Pages, ADR-045) | [`plano-etapa-10.md`](plano-etapa-10.md), sessões P1 a P4; checklist na seção Etapa 10 |
 | — | **5B.4 Qualidade do mapeamento de itens de edital** (KAN-79; antes de aprovar o `BANRISUL_25` e de rodar o LLM de mapeamento da C1b) | **em andamento**: ondas 0 a 3 e 5 entregues (em análise); onda 4 entregue (EXEC KAN-92: 546 propostas do LLM a revisar) e a 6 (C1 KAN-95, partes 2 e 3) | seção 5B.4 abaixo |
 | — | Pendências sem etapa (KAN-66 busca, KAN-52, KAN-53, recortes lado a lado, 5F.12 deploy) | quando o dono pedir | "Pendências posteriores" e 5F, abaixo |
 | — | Etapa 7 (cruzamento com o `study-rag-agent`) | futura | seção Etapa 7 |
@@ -195,7 +195,7 @@ Concluídas: Etapas 1 a 6, 5A a 5H, 8.0, 8.M e 8.M.1 (histórico abaixo; planos 
   partir desses JSONs; `docker-compose.yml` sobe Datasette. A interface
   agora está exposta via Traefik e Cloudflare Tunnel no endereço
   `https://datasette.projetoathos.com.br`, protegida por Zero Trust SSO
-  (permissão restrita para `athoslobin@hotmail.com`). Isso é ferramenta
+  (permissão restrita à conta do dono). Isso é ferramenta
   de apoio à revisão — **não fecha** o item acima (a aprovação foi
   registrada na Etapa 5A). Em caso de erro na geração
   do DB, lembre-se de renomear arquivos corrompidos (ex: `.json` para `.bak`).
@@ -1483,15 +1483,19 @@ Decisões da abertura: redesenhar os dois fronts, documentação primeiro; mante
 completa de processos e governança; repositório público apenas com o `scraper_cebraspe`.
 
 ### 10/P1 — Identidade visual do site de documentação
-- `[ ]` Plano de design (paleta, tipografia, layout, princípios) revisado contra o brief
-  e aprovado pelo dono antes de qualquer CSS.
-- `[ ]` `docs/stylesheets/tema.css` com a identidade nova, preservando `font: false`
+
+Entregue em 2026-11-13 (KAN-103, commit `6bca67c`), em análise pelo dono.
+
+- `[x]` Plano de design (paleta, tipografia, layout, princípios) revisado contra o brief
+  e aprovado pelo dono antes de qualquer CSS — direção "folha de leitura ótica".
+- `[x]` `docs/stylesheets/tema.css` com a identidade nova, preservando `font: false`
   (medição do Mermaid), os dois modos de cor e o `impressao.css` do PDF.
-- `[ ]` Abertura do `docs/index.md` sem o parágrafo repetido no `executivo/index.md`.
-- `[ ]` Hero da visão executiva pelo que é característico do projeto.
-- `[ ]` Responsivo, foco visível, `prefers-reduced-motion`, contraste nos dois modos.
-- `[ ]` Conferido no Chromium e no PDF; `make check` verde.
-- `[ ]` ADR-043 com a direção visual e o que foi descartado.
+- `[x]` Abertura do `docs/index.md` sem o parágrafo repetido no `executivo/index.md`.
+- `[x]` Hero da visão executiva pelo que é característico do projeto — de-para real do
+  STM 2025: bloco de licitações → Lei nº 14.133/2021 → 11 de 68 questões (16,2%).
+- `[x]` Responsivo, foco visível, `prefers-reduced-motion`, contraste nos dois modos.
+- `[x]` Conferido no Chromium e no PDF; `--strict`, `ruff` e `format-check` verdes.
+- `[x]` ADR-043 com a direção visual e o que foi descartado.
 
 ### 10/P2 — Seção "Processos e governança"
 - `[ ]` Fluxo BPMN da curadoria de edital, em raias (dono/curador, pipeline, LLM), com
@@ -1504,14 +1508,31 @@ completa de processos e governança; repositório público apenas com o `scraper
 - `[ ]` Fluxo de card no Jira como processo de ITSM, ligando card ↔ etapa ↔ commit.
 - `[ ]` `nav` atualizado com `index.md` de abertura da seção; ADR-044.
 
-### 10/P3 — Repositório público do scraper e README de portfólio
-- `[ ]` Decidir com o dono: histórico novo ou extração com `git filter-repo`.
-- `[ ]` Varredura de segredos no conteúdo publicado (e no histórico, se for junto).
-- `[ ]` Definir o que fica fora: `data/`, `logs/`, `questoes/`, `build/`, bancos locais.
-- `[ ]` `README.md` reescrito como apresentação, com a instalação depois.
-- `[ ]` Decidir se `CLAUDE.md` e `task.md` vão junto.
+### 10/P3 — Repositório público do scraper, GitHub Pages e README de portfólio
+
+Em andamento desde 2026-11-17 (KAN-105). O dono escolheu o **GitHub Pages** como
+endereço público da documentação, e pediu o README do repositório e o card no README do
+perfil. Decisões em ADR-045.
+
+- `[x]` Decidir com o dono: histórico **preservado**, extraído com
+  `git subtree split --prefix=scraper_cebraspe` (nativo; `git filter-repo` não é preciso).
+- `[x]` Varredura de segredos no conteúdo publicado e no histórico: 438 caminhos, só
+  `.env.example`; nenhuma chave real. E-mail pessoal removido do `CLAUDE.md` e deste
+  arquivo.
+- `[x]` Definir o que fica fora: `data/`, `logs/`, `questoes/`, `build/`, `venv/`,
+  `revisao_piloto/*.db`, `.env` — todos já no `.gitignore`.
+- `[x]` `README.md` reescrito como apresentação, com a instalação depois.
+- `[x]` Decidir se `CLAUDE.md` e `task.md` vão junto: **vão**, sem o e-mail; mostram o
+  método, que é o que a vaga da Etapa 10 valoriza.
+- `[x]` `mkdocs.yml` com `site_url`, `repo_url` e `edit_uri` do repositório público.
+- `[x]` `.github/workflows/publicar-docs.yml` e `requirements-docs.txt`: o mesmo
+  `mkdocs build --strict` publicado no Pages, com o PDF executivo gerado no job.
+- `[x]` Atualizar "Repositório GitHub" no `CLAUDE.md` §1; ADR-045.
 - `[ ]` Criar e publicar o repositório, com confirmação explícita do dono antes do push.
-- `[ ]` Atualizar "Repositório GitHub" no `CLAUDE.md` §1; ADR-045.
+- `[ ]` Conferir o Pages no ar e o botão do PDF; `edit_uri` apontando para `main`.
+- `[ ]` **P3b** — card do scraper no README do perfil (`athosroque/athosroque`), link do
+  Genesys corrigido para `genesys-manager-api`, decisão sobre enxugar a lista de badges e
+  sobre os públicos não citados. Push só com confirmação.
 
 ### 10/P4 — Identidade visual do site de questões
 - `[ ]` Plano de design aprovado, dizendo o que muda e o que fica do formato Gran em teal

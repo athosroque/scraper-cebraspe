@@ -1,0 +1,14 @@
+# Dependências do build da documentação, separadas do requirements.txt para o
+# GitHub Actions não instalar o pipeline inteiro (Postgres, LLM, Dagster) só
+# para gerar HTML (ADR-045).
+#
+# As páginas de docs/tecnico/ são versionadas, geradas por
+# `make docs-gerar` a partir de src/registro/, então o build do site não
+# precisa do banco.
+mkdocs-material>=9.6,<10
+pymdown-extensions>=12,<13
+
+# PDF da visão executiva: imprime as páginas com o Chromium do Playwright e
+# junta com o PyMuPDF (scripts/exportar_pdf_executivo.py).
+playwright>=1.42
+pymupdf>=1.23

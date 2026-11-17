@@ -8,7 +8,9 @@ Template version: 1.2
 - **Nome legível:** Scraper CEBRASPE — Coleta Estruturada de Editais, Provas e Gabaritos
 - **Guia de referência:** `task.md` (roteiro de implementação por etapas, neste diretório)
 - **Status:** in-progress:phase-6
-- **Repositório GitHub:** homelab local / a versionar
+- **Repositório GitHub:** desenvolvimento no monorepo privado `athosroque/Homelab`;
+  publicação em `athosroque/scraper-cebraspe` (público, branch `main`), por
+  `git subtree split` (ADR-045). O monorepo é a fonte; a publicação é só de ida.
 
 ## 2. Pré-requisitos
 
@@ -143,7 +145,8 @@ fica só o estado resumido. Mantenha o título de cada item (o texto antes do ` 
 - [ ] Etapa 10 Portfólio público — identidade visual dos dois fronts (skill `frontend-design`), seção de
       processos e governança (BPMN da curadoria, matriz RACI, indicadores, riscos, fluxo Jira/ITSM) e
       repositório público só do `scraper_cebraspe`. Pedido do dono em 2026-11-13, plano em
-      `plano-etapa-10.md` (sessões P1 a P4). P1 em andamento.
+      `plano-etapa-10.md` (sessões P1 a P4). P1 entregue em 2026-11-13 (KAN-103, ADR-043),
+      em análise; P3 em andamento (KAN-105, ADR-045): repositório público e GitHub Pages.
 - **Deploy público (5F.12): opcional**, por decisão do dono em 2026-10-06 (o site ainda vai mudar muito antes de ir ao ar).
 
 ## 6. Patterns
@@ -211,6 +214,12 @@ Documentação (Etapa 9/D1, ADR-040):
   `build/docs/executivo/scraper-cebraspe-executivo.pdf`; também roda no `make check`.
 - `make docs-build && docker compose up -d scraper-cebraspe-docs`: nginx em
   `127.0.0.1:8013` e `docs.projetoathos.com.br` via Traefik + Cloudflare Access.
+- Publicação pública (Etapa 10/P3, ADR-045): o workflow
+  `.github/workflows/publicar-docs.yml` do repositório público roda o mesmo
+  `mkdocs build --strict` e publica em
+  [athosroque.github.io/scraper-cebraspe](https://athosroque.github.io/scraper-cebraspe/),
+  com `requirements-docs.txt` (sem banco, sem LLM) e o PDF gerado no próprio job. O nginx
+  interno continua servindo a cópia atrás do Cloudflare Access.
 - Página nova em `docs/` entra no `nav` do `mkdocs.yml`, na aba e seção do seu propósito
   (seção nova ganha `index.md` de abertura; ADR-040), senão o `--strict` falha.
 - `make hooks-instalar` (uma vez por clone): instala os hooks `post-commit` e `post-merge` em `.git/hooks`
@@ -230,7 +239,7 @@ Navega a trilha de auditoria (entrada/saída do parser+chunking+LLM) e a
 taxonomia extraída lado a lado, sem frontend próprio. Exposto externamente
 via rede `homelab_default` com Traefik e Cloudflare Tunnel, acessível em
 `https://datasette.projetoathos.com.br`, protegido por Cloudflare Zero Trust
-(SSO restrito a `athoslobin@hotmail.com`). **Não é** o banco de produção
+(SSO restrito à conta do dono). **Não é** o banco de produção
 da Fase 5 (esse é o Postgres próprio `scraper-cebraspe-db`).
 
 Além das tabelas (`chunks`/`taxonomia_topicos`/`taxonomia_subtopicos`/
@@ -310,7 +319,7 @@ Os comandos de cada script, com argumentos, estão em
 
 ## 12. Log de decisões
 
-As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-041;
+As decisões ficam em [`docs/adr/`](docs/adr/README.md) (ADR-001 a ADR-045;
 o `README.md` de lá é o índice com data e título). Antes de reabrir uma
 escolha de stack, banco, parser ou site, ler o ADR correspondente.
 
