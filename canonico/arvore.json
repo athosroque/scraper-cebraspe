@@ -174,7 +174,7 @@
   "A-2787db593b": {"id": "A-2787db593b", "nivel": "assunto", "nome": "Evento Subsequente", "pai": "M-abfb20137f", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-27a20bc62b": {"id": "A-27a20bc62b", "nivel": "assunto", "nome": "Recebimento e armazenagem", "pai": "M-41b9fa3948", "origem": "semente", "status": "fundido", "fundido_em": "A-951940f646"},
   "A-27b2ff1c99": {"id": "A-27b2ff1c99", "nivel": "assunto", "nome": "Métodos estatísticos aplicados à farmacologia", "pai": "M-ee88a66013", "origem": "semente", "status": "ativo", "fundido_em": null},
-  "A-27cb1a6971": {"id": "A-27cb1a6971", "nivel": "subassunto", "nome": "Armazenamento de dados em rede", "pai": "NA-e8ea9374ad", "origem": "semente", "status": "ativo", "fundido_em": null},
+  "A-27cb1a6971": {"id": "A-27cb1a6971", "nivel": "subassunto", "nome": "Armazenamento", "pai": "NA-e8ea9374ad", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-27dd76ddca": {"id": "A-27dd76ddca", "nivel": "assunto", "nome": "Dados estruturados e não estruturados", "pai": "M-41f37f57d8", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-281d69ae74": {"id": "A-281d69ae74", "nivel": "assunto", "nome": "Estrutura Conceitual", "pai": "M-abfb20137f", "origem": "semente", "status": "ativo", "fundido_em": null},
   "A-289cf154ab": {"id": "A-289cf154ab", "nivel": "subassunto", "nome": "Direção ofensiva", "pai": "NA-39cede7789", "origem": "semente", "status": "ativo", "fundido_em": null},
