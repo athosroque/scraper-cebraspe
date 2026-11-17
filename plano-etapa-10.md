@@ -106,7 +106,7 @@ portfólio, sem arrastar o resto do homelab nem nenhum segredo.
   executivo versionado no repositório. Decisão do dono, com ADR.
 - `[x]` Conferir se o CLAUDE.md e o `task.md` devem ir junto — eles mostram método, mas
   também expõem decisões internas. Decisão do dono.
-- `[ ]` Criar o repositório e publicar. **Confirmação explícita do dono antes do push**,
+- `[x]` Criar o repositório e publicar. **Confirmação explícita do dono antes do push**,
   por ser ação pública e difícil de reverter.
 - `[ ]` Depois da primeira publicação: transformar os dois comandos do `subtree split` em
   script registrado em `src/registro/scripts.py` (P70) com alvo no `Makefile`, para que
@@ -137,21 +137,21 @@ dele mora no repositório `athosroque/athosroque` (público, última alteração
 2026-09-18). Hoje ele destaca cinco projetos e não cita o scraper. Depois que o
 repositório público existir:
 
-- `[ ]` Escrever o card do scraper CEBRASPE no mesmo formato dos outros (título com link,
+- `[x]` Escrever o card do scraper CEBRASPE no mesmo formato dos outros (título com link,
   uma linha de chamada, um parágrafo e as badges da stack), posicionado como projeto de
   destaque: é o único do portfólio com pipeline de ponta a ponta, banco próprio,
   governança documentada e site público.
-- `[ ]` Puxar para o card o que a vaga de mapeamento de processos valoriza e que nenhum
+- `[x]` Puxar para o card o que a vaga de mapeamento de processos valoriza e que nenhum
   outro projeto do perfil mostra: BPMN da curadoria, matriz RACI, indicadores auditáveis,
   ADRs numerados, versionamento da documentação e fluxo de card no Jira (vem da P2).
-- `[ ]` Corrigir o link do card do Genesys: aponta para `genesys-manager-v2-pilot`, nome
+- `[x]` Corrigir o link do card do Genesys: aponta para `genesys-manager-v2-pilot`, nome
   antigo do repositório `genesys-manager-api`. Funciona por redirecionamento do GitHub,
   mas o endereço certo é o atual.
 - `[ ]` Avaliar com o dono o enxugamento da seção "Stack Tecnológica": são cerca de 30
   badges em cinco grupos, e a lista longa dilui o que ele realmente quer destacar.
 - `[ ]` Decidir se entram no perfil os públicos hoje não citados (`portfolio-sites`,
   `mushroom-information-gain`, `Power-B.I-projetos`, `-Movie-Recommender-System-MLOps`).
-- `[ ]` **Confirmação explícita do dono antes de qualquer push** em
+- `[x]` **Confirmação explícita do dono antes de qualquer push** em
   `athosroque/athosroque`: é conteúdo público e com o nome dele.
 
 Pronto quando: o perfil abre citando o scraper entre os destaques, com link que resolve

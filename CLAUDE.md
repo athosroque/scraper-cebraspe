@@ -9,8 +9,9 @@ Template version: 1.2
 - **Guia de referência:** `task.md` (roteiro de implementação por etapas, neste diretório)
 - **Status:** in-progress:phase-6
 - **Repositório GitHub:** desenvolvimento no monorepo privado `athosroque/Homelab`;
-  publicação em `athosroque/scraper-cebraspe` (público, branch `main`), por
-  `git subtree split` (ADR-045). O monorepo é a fonte; a publicação é só de ida.
+  publicado em <https://github.com/athosroque/scraper-cebraspe> (público, branch `main`,
+  desde 2026-11-17) por `git subtree split` (ADR-045). O monorepo é a fonte; a publicação
+  é só de ida. Documentação em <https://athosroque.github.io/scraper-cebraspe/>.
 
 ## 2. Pré-requisitos
 

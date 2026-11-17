@@ -1528,11 +1528,20 @@ perfil. Decisões em ADR-045.
 - `[x]` `.github/workflows/publicar-docs.yml` e `requirements-docs.txt`: o mesmo
   `mkdocs build --strict` publicado no Pages, com o PDF executivo gerado no job.
 - `[x]` Atualizar "Repositório GitHub" no `CLAUDE.md` §1; ADR-045.
-- `[ ]` Criar e publicar o repositório, com confirmação explícita do dono antes do push.
-- `[ ]` Conferir o Pages no ar e o botão do PDF; `edit_uri` apontando para `main`.
-- `[ ]` **P3b** — card do scraper no README do perfil (`athosroque/athosroque`), link do
-  Genesys corrigido para `genesys-manager-api`, decisão sobre enxugar a lista de badges e
-  sobre os públicos não citados. Push só com confirmação.
+- `[x]` Criar e publicar o repositório, com confirmação explícita do dono antes do push —
+  `athosroque/scraper-cebraspe`, público, 268 commits em `main`, 2026-11-17.
+- `[x]` Conferir o Pages no ar e o botão do PDF — home, visão executiva, ADRs, comandos
+  e o PDF (329 KB) respondem 200 em `athosroque.github.io/scraper-cebraspe`.
+- `[x]` **P3b** — card do scraper no README do perfil (`athosroque/athosroque`), como
+  primeiro destaque, e link do Genesys corrigido para `genesys-manager-api` (commit
+  `c143dd0`).
+- `[ ]` Decisões do perfil ainda abertas: enxugar a seção "Stack Tecnológica" (cerca de 30
+  badges) e decidir sobre os públicos não citados (`portfolio-sites`,
+  `mushroom-information-gain`, `Power-B.I-projetos`, `-Movie-Recommender-System-MLOps`).
+- `[ ]` Licença do repositório público: hoje não há arquivo `LICENSE`, só a nota do README
+  ("publicado para leitura e avaliação"). Decisão do dono.
+- `[ ]` Actions avisam que `checkout@v4`, `setup-python@v5`, `configure-pages@v5` e
+  `upload-artifact@v4` ainda miram Node 20; subir de versão quando houver release estável.
 
 ### 10/P4 — Identidade visual do site de questões
 - `[ ]` Plano de design aprovado, dizendo o que muda e o que fica do formato Gran em teal
