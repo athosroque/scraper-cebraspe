@@ -224,14 +224,23 @@ def test_buscar_edital_formato_real(revisao_tmp):
 
 @pytest.mark.db
 def test_contrato_buscar_edital_contra_revisao_piloto_real():
-    """Contrato: os editais reais do piloto são achados e os aprovados, aprovados."""
+    """Contrato: os editais reais são achados pelo slug e o status é lido deles.
+
+    Só o piloto fixa valor de aprovação: ele é invariante por P71/K22. Concurso
+    fora do piloto entra aqui só como "o slug é encontrado" — o
+    `status_revisao_humana` dele muda a cada curadoria (o SEFA_PR_25 foi aprovado
+    em 2026-11-13), e fixar esse valor faz o teste quebrar sem haver defeito."""
     from src.stats_writer import STATUS_REVISAO_APROVADO, status_revisao
 
-    esperado = {"PF_25_ADM": True, "STM_25": True, "SEFA_PR_25": False}
+    esperado = {"PF_25_ADM": True, "STM_25": True}
     for slug, aprovado in esperado.items():
         achado = _buscar_edital(slug, assets_c2.RAIZ / "revisao_piloto")
         assert achado is not None, slug
         assert (status_revisao(achado[1]) == STATUS_REVISAO_APROVADO) is aprovado, slug
+    for slug in ("SEFA_PR_25", "BANRISUL_25"):
+        achado = _buscar_edital(slug, assets_c2.RAIZ / "revisao_piloto")
+        assert achado is not None, slug
+        assert status_revisao(achado[1]), slug
     assert _buscar_edital("BANRISUL_25", assets_c2.RAIZ / "revisao_piloto") is not None
 
 
